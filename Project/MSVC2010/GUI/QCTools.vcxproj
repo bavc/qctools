@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F4F4FAF7-25A4-4BAC-8BEA-C88661D1180D}</ProjectGuid>
+    <RootNamespace>VideoAnalyzer</RootNamespace>
+    <ProjectName>QC Tools</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../../../Source;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;../../../../Qt/qtbase/include/QtGui;../../../../Qt/qtbase/include/QtWidgets;../../../../Qt/qtbase/include/QtCore;../../../../Qt/qtbase/include;./;D:\Programmation\qwt\src;./_Automated;../../../../Qt/qtbase/include/QtPrintSupport;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\..\..\..\MediaInfoLib\Project\MSVC2010\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2010\Library\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2010\$(Platform)\$(Configuration);../../../../Qt\qtbase\lib\MSVC2010\Win32;../../../../Qt\qtbase\plugins\imageformats;D:\Programmation\qwt\lib;D:\Programmation\zlib\projects\MSVC2010\Win32\Debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>qwtd.lib;ZenLib.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;qwindowsd.lib;qminimald.lib;qtmaind.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../Source;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;../../../../Qt/qtbase/include/QtGui;../../../../Qt/qtbase/include/QtWidgets;../../../../Qt/qtbase/include/QtCore;../../../../Qt/qtbase/include;./;D:\Programmation\qwt\src;./_Automated;../../../../Qt/qtbase/include/QtPrintSupport;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>..\..\..\..\MediaInfoLib\Project\MSVC2010\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2010\Library\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2010\$(Platform)\$(Configuration);../../../../Qt\qtbase\lib\MSVC2010\Win32;../../../../Qt\qtbase\plugins\imageformats;D:\Programmation\qwt\lib;D:\Programmation\zlib\projects\MSVC2010\Win32\Debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>qwt.lib;ZenLib.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;qwindows.lib;qminimal.lib;qtmain.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Source\Core\Core.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Help.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\main.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\mainwindow.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\mainwindow_More.cpp" />
+    <ClCompile Include="_Automated\moc_Help.cpp" />
+    <ClCompile Include="_Automated\moc_mainwindow.cpp" />
+    <ClCompile Include="_Automated\qrc_Resources.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Source\Core\Core.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Help.h" />
+    <ClInclude Include="..\..\..\Source\GUI\mainwindow.h" />
+    <ClInclude Include="_Automated\ui_mainwindow.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
