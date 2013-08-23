@@ -58,4 +58,7 @@ enum PlotType
     PlotType_Max
 };
 
+extern size_t StatsFile_Positions[PlotType_Max];
+extern size_t StatsFile_Counts[PlotType_Max];
+
 #endif // Core_H

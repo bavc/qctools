@@ -10,19 +10,35 @@ CONFIG += qt release
 CONFIG += no_keywords
 
 HEADERS = \
+    ../../Source/Core/Core.h \
+    ../../Source/Core/ffmpeg_BasicInfo.h \
+    ../../Source/Core/ffmpeg_Pictures.h \
+    ../../Source/Core/ffmpeg_Stats.h \
+    ../../Source/Core/ffmpeg_Thumbnails.h \
     ../../Source/GUI/mainwindow.h \
     ../../Source/GUI/Help.h \
-    ../../Source/Core/Core.h
+    ../../Source/GUI/PerPicture.h
 
 SOURCES = \
+    ../../Source/Core/Core.cpp \
+    ../../Source/Core/ffmpeg_BasicInfo.cpp \
+    ../../Source/Core/ffmpeg_Pictures.cpp \
+    ../../Source/Core/ffmpeg_Stats.cpp \
+    ../../Source/Core/ffmpeg_Thumbnails.cpp \
+    ../../Source/GUI/Help.cpp \
     ../../Source/GUI/main.cpp \
     ../../Source/GUI/mainwindow.cpp \
+    ../../Source/GUI/mainwindow_Callbacks.cpp \
     ../../Source/GUI/mainwindow_More.cpp \
-    ../../Source/GUI/Help.cpp \
-    ../../Source/Core/Core.cpp
+    ../../Source/GUI/mainwindow_Pictures.cpp \
+    ../../Source/GUI/mainwindow_Plots.cpp \
+    ../../Source/GUI/mainwindow_Ui.cpp \
+    ../../Source/GUI/PerFile.cpp \
+    ../../Source/GUI/PerPicture.cpp
 
 FORMS += \
     ../../Source/GUI/mainwindow.ui \
+    ../../Source/GUI/PerPicture.ui
 
 RESOURCES += \
     ../../Source/Resource/Resources.qrc

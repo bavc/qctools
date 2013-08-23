@@ -72,19 +72,41 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Core\Core.cpp" />
+    <ClCompile Include="..\..\..\Source\Core\ffmpeg_BasicInfo.cpp" />
+    <ClCompile Include="..\..\..\Source\Core\ffmpeg_Pictures.cpp" />
+    <ClCompile Include="..\..\..\Source\Core\ffmpeg_Stats.cpp" />
+    <ClCompile Include="..\..\..\Source\Core\ffmpeg_Thumbnails.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Help.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\main.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\mainwindow.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\mainwindow_Callbacks.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\mainwindow_More.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\mainwindow_Pictures.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\mainwindow_Plots.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\mainwindow_Ui.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\PerFile.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\PerPicture.cpp" />
+    <ClCompile Include="_Automated\moc_ffmpeg_Pictures.cpp" />
+    <ClCompile Include="_Automated\moc_ffmpeg_Stats.cpp" />
+    <ClCompile Include="_Automated\moc_ffmpeg_Thumbnails.cpp" />
     <ClCompile Include="_Automated\moc_Help.cpp" />
     <ClCompile Include="_Automated\moc_mainwindow.cpp" />
+    <ClCompile Include="_Automated\moc_PerPicture.cpp" />
+    <ClCompile Include="_Automated\moc_ffmpeg_BasicInfo.cpp" />
     <ClCompile Include="_Automated\qrc_Resources.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Core\Core.h" />
+    <ClInclude Include="..\..\..\Source\Core\ffmpeg_BasicInfo.h" />
+    <ClInclude Include="..\..\..\Source\Core\ffmpeg_Pictures.h" />
+    <ClInclude Include="..\..\..\Source\Core\ffmpeg_Stats.h" />
+    <ClInclude Include="..\..\..\Source\Core\ffmpeg_Thumbnails.h" />
     <ClInclude Include="..\..\..\Source\GUI\Help.h" />
     <ClInclude Include="..\..\..\Source\GUI\mainwindow.h" />
+    <ClInclude Include="..\..\..\Source\GUI\PerFile.h" />
+    <ClInclude Include="..\..\..\Source\GUI\PerPicture.h" />
     <ClInclude Include="_Automated\ui_mainwindow.h" />
+    <ClInclude Include="_Automated\ui_PerPicture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

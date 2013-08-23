@@ -5,6 +5,7 @@
         <file alias="help.png">help.png</file>
         <file alias="zoom-in.png">zoom-in.png</file>
         <file alias="zoom-out.png">zoom-out.png</file>
+        <file alias="logo.jpg">logo.jpg</file>
     </qresource>
     <qresource prefix="/documentation">
         <file alias="Help_FilterDescriptions.html">Help_FilterDescriptions.html</file>

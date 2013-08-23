@@ -13,6 +13,8 @@
 #include <QDropEvent>
 #include <QDragEnterEvent>
 #include <QMimeData>
+#include <QLabel>
+#include <QToolButton>
 
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
@@ -24,6 +26,8 @@
 #include <qwt_plot_picker.h>
 #include <qwt_plot_renderer.h>
 #include <qwt_scale_widget.h>
+
+#include "GUI/PerPicture.h"
 
 #include <ZenLib/ZtringListList.h>
 #include <ZenLib/Ztring.h>
@@ -40,33 +44,22 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+    Ui_Init();
+    Plots_Init();
+    Pictures_Init();
+    configureZoom();
 
-    //shortcuts
-    QShortcut *shortcutPlus = new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_Plus), this);
-    QObject::connect(shortcutPlus, SIGNAL(activated()), this, SLOT(on_actionZoomIn_triggered()));
-    QShortcut *shortcutEqual = new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_Equal), this);
-    QObject::connect(shortcutEqual, SIGNAL(activated()), this, SLOT(on_actionZoomIn_triggered()));
-    QShortcut *shortcutMinus = new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_Minus), this);
-    QObject::connect(shortcutMinus, SIGNAL(activated()), this, SLOT(on_actionZoomOut_triggered()));
-
-    //Temp
-    Frames_Plot_Pos=0;
-    Frames_Total=(int)-1;
-    Process=NULL;
-    Process_Status=Status_Ok;
-    Ztring A(EOL);
-    Data_EOL=A.To_UTF8().c_str();
-
-    //Drag n drop
-    setAcceptDrops(true);
-
-    init();
+    // Per file
+    Files_Pos=(size_t)-1;
 }
 
 //---------------------------------------------------------------------------
 MainWindow::~MainWindow()
 {
+    for (size_t Pos=0; Pos<Files.size(); Pos++)
+        delete Files[Pos];    
+    delete Picture_Main;
+
     delete ui;
 }
 
@@ -216,4 +209,59 @@ void MainWindow::dropEvent(QDropEvent *event)
     }
 
     processFile();
+}
+
+void MainWindow::plot_moved( const QPoint &pos )
+{
+    QString info;
+
+    double X=plots[0]->invTransform(QwtPlot::xBottom, pos.x());
+    double Y=plots[0]->invTransform(QwtPlot::yLeft, pos.y());
+    if (X<0)
+        X=0;
+    if (Y<0)
+        Y=0;
+    double FrameRate=Frames_Total/Files[Files_Pos]->BasicInfo->Duration_Get();
+    Picture_Main_X=(size_t)(X*FrameRate);
+    if (Picture_Main_X>=Frames_Total)
+        Picture_Main_X=Frames_Total-1;
+    
+    Pictures_Update(Picture_Main_X);
+}
+
+void MainWindow::plot_mousePressEvent(QMouseEvent *ev) 
+{
+    QPoint Point(ev->x(), ev->y());
+    plot_moved(Point);
+}
+
+void MainWindow::on_Labels_Middle_clicked(bool checked)
+{
+    if (Picture_Main)
+    {
+        delete Picture_Main; Picture_Main=NULL;
+    }
+    else
+    {
+        Picture_Main=new PerPicture(this);
+        Picture_Main->move(geometry().left()+geometry().width(), geometry().top());
+        Picture_Main->show();
+        Picture_Main->ShowPicture(Picture_Main_X, Files[Files_Pos]->Stats->y, FileName, Files[0]);
+    }
+}
+
+void MainWindow::on_Control_Minus1_clicked(bool checked)
+{
+    if (Picture_Main_X==0)
+        return;
+    
+    Pictures_Update(Picture_Main_X-1);
+}
+
+void MainWindow::on_Control_Plus1_clicked(bool checked)
+{
+    if (Picture_Main_X+1>=Frames_Total)
+        return;
+    
+    Pictures_Update(Picture_Main_X+1);
 }
