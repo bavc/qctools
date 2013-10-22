@@ -20,6 +20,11 @@ class Help : public QDialog
 public:
     Help (QWidget * parent);
 
+    // Direct access
+    void show_HowToUse();
+    void show_FilterDescriptions();
+    void show_License();
+
 private:
     //GUI
     QTabWidget*     Central;

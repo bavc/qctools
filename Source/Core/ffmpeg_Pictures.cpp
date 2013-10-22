@@ -16,6 +16,7 @@
 #include <QDialog>
 #include <QToolButton>
 #include <QProcess>
+#include <QDesktopWidget>
 
 #ifndef UNICODE
     #define UNICODE
@@ -26,7 +27,7 @@
 #include <ZenLib/File.h>
 using namespace ZenLib;
 
-const size_t numFiles=50;
+const size_t numFiles=10;
 
 //---------------------------------------------------------------------------
 ffmpeg_Pictures::ffmpeg_Pictures ()
@@ -51,7 +52,7 @@ ffmpeg_Pictures::~ffmpeg_Pictures ()
 }
 
 //---------------------------------------------------------------------------
-void ffmpeg_Pictures::Launch (PerPicture* SourceClass, const QString &FileName, size_t Frames_Total, double Duration, size_t Mode)
+void ffmpeg_Pictures::Launch (PerPicture* SourceClass, const QString &FileName, size_t Frames_Total, double Duration, const string &Mode)
 {
     // Saving information
     ffmpeg_Pictures::Frames_Total=Frames_Total;
@@ -131,6 +132,8 @@ QPixmap* ffmpeg_Pictures::Picture_Get (size_t Pos)
     if (Frames_Next==(size_t)-1 && Pos>=Picture_BaseFrame && Pos<Picture_BaseFrame+1+numFiles*2 && Pictures && Pictures[Pos-Picture_BaseFrame])
     {
         Picture_Default.loadFromData(*Pictures[Pos-Picture_BaseFrame]);
+        if (Picture_Default.height()>QDesktopWidget().screenGeometry().height()/5*4 || Picture_Default.width()>QDesktopWidget().screenGeometry().width()/5*4)
+            Picture_Default=Picture_Default.scaled(Picture_Default.width()/2, Picture_Default.height()/2);
         Picture_Current=Pos;
     }
     return &Picture_Default;    
@@ -183,8 +186,8 @@ void ffmpeg_Pictures::Process_Launch (size_t Pos)
     QFileInfo FileInfo(FileName);
     Data.clear();
     Process->setWorkingDirectory(FileInfo.absolutePath());
-    if (Mode==0)
+    if (Mode.empty())
         Process->start(QCoreApplication::applicationDirPath()+"/ffmpeg", QStringList() << "-ss" << QString::number(((float)Picture_BaseFrame)*Duration/Frames_Total) << "-i" << FileInfo.fileName() << "-s" << "702x525" << "-f" << "image2" << "-qscale" << "1" << "-vframes" << QString::number(1+numFiles*2) << TempDir.path()+"/image%d.jpg");
     else
-        Process->start(QCoreApplication::applicationDirPath()+"/ffmpeg", QStringList() << "-ss" << QString::number(((float)Picture_BaseFrame)*Duration/Frames_Total) << "-i" << FileInfo.fileName() << "-s" << "702x525" << "-f" << "image2" << "-qscale" << "1" << "-vf" << "split=4[a][b][c][d];[a]pad=iw*4:ih[w];[b]lutyuv=u=128:v=128[x];[c]lutyuv=y=128:v=128,curves=strong_contrast[y];[d]lutyuv=y=128:u=128,curves=strong_contrast[z];[w][x]overlay=w:0[wx];[wx][y]overlay=w*2:0[wxy];[wxy][z]overlay=w*3:0" << "-vframes" << QString::number(1+numFiles*2) << TempDir.path()+"/image%d.jpg");
+        Process->start(QCoreApplication::applicationDirPath()+"/ffmpeg", QStringList() << "-ss" << QString::number(((float)Picture_BaseFrame)*Duration/Frames_Total) << "-i" << FileInfo.fileName() << "-s" << "702x525" << "-f" << "image2" << "-qscale" << "1" << "-vf" << Mode.c_str() << "-vframes" << QString::number(1+numFiles*2) << TempDir.path()+"/image%d.jpg");
 }

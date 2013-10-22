@@ -41,9 +41,10 @@ public:
     QString         FileName_Current;
     QTemporaryDir   TempDir;
 
-    ffmpeg_Pictures*            Pictures[2];
+    ffmpeg_Pictures**           Pictures;
     size_t                      Pictures_Current;
     size_t                      PicturePos;
+    PerFile*                    Source;
 
 private:
     Ui::PerPicture *ui;
@@ -53,7 +54,7 @@ private Q_SLOTS:
     void ProcessError();
     void ProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
-    void on_Keep_clicked(bool checked);
+    void on_FiltersList_currentIndexChanged(int index);
 };
 
 #endif // PERPICTURE_H

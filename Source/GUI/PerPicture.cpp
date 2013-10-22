@@ -11,6 +11,38 @@
 #include <ZenLib/File.h>
 using namespace ZenLib;
 
+
+const size_t FiltersListDefault_Count = 10;
+
+const char* FiltersListDefault_Names [FiltersListDefault_Count] =
+{
+    "Normal",
+    "Field split",
+    "Field diff",
+    "Field waveform",
+    "Range waveform",
+    "Waveform parade",
+    "Field histogram",
+    "Field vectroscope",
+    "Chroma split",
+    "Interlace",
+};
+
+const char* FiltersListDefault_Value [FiltersListDefault_Count] =
+{
+    "",
+    "split[a][b]; [a]pad=iw:ih*2,field=top[src]; [b]field=bottom[filt]; [src][filt]overlay=0:h",
+    "split=4[a][b][c][d]; [a]pad=iw:ih*3,field=top[src]; [b]field=bottom[filt];[c]field=bottom[bb];[d]field=top,negate[tb];[src][filt]overlay=0:h[upper];[bb][tb]blend=all_mode=average[blend];[upper][blend]overlay=0:h*2",
+    "split[a][b];[a]field=top,split[topa][topb];[b]field=bottom,split[bota][botb];[topb]histogram=mode=waveform:waveform_mode=column:waveform_mirror=1[topbh];[botb]histogram=mode=waveform:waveform_mode=column:waveform_mirror=1[botbh];[topa]pad=iw*2:ih+(256*3)[topapad];[topapad][bota]overlay=w[rowa];[rowa][topbh]overlay=0:H-(256*3)[rowab1];[rowab1][botbh]overlay=w:H-(256*3)",
+    "split[a][b];[a]format=gray,histogram=mode=waveform:waveform_mode=column:waveform_mirror=1,split[c][d];[b]pad=iw:ih+256[padded];[c]geq=g=1:b=1[red];[d]geq=r=1:b=1,crop=in_w:220:0:16[mid];[red][mid]overlay=0:16[wave];[padded][wave]overlay=0:H-h",
+    "split[a][b];[a]histogram=mode=waveform:waveform_mode=column:waveform_mirror=1:display_mode=overlay[c];[b]pad=iw:ih+256[padded];[padded][c]overlay=0:H-h",
+    "split[a][b];[a]field=top,split[topa][topb];[b]field=bottom,split[bota][botb];[topb]histogram[topbh];[botb]histogram[botbh];[topa]pad=iw*2:ih+636[topapad];[topapad][bota]overlay=w[rowa];[rowa][topbh]overlay=W/2-256:H-636[rowab1];[rowab1][botbh]overlay=W/2:H-636",
+    "split[a][b];[a]field=top,split[topa][topb];[b]field=bottom,split[bota][botb];[topb]histogram=mode=color[topbh];[botb]histogram=mode=color[botbh];[topa]pad=iw*2:ih+256[topapad];[topapad][bota]overlay=w[rowa];[rowa][topbh]overlay=W/2-256:H-256[rowab1];[rowab1][botbh]overlay=W/2:H-256",
+    "split=4[a][b][c][d];[a]pad=iw*2:ih*2[w];[b]lutyuv=u=128:v=128[x];[c]lutyuv=y=128:v=128,curves=strong_contrast[y];[d]lutyuv=y=128:u=128,curves=strong_contrast[z];[w][x]overlay=w:0[wx];[wx][y]overlay=0:h[wxy];[wxy][z]overlay=w:h",
+    "kerndeint=map=1",
+};
+
+
 PerPicture::PerPicture(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::PerPicture)
@@ -34,12 +66,14 @@ PerPicture::PerPicture(QWidget *parent) :
 
 
     ui->Picture->setPixmap(QPixmap(":/icon/logo.jpg"));
-    //ui->Keep->setVisible(false);
-    ui->Keep->setText("Switch to chroma");
-    //connect(ui->Keep, SIGNAL(clicked(bool)), this, SLOT(on_Keep_clicked(bool)));
+    Pictures=new ffmpeg_Pictures*[FiltersListDefault_Count];
+    for (size_t Pos=0; Pos<FiltersListDefault_Count; Pos++)
+    {
+        ui->FiltersList->addItem(FiltersListDefault_Names[Pos]);
+        Pictures[Pos]=NULL;
+    }
+    connect(ui->FiltersList, SIGNAL(currentIndexChanged(int)), this, SLOT(on_FiltersList_currentIndexChanged(int)));
 
-    Pictures[0]=NULL;
-    Pictures[1]=NULL;
     Pictures_Current=0;
 }
 
@@ -47,8 +81,9 @@ PerPicture::~PerPicture()
 {
     delete ui;
 
-    delete Pictures[0];
-    delete Pictures[1];
+    for (size_t Pos=0; Pos<FiltersListDefault_Count; Pos++)
+        delete Pictures[Pos];
+    delete[] Pictures;
 }
 
 void PerPicture::ShowPicture (size_t PicturePos, double** y, QString FileName, PerFile* Source)
@@ -58,8 +93,11 @@ void PerPicture::ShowPicture (size_t PicturePos, double** y, QString FileName, P
 
     // Stats
     PerPicture::PicturePos=PicturePos;
+    if (Source)
+        PerPicture::Source=Source;
     FileName_Current=FileName;
     if (y)
+    {
         for (size_t Pos=0; Pos<PlotName_Max; Pos++)
         {
             if (PicturePos<Source->Stats->Frames_Current)
@@ -67,16 +105,16 @@ void PerPicture::ShowPicture (size_t PicturePos, double** y, QString FileName, P
             else
                 Values[Pos]->setText(Names[Pos]+QString("= XXX"));
         }
+    }
 
     // Picture
     if (Pictures[Pictures_Current]==NULL)
     {
-        Pictures[0]=new ffmpeg_Pictures();
-        Pictures[0]->Launch(this, FileName, Source->BasicInfo->Frames_Total_Get(), Source->BasicInfo->Duration_Get(), 0);
-        Pictures[1]=new ffmpeg_Pictures();
-        Pictures[1]->Launch(this, FileName, Source->BasicInfo->Frames_Total_Get(), Source->BasicInfo->Duration_Get(), 1);
+        Pictures[Pictures_Current]=new ffmpeg_Pictures();
+        Pictures[Pictures_Current]->Launch(this, FileName, Source->BasicInfo->Frames_Total_Get(), Source->BasicInfo->Duration_Get(), FiltersListDefault_Value[Pictures_Current]);
     }
-    ui->Picture->setPixmap(*Pictures[Pictures_Current]->Picture_Get(PicturePos));
+    QPixmap* NewPicture=Pictures[Pictures_Current]->Picture_Get(PicturePos);
+    ui->Picture->setPixmap(*NewPicture);
 
     // Displaying the frame
     double Progress=Pictures[Pictures_Current]->Frames_Progress_Get();
@@ -118,17 +156,11 @@ void PerPicture::Load_Finished()
     setWindowTitle("QC Tools - Frame "+QString::number(PicturePos)+" - "+FileName_Current);
 }
 
-void PerPicture::on_Keep_clicked(bool checked)
+void PerPicture::on_FiltersList_currentIndexChanged(int index)
 {
-    if (Pictures_Current)
-    {
-        Pictures_Current=0;
-        ui->Keep->setText("Switch to chroma");
-    }
-    else
-    {
-        Pictures_Current=1;
-        ui->Keep->setText("Switch to normal");
-    }
-    ShowPicture (PicturePos, NULL, FileName_Current, NULL);
+    if (Pictures_Current==index)
+        return;
+
+    Pictures_Current=index;
+    ShowPicture (PicturePos, NULL, FileName_Current, Source);
 }

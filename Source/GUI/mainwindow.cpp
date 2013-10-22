@@ -110,9 +110,21 @@ void MainWindow::on_actionPrint_triggered()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_actionHowToUse_triggered()
+{
+    Help_HowToUse();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::on_actionFilterDescriptions_triggered()
 {
     Help_FilterDescriptions();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionLicense_triggered()
+{
+    Help_License();
 }
 
 //---------------------------------------------------------------------------
@@ -237,11 +249,14 @@ void MainWindow::plot_mousePressEvent(QMouseEvent *ev)
 
 void MainWindow::on_Labels_Middle_clicked(bool checked)
 {
+    bool ShouldDisplay=true;
     if (Picture_Main)
     {
+        ShouldDisplay=!Picture_Main->isVisible();
         delete Picture_Main; Picture_Main=NULL;
     }
-    else
+    
+    if (ShouldDisplay)
     {
         Picture_Main=new PerPicture(this);
         Picture_Main->move(geometry().left()+geometry().width(), geometry().top());

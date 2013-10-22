@@ -26,11 +26,7 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QPushButton" name="Keep">
-         <property name="text">
-          <string>Keep this frame</string>
-         </property>
-        </widget>
+        <widget class="QComboBox" name="FiltersList"/>
        </item>
       </layout>
      </item>

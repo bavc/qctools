@@ -36,17 +36,45 @@ Help::Help(QWidget * parent)
     QTextBrowser* Text1=new QTextBrowser(this);
     Text1->setReadOnly(true);
     Text1->setOpenExternalLinks(true);
-    Text1->setSource(QUrl("qrc:/documentation/Help_FilterDescriptions.html"));
-    Central->addTab(Text1, tr("Filter Descriptions"));
-    /*
+    Text1->setSource(QUrl("qrc:/documentation/Help_HowToUse.html"));
+    Central->addTab(Text1, tr("How to use"));
     QTextBrowser* Text2=new QTextBrowser(this);
     Text2->setReadOnly(true);
     Text2->setOpenExternalLinks(true);
-    Text2->setHtml(Help_Details_HTML());
-    Central->addTab(Text2, tr("Details"));
-    */
+    Text2->setSource(QUrl("qrc:/documentation/Help_FilterDescriptions.html"));
+    Central->addTab(Text2, tr("Filter Descriptions"));
+    QTextBrowser* Text3=new QTextBrowser(this);
+    Text3->setReadOnly(true);
+    Text3->setOpenExternalLinks(true);
+    Text3->setSource(QUrl("qrc:/documentation/Help_License.html"));
+    Central->addTab(Text3, tr("License"));
     L->addWidget(Central);
     L->addWidget(Close);
 
     setLayout(L);
+}
+
+//***************************************************************************
+// Direct access
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void Help::show_HowToUse ()
+{
+    Central->setCurrentIndex(0);
+    show();
+}
+
+//---------------------------------------------------------------------------
+void Help::show_FilterDescriptions ()
+{
+    Central->setCurrentIndex(1);
+    show();
+}
+
+//---------------------------------------------------------------------------
+void Help::show_License ()
+{
+    Central->setCurrentIndex(2);
+    show();
 }

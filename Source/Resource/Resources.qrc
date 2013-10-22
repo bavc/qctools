@@ -9,5 +9,7 @@
     </qresource>
     <qresource prefix="/documentation">
         <file alias="Help_FilterDescriptions.html">Help_FilterDescriptions.html</file>
+        <file alias="Help_HowToUse.html">Help_HowToUse.html</file>
+        <file alias="Help_License.html">../../License.html</file>
     </qresource>
 </RCC>

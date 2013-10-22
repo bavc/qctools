@@ -57,7 +57,9 @@ public:
     void                        Export_CSV                  ();
     void                        Export_PDF                  ();
     void                        refreshDisplay              ();
+    void                        Help_HowToUse               ();
     void                        Help_FilterDescriptions     ();
+    void                        Help_License                ();
 
     // Plots
     void                        Plots_Init                  ();
@@ -122,7 +124,11 @@ private Q_SLOTS:
 
     void on_actionPrint_triggered();
 
+    void on_actionHowToUse_triggered();
+
     void on_actionFilterDescriptions_triggered();
+
+    void on_actionLicense_triggered();
 
     void on_check_Y_toggled(bool checked);
 

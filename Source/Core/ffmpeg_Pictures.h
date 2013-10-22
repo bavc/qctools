@@ -25,7 +25,7 @@ public:
                                 ~ffmpeg_Pictures  ();
 
     // Functions
-    void                        Launch                      (PerPicture* SourceClass, const QString &FileName, size_t Frames_Total, double Duration, size_t Mode);
+    void                        Launch                      (PerPicture* SourceClass, const QString &FileName, size_t Frames_Total, double Duration, const string &Mode);
 
     // Infos
     QPixmap*                    Picture_Get                 (size_t Pos);
@@ -49,7 +49,7 @@ private:
 
     //For callback
     PerPicture*                 SourceClass;
-    size_t                      Mode;
+    string                      Mode;
 
     // Process Temp
     QProcess*                   Process;

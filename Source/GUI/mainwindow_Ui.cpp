@@ -72,7 +72,7 @@ void MainWindow::Ui_Init()
     ui->actionZoomIn->setIcon(QIcon(":/icon/zoom-in.png"));
     ui->actionZoomOut->setIcon(QIcon(":/icon/zoom-out.png"));
     ui->actionPrint->setIcon(QIcon(":/icon/document-print.png"));
-    ui->actionFilterDescriptions->setIcon(QIcon(":/icon/help.png"));
+    ui->actionHowToUse->setIcon(QIcon(":/icon/help.png"));
 
     // Window
     setWindowTitle("QC Tools");
@@ -243,8 +243,22 @@ void MainWindow::refreshDisplay()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::Help_HowToUse()
+{
+    Help* Frame=new Help(this);
+    Frame->show_HowToUse();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::Help_FilterDescriptions()
 {
     Help* Frame=new Help(this);
-    Frame->show();
+    Frame->show_FilterDescriptions();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::Help_License()
+{
+    Help* Frame=new Help(this);
+    Frame->show_License();
 }
