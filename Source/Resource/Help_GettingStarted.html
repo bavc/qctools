@@ -4,14 +4,14 @@
         <title>QC Tools Help Guide</title>
     </head>
 <body>
-<body>
+
 <h1>Getting Started with QC Tools</h1>
 
 <h2 style="color:blue">What is QC Tools?</h2>
 <p>
 QC Tools (Quality Control Tools for Video Preservation) is a software tool that helps users analyze and understand their digitized video files. With QC Tools, archives and other institutions can check files for corruptions before and after transferring to a digital format. The goal is simple: to cut down the time it takes to perform high-quality video preservation and direct time towards preservation issues that are solvable, for example identifying tapes that would benefit from a second transfer, saving not only the precious time of preservationists and institutional resources, but giving collections a necessary advantage in the bigger race against time to preserve their significant cultural artifacts. QC Tools incorporates archival standards and best practices for reformatting and capturing metadata that enables the long-term preservation and of and access to the original artifact, the digital object, and the associated catalog record.
 </p>
-<br/>
+
 <h2 style="color:blue">Who can benefit from using QC Tools (and how)?</h2>
 <p>
 Potential users of the quality control tools include specialists and non-specialists:
@@ -50,5 +50,41 @@ Historians and collection managers that do not usually work with audiovisual his
 <br/><br />
 For example, a small state historical society may have a collection of tapes, but because they are a small staff and cannot afford to outsource digitization, the tapes have been neglected. If the staff is able to get the equipment to digitize the tapes in-house, QC Tools can help them diagnose issues and make the digitization process less intimidating while ensuring high quality digital files.
 </p>
+
+<h2 style="color:blue">What is the Workplan?</h2>
+<p>
+This project will span two years. The first part will focus on the development of tools for use in the repository workflow and archival digitization environments. The central piece of the tool set is the development of a data format to document and express quality control, analytical, and visual qualitative data across the frames of a digital video, QC Tools report. The data format will be designed to be transparent, understandable, plottable, flexible, and efficient to store analytical data on a frame-by-frame basis. Alongside the development of the data format will be the design, testing, and release of an open source, multi-platform tool to generate this report from referenced digital video files as well as tools to analyze and visualize the collected data according to locally defined priorities and thresholds.
+<br/>
+The second part of the development will focus on designing a software application to simplify generation of QC Tools reports for batches of digitized video. The software applications will enable the archivist to depict the contents of the QC Tools report as graphed data, revealing trends, averages, and extremes of the signals stored within the digitized video. The applications can also be used to set thresholds of tolerance for the extent to which the reported digitized video signal can veer from expected trends of best practices (such as video out of a legal range, extended drop-outs, changes in). The QC Tools will also facilitate sorting of collections of digitized video according to the presence of digitization issues to enable the archivist to focus quality control and assessment of video on the digitized content most deserving of attention.
+<br/>
+An ongoing focus of the project will be the deployment of the full toolset and dissemination of findings and training materials to archivists, media and preservation specialists, as well as all areas of the humanities where access to reliable information on digital preservation standards and practices is not easily accessible.
+</p>
+
+<h2 style="color:blue">What video formats does QC Tools accept?</h2>
+<p>
+QC Tools accepts a variety of video formats, including *.avi, *.mkv, *.mov, and *.mp4, as well as a diverse selection of codecs. Uncompressed 8-bit formats are ideal for the most accurate interpretation of the video.
+</p>
+<h2 style="color:blue">How can I integrate the QC Tools export feature into my workflow?</h2>
+<p>
+QC Tools currently a frame-by-frame analysis in CSV format. These files can be integrated into your preservation metadata. 
+</p>
+<h2 style="color:blue">What is the QC Tools license agreement?</h2>
+<p>
+For licensing, the project will be released under an open license that will enable anyone to edit or repurpose this code for any other intention. The software design and integration of existing open source tools will be performed in a manner that enables an open license. While the license selection is pending assessment of integrated tools, we are currently considering LGPLv3+ and BSD as licensing models for the project.
+<br/>
+By using an open code repository, GitHub, all changes, drafts, and progress in programming and development software will be available for review. Our project intends to not only make the resulting code available but also the full development process so that onlookers and users can understand the change progress and development that formed the final project.
+</p>
+<h2 style="color:blue">What about my audio?</h2>
+<p>
+QC Tools does not support audio at this time, but will in future releases. 
+</p>
+
+<h2 style="color:blue">I don't know what [this error] is called.</h2>
+<p>
+You may be able to find the answer in the <a href=”http://preservation.bavc.org/artifactatlas/index.php/A/V_Artifact_Atlas”>A/V Artifact Atlas</a>, which is closely associated with QC Tools. The AV Artifact Atlas is for use in the identification and definition of the technical issues and anomalies that can afflict audio and video signals.
+</p>
+
 </body>
+
+
 </html>
