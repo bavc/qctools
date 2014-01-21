@@ -70,9 +70,7 @@ QC Tools currently a frame-by-frame analysis in CSV format. These files can be i
 </p>
 <h2 style="color:blue">What is the QC Tools license agreement?</h2>
 <p>
-For licensing, the project will be released under an open license that will enable anyone to edit or repurpose this code for any other intention. The software design and integration of existing open source tools will be performed in a manner that enables an open license. While the license selection is pending assessment of integrated tools, we are currently considering LGPLv3+ and BSD as licensing models for the project.
-<br/>
-By using an open code repository, GitHub, all changes, drafts, and progress in programming and development software will be available for review. Our project intends to not only make the resulting code available but also the full development process so that onlookers and users can understand the change progress and development that formed the final project.
+QCTools is licensed under a Free BSD License. Please see the License tab for more information about this license and what it means.
 </p>
 <h2 style="color:blue">What about my audio?</h2>
 <p>
@@ -84,6 +82,15 @@ QC Tools does not support audio at this time, but will in future releases.
 You may be able to find the answer in the <a href=”http://preservation.bavc.org/artifactatlas/index.php/A/V_Artifact_Atlas”>A/V Artifact Atlas</a>, which is closely associated with QC Tools. The AV Artifact Atlas is for use in the identification and definition of the technical issues and anomalies that can afflict audio and video signals.
 </p>
 
+<h2 style="color:blue">Which graphs are useful to look at for [this] video format?</h2>
+<p>
+The YUV and Diffs (Y values, U values, V values, YDiff, YDiffX) are beneficial to all video formats. The TOUT (Temporal Outliers) filter is targeted to detecting white noise in VHS and 8mm video. The HEAD (Head Switching) filter is targeted to visible problems at the bottom of VHS tapes, but can be used to diagnose U-Matic as well. The VREP (Vertical Line Repetitions) filter can analyze pneumatic tapes (U-Matic) for digitization artifacts.
+</p>
+
+<h2 style="color:blue">What is YUV?</h2>
+<p>
+YUV are channels that hold data about video. The Y channel carries the luma. This is the information on the brightness of a video. Mostly white images will have a high number and mostly dark images will have a low number. The U and V channels both carry information about the chrominance, or the color of the video. The range in these fields while change as the colors of the image changes. 
+</p>
 </body>
 
 
