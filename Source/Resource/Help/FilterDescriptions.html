@@ -7,7 +7,7 @@
        <h1>Filter Descriptions</h1>
         <h2 style="color:blue">1. YUV Values/ MIN, AVG, MAX</h2>
         <p>YUV refers to a particular a way of encoding color information in analog video where Y channels carry <q>luma</q>, or brightness information, and U and V channels carry information about color, or <q>chrominance</q>.
-            QC Tools can analyze the YUV Values of a particular encoded video file in order to provide information about the appearance of the video. These filters examine every pixel in a given channel and records the Maximum, Minimum, and then adds up and divides by the total number of pixels to calculate and provide the Average value.<br/>
+          QC Tools can analyze the YUV Values of a particular encoded video file in order to provide information about the appearance of the video. These filters examine every pixel in a given channel and records the Maximum, Minimum, and then adds up and divides by the total number of pixels to calculate and provide the Average value.<br/>
        <br/>
         </p>
             <h3> Y Value Filters: YMIN, YAVG, YMAX</h3>
@@ -29,15 +29,14 @@
         Y Channels carry data about the brightness of a picture. Problematic variance in Y Channel values will manifest as a picture that is either too light or too dark, also known as containing luma noise. 8-bit video will have values falling in the range of 0-255 pixels. A picture with well-balanced light levels will have an average, or mid-range Y Channel value of around 128 (YAVG). Graph readings outside of that range will indicate a picture that is either too bright or too dark. A Y Value of 0 would indicate total blackness and a value of 255 would present as entirely white. Except during particular moments like scene changes where one might expect abrupt spikes, the average values of Y channels should remain relatively stable or constant with little variation. Portions of video showing extreme changes in average values (and not corresponding to a scene change or otherwise dramatic edit) likely indicate a picture error.
 <br /><br />
 Y values = Combined graph of YMAX, YHIGH, YAVG, YLOW, and YMIN.<br />
-YMIN =  Y channel minimum<br />
+YMIN = Y channel minimum<br />
 YLOW = Y channel 10th percentile<br />
-YAVG =  Y channel average<br />
+YAVG = Y channel average<br />
 YHIGH = Y channel 95th percentile<br />
 YMAX = Y channel maximum<br/></p>
 
-            <h4>Samples which demonstrate Y Value anomalies:</h4>
+        <h4>Samples which demonstrate Y Value anomalies:</h4>
         <p>In the graph below, you can see the YMAX spikes which would manifest as white lines across the video picture: </p>
-
         <img src="ymax_trackingerror.png" /><br/>
 
         <br />The graph below illustrates a reading with many luma spikes in the YLOW, YAVG, and YHIGH, most notably in the first second of the graph.<br/><br/>
@@ -73,21 +72,16 @@ UAVG, VAVG = U channel average, V channel average<br />
 UHIGH, VHIGH = U channel 95th percentile, V channel 95th percentile<br />
 UMAX, VMAX = U channel maximum, V channel maximum<br />
             </p>
-                <h4>Samples which demonstrate U/V Value anomalies:</h4>
-
-
-                The graph of this video file shows dramatic variance in U and V MIN/MAX values, affects UAVG and VAVG values as well. Especially apparent from approximately around 3 and 7s where horizontal black/ white/ colored lines would likely be seen obscuring the image &#40;color loss &#41;.<br/><br/>
-            <img src="uv_syncloss.png" />
-
-<br />
-                This is a good example of dramatic activity in U and V channels showing around the 5s mark, corresponding to chrominance noise in the video &#40;visible rainbow-ed speckles across the picture&#41;. <br/><br/>
+            <h4>Samples which demonstrate U/V Value anomalies:</h4>
+            The graph of this video file shows dramatic variance in U and V MIN/MAX values, affects UAVG and VAVG values as well. Especially apparent from approximately around 3 and 7s where horizontal black/ white/ colored lines would likely be seen obscuring the image &#40;color loss &#41;.<br/><br/>
+            <img src="uv_syncloss.png" /><br />
+            This is a good example of dramatic activity in U and V channels showing around the 5s mark, corresponding to chrominance noise in the video &#40;visible rainbow-ed speckles across the picture&#41;. <br/><br/>
             <img src="uv_chrominancenoise.png" /><br/><br/>
-
-                Notice U noise in the graph below from approximately 2.86s to 4.37s. Also seen in UDIF reading.<br/><br/>
+            Notice U noise in the graph below from approximately 2.86s to 4.37s. Also seen in UDIF reading.<br/><br/>
             <img src="u_jitters.png" />
 
-        <h2 style="color:blue"> 2. YUV Values/ LOW, HIGH</h2>
-        <table border="1">
+            <h2 style="color:blue"> 2. YUV Values/ LOW, HIGH</h2>
+            <table border="1">
             <tr>
                 <th>Filter Domain</th>
                 <th>Filter Name(s)</th>
@@ -165,8 +159,7 @@ YDIF2 = YDIF of video deck head 2<br />
 <br />
             </p>
             <h4>Samples which demonstrate YUV Difference anomalies:</h4>
-               <img src="yuv_diff.jpg" />
-
+            <img src="yuv_diff.jpg" />
 
         <h2 style="color:blue"> 4. Temporal Outliers (TOUT)</h2>
 
@@ -194,8 +187,6 @@ This filter was created to detect white speckle noise in analog VHS and 8mm vide
         <h4>Samples which demonstrate Temporal Outliers' anomalies:</h4>
             You can see several blips in the graph reading, especially around 7.5s, 15s, and 24s <br/><br/>
             <img src="tout_trackingerror.png" />
-
-
 
         <h2 style="color:blue"> 5. Head Switching (HEAD)</h2>
         <table border="1">
@@ -233,7 +224,7 @@ This filter was created to detect white speckle noise in analog VHS and 8mm vide
         </table>
         <br />
         <p>
-        Vertical Line Repetitions, or the VREP filter, is useful in analyzing pneumatic tapes (such as U-Matic) and detecting artifacts generated in the course of the digitization process. Specifically, VREP detects the repetition of lines in a video. The filter works by taking a given video line and comparing it against a video line that occurs 4 pixels earlier. If the difference in the two is less than 512, the filter reads them as being close enough to be deemed repetitious.
+        Vertical Line Repetitions, or the VREP filter, is useful in analyzing pneumatic tapes (such as U-Matic) and detecting artifacts generated in the course of the digitization process. Specifically, VREP detects the repetition of lines in a video. The filter works by taking a given video line and comparing it against a video line that occurs 4 pixels earlier. If the difference in the two is less than 512, the filter reads them as being close enough to be deemed repetitious. Note that the VREP filter is still under development.
         <br />
         VREP = Vertical Line Repetitions<br /><br /></p>
 
@@ -253,14 +244,13 @@ This filter was created to detect white speckle noise in analog VHS and 8mm vide
         <br />
 
         <p>
-        The BRNG filter is one that identifies the number of pixels which fall outside the standard video broadcast range of 16-235 pixels. Normal, noise-free video would not trigger this filer, but noise occurring outside of these parameters would read as spikes in the graph. Typically anything with a value over 0.01 will read as an artifact. While the RANG filter is good at detecting the general presence of noise, it can be a bit non-specific in its identification of the causes.
+        The BRNG filter is one that identifies the number of pixels which fall outside the standard video broadcast range of 16-235 pixels. Normal, noise-free video would not trigger this filer, but noise occurring outside of these parameters would read as spikes in the graph. Typically sudden spikes of anything with a value over 0.01 will read as an artifact such as a dropout which would contain random luminosity values which would thus often fall outside of broadcast range. While the BRNG filter is good at detecting the general presence of noise, it can be a bit non-specific in its identification of the causes.
         <br />
         BRNG = Broadcast Range<br /><br /></p>
         <h4>Samples which demonstrate Broadcast Range anomalies:</h4>
 
         <img src="brng_syncloss.png" />
             <br/><br/>
-
 
         The graph below shows sharp spike in BRNG around 5.5s of the video which likely manifests as an over-brightness of this portion of the video.<br/><br/>
         <img src="brng_dropout.png" />
