@@ -38,11 +38,11 @@ YMAX = Y channel maximum<br/></p>
             <h4>Samples which demonstrate Y Value anomalies:</h4>
         <p>In the graph below, you can see the YMAX spikes which would manifest as white lines across the video picture: </p>
      
-        <img src="YMAX_DHC0177_trackingerror_ffv1_h264.tiff" /><br/>
+        <img src="YMAX_DHC0177_trackingerror_ffv1_h264.png" /><br/>
             
-        <br>The graph below illustrates a reading with many luma spikes in the YLOW, YAVG, and YHIGH, most notably in the first second of the graph.<br/><br/>
+        <br />The graph below illustrates a reading with many luma spikes in the YLOW, YAVG, and YHIGH, most notably in the first second of the graph.<br/><br/>
            
-            <img src="YValues_293_0047_SKEW_ffv1_h264.tiff" />            
+            <img src="YValues_293_0047_SKEW_ffv1_h264.png" />            
         <h3>U, V Value Filters: UMIN, UAVG, UMAX/ VMIN, VAVG, VMAX</h3>
         <table border="1">
             <tr> 
@@ -61,30 +61,30 @@ YMAX = Y channel maximum<br/></p>
                 <td>&nbsp;0-255</td> 
             </tr>
         </table>
-            <br></br>
+            <br />
             <p>
              The U and V Channels represent the chrominance, or color differences of a picture. U and V filters act to detect color abnormalities in video. It can be difficult to derive meaning from U or V values on their own, but they provide supplementary information and can be good indicators of artifacts, especially when occurring in tandem with similar Y Value readings. Black and white videos should present flat-lines (or no data) for UV channels. Activity in UV Channels for black and white video content, however, would certainly be an indication of chrominance noise. Alternatively, a color video which shows flat-lines for these channels would be an indicator of a color drop-out scenario. 
 <br />
 
-U values, V values = Combined graph of UMIN, ULOW, UAVG, UHIGH, and UMAX, Combined graph of VMIN, VLOW, VAVG, VHIGH, VMAX<br /> </br>
+U values, V values = Combined graph of UMIN, ULOW, UAVG, UHIGH, and UMAX, Combined graph of VMIN, VLOW, VAVG, VHIGH, VMAX<br />
 UMIN, VMIN = U channel minimum, V channel minimum<br />
 ULOW, VLOW = U channel 10th percentile, V channel 10th percentile<br />
 UAVG, VAVG = U channel average, V channel average<br />
 UHIGH, VHIGH = U channel 95th percentile, V channel 95th percentile<br />
-UMAX, VMAX = U channel maximum, V channel maximum<br></br> 
+UMAX, VMAX = U channel maximum, V channel maximum<br /> 
             </p>
                 <h4>Samples which demonstrate U/V Value anomalies:</h4>
                 
                 
                 The graph of this video file shows dramatic variance in U and V MIN/MAX values, affects UAVG and VAVG values as well. Especially apparent from approximately around 3 and 7s where horizontal black/ white/ colored lines would likely be seen obscuring the image &#40;color loss &#41;.<br/><br/>
-            <img src="UV_293_0046_syncloss_ffv1_h264.tiff" />           
+            <img src="UV_293_0046_syncloss_ffv1_h264.png" />           
            
-<br></br>
+<br />
                 This is a good example of dramatic activity in U and V channels showing around the 5s mark, corresponding to chrominance noise in the video &#40;visible rainbow-ed speckles across the picture&#41;. <br/><br/>
-            <img src="UV_293_0050_chrominancenoise_ffv1_h264.tiff" /><br/><br/>
+            <img src="UV_293_0050_chrominancenoise_ffv1_h264.png" /><br/><br/>
           
                 Notice U noise in the graph below from approximately 2.86s to 4.37s. Also seen in UDIF reading.<br/><br/>  
-            <img src="UNoise_293_0047_JITTERS_ffv1.tiff" />
+            <img src="UNoise_293_0047_JITTERS_ffv1.png" />
             
         <h2 style="color:blue"> 2. YUV Values/ LOW, HIGH</h2>
         <table border="1">
@@ -109,7 +109,7 @@ UMAX, VMAX = U channel maximum, V channel maximum<br></br>
                 <td>&nbsp;16-235</td>    
             </tr>
         </table>
-    <br></br>
+    <br />
    <p>
    This filter works in a similar fashion as the YUV *MIN and *MAX filters, but instead of looking at the absolute minimum and maximum value for these channels, it looks at the 10th percentile (LOW, or 16 pixels) and 95th percentile (HIGH, or 235 pixels) which present the outside limits of the legal broadcast range. An extreme minimum or maximum value could dramatically skew the graph but because they may be outside the viewable broadcast image, they may not necessarily be meaningful indicators of a problematic visual image. For that reason, it is useful to screen for the low/high values within broadcast range. 
        
@@ -117,7 +117,7 @@ UMAX, VMAX = U channel maximum, V channel maximum<br></br>
  
         <h4>Samples which demonstrate YUV LOW/HIGH anomalies:</h4>
             Notice the jagged spikes in the YHIGH values.<br/><br/> 
-            <img src="YValues_DHC0267_trackingerror_ffv1_h264.tiff" />      
+            <img src="YValues_DHC0267_trackingerror_ffv1_h264.png" />      
        
         <h2 style="color:blue"> 3. YUV Values/ Difference</h2>
         <table border="1">
@@ -152,20 +152,21 @@ UMAX, VMAX = U channel maximum, V channel maximum<br></br>
                 <td>&nbsp;0-18</td>    
             </tr>
         </table>
-        <br></br>
+        <br />
             <p>This QC Tools filter selects two successive frames of video and subtracts the values of one from the other in order to find the change, or difference, between the two frames (measured in pixels). This information is meaningful in that it indicates the rapidity with which a video picture is changing from one frame to the next. Aside from scene-change scenarios, a video picture should not undergo dramatic changes in these values unless an artifact is present. A scene-change would present as a short but dramatic spike in the graph, and that is normal. Other YUV Difference spikes may be present in cases where picture problems are visible. Often, head problems with corrupted frames will result in large YUV Difference values/graph spikes.
 <br />
 The YDIF1 and YDIF2 filters help detect artifacts caused by video deck head clogs, with each filter providing a reading per head. The filter is built on the assumption that one head is functioning (and as such, presents as a stable graph line), and one is corrupt (presenting as a variable line with spikes and troughs). A user, in reading the two results against one another, would see the areas where the two readings diverge as red portions on the graph. See graph below: between 17-19s the YDIF1 and YDIF2 readings vary dramatically, presenting as red portions in the graph.
-</br>
+<br />
 YDIF = Difference of Y Channel between two frames<br />
 UDIF = Difference of U Channel between two frames<br />
 VDIF = Difference of V Channel between two frames<br />
 YDIF1 = YDIF of video deck head 1<br />
 YDIF2 = YDIF of video deck head 2<br />
 <br />
-                <h4>Samples which demonstrate YUV Difference anomalies:</h4>
-               <img src="yuv_diff.png" /> 
             </p>
+            <h4>Samples which demonstrate YUV Difference anomalies:</h4>
+               <img src="yuv_diff.jpg" /> 
+
         
         <h2 style="color:blue"> 4. Temporal Outliers (TOUT)</h2>
         
@@ -181,7 +182,7 @@ YDIF2 = YDIF of video deck head 2<br />
                 <td>&nbsp;0.00-0.09&nbsp;</td>    
             </tr>         
         </table>
-        <br></br>
+        <br />
         <p>
 This filter was created to detect white speckle noise in analog VHS and 8mm video. It works by analyzing the current pixel against the two above and below and calculates an average value. In cases where the filter detects a pixel value which is dramatically outside of this established average, the graph will show small spikes, or blips, which correspond to white speckling in the video. The range of 0.00-0.09 is considered normal, and anything above that range is a questionable quality issue.
 <br />
@@ -192,7 +193,7 @@ This filter was created to detect white speckle noise in analog VHS and 8mm vide
         
         <h4>Samples which demonstrate Temporal Outliers' anomalies:</h4>
             You can see several blips in the graph reading, especially around 7.5s, 15s, and 24s <br/><br/>
-            <img src="TOUT_DHC0177_trackingerror_ffv1_h264.tiff" />
+            <img src="TOUT_DHC0177_trackingerror_ffv1_h264.png" />
        
       
         
@@ -209,7 +210,7 @@ This filter was created to detect white speckle noise in analog VHS and 8mm vide
                 <td>&nbsp;0.00-0.79&nbsp;</td>    
             </tr>         
         </table>
-   <br></br>
+   <br />
         <p>
         Head switching noise is visible on the bottom lines of a video display. A good range would be between 0.00-0.01, indicating that there is very little issues with head switching. Furthermore, the HEAD graph should remain consistent without significant spikes or dips. Visible and notable head switching noise will be in the 0.01-0.80 range. 
         <br />
@@ -230,7 +231,7 @@ This filter was created to detect white speckle noise in analog VHS and 8mm vide
                 <td>&nbsp;0.00-0.92&nbsp;</td>    
             </tr>         
         </table>
-        <br></br>
+        <br />
         <p>
         Vertical Line Repetitions, or the VREP filter, is useful in analyzing pneumatic tapes (such as U-Matic) and detecting artifacts generated in the course of the digitization process. Specifically, VREP detects the repetition of lines in a video. The filter works by taking a given video line and comparing it against a video line that occurs 4 pixels earlier. If the difference in the two is less than 512, the filter reads them as being close enough to be deemed repetitious. 
         <br />
@@ -238,10 +239,10 @@ This filter was created to detect white speckle noise in analog VHS and 8mm vide
         <h4>Samples which demonstrate Vertical Repetition anomalies:</h4>
         
        
-           <img src="VREP_293_0047_JITTER.tiff" />
-            <br/><br/></br>  <br/><br/>
+           <img src="VREP_293_0047_JITTER.png" />
+            <br/><br/><br/>  <br/><br/>
             
-            <img src="VREP_293_0047_SKEW.tiff" />
+            <img src="VREP_293_0047_SKEW.png" />
 
         <h2 style="color:blue"> 7. Range (RANG)</h2>
         <table border="1">
@@ -256,7 +257,7 @@ This filter was created to detect white speckle noise in analog VHS and 8mm vide
             <td>&nbsp;0.00-0.79</td>    
         </tr>         
         </table>
-        <br></br>
+        <br />
         
         <p>
         The BRNG filter is one that identifies the number of pixels which fall outside the standard video broadcast range of 16-235 pixels. Normal, noise-free video would not trigger this filer, but noise occurring outside of these parameters would read as spikes in the graph. Typically anything with a value over 0.01 will read as an artifact. While the RANG filter is good at detecting the general presence of noise, it can be a bit non-specific in its identification of the causes. 
@@ -264,11 +265,11 @@ This filter was created to detect white speckle noise in analog VHS and 8mm vide
         BRNG = Broadcast Range<br /><br /></p>
         <h4>Samples which demonstrate Broadcast Range anomalies:</h4>
         
-        <img src="RANG_293_0046_syncloss2.tiff" />
+        <img src="RANG_293_0046_syncloss2.png" />
             <br/><br/>
         
       
         The graph below shows sharp spike in BRNG around 5.5s of the video which likely manifests as an over-brightness of this portion of the video.<br/><br/> 
-        <img src="RANG_DHC0024_dropout.tiff" />
+        <img src="RANG_DHC0024_dropout.png" />
     </body>
 </html>
