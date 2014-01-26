@@ -1,13 +1,13 @@
 <!DOCTYPE html SYSTEM "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <title>QC Tools Help Guide</title>
+        <title>QCTools Help Guide</title>
     </head>
     <body>
         <h1>Filter Descriptions</h1>
         <h2 style="color:blue">YUV Values: MIN, AVG, MAX</h2>
         <p>YUV refers to a particular a way of encoding color information in analog video where Y channels carry <q>luma</q>, or brightness information, and U and V channels carry information about color, or <q>chrominance</q>.</p>
-        <p>QC Tools can analyze the YUV Values of a particular encoded video file in order to provide information about the appearance of the video. These filters examine every pixel in a given channel and records the Maximum, Minimum, and then adds up and divides by the total number of pixels to calculate and provide the Average value.</p>
+        <p>QCTools can analyze the YUV Values of a particular encoded video file in order to provide information about the appearance of the video. These filters examine every pixel in a given channel and records the Maximum, Minimum, and then adds up and divides by the total number of pixels to calculate and provide the Average value.</p>
         <h3>Y Value Filters: YMIN, YAVG, YMAX</h3>
         <table border="1">
             <tr>
@@ -133,7 +133,7 @@
                 <td>&nbsp;0-100</td>
             </tr>
         </table>
-        <p>This QC Tools filter selects two successive frames of video and subtracts the values of one from the other in order to find the change, or difference, between the two frames (measured in pixels). This information is meaningful in that it indicates the rapidity with which a video picture is changing from one frame to the next. Aside from scene-change scenarios, a video picture should not undergo dramatic changes in these values unless an artifact is present. A scene-change would present as a short but dramatic spike in the graph, and that is normal. Other YUV Difference spikes may be present in cases where picture problems are visible. Often, head problems with corrupted frames will result in large YUV Difference values/graph spikes.</p>
+        <p>This QCTools filter selects two successive frames of video and subtracts the values of one from the other in order to find the change, or difference, between the two frames (measured in pixels). This information is meaningful in that it indicates the rapidity with which a video picture is changing from one frame to the next. Aside from scene-change scenarios, a video picture should not undergo dramatic changes in these values unless an artifact is present. A scene-change would present as a short but dramatic spike in the graph, and that is normal. Other YUV Difference spikes may be present in cases where picture problems are visible. Often, head problems with corrupted frames will result in large YUV Difference values/graph spikes.</p>
         <p>The YDIF1 and YDIF2 filters help detect artifacts caused by video deck head clogs, with each filter providing a reading per head. The filter is built on the assumption that one head is functioning (and as such, presents as a stable graph line), and one is corrupt (presenting as a variable line with spikes and troughs). A user, in reading the two results against one another, would see the areas where the two readings diverge as red portions on the graph. See graph below: between 17-19s the YDIF1 and YDIF2 readings vary dramatically, presenting as red portions in the graph.</p>
         <p>
         YDIF = Difference of Y Channel between two frames<br/>
