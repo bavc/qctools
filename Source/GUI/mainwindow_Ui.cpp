@@ -1,5 +1,15 @@
+/*  Copyright (c) BAVC. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license that can
+ *  be found in the License.html file in the root of the source tree.
+ */
+
+//---------------------------------------------------------------------------
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
+#include "GUI/Help.h"
+#include "Core/Core.h"
 
 #include <QFileDialog>
 #include <QScrollBar>
@@ -17,30 +27,12 @@
 #include <QDialog>
 #include <QShortcut>
 #include <QToolButton>
+#include <QDesktopWidget>
+#include <QHBoxLayout>
+#include <QComboBox>
 
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_picker.h>
-#include <qwt_plot_zoomer.h>
-#include <qwt_legend.h>
-#include <qwt_plot_grid.h>
-#include <qwt_plot_layout.h>
-#include <qwt_plot_picker.h>
 #include <qwt_plot_renderer.h>
-#include <qwt_scale_widget.h>
-#include <qwt_picker_machine.h>
-
-#include "PerPicture.h"
-
-#ifndef UNICODE
-    #define UNICODE
-#endif //UNICODE
-#include <GUI/Help.h>
-#include <Core/Core.h>
-#include <ZenLib/ZtringListList.h>
-#include <ZenLib/Ztring.h>
-#include <ZenLib/File.h>
-using namespace ZenLib;
+//---------------------------------------------------------------------------
 
 //***************************************************************************
 // Constants
@@ -72,22 +64,44 @@ void MainWindow::Ui_Init()
     ui->actionZoomIn->setIcon(QIcon(":/icon/zoom-in.png"));
     ui->actionZoomOut->setIcon(QIcon(":/icon/zoom-out.png"));
     ui->actionPrint->setIcon(QIcon(":/icon/document-print.png"));
-    ui->actionHowToUse->setIcon(QIcon(":/icon/help.png"));
+    ui->actionGettingStarted->setIcon(QIcon(":/icon/help.png"));
+
+    // Config
+    ui->verticalLayout->setSpacing(0);
+    ui->verticalLayout->setMargin(0);
+    ui->verticalLayout->setStretch(0, 1);
+    ui->verticalLayout->setContentsMargins(0,0,0,0);
 
     // Window
-    setWindowTitle("QC Tools");
+    setWindowTitle("QCTools");
     setWindowIcon(QIcon(":/icon/logo.jpg"));
+    move(75, 75);
+    resize(QApplication::desktop()->screenGeometry().width()-150, QApplication::desktop()->screenGeometry().height()-150);
 
-    // First display
-    FirstDisplay=new QLabel(this);
-    FirstDisplay->setPixmap(QPixmap(":/icon/logo.jpg").scaled(geometry().width(), geometry().height()));
-    ui->verticalLayout->addWidget(FirstDisplay);
+    //ToolBar
+    QObject::connect(ui->toolBar, SIGNAL(visibilityChanged(bool)), this, SLOT(on_Toolbar_visibilityChanged(bool)));
+
+    //ToolTip
+    ui->check_Y->setToolTip(StatsFile_Description[PlotType_Y]);
+    ui->check_U->setToolTip(StatsFile_Description[PlotType_U]);
+    ui->check_V->setToolTip(StatsFile_Description[PlotType_V]);
+    ui->check_YDiff->setToolTip(StatsFile_Description[PlotType_YDiff]);
+    ui->check_YDiffX->setToolTip(StatsFile_Description[PlotType_YDiffX]);
+    ui->check_UDiff->setToolTip(StatsFile_Description[PlotType_UDiff]);
+    ui->check_VDiff->setToolTip(StatsFile_Description[PlotType_VDiff]);
+    ui->check_Diffs->setToolTip(StatsFile_Description[PlotType_Diffs]);
+    ui->check_TOUT->setToolTip(StatsFile_Description[PlotType_TOUT]);
+    ui->check_VREP->setToolTip(StatsFile_Description[PlotType_VREP]);
+    ui->check_HEAD->setToolTip(StatsFile_Description[PlotType_HEAD]);
+    ui->check_BRNG->setToolTip(StatsFile_Description[PlotType_BRNG]);
+
+    configureZoom();
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::configureZoom()
 {
-    if (Files.empty() || ZoomScale==1)
+    if (Files.empty() || PlotsArea==NULL || PlotsArea->ZoomScale==1)
     {
         ui->horizontalScrollBar->setRange(0, 0);
         ui->horizontalScrollBar->setMaximum(0);
@@ -96,18 +110,20 @@ void MainWindow::configureZoom()
         ui->horizontalScrollBar->setEnabled(false);
         ui->actionZoomOut->setEnabled(false);
         ui->actionZoomIn->setEnabled(!Files.empty());
+        ui->actionGoTo->setEnabled(!Files.empty());
         ui->actionCSV->setEnabled(!Files.empty());
         ui->actionPrint->setEnabled(!Files.empty());
         return;
     }
 
-    size_t Increment=Frames_Total/ZoomScale;
-    ui->horizontalScrollBar->setMaximum(Frames_Total-Increment);
+    size_t Increment=Files[Files_Pos]->Glue->VideoFrameCount/PlotsArea->ZoomScale;
+    ui->horizontalScrollBar->setMaximum(Files[Files_Pos]->Glue->VideoFrameCount-Increment);
     ui->horizontalScrollBar->setPageStep(Increment);
     ui->horizontalScrollBar->setSingleStep(Increment);
     ui->horizontalScrollBar->setEnabled(true);
     ui->actionZoomOut->setEnabled(true);
     ui->actionZoomIn->setEnabled(true);
+    ui->actionGoTo->setEnabled(true);
     ui->actionCSV->setEnabled(true);
     ui->actionPrint->setEnabled(true);
 }
@@ -115,51 +131,56 @@ void MainWindow::configureZoom()
 //---------------------------------------------------------------------------
 void MainWindow::Zoom_Move(size_t Begin)
 {
-    size_t Increment=Frames_Total/ZoomScale;
-    for (size_t Type=PlotType_Y; Type<PlotType_Max; Type++)
-        if (plots[Type])
-        {
-            QwtPlotZoomer* zoomer = new QwtPlotZoomer(plots[Type]->canvas());
-            QRectF Rect=zoomer->zoomBase();
-            Rect.setLeft(Files[Files_Pos]->BasicInfo->Duration_Get()*Begin/Frames_Total);
-            Rect.setWidth(Files[Files_Pos]->BasicInfo->Duration_Get()*Increment/Frames_Total);
-            zoomer->zoom(Rect);
-            if (Type<=PlotType_V)
-                plots[Type]->setAxisScale(QwtPlot::yLeft, 0, 255, 85);
-            plots[Type]->replot();
-            delete zoomer;
-        }
+    PlotsArea->Zoom_Move(Begin);
+
+    ui->horizontalScrollBar->setValue(Begin);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::Zoom_In()
 {
-    ZoomScale*=2;
+    PlotsArea->ZoomScale*=2;
     configureZoom();
-    Zoom_Move(ui->horizontalScrollBar->value());
+    size_t Position=Files[Files_Pos]->Glue->VideoFramePos;
+    size_t Increment=Files[Files_Pos]->Glue->VideoFrameCount/PlotsArea->ZoomScale;
+    if (Position+Increment/2>Files[Files_Pos]->Glue->VideoFrameCount)
+        Position=Files[Files_Pos]->Glue->VideoFrameCount-Increment/2;
+    if (Position>Increment/2)
+        Position-=Increment/2;
+    Zoom_Move(Position);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::Zoom_Out()
 {
-    if (ZoomScale>1)
-        ZoomScale/=2;
+    if (PlotsArea->ZoomScale>1)
+        PlotsArea->ZoomScale/=2;
     configureZoom();
-    Zoom_Move(ui->horizontalScrollBar->value());
+    size_t Position=Files[Files_Pos]->Glue->VideoFramePos;
+    size_t Increment=Files[Files_Pos]->Glue->VideoFrameCount/PlotsArea->ZoomScale;
+    if (Position+Increment/2>Files[Files_Pos]->Glue->VideoFrameCount)
+        Position=Files[Files_Pos]->Glue->VideoFrameCount-Increment/2;
+    if (Position>Increment/2)
+        Position-=Increment/2;
+    Zoom_Move(Position);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::Export_CSV()
 {
-    QString SaveFileName=QFileDialog::getSaveFileName(this, "Export to CSV", FileName+".qctools_development.csv", "Statistic files (*.csv)");
-
-    Files[Files_Pos]->Export_CSV(SaveFileName);
+    if (Files_Pos>=Files.size() || !Files[Files_Pos])
+        return;
+    
+    Files[Files_Pos]->Export_CSV(QFileDialog::getSaveFileName(this, "Export to CSV", Files[Files_Pos]->FileName+".qctools.csv", "Statistic files (*.csv)", 0, QFileDialog::DontUseNativeDialog));
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::Export_PDF()
 {
-   QString SaveFileName=QFileDialog::getSaveFileName(this, "Acrobat Reader file (PDF)", FileName+".qctools_development.pdf", "PDF (*.pdf)");
+    if (Files_Pos>=Files.size() || !Files[Files_Pos])
+        return;
+    
+    QString SaveFileName=QFileDialog::getSaveFileName(this, "Acrobat Reader file (PDF)", Files[Files_Pos]->FileName+".qctools.pdf", "PDF (*.pdf)", 0, QFileDialog::DontUseNativeDialog);
 
     if (SaveFileName.isEmpty())
         return;
@@ -171,94 +192,73 @@ void MainWindow::Export_PDF()
     QPainter painter(&printer);  */
 
     QwtPlotRenderer PlotRenderer;
-    PlotRenderer.renderDocument(plots[PlotType_Y], SaveFileName, "PDF", QSizeF(210, 297), 150);
+    PlotRenderer.renderDocument(PlotsArea->plots[PlotType_Y], SaveFileName, "PDF", QSizeF(210, 297), 150);
     QDesktopServices::openUrl(QUrl("file:///"+SaveFileName, QUrl::TolerantMode));
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::refreshDisplay()
 {
-    for (size_t Type=PlotType_Y; Type<PlotType_Max; Type++)
-        if (plots[Type])
-        {
-            plots[Type]->setVisible(false);
-            ui->verticalLayout->removeWidget(plots[Type]);
-        }
-    if (Pictures_Widgets)
+    if (PlotsArea)
     {
-        Pictures_Widgets->setVisible(false);
-        ui->verticalLayout->removeWidget(Pictures_Widgets);
-    }
-    if (Control_Widgets)
-    {
-        Control_Widgets->setVisible(false);
-        ui->verticalLayout->removeWidget(Control_Widgets);
-    }
-
-    //Per checkbox
-    bool Status[PlotType_Max];
-    Status[PlotType_Y]=ui->check_Y->checkState()==Qt::Checked;
-    Status[PlotType_U]=ui->check_U->checkState()==Qt::Checked;
-    Status[PlotType_V]=ui->check_V->checkState()==Qt::Checked;
-    Status[PlotType_YDiff]=ui->check_YDiff->checkState()==Qt::Checked;
-    Status[PlotType_YDiffX]=ui->check_YDiffX->checkState()==Qt::Checked;
-    Status[PlotType_UDiff]=ui->check_UDiff->checkState()==Qt::Checked;
-    Status[PlotType_VDiff]=ui->check_VDiff->checkState()==Qt::Checked;
-    Status[PlotType_Diffs]=ui->check_Diffs->checkState()==Qt::Checked;
-    Status[PlotType_TOUT]=ui->check_TOUT->checkState()==Qt::Checked;
-    Status[PlotType_VREP]=ui->check_VREP->checkState()==Qt::Checked;
-    Status[PlotType_HEAD]=ui->check_HEAD->checkState()==Qt::Checked;
-    Status[PlotType_RANG]=ui->check_RANG->checkState()==Qt::Checked;
-    PlotType Latest=PlotType_Max;
-    for (size_t Type=PlotType_Y; Type<PlotType_Max; Type++)
-        if (Status[Type])
-        {
-            if (plots[Type])
-            {
-                createData_Update((PlotType)Type);
-                plots[Type]->setVisible(true);
-                ui->verticalLayout->addWidget(plots[Type]);
-            }
-            Latest=(PlotType)Type;
-        }
-    if (Pictures_Widgets)
-    {
-        Pictures_Widgets->setVisible(true);
-        ui->verticalLayout->addWidget(Pictures_Widgets);
-    }
-    if (Control_Widgets)
-    {
-        Control_Widgets->setVisible(true);
-        ui->verticalLayout->addWidget(Control_Widgets);
+        PlotsArea->Status[PlotType_Y]=ui->check_Y->checkState()==Qt::Checked;
+        PlotsArea->Status[PlotType_U]=ui->check_U->checkState()==Qt::Checked;
+        PlotsArea->Status[PlotType_V]=ui->check_V->checkState()==Qt::Checked;
+        PlotsArea->Status[PlotType_YDiff]=ui->check_YDiff->checkState()==Qt::Checked;
+        PlotsArea->Status[PlotType_YDiffX]=ui->check_YDiffX->checkState()==Qt::Checked;
+        PlotsArea->Status[PlotType_UDiff]=ui->check_UDiff->checkState()==Qt::Checked;
+        PlotsArea->Status[PlotType_VDiff]=ui->check_VDiff->checkState()==Qt::Checked;
+        PlotsArea->Status[PlotType_Diffs]=ui->check_Diffs->checkState()==Qt::Checked;
+        PlotsArea->Status[PlotType_TOUT]=ui->check_TOUT->checkState()==Qt::Checked;
+        PlotsArea->Status[PlotType_VREP]=ui->check_VREP->checkState()==Qt::Checked;
+        PlotsArea->Status[PlotType_HEAD]=ui->check_HEAD->checkState()==Qt::Checked;
+        PlotsArea->Status[PlotType_BRNG]=ui->check_BRNG->checkState()==Qt::Checked;
+        PlotsArea->Status[PlotType_Axis]=true;
+        PlotsArea->refreshDisplay();
     }
 
-    //RePlot
-    for (size_t Type=PlotType_Y; Type<PlotType_Max; Type++)
-        if (plots[Type])
-            plots[Type]->enableAxis(QwtPlot::xBottom, Latest==Type);
-    
-    for (size_t Type=PlotType_Y; Type<PlotType_Max; Type++)
-        if (plots[Type])
-            plots[Type]->replot();
+
+    refreshDisplay_Axis();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::refreshDisplay_Axis()
+{
+    if (PlotsArea)
+        PlotsArea->refreshDisplay_Axis();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::Help_GettingStarted()
+{
+    Help* Frame=new Help(this);
+    Frame->GettingStarted();
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::Help_HowToUse()
 {
     Help* Frame=new Help(this);
-    Frame->show_HowToUse();
+    Frame->HowToUseThisTool();
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::Help_FilterDescriptions()
 {
     Help* Frame=new Help(this);
-    Frame->show_FilterDescriptions();
+    Frame->FilterDescriptions();
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::Help_License()
+void MainWindow::Help_PlaybackFilters()
 {
     Help* Frame=new Help(this);
-    Frame->show_License();
+    Frame->PlaybackFilters();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::Help_About()
+{
+    Help* Frame=new Help(this);
+    Frame->About();
 }

@@ -1,5 +1,13 @@
+/*  Copyright (c) BAVC. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license that can
+ *  be found in the License.html file in the root of the source tree.
+ */
+
+//---------------------------------------------------------------------------
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "Core/Core.h"
 
 #include <QFileDialog>
 #include <QScrollBar>
@@ -16,109 +24,70 @@
 #include <QCoreApplication>
 #include <QDialog>
 #include <QToolButton>
+#include <QSizePolicy>
+#include <QTimer>
 
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_picker.h>
-#include <qwt_plot_zoomer.h>
-#include <qwt_legend.h>
-#include <qwt_plot_grid.h>
-#include <qwt_plot_layout.h>
-#include <qwt_plot_picker.h>
-#include <qwt_plot_renderer.h>
-#include <qwt_scale_widget.h>
-#include <qwt_picker_machine.h>
-
-#ifndef UNICODE
-    #define UNICODE
-#endif //UNICODE
-#include <GUI/Help.h>
-#include <Core/Core.h>
-#include <ZenLib/ZtringListList.h>
-#include <ZenLib/Ztring.h>
-#include <ZenLib/File.h>
-using namespace ZenLib;
+#include <sstream>
+//---------------------------------------------------------------------------
 
 //***************************************************************************
-// BasicInfo
+// Time
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void MainWindow::BasicInfo_Finished ()
+void MainWindow::TimeOut ()
 {
-    // Coherency
-    if (Files[Files_Pos]->BasicInfo->Frames_Total_Get()==0)
+    // Configuring plots
+    if (PlotsArea==NULL)
     {
-        statusBar()->showMessage("Problem", 10000);
-        return;
+        PlotsArea=new Plots(this, Files[Files_Pos]);
+        ui->verticalLayout->addWidget(PlotsArea);
+
+        TinyDisplayArea=new TinyDisplay(this, Files[Files_Pos]);
+        ui->verticalLayout->addWidget(TinyDisplayArea);
+
+        ControlArea=new Control(this, Files[Files_Pos], Control::Style_Cols);
+        ui->verticalLayout->addWidget(ControlArea);
+
+        InfoArea=new Info(this, Files[Files_Pos], Info::Style_Grid);
+        ui->verticalLayout->addWidget(InfoArea);
+
+        PlotsArea->TinyDisplayArea=TinyDisplayArea;
+        PlotsArea->ControlArea=ControlArea;
+        PlotsArea->InfoArea=InfoArea;
+        TinyDisplayArea->ControlArea=ControlArea;
+        ControlArea->TinyDisplayArea=TinyDisplayArea;
+        ControlArea->InfoArea=InfoArea;
+
+        refreshDisplay();
+        PlotsArea->createData_Init();
+
+        configureZoom();
+        ui->verticalLayout->removeItem(ui->verticalSpacer);
     }
-
-    //Configuring plots
-    createData_Init();
-
-    // Init
-    Frames_Total=Files[Files_Pos]->BasicInfo->Frames_Total_Get();
-    Frames_Pos=0;
-    
-    // Pictures
-    Pictures_Update(0);
-}
-
-//***************************************************************************
-// Thumbnails
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-void MainWindow::Thumbnails_Updated ()
-{
-    Pictures_Update(Picture_Main_X);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::Thumbnails_Finished ()
-{
-    Pictures_Update(Picture_Main_X);
-}
-
-//***************************************************************************
-// Stats
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-void MainWindow::Stats_Updated ()
-{
-    //Configuring plots
-    createData_Update();
-
-    Frames_Pos=Files[Files_Pos]->Stats->Frames_Current;
+    refreshDisplay();
+    Update();
 
     // Status
-    double Stats_Progress=Files[Files_Pos]->Stats->Frames_Progress_Get();
-    Ztring Message;
-    if (Stats_Progress<1)
+    stringstream Message;
+    if (Files[Files_Pos]->Glue->VideoFramePos<Files[Files_Pos]->Glue->VideoFrameCount)
     {
-        Message+=__T("Parsing frame ")+Ztring().From_Number(Files[Files_Pos]->Stats->Frames_Current);
-        if (Files[Files_Pos]->Stats->Frames_Total)
-            Message+=__T("/")+Ztring().From_Number(Frames_Total)+__T(" (")+Ztring().From_Number(Stats_Progress*100, 0)+__T("%)");
+        Message<<"Parsing frame "<<Files[Files_Pos]->Glue->VideoFramePos;
+        if (Files[Files_Pos]->Glue->VideoFrameCount)
+            Message<<"/"<<Files[Files_Pos]->Glue->VideoFrameCount<<" ("<<(int)((double)Files[Files_Pos]->Glue->VideoFramePos)*100/Files[Files_Pos]->Glue->VideoFrameCount<<"%)";
+        statusBar()->showMessage(Message.str().c_str());
+        QTimer::singleShot(250, this, SLOT(TimeOut()));
     }
-    double Thumbnails_Progress=Files[Files_Pos]->Thumbnails->Frames_Progress_Get();
-    if (Thumbnails_Progress<1)
+    else
     {
-        if (!Message.empty())
-            Message+=__T(", ");
-        Message+=__T("Creating thumbnail ")+Ztring().From_Number(Files[Files_Pos]->Thumbnails->Frames_Current);
-        if (Files[Files_Pos]->Thumbnails->Frames_Total)
-            Message+=__T("/")+Ztring().From_Number(Frames_Total)+__T(" (")+Ztring().From_Number(Thumbnails_Progress*100, 0)+__T("%)");
+        statusBar()->showMessage("Parsing complete", 10000);
+        QTimer::singleShot(0, this, SLOT(TimeOut_Refresh()));
     }
-
-    statusBar()->showMessage(Message.To_UTF8().c_str());
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::Stats_Finished ()
+void MainWindow::TimeOut_Refresh ()
 {
-    //Configuring plots
-    createData_Update();
-
-    statusBar()->showMessage("Parsing complete", 10000);
+    // Hack for refreshing the plots, else plots are not aligned in some cases (e.g. very small file with sidecar stats file). TODO: find the source of the issue
+    refreshDisplay();
 }

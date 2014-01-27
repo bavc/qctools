@@ -1,44 +1,17 @@
+/*  Copyright (c) BAVC. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license that can
+ *  be found in the License.html file in the root of the source tree.
+ */
+
+//---------------------------------------------------------------------------
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 #include <QFileDialog>
-#include <QScrollBar>
-#include <QSizePolicy>
-#include <QScrollArea>
-#include <QPrinter>
-#include <QDesktopServices>
-#include <QUrl>
-#include <QCoreApplication>
-#include <QColor>
-#include <QPixmap>
-#include <QLabel>
-#include <QFileInfo>
-#include <QCoreApplication>
-#include <QDialog>
-#include <QToolButton>
 
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_picker.h>
-#include <qwt_plot_zoomer.h>
-#include <qwt_legend.h>
-#include <qwt_plot_grid.h>
-#include <qwt_plot_layout.h>
-#include <qwt_plot_picker.h>
-#include <qwt_plot_renderer.h>
-#include <qwt_scale_widget.h>
-#include <qwt_picker_machine.h>
-
-#ifndef UNICODE
-    #define UNICODE
-#endif //UNICODE
-#include <GUI/Help.h>
-#include <GUI/PerPicture.h>
-#include <Core/Core.h>
-#include <ZenLib/ZtringListList.h>
-#include <ZenLib/Ztring.h>
-#include <ZenLib/File.h>
-using namespace ZenLib;
+#include "Core/Core.h"
+//---------------------------------------------------------------------------
 
 //***************************************************************************
 // Constants
@@ -52,49 +25,69 @@ using namespace ZenLib;
 //---------------------------------------------------------------------------
 void MainWindow::openFile()
 {
-    ZtringListList List;
-    List.Separator_Set(1, __T(","));
-        
-    FileName=QFileDialog::getOpenFileName(this, "Open file", "", "Video files (*.avi *.mkv *.mov *.mxf);;Statistic files (*.csv);;All (*.*)");
-    if (FileName.isEmpty())
-        return;
-
-    processFile();
+    processFile(QFileDialog::getOpenFileName(this, "Open file", "", "Video files (*.avi *.mkv *.mov *.mxf *.mp4);;Statistic files (*.csv);;All (*.*)"));
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::processFile()
+void MainWindow::processFile(const QString &FileName)
 {
-    statusBar()->showMessage("Scanning "+QFileInfo(FileName).fileName()+"...");
+    if (FileName.isEmpty())
+        return;
 
-    // Delete previous
+    // Files (must be deleted first in order to stop ffmpeg processes)
     for (size_t Pos=0; Pos<Files.size(); Pos++)
         delete Files[Pos];    
-    for (size_t Type=PlotType_Y; Type<PlotType_Max; Type++)
-        if (plots[Type])
-        {
-            ui->verticalLayout->removeWidget(plots[Type]);
-            delete plotsZoomers[Type]; plotsZoomers[Type]=NULL;
-            delete plots[Type]; plots[Type]=NULL;
-        }
-    if (Pictures_Widgets)
+    Files.clear();
+    ui->fileNamesBox->clear();
+
+    // Layout
+    QLayout* Layout=layout();
+    if (PlotsArea)
     {
-        ui->verticalLayout->removeWidget(Pictures_Widgets);
-        delete Pictures_Widgets; Pictures_Widgets=NULL;
+        ui->verticalLayout->removeWidget(PlotsArea);
+        delete PlotsArea; PlotsArea=NULL;
     }
-    if (Control_Widgets)
+    if (TinyDisplayArea)
     {
-        ui->verticalLayout->removeWidget(Control_Widgets);
-        delete Control_Widgets; Control_Widgets=NULL;
+        ui->verticalLayout->removeWidget(TinyDisplayArea);
+        delete TinyDisplayArea; TinyDisplayArea=NULL;
     }
-    if (Picture_Main)
+    if (ControlArea)
     {
-        delete Picture_Main; Picture_Main=NULL;
+        ui->verticalLayout->removeWidget(ControlArea);
+        delete ControlArea; ControlArea=NULL;
+    }
+    if (InfoArea)
+    {
+        ui->verticalLayout->removeWidget(InfoArea);
+        delete InfoArea; InfoArea=NULL;
     }
 
+    // Status
+    statusBar()->showMessage("Scanning "+QFileInfo(FileName).fileName()+"...");
+
     // Launch analysis
-    Files.clear();
-    Files.push_back(new PerFile());
+    Files.push_back(new FileInformation(this, FileName));
     Files_Pos=0;
-    Files[0]->Launch(this, FileName);
+    ui->fileNamesBox->addItem(FileName);
+
+    // Coherency
+    if (Files[Files_Pos]->Glue->VideoFrameCount==0)
+    {
+        statusBar()->showMessage("Unsupported format", 10000);
+        return;
+    }
+
+    TimeOut();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::Update()
+{
+    if (TinyDisplayArea)
+        TinyDisplayArea->Update();
+    if (ControlArea)
+        ControlArea->Update();
+    if (InfoArea)
+        InfoArea->Update();
 }

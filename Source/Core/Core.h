@@ -1,7 +1,18 @@
+/*  Copyright (c) BAVC. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license that can
+ *  be found in the License.html file in the root of the source tree.
+ */
+
+//---------------------------------------------------------------------------
 #ifndef Core_H
 #define Core_H
 
 #include <new>
+
+#ifndef UNICODE
+    #define UNICODE
+#endif //UNICODE
 
 const size_t PlotName_Begin=21;
 
@@ -34,12 +45,14 @@ enum PlotName
     //Other
     PlotName_TOUT,
     PlotName_VREP,
-    PlotName_RANG,
+    PlotName_BRNG,
     PlotName_HEAD,
+    //Internal
     PlotName_Max
 };
 
 extern const char* Names[PlotName_Max];
+extern const int PlotValues_DigitsAfterComma[PlotName_Max];
 
 enum PlotType
 {
@@ -54,11 +67,14 @@ enum PlotType
     PlotType_TOUT,
     PlotType_VREP,
     PlotType_HEAD,
-    PlotType_RANG,
+    PlotType_BRNG,
+    PlotType_Axis,
     PlotType_Max
 };
 
 extern size_t StatsFile_Positions[PlotType_Max];
 extern size_t StatsFile_Counts[PlotType_Max];
+extern size_t StatsFile_CountPerLine[];
+extern const char* StatsFile_Description[PlotType_Max];
 
 #endif // Core_H

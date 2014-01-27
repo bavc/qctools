@@ -1,3 +1,9 @@
+/*  Copyright (c) BAVC. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license that can
+ *  be found in the License.html file in the root of the source tree.
+ */
+
 //---------------------------------------------------------------------------
 #ifndef HelpH
 #define HelpH
@@ -5,6 +11,7 @@
 
 //---------------------------------------------------------------------------
 #include <QDialog>
+
 class QTabWidget;
 class QPushButton;
 //---------------------------------------------------------------------------
@@ -18,12 +25,15 @@ class Help : public QDialog
     Q_OBJECT
 
 public:
+    // Constructor/Destructor
     Help (QWidget * parent);
 
-    // Direct access
-    void show_HowToUse();
-    void show_FilterDescriptions();
-    void show_License();
+    // Actions
+    void GettingStarted();
+    void HowToUseThisTool();
+    void FilterDescriptions();
+    void PlaybackFilters();
+    void About();
 
 private:
     //GUI

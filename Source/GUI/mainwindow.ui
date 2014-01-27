@@ -139,9 +139,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="check_HEAD">
+         <widget class="QCheckBox" name="check_BRNG">
           <property name="text">
-           <string>HEAD</string>
+           <string>BRNG</string>
           </property>
           <property name="checked">
            <bool>false</bool>
@@ -149,9 +149,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="check_RANG">
+         <widget class="QCheckBox" name="check_HEAD">
           <property name="text">
-           <string>RANG</string>
+           <string>HEAD</string>
           </property>
           <property name="checked">
            <bool>false</bool>
@@ -198,14 +198,21 @@
     </property>
     <addaction name="actionZoomIn"/>
     <addaction name="actionZoomOut"/>
+    <addaction name="separator"/>
+    <addaction name="actionGoTo"/>
+    <addaction name="separator"/>
+    <addaction name="actionToolbar"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionHowToUse"/>
+    <addaction name="actionGettingStarted"/>
+    <addaction name="actionHowToUseThisTool"/>
     <addaction name="actionFilterDescriptions"/>
-    <addaction name="actionLicense"/>
+    <addaction name="actionPlaybackFilters"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -238,7 +245,7 @@
    <addaction name="actionCSV"/>
    <addaction name="actionPrint"/>
    <addaction name="separator"/>
-   <addaction name="actionHowToUse"/>
+   <addaction name="actionGettingStarted"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="sizeGripEnabled">
@@ -284,9 +291,9 @@
     <string>Print</string>
    </property>
   </action>
-  <action name="actionHowToUse">
+  <action name="actionGettingStarted">
    <property name="text">
-    <string>How to use</string>
+    <string>Getting started</string>
    </property>
   </action>
   <action name="actionFilterDescriptions">
@@ -294,9 +301,9 @@
     <string>Filter Descriptions</string>
    </property>
   </action>
-  <action name="actionLicense">
+  <action name="actionAbout">
    <property name="text">
-    <string>License</string>
+    <string>About</string>
    </property>
   </action>
   <action name="actionCSV">
@@ -305,6 +312,32 @@
    </property>
    <property name="text">
     <string>CSV</string>
+   </property>
+  </action>
+  <action name="actionGoTo">
+   <property name="text">
+    <string>Go to frame at position...</string>
+   </property>
+  </action>
+  <action name="actionHowToUseThisTool">
+   <property name="text">
+    <string>How to use this tool</string>
+   </property>
+  </action>
+  <action name="actionPlaybackFilters">
+   <property name="text">
+    <string>Playback Filters</string>
+   </property>
+  </action>
+  <action name="actionToolbar">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Toolbar</string>
    </property>
   </action>
  </widget>

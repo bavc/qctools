@@ -7,9 +7,25 @@
         <file alias="zoom-out.png">zoom-out.png</file>
         <file alias="logo.jpg">logo.jpg</file>
     </qresource>
-    <qresource prefix="/documentation">
-        <file alias="Help_FilterDescriptions.html">Help_FilterDescriptions.html</file>
-        <file alias="Help_HowToUse.html">Help_HowToUse.html</file>
-        <file alias="Help_License.html">../../License.html</file>
+    <qresource prefix="/Help">
+        <file alias="About.html">../../License.html</file>
+        <file alias="GettingStarted.html">Help/GettingStarted.html</file>
+        <file alias="HowToUseThisTool.html">Help/HowToUseThisTool.html</file>
+        <file alias="FilterDescriptions.html">Help/FilterDescriptions.html</file>
+        <file alias="PlaybackFilters.html">Help/PlaybackFilters.html</file>
+        <file alias="brng_dropout.png">Help/brng_dropout.png</file>
+        <file alias="brng_syncloss.png">Help/brng_syncloss.png</file>
+        <file alias="Slide1.jpg">Help/Slide1.jpg</file>
+        <file alias="Slide2.jpg">Help/Slide2.jpg</file>
+        <file alias="Slide3.jpg">Help/Slide3.jpg</file>
+        <file alias="Slide.jpg">Help/Slide4.jpg</file>
+        <file alias="tout_trackingerror.png">Help/tout_trackingerror.png</file>
+        <file alias="u_jitters.png">Help/u_jitters.png</file>
+        <file alias="uv_chrominancenoise.png">Help/uv_chrominancenoise.png</file>
+        <file alias="uv_syncloss.png">Help/uv_syncloss.png</file>
+        <file alias="ymax_trackingerror.png">Help/ymax_trackingerror.png</file>
+        <file alias="yuv_diff.jpg">Help/yuv_diff.jpg</file>
+        <file alias="yvalues_skew.png">Help/yvalues_skew.png</file>
+        <file alias="yvalues_trackingerror.png">Help/yvalues_trackingerror.png</file>
     </qresource>
 </RCC>

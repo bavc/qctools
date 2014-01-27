@@ -1,7 +1,8 @@
-<!DOCTYPE html SYSTEM "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
-        <title>QCTools Help Guide</title>
+        <title>Filter Descriptions - QCTools Help Guide</title>
     </head>
     <body>
         <h1>Filter Descriptions</h1>
@@ -32,10 +33,10 @@
         YMAX = Y channel maximum<br/>
         </p>
         <h4>Samples which demonstrate Y Value anomalies:</h4>
-        <p>In the graph below, you can see the YMAX spikes which would manifest as white lines across the video picture:</p>
-        <img src="ymax_trackingerror.png"/>
-        <p>The graph below illustrates a reading with many luma spikes in the YLOW, YAVG, and YHIGH, most notably in the first second of the graph.</p>
-        <img src="yvalues_skew.png"/>
+        <p>In the graph below, you can see the YMAX spikes which would manifest as white lines across the video picture:<br/>
+        <img src="ymax_trackingerror.png" alt=""/></p>
+        <p>The graph below illustrates a reading with many luma spikes in the YLOW, YAVG, and YHIGH, most notably in the first second of the graph:<br/>
+        <img src="yvalues_skew.png" alt=""/></p>
 
         <h3>U, V Value Filters: UMIN, UAVG, UMAX / VMIN, VAVG, VMAX</h3>
         <table border="1">
@@ -65,12 +66,12 @@
         UMAX, VMAX = U channel maximum, V channel maximum<br/>
         </p>
         <h4>Samples which demonstrate U/V Value anomalies:</h4>
-        The graph of this video file shows dramatic variance in U and V MIN/MAX values, affects UAVG and VAVG values as well. Especially apparent from approximately around 3 and 7s where horizontal black/ white/ colored lines would likely be seen obscuring the image &#40;color loss &#41;.<br/><br/>
-        <img src="uv_syncloss.png"/>
-        <p>This is a good example of dramatic activity in U and V channels showing around the 5s mark, corresponding to chrominance noise in the video (visible rainbow-ed speckles across the picture).</p>
-        <img src="uv_chrominancenoise.png"/>
-        <p>Notice U noise in the graph below from approximately 2.86s to 4.37s. Also seen in UDIF reading.</p>
-        <img src="u_jitters.png"/>
+        <p>The graph of this video file shows dramatic variance in U and V MIN/MAX values, affects UAVG and VAVG values as well. Especially apparent from approximately around 3 and 7s where horizontal black/ white/ colored lines would likely be seen obscuring the image &#40;color loss &#41;.<br/>
+        <img src="uv_syncloss.png" alt=""/></p>
+        <p>This is a good example of dramatic activity in U and V channels showing around the 5s mark, corresponding to chrominance noise in the video (visible rainbow-ed speckles across the picture).<br/>
+        <img src="uv_chrominancenoise.png" alt=""/></p>
+        <p>Notice U noise in the graph below from approximately 2.86s to 4.37s. Also seen in UDIF reading.<br/>
+        <img src="u_jitters.png" alt=""/></p>
 
         <h2 style="color:blue">YUV Values/ LOW, HIGH</h2>
         <table border="1">
@@ -98,8 +99,8 @@
         <p>This filter works in a similar fashion as the YUV *MIN and *MAX filters, but instead of looking at the absolute minimum and maximum value for these channels, it looks at the 10th percentile (LOW, or 16 pixels) and 95th percentile (HIGH, or 235 pixels) which present the outside limits of the legal broadcast range. An extreme minimum or maximum value could dramatically skew the graph but because they may be outside the viewable broadcast image, they may not necessarily be meaningful indicators of a problematic visual image. For that reason, it is useful to screen for the low/high values within broadcast range.</p>
 
         <h4>Samples which demonstrate YUV LOW/HIGH anomalies:</h4>
-        Notice the jagged spikes in the YHIGH values.<br/><br/>
-        <img src="yvalues_trackingerror.png" />
+        <p>Notice the jagged spikes in the YHIGH values.<br/>
+        <img src="yvalues_trackingerror.png" alt=""/></p>
         <h2 style="color:blue">YUV Values / Difference</h2>
         <table border="1">
             <tr>
@@ -143,7 +144,7 @@
         YDIF2 = YDIF of video deck head 2<br/>
         </p>
         <h4>Samples which demonstrate YUV Difference anomalies:</h4>
-        <img src="yuv_diff.jpg" />
+        <p><img src="yuv_diff.jpg" alt=""/></p>
 
         <h2 style="color:blue">Temporal Outliers (TOUT)</h2>
         <table border="1">
@@ -160,8 +161,8 @@
         </table>
         <p>This filter was created to detect white speckle noise in analog VHS and 8mm video. It works by analyzing the current pixel against the two above and below and calculates an average value. In cases where the filter detects a pixel value which is dramatically outside of this established average, the graph will show small spikes, or blips, which correspond to white speckling in the video. The range of 0.00-0.09 is considered normal, and anything above that range is a questionable quality issue.</p>
         <h4>Samples which demonstrate Temporal Outliers' anomalies:</h4>
-        <p>You can see several blips in the graph reading, especially around 7.5s, 15s, and 24s</p>
-        <img src="tout_trackingerror.png"/>
+        <p>You can see several blips in the graph reading, especially around 7.5s, 15s, and 24s:<br/>
+        <img src="tout_trackingerror.png" alt=""/></p>
 
         <h2 style="color:blue">Head Switching (HEAD)</h2>
         <table border="1">
@@ -209,8 +210,8 @@
         </table>
         <p>The BRNG filter is one that identifies the number of pixels which fall outside the standard video broadcast range of 16-235 pixels. Normal, noise-free video would not trigger this filer, but noise occurring outside of these parameters would read as spikes in the graph. Typically sudden spikes of anything with a value over 0.01 will read as an artifact such as a dropout which would contain random luminosity values which would thus often fall outside of broadcast range. While the BRNG filter is good at detecting the general presence of noise, it can be a bit non-specific in its identification of the causes.</p>
         <h4>Samples which demonstrate Broadcast Range anomalies:</h4>
-        <img src="brng_syncloss.png"/>
-        <p>The graph below shows sharp spike in BRNG around 5.5s of the video which likely manifests as an over-brightness of this portion of the video.</p>
-        <img src="brng_dropout.png"/>
+        <p><img src="brng_syncloss.png" alt=""/></p>
+        <p>The graph below shows sharp spike in BRNG around 5.5s of the video which likely manifests as an over-brightness of this portion of the video:<br/>
+        <img src="brng_dropout.png" alt=""/></p>
     </body>
 </html>

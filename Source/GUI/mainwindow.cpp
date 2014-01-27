@@ -1,3 +1,10 @@
+/*  Copyright (c) BAVC. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license that can
+ *  be found in the License.html file in the root of the source tree.
+ */
+
+//---------------------------------------------------------------------------
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -15,24 +22,8 @@
 #include <QMimeData>
 #include <QLabel>
 #include <QToolButton>
-
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_picker.h>
-#include <qwt_plot_zoomer.h>
-#include <qwt_legend.h>
-#include <qwt_plot_grid.h>
-#include <qwt_plot_layout.h>
-#include <qwt_plot_picker.h>
-#include <qwt_plot_renderer.h>
-#include <qwt_scale_widget.h>
-
-#include "GUI/PerPicture.h"
-
-#include <ZenLib/ZtringListList.h>
-#include <ZenLib/Ztring.h>
-#include <ZenLib/File.h>
-using namespace ZenLib;
+#include <QPushButton>
+#include <QinputDialog>
 
 
 //***************************************************************************
@@ -44,22 +35,45 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    Ui_Init();
-    Plots_Init();
-    Pictures_Init();
-    configureZoom();
+    // Plots
+    PlotsArea=NULL;
 
-    // Per file
+    // Pictures
+    TinyDisplayArea=NULL;
+
+    // Control
+    ControlArea=NULL;
+
+    // Info
+    InfoArea=NULL;
+
+    // Files
     Files_Pos=(size_t)-1;
+
+    // UI
+    Ui_Init();
 }
 
 //---------------------------------------------------------------------------
 MainWindow::~MainWindow()
 {
+    // Files (must be deleted first in order to stop ffmpeg processes)
     for (size_t Pos=0; Pos<Files.size(); Pos++)
         delete Files[Pos];    
-    delete Picture_Main;
 
+    // Plots
+    delete PlotsArea;
+
+    // Pictures
+    delete TinyDisplayArea;
+
+    // Controls
+    delete ControlArea;
+
+    // Info
+    delete InfoArea;
+
+    // UI
     delete ui;
 }
 
@@ -98,6 +112,35 @@ void MainWindow::on_actionZoomOut_triggered()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_actionGoTo_triggered()
+{
+    if (!ControlArea && !TinyDisplayArea) //TODO: without TinyDisplayArea
+        return;
+
+    if (Files_Pos>=Files.size())
+        return;
+    
+    bool ok;
+    int i = QInputDialog::getInt(this, tr("Go to frame at position..."), tr("frame position (0-based):"), Files[Files_Pos]->Glue->VideoFramePos, 0, Files[Files_Pos]->Glue->VideoFrameCount, 1, &ok);
+    if (ok)
+    {
+        Files[Files_Pos]->Frames_Pos_Set(i);
+    }
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionToolbar_triggered()
+{
+    ui->toolBar->setVisible(ui->actionToolbar->isChecked());
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_Toolbar_visibilityChanged(bool visible)
+{
+    ui->actionToolbar->setChecked(visible);
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::on_actionCSV_triggered()
 {
     Export_CSV();
@@ -110,7 +153,13 @@ void MainWindow::on_actionPrint_triggered()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_actionHowToUse_triggered()
+void MainWindow::on_actionGettingStarted_triggered()
+{
+    Help_GettingStarted();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionHowToUseThisTool_triggered()
 {
     Help_HowToUse();
 }
@@ -122,9 +171,15 @@ void MainWindow::on_actionFilterDescriptions_triggered()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_actionLicense_triggered()
+void MainWindow::on_actionPlaybackFilters_triggered()
 {
-    Help_License();
+    Help_PlaybackFilters();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionAbout_triggered()
+{
+    Help_About();
 }
 
 //---------------------------------------------------------------------------
@@ -194,7 +249,7 @@ void MainWindow::on_check_HEAD_toggled(bool checked)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_check_RANG_toggled(bool checked)
+void MainWindow::on_check_BRNG_toggled(bool checked)
 {
     refreshDisplay();
 }
@@ -214,69 +269,10 @@ void MainWindow::dropEvent(QDropEvent *event)
         //foreach (QUrl url, event->mimeData()->urls())
         {
           
-            FileName=event->mimeData()->urls()[0].toLocalFile();
+            processFile(event->mimeData()->urls()[0].toLocalFile());
 
             //break; //TEMP: currently only one file
         }
     }
-
-    processFile();
 }
 
-void MainWindow::plot_moved( const QPoint &pos )
-{
-    QString info;
-
-    double X=plots[0]->invTransform(QwtPlot::xBottom, pos.x());
-    double Y=plots[0]->invTransform(QwtPlot::yLeft, pos.y());
-    if (X<0)
-        X=0;
-    if (Y<0)
-        Y=0;
-    double FrameRate=Frames_Total/Files[Files_Pos]->BasicInfo->Duration_Get();
-    Picture_Main_X=(size_t)(X*FrameRate);
-    if (Picture_Main_X>=Frames_Total)
-        Picture_Main_X=Frames_Total-1;
-    
-    Pictures_Update(Picture_Main_X);
-}
-
-void MainWindow::plot_mousePressEvent(QMouseEvent *ev) 
-{
-    QPoint Point(ev->x(), ev->y());
-    plot_moved(Point);
-}
-
-void MainWindow::on_Labels_Middle_clicked(bool checked)
-{
-    bool ShouldDisplay=true;
-    if (Picture_Main)
-    {
-        ShouldDisplay=!Picture_Main->isVisible();
-        delete Picture_Main; Picture_Main=NULL;
-    }
-    
-    if (ShouldDisplay)
-    {
-        Picture_Main=new PerPicture(this);
-        Picture_Main->move(geometry().left()+geometry().width(), geometry().top());
-        Picture_Main->show();
-        Picture_Main->ShowPicture(Picture_Main_X, Files[Files_Pos]->Stats->y, FileName, Files[0]);
-    }
-}
-
-void MainWindow::on_Control_Minus1_clicked(bool checked)
-{
-    if (Picture_Main_X==0)
-        return;
-    
-    Pictures_Update(Picture_Main_X-1);
-}
-
-void MainWindow::on_Control_Plus1_clicked(bool checked)
-{
-    if (Picture_Main_X+1>=Frames_Total)
-        return;
-    
-    Pictures_Update(Picture_Main_X+1);
-}

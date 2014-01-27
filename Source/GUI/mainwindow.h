@@ -1,3 +1,10 @@
+/*  Copyright (c) BAVC. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license that can
+ *  be found in the License.html file in the root of the source tree.
+ */
+
+//---------------------------------------------------------------------------
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -11,13 +18,18 @@
 using namespace std;
 
 #include "Core/Core.h"
-#include "GUI/PerFile.h"
+#include "GUI/FileInformation.h"
+#include "GUI/Plots.h"
+#include "GUI/TinyDisplay.h"
+#include "GUI/Control.h"
+#include "GUI/Info.h"
 
 namespace Ui {
 class MainWindow;
 }
 
 class QwtPlot;
+class QwtLegend;
 class QwtPlotZoomer;
 class QwtPlotCurve;
 class QwtPlotPicker;
@@ -28,6 +40,7 @@ class QToolButton;
 class QDropEvent;
 class QDragEnterEvent;
 class QPushButton;
+class QComboBox;
 
 class PerPicture;
 
@@ -42,14 +55,12 @@ public:
     //Functions
     void dragEnterEvent         (QDragEnterEvent *event);
     void dropEvent              (QDropEvent *event);
-
-    //Temp
-    QString                     FileName;
     
     // UI
     void                        Ui_Init                     ();
     void                        configureZoom               ();
-    void                        processFile                 ();
+    void                        Update                      ();
+    void                        processFile                 (const QString &FileName);
     void                        openFile                    ();
     void                        Zoom_Move                   (size_t Begin);
     void                        Zoom_In                     ();
@@ -57,58 +68,27 @@ public:
     void                        Export_CSV                  ();
     void                        Export_PDF                  ();
     void                        refreshDisplay              ();
+    void                        refreshDisplay_Axis         ();
+    void                        Help_GettingStarted         ();
     void                        Help_HowToUse               ();
     void                        Help_FilterDescriptions     ();
-    void                        Help_License                ();
+    void                        Help_PlaybackFilters        ();
+    void                        Help_About                  ();
 
-    // Plots
-    void                        Plots_Init                  ();
-    void                        Plots_Create                ();
-    void                        Plots_Create                (PlotType Type);
-    void                        createData_Init             ();
-    void                        createData_Update           ();
-    void                        createData_Update           (PlotType Type);
-    QwtPlot*                    plots[PlotType_Max];
-    QwtPlotCurve*               curves[PlotType_Max][5];
-    QwtPlotZoomer*              plotsZoomers[PlotType_Max];
-    QwtPlotPicker*              plotsPicker[PlotType_Max];
-    size_t                      ZoomScale;
-    int                         Frames_Total;
-    int                         Frames_Pos;
-    double                      plots_YMax[PlotType_Max];
+    // Visual elements
+    Plots*                      PlotsArea;
+    TinyDisplay*                TinyDisplayArea;
+    Control*                    ControlArea;
+    Info*                       InfoArea;
 
-    // Pictures
-    void                        Pictures_Init               ();
-    void                        Pictures_Create             ();
-    void                        Pictures_Update             (size_t Picture_Pos);
-    QWidget*                    Pictures_Widgets;
-    QLabel*                     Labels[9];
-    QToolButton*                Labels_Middle;
-    PerPicture*                 Picture_Main;
-    size_t                      Picture_Main_X;
-    QLabel*                     FirstDisplay;
-    QWidget*                    Control_Widgets;
-    QLabel*                     Control_Info;
-    QPushButton*                Control_Minus;
-    QPushButton*                Control_Plus;
-
-    // Per file
-    std::vector<PerFile*>       Files;
+    // Files
+    std::vector<FileInformation*> Files;
     size_t                      Files_Pos;
 
-    // Callbacks
-    void                        BasicInfo_Finished          ();
-    void                        Thumbnails_Updated          ();
-    void                        Thumbnails_Finished         ();
-    void                        Stats_Updated               ();
-    void                        Stats_Finished              ();
-
 private Q_SLOTS:
-    void plot_moved( const QPoint & );
-    void plot_mousePressEvent(QMouseEvent *ev);
-    void on_Labels_Middle_clicked(bool checked);
-    void on_Control_Minus1_clicked(bool checked);
-    void on_Control_Plus1_clicked(bool checked);
+
+    void TimeOut();
+    void TimeOut_Refresh();
 
     void on_actionQuit_triggered();
 
@@ -120,15 +100,25 @@ private Q_SLOTS:
 
     void on_actionZoomOut_triggered();
 
+    void on_actionGoTo_triggered();
+
+    void on_actionToolbar_triggered();
+
+    void on_Toolbar_visibilityChanged(bool visible);
+
     void on_actionCSV_triggered();
 
     void on_actionPrint_triggered();
 
-    void on_actionHowToUse_triggered();
+    void on_actionGettingStarted_triggered();
+
+    void on_actionHowToUseThisTool_triggered();
 
     void on_actionFilterDescriptions_triggered();
 
-    void on_actionLicense_triggered();
+    void on_actionPlaybackFilters_triggered();
+
+    void on_actionAbout_triggered();
 
     void on_check_Y_toggled(bool checked);
 
@@ -152,7 +142,7 @@ private Q_SLOTS:
 
     void on_check_HEAD_toggled(bool checked);
 
-    void on_check_RANG_toggled(bool checked);
+    void on_check_BRNG_toggled(bool checked);
 
 private:
     Ui::MainWindow *ui;

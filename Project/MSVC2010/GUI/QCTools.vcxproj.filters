@@ -19,15 +19,21 @@
     <Filter Include="Source Files\_Automated">
       <UniqueIdentifier>{0cf4eb04-0bc8-4572-b3f2-a23fba77b643}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\GUI">
+      <UniqueIdentifier>{25966f47-d457-4458-8367-92ca99aebc1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{7701837b-72b8-416e-9d45-84b2f622b539}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GUI">
+      <UniqueIdentifier>{c1311d4e-9726-4a90-9605-baa55816baa5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{4e4fa5d7-7494-4115-97db-f95a656bf04e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Source\GUI\mainwindow_More.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\mainwindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="_Automated\moc_mainwindow.cpp">
@@ -36,94 +42,100 @@
     <ClCompile Include="_Automated\qrc_Resources.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Core\Core.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Help.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="_Automated\moc_Help.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\PerPicture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_PerPicture.cpp">
+    <ClCompile Include="_Automated\moc_Plots.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Core\ffmpeg_BasicInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_ffmpeg_BasicInfo.cpp">
+    <ClCompile Include="_Automated\moc_Control.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Core\ffmpeg_Thumbnails.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_ffmpeg_Thumbnails.cpp">
+    <ClCompile Include="_Automated\moc_Info.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Core\ffmpeg_Stats.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_ffmpeg_Stats.cpp">
+    <ClCompile Include="_Automated\moc_TinyDisplay.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\mainwindow_Callbacks.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="_Automated\moc_BigDisplay.cpp">
+      <Filter>Source Files\_Automated</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\PerFile.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\..\Source\GUI\TinyDisplay.cpp">
+      <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\mainwindow_Plots.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\..\Source\GUI\BigDisplay.cpp">
+      <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\mainwindow_Pictures.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\..\Source\GUI\Plots.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Core\Core.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Control.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\mainwindow.cpp">
+      <Filter>Source Files\GUI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\mainwindow_Ui.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Core\ffmpeg_Pictures.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\..\Source\GUI\mainwindow_Callbacks.cpp">
+      <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="_Automated\moc_ffmpeg_Pictures.cpp">
+    <ClCompile Include="..\..\..\Source\GUI\mainwindow_More.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Help.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Info.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Core\FFmpeg_Glue.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\FileInformation.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_FileInformation.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Source\GUI\mainwindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="_Automated\ui_mainwindow.h">
       <Filter>Header Files\_Automated</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\TinyDisplay.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\BigDisplay.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Plots.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Info.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Help.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="_Automated\ui_PerPicture.h">
-      <Filter>Header Files\_Automated</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\PerPicture.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Core\Core.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Core\ffmpeg_BasicInfo.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\..\Source\GUI\Control.h">
+      <Filter>Header Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Core\ffmpeg_Thumbnails.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\..\Source\GUI\mainwindow.h">
+      <Filter>Header Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Core\ffmpeg_Stats.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\..\Source\Core\FFmpeg_Glue.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\PerFile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Core\ffmpeg_Pictures.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\..\Source\GUI\FileInformation.h">
+      <Filter>Header Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
