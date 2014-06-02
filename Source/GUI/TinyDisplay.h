@@ -38,18 +38,20 @@ public:
 
     // Commands
     void                        Update                      ();
+    void                        Filters_Show                (); //Quick hack for showing filters
 
     // Info
     bool                        ShouldUpate;
 
 protected:
     // File information
-    FileInformation*                   FileInfoData;
+    FileInformation*            FileInfoData;
     int                         Frames_Pos;
 
     // Widgets
     QLabel*                     Labels[9];
     QToolButton*                Labels_Middle;
+    QPixmap                     Labels_Temp[9];
 
 private Q_SLOTS:
     void on_Labels_Middle_clicked(bool checked);

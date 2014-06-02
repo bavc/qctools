@@ -38,50 +38,54 @@
 void MainWindow::TimeOut ()
 {
     // Configuring plots
-    if (PlotsArea==NULL)
-    {
-        PlotsArea=new Plots(this, Files[Files_Pos]);
-        ui->verticalLayout->addWidget(PlotsArea);
-
-        TinyDisplayArea=new TinyDisplay(this, Files[Files_Pos]);
-        ui->verticalLayout->addWidget(TinyDisplayArea);
-
-        ControlArea=new Control(this, Files[Files_Pos], Control::Style_Cols);
-        ui->verticalLayout->addWidget(ControlArea);
-
-        InfoArea=new Info(this, Files[Files_Pos], Info::Style_Grid);
-        ui->verticalLayout->addWidget(InfoArea);
-
-        PlotsArea->TinyDisplayArea=TinyDisplayArea;
-        PlotsArea->ControlArea=ControlArea;
-        PlotsArea->InfoArea=InfoArea;
-        TinyDisplayArea->ControlArea=ControlArea;
-        ControlArea->TinyDisplayArea=TinyDisplayArea;
-        ControlArea->InfoArea=InfoArea;
-
-        refreshDisplay();
-        PlotsArea->createData_Init();
-
-        configureZoom();
-        ui->verticalLayout->removeItem(ui->verticalSpacer);
-    }
+    if (ui->actionFilesList->isChecked() && FilesListArea==NULL)
+        createFilesList();
+    if (ui->actionGraphsLayout->isChecked() && PlotsArea==NULL)
+        createGraphsLayout();
     refreshDisplay();
     Update();
 
     // Status
-    stringstream Message;
-    if (Files[Files_Pos]->Glue->VideoFramePos<Files[Files_Pos]->Glue->VideoFrameCount)
+    stringstream Message_Total;
+    int Files_Completed=0;
+    if (Files.size()>1)
     {
-        Message<<"Parsing frame "<<Files[Files_Pos]->Glue->VideoFramePos;
-        if (Files[Files_Pos]->Glue->VideoFrameCount)
-            Message<<"/"<<Files[Files_Pos]->Glue->VideoFrameCount<<" ("<<(int)((double)Files[Files_Pos]->Glue->VideoFramePos)*100/Files[Files_Pos]->Glue->VideoFrameCount<<"%)";
-        statusBar()->showMessage(Message.str().c_str());
-        QTimer::singleShot(250, this, SLOT(TimeOut()));
+        Message_Total<<", total ";
+        int VideoFrameCount_Total=0;
+        int VideoFramePos_Total=0;
+        for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
+        {
+            VideoFramePos_Total+=Files[Files_Pos]->Glue->VideoFramePos;
+            VideoFrameCount_Total+=Files[Files_Pos]->Glue->VideoFrameCount;
+        }
+        if (Files_Completed!=Files.size())
+            Message_Total<<(int)((double)VideoFramePos_Total)*100/VideoFrameCount_Total<<"%";
     }
-    else
+    for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
+        if (Files[Files_Pos]->Glue->VideoFramePos==Files[Files_Pos]->Glue->VideoFrameCount)
+            Files_Completed++;
+
+    if (Files_CurrentPos!=(size_t)-1)
     {
-        statusBar()->showMessage("Parsing complete", 10000);
-        QTimer::singleShot(0, this, SLOT(TimeOut_Refresh()));
+        if (Files[Files_CurrentPos]->Glue->VideoFramePos<Files[Files_CurrentPos]->Glue->VideoFrameCount)
+        {
+            stringstream Message;
+            Message<<"Parsing frame "<<Files[Files_CurrentPos]->Glue->VideoFramePos;
+            if (Files[Files_CurrentPos]->Glue->VideoFrameCount)
+                Message<<"/"<<Files[Files_CurrentPos]->Glue->VideoFrameCount<<" ("<<(int)((double)Files[Files_CurrentPos]->Glue->VideoFramePos)*100/Files[Files_CurrentPos]->Glue->VideoFrameCount<<"%)";
+            statusBar()->showMessage((Message.str()+Message_Total.str()).c_str());
+            QTimer::singleShot(250, this, SLOT(TimeOut()));
+        }
+        else
+        {
+            statusBar()->showMessage(("Parsing complete"+Message_Total.str()).c_str(), 10000);
+            if (Files_Completed==Files.size())
+                QTimer::singleShot(0, this, SLOT(TimeOut_Refresh()));
+            else
+                QTimer::singleShot(250, this, SLOT(TimeOut()));
+        }
+        if (FilesListArea)
+            FilesListArea->Update();
     }
 }
 

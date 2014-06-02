@@ -104,12 +104,27 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
         return;
     VideoStream=FormatContext->streams[VideoStream_Index];
 
+    // Audio stream
+    int AudioStream_Index=av_find_best_stream(FormatContext, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
+    if (AudioStream_Index>=0)
+        AudioStream=FormatContext->streams[AudioStream_Index];
+    else
+        AudioStream=NULL;
+
     // Video codec
     AVCodec* VideoStream_Codec=avcodec_find_decoder(VideoStream->codec->codec_id);
     if (!VideoStream_Codec)
         return;
     if (avcodec_open2(VideoStream->codec, VideoStream_Codec, NULL) < 0)
         return;
+
+    // Audio codec
+    if (AudioStream)
+    {
+        AVCodec* AudioStream_Codec=avcodec_find_decoder(AudioStream->codec->codec_id);
+        if (AudioStream_Codec)
+            avcodec_open2(AudioStream->codec, AudioStream_Codec, NULL);
+    }
 
     // Frame
     Frame = avcodec_alloc_frame();
@@ -160,19 +175,8 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
             y[j] = new double[VideoFrameCount];
             memset(y[j], 0x00, VideoFrameCount*sizeof(double));
         }
-    
-        y_Max[PlotType_Y]=255;
-        y_Max[PlotType_U]=255;
-        y_Max[PlotType_V]=255;
-        y_Max[PlotType_YDiff]=0;
-        y_Max[PlotType_YDiffX]=0;
-        y_Max[PlotType_UDiff]=0;
-        y_Max[PlotType_VDiff]=0;
-        y_Max[PlotType_Diffs]=0;
-        y_Max[PlotType_TOUT]=0;
-        y_Max[PlotType_VREP]=0;
-        y_Max[PlotType_HEAD]=0;
-        y_Max[PlotType_BRNG]=0;
+        for(size_t j=0; j<PlotType_Max; ++j)
+            y_Max[j]=0; //PerPlotGroup[j].Max;
     }
     x_Max=0;
     x_Line_Begin=0;
@@ -296,43 +300,11 @@ void FFmpeg_Glue::NextFrame()
                         size_t j=Pos2-PlotName_Begin;
                         y[j][x_Max]=std::atof(Value.data());
 
-                        switch (j)
-                        {
-                            case PlotName_YDIF :    if (y_Max[PlotType_YDiff]<y[j][x_Max])
-                                                        y_Max[PlotType_YDiff]=y[j][x_Max];
-                                                    if (y_Max[PlotType_Diffs]<y[j][x_Max])
-                                                        y_Max[PlotType_Diffs]=y[j][x_Max];
-                                                    break;
-                            case PlotName_UDIF :    if (y_Max[PlotType_UDiff]<y[j][x_Max])
-                                                        y_Max[PlotType_UDiff]=y[j][x_Max];
-                                                    if (y_Max[PlotType_Diffs]<y[j][x_Max])
-                                                        y_Max[PlotType_Diffs]=y[j][x_Max];
-                                                    break;
-                            case PlotName_VDIF :    if (y_Max[PlotType_VDiff]<y[j][x_Max])
-                                                        y_Max[PlotType_VDiff]=y[j][x_Max];
-                                                    if (y_Max[PlotType_Diffs]<y[j][x_Max])
-                                                        y_Max[PlotType_Diffs]=y[j][x_Max];
-                                                    break;
-                            case PlotName_YDIF1 :   if (y_Max[PlotType_YDiffX]<y[j][x_Max])
-                                                        y_Max[PlotType_YDiffX]=y[j][x_Max];
-                                                    break;
-                            case PlotName_YDIF2 :   if (y_Max[PlotType_YDiffX]<y[j][x_Max])
-                                                        y_Max[PlotType_YDiffX]=y[j][x_Max];
-                                                    break;
-                            case PlotName_TOUT :    if (y_Max[PlotType_TOUT]<y[j][x_Max])
-                                                        y_Max[PlotType_TOUT]=y[j][x_Max];
-                                                    break;
-                            case PlotName_VREP :    if (y_Max[PlotType_VREP]<y[j][x_Max])
-                                                        y_Max[PlotType_VREP]=y[j][x_Max];
-                                                    break;
-                            case PlotName_BRNG :    if (y_Max[PlotType_BRNG]<y[j][x_Max])
-                                                        y_Max[PlotType_BRNG]=y[j][x_Max];
-                                                    break;
-                            case PlotName_HEAD :    if (y_Max[PlotType_HEAD]<y[j][x_Max])
-                                                        y_Max[PlotType_HEAD]=y[j][x_Max];
-                                                    break;
-                            default:                ;
-                        }
+                        //TODO
+                        if (PerPlotName[j].Group1!=PlotType_Max && y_Max[PerPlotName[j].Group1]<y[j][x_Max])
+                            y_Max[PerPlotName[j].Group1]=y[j][x_Max];
+                        if (PerPlotName[j].Group2!=PlotType_Max && y_Max[PerPlotName[j].Group2]<y[j][x_Max])
+                            y_Max[PerPlotName[j].Group2]=y[j][x_Max];
                     }
 
                     if (Col_End>=Line_End)
@@ -669,54 +641,29 @@ bool FFmpeg_Glue::Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, 
 
             AVDictionary * m=av_frame_get_metadata (FilteredFrame);
             AVDictionaryEntry* e=NULL;
-            //string A;
-            size_t j=0;
+            string A;
             for (;;)
             {
                 e=av_dict_get 	(m, "", e, AV_DICT_IGNORE_SUFFIX);
                 if (!e)
                     break;
-                y[j][x_Max]=std::atof(e->value);
-
-                switch (j)
+                size_t j=0;
+                for (; j<PlotName_Max; j++)
                 {
-                    case PlotName_YDIF :    if (y_Max[PlotType_YDiff]<y[j][x_Max])
-                                                y_Max[PlotType_YDiff]=y[j][x_Max];
-                                            if (y_Max[PlotType_Diffs]<y[j][x_Max])
-                                                y_Max[PlotType_Diffs]=y[j][x_Max];
-                                            break;
-                    case PlotName_UDIF :    if (y_Max[PlotType_UDiff]<y[j][x_Max])
-                                                y_Max[PlotType_UDiff]=y[j][x_Max];
-                                            if (y_Max[PlotType_Diffs]<y[j][x_Max])
-                                                y_Max[PlotType_Diffs]=y[j][x_Max];
-                                            break;
-                    case PlotName_VDIF :    if (y_Max[PlotType_VDiff]<y[j][x_Max])
-                                                y_Max[PlotType_VDiff]=y[j][x_Max];
-                                            if (y_Max[PlotType_Diffs]<y[j][x_Max])
-                                                y_Max[PlotType_Diffs]=y[j][x_Max];
-                                            break;
-                    case PlotName_YDIF1 :   if (y_Max[PlotType_YDiffX]<y[j][x_Max])
-                                                y_Max[PlotType_YDiffX]=y[j][x_Max];
-                                            break;
-                    case PlotName_YDIF2 :   if (y_Max[PlotType_YDiffX]<y[j][x_Max])
-                                                y_Max[PlotType_YDiffX]=y[j][x_Max];
-                                            break;
-                    case PlotName_TOUT :    if (y_Max[PlotType_TOUT]<y[j][x_Max])
-                                                y_Max[PlotType_TOUT]=y[j][x_Max];
-                                            break;
-                    case PlotName_VREP :    if (y_Max[PlotType_VREP]<y[j][x_Max])
-                                                y_Max[PlotType_VREP]=y[j][x_Max];
-                                            break;
-                    case PlotName_BRNG :    if (y_Max[PlotType_BRNG]<y[j][x_Max])
-                                                y_Max[PlotType_BRNG]=y[j][x_Max];
-                                            break;
-                    case PlotName_HEAD :    if (y_Max[PlotType_HEAD]<y[j][x_Max])
-                                                y_Max[PlotType_HEAD]=y[j][x_Max];
-                                            break;
-                    default:                ;
+                    if (strcmp(e->key, PerPlotName[j].FFmpeg_Name)==0)
+                        break;
                 }
 
-                j++;
+                if (j<PlotName_Max)
+                {
+                    y[j][x_Max]=std::atof(e->value);
+
+                    if (PerPlotName[j].Group1!=PlotType_Max && y_Max[PerPlotName[j].Group1]<y[j][x_Max])
+                        y_Max[PerPlotName[j].Group1]=y[j][x_Max];
+                    if (PerPlotName[j].Group2!=PlotType_Max && y_Max[PerPlotName[j].Group2]<y[j][x_Max])
+                        y_Max[PerPlotName[j].Group2]=y[j][x_Max];
+                }
+
                 /*
                 A+=e->key;
                 A+=',';
@@ -732,6 +679,13 @@ bool FFmpeg_Glue::Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, 
             return true; // TODO: handle such cases
         if (GetAnswer<0)
             return true; // Error
+
+        //TODO: add a real flag for skipping filter
+        if (OutputMethod!=Output_QImage) //Awful hack: we detect it is not the BigBisplay
+        {
+            av_frame_unref(FilteredFrame);
+            FilteredFrame=Frame; // The filtered frame is the decoded frame
+        }
     }
 
     //Scale
@@ -805,10 +759,309 @@ bool FFmpeg_Glue::Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, 
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+string FFmpeg_Glue::ContainerFormat_Get()
+{
+    if (FormatContext==NULL || FormatContext->iformat==NULL || FormatContext->iformat->long_name==NULL)
+        return "";
+
+    return FormatContext->iformat->long_name;
+}
+
+//---------------------------------------------------------------------------
+int FFmpeg_Glue::StreamCount_Get()
+{
+    if (FormatContext==NULL)
+        return 0;
+
+    return FormatContext->nb_streams;
+}
+
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::VideoFormat_Get()
+{
+    if (VideoStream==NULL || VideoStream->codec==NULL || VideoStream->codec->codec==NULL || VideoStream->codec->codec->long_name==NULL)
+        return "";
+
+    return VideoStream->codec->codec->long_name;
+}
+
+//---------------------------------------------------------------------------
+int FFmpeg_Glue::Width_Get()
+{
+    if (VideoStream==NULL || VideoStream->codec==NULL)
+        return 0;
+
+    return VideoStream->codec->width;
+}
+
+//---------------------------------------------------------------------------
+int FFmpeg_Glue::Height_Get()
+{
+    if (VideoStream==NULL || VideoStream->codec==NULL)
+        return 0;
+
+    return VideoStream->codec->height;
+}
+
+//---------------------------------------------------------------------------
+double FFmpeg_Glue::DAR_Get()
+{
+    if (VideoStream==NULL || VideoStream->codec==NULL || VideoStream->codec->codec==NULL || VideoStream->codec->codec->long_name==NULL)
+        return 0;
+
+    double DAR;
+    if (VideoStream->codec->sample_aspect_ratio.num && VideoStream->codec->sample_aspect_ratio.den)
+        DAR=((double)VideoStream->codec->width)/VideoStream->codec->height*VideoStream->codec->sample_aspect_ratio.num/VideoStream->codec->sample_aspect_ratio.den;
+    else if ((VideoStream->codec->width>=704 && VideoStream->codec->width<=720) //NTSC / PAL
+          && ((VideoStream->codec->height>=480 && VideoStream->codec->height<=486)
+           || VideoStream->codec->height==576))
+        DAR=((double)4)/3;
+    else
+        DAR=((double)VideoStream->codec->width)/VideoStream->codec->height;
+    return DAR;
+}
+
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::PixFormat_Get()
+{
+    if (VideoStream==NULL || VideoStream->codec==NULL)
+        return "";
+
+    switch (VideoStream->codec->pix_fmt)
+    {
+        case AV_PIX_FMT_YUV420P: return "planar YUV 4:2:0, 12bpp, (1 Cr & Cb sample per 2x2 Y samples)";
+        case AV_PIX_FMT_YUYV422: return "packed YUV 4:2:2, 16bpp, Y0 Cb Y1 Cr";
+        case AV_PIX_FMT_RGB24:   return "packed RGB 8:8:8, 24bpp, RGBRGB...";
+        case AV_PIX_FMT_BGR24:   return "packed RGB 8:8:8, 24bpp, BGRBGR...";
+        case AV_PIX_FMT_YUV422P: return "planar YUV 4:2:2, 16bpp, (1 Cr & Cb sample per 2x1 Y samples)";
+        case AV_PIX_FMT_YUV444P: return "planar YUV 4:4:4, 24bpp, (1 Cr & Cb sample per 1x1 Y samples)";
+        case AV_PIX_FMT_YUV410P: return "planar YUV 4:1:0: 9bpp, (1 Cr & Cb sample per 4x4 Y samples)";
+        case AV_PIX_FMT_YUV411P: return "planar YUV 4:1:1, 12bpp, (1 Cr & Cb sample per 4x1 Y samples)";
+        case AV_PIX_FMT_GRAY8:   return "Y 8bpp";
+        case AV_PIX_FMT_MONOWHITE: return "Y 1bpp, 0 is white, 1 is black, in each byte pixels are ordered from the msb to the lsb";
+        case AV_PIX_FMT_MONOBLACK: return " Y 1bpp, 0 is black, 1 is white, in each byte pixels are ordered from the msb to the lsb";
+        case AV_PIX_FMT_PAL8:    return "8 bit with PIX_FMT_RGB32 palette";
+        case AV_PIX_FMT_YUVJ420P: return "planar YUV 4:2:0, 12bpp, full scale (JPEG), deprecated in favor of PIX_FMT_YUV420P and setting color_range";
+        case AV_PIX_FMT_YUVJ422P: return "planar YUV 4:2:2, 16bpp, full scale (JPEG), deprecated in favor of PIX_FMT_YUV422P and setting color_range";
+        case AV_PIX_FMT_YUVJ444P: return "planar YUV 4:4:4, 24bpp, full scale (JPEG), deprecated in favor of PIX_FMT_YUV444P and setting color_range";
+        case AV_PIX_FMT_XVMC_MPEG2_MC: return "XVideo Motion Acceleration via common packet passing";
+        case AV_PIX_FMT_XVMC_MPEG2_IDCT: return "XVideo Motion Acceleration";
+        case AV_PIX_FMT_UYVY422: return "packed YUV 4:2:2, 16bpp, Cb Y0 Cr Y1";
+        case AV_PIX_FMT_UYYVYY411: return "packed YUV 4:1:1, 12bpp, Cb Y0 Y1 Cr Y2 Y3";
+        case AV_PIX_FMT_BGR8:    return "packed RGB 3:3:2:8bpp, (msb)2B 3G 3R(lsb)";
+        case AV_PIX_FMT_BGR4:    return "packed RGB 1:2:1 bitstream:4bpp, (msb)1B 2G 1R(lsb), a byte contains two pixels, the first pixel in the byte is the one composed by the 4 msb bits";
+        case AV_PIX_FMT_BGR4_BYTE: return "packed RGB 1:2:1:8bpp, (msb)1B 2G 1R(lsb)";
+        case AV_PIX_FMT_RGB8:    return "packed RGB 3:3:2:8bpp, (msb)2R 3G 3B(lsb)";
+        case AV_PIX_FMT_RGB4:    return "packed RGB 1:2:1 bitstream:4bpp, (msb)1R 2G 1B(lsb), a byte contains two pixels, the first pixel in the byte is the one composed by the 4 msb bits";
+        case AV_PIX_FMT_RGB4_BYTE: return "packed RGB 1:2:1:8bpp, (msb)1R 2G 1B(lsb)";
+        case AV_PIX_FMT_NV12:    return "planar YUV 4:2:0, 12bpp, 1 plane for Y and 1 plane for the UV components, which are interleaved (first byte U and the following byte V)";
+        case AV_PIX_FMT_NV21:    return "as above, but U and V bytes are swapped";
+
+        case AV_PIX_FMT_ARGB:    return "packed ARGB 8:8:8:8, 32bpp, ARGBARGB...";
+        case AV_PIX_FMT_RGBA:    return "packed RGBA 8:8:8:8, 32bpp, RGBARGBA...";
+        case AV_PIX_FMT_ABGR:    return "packed ABGR 8:8:8:8, 32bpp, ABGRABGR...";
+        case AV_PIX_FMT_BGRA:    return "packed BGRA 8:8:8:8, 32bpp, BGRABGRA...";
+
+        case AV_PIX_FMT_GRAY16BE: return "Y, 16bpp, big-endian";
+        case AV_PIX_FMT_GRAY16LE: return "Y, 16bpp, little-endian";
+        case AV_PIX_FMT_YUV440P: return "planar YUV 4:4:0 (1 Cr & Cb sample per 1x2 Y samples)";
+        case AV_PIX_FMT_YUVJ440P: return "planar YUV 4:4:0 full scale (JPEG), deprecated in favor of PIX_FMT_YUV440P and setting color_range";
+        case AV_PIX_FMT_YUVA420P: return "planar YUV 4:2:0, 20bpp, (1 Cr & Cb sample per 2x2 Y & A samples)";
+//#if FF_API_VDPAU
+        case AV_PIX_FMT_VDPAU_H264: return "H.264 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
+        case AV_PIX_FMT_VDPAU_MPEG1: return "MPEG-1 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
+        case AV_PIX_FMT_VDPAU_MPEG2: return "MPEG-2 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
+        case AV_PIX_FMT_VDPAU_WMV3: return "WMV3 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
+        case AV_PIX_FMT_VDPAU_VC1: return "VC-1 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
+//#endif
+        case AV_PIX_FMT_RGB48BE: return "packed RGB 16:16:16, 48bpp, 16R, 16G, 16B, the 2-byte value for each R/G/B component is stored as big-endian";
+        case AV_PIX_FMT_RGB48LE: return "packed RGB 16:16:16, 48bpp, 16R, 16G, 16B, the 2-byte value for each R/G/B component is stored as little-endian";
+
+        case AV_PIX_FMT_RGB565BE: return "packed RGB 5:6:5, 16bpp, (msb)   5R 6G 5B(lsb), big-endian";
+        case AV_PIX_FMT_RGB565LE: return "packed RGB 5:6:5, 16bpp, (msb)   5R 6G 5B(lsb), little-endian";
+        case AV_PIX_FMT_RGB555BE: return "packed RGB 5:5:5, 16bpp, (msb)1A 5R 5G 5B(lsb), big-endian, most significant bit to 0";
+        case AV_PIX_FMT_RGB555LE: return "packed RGB 5:5:5, 16bpp, (msb)1A 5R 5G 5B(lsb), little-endian, most significant bit to 0";
+
+        case AV_PIX_FMT_BGR565BE: return "packed BGR 5:6:5, 16bpp, (msb)   5B 6G 5R(lsb), big-endian";
+        case AV_PIX_FMT_BGR565LE: return "packed BGR 5:6:5, 16bpp, (msb)   5B 6G 5R(lsb), little-endian";
+        case AV_PIX_FMT_BGR555BE: return "packed BGR 5:5:5, 16bpp, (msb)1A 5B 5G 5R(lsb), big-endian, most significant bit to 1";
+        case AV_PIX_FMT_BGR555LE: return "packed BGR 5:5:5, 16bpp, (msb)1A 5B 5G 5R(lsb), little-endian, most significant bit to 1";
+
+        case AV_PIX_FMT_VAAPI_MOCO: return "HW acceleration through VA API at motion compensation entry-point, Picture.data[3] contains a vaapi_render_state struct which contains macroblocks as well as various fields extracted from headers";
+        case AV_PIX_FMT_VAAPI_IDCT: return "HW acceleration through VA API at IDCT entry-point, Picture.data[3] contains a vaapi_render_state struct which contains fields extracted from headers";
+        case AV_PIX_FMT_VAAPI_VLD: return "HW decoding through VA API, Picture.data[3] contains a vaapi_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
+
+        case AV_PIX_FMT_YUV420P16LE: return "planar YUV 4:2:0, 24bpp, (1 Cr & Cb sample per 2x2 Y samples), little-endian";
+        case AV_PIX_FMT_YUV420P16BE: return "planar YUV 4:2:0, 24bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian";
+        case AV_PIX_FMT_YUV422P16LE: return "planar YUV 4:2:2, 32bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian";
+        case AV_PIX_FMT_YUV422P16BE: return "planar YUV 4:2:2, 32bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian";
+        case AV_PIX_FMT_YUV444P16LE: return "planar YUV 4:4:4, 48bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian";
+        case AV_PIX_FMT_YUV444P16BE: return "planar YUV 4:4:4, 48bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian";
+//#if FF_API_VDPAU
+        case AV_PIX_FMT_VDPAU_MPEG4: return "MPEG4 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
+//#endif
+        case AV_PIX_FMT_DXVA2_VLD:  return "HW decoding through DXVA2, Picture.data[3] contains a LPDIRECT3DSURFACE9 pointer";
+
+        case AV_PIX_FMT_RGB444LE: return "packed RGB 4:4:4, 16bpp, (msb)4A 4R 4G 4B(lsb), little-endian, most significant bits to 0";
+        case AV_PIX_FMT_RGB444BE: return "packed RGB 4:4:4, 16bpp, (msb)4A 4R 4G 4B(lsb), big-endian, most significant bits to 0";
+        case AV_PIX_FMT_BGR444LE: return "packed BGR 4:4:4, 16bpp, (msb)4A 4B 4G 4R(lsb), little-endian, most significant bits to 1";
+        case AV_PIX_FMT_BGR444BE: return "packed BGR 4:4:4, 16bpp, (msb)4A 4B 4G 4R(lsb), big-endian, most significant bits to 1";
+        case AV_PIX_FMT_GRAY8A:  return "8bit gray, 8bit alpha";
+        case AV_PIX_FMT_BGR48BE: return "packed RGB 16:16:16, 48bpp, 16B, 16G, 16R, the 2-byte value for each R/G/B component is stored as big-endian";
+        case AV_PIX_FMT_BGR48LE: return "packed RGB 16:16:16, 48bpp, 16B, 16G, 16R, the 2-byte value for each R/G/B component is stored as little-endian";
+
+        case AV_PIX_FMT_YUV420P9BE: return "planar YUV 4:2:0, 13.5bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian";
+        case AV_PIX_FMT_YUV420P9LE: return "planar YUV 4:2:0, 13.5bpp, (1 Cr & Cb sample per 2x2 Y samples), little-endian";
+        case AV_PIX_FMT_YUV420P10BE: return "planar YUV 4:2:0, 15bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian";
+        case AV_PIX_FMT_YUV420P10LE: return "planar YUV 4:2:0, 15bpp, (1 Cr & Cb sample per 2x2 Y samples), little-endian";
+        case AV_PIX_FMT_YUV422P10BE: return "planar YUV 4:2:2, 20bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian";
+        case AV_PIX_FMT_YUV422P10LE: return "planar YUV 4:2:2, 20bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian";
+        case AV_PIX_FMT_YUV444P9BE: return "planar YUV 4:4:4, 27bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian";
+        case AV_PIX_FMT_YUV444P9LE: return "planar YUV 4:4:4, 27bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian";
+        case AV_PIX_FMT_YUV444P10BE: return "planar YUV 4:4:4, 30bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian";
+        case AV_PIX_FMT_YUV444P10LE: return "planar YUV 4:4:4, 30bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian";
+        case AV_PIX_FMT_YUV422P9BE: return "planar YUV 4:2:2, 18bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian";
+        case AV_PIX_FMT_YUV422P9LE: return "planar YUV 4:2:2, 18bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian";
+        case AV_PIX_FMT_VDA_VLD:  return "hardware decoding through VDA";
+
+//#ifdef AV_PIX_FMT_ABI_GIT_MASTER
+        case AV_PIX_FMT_RGBA64BE: return "packed RGBA 16:16:16:16, 64bpp, 16R, 16G, 16B, 16A, the 2-byte value for each R/G/B/A component is stored as big-endian";
+        case AV_PIX_FMT_RGBA64LE: return "packed RGBA 16:16:16:16, 64bpp, 16R, 16G, 16B, 16A, the 2-byte value for each R/G/B/A component is stored as little-endian";
+        case AV_PIX_FMT_BGRA64BE: return "packed RGBA 16:16:16:16, 64bpp, 16B, 16G, 16R, 16A, the 2-byte value for each R/G/B/A component is stored as big-endian";
+        case AV_PIX_FMT_BGRA64LE: return "packed RGBA 16:16:16:16, 64bpp, 16B, 16G, 16R, 16A, the 2-byte value for each R/G/B/A component is stored as little-endian";
+//#endif
+        case AV_PIX_FMT_GBRP:    return "planar GBR 4:4:4 24bpp";
+        case AV_PIX_FMT_GBRP9BE: return "planar GBR 4:4:4 27bpp, big-endian";
+        case AV_PIX_FMT_GBRP9LE: return "planar GBR 4:4:4 27bpp, little-endian";
+        case AV_PIX_FMT_GBRP10BE: return "planar GBR 4:4:4 30bpp, big-endian";
+        case AV_PIX_FMT_GBRP10LE: return "planar GBR 4:4:4 30bpp, little-endian";
+        case AV_PIX_FMT_GBRP16BE: return "planar GBR 4:4:4 48bpp, big-endian";
+        case AV_PIX_FMT_GBRP16LE: return "planar GBR 4:4:4 48bpp, little-endian";
+
+        case AV_PIX_FMT_YUVA422P_LIBAV: return "planar YUV 4:2:2 24bpp, (1 Cr & Cb sample per 2x1 Y & A samples)";
+        case AV_PIX_FMT_YUVA444P_LIBAV: return "planar YUV 4:4:4 32bpp, (1 Cr & Cb sample per 1x1 Y & A samples)";
+
+        case AV_PIX_FMT_YUVA420P9BE: return "planar YUV 4:2:0 22.5bpp, (1 Cr & Cb sample per 2x2 Y & A samples), big-endian";
+        case AV_PIX_FMT_YUVA420P9LE: return "planar YUV 4:2:0 22.5bpp, (1 Cr & Cb sample per 2x2 Y & A samples), little-endian";
+        case AV_PIX_FMT_YUVA422P9BE: return "planar YUV 4:2:2 27bpp, (1 Cr & Cb sample per 2x1 Y & A samples), big-endian";
+        case AV_PIX_FMT_YUVA422P9LE: return "planar YUV 4:2:2 27bpp, (1 Cr & Cb sample per 2x1 Y & A samples), little-endian";
+        case AV_PIX_FMT_YUVA444P9BE: return "planar YUV 4:4:4 36bpp, (1 Cr & Cb sample per 1x1 Y & A samples), big-endian";
+        case AV_PIX_FMT_YUVA444P9LE: return "planar YUV 4:4:4 36bpp, (1 Cr & Cb sample per 1x1 Y & A samples), little-endian";
+        case AV_PIX_FMT_YUVA420P10BE: return "planar YUV 4:2:0 25bpp, (1 Cr & Cb sample per 2x2 Y & A samples, big-endian)";
+        case AV_PIX_FMT_YUVA420P10LE: return "planar YUV 4:2:0 25bpp, (1 Cr & Cb sample per 2x2 Y & A samples, little-endian)";
+        case AV_PIX_FMT_YUVA422P10BE: return "planar YUV 4:2:2 30bpp, (1 Cr & Cb sample per 2x1 Y & A samples, big-endian)";
+        case AV_PIX_FMT_YUVA422P10LE: return "planar YUV 4:2:2 30bpp, (1 Cr & Cb sample per 2x1 Y & A samples, little-endian)";
+        case AV_PIX_FMT_YUVA444P10BE: return "planar YUV 4:4:4 40bpp, (1 Cr & Cb sample per 1x1 Y & A samples, big-endian)";
+        case AV_PIX_FMT_YUVA444P10LE: return "planar YUV 4:4:4 40bpp, (1 Cr & Cb sample per 1x1 Y & A samples, little-endian)";
+        case AV_PIX_FMT_YUVA420P16BE: return "planar YUV 4:2:0 40bpp, (1 Cr & Cb sample per 2x2 Y & A samples, big-endian)";
+        case AV_PIX_FMT_YUVA420P16LE: return "planar YUV 4:2:0 40bpp, (1 Cr & Cb sample per 2x2 Y & A samples, little-endian)";
+        case AV_PIX_FMT_YUVA422P16BE: return "planar YUV 4:2:2 48bpp, (1 Cr & Cb sample per 2x1 Y & A samples, big-endian)";
+        case AV_PIX_FMT_YUVA422P16LE: return "planar YUV 4:2:2 48bpp, (1 Cr & Cb sample per 2x1 Y & A samples, little-endian)";
+        case AV_PIX_FMT_YUVA444P16BE: return "planar YUV 4:4:4 64bpp, (1 Cr & Cb sample per 1x1 Y & A samples, big-endian)";
+        case AV_PIX_FMT_YUVA444P16LE: return "planar YUV 4:4:4 64bpp, (1 Cr & Cb sample per 1x1 Y & A samples, little-endian)";
+
+        case AV_PIX_FMT_VDPAU:   return "HW acceleration through VDPAU, Picture.data[3] contains a VdpVideoSurface";
+
+        case AV_PIX_FMT_XYZ12LE:    return "packed XYZ 4:4:4, 36 bpp, (msb) 12X, 12Y, 12Z (lsb), the 2-byte value for each X/Y/Z is stored as little-endian, the 4 lower bits are set to 0";
+        case AV_PIX_FMT_XYZ12BE:    return "packed XYZ 4:4:4, 36 bpp, (msb) 12X, 12Y, 12Z (lsb), the 2-byte value for each X/Y/Z is stored as big-endian, the 4 lower bits are set to 0";
+        case AV_PIX_FMT_NV16:       return "interleaved chroma YUV 4:2:2, 16bpp, (1 Cr & Cb sample per 2x1 Y samples)";
+        case AV_PIX_FMT_NV20LE:     return "interleaved chroma YUV 4:2:2, 20bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian";
+        case AV_PIX_FMT_NV20BE:     return "interleaved chroma YUV 4:2:2, 20bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian";
+
+        case AV_PIX_FMT_0RGB:    return "packed RGB 8:8:8, 32bpp, 0RGB0RGB...";
+        case AV_PIX_FMT_RGB0:    return "packed RGB 8:8:8, 32bpp, RGB0RGB0...";
+        case AV_PIX_FMT_0BGR:    return "packed BGR 8:8:8, 32bpp, 0BGR0BGR...";
+        case AV_PIX_FMT_BGR0:    return "packed BGR 8:8:8, 32bpp, BGR0BGR0...";
+        case AV_PIX_FMT_YUVA444P: return "planar YUV 4:4:4 32bpp, (1 Cr & Cb sample per 1x1 Y & A samples)";
+        case AV_PIX_FMT_YUVA422P: return "planar YUV 4:2:2 24bpp, (1 Cr & Cb sample per 2x1 Y & A samples)";
+
+        case AV_PIX_FMT_YUV420P12BE: return "planar YUV 4:2:0,18bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian";
+        case AV_PIX_FMT_YUV420P12LE: return "planar YUV 4:2:0,18bpp, (1 Cr & Cb sample per 2x2 Y samples), little-endian";
+        case AV_PIX_FMT_YUV420P14BE: return "planar YUV 4:2:0,21bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian";
+        case AV_PIX_FMT_YUV420P14LE: return "planar YUV 4:2:0,21bpp, (1 Cr & Cb sample per 2x2 Y samples), little-endian";
+        case AV_PIX_FMT_YUV422P12BE: return "planar YUV 4:2:2,24bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian";
+        case AV_PIX_FMT_YUV422P12LE: return "planar YUV 4:2:2,24bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian";
+        case AV_PIX_FMT_YUV422P14BE: return "planar YUV 4:2:2,28bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian";
+        case AV_PIX_FMT_YUV422P14LE: return "planar YUV 4:2:2,28bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian";
+        case AV_PIX_FMT_YUV444P12BE: return "planar YUV 4:4:4,36bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian";
+        case AV_PIX_FMT_YUV444P12LE: return "planar YUV 4:4:4,36bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian";
+        case AV_PIX_FMT_YUV444P14BE: return "planar YUV 4:4:4,42bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian";
+        case AV_PIX_FMT_YUV444P14LE: return "planar YUV 4:4:4,42bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian";
+        case AV_PIX_FMT_GBRP12BE:  return "planar GBR 4:4:4 36bpp, big-endian";
+        case AV_PIX_FMT_GBRP12LE:  return "planar GBR 4:4:4 36bpp, little-endian";
+        case AV_PIX_FMT_GBRP14BE:  return "planar GBR 4:4:4 42bpp, big-endian";
+        case AV_PIX_FMT_GBRP14LE:  return "planar GBR 4:4:4 42bpp, little-endian";
+        case AV_PIX_FMT_GBRAP:     return "planar GBRA 4:4:4:4 32bpp";
+        case AV_PIX_FMT_GBRAP16BE: return "planar GBRA 4:4:4:4 64bpp, big-endian";
+        case AV_PIX_FMT_GBRAP16LE: return "planar GBRA 4:4:4:4 64bpp, little-endian";
+        case AV_PIX_FMT_YUVJ411P:  return "planar YUV 4:1:1, 12bpp, (1 Cr & Cb sample per 4x1 Y samples) full scale (JPEG), deprecated in favor of PIX_FMT_YUV411P and setting color_range";
+
+        case AV_PIX_FMT_BAYER_BGGR8:  return "bayer, BGBG..(odd line), GRGR..(even line), 8-bit samples";
+        case AV_PIX_FMT_BAYER_RGGB8:  return "bayer, RGRG..(odd line), GBGB..(even line), 8-bit samples";
+        case AV_PIX_FMT_BAYER_GBRG8:  return "bayer, GBGB..(odd line), RGRG..(even line), 8-bit samples";
+        case AV_PIX_FMT_BAYER_GRBG8:  return "bayer, GRGR..(odd line), BGBG..(even line), 8-bit samples";
+        case AV_PIX_FMT_BAYER_BGGR16LE: return "bayer, BGBG..(odd line), GRGR..(even line), 16-bit samples, little-endian";
+        case AV_PIX_FMT_BAYER_BGGR16BE: return "bayer, BGBG..(odd line), GRGR..(even line), 16-bit samples, big-endian";
+        case AV_PIX_FMT_BAYER_RGGB16LE: return "bayer, RGRG..(odd line), GBGB..(even line), 16-bit samples, little-endian";
+        case AV_PIX_FMT_BAYER_RGGB16BE: return "bayer, RGRG..(odd line), GBGB..(even line), 16-bit samples, big-endian";
+        case AV_PIX_FMT_BAYER_GBRG16LE: return "bayer, GBGB..(odd line), RGRG..(even line), 16-bit samples, little-endian";
+        case AV_PIX_FMT_BAYER_GBRG16BE: return "bayer, GBGB..(odd line), RGRG..(even line), 16-bit samples, big-endian";
+        case AV_PIX_FMT_BAYER_GRBG16LE: return "bayer, GRGR..(odd line), BGBG..(even line), 16-bit samples, little-endian";
+        case AV_PIX_FMT_BAYER_GRBG16BE: return "bayer, GRGR..(odd line), BGBG..(even line), 16-bit samples, big-endian";
+        default: return string();
+    }
+}
+
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::AudioFormat_Get()
+{
+    if (AudioStream==NULL || AudioStream->codec==NULL || AudioStream->codec->codec==NULL || AudioStream->codec->codec->long_name==NULL)
+        return "";
+
+    return AudioStream->codec->codec->long_name;
+}
+
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::SampleFormat_Get()
+{
+    if (AudioStream==NULL || AudioStream->codec==NULL || AudioStream->codec->codec==NULL || AudioStream->codec->codec->long_name==NULL)
+        return "";
+
+    return "";
+}
+
+//---------------------------------------------------------------------------
+int FFmpeg_Glue::SamplingRate_Get()
+{
+    if (AudioStream==NULL || AudioStream->time_base.den==0)
+        return 0;
+
+    return AudioStream->time_base.den;
+}
+
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::ChannelLayout_Get()
+{
+    if (AudioStream==NULL || AudioStream->codec==NULL || AudioStream->codec->codec==NULL || AudioStream->codec->codec->long_name==NULL)
+        return "";
+
+    return "";
+}
+
+//---------------------------------------------------------------------------
+int FFmpeg_Glue::BitDepth_Get()
+{
+    if (AudioStream==NULL || AudioStream->codec==NULL || AudioStream->codec->codec==NULL || AudioStream->codec->codec->long_name==NULL)
+        return 0;
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 string FFmpeg_Glue::StatsToExternalData()
 {
     stringstream Value;
-    Value<<",,,,,,,,,,,,,,,,,,,,,YMIN,YLOW,YAVG,YHIGH,YMAX,UMIN,ULOW,UAVG,UHIGH,UMAX,VMIN,VLOW,VAVG,VHIGH,VMAX,YDIF,UDIF,VDIF,YDIF1,YDIF2,TOUT,VREP,BRNG,HEAD";
+    Value<<",,,,,,,,,,,,,,,,,,,,,YMIN,YLOW,YAVG,YHIGH,YMAX,UMIN,ULOW,UAVG,UHIGH,UMAX,VMIN,VLOW,VAVG,VHIGH,VMAX,YDIF,UDIF,VDIF,YDIF1,YDIF2,TOUT,HEAD,VREP,BRNG";
     #ifdef _WIN32
         Value<<"\r\n";
     #else
@@ -825,7 +1078,7 @@ string FFmpeg_Glue::StatsToExternalData()
         Value<<",,,,,,,,,,,,,,";
         for (size_t Pos2=0; Pos2<PlotName_Max; Pos2++)
         {
-            Value<<','<<fixed<<setprecision(PlotValues_DigitsAfterComma[Pos2])<<y[Pos2][Pos];
+            Value<<','<<fixed<<setprecision(PerPlotName[Pos2].DigitsAfterComma)<<y[Pos2][Pos];
         }
         #ifdef _WIN32
             Value<<"\r\n";

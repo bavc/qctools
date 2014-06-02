@@ -24,7 +24,8 @@
 #include <QToolButton>
 #include <QPushButton>
 #include <QinputDialog>
-
+#include <QCheckBox>
+#include <QTimer>
 
 //***************************************************************************
 // Constructor / Desructor
@@ -35,6 +36,13 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    // FilesList
+    FilesListArea=NULL;
+
+    // CheckBoxes
+    for (size_t Pos=0; Pos<PlotType_Max; Pos++)
+        CheckBoxes[Pos]=NULL;
+
     // Plots
     PlotsArea=NULL;
 
@@ -47,8 +55,12 @@ MainWindow::MainWindow(QWidget *parent) :
     // Info
     InfoArea=NULL;
 
+    // Info
+    DragDrop_Image=NULL;
+    DragDrop_Text=NULL;
+
     // Files
-    Files_Pos=(size_t)-1;
+    Files_CurrentPos=(size_t)-1;
 
     // UI
     Ui_Init();
@@ -94,6 +106,20 @@ void MainWindow::on_actionOpen_triggered()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_actionClose_triggered()
+{
+    closeFile();
+    if (FilesListArea && ui->actionFilesList->isChecked())
+        FilesListArea->UpdateAll();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionCloseAll_triggered()
+{
+    closeAllFiles();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::on_horizontalScrollBar_valueChanged(int value)
 {
     Zoom_Move(value);
@@ -117,14 +143,16 @@ void MainWindow::on_actionGoTo_triggered()
     if (!ControlArea && !TinyDisplayArea) //TODO: without TinyDisplayArea
         return;
 
-    if (Files_Pos>=Files.size())
+    if (Files_CurrentPos>=Files.size())
         return;
     
     bool ok;
-    int i = QInputDialog::getInt(this, tr("Go to frame at position..."), tr("frame position (0-based):"), Files[Files_Pos]->Glue->VideoFramePos, 0, Files[Files_Pos]->Glue->VideoFrameCount, 1, &ok);
+    int i = QInputDialog::getInt(this, tr("Go to frame at position..."), Files[Files_CurrentPos]->Glue->VideoFrameCount?("frame position (0-"+QString::number(Files[Files_CurrentPos]->Glue->VideoFrameCount-1)+"):"):QString("frame position (0-based)"), Files[Files_CurrentPos]->Frames_Pos_Get(), 0, Files[Files_CurrentPos]->Glue->VideoFrameCount-1, 1, &ok);
+    if (Files[Files_CurrentPos]->Glue->VideoFrameCount && i>=Files[Files_CurrentPos]->Glue->VideoFrameCount)
+        i=Files[Files_CurrentPos]->Glue->VideoFrameCount-1;
     if (ok)
     {
-        Files[Files_Pos]->Frames_Pos_Set(i);
+        Files[Files_CurrentPos]->Frames_Pos_Set(i);
     }
 }
 
@@ -150,6 +178,78 @@ void MainWindow::on_actionCSV_triggered()
 void MainWindow::on_actionPrint_triggered()
 {
     Export_PDF();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionFilesList_triggered()
+{
+    if (ui->actionGoTo)
+        ui->actionGoTo->setVisible(false);
+    if (ui->actionCSV)
+        ui->actionCSV->setVisible(false);
+    if (ui->actionPrint)
+        ui->actionPrint->setVisible(false);
+    if (ui->actionZoomIn)
+        ui->actionZoomIn->setVisible(false);
+    if (ui->actionZoomOut)
+        ui->actionZoomOut->setVisible(false);
+    if (ui->actionWindowOut)
+        ui->actionWindowOut->setVisible(false);
+    for (size_t Pos=0; Pos<PlotType_Max; Pos++)
+        if (CheckBoxes[Pos])
+            CheckBoxes[Pos]->hide();
+    if (ui->fileNamesBox)
+        ui->fileNamesBox->hide();
+    if (PlotsArea)
+        PlotsArea->hide();
+    if (TinyDisplayArea)
+        TinyDisplayArea->hide();
+    if (ControlArea)
+        ControlArea->hide();
+    if (FilesListArea && !Files.empty())
+        FilesListArea->show();
+
+    TimeOut();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionGraphsLayout_triggered()
+{
+    if (ui->actionGoTo)
+        ui->actionGoTo->setVisible(true);
+    if (ui->actionCSV)
+        ui->actionCSV->setVisible(true);
+    if (ui->actionPrint)
+        ui->actionPrint->setVisible(true);
+    if (ui->actionZoomIn)
+        ui->actionZoomIn->setVisible(true);
+    if (ui->actionZoomOut)
+        ui->actionZoomOut->setVisible(true);
+    if (ui->actionWindowOut)
+        ui->actionWindowOut->setVisible(false);
+    for (size_t Pos=0; Pos<PlotType_Max; Pos++)
+        if (CheckBoxes[Pos])
+            CheckBoxes[Pos]->show();
+    if (ui->fileNamesBox)
+        ui->fileNamesBox->show();
+    if (PlotsArea)
+        PlotsArea->show();
+    if (TinyDisplayArea)
+        TinyDisplayArea->show();
+    if (ControlArea)
+        ControlArea->show();
+    if (FilesListArea)
+        FilesListArea->hide();
+
+    if (ui->fileNamesBox)
+        ui->fileNamesBox->setCurrentIndex(Files_CurrentPos);
+
+    TimeOut();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionFiltersLayout_triggered()
+{
 }
 
 //---------------------------------------------------------------------------
@@ -183,75 +283,72 @@ void MainWindow::on_actionAbout_triggered()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_check_Y_toggled(bool checked)
+void MainWindow::on_fileNamesBox_currentIndexChanged(int index)
+{
+    Files_CurrentPos=index;
+    if (!ui->actionGraphsLayout->isChecked())
+        return;
+    createGraphsLayout();
+    refreshDisplay();
+    Update();
+    QTimer::singleShot(0, this, SLOT(TimeOut_Refresh()));
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_check_toggled(bool checked)
 {
     refreshDisplay();
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_check_U_toggled(bool checked)
+void MainWindow::on_M1_triggered()
 {
-    refreshDisplay();
+    if (ControlArea)
+        ControlArea->on_M1_clicked(true);
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_check_V_toggled(bool checked)
+void MainWindow::on_Minus_triggered()
 {
-    refreshDisplay();
+    if (ControlArea)
+        ControlArea->on_Minus_clicked(true);
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_check_YDiff_toggled(bool checked)
+void MainWindow::on_PlayPause_triggered()
 {
-    refreshDisplay();
+    if (ControlArea)
+        ControlArea->on_PlayPause_clicked(true);
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_check_YDiffX_toggled(bool checked)
+void MainWindow::on_Pause_triggered()
 {
-    refreshDisplay();
+    if (ControlArea)
+        ControlArea->on_PlayPause_clicked(true);
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_check_UDiff_toggled(bool checked)
+void MainWindow::on_Plus_triggered()
 {
-    refreshDisplay();
+    if (ControlArea)
+        ControlArea->on_Plus_clicked(true);
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_check_VDiff_toggled(bool checked)
+void MainWindow::on_P1_triggered()
 {
-    refreshDisplay();
+    if (ControlArea)
+        ControlArea->on_P1_clicked(true);
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_check_Diffs_toggled(bool checked)
+void MainWindow::on_Full_triggered()
 {
-    refreshDisplay();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_check_TOUT_toggled(bool checked)
-{
-    refreshDisplay();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_check_VREP_toggled(bool checked)
-{
-    refreshDisplay();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_check_HEAD_toggled(bool checked)
-{
-    refreshDisplay();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_check_BRNG_toggled(bool checked)
-{
-    refreshDisplay();
+  if (isFullScreen())
+     setWindowState(Qt::WindowActive);
+  else
+     setWindowState(Qt::WindowFullScreen);
 }
 
 //---------------------------------------------------------------------------
@@ -261,18 +358,29 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 }
  
 //---------------------------------------------------------------------------
-void MainWindow::dropEvent(QDropEvent *event)
+void MainWindow::dropEvent(QDropEvent *Event)
 {
-    const QMimeData* Data=event->mimeData ();
-    if (event->mimeData()->hasUrls())
+    const QMimeData* Data=Event->mimeData ();
+    if (Event->mimeData()->hasUrls())
     {
-        //foreach (QUrl url, event->mimeData()->urls())
+        //foreach (QUrl url, Event->mimeData()->urls())
+        //clearFiles();
+        QList<QUrl> urls=Event->mimeData()->urls();
+        for (int Pos=0; Pos<urls.size(); Pos++)
         {
-          
-            processFile(event->mimeData()->urls()[0].toLocalFile());
-
-            //break; //TEMP: currently only one file
+            addFile(urls[Pos].toLocalFile());
         }
     }
+
+    clearDragDrop();
+    if (FilesListArea)
+    {
+        FilesListArea->UpdateAll();
+        FilesListArea->show();
+    }
+    if (Files.size()>1)
+        ui->actionFilesList->trigger();
+    else
+        ui->actionGraphsLayout->trigger();
 }
 

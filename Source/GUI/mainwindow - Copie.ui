@@ -46,7 +46,161 @@
        <widget class="QComboBox" name="fileNamesBox"/>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout"/>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QCheckBox" name="check_Y">
+          <property name="text">
+           <string>Y</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_U">
+          <property name="text">
+           <string>U</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_V">
+          <property name="text">
+           <string>V</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_Sat">
+          <property name="text">
+           <string>Sat</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_Hue">
+          <property name="text">
+           <string>Hue</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_YDiff">
+          <property name="text">
+           <string>YDiff</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_YDiffX">
+          <property name="text">
+           <string>YDiffX</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_UDiff">
+          <property name="text">
+           <string>UDiff</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_VDiff">
+          <property name="text">
+           <string>VDiff</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_Diffs">
+          <property name="text">
+           <string>Diffs</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_TOUT">
+          <property name="text">
+           <string>TOUT</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_VREP">
+          <property name="text">
+           <string>VREP</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_BRNG">
+          <property name="text">
+           <string>BRNG</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_HEAD">
+          <property name="text">
+           <string>HEAD</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_CropX">
+          <property name="text">
+           <string>Crop x</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_CropY">
+          <property name="text">
+           <string>Crop y</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_MSE">
+          <property name="text">
+           <string>MSEf</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_PSNR">
+          <property name="text">
+           <string>PSNRf</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
@@ -74,7 +228,6 @@
     </property>
     <addaction name="actionOpen"/>
     <addaction name="actionClose"/>
-    <addaction name="actionCloseAll"/>
     <addaction name="separator"/>
     <addaction name="actionCSV"/>
     <addaction name="actionPrint"/>
@@ -145,12 +298,13 @@
    <addaction name="separator"/>
    <addaction name="actionZoomIn"/>
    <addaction name="actionZoomOut"/>
-   <addaction name="actionWindowOut"/>
    <addaction name="actionFilesList"/>
    <addaction name="actionGraphsLayout"/>
    <addaction name="actionFiltersLayout"/>
    <addaction name="separator"/>
    <addaction name="actionGettingStarted"/>
+   <addaction name="separator"/>
+   <addaction name="actionWindowOut"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="sizeGripEnabled">
@@ -275,14 +429,6 @@
   <action name="actionWindowOut">
    <property name="text">
     <string>Window out</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
-  </action>
-  <action name="actionCloseAll">
-   <property name="text">
-    <string>Close all</string>
    </property>
   </action>
  </widget>

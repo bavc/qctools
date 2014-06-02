@@ -75,7 +75,7 @@ Plots::Plots(QWidget *parent, FileInformation* FileInformationData_) :
 //---------------------------------------------------------------------------
 Plots::~Plots()
 {
-    for (size_t Type=PlotType_Y; Type<PlotType_Max; Type++)
+    for (size_t Type=0; Type<PlotType_Max; Type++)
     {
         // Layouts and Widgets
         delete Layouts      [Type];
@@ -93,7 +93,7 @@ Plots::~Plots()
 void Plots::Plots_Create()
 {
     //Creating data
-    for (size_t Type=PlotType_Y; Type<PlotType_Max; Type++)
+    for (size_t Type=0; Type<PlotType_Max; Type++)
         Plots_Create((PlotType)Type);
 
     // XAxis_Kind
@@ -129,7 +129,7 @@ void Plots::Plots_Create(PlotType Type)
         case 1 : plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoFrameCount); break;
         default: ;
     }
-    if (StatsFile_Counts[Type]>3)
+    if (PerPlotGroup[Type].Count>3)
         plot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     // Plot grid
@@ -141,12 +141,12 @@ void Plots::Plots_Create(PlotType Type)
     grid->attach(plot);
 
     // Plot curves
-    for(unsigned j=0; j<StatsFile_Counts[Type]; ++j)
+    for(unsigned j=0; j<PerPlotGroup[Type].Count; ++j)
     {
-        plotsCurves[Type][j] = new QwtPlotCurve(Names[StatsFile_Positions[Type]+j]);
+        plotsCurves[Type][j] = new QwtPlotCurve(PerPlotName[PerPlotGroup[Type].Start+j].Name);
         QColor c;
         
-        switch (StatsFile_Counts[Type])
+        switch (PerPlotGroup[Type].Count)
         {
              case 1 :
                         c=Qt::black;
@@ -220,7 +220,7 @@ void Plots::createData_Init()
 void Plots::createData_Update()
 {    
     //Creating data
-    for (size_t Type=PlotType_Y; Type<PlotType_Max; Type++)
+    for (size_t Type=0; Type<PlotType_Max; Type++)
         if (plots[Type] && plots[Type]->isVisible())
             createData_Update((PlotType)Type);
 }
@@ -228,15 +228,15 @@ void Plots::createData_Update()
 //---------------------------------------------------------------------------
 void Plots::createData_Update(PlotType Type)
 {
+    if (PerPlotGroup[Type].Min!=PerPlotGroup[Type].Max && FileInfoData->Glue->y_Max[Type]>=PerPlotGroup[Type].Max/2)
+        FileInfoData->Glue->y_Max[Type]=PerPlotGroup[Type].Max;
     double y_Max_ForThisPlot=FileInfoData->Glue->y_Max[Type];
     
     //plot->setMinimumHeight(0);
 
     if (y_Max_ForThisPlot)
     {
-        double StepCount=3;
-        if (Type==PlotType_Diffs)
-            StepCount=2;
+        double StepCount=PerPlotGroup[Type].StepsCount;
 
         if (y_Max_ForThisPlot>plots_YMax[Type])
         {
@@ -266,22 +266,6 @@ void Plots::createData_Update(PlotType Type)
                 }
             }
 
-            // Special cases
-            switch (Type)
-            {
-                case PlotType_YDiff:
-                case PlotType_YDiffX:
-                case PlotType_UDiff:
-                case PlotType_VDiff:
-                case PlotType_Diffs:
-                                    if (FileInfoData->Glue->y_Max[Type]>255)
-                                    {
-                                        FileInfoData->Glue->y_Max[Type]=255;
-                                        Step=83;
-                                    };
-                                    break;
-                default:            ;
-            }
             if (FileInfoData->Glue->y_Max[Type]==0)
             {
                 FileInfoData->Glue->y_Max[Type]=1; //Special case, in order to force a scale instead of -1 to 1
@@ -300,8 +284,8 @@ void Plots::createData_Update(PlotType Type)
         plots[Type]->setAxisScale(QwtPlot::yLeft, 0, 1, 1); //Special case, in order to force a scale instead of -1 to 1
     }
 
-    for(unsigned j=0; j<StatsFile_Counts[Type]; ++j)
-        plotsCurves[Type][j]->setRawSamples(FileInfoData->Glue->x[XAxis_Kind_index], FileInfoData->Glue->y[StatsFile_Positions[Type]+j], FileInfoData->Glue->x_Max);
+    for(unsigned j=0; j<PerPlotGroup[Type].Count; ++j)
+        plotsCurves[Type][j]->setRawSamples(FileInfoData->Glue->x[XAxis_Kind_index], FileInfoData->Glue->y[PerPlotGroup[Type].Start+j], FileInfoData->Glue->x_Max);
     plots[Type]->replot();
 }
 
@@ -311,7 +295,7 @@ void Plots::Zoom_Move(size_t Begin)
     size_t Increment=FileInfoData->Glue->VideoFrameCount/ZoomScale;
     if (Begin+Increment>FileInfoData->Glue->VideoFrameCount)
         Begin=FileInfoData->Glue->VideoFrameCount-Increment;
-    for (size_t Type=PlotType_Y; Type<PlotType_Max; Type++)
+    for (size_t Type=0; Type<PlotType_Max; Type++)
         if (plots[Type])
         {
             QwtPlotZoomer* zoomer = new QwtPlotZoomer(plots[Type]->canvas());
@@ -348,7 +332,7 @@ void Plots::refreshDisplay()
     }
 
     int Pos=0;
-    for (size_t Type=PlotType_Y; Type<PlotType_Max; Type++)
+    for (size_t Type=0; Type<PlotType_Max; Type++)
         if (Status[Type])
         {
             if (Layouts[Type]==NULL)
@@ -416,13 +400,13 @@ void Plots::refreshDisplay_Axis()
 {
     // Paddings
     int Width_Max=0;
-    for (size_t Type=PlotType_Y; Type<PlotType_Max; Type++)
+    for (size_t Type=0; Type<PlotType_Max; Type++)
     {
         int Width_Temp=plots[Type]->axisWidget(QwtPlot::yLeft)->width();
         if (Width_Temp>Width_Max)
             Width_Max=Width_Temp;
     }
-    for (size_t Type=PlotType_Y; Type<PlotType_Max; Type++)
+    for (size_t Type=0; Type<PlotType_Max; Type++)
     {
         int temp_Width=Width_Max-plots[Type]->axisWidget(QwtPlot::yLeft)->width();
         paddings[Type]->setMinimumWidth(temp_Width);
@@ -431,7 +415,7 @@ void Plots::refreshDisplay_Axis()
 
     // Legends
     Width_Max=0;
-    for (size_t Type=PlotType_Y; Type<PlotType_Max; Type++)
+    for (size_t Type=0; Type<PlotType_Max; Type++)
     {
         int Width_Temp;
         if (Type==PlotType_Axis)
@@ -447,7 +431,7 @@ void Plots::refreshDisplay_Axis()
         if (Width_Temp>Width_Max)
             Width_Max=Width_Temp;
     }
-    for (size_t Type=PlotType_Y; Type<PlotType_Max; Type++)
+    for (size_t Type=0; Type<PlotType_Max; Type++)
     {
         if (Type==PlotType_Axis)
         {
@@ -467,7 +451,7 @@ void Plots::refreshDisplay_Axis()
     }
 
     //RePlot
-    for (size_t Type=PlotType_Y; Type<PlotType_Max; Type++)
+    for (size_t Type=0; Type<PlotType_Max; Type++)
         if (plots[Type])
             plots[Type]->replot();
 }
@@ -498,7 +482,7 @@ void Plots::on_XAxis_Kind_currentIndexChanged(int index)
 {
     XAxis_Kind_index=index;
 
-    for (size_t Type=PlotType_Y; Type<PlotType_Max; Type++)
+    for (size_t Type=0; Type<PlotType_Max; Type++)
     {
         switch (XAxis_Kind_index)
         {
@@ -507,8 +491,8 @@ void Plots::on_XAxis_Kind_currentIndexChanged(int index)
             default: ;
         }
 
-        for(unsigned j=0; j<StatsFile_Counts[Type]; ++j)
-            plotsCurves[Type][j]->setRawSamples(FileInfoData->Glue->x[XAxis_Kind_index], FileInfoData->Glue->y[StatsFile_Positions[Type]+j], FileInfoData->Glue->x_Max);
+        for(unsigned j=0; j<PerPlotGroup[Type].Count; ++j)
+            plotsCurves[Type][j]->setRawSamples(FileInfoData->Glue->x[XAxis_Kind_index], FileInfoData->Glue->y[PerPlotGroup[Type].Start+j], FileInfoData->Glue->x_Max);
         plots[Type]->replot();
     }
 

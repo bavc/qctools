@@ -102,6 +102,12 @@
     <ClCompile Include="_Automated\moc_FileInformation.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\FilesList.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_FilesList.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="_Automated\ui_mainwindow.h">
@@ -135,6 +141,9 @@
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\FileInformation.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\FilesList.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>

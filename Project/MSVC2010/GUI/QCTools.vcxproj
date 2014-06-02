@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F4F4FAF7-25A4-4BAC-8BEA-C88661D1180D}</ProjectGuid>
     <RootNamespace>VideoAnalyzer</RootNamespace>
-    <ProjectName>QC Tools</ProjectName>
+    <ProjectName>QCTools</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -78,6 +78,7 @@
     <ClCompile Include="..\..\..\Source\Core\FFmpeg_Glue.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Control.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\FileInformation.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\FilesList.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Help.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Info.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\main.cpp" />
@@ -90,6 +91,7 @@
     <ClCompile Include="..\..\..\Source\GUI\Plots.cpp" />
     <ClCompile Include="_Automated\moc_Control.cpp" />
     <ClCompile Include="_Automated\moc_FileInformation.cpp" />
+    <ClCompile Include="_Automated\moc_FilesList.cpp" />
     <ClCompile Include="_Automated\moc_Help.cpp" />
     <ClCompile Include="_Automated\moc_Info.cpp" />
     <ClCompile Include="_Automated\moc_mainwindow.cpp" />
@@ -103,6 +105,7 @@
     <ClInclude Include="..\..\..\Source\Core\FFmpeg_Glue.h" />
     <ClInclude Include="..\..\..\Source\GUI\Control.h" />
     <ClInclude Include="..\..\..\Source\GUI\FileInformation.h" />
+    <ClInclude Include="..\..\..\Source\GUI\FilesList.h" />
     <ClInclude Include="..\..\..\Source\GUI\Help.h" />
     <ClInclude Include="..\..\..\Source\GUI\Info.h" />
     <ClInclude Include="..\..\..\Source\GUI\mainwindow.h" />

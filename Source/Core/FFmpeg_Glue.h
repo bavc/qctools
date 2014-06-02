@@ -68,6 +68,18 @@ public:
     // Infos
     size_t                      Frames_Total_Get()                                                                      {return VideoFrameCount;}
     double                      Duration_Get()                                                                          {return VideoDuration;}
+    string                      ContainerFormat_Get();
+    int                         StreamCount_Get();
+    string                      VideoFormat_Get();
+    int                         Width_Get();
+    int                         Height_Get();
+    double                      DAR_Get();
+    string                      PixFormat_Get();
+    string                      AudioFormat_Get();
+    string                      SampleFormat_Get();
+    int                         SamplingRate_Get();
+    string                      ChannelLayout_Get();
+    int                         BitDepth_Get();
     string                      StatsToExternalData();
 
     // Actions
@@ -94,6 +106,7 @@ private:
     // FFmpeg pointers - Input
     AVFormatContext*            FormatContext;
     AVStream*                   VideoStream;
+    AVStream*                   AudioStream;
     int                         VideoStream_Index;
     AVFrame*                    Frame;
     AVPacket*                   Packet;

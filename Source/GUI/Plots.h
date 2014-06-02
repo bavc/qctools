@@ -51,7 +51,7 @@ public:
     ~Plots();
 
     // File information
-    FileInformation*                    FileInfoData;
+    FileInformation*            FileInfoData;
 
     // To update
     TinyDisplay*                TinyDisplayArea;

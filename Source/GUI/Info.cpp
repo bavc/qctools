@@ -48,12 +48,12 @@ Info::Info(QWidget *parent, FileInformation* FileInformationData_, style Style):
     for (size_t Pos=0; Pos<PlotName_Max; Pos++)
     {
         Values[Pos]=new QLabel(this);
-        Values[Pos]->setText(Names[Pos]+QString("= "));
+        Values[Pos]->setText(PerPlotName[Pos].Name+QString("= "));
         Values[Pos]->setFont(Font);
         Layout->addWidget(Values[Pos], X, Y);
 
         Y++;
-        if (Style==Style_Columns || Y>StatsFile_CountPerLine[X])
+        if (Style==Style_Columns || PerPlotName[Y].NewLine)
         {
             X++;
             Y=0;
@@ -89,11 +89,11 @@ void Info::Update()
     if (Frames_Pos<FileInfoData->Glue->x_Max)
         for (size_t Pos=0; Pos<PlotName_Max; Pos++)
         {
-            if (PlotValues_DigitsAfterComma[Pos]==0)
-                Values[Pos]->setText(Names[Pos]+QString("= ")+QString::number((int)FileInfoData->Glue->y[Pos][Frames_Pos]));
+            if (PerPlotName[Pos].DigitsAfterComma==0)
+                Values[Pos]->setText(PerPlotName[Pos].Name+QString("= ")+QString::number((int)FileInfoData->Glue->y[Pos][Frames_Pos]));
             else
             {
-                QString Value=QString::number(FileInfoData->Glue->y[Pos][Frames_Pos], 'g', PlotValues_DigitsAfterComma[Pos]);
+                QString Value=QString::number(FileInfoData->Glue->y[Pos][Frames_Pos], 'f', PerPlotName[Pos].DigitsAfterComma);
                 int Point=Value.indexOf('.');
                 if (Point==-1)
                 {
@@ -102,15 +102,15 @@ void Info::Update()
                 }
                 else
                     Point++;
-                while (Value.size()-Point<PlotValues_DigitsAfterComma[Pos])
+                while (Value.size()-Point<PerPlotName[Pos].DigitsAfterComma)
                     Value+='0'; //Adding precision information
-                Values[Pos]->setText(Names[Pos]+QString("= ")+Value);
+                Values[Pos]->setText(PerPlotName[Pos].Name+QString("= ")+Value);
             }
         }
     else
     {
         for (size_t Pos=0; Pos<PlotName_Max; Pos++)
-            Values[Pos]->setText(Names[Pos]+QString("= "));
+            Values[Pos]->setText(PerPlotName[Pos].Name+QString("= "));
         ShouldUpate=true;
     }
 }

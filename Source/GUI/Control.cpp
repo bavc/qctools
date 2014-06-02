@@ -44,10 +44,11 @@ Control::Control(QWidget *parent, FileInformation* FileInformationData_, style S
 
     QFont Font=QFont();
     #ifdef _WIN32
-        Font.setPointSize(8);
+        //Font.setPointSize(8);
     #else //_WIN32
-        Font.setPointSize(8);
+        //Font.setPointSize(8);
     #endif //_WIN32
+    Font.setPointSize(Font.pointSize()*3/2);
 
     // Control
     QGridLayout* Layout=new QGridLayout();
@@ -55,12 +56,23 @@ Control::Control(QWidget *parent, FileInformation* FileInformationData_, style S
     Layout->setMargin(0);
     Layout->setContentsMargins(0,0,0,0);
 
+    M9=new QToolButton(this);
+    M9->setText("<|");
+    M9->setFont(Font);
+    M9->setIcon(QIcon(":/icon/backward.png"));
+    M9->setIconSize(QSize(32, 32));
+    connect(M9, SIGNAL(clicked(bool)), this, SLOT(on_M9_clicked(bool)));
+    if (Style==Style_Cols)
+        Layout->addWidget(M9, 0, 0, 1, 1);
+    else
+        Layout->addWidget(M9, 0, 0, 1, 1);
+
     M2=new QToolButton(this);
     M2->setText("-2x");
     M2->setFont(Font);
     connect(M2, SIGNAL(clicked(bool)), this, SLOT(on_M2_clicked(bool)));
     if (Style==Style_Cols)
-        Layout->addWidget(M2, 0, 0, 1, 1);
+        Layout->addWidget(M2, 0, 1, 1, 1);
     else
         Layout->addWidget(M2, 0, 0, 1, 1);
 
@@ -69,7 +81,7 @@ Control::Control(QWidget *parent, FileInformation* FileInformationData_, style S
     M1->setFont(Font);
     connect(M1, SIGNAL(clicked(bool)), this, SLOT(on_M1_clicked(bool)));
     if (Style==Style_Cols)
-        Layout->addWidget(M1, 0, 1, 1, 1);
+        Layout->addWidget(M1, 0, 2, 1, 1);
     else
         Layout->addWidget(M1, 0, 1, 1, 1);
 
@@ -78,55 +90,66 @@ Control::Control(QWidget *parent, FileInformation* FileInformationData_, style S
     M0->setFont(Font);
     connect(M0, SIGNAL(clicked(bool)), this, SLOT(on_M0_clicked(bool)));
     if (Style==Style_Cols)
-        Layout->addWidget(M0, 0, 2, 1, 1);
+        Layout->addWidget(M0, 0, 3, 1, 1);
     else
         Layout->addWidget(M0, 0, 2, 1, 1);
 
-    Minus=new QPushButton(this);
+    Minus=new QToolButton(this);
     connect(Minus, SIGNAL(clicked(bool)), this, SLOT(on_Minus_clicked(bool)));
     Minus->setText("Previous");
-    //Minus->setFont(Font);
+    Minus->setFont(Font);
     if (Style==Style_Cols)
-        Layout->addWidget(Minus, 0, 3, 1, 1);
+        Layout->addWidget(Minus, 0, 4, 1, 1);
     else
         Layout->addWidget(Minus, 1, 0, 1, 3);
 
-    OM=new QToolButton(this);
-    OM->setText("||");
-    OM->setFont(Font);
-    connect(OM, SIGNAL(clicked(bool)), this, SLOT(on_OM_clicked(bool)));
+    Info_Time=new QLabel(this);
+    Info_Time->setFont(Font);
+    //QPalette Palette(Info_Time->palette());
+    //Palette.setColor(QPalette::Window, Qt::darkGray);
+    //Info_Time->setFont(Font);
+    //Info_Time->setPalette(Palette);
+    //Info_Time->setAutoFillBackground(true);
+    Info_Time->setAlignment(Qt::AlignCenter);
     if (Style==Style_Cols)
-        Layout->addWidget(OM, 0, 4, 1, 1);
+        Layout->addWidget(Info_Time, 0, 5, 1, 1);
     else
-        Layout->addWidget(OM, 2, 1, 1, 1);
+        Layout->addWidget(Info_Time, 3, 0, 1, 3);
 
-    Info=new QLabel(this);
-    QPalette Palette(Info->palette());
-    Palette.setColor(QPalette::Window, Qt::darkGray);
-   // Info->setFont(Font);
-    Info->setAutoFillBackground(true);
-    Info->setPalette(Palette);
-    Info->setAlignment(Qt::AlignCenter);
+    PlayPause=new QToolButton(this);
+    PlayPause->setText(">");
+    PlayPause->setFont(Font);
+    PlayPause->setIcon(QIcon(":/icon/play.png"));
+    PlayPause->setIconSize(QSize(48, 48));
+    connect(PlayPause, SIGNAL(clicked(bool)), this, SLOT(on_PlayPause_clicked(bool)));
     if (Style==Style_Cols)
-        Layout->addWidget(Info, 0, 5, 1, 1);
+        Layout->addWidget(PlayPause, 0, 6, 1, 1);
     else
-        Layout->addWidget(Info, 3, 0, 1, 3);
+        Layout->addWidget(PlayPause, 4, 1, 1, 1);
 
-    OP=new QToolButton(this);
-    OP->setText("||");
-    OP->setFont(Font);
-    connect(OP, SIGNAL(clicked(bool)), this, SLOT(on_OP_clicked(bool)));
+    Pause=new QToolButton(this);
+    Pause->setVisible(false);
+    connect(Pause, SIGNAL(clicked(bool)), this, SLOT(on_Pause_clicked(bool)));
+
+    Info_Frames=new QLabel(this);
+    Info_Frames->setFont(Font);
+    //Palette=Info_Frames->palette();
+    //Palette.setColor(QPalette::Window, Qt::darkGray);
+    //Info_Frames->setFont(Font);
+    //Info_Frames->setPalette(Palette);
+    //Info_Frames->setAutoFillBackground(true);
+    Info_Frames->setAlignment(Qt::AlignCenter);
     if (Style==Style_Cols)
-        Layout->addWidget(OP, 0, 6, 1, 1);
+        Layout->addWidget(Info_Frames, 0, 7, 1, 1);
     else
-        Layout->addWidget(OP, 4, 1, 1, 1);
+        Layout->addWidget(Info_Frames, 3, 0, 1, 3);
 
-    Plus=new QPushButton(this);
+    Plus=new QToolButton(this);
     connect(Plus, SIGNAL(clicked(bool)), this, SLOT(on_Plus_clicked(bool)));
-    Plus->setText("    Next    ");
-    //Plus->setFont(Font);
+    Plus->setText("   Next   ");
+    Plus->setFont(Font);
     if (Style==Style_Cols)
-        Layout->addWidget(Plus, 0, 7, 1, 1);
+        Layout->addWidget(Plus, 0, 8, 1, 1);
     else
         Layout->addWidget(Plus, 5, 0, 1, 3);
 
@@ -135,7 +158,7 @@ Control::Control(QWidget *parent, FileInformation* FileInformationData_, style S
     P0->setFont(Font);
     connect(P0, SIGNAL(clicked(bool)), this, SLOT(on_P0_clicked(bool)));
     if (Style==Style_Cols)
-        Layout->addWidget(P0, 0, 8, 1, 1);
+        Layout->addWidget(P0, 0, 9, 1, 1);
     else
         Layout->addWidget(P0, 6, 0, 1, 1);
 
@@ -144,7 +167,7 @@ Control::Control(QWidget *parent, FileInformation* FileInformationData_, style S
     P1->setFont(Font);
     connect(P1, SIGNAL(clicked(bool)), this, SLOT(on_P1_clicked(bool)));
     if (Style==Style_Cols)
-        Layout->addWidget(P1, 0, 9, 1, 1);
+        Layout->addWidget(P1, 0, 10, 1, 1);
     else
         Layout->addWidget(P1, 6, 1, 1, 1);
 
@@ -153,9 +176,20 @@ Control::Control(QWidget *parent, FileInformation* FileInformationData_, style S
     P2->setFont(Font);
     connect(P2, SIGNAL(clicked(bool)), this, SLOT(on_P2_clicked(bool)));
     if (Style==Style_Cols)
-        Layout->addWidget(P2, 0, 10, 1, 1);
+        Layout->addWidget(P2, 0, 11, 1, 1);
     else
         Layout->addWidget(P2, 6, 2, 1, 1);
+
+    P9=new QToolButton(this);
+    P9->setText("|>");
+    P9->setFont(Font);
+    P9->setIcon(QIcon(":/icon/forward.png"));
+    P9->setIconSize(QSize(32, 32));
+    connect(P9, SIGNAL(clicked(bool)), this, SLOT(on_P9_clicked(bool)));
+    if (Style==Style_Cols)
+        Layout->addWidget(P9, 0, 12, 1, 1);
+    else
+        Layout->addWidget(P9, 6, 2, 1, 1);
 
     setLayout(Layout);
 
@@ -222,7 +256,8 @@ void Control::Update()
     Time.append(1, '0'+m1);
     Time.append(1, '0'+m2);
     Time.append(1, '0'+m3);
-    Info->setText(QString().fromUtf8(Time.c_str())+(Style==Style_Cols?" ":"\n")+"(Frame "+QString::number(Frames_Pos)+")");
+    Info_Time->setText(QString().fromUtf8(Time.c_str()));
+    Info_Frames->setText("Frame "+QString::number(Frames_Pos));
     }
 
     // Controls
@@ -234,8 +269,9 @@ void Control::Update()
         M1->setEnabled(false);
         M0->setEnabled(false);
         Minus->setEnabled(false);
-        OM->setEnabled(false);
-        OP->setEnabled(false);
+        PlayPause->setText(">");
+        PlayPause->setIcon(QIcon(":/icon/play.png"));
+        PlayPause->setEnabled(true);
         Plus->setEnabled(true);
         P0->setEnabled(true);
         P1->setEnabled(true);
@@ -248,8 +284,10 @@ void Control::Update()
             TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
             TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
             TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->OM->setEnabled(OM->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->OP->setEnabled(OP->isEnabled());
+            TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
+            TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
+            TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
+            TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
             TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
             TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
             TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
@@ -264,8 +302,9 @@ void Control::Update()
         M1->setEnabled(true);
         M0->setEnabled(true);
         Minus->setEnabled(true);
-        OM->setEnabled(false);
-        OP->setEnabled(false);
+        PlayPause->setText(">");
+        PlayPause->setIcon(QIcon(":/icon/play.png"));
+        PlayPause->setEnabled(false);
         Plus->setEnabled(false);
         P0->setEnabled(false);
         P1->setEnabled(false);
@@ -278,8 +317,10 @@ void Control::Update()
             TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
             TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
             TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->OM->setEnabled(OM->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->OP->setEnabled(OP->isEnabled());
+            TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
+            TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
+            TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
+            TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
             TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
             TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
             TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
@@ -294,8 +335,9 @@ void Control::Update()
             M1->setEnabled(true);
             M0->setEnabled(true);
             Minus->setEnabled(true);
-            OM->setEnabled(false);
-            OP->setEnabled(false);
+            PlayPause->setText(">");
+            PlayPause->setIcon(QIcon(":/icon/play.png"));
+            PlayPause->setEnabled(true);
 
             if (TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
             {
@@ -304,8 +346,10 @@ void Control::Update()
                 TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
                 TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
                 TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->OM->setEnabled(OM->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->OP->setEnabled(OP->isEnabled());
+                TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
+                TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
+                TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
+                TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
                 TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
                 TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
                 TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
@@ -314,9 +358,10 @@ void Control::Update()
         }
         if (SelectedSpeed==Speed_O && Frames_Pos+1!=FileInfoData->Glue->VideoFrameCount)
         {
-            OM->setEnabled(false);
-            OP->setEnabled(false);
-            Plus->setEnabled(Plus);
+            PlayPause->setText(">");
+            PlayPause->setIcon(QIcon(":/icon/play.png"));
+            PlayPause->setEnabled(true);
+            Plus->setEnabled(true);
             P0->setEnabled(true);
             P1->setEnabled(true);
             P2->setEnabled(true);
@@ -327,9 +372,11 @@ void Control::Update()
                 TinyDisplayArea->BigDisplayArea->ControlArea->M2->setEnabled(M2->isEnabled());
                 TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
                 TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
+                TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
                 TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->OM->setEnabled(OM->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->OP->setEnabled(OP->isEnabled());
+                TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
+                TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
+                TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
                 TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
                 TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
                 TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
@@ -358,21 +405,31 @@ void Control::on_Plus_clicked(bool checked)
 }
 
 //---------------------------------------------------------------------------
+void Control::on_M9_clicked(bool checked)
+{
+    if (IsSlave)
+        return;    
+        
+    FileInfoData->Frames_Pos_Set(0);
+}
+
+//---------------------------------------------------------------------------
 void Control::on_M2_clicked(bool checked)
 {
     if (IsSlave)
         return;    
         
     SelectedSpeed=Speed_M2;
-    Timer_Duration=16;
+    Timer_Duration=17;
     Time_MinusPlus=false;
     Minus->setEnabled(false);
     Plus->setEnabled(false);
     M2->setEnabled(false);
     M1->setEnabled(true);
     M0->setEnabled(true);
-    OM->setEnabled(true);
-    OP->setEnabled(true);
+    PlayPause->setText("||");
+    PlayPause->setIcon(QIcon(":/icon/pause.png"));
+    PlayPause->setEnabled(true);
     P0->setEnabled(true);
     P1->setEnabled(true);
     P2->setEnabled(true);
@@ -384,7 +441,10 @@ void Control::on_M2_clicked(bool checked)
         TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->OM->setEnabled(OM->isEnabled());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
@@ -408,8 +468,9 @@ void Control::on_M1_clicked(bool checked)
     M2->setEnabled(true);
     M1->setEnabled(false);
     M0->setEnabled(true);
-    OM->setEnabled(true);
-    OP->setEnabled(true);
+    PlayPause->setText("||");
+    PlayPause->setIcon(QIcon(":/icon/pause.png"));
+    PlayPause->setEnabled(true);
     P0->setEnabled(true);
     P1->setEnabled(true);
     P2->setEnabled(true);
@@ -421,8 +482,10 @@ void Control::on_M1_clicked(bool checked)
         TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->OM->setEnabled(OM->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->OP->setEnabled(OP->isEnabled());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
@@ -439,15 +502,16 @@ void Control::on_M0_clicked(bool checked)
         return;    
         
     SelectedSpeed=Speed_M0;
-    Timer_Duration=66;
+    Timer_Duration=67;
     Time_MinusPlus=false;
     Minus->setEnabled(false);
     Plus->setEnabled(false);
     M2->setEnabled(true);
     M1->setEnabled(true);
     M0->setEnabled(true);
-    OM->setEnabled(true);
-    OP->setEnabled(true);
+    PlayPause->setText("||");
+    PlayPause->setIcon(QIcon(":/icon/pause.png"));
+    PlayPause->setEnabled(true);
     P0->setEnabled(true);
     P1->setEnabled(true);
     P2->setEnabled(true);
@@ -459,8 +523,10 @@ void Control::on_M0_clicked(bool checked)
         TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->OM->setEnabled(OM->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->OP->setEnabled(OP->isEnabled());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
@@ -471,44 +537,16 @@ void Control::on_M0_clicked(bool checked)
 }
 
 //---------------------------------------------------------------------------
-void Control::on_OM_clicked(bool checked)
+void Control::on_PlayPause_clicked(bool checked)
 {
-    if (IsSlave)
-        return;    
-        
-    SelectedSpeed=Speed_O;
-    Minus->setEnabled(Frames_Pos);
-    Plus->setEnabled(Frames_Pos+1!=FileInfoData->Glue->VideoFrameCount);
-    M2->setEnabled(Frames_Pos);
-    M1->setEnabled(Frames_Pos);
-    M0->setEnabled(Frames_Pos);
-    OM->setEnabled(false);
-    OP->setEnabled(false);
-    P0->setEnabled(Frames_Pos+1!=FileInfoData->Glue->VideoFrameCount);
-    P1->setEnabled(Frames_Pos+1!=FileInfoData->Glue->VideoFrameCount);
-    P2->setEnabled(Frames_Pos+1!=FileInfoData->Glue->VideoFrameCount);
-
-    if (TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
-    {
-        TinyDisplayArea->BigDisplayArea->ControlArea->SelectedSpeed=SelectedSpeed;
-        TinyDisplayArea->BigDisplayArea->ControlArea->M2->setEnabled(M2->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->OM->setEnabled(OM->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->OP->setEnabled(OP->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P2->setEnabled(P2->isEnabled());
-    }
-
-    if (Timer)
-        Timer->stop();
+    if (SelectedSpeed==Control::Speed_O)
+        on_P1_clicked(checked);
+    else
+        on_Pause_clicked(checked);
 }
 
 //---------------------------------------------------------------------------
-void Control::on_OP_clicked(bool checked)
+void Control::on_Pause_clicked(bool checked)
 {
     if (IsSlave)
         return;    
@@ -519,8 +557,9 @@ void Control::on_OP_clicked(bool checked)
     M2->setEnabled(Frames_Pos);
     M1->setEnabled(Frames_Pos);
     M0->setEnabled(Frames_Pos);
-    OM->setEnabled(false);
-    OP->setEnabled(false);
+    PlayPause->setText(">");
+    PlayPause->setIcon(QIcon(":/icon/play.png"));
+    PlayPause->setEnabled(Frames_Pos+1!=FileInfoData->Glue->VideoFrameCount);
     P0->setEnabled(Frames_Pos+1!=FileInfoData->Glue->VideoFrameCount);
     P1->setEnabled(Frames_Pos+1!=FileInfoData->Glue->VideoFrameCount);
     P2->setEnabled(Frames_Pos+1!=FileInfoData->Glue->VideoFrameCount);
@@ -532,8 +571,10 @@ void Control::on_OP_clicked(bool checked)
         TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->OM->setEnabled(OM->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->OP->setEnabled(OP->isEnabled());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
@@ -550,16 +591,17 @@ void Control::on_P0_clicked(bool checked)
     if (IsSlave)
         return;    
         
-    SelectedSpeed=Speed_P0;
-    Timer_Duration=66;
+    SelectedSpeed=Speed_P1;
+    Timer_Duration=67;
     Time_MinusPlus=true;
     Minus->setEnabled(false);
     Plus->setEnabled(false);
     M2->setEnabled(true);
     M1->setEnabled(true);
     M0->setEnabled(true);
-    OM->setEnabled(true);
-    OP->setEnabled(true);
+    PlayPause->setText("||");
+    PlayPause->setIcon(QIcon(":/icon/pause.png"));
+    PlayPause->setEnabled(true);
     P0->setEnabled(false);
     P1->setEnabled(true);
     P2->setEnabled(true);
@@ -571,8 +613,10 @@ void Control::on_P0_clicked(bool checked)
         TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->OM->setEnabled(OM->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->OP->setEnabled(OP->isEnabled());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
@@ -596,8 +640,9 @@ void Control::on_P1_clicked(bool checked)
     M2->setEnabled(true);
     M1->setEnabled(true);
     M0->setEnabled(true);
-    OM->setEnabled(true);
-    OP->setEnabled(true);
+    PlayPause->setText("||");
+    PlayPause->setIcon(QIcon(":/icon/pause.png"));
+    PlayPause->setEnabled(true);
     P0->setEnabled(true);
     P1->setEnabled(false);
     P2->setEnabled(true);
@@ -609,8 +654,10 @@ void Control::on_P1_clicked(bool checked)
         TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->OM->setEnabled(OM->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->OP->setEnabled(OM->isEnabled());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
@@ -627,15 +674,16 @@ void Control::on_P2_clicked(bool checked)
         return;    
         
     SelectedSpeed=Speed_P2;
-    Timer_Duration=16;
+    Timer_Duration=17;
     Time_MinusPlus=true;
     Minus->setEnabled(false);
     Plus->setEnabled(false);
     M2->setEnabled(true);
     M1->setEnabled(true);
     M0->setEnabled(true);
-    OM->setEnabled(true);
-    OP->setEnabled(true);
+    PlayPause->setText("||");
+    PlayPause->setIcon(QIcon(":/icon/pause.png"));
+    PlayPause->setEnabled(true);
     P0->setEnabled(true);
     P1->setEnabled(true);
     P2->setEnabled(false);
@@ -648,8 +696,10 @@ void Control::on_P2_clicked(bool checked)
         TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->OM->setEnabled(OM->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->OP->setEnabled(OP->isEnabled());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
+        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
         TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
@@ -657,6 +707,16 @@ void Control::on_P2_clicked(bool checked)
     }
 
     TimeOut_Init();
+}
+
+//---------------------------------------------------------------------------
+void Control::on_P9_clicked(bool checked)
+{
+    if (IsSlave)
+        return;    
+        
+    if (FileInfoData->Glue->VideoFrameCount)
+        FileInfoData->Frames_Pos_Set(FileInfoData->Glue->VideoFrameCount-1);
 }
 
 //***************************************************************************

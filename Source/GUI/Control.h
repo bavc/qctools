@@ -57,17 +57,20 @@ public:
     Info*                       InfoArea;
 
     // Widgets
+    QToolButton*                M9;
     QToolButton*                M2;
     QToolButton*                M1;
     QToolButton*                M0;
-    QPushButton*                Minus;
-    QToolButton*                OM;
-    QLabel*                     Info;
-    QToolButton*                OP;
-    QPushButton*                Plus;
+    QToolButton*                Minus;
+    QLabel*                     Info_Time;
+    QToolButton*                PlayPause;
+    QToolButton*                Pause;
+    QLabel*                     Info_Frames;
+    QToolButton*                Plus;
     QToolButton*                P0;
     QToolButton*                P1;
     QToolButton*                P2;
+    QToolButton*                P9;
 
 protected:
     // File information
@@ -83,6 +86,7 @@ protected:
     qint64  DateTime;
     bool    Time_MinusPlus;
     int     Timer_Duration;
+public:
     enum selectedspeed
     {
         Speed_M2,
@@ -94,22 +98,25 @@ protected:
         Speed_P2,
     };
     selectedspeed SelectedSpeed;
+protected:
     bool    IsSlave;
     
     void TimeOut_Init();
 
 public Q_SLOTS:
     void TimeOut();
+    void on_M9_clicked(bool checked);
     void on_M2_clicked(bool checked);
     void on_M1_clicked(bool checked);
     void on_M0_clicked(bool checked);
     void on_Minus_clicked(bool checked=false);
-    void on_OM_clicked(bool checked);
-    void on_OP_clicked(bool checked);
+    void on_PlayPause_clicked(bool checked);
+    void on_Pause_clicked(bool checked);
     void on_Plus_clicked(bool checked=false);
     void on_P0_clicked(bool checked);
     void on_P1_clicked(bool checked);
     void on_P2_clicked(bool checked);
+    void on_P9_clicked(bool checked);
 };
 
 #endif // GUI_Control_H

@@ -19,6 +19,8 @@
 #include <QPushbutton>
 #include <QToolbutton>
 #include <QLabel>
+#include <QApplication>
+#include <QDesktopWidget>
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -99,12 +101,12 @@ void TinyDisplay::Update()
     for (size_t Pos=0; Pos<9; Pos++)
     {
         if (Pos==4)
-            Labels_Middle->setIcon(*FileInfoData->Picture_Get(Frames_Pos));
+            Labels_Middle->setIcon(FileInfoData->Picture_Get(Frames_Pos)->copy(0, 0, 72, 72));
         else if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->Glue->VideoFramePos)
-            Labels[Pos]->setPixmap(*FileInfoData->Picture_Get(Frames_Pos-4+Pos));
+            Labels[Pos]->setPixmap(FileInfoData->Picture_Get(Frames_Pos-4+Pos)->copy(0, 0, 72, 72));
         else if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->Glue->VideoFrameCount)
         {
-            Labels[Pos]->setPixmap(QPixmap(":/icon/logo.jpg").scaled(72, 72));
+            Labels[Pos]->setPixmap(QPixmap());
             ShouldUpate=true;
         }
         else
@@ -114,6 +116,12 @@ void TinyDisplay::Update()
     // BigDisplayArea
     if (BigDisplayArea)
         BigDisplayArea->ShowPicture();
+}
+
+//---------------------------------------------------------------------------
+void TinyDisplay::Filters_Show()
+{
+    on_Labels_Middle_clicked(true);
 }
 
 //***************************************************************************
@@ -133,21 +141,24 @@ void TinyDisplay::on_Labels_Middle_clicked(bool checked)
     if (ShouldDisplay)
     {
         BigDisplayArea=new BigDisplay(this, FileInfoData);
-        BigDisplayArea->move(geometry().left()+geometry().width(), geometry().top());
+        BigDisplayArea->resize(QApplication::desktop()->screenGeometry().width()-300, QApplication::desktop()->screenGeometry().height()-300);
+        BigDisplayArea->move(150, 150); //BigDisplayArea->move(geometry().left()+geometry().width(), geometry().top());
         BigDisplayArea->show();
         BigDisplayArea->ShowPicture();
         if (ControlArea)
         {
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->M2   , SIGNAL(clicked(bool)), ControlArea, SLOT(on_M2_clicked   (bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->M1   , SIGNAL(clicked(bool)), ControlArea, SLOT(on_M1_clicked   (bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->M0   , SIGNAL(clicked(bool)), ControlArea, SLOT(on_M0_clicked   (bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->Minus, SIGNAL(clicked(bool)), ControlArea, SLOT(on_Minus_clicked(bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->OM   , SIGNAL(clicked(bool)), ControlArea, SLOT(on_OM_clicked   (bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->OP   , SIGNAL(clicked(bool)), ControlArea, SLOT(on_OP_clicked   (bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->Plus , SIGNAL(clicked(bool)), ControlArea, SLOT(on_Plus_clicked (bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->P0   , SIGNAL(clicked(bool)), ControlArea, SLOT(on_P0_clicked   (bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->P1   , SIGNAL(clicked(bool)), ControlArea, SLOT(on_P1_clicked   (bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->P2   , SIGNAL(clicked(bool)), ControlArea, SLOT(on_P2_clicked   (bool)));
+            BigDisplayArea->connect(BigDisplayArea->ControlArea->M9         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_M9_clicked        (bool)));
+            BigDisplayArea->connect(BigDisplayArea->ControlArea->M2         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_M2_clicked        (bool)));
+            BigDisplayArea->connect(BigDisplayArea->ControlArea->M1         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_M1_clicked        (bool)));
+            BigDisplayArea->connect(BigDisplayArea->ControlArea->M0         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_M0_clicked        (bool)));
+            BigDisplayArea->connect(BigDisplayArea->ControlArea->Minus      , SIGNAL(clicked(bool)), ControlArea, SLOT(on_Minus_clicked     (bool)));
+            BigDisplayArea->connect(BigDisplayArea->ControlArea->PlayPause  , SIGNAL(clicked(bool)), ControlArea, SLOT(on_PlayPause_clicked (bool)));
+            BigDisplayArea->connect(BigDisplayArea->ControlArea->Pause      , SIGNAL(clicked(bool)), ControlArea, SLOT(on_Pause_clicked     (bool)));
+            BigDisplayArea->connect(BigDisplayArea->ControlArea->Plus       , SIGNAL(clicked(bool)), ControlArea, SLOT(on_Plus_clicked      (bool)));
+            BigDisplayArea->connect(BigDisplayArea->ControlArea->P0         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_P0_clicked        (bool)));
+            BigDisplayArea->connect(BigDisplayArea->ControlArea->P1         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_P1_clicked        (bool)));
+            BigDisplayArea->connect(BigDisplayArea->ControlArea->P2         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_P2_clicked        (bool)));
+            BigDisplayArea->connect(BigDisplayArea->ControlArea->P9         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_P9_clicked        (bool)));
         }
     }
 }

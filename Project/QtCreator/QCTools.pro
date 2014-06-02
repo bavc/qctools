@@ -15,6 +15,7 @@ HEADERS = \
     ../../Source/GUI/BigDisplay.h \
     ../../Source/GUI/Control.h \
     ../../Source/GUI/FileInformation.h \
+    ../../Source/GUI/FilesList.h \
     ../../Source/GUI/Help.h \
     ../../Source/GUI/Info.h \
     ../../Source/GUI/mainwindow.h \
@@ -27,6 +28,7 @@ SOURCES = \
     ../../Source/GUI/BigDisplay.cpp \
     ../../Source/GUI/Control.cpp \
     ../../Source/GUI/FileInformation.cpp \
+    ../../Source/GUI/FilesList.cpp \
     ../../Source/GUI/Help.cpp \
     ../../Source/GUI/Info.cpp \
     ../../Source/GUI/main.cpp \
@@ -49,17 +51,17 @@ include( $${QWT_ROOT}/qwtfunctions.pri )
 
 INCLUDEPATH += $$PWD/../../Source
 INCLUDEPATH += $$QWT_ROOT/src
-INCLUDEPATH += $$PWD/../../../FFmpeg-master
+INCLUDEPATH += $$PWD/../../../FFmpeg-bavc
 
 LIBS      += -L$${QWT_ROOT}/lib -lqwt
-LIBS      += -L$${PWD}/../../../FFmpeg-master/libavdevice -lavdevice \
-             -L$${PWD}/../../../FFmpeg-master/libavcodec -lavcodec \
-             -L$${PWD}/../../../FFmpeg-master/libavfilter -lavfilter \
-             -L$${PWD}/../../../FFmpeg-master/libavformat -lavformat \
-             -L$${PWD}/../../../FFmpeg-master/libavutil -lavutil \
-             -L$${PWD}/../../../FFmpeg-master/libpostproc -lpostproc \
-             -L$${PWD}/../../../FFmpeg-master/libswresample -lswresample \
-             -L$${PWD}/../../../FFmpeg-master/libswscale -lswscale
+LIBS      += -L$${PWD}/../../../FFmpeg-bavc/libavdevice -lavdevice \
+             -L$${PWD}/../../../FFmpeg-bavc/libavcodec -lavcodec \
+             -L$${PWD}/../../../FFmpeg-bavc/libavfilter -lavfilter \
+             -L$${PWD}/../../../FFmpeg-bavc/libavformat -lavformat \
+             -L$${PWD}/../../../FFmpeg-bavc/libavutil -lavutil \
+             -L$${PWD}/../../../FFmpeg-bavc/libpostproc -lpostproc \
+             -L$${PWD}/../../../FFmpeg-bavc/libswresample -lswresample \
+             -L$${PWD}/../../../FFmpeg-bavc/libswscale -lswscale
 
 macx:
 {

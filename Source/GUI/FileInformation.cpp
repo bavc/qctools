@@ -69,7 +69,7 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_) :
         Glue= new FFmpeg_Glue(FileName_string.c_str(), 72, 72, FFmpeg_Glue::Output_JpegList, string(), string(), true, false, false, StatsFromExternalData);
     }
     else
-        Glue= new FFmpeg_Glue(FileName_string.c_str(), 72, 72, FFmpeg_Glue::Output_JpegList, "values=stat=tout|vrep|rang|head", "", true, false, true);
+        Glue= new FFmpeg_Glue(FileName_string.c_str(), 72, 72, FFmpeg_Glue::Output_JpegList, "signalstats=stat=tout+vrep+rang+head,cropdetect,split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr", "", true, false, true);
 
     if (Glue->VideoFrameCount==0)
         return; // Problem
@@ -112,9 +112,9 @@ void FileInformation::Export_CSV (const QString &ExportFileName)
 //---------------------------------------------------------------------------
 QPixmap* FileInformation::Picture_Get (size_t Pos)
 {
-    if (Glue==NULL || Pos>=Glue->VideoFramePos)
+    if (Glue==NULL || Pos>=Glue->VideoFramePos || Pos>=Glue->JpegList.size())
     {
-        Pixmap.load(":/icon/logo.jpg");
+        Pixmap.load(":/icon/logo.png");
         Pixmap=Pixmap.scaled(72, 72);
     }
     else

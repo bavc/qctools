@@ -36,23 +36,43 @@ enum PlotName
     PlotName_VAVG,
     PlotName_VHIGH,
     PlotName_VMAX,
-    //DIF
+    //Diffs
     PlotName_YDIF,
     PlotName_UDIF,
     PlotName_VDIF,
     PlotName_YDIF1,
     PlotName_YDIF2,
+    //Sat
+    PlotName_SATMIN,
+    PlotName_SATLOW,
+    PlotName_SATAVG,
+    PlotName_SATHIGH,
+    PlotName_SATMAX,
+    //Hue
+    PlotName_HUEMOD,
+    PlotName_HUEMED,
+    PlotName_HUEAVG,
     //Other
     PlotName_TOUT,
+    PlotName_HEAD,
     PlotName_VREP,
     PlotName_BRNG,
-    PlotName_HEAD,
+    //Crop
+    //PlotName_Crop_x1,
+    //PlotName_Crop_x2,
+    //PlotName_Crop_y1,
+    //PlotName_Crop_y2,
+    //MSEf
+    PlotName_MSE_v,
+    PlotName_MSE_u,
+    PlotName_MSE_y,
+    //PSNRf
+    PlotName_PSNR_v,
+    PlotName_PSNR_u,
+    PlotName_PSNR_y,
     //Internal
     PlotName_Max
 };
-
-extern const char* Names[PlotName_Max];
-extern const int PlotValues_DigitsAfterComma[PlotName_Max];
 
 enum PlotType
 {
@@ -64,17 +84,41 @@ enum PlotType
     PlotType_UDiff,
     PlotType_VDiff,
     PlotType_Diffs,
+    PlotType_Sat,
+    PlotType_Hue,
     PlotType_TOUT,
-    PlotType_VREP,
     PlotType_HEAD,
+    PlotType_VREP,
     PlotType_BRNG,
+    //PlotType_CropW,
+    //PlotType_CropH,
+    PlotType_MSE,
+    PlotType_PSNR,
     PlotType_Axis,
     PlotType_Max
 };
 
-extern size_t StatsFile_Positions[PlotType_Max];
-extern size_t StatsFile_Counts[PlotType_Max];
-extern size_t StatsFile_CountPerLine[];
-extern const char* StatsFile_Description[PlotType_Max];
+struct per_plot_group
+{
+    const   PlotName    Start;
+    const   size_t      Count;
+    const   double      Min;
+    const   double      Max;
+    const   double      StepsCount;
+    const   char*       Name;
+    const   bool        CheckedByDefault;
+    const   char*       Description;
+};
+struct per_plot_item
+{
+    const   PlotType    Group1;
+    const   PlotType    Group2;
+    const   char*       Name;
+    const   char*       FFmpeg_Name;
+    const   int         DigitsAfterComma;
+    const   bool        NewLine;
+};
+extern const struct per_plot_group  PerPlotGroup    [PlotType_Max];
+extern const struct per_plot_item   PerPlotName     [PlotName_Max];
 
 #endif // Core_H
