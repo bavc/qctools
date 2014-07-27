@@ -143,11 +143,12 @@ const filter Filters[]=
         },
         {
             "extractplanes=${1},split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3}",
-            "split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3}",
             "extractplanes=${1},transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3},transpose=2",
+            "split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3}",
             "transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3},transpose=2",
         },
     },
+    /*
     {
         "Frame Metadata Play",
         {
@@ -161,6 +162,7 @@ const filter Filters[]=
             "cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,drawtext=fontfile=Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=yellow:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=drawtext.txt",
         },
     },
+    */
     {
         "Histogram",
         {
@@ -172,9 +174,13 @@ const filter Filters[]=
         },
         {
             "extractplanes=${3},histogram",
-            "extractplanes=${3},histogram",
+            "histogram",
+            "format=rgb48,extractplanes=${3},histogram",
+            "format=rgb48,histogram",
             "extractplanes=${3},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack",
-            "extractplanes=${3},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack",
+            "format=rgb48,extractplanes=${3},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack",
+            "format=rgb48,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack",
         },
     },
     {
@@ -270,14 +276,18 @@ const filter Filters[]=
         "Value Highlight",
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
-            { Args_Type_Yuv,      0,   0,   0,   0, "Plane" },
+            { Args_Type_YuvA,     2,   0,   0,   0, "Plane" },
             { Args_Type_Slider, 128,   0, 255,   1, "Min"},
             { Args_Type_Slider, 128,   0, 255,   1, "Max"},
-            { Args_Type_ClrPck, 0xFFFFFF,   0,   0,   0, ""},
+            { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
         },
         {
-            "extractplanes=${2},lutrgb=r=if(between(val\\,${3}\\,${4})\\,255\\,val):g=if(between(val\\,${3}\\,${4})\\,255\\,val):b=if(between(val\\,${3}\\,${4})\\,0\\,val)",
-            "extractplanes=${2},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]lutrgb=r=if(between(val\\,${3}\\,${4})\\,255\\,val):g=if(between(val\\,${3}\\,${4})\\,255\\,val):b=if(between(val\\,${3}\\,${4})\\,0\\,val)[a2];[b1]lutrgb=r=if(between(val\\,${3}\\,${4})\\,255\\,val):g=if(between(val\\,${3}\\,${4})\\,255\\,val):b=if(between(val\\,${3}\\,${4})\\,0\\,val)[b2];[a2][b2]framepack=tab",
+            //"extractplanes=${2},lutrgb=r=if(between(val\\,${3}\\,${4})\\,255\\,val):g=if(between(val\\,${3}\\,${4})\\,255\\,val):b=if(between(val\\,${3}\\,${4})\\,0\\,val)",
+            //"extractplanes=${2},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]lutrgb=r=if(between(val\\,${3}\\,${4})\\,255\\,val):g=if(between(val\\,${3}\\,${4})\\,255\\,val):b=if(between(val\\,${3}\\,${4})\\,0\\,val)[a2];[b1]lutrgb=r=if(between(val\\,${3}\\,${4})\\,255\\,val):g=if(between(val\\,${3}\\,${4})\\,255\\,val):b=if(between(val\\,${3}\\,${4})\\,0\\,val)[b2];[a2][b2]framepack=tab",
+            "extractplanes=${2},lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)",
+            "lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)",
+            "extractplanes=${2},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)[a2];[b1]lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)[b2];[a2][b2]framepack=tab",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)[a2];[b1]lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)[b2];[a2][b2]framepack=tab",
         },
     },
     {
@@ -305,7 +315,7 @@ const filter Filters[]=
         },
         {
             "signalstats=out=brng:c=${2}",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]signalstats=out=brng[a2];[b1]signalstats=out=brng[b2];[a2][b2]framepack=tab",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]signalstats=out=brng:c=${2}[a2];[b1]signalstats=out=brng:c=${2}[b2];[a2][b2]framepack=tab",
         },
     },
     {
@@ -318,12 +328,12 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "signalstats=out=tout",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]signalstats=out=tout[a2];[b1]signalstats=out=tout[b2];[a2][b2]framepack=tab",
+            "signalstats=out=tout:c=${2}",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]signalstats=out=tout:c=${2}[a2];[b1]signalstats=out=tout:c=${2}[b2];[a2][b2]framepack=tab",
         },
     },
     {
-        "Veritcal Repetition Pixels",
+        "Vertical Repetition Pixels",
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
@@ -332,10 +342,11 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "signalstats=out=vrep",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]signalstats=out=vrep[a2];[b1]signalstats=out=vrep[b2];[a2][b2]framepack=tab",
+            "signalstats=out=vrep:c=${2}",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]signalstats=out=vrep:c=${2}[a2];[b1]signalstats=out=vrep:c=${2}[b2];[a2][b2]framepack=tab",
         },
     },
+    /*
     {
         "Tile",
         {
@@ -349,6 +360,7 @@ const filter Filters[]=
             "scale=iw/${1}:ih/${1}"
         },
     },
+    */
     {
         "Zoom",
         {
@@ -623,9 +635,9 @@ QString DoubleSpinBoxWithSlider::textFromValue (double value) const
 double DoubleSpinBoxWithSlider::valueFromText (const QString& text) const
 {
     if (IsBitSlice && text=="None")
-        return 0;
-    else if (IsBitSlice && text=="All")
         return -1;
+    else if (IsBitSlice && text=="All")
+        return 0;
     else
         return QDoubleSpinBox::valueFromText(text);
 }
@@ -740,7 +752,7 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     // Picture
     Picture=NULL;
     Picture_Current1=2;
-    Picture_Current2=7;
+    Picture_Current2=6;
     Options[0].FiltersList->setCurrentIndex(Picture_Current1);
     Options[1].FiltersList->setCurrentIndex(Picture_Current2);
     connect(Options[0].FiltersList, SIGNAL(currentIndexChanged(int)), this, SLOT(on_FiltersList1_currentIndexChanged(int)));
@@ -783,6 +795,7 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
     size_t Widget_XPox=1;
     for (size_t OptionPos=0; OptionPos<Args_Max; OptionPos++)
     {
+        PreviousValues[Pos].clear(); //TODO: previous values
         if (FilterPos>=PreviousValues[Pos].size())
             PreviousValues[Pos].resize(FilterPos+1);
         if (PreviousValues[Pos][FilterPos].Values[OptionPos]==-2)
@@ -872,6 +885,7 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                     Options[Pos].ColorValue[OptionPos]=Filters[FilterPos].Args[OptionPos].Default;
                                     Options[Pos].ColorButton[OptionPos]=new QPushButton("Color");
                                     Options[Pos].ColorButton[OptionPos]->setFont(Font);
+                                    Options[Pos].ColorButton[OptionPos]->setMaximumHeight(Options[Pos].FiltersList->height());
                                     connect(Options[Pos].ColorButton[OptionPos], SIGNAL(clicked (bool)), this, Pos==0?(SLOT(on_Color1_click(bool))):SLOT(on_Color2_click(bool)));
                                     Layout0->addWidget(Options[Pos].ColorButton[OptionPos], 0, Widget_XPox);
                                     Widget_XPox++;
@@ -935,10 +949,6 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
     WithSliders[2]=-2;
     WithSliders[3]=-2;
     string WithRadios[Args_Max];
-    WithRadios[0]="";
-    WithRadios[1]="";
-    WithRadios[2]="";
-    WithRadios[3]="";
     string Modified_String;
     for (size_t OptionPos=0; OptionPos<Args_Max; OptionPos++)
     {
@@ -954,6 +964,26 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                         for (size_t OptionPos2=0; OptionPos2<Args_Max; OptionPos2++)
                                             if (Filters[Picture_Current].Args[OptionPos2].Type!=Args_Type_None && string(Filters[Picture_Current].Args[OptionPos2].Name)=="Line")
                                                 Options[Pos].Sliders_SpinBox[OptionPos2]->ChangeMax(Options[Pos].Checks[OptionPos]->isChecked()?FileInfoData->Glue->Height_Get():FileInfoData->Glue->Width_Get());
+
+                                    // Special case: RGB
+                                    if (string(Filters[Picture_Current].Name)=="Histogram" && Options[Pos].Checks[1])
+                                    {
+                                        if (Options[Pos].Checks[1]->isChecked() && Options[Pos].Radios[2][0]->text()!="R") //RGB
+                                        {
+                                            Options[Pos].Radios[2][0]->setText("R");
+                                            Options[Pos].Radios[2][1]->setText("G");
+                                            Options[Pos].Radios[2][2]->setText("B");
+                                            Options[Pos].Radios[2][3]->setChecked(true);
+                                        }
+                                        if (!Options[Pos].Checks[1]->isChecked() && Options[Pos].Radios[2][0]->text()!="Y") //YUV
+                                        {
+                                            Options[Pos].Radios[2][0]->setText("Y");
+                                            Options[Pos].Radios[2][1]->setText("U");
+                                            Options[Pos].Radios[2][2]->setText("V");
+                                            Options[Pos].Radios[2][3]->setChecked(true);
+                                        }
+                                    }
+
                                     break;
             case Args_Type_Slider:
                                     Modified=true;
@@ -967,7 +997,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
             case Args_Type_Yuv:
             case Args_Type_Tile:
                                     Modified=true;
-                                    for (size_t OptionPos2=0; OptionPos2<Filters[Picture_Current].Args[OptionPos].Type?4:3; OptionPos2++)
+                                    for (size_t OptionPos2=0; OptionPos2<(Filters[Picture_Current].Args[OptionPos].Type?4:3); OptionPos2++)
                                     {
                                         if (Options[Pos].Radios[OptionPos][OptionPos2] && Options[Pos].Radios[OptionPos][OptionPos2]->isChecked())
                                         {
@@ -987,6 +1017,15 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                                     case 3: WithRadios[OptionPos]="all"; break; //Special case: remove plane
                                                     default:;
                                                 }
+                                            else if (string(Filters[Picture_Current].Name)=="Histogram" && Options[Pos].Checks[1] && Options[Pos].Checks[1]->isChecked()) //RGB
+                                                switch (OptionPos2)
+                                                {
+                                                    case 0: WithRadios[OptionPos]="r"; break;
+                                                    case 1: WithRadios[OptionPos]="g"; break;
+                                                    case 2: WithRadios[OptionPos]="b"; break;
+                                                    case 3: WithRadios[OptionPos]="all"; break; //Special case: remove plane
+                                                    default:;
+                                                }
                                             else
                                                 switch (OptionPos2)
                                                 {
@@ -1000,11 +1039,11 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                             break;
                                         }
                                     }
-                                    break ;
             case Args_Type_ClrPck:
                                     Modified=true;
-                                    WithRadios[OptionPos]=("0x"+QString::number(Options[Pos].ColorValue[OptionPos], 16)).toUtf8().data();
+                                    WithSliders[OptionPos]=Options[Pos].ColorValue[OptionPos];
                                     PreviousValues[Pos][Picture_Current].Values[OptionPos]=Options[Pos].ColorValue[OptionPos];
+                                    break ;
                                     break ;
             default:                ;
         }
@@ -1071,9 +1110,38 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                                     BytesCount=2;
                                             }
                                             if (InsertPos==string::npos)
+                                            {
+                                                // Special case RGB
+                                                char ToFind3[4];
+                                                ToFind3[0]='$';
+                                                ToFind3[1]='{';
+                                                ToFind3[2]='1'+OptionPos;
+                                                ToFind3[3]='\0';
+                                                InsertPos=Modified_String.find(ToFind3);
+                                                if (InsertPos!=string::npos)
+                                                {
+                                                    if (InsertPos+6<Modified_String.size() && (Modified_String[InsertPos+3]=='R' || Modified_String[InsertPos+3]=='G' ||Modified_String[InsertPos+3]=='B') && Modified_String[InsertPos+4]=='}')
+                                                    {
+                                                        int Value=(int)WithSliders[OptionPos];
+                                                        switch(Modified_String[InsertPos+3])
+                                                        {
+                                                            case 'R' : Value>>=16;            ; break;
+                                                            case 'G' : Value>>= 8; Value&=0xFF; break;
+                                                            case 'B' :             Value&=0xFF; break;
+                                                            default  : ;
+                                                        }
+                                                            
+                                                        Modified_String.erase(InsertPos, 5);
+                                                        Modified_String.insert(InsertPos, QString::number(Value).toUtf8());
+                                                    }
+                                                }
                                                 break;
+                                            }
                                             Modified_String.erase(InsertPos, BytesCount);
-                                            Modified_String.insert(InsertPos, WithRadios[OptionPos]);
+                                            if (Filters[Picture_Current].Args[OptionPos].Type==Args_Type_ClrPck)
+                                                Modified_String.insert(InsertPos, ("0x"+QString::number(Options[Pos].ColorValue[OptionPos], 16)).toUtf8().data());
+                                            else
+                                                Modified_String.insert(InsertPos, WithRadios[OptionPos]);
                                         }
 
                                         // Special case: removing fake "extractplanes=all,"
@@ -1314,14 +1382,24 @@ void BigDisplay::on_FiltersSpinBox2_click()
 //---------------------------------------------------------------------------
 void BigDisplay::on_Color1_click(bool checked)
 {
-    Options[0].ColorValue[2] = QColorDialog::getColor(QColor(Options[0].ColorValue[2]), this).rgb(); //TODO: find the right ColorValue pos
+    QObject* Sender=sender();
+    size_t OptionPos=0;
+    while (Sender!=Options[0].ColorButton[OptionPos])
+        OptionPos++;
+    
+    Options[0].ColorValue[OptionPos] = QColorDialog::getColor(QColor(Options[0].ColorValue[OptionPos]), this).rgb()&0x00FFFFFF;
     FiltersList1_currentOptionChanged(Picture_Current1);
 }
 
 //---------------------------------------------------------------------------
 void BigDisplay::on_Color2_click(bool checked)
 {
-    Options[0].ColorValue[2] = QColorDialog::getColor(QColor(Options[1].ColorValue[2]), this).rgb(); //TODO: find the right ColorValue pos
+    QObject* Sender=sender();
+    size_t OptionPos=0;
+    while (Sender!=Options[1].ColorButton[OptionPos])
+        OptionPos++;
+    
+    Options[1].ColorValue[OptionPos] = QColorDialog::getColor(QColor(Options[1].ColorValue[OptionPos]), this).rgb()&0x00FFFFFF;
     FiltersList2_currentOptionChanged(Picture_Current2);
 }
 
