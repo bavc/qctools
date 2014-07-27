@@ -76,8 +76,6 @@
     <addaction name="actionClose"/>
     <addaction name="actionCloseAll"/>
     <addaction name="separator"/>
-    <addaction name="actionCSV"/>
-    <addaction name="actionPrint"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -109,8 +107,35 @@
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuImport">
+    <property name="title">
+     <string>Import</string>
+    </property>
+    <addaction name="actionImport_XmlGz_Prompt"/>
+   </widget>
+   <widget class="QMenu" name="menuExport">
+    <property name="title">
+     <string>Export</string>
+    </property>
+    <addaction name="actionExport_XmlGz_Prompt"/>
+    <addaction name="actionExport_XmlGz_Sidecar"/>
+    <addaction name="actionExport_XmlGz_Custom"/>
+    <addaction name="separator"/>
+    <addaction name="actionCSV"/>
+    <addaction name="separator"/>
+    <addaction name="actionPrint"/>
+   </widget>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <addaction name="actionPreferences"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
+   <addaction name="menuImport"/>
+   <addaction name="menuExport"/>
+   <addaction name="menuOptions"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
@@ -283,6 +308,40 @@
   <action name="actionCloseAll">
    <property name="text">
     <string>Close all</string>
+   </property>
+  </action>
+  <action name="actionExport_XmlGz_Prompt">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>To .xml.gz...</string>
+   </property>
+  </action>
+  <action name="actionImport_XmlGz_Prompt">
+   <property name="text">
+    <string>From .xml.gz...</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Preferences</string>
+   </property>
+  </action>
+  <action name="actionExport_XmlGz_Sidecar">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>To sidecar .xml.gz</string>
+   </property>
+  </action>
+  <action name="actionExport_XmlGz_Custom">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>To prefered directory</string>
    </property>
   </action>
  </widget>

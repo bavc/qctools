@@ -1,0 +1,55 @@
+Qt
+--
+You can download directly the binaries or compile yourself.
+http://qt-project.org/downloads
+My config:
+Mac: "./configure -release -opensource -confirm-license -static -no-sql-sqlite -no-sql-odbc -no-javascript-jit -no-qml-debug -no-gif -no-nis -no-dbus -no-audio-backend -no-framework -nomake examples"
+Windows: Edit qtbase\mkspecs\win32-msvc* and replace -MD by -MT in order to have  static build of the C library then "configure -opensource -confirm-license -static -ltcg -no-sql-sqlite -no-sql-odbc -no-qml-debug -no-gif -no-dbus -no-opengl -no-audio-backend -nomake examples -mp"
+
+FFmpeg
+------
+My config:
+./configure --enable-gpl --enable-version3 --enable-shared --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug
+
+On Mac:
+install_name_tool -id @executable_path/../Resources/libavcodec.55.dylib libavcodec.55.dylib
+install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib libavcodec.55.dylib
+install_name_tool -id @executable_path/../Resources/libavdevice.55.dylib libavdevice.55.dylib
+install_name_tool -change /usr/local/lib/libavcodec.55.dylib @executable_path/../Resources/libavcodec.55.dylib libavdevice.55.dylib
+install_name_tool -change /usr/local/lib/libavfilter.4.dylib @executable_path/../Resources/libavfilter.4.dylib libavdevice.55.dylib
+install_name_tool -change /usr/local/lib/libavformat.55.dylib @executable_path/../Resources/libavformat.55.dylib libavdevice.55.dylib
+install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib libavdevice.55.dylib
+install_name_tool -id @executable_path/../Resources/libavfilter.4.dylib libavfilter.4.dylib
+install_name_tool -change /usr/local/lib/libavcodec.55.dylib @executable_path/../Resources/libavcodec.55.dylib libavfilter.4.dylib
+install_name_tool -change /usr/local/lib/libavformat.55.dylib @executable_path/../Resources/libavformat.55.dylib libavfilter.4.dylib
+install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib libavfilter.4.dylib
+install_name_tool -change /usr/local/lib/libpostproc.52.dylib @executable_path/../Resources/libpostproc.52.dylib libavfilter.4.dylib
+install_name_tool -change /usr/local/lib/libswresample.0.dylib @executable_path/../Resources/libswresample.0.dylib libavfilter.4.dylib
+install_name_tool -change /usr/local/lib/libswscale.2.dylib @executable_path/../Resources/libswscale.2.dylib libavfilter.4.dylib
+install_name_tool -id @executable_path/../Resources/libavformat.55.dylib libavformat.55.dylib
+install_name_tool -change /usr/local/lib/libavcodec.55.dylib @executable_path/../Resources/libavcodec.55.dylib libavformat.55.dylib
+install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib libavformat.55.dylib
+install_name_tool -id @executable_path/../Resources/libavutil.52.dylib libavutil.52.dylib
+install_name_tool -id @executable_path/../Resources/libpostproc.52.dylib libpostproc.52.dylib
+install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib libpostproc.52.dylib
+install_name_tool -id @executable_path/../Resources/libswresample.0.dylib libswresample.0.dylib
+install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib libswresample.0.dylib
+install_name_tool -id @executable_path/../Resources/libswscale.2.dylib libswscale.2.dylib
+install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib libswscale.2.dylib
+install_name_tool -change /usr/local/lib/libavcodec.55.dylib @executable_path/../Resources/libavcodec.55.dylib QCTools
+install_name_tool -change /usr/local/lib/libavdevice.55.dylib @executable_path/../Resources/libavdevice.55.dylib QCTools
+install_name_tool -change /usr/local/lib/libavfilter.4.dylib @executable_path/../Resources/libavfilter.4.dylib QCTools
+install_name_tool -change /usr/local/lib/libavformat.55.dylib @executable_path/../Resources/libavformat.55.dylib QCTools
+install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib QCTools
+install_name_tool -change /usr/local/lib/libpostproc.52.dylib @executable_path/../Resources/libpostproc.52.dylib QCTools
+install_name_tool -change /usr/local/lib/libswresample.0.dylib @executable_path/../Resources/libswresample.0.dylib QCTools
+install_name_tool -change /usr/local/lib/libswscale.2.dylib @executable_path/../Resources/libswscale.2.dylib QCTools
+
+
+YASM
+----
+For speed optimization, you need to install YASM
+http://yasm.tortall.net/Download.html
+My config:
+Mac: I compile YASM from source then I put the resulting binary in /FFmpeg_for_QCTools directory, FFmpeg automaticly detects it
+Windows: I put the binary from website in /FFmpeg_for_QCTools directory, FFmpeg automaticly detects it

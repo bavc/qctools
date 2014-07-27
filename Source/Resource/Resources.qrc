@@ -17,25 +17,29 @@
         <file alias="backward.png">backward.png</file>
         <file alias="forward.png">forward.png</file>
     </qresource>
-    <qresource prefix="/Help">
-        <file alias="About.html">../../License.html</file>
-        <file alias="GettingStarted.html">Help/GettingStarted.html</file>
-        <file alias="HowToUseThisTool.html">Help/HowToUseThisTool.html</file>
-        <file alias="FilterDescriptions.html">Help/FilterDescriptions.html</file>
-        <file alias="PlaybackFilters.html">Help/PlaybackFilters.html</file>
-        <file alias="brng_dropout.png">Help/brng_dropout.png</file>
-        <file alias="brng_syncloss.png">Help/brng_syncloss.png</file>
-        <file alias="Slide1.jpg">Help/Slide1.jpg</file>
-        <file alias="Slide2.jpg">Help/Slide2.jpg</file>
-        <file alias="Slide3.jpg">Help/Slide3.jpg</file>
-        <file alias="Slide.jpg">Help/Slide4.jpg</file>
-        <file alias="tout_trackingerror.png">Help/tout_trackingerror.png</file>
-        <file alias="u_jitters.png">Help/u_jitters.png</file>
-        <file alias="uv_chrominancenoise.png">Help/uv_chrominancenoise.png</file>
-        <file alias="uv_syncloss.png">Help/uv_syncloss.png</file>
-        <file alias="ymax_trackingerror.png">Help/ymax_trackingerror.png</file>
-        <file alias="yuv_diff.jpg">Help/yuv_diff.jpg</file>
-        <file alias="yvalues_skew.png">Help/yvalues_skew.png</file>
-        <file alias="yvalues_trackingerror.png">Help/yvalues_trackingerror.png</file>
+    <qresource>
+        <file alias="Help/About.html">../../License.html</file>
+        <file>Help/Getting Started/Getting Started.html</file>
+        <file>Help/How To Use/How To Use.html</file>
+        <file>Help/How To Use/metadatascreen.jpg</file>
+        <file>Help/How To Use/Slide1.jpg</file>
+        <file>Help/How To Use/Slide2.jpg</file>
+        <file>Help/How To Use/Slide3.jpg</file>
+        <file>Help/How To Use/Slide4.jpg</file>
+        <file>Help/Filter Descriptions/Filter Descriptions.html</file>
+        <file>Help/Filter Descriptions/RANG_293_0046_syncloss2.jpg</file>
+        <file>Help/Filter Descriptions/RANG_DHC0024_dropout.jpg</file>
+        <file>Help/Filter Descriptions/TOUT_DHC0177_trackingerror_ffv1_h264.jpg</file>
+        <file>Help/Filter Descriptions/UNoise_293_0047_JITTERS_ffv1.jpg</file>
+        <file>Help/Filter Descriptions/UV_293_0046_syncloss_ffv1_h264.jpg</file>
+        <file>Help/Filter Descriptions/UV_293_0050_chrominancenoise_ffv1_h264.jpg</file>
+        <file>Help/Filter Descriptions/VREP_293_0047_JITTER.jpg</file>
+        <file>Help/Filter Descriptions/VREP_293_0047_SKEW.jpg</file>
+        <file>Help/Filter Descriptions/YMAX_DHC0177_trackingerror_ffv1_h264.jpg</file>
+        <file>Help/Filter Descriptions/yuv_diff.jpg</file>
+        <file>Help/Filter Descriptions/YValues_293_0047_SKEW_ffv1_h264.jpg</file>
+        <file>Help/Filter Descriptions/YValues_DHC0267_trackingerror_ffv1_h264.jpg</file>
+        <file>Help/Playback Filters/Playback Filters.html</file>
+        <file>Help/Data Format/Data Format.html</file>
     </qresource>
 </RCC>

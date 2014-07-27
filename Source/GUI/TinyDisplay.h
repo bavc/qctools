@@ -49,8 +49,7 @@ protected:
     int                         Frames_Pos;
 
     // Widgets
-    QLabel*                     Labels[9];
-    QToolButton*                Labels_Middle;
+    QToolButton*                Labels[9];
     QPixmap                     Labels_Temp[9];
 
 private Q_SLOTS:

@@ -10,6 +10,7 @@
 
 //---------------------------------------------------------------------------
 #include <QImage>
+#include <QXmlStreamReader>
 
 extern "C"
 {
@@ -73,6 +74,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
     Jpeg.Data=NULL;
     Jpeg.Size=0;
     VideoFrameCount=0;
+    VideoFrameCount_Max=0;
     VideoDuration=0;
     
     // FFmpeg pointers
@@ -93,37 +95,41 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
     //av_log_set_callback(avlog_cb);
 
     // Container part
-    if (avformat_open_input(&FormatContext, FileName.c_str(), NULL, NULL)<0)
-        return;
-    if (avformat_find_stream_info(FormatContext, NULL)<0)
-        return;
-
-    // Video stream
-    VideoStream_Index=av_find_best_stream(FormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
-    if (VideoStream_Index<0)
-        return;
-    VideoStream=FormatContext->streams[VideoStream_Index];
-
-    // Audio stream
-    int AudioStream_Index=av_find_best_stream(FormatContext, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
-    if (AudioStream_Index>=0)
-        AudioStream=FormatContext->streams[AudioStream_Index];
-    else
-        AudioStream=NULL;
-
-    // Video codec
-    AVCodec* VideoStream_Codec=avcodec_find_decoder(VideoStream->codec->codec_id);
-    if (!VideoStream_Codec)
-        return;
-    if (avcodec_open2(VideoStream->codec, VideoStream_Codec, NULL) < 0)
-        return;
-
-    // Audio codec
-    if (AudioStream)
+    VideoStream=NULL;
+    AudioStream=NULL;
+    if (avformat_open_input(&FormatContext, FileName.c_str(), NULL, NULL)>=0)
     {
-        AVCodec* AudioStream_Codec=avcodec_find_decoder(AudioStream->codec->codec_id);
-        if (AudioStream_Codec)
-            avcodec_open2(AudioStream->codec, AudioStream_Codec, NULL);
+        if (avformat_find_stream_info(FormatContext, NULL)>=0)
+        {
+            // Video stream
+            VideoStream_Index=av_find_best_stream(FormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
+            if (VideoStream_Index>=0)
+            {
+                VideoStream=FormatContext->streams[VideoStream_Index];
+
+                // Video codec
+                if (VideoStream)
+                {
+                    AVCodec* VideoStream_Codec=avcodec_find_decoder(VideoStream->codec->codec_id);
+                    if (VideoStream_Codec)
+                        avcodec_open2(VideoStream->codec, VideoStream_Codec, NULL);
+                }
+            }
+
+            // Audio stream
+            int AudioStream_Index=av_find_best_stream(FormatContext, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
+            if (AudioStream_Index>=0)
+            {
+                AudioStream=FormatContext->streams[AudioStream_Index];
+
+                if (AudioStream)
+                {
+                    AVCodec* AudioStream_Codec=avcodec_find_decoder(AudioStream->codec->codec_id);
+                    if (AudioStream_Codec)
+                        avcodec_open2(AudioStream->codec, AudioStream_Codec, NULL);
+                }
+            }
+        }
     }
 
     // Frame
@@ -138,11 +144,18 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
     Packet->size = 0;
 
     // Output
-    VideoFrameCount=VideoStream->nb_frames;
-    VideoDuration=((double)VideoStream->duration)*VideoStream->time_base.num/VideoStream->time_base.den;
+    if (VideoStream)
+    {
+        VideoFrameCount_Max=VideoFrameCount=VideoStream->nb_frames;
+        VideoDuration=((double)VideoStream->duration)*VideoStream->time_base.num/VideoStream->time_base.den;
+    }
+    else
+    {
+        VideoFrameCount_Max=3*60*60*30; // 3 hours max for the moment
+    }
     if (OutputMethod==Output_JpegList)
     {
-        JpegList.reserve(VideoFrameCount);
+        JpegList.reserve(VideoFrameCount_Max);
     }
     if (OutputMethod==Output_Jpeg || OutputMethod==Output_JpegList)
     {
@@ -167,13 +180,13 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
 
         for(size_t j=0; j<2; ++j)
         {
-            x[j]=new double[VideoFrameCount];
-            memset(x[j], 0x00, VideoFrameCount*sizeof(double));
+            x[j]=new double[VideoFrameCount_Max];
+            memset(x[j], 0x00, VideoFrameCount_Max*sizeof(double));
         }
         for(size_t j=0; j<PlotName_Max; ++j)
         {
-            y[j] = new double[VideoFrameCount];
-            memset(y[j], 0x00, VideoFrameCount*sizeof(double));
+            y[j] = new double[VideoFrameCount_Max];
+            memset(y[j], 0x00, VideoFrameCount_Max*sizeof(double));
         }
         for(size_t j=0; j<PlotType_Max; ++j)
             y_Max[j]=0; //PerPlotGroup[j].Max;
@@ -184,12 +197,75 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
 
     // Temp
     DTS_Target=-1;
+
+    // Stats from external data
+    // XML input
+    QXmlStreamReader Xml(StatsFromExternalData.c_str());
+    while (!Xml.atEnd())
+    {
+        if (Xml.readNextStartElement())
+        {
+            if (Xml.name()=="ffprobe")
+            {
+                while (Xml.readNextStartElement())
+                {
+                    if (Xml.name()=="frames")
+                    {
+                        while (Xml.readNextStartElement())
+                        {
+                            if (Xml.name()=="frame" && Xml.attributes().value("media_type")=="video")
+                            {
+                                double Frame_Duration=std::atof(Xml.attributes().value("pkt_duration_time").toUtf8());
+                                x[0][x_Max]=std::atof(Xml.attributes().value("pkt_pts_time").toUtf8());
+                                x[1][x_Max]=x_Max;
+
+                                while (Xml.readNextStartElement())
+                                {
+                                    if (Xml.name()=="tag")
+                                    {
+                                        PlotName j=PlotName_Max;
+                                        for (size_t Plot_Pos=0; Plot_Pos<PlotName_Max; Plot_Pos++)
+                                            if (Xml.attributes().value("key")==PerPlotName[Plot_Pos].FFmpeg_Name_2_3)
+                                                j=(PlotName)Plot_Pos;
+
+                                        if (j!=PlotName_Max)
+                                        {
+                                            y[j][x_Max]=std::atof(Xml.attributes().value("value").toUtf8());
+                                            if (PerPlotName[j].Group1!=PlotType_Max && y_Max[PerPlotName[j].Group1]<y[j][x_Max])
+                                                y_Max[PerPlotName[j].Group1]=y[j][x_Max];
+                                            if (PerPlotName[j].Group2!=PlotType_Max && y_Max[PerPlotName[j].Group2]<y[j][x_Max])
+                                                y_Max[PerPlotName[j].Group2]=y[j][x_Max];
+                                        }
+                                    }
+                                    Xml.skipCurrentElement();
+                                }
+                                x_Max++;
+                                if (VideoFrameCount<x_Max)
+                                {
+                                    VideoFrameCount=x_Max;
+                                    VideoDuration=x[0][x_Max-1]+Frame_Duration;
+                                    if (FormatContext==NULL)
+                                        VideoFramePos=VideoFrameCount;
+                                }
+                            }
+                            else
+                                Xml.skipCurrentElement();
+                        }
+                    }
+                    else
+                        Xml.skipCurrentElement();
+                }
+            }
+            else
+                Xml.skipCurrentElement();
+        }
+    }
 }
 
 //---------------------------------------------------------------------------
 FFmpeg_Glue::~FFmpeg_Glue()
 {
-    if (VideoFrameCount==0)
+    if (VideoFrameCount_Max==0)
         return; // Nothing was initialized    
         
     // Clear
@@ -246,6 +322,7 @@ void FFmpeg_Glue::NextFrame()
 {
     if (!StatsFromExternalData.empty())
     {
+        /* CSV input disabled
         if (!x_Line_Begin)
         {
             size_t Line_End=StatsFromExternalData.find('\r');
@@ -321,8 +398,12 @@ void FFmpeg_Glue::NextFrame()
 
         if (Line_End==-1)
             StatsFromExternalData.clear();
+        */
     }
     
+    if (!FormatContext)
+        return;
+
     // Clear
     Jpeg.Data=NULL;
     Jpeg.Size=0;
@@ -650,7 +731,7 @@ bool FFmpeg_Glue::Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, 
                 size_t j=0;
                 for (; j<PlotName_Max; j++)
                 {
-                    if (strcmp(e->key, PerPlotName[j].FFmpeg_Name)==0)
+                    if (strcmp(e->key, PerPlotName[j].FFmpeg_Name_2_3)==0)
                         break;
                 }
 
@@ -1061,7 +1142,7 @@ int FFmpeg_Glue::BitDepth_Get()
 string FFmpeg_Glue::StatsToExternalData()
 {
     stringstream Value;
-    Value<<",,,,,,,,,,,,,,,,,,,,,YMIN,YLOW,YAVG,YHIGH,YMAX,UMIN,ULOW,UAVG,UHIGH,UMAX,VMIN,VLOW,VAVG,VHIGH,VMAX,YDIF,UDIF,VDIF,YDIF1,YDIF2,TOUT,HEAD,VREP,BRNG";
+    Value<<",,,,,,,,,,,,,,,,,,,,,YMIN,YLOW,YAVG,YHIGH,YMAX,UMIN,ULOW,UAVG,UHIGH,UMAX,VMIN,VLOW,VAVG,VHIGH,VMAX,YDIF,UDIF,VDIF,TOUT,VREP,BRNG";
     #ifdef _WIN32
         Value<<"\r\n";
     #else

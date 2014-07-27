@@ -40,8 +40,8 @@ enum PlotName
     PlotName_YDIF,
     PlotName_UDIF,
     PlotName_VDIF,
-    PlotName_YDIF1,
-    PlotName_YDIF2,
+    //PlotName_YDIF1,
+    //PlotName_YDIF2,
     //Sat
     PlotName_SATMIN,
     PlotName_SATLOW,
@@ -49,19 +49,21 @@ enum PlotName
     PlotName_SATHIGH,
     PlotName_SATMAX,
     //Hue
-    PlotName_HUEMOD,
+    //PlotName_HUEMOD,
     PlotName_HUEMED,
     PlotName_HUEAVG,
     //Other
     PlotName_TOUT,
-    PlotName_HEAD,
+    //PlotName_HEAD,
     PlotName_VREP,
     PlotName_BRNG,
     //Crop
-    //PlotName_Crop_x1,
-    //PlotName_Crop_x2,
-    //PlotName_Crop_y1,
-    //PlotName_Crop_y2,
+    PlotName_Crop_x1,
+    PlotName_Crop_x2,
+    PlotName_Crop_y1,
+    PlotName_Crop_y2,
+    PlotName_Crop_w,
+    PlotName_Crop_h,
     //MSEf
     PlotName_MSE_v,
     PlotName_MSE_u,
@@ -80,18 +82,19 @@ enum PlotType
     PlotType_U,
     PlotType_V,
     PlotType_YDiff,
-    PlotType_YDiffX,
+    //PlotType_YDiffX,
     PlotType_UDiff,
     PlotType_VDiff,
     PlotType_Diffs,
     PlotType_Sat,
     PlotType_Hue,
     PlotType_TOUT,
-    PlotType_HEAD,
+    //PlotType_HEAD,
     PlotType_VREP,
     PlotType_BRNG,
-    //PlotType_CropW,
-    //PlotType_CropH,
+    PlotType_CropW,
+    PlotType_CropH,
+    PlotType_CropF,
     PlotType_MSE,
     PlotType_PSNR,
     PlotType_Axis,
@@ -115,6 +118,7 @@ struct per_plot_item
     const   PlotType    Group2;
     const   char*       Name;
     const   char*       FFmpeg_Name;
+    const   char*       FFmpeg_Name_2_3;
     const   int         DigitsAfterComma;
     const   bool        NewLine;
 };

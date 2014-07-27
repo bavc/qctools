@@ -8,6 +8,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "GUI/Preferences.h"
 #include "GUI/Help.h"
 #include "Core/Core.h"
 
@@ -154,6 +155,9 @@ void MainWindow::configureZoom()
         ui->actionZoomOut->setEnabled(false);
         ui->actionZoomIn->setEnabled(!Files.empty());
         ui->actionGoTo->setEnabled(!Files.empty());
+        ui->actionExport_XmlGz_Prompt->setEnabled(!Files.empty());
+        ui->actionExport_XmlGz_Sidecar->setEnabled(!Files.empty());
+        ui->actionExport_XmlGz_Custom->setEnabled(!Files.empty());
         ui->actionCSV->setEnabled(!Files.empty());
         ui->actionPrint->setEnabled(!Files.empty());
         return;
@@ -167,6 +171,9 @@ void MainWindow::configureZoom()
     ui->actionZoomOut->setEnabled(true);
     ui->actionZoomIn->setEnabled(true);
     ui->actionGoTo->setEnabled(true);
+    ui->actionExport_XmlGz_Prompt->setEnabled(true);
+    ui->actionExport_XmlGz_Sidecar->setEnabled(true);
+    ui->actionExport_XmlGz_Custom->setEnabled(true);
     ui->actionCSV->setEnabled(true);
     ui->actionPrint->setEnabled(true);
 }
@@ -263,6 +270,13 @@ void MainWindow::refreshDisplay_Axis()
 {
     if (PlotsArea)
         PlotsArea->refreshDisplay_Axis();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::Options_Preferences()
+{
+    Preferences* Frame=new Preferences(this);
+    Frame->show();
 }
 
 //---------------------------------------------------------------------------

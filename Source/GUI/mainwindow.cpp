@@ -169,6 +169,50 @@ void MainWindow::on_Toolbar_visibilityChanged(bool visible)
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_actionImport_XmlGz_Prompt_triggered()
+{
+    // TODO
+    // Temp
+    statusBar()->showMessage("(Not implemeted) Import from "+QFileDialog::getOpenFileName(this, "Import from qctools..xml.gz", QString(), "Statistic files (*.qctools.xml.gz)"));
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionExport_XmlGz_Prompt_triggered()
+{
+    if (Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
+        return;
+    
+    // TODO
+    //Files[Files_CurrentPos]->Export_CSV(QFileDialog::getSaveFileName(this, "Import from .xml.gz", Files[Files_CurrentPos]->FileName+".qctools.xml.gz", "Statistic files (*.xml.gz)", 0, QFileDialog::DontUseNativeDialog));
+    // Temp
+    statusBar()->showMessage("(Not implemeted) Export to "+QFileDialog::getSaveFileName(this, "Export to .qctools.xml.gz", Files[Files_CurrentPos]->FileName+".qctools.xml.gz", "Statistic files (*.xml.gz)", 0, QFileDialog::DontUseNativeDialog)+".qctools.xml.gz");
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionExport_XmlGz_Sidecar_triggered()
+{
+    if (Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
+        return;
+    
+    // TODO
+    // Temp
+    statusBar()->showMessage("(Not implemeted) Export to "+Files[Files_CurrentPos]->FileName+".qctools.xml.gz");
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionExport_XmlGz_Custom_triggered()
+{
+    if (Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
+        return;
+    
+    // TODO
+    // Temp
+    QString Name=Files[Files_CurrentPos]->FileName;
+    Name.replace(":", "");
+    statusBar()->showMessage("(Not implemeted) Export to ~/.qctools"+Name+".qctools.xml.gz");
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::on_actionCSV_triggered()
 {
     Export_CSV();
@@ -185,6 +229,12 @@ void MainWindow::on_actionFilesList_triggered()
 {
     if (ui->actionGoTo)
         ui->actionGoTo->setVisible(false);
+    if (ui->actionExport_XmlGz_Prompt)
+        ui->actionExport_XmlGz_Prompt->setVisible(false);
+    if (ui->actionExport_XmlGz_Sidecar)
+        ui->actionExport_XmlGz_Sidecar->setVisible(false);
+    if (ui->actionExport_XmlGz_Custom)
+        ui->actionExport_XmlGz_Custom->setVisible(false);
     if (ui->actionCSV)
         ui->actionCSV->setVisible(false);
     if (ui->actionPrint)
@@ -217,6 +267,12 @@ void MainWindow::on_actionGraphsLayout_triggered()
 {
     if (ui->actionGoTo)
         ui->actionGoTo->setVisible(true);
+    if (ui->actionExport_XmlGz_Prompt)
+        ui->actionExport_XmlGz_Prompt->setVisible(true);
+    if (ui->actionExport_XmlGz_Sidecar)
+        ui->actionExport_XmlGz_Sidecar->setVisible(true);
+    if (ui->actionExport_XmlGz_Custom)
+        ui->actionExport_XmlGz_Custom->setVisible(true);
     if (ui->actionCSV)
         ui->actionCSV->setVisible(true);
     if (ui->actionPrint)
@@ -245,6 +301,12 @@ void MainWindow::on_actionGraphsLayout_triggered()
         ui->fileNamesBox->setCurrentIndex(Files_CurrentPos);
 
     TimeOut();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionPreferences_triggered()
+{
+    Options_Preferences();
 }
 
 //---------------------------------------------------------------------------

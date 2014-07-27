@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+   <head>
+   <title>How To Use - QCTools Help Guide</title>
+   </head>
+   <body>
+     
+     <h2>Install</h2>  
+       <p>
+	   Go to <a href="http://bavc.org/qctools">http://bavc.org/qctools</a> and download QCTools for your operating system (currently Windows or Mac OS X are supported). Initiate the install by double-clicking the icon, and follow the steps. New releases of QCTools will be periodically available at the <a href="http://www.bavc.org/qctools">QCTools project website</a>.
+       </p>
+       <h2>Load Video Files</h2>
+       <p>
+           QCTools can currently accomodate several video file types including .mov, .mp4
+           Once the QCTools application is open you may identify selected video files for QC Tools analysis in three ways: 
+       </p>
+           <ol>
+               <li>Simply drag a video file (or files) into the QCTools window. <br />(Note that you may import multiple files at once into the tool, though depending on the number and size of the files, processing speed may be affected)<br /></li>
+               <li>Double click the folder icon on the upper left. This launches a window from which you can browse and select video files. </li>
+               <li>Navigating to File --&gt; Open.</li>
+           </ol> 
+       <h2>Select Graph Filters</h2>
+       <p>
+       By clicking the filter checkboxes you can select those that you wish to analyze and display. You may make these selections before uploading your video or at any time after the QC Tools analysis has been done and the graph display will update dynamically. 
+       As a default, 'Y values', 'U values', 'V values', and 'Diffs' are selected. 
+       To begin, you may want to select the <b>Temporal Outliers</b> Graph Filter. This will detect any large discrepancies between pixels and can provide an initial, high-level overview of potential errors. <br /><br />
+       For descriptions of each Filter and how to read graph values, please see the Help Section, denoted by the '?' icon in the toolbox portion of the application. 
+       </p>
+        
+       <h2>View and Navigate Graphs</h2>
+       <p>
+       Graphs display on the top portion of the screen, corresponding video frames show below. The video frames may be navigated via the next, previous, or playback buttons; the frame and time for the particular selection will be displayed. Clicking and dragging your cursor over a portion of the graph will cause the thumbnails below to update accordingly. You may also double click a specific frame and a window will appear displaying the image and all of the various filter values, with 'chroma' or 'normal' view options. <br /><br />
+       Pointing your keyboard cursor to a particular point on a graph will result in the display of two values: the frame, and the timecode of the particular place in the video you have navigated to. <br />
+       
+       You may also use the '+' and '-' icons in the tool box section of the application to zoom in/out, giving you a more or less detailed view of the graph displays, over a specific timespan of the uploaded video. <br /><br /> 
+       Some helpful <b>keyboard shortcuts</b> you may want to use are: <br />
+       </p>
+           <ul>
+           <li>'J' - To rewind </li>
+           <li>'K' - To pause</li>
+           <li>'L' - To Fast Forward</li>
+           <li>'F' - To enlarge the window to full screen </li>   
+           </ul>
+
+      <h2>Playback and Visual Analysis</h2>  
+       <p>
+               By clicking on a thumbail, you can open the preview window. The preview window serves as a playback environment that allows spot checking and manual video alaysis. The preview window contains two playback windows that can be set to various selections; the filters allow the video to be processed in one of many ways which may help make particular issues more discernable. See the <b> Filter Description </b> page for more details on these playback filters. 
+       </p>
+               
+        <h2>Create/ Export a CSV File</h2>   
+       <p>
+               QCTools may express analytical metadata per frame in a CSV <a href="http://en.wikipedia.org/wiki/Comma-separated_values">('comma separated values')</a> file. <br /> When an analysis (which may be time consuming, depending on the length of the file) is complete, a .csv may be saved. At a later point, the video may be reviewed simply by opening the .csv in QCTools instead of having to reload/ reanalyze the video file itself; this process will take considerably less time. Additionally, the .csv may be opened in other environments such as standard spreadsheet or database applications.<br /><br />
+           You may execute this function in one of two ways:
+       </p>
+       <ol>
+           <li>Navigate to File --&gt; CSV</li>
+           <li>Click the 'CSV' icon in the toolbox section of the application. </li>
+       </ol>
+       <p>
+       Both options will prompt you to name your file and select a select a location. 
+       </p>
+       
+       <h2>Parts of the Tool</h2>
+			<h3 style="color:blue">Data Analysis Window:</h3> 
+				<p>
+				This view displays the filename, filter selections, X-Axis value selector, and the frame navigator buttons.<br /><br />
+				<img src="Slide1.jpg" alt="Slide 1" /><br /><br /><br />
+				Descriptions of a particular filter display as you use your mouse to hover:<br /><br />
+				<img src="Slide4.jpg" alt="Slide 4" /><br /><br /><br />
+				</p>
+				
+			<h3 style="color:blue">List View:</h3> 
+				<p>
+				The List View enables you to view the progress of your file download, plus associated metadata:<br /><br />
+				<img src="metadatascreen.jpg" alt="List View" /><br /><br /><br />
+				</p>
+
+			<h3 style="color:blue">Video Analysis Window:</h3>
+				<p>
+				<img src="Slide2.jpg" alt="Slide 2" /><br /><br /><br />
+				With the available views:<br /><br />
+				<img src="Slide3.jpg" alt="Slide 3" /><br /><br /><br />
+				</p>
+</body>
+</html>

@@ -45,6 +45,13 @@ void MainWindow::TimeOut ()
     refreshDisplay();
     Update();
 
+    // Simultaneous parsing
+    for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
+    {
+        if (Files[Files_Pos]->Glue->VideoFramePos!=Files[Files_Pos]->Glue->VideoFrameCount)
+            Files[Files_Pos]->Parse();
+    }
+    
     // Status
     stringstream Message_Total;
     int Files_Completed=0;
@@ -73,12 +80,16 @@ void MainWindow::TimeOut ()
             Message<<"Parsing frame "<<Files[Files_CurrentPos]->Glue->VideoFramePos;
             if (Files[Files_CurrentPos]->Glue->VideoFrameCount)
                 Message<<"/"<<Files[Files_CurrentPos]->Glue->VideoFrameCount<<" ("<<(int)((double)Files[Files_CurrentPos]->Glue->VideoFramePos)*100/Files[Files_CurrentPos]->Glue->VideoFrameCount<<"%)";
-            statusBar()->showMessage((Message.str()+Message_Total.str()).c_str());
+            QStatusBar* StatusBar=statusBar();
+            if (StatusBar)
+                StatusBar->showMessage((Message.str()+Message_Total.str()).c_str());
             QTimer::singleShot(250, this, SLOT(TimeOut()));
         }
         else
         {
-            statusBar()->showMessage(("Parsing complete"+Message_Total.str()).c_str(), 10000);
+            QStatusBar* StatusBar=statusBar();
+            if (StatusBar)
+                StatusBar->showMessage(("Parsing complete"+Message_Total.str()).c_str(), 10000);
             if (Files_Completed==Files.size())
                 QTimer::singleShot(0, this, SLOT(TimeOut_Refresh()));
             else
