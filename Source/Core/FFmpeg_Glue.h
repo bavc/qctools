@@ -63,6 +63,7 @@ public:
     size_t                      x_Max;
     size_t                      VideoFramePos;
     size_t                      VideoFrameCount;
+    size_t                      VideoFrameCount_Max;
     double                      VideoDuration;
 
     // Infos

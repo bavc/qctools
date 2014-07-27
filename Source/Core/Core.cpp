@@ -38,7 +38,7 @@ const struct per_plot_group PerPlotGroup [PlotType_Max]=
     },
     //YDiff
     {
-        PlotName_YDIF,      1,    0,  100,  4,  "YDiff", false,
+        PlotName_YDIF,      1,    0,  255,  4,  "YDiff", false,
         "This QCTools filter selects two successive frames of video and subtracts the values of one from the other in order to find the change,\n"
             "or difference, between the two frames (measured in pixels). This information is meaningful in that it indicates the rapidity\n"
             "with which a video picture is changing from one frame to the next. Aside from scene-change scenarios,\n"
@@ -53,17 +53,17 @@ const struct per_plot_group PerPlotGroup [PlotType_Max]=
             "See graph below: between 17-19s the YDIF1 and YDIF2 readings vary dramatically, presenting as red portions in the graph.",
     },
     //YDiffX
-    {
-        PlotName_YDIF1,     2,    0,  100,  4,  "YDiffX", false,
-        "The YDIF1 and YDIF2 filters help detect artifacts caused by video deck head clogs, with each filter providing a reading per head.\n"
-            "The filter is built on the assumption that one head is functioning (and as such, presents as a stable graph line),\n"
-            "and one is corrupt (presenting as a variable line with spikes and troughs).\n"
-            "A user, in reading the two results against one another, would see the areas where the two readings diverge as red portions on the graph.\n"
-            "See graph below: between 17-19s the YDIF1 and YDIF2 readings vary dramatically, presenting as red portions in the graph.",
-    },
+    //{
+    //    PlotName_YDIF1,     2,    0,  255,  4,  "YDiffX", false,
+    //    "The YDIF1 and YDIF2 filters help detect artifacts caused by video deck head clogs, with each filter providing a reading per head.\n"
+    //        "The filter is built on the assumption that one head is functioning (and as such, presents as a stable graph line),\n"
+    //        "and one is corrupt (presenting as a variable line with spikes and troughs).\n"
+    //        "A user, in reading the two results against one another, would see the areas where the two readings diverge as red portions on the graph.\n"
+    //        "See graph below: between 17-19s the YDIF1 and YDIF2 readings vary dramatically, presenting as red portions in the graph.",
+    //},
     //UDiff
     {
-        PlotName_UDIF,      1,    0,  100,  4,  "UDiff", false,
+        PlotName_UDIF,      1,    0,  255,  4,  "UDiff", false,
         "The YDIF1 and YDIF2 filters help detect artifacts caused by video deck head clogs, with each filter providing a reading per head.\n"
             "The filter is built on the assumption that one head is functioning (and as such, presents as a stable graph line),\n"
             "and one is corrupt (presenting as a variable line with spikes and troughs).\n"
@@ -72,7 +72,7 @@ const struct per_plot_group PerPlotGroup [PlotType_Max]=
     },
     //VDiff
     {
-        PlotName_VDIF,      1,    0,  100,  4,  "VDiff", false,
+        PlotName_VDIF,      1,    0,  255,  4,  "VDiff", false,
         "The YDIF1 and YDIF2 filters help detect artifacts caused by video deck head clogs, with each filter providing a reading per head.\n"
             "The filter is built on the assumption that one head is functioning (and as such, presents as a stable graph line),\n"
             "and one is corrupt (presenting as a variable line with spikes and troughs).\n"
@@ -81,7 +81,7 @@ const struct per_plot_group PerPlotGroup [PlotType_Max]=
     },
     //Diffs
     {
-        PlotName_YDIF,      3,    0,  100,  4,  "Diffs",  true,
+        PlotName_YDIF,      3,    0,  255,  4,  "Diffs",  true,
         "The YDIF1 and YDIF2 filters help detect artifacts caused by video deck head clogs, with each filter providing a reading per head.\n"
             "The filter is built on the assumption that one head is functioning (and as such, presents as a stable graph line),\n"
             "and one is corrupt (presenting as a variable line with spikes and troughs).\n"
@@ -100,7 +100,7 @@ const struct per_plot_group PerPlotGroup [PlotType_Max]=
     },
     //Hue
     {
-        PlotName_HUEMOD,    3,    0,  360,  4,  "Hue", false,
+        PlotName_HUEMED,    2,    0,  360,  4,  "Hue", false,
         "Hue (Graph Description TBD)",
     },
     //TOUT
@@ -112,10 +112,10 @@ const struct per_plot_group PerPlotGroup [PlotType_Max]=
             "the graph will show small spikes, or blips, which correspond to white speckling in the video.",
     },
     //HEAD
-    {
-        PlotName_HEAD,      1,    0,    0,  4,  "HEAD", false,
-        "Head Switching (Graph Description TBD)",
-    },
+    //{
+    //    PlotName_HEAD,      1,    0,    0,  4,  "HEAD", false,
+    //    "Head Switching (Graph Description TBD)",
+    //},
     //VREP
     {
         PlotName_VREP,      1,    0,    1,  4,  "VREP", false,
@@ -133,11 +133,21 @@ const struct per_plot_group PerPlotGroup [PlotType_Max]=
             "Typically anything with a value over 0.01 will read as an artifact. While the BRNG filter is good at detecting the general presence of noise,\n"
             "it can be a bit non-specific in its identification of the causes.",
     },
-    //Crop
-    //{
-    //    PlotName_Crop_x1,   1,    0,    0,  4,  "Crop", false,
-    //    "Crop (Graph Description TBD)",
-    //},
+    //CropW
+    {
+        PlotName_Crop_x1,   2,    0,    0,  4,  "CropW", false,
+        "CropW (Graph Description TBD)",
+    },
+    //CropH
+    {
+        PlotName_Crop_y1,   2,    0,    0,  4,  "CropH", false,
+        "CropH (Graph Description TBD)",
+    },
+    //CropF
+    {
+        PlotName_Crop_w,   2,    0,    0,  4,  "CropF", false,
+        "CropH (Graph Description TBD)",
+    },
     //MSEf
     {
         PlotName_MSE_v,     3,    0,    0,  4,  "MSEf", false,
@@ -160,55 +170,57 @@ const struct per_plot_group PerPlotGroup [PlotType_Max]=
 const struct per_plot_item PerPlotName [PlotName_Max]=
 {
     //Y
-    { PlotType_Y,       PlotType_Max,       "YMIN",       "lavfi.values.YMIN",    0,   false,  },
-    { PlotType_Y,       PlotType_Max,       "YLOW",       "lavfi.values.YLOW",    0,   false,  },
-    { PlotType_Y,       PlotType_Max,       "YAVG",       "lavfi.values.YAVG",    0,   false,  },
-    { PlotType_Y,       PlotType_Max,       "YHIGH",      "lavfi.values.YHIGH",   0,   false,  },
-    { PlotType_Y,       PlotType_Max,       "YMAX",       "lavfi.values.YMAX",    0,   true,   },
+    { PlotType_Y,       PlotType_Max,       "YMIN",       "lavfi.values.YMIN",    "lavfi.signalstats.YMIN",    0,   false,  },
+    { PlotType_Y,       PlotType_Max,       "YLOW",       "lavfi.values.YLOW",    "lavfi.signalstats.YLOW",    0,   false,  },
+    { PlotType_Y,       PlotType_Max,       "YAVG",       "lavfi.values.YAVG",    "lavfi.signalstats.YAVG",    0,   false,  },
+    { PlotType_Y,       PlotType_Max,       "YHIGH",      "lavfi.values.YHIGH",   "lavfi.signalstats.YHIGH",   0,   false,  },
+    { PlotType_Y,       PlotType_Max,       "YMAX",       "lavfi.values.YMAX",    "lavfi.signalstats.YMAX",    0,   true,   },
     //U
-    { PlotType_U,       PlotType_Max,       "UMIN",       "lavfi.values.UMIN",    0,   false,  },
-    { PlotType_U,       PlotType_Max,       "ULOW",       "lavfi.values.ULOW",    0,   false,  },
-    { PlotType_U,       PlotType_Max,       "UAVG",       "lavfi.values.UAVG",    0,   false,  },
-    { PlotType_U,       PlotType_Max,       "UHIGH",      "lavfi.values.UHIGH",   0,   false,  },
-    { PlotType_U,       PlotType_Max,       "UMAX",       "lavfi.values.UMAX",    0,   true,   },
+    { PlotType_U,       PlotType_Max,       "UMIN",       "lavfi.values.UMIN",    "lavfi.signalstats.UMIN",    0,   false,  },
+    { PlotType_U,       PlotType_Max,       "ULOW",       "lavfi.values.ULOW",    "lavfi.signalstats.ULOW",    0,   false,  },
+    { PlotType_U,       PlotType_Max,       "UAVG",       "lavfi.values.UAVG",    "lavfi.signalstats.UAVG",    0,   false,  },
+    { PlotType_U,       PlotType_Max,       "UHIGH",      "lavfi.values.UHIGH",   "lavfi.signalstats.UHIGH",   0,   false,  },
+    { PlotType_U,       PlotType_Max,       "UMAX",       "lavfi.values.UMAX",    "lavfi.signalstats.UMAX",    0,   true,   },
     //V
-    { PlotType_V,       PlotType_Max,       "VMIN",       "lavfi.values.VMIN",    0,  false,  },
-    { PlotType_V,       PlotType_Max,       "VLOW",       "lavfi.values.VLOW",    0,  false,  },
-    { PlotType_V,       PlotType_Max,       "VAVG",       "lavfi.values.VAVG",    0,  false,  },
-    { PlotType_V,       PlotType_Max,       "VHIGH",      "lavfi.values.VHIGH",   0,  false,  },
-    { PlotType_V,       PlotType_Max,       "VMAX",       "lavfi.values.VMAX",    0,  true,   },
+    { PlotType_V,       PlotType_Max,       "VMIN",       "lavfi.values.VMIN",    "lavfi.signalstats.VMIN",    0,  false,  },
+    { PlotType_V,       PlotType_Max,       "VLOW",       "lavfi.values.VLOW",    "lavfi.signalstats.VLOW",    0,  false,  },
+    { PlotType_V,       PlotType_Max,       "VAVG",       "lavfi.values.VAVG",    "lavfi.signalstats.VAVG",    0,  false,  },
+    { PlotType_V,       PlotType_Max,       "VHIGH",      "lavfi.values.VHIGH",   "lavfi.signalstats.VHIGH",   0,  false,  },
+    { PlotType_V,       PlotType_Max,       "VMAX",       "lavfi.values.VMAX",    "lavfi.signalstats.VMAX",    0,  true,   },
     //Diffs
-    { PlotType_YDiff,   PlotType_Diffs,     "YDIF",       "lavfi.values.YDIF",    5,  false,  },
-    { PlotType_UDiff,   PlotType_Diffs,     "UDIF",       "lavfi.values.UDIF",    5,  false,  },
-    { PlotType_VDiff,   PlotType_Diffs,     "VDIF",       "lavfi.values.VDIF",    5,  false,  },
-    { PlotType_YDiffX,  PlotType_Max,       "YDIF1",      "lavfi.values.YDIF1",   5,  false,  },
-    { PlotType_YDiffX,  PlotType_Max,       "YDIF2",      "lavfi.values.YDIF2",   5,  true,   },
+    { PlotType_YDiff,   PlotType_Diffs,     "YDIF",       "lavfi.values.YDIF",    "lavfi.signalstats.YDIF",    5,  false,  },
+    { PlotType_UDiff,   PlotType_Diffs,     "UDIF",       "lavfi.values.UDIF",    "lavfi.signalstats.UDIF",    5,  false,  },
+    { PlotType_VDiff,   PlotType_Diffs,     "VDIF",       "lavfi.values.VDIF",    "lavfi.signalstats.VDIF",    5,  false,  },
+    //{ PlotType_YDiffX,  PlotType_Max,       "YDIF1",      "lavfi.values.YDIF1",   "lavfi.signalstats.YDIF1",   5,  false,  },
+    //{ PlotType_YDiffX,  PlotType_Max,       "YDIF2",      "lavfi.values.YDIF2",   "lavfi.signalstats.YDIF2",   5,  true,   },
     //Sat
-    { PlotType_Sat,     PlotType_Max,       "SATMIN",     "lavfi.values.SATMIN",  0,  false,  },
-    { PlotType_Sat,     PlotType_Max,       "SATLOW",     "lavfi.values.SATLOW",  0,  false,  },
-    { PlotType_Sat,     PlotType_Max,       "SATAVG",     "lavfi.values.SATAVG",  0,  false,  },
-    { PlotType_Sat,     PlotType_Max,       "SATHIGH",    "lavfi.values.SATHIGH", 0,  false,  },
-    { PlotType_Sat,     PlotType_Max,       "SATMAX",     "lavfi.values.SATMAX",  0,  true,   },
+    { PlotType_Sat,     PlotType_Max,       "SATMIN",     "lavfi.values.SATMIN",  "lavfi.signalstats.SATMIN",  0,  false,  },
+    { PlotType_Sat,     PlotType_Max,       "SATLOW",     "lavfi.values.SATLOW",  "lavfi.signalstats.SATLOW",  0,  false,  },
+    { PlotType_Sat,     PlotType_Max,       "SATAVG",     "lavfi.values.SATAVG",  "lavfi.signalstats.SATAVG",  0,  false,  },
+    { PlotType_Sat,     PlotType_Max,       "SATHIGH",    "lavfi.values.SATHIGH", "lavfi.signalstats.SATHIGH", 0,  false,  },
+    { PlotType_Sat,     PlotType_Max,       "SATMAX",     "lavfi.values.SATMAX",  "lavfi.signalstats.SATMAX",  0,  true,   },
     //Hue
-    { PlotType_Hue,     PlotType_Max,       "HUEMOD",     "lavfi.values.HUEMOD",  0,  false,  },
-    { PlotType_Hue,     PlotType_Max,       "HUEMED",     "lavfi.values.HUEMED",  0,  false,  },
-    { PlotType_Hue,     PlotType_Max,       "HUEAVG",     "lavfi.values.HUEAVG",  0,  true,   },
+    //{ PlotType_Hue,     PlotType_Max,       "HUEMOD",     "lavfi.values.HUEMOD",  "lavfi.signalstats.HUEMOD",  0,  false,  },
+    { PlotType_Hue,     PlotType_Max,       "HUEMED",     "lavfi.values.HUEMED",  "lavfi.signalstats.HUEMED",  0,  false,  },
+    { PlotType_Hue,     PlotType_Max,       "HUEAVG",     "lavfi.values.HUEAVG",  "lavfi.signalstats.HUEAVG",  0,  true,   },
     //Others
-    { PlotType_TOUT,    PlotType_Max,       "TOUT",       "lavfi.values.TOUT",    8,  false,  },
-    { PlotType_HEAD,    PlotType_Max,       "HEAD",       "lavfi.values.HEAD",    8,  false,  },
-    { PlotType_VREP,    PlotType_Max,       "VREP",       "lavfi.values.VREP",    8,  false,  },
-    { PlotType_BRNG,    PlotType_Max,       "BRNG",       "lavfi.values.RANG",    8,  true,   },
+    { PlotType_TOUT,    PlotType_Max,       "TOUT",       "lavfi.values.TOUT",    "lavfi.signalstatsTOUT.",    8,  false,  },
+    //{ PlotType_HEAD,    PlotType_Max,       "HEAD",       "lavfi.values.HEAD",    "lavfi.signalstats.HEAD",    8,  false,  },
+    { PlotType_VREP,    PlotType_Max,       "VREP",       "lavfi.values.VREP",    "lavfi.signalstats.VREP",    8,  false,  },
+    { PlotType_BRNG,    PlotType_Max,       "BRNG",       "lavfi.values.RANG",    "lavfi.signalstats.BRNG",    8,  true,   },
     //Crop
-    //{ PlotType_CropW,   PlotType_Max,       "Crop x1",    "",    0,  false,  },
-    //{ PlotType_CropW,   PlotType_Max,       "Crop x2",    "",    0,  false,  },
-    //{ PlotType_CropH,   PlotType_Max,       "Crop y1",    "",    0,  false,  },
-    //{ PlotType_CropH,   PlotType_Max,       "Crop y2",    "",    0,  true,   },
+    { PlotType_CropW,   PlotType_Max,       "Crop x1",    "",                     "lavfi.cropdetect.x1", 0,  false,  },
+    { PlotType_CropW,   PlotType_Max,       "Crop x2",    "",                     "lavfi.cropdetect.x2", 0,  false,  },
+    { PlotType_CropH,   PlotType_Max,       "Crop y1",    "",                     "lavfi.cropdetect.y1", 0,  false,  },
+    { PlotType_CropH,   PlotType_Max,       "Crop y2",    "",                     "lavfi.cropdetect.y1", 0,  true,   },
+    { PlotType_CropF,   PlotType_Max,       "Crop w",     "",                     "lavfi.cropdetect.w",  0,  false,  },
+    { PlotType_CropF,   PlotType_Max,       "Crop h",     "",                     "lavfi.cropdetect.h",  0,  true,   },
     //MSEf
-    { PlotType_MSE,     PlotType_Max,       "MSEf V",     "lavfi.psnr.mse.v",     2,  true,   },
-    { PlotType_MSE,     PlotType_Max,       "MSEf U",     "lavfi.psnr.mse.u",     2,  false,  },
-    { PlotType_MSE,     PlotType_Max,       "MSEf Y",     "lavfi.psnr.mse.y",     2,  false,  },
+    { PlotType_MSE,     PlotType_Max,       "MSEf V",     "lavfi.psnr.mse.v",     "lavfi.psnr.mse.v",          2,  true,   },
+    { PlotType_MSE,     PlotType_Max,       "MSEf U",     "lavfi.psnr.mse.u",     "lavfi.psnr.mse.u",          2,  false,  },
+    { PlotType_MSE,     PlotType_Max,       "MSEf Y",     "lavfi.psnr.mse.y",     "lavfi.psnr.mse.y",          2,  false,  },
     //PSNRf
-    { PlotType_PSNR,    PlotType_Max,       "PSNRf V",    "lavfi.psnr.psnr.v",    2,  true,   },
-    { PlotType_PSNR,    PlotType_Max,       "PSNRf U",    "lavfi.psnr.psnr.u",    2,  false,  },
-    { PlotType_PSNR,    PlotType_Max,       "PSNRf Y",    "lavfi.psnr.psnr.y",    2,  false,  },
+    { PlotType_PSNR,    PlotType_Max,       "PSNRf V",    "lavfi.psnr.psnr.v",    "lavfi.psnr.psnr.v",         2,  true,   },
+    { PlotType_PSNR,    PlotType_Max,       "PSNRf U",    "lavfi.psnr.psnr.u",    "lavfi.psnr.psnr.u",         2,  false,  },
+    { PlotType_PSNR,    PlotType_Max,       "PSNRf Y",    "lavfi.psnr.psnr.y",    "lavfi.psnr.psnr.y",         2,  false,  },
 };

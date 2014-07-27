@@ -65,6 +65,7 @@ public:
     void                        Export_PDF                  ();
     void                        refreshDisplay              ();
     void                        refreshDisplay_Axis         ();
+    void                        Options_Preferences         ();
     void                        Help_GettingStarted         ();
     void                        Help_HowToUse               ();
     void                        Help_FilterDescriptions     ();
@@ -127,6 +128,14 @@ private Q_SLOTS:
 
     void on_Toolbar_visibilityChanged(bool visible);
 
+    void on_actionImport_XmlGz_Prompt_triggered();
+
+    void on_actionExport_XmlGz_Prompt_triggered();
+
+    void on_actionExport_XmlGz_Sidecar_triggered();
+
+    void on_actionExport_XmlGz_Custom_triggered();
+
     void on_actionCSV_triggered();
 
     void on_actionPrint_triggered();
@@ -136,6 +145,8 @@ private Q_SLOTS:
     void on_actionGraphsLayout_triggered();
 
     void on_actionFiltersLayout_triggered();
+
+    void on_actionPreferences_triggered();
 
     void on_actionGettingStarted_triggered();
 

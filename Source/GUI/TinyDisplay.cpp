@@ -48,33 +48,29 @@ TinyDisplay::TinyDisplay(QWidget *parent, FileInformation* FileInformationData_)
     Layout->setContentsMargins(1,0,1,0);
     for (size_t Pos=0; Pos<9; Pos++)
     {
-        if (Pos==4)
-        {
-            Labels_Middle = new QToolButton(this);
-            connect(Labels_Middle, SIGNAL(clicked(bool)), this, SLOT(on_Labels_Middle_clicked(bool)));
-            Labels_Middle->setIconSize(QSize(72, 72));
-            Labels_Middle->setMinimumHeight(84);
-            Labels_Middle->setMinimumWidth(84);
-            Labels_Middle->setIcon(QPixmap(":/icon/logo.jpg").scaled(72, 72));
-            Layout->addWidget(Labels_Middle);
-        }
-        else
-        {
-            Labels[Pos] = new QLabel(this);
-            Labels[Pos]->setMinimumHeight(72);
-            QPalette Palette(Labels[Pos]->palette());
-            Palette.setColor(QPalette::Window, Qt::darkGray);
-            Labels[Pos]->setAutoFillBackground(true);
-            Labels[Pos]->setPalette(Palette);
-            Labels[Pos]->setAlignment(Qt::AlignCenter);
-            Layout->addWidget(Labels[Pos]);
-        }
+        Labels[Pos] = new QToolButton(this);
+        connect(Labels[Pos], SIGNAL(clicked(bool)), this, SLOT(on_Labels_Middle_clicked(bool)));
+        Labels[Pos]->setIconSize(QSize(72, 72));
+        Labels[Pos]->setMinimumHeight(84);
+        Labels[Pos]->setMinimumWidth(84);
+        Labels[Pos]->setIcon(QPixmap(":/icon/logo.jpg").scaled(72, 72));
+        //Labels[Pos]->setStyleSheet("border: 5px;");
+        Layout->addWidget(Labels[Pos]);
+        if (Pos!=4)
+            Labels[Pos]->setStyleSheet("background-color: grey;");
     }
     setLayout(Layout);
 
     // Info
     Frames_Pos=-1;
     ShouldUpate=false;
+
+    // Disable PlayBackFilters if the source file is not available
+    if (!FileInfoData->PlayBackFilters_Available())
+    {
+        for (size_t Pos=0; Pos<9; Pos++)
+            Labels[Pos]->setEnabled(false);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -100,17 +96,15 @@ void TinyDisplay::Update()
         
     for (size_t Pos=0; Pos<9; Pos++)
     {
-        if (Pos==4)
-            Labels_Middle->setIcon(FileInfoData->Picture_Get(Frames_Pos)->copy(0, 0, 72, 72));
-        else if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->Glue->VideoFramePos)
-            Labels[Pos]->setPixmap(FileInfoData->Picture_Get(Frames_Pos-4+Pos)->copy(0, 0, 72, 72));
+        if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->Glue->VideoFramePos)
+            Labels[Pos]->setIcon(FileInfoData->Picture_Get(Frames_Pos-4+Pos)->copy(0, 0, 72, 72));
         else if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->Glue->VideoFrameCount)
         {
-            Labels[Pos]->setPixmap(QPixmap());
+            Labels[Pos]->setIcon(QPixmap());
             ShouldUpate=true;
         }
         else
-            Labels[Pos]->setPixmap(QPixmap());
+            Labels[Pos]->setIcon(QPixmap());
     }
 
     // BigDisplayArea
@@ -131,20 +125,26 @@ void TinyDisplay::Filters_Show()
 //---------------------------------------------------------------------------
 void TinyDisplay::on_Labels_Middle_clicked(bool checked)
 {
-    bool ShouldDisplay=true;
-    if (BigDisplayArea)
+    // Positioning the current frame if any button but the center button is clicked
+    QObject* Sender=sender();
+    if (Sender!=Labels[4])
     {
-        ShouldDisplay=!BigDisplayArea->isVisible();
-        delete BigDisplayArea; BigDisplayArea=NULL;
+        size_t Pos=0;
+        while (Pos<10)
+        {
+            if (Sender==Labels[Pos])
+                break;
+            Pos++;
+        }
+        if (Pos<10)
+            FileInfoData->Frames_Pos_Set(FileInfoData->Frames_Pos_Get()+Pos-4);
     }
     
-    if (ShouldDisplay)
+    if (BigDisplayArea==NULL)
     {
         BigDisplayArea=new BigDisplay(this, FileInfoData);
         BigDisplayArea->resize(QApplication::desktop()->screenGeometry().width()-300, QApplication::desktop()->screenGeometry().height()-300);
         BigDisplayArea->move(150, 150); //BigDisplayArea->move(geometry().left()+geometry().width(), geometry().top());
-        BigDisplayArea->show();
-        BigDisplayArea->ShowPicture();
         if (ControlArea)
         {
             BigDisplayArea->connect(BigDisplayArea->ControlArea->M9         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_M9_clicked        (bool)));
@@ -161,4 +161,6 @@ void TinyDisplay::on_Labels_Middle_clicked(bool checked)
             BigDisplayArea->connect(BigDisplayArea->ControlArea->P9         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_P9_clicked        (bool)));
         }
     }
+    BigDisplayArea->show();
+    BigDisplayArea->ShowPicture();
 }

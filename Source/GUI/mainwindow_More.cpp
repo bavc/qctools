@@ -329,7 +329,7 @@ void MainWindow::addFile(const QString &FileName)
     }
 
     Files.push_back(Temp);
-    ui->fileNamesBox->addItem(FileName);
+    ui->fileNamesBox->addItem(Temp->FileName);
 
     TimeOut();
 }

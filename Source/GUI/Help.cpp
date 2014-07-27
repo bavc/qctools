@@ -43,25 +43,25 @@ Help::Help(QWidget * parent)
     QTextBrowser* Text1=new QTextBrowser(this);
     Text1->setReadOnly(true);
     Text1->setOpenExternalLinks(true);
-    Text1->setSource(QUrl("qrc:/Help/GettingStarted.html"));
+    Text1->setSource(QUrl("qrc:/Help/Getting Started/Getting Started.html"));
     Central->addTab(Text1, tr("Getting Started"));
 
     QTextBrowser* Text2=new QTextBrowser(this);
     Text2->setReadOnly(true);
     Text2->setOpenExternalLinks(true);
-    Text2->setSource(QUrl("qrc:/Help/HowToUseThisTool.html"));
-    Central->addTab(Text2, tr("How To Use This Tool"));
+    Text2->setSource(QUrl("qrc:/Help/How To Use/How To Use.html"));
+    Central->addTab(Text2, tr("How To Use"));
 
     QTextBrowser* Text3=new QTextBrowser(this);
     Text3->setReadOnly(true);
     Text3->setOpenExternalLinks(true);
-    Text3->setSource(QUrl("qrc:/Help/FilterDescriptions.html"));
+    Text3->setSource(QUrl("qrc:/Help/Filter Descriptions/Filter Descriptions.html"));
     Central->addTab(Text3, tr("Filter Descriptions"));
 
     QTextBrowser* Text4=new QTextBrowser(this);
     Text4->setReadOnly(true);
     Text4->setOpenExternalLinks(true);
-    Text4->setSource(QUrl("qrc:/Help/PlaybackFilters.html"));
+    Text4->setSource(QUrl("qrc:/Help/Playback Filters/Playback Filters.html"));
     Central->addTab(Text4, tr("Playback Filters"));
 
     QTextBrowser* Text5=new QTextBrowser(this);

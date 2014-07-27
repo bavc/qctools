@@ -11,6 +11,7 @@
 
 //---------------------------------------------------------------------------
 #include <QDialog>
+#include <QDoubleSpinBox>
 #include <string>
 
 class FFmpeg_Glue;
@@ -26,7 +27,13 @@ class QSlider;
 class QCheckBox;
 class QGridLayout;
 class QRadioButton;
+class QButtonGroup;
 class QHBoxLayout;
+class QPushButton;
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+const size_t Args_Max=5;
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -50,6 +57,43 @@ private:
     QPixmap                     Pixmap;
     FFmpeg_Glue**               Picture;
     size_t                      Pos;
+};
+
+class BigDisplay;
+class DoubleSpinBoxWithSlider : public QDoubleSpinBox
+{
+    Q_OBJECT
+
+public:
+    explicit DoubleSpinBoxWithSlider (DoubleSpinBoxWithSlider** Others, int Min, int Max, int Divisor, int Current, const char* Name, BigDisplay* Display, size_t Pos, bool IsBitSlice, QWidget *parent=NULL);
+    ~DoubleSpinBoxWithSlider();
+
+    bool IsBitSlice;
+    void ChangeMax(int Max);
+
+protected:
+    void enterEvent (QEvent* event);
+    void leaveEvent (QEvent* event);
+
+    void hidePopup ();
+
+    void showEvent (QShowEvent* event);
+    QString textFromValue (double value) const;
+    double  valueFromText (const QString& text) const;
+
+private:
+    DoubleSpinBoxWithSlider**   Others;
+    QWidget*                    Popup;
+    QSlider*                    Slider;
+    int                         Min;
+    int                         Max;
+    int                         Divisor;
+    BigDisplay*                 Display;
+    size_t                      Pos;
+
+public Q_SLOTS:
+    void on_valueChanged(double);
+    void on_sliderMoved(int);
 };
 
 //***************************************************************************
@@ -87,11 +131,13 @@ protected:
     // Content
     struct options
     {
-        QCheckBox*              Checks[4];
-        QSlider*                Sliders[4];
-        QLabel*                 Sliders_Label[4];
-        QRadioButton*           Radios[4][3];
-        //QToolButton*          FiltersList1;
+        QCheckBox*              Checks[Args_Max];
+        QLabel*                 Sliders_Label[Args_Max];
+        DoubleSpinBoxWithSlider* Sliders_SpinBox[Args_Max];
+        QRadioButton*           Radios[Args_Max][4];
+        QButtonGroup*           Radios_Group[Args_Max];
+        QPushButton*            ColorButton[Args_Max];
+        int                     ColorValue[Args_Max];
         QComboBox*              FiltersList;
         QLabel*                 FiltersList_Fake;
     };
@@ -141,6 +187,12 @@ public Q_SLOTS:
     void on_FiltersList2_click();
     void on_FiltersOptions1_click();
     void on_FiltersOptions2_click();
+    void on_FiltersOptions1_toggle(bool checked);
+    void on_FiltersOptions2_toggle(bool checked);
+    void on_FiltersSpinBox1_click();
+    void on_FiltersSpinBox2_click();
+    void on_Color1_click(bool checked);
+    void on_Color2_click(bool checked);
 
     void on_M1_triggered();
     void on_Minus_triggered();

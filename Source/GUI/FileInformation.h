@@ -31,7 +31,12 @@ public:
                                 FileInformation             (MainWindow* Main, const QString &FileName);
                                 ~FileInformation            ();
 
+    // Parsing
+    void                        Parse                       ();
+
     // Dumps
+    void                        Import_XmlGz                (const QString &ExportFileName);
+    void                        Export_XmlGz                (const QString &ExportFileName);
     void                        Export_CSV                  (const QString &ExportFileName);
     
     // Infos
@@ -41,6 +46,7 @@ public:
     void                        Frames_Pos_Set              (int Frames_Pos);
     void                        Frames_Pos_Minus            ();
     void                        Frames_Pos_Plus             ();
+    bool                        PlayBackFilters_Available   ();
 
     // FFmpeg glue
     FFmpeg_Glue*                Glue;

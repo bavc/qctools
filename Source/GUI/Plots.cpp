@@ -149,14 +149,20 @@ void Plots::Plots_Create(PlotType Type)
         switch (PerPlotGroup[Type].Count)
         {
              case 1 :
-                        c=Qt::black;
+                        switch (Type)
+                        {
+                            case PlotType_YDiff: c=Qt::darkGreen; break;
+                            case PlotType_UDiff: c=Qt::darkBlue; break;
+                            case PlotType_VDiff: c=Qt::darkRed; break;
+                            default: c=Qt::black;
+                        }
                         break;
              case 3 : 
                         switch (j)
                         {
-                            case 0: c=Qt::black; break;
-                            case 1: c=Qt::darkGray; break;
-                            case 2: c=Qt::darkGray; break;
+                            case 0: c=Qt::darkGreen; break;
+                            case 1: c=Qt::darkBlue; break;
+                            case 2: c=Qt::darkRed; break;
                             default: c=Qt::black;
                         }
                         break;
