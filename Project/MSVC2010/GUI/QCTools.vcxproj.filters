@@ -108,6 +108,12 @@
     <ClCompile Include="_Automated\moc_FilesList.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\preferences.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_preferences.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="_Automated\ui_mainwindow.h">
@@ -145,6 +151,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\FilesList.h">
       <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\preferences.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="_Automated\ui_preferences.h">
+      <Filter>Header Files\_Automated</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

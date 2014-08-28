@@ -315,12 +315,12 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>To .xml.gz...</string>
+    <string>To .qctools.xml.gz...</string>
    </property>
   </action>
   <action name="actionImport_XmlGz_Prompt">
    <property name="text">
-    <string>From .xml.gz...</string>
+    <string>From .qctools.xml.gz...</string>
    </property>
   </action>
   <action name="actionPreferences">
@@ -333,7 +333,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>To sidecar .xml.gz</string>
+    <string>To sidecar .qctools.xml.gz</string>
    </property>
   </action>
   <action name="actionExport_XmlGz_Custom">

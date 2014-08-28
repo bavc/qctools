@@ -35,7 +35,6 @@ public:
     void                        Parse                       ();
 
     // Dumps
-    void                        Import_XmlGz                (const QString &ExportFileName);
     void                        Export_XmlGz                (const QString &ExportFileName);
     void                        Export_CSV                  (const QString &ExportFileName);
     

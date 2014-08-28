@@ -22,6 +22,7 @@
 #include <qwt_plot_renderer.h>
 #include <qwt_scale_widget.h>
 #include <qwt_picker_machine.h>
+#include <qwt_plot_marker.h>
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -60,10 +61,11 @@ Plots::Plots(QWidget *parent, FileInformation* FileInformationData_) :
     memset(plotsCurves  , 0, sizeof(QwtPlotCurve* )*PlotType_Max*5);
     memset(plotsZoomers , 0, sizeof(QwtPlotZoomer*)*PlotType_Max);
     memset(plotsPickers , 0, sizeof(QwtPlotPicker*)*PlotType_Max);
+    memset(plotsMarkers , 0, sizeof(QwtPlotMarker*)*PlotType_Max);
     
     // X axis info
     XAxis_Kind=NULL;
-    XAxis_Kind_index=0;
+    XAxis_Kind_index=1;
 
     // Y axis info
     memset(plots_YMax, 0, sizeof(double)*PlotType_Max);
@@ -77,6 +79,13 @@ Plots::~Plots()
 {
     for (size_t Type=0; Type<PlotType_Max; Type++)
     {
+        // Widgets addons
+        for(unsigned j=0; j<5; ++j)
+            delete plotsCurves[Type][j];
+        delete plotsZoomers [Type];
+        delete plotsPickers [Type];
+        delete plotsMarkers [Type];
+
         // Layouts and Widgets
         delete Layouts      [Type];
         delete paddings     [Type];
@@ -99,8 +108,10 @@ void Plots::Plots_Create()
     // XAxis_Kind
     XAxis_Kind=new QComboBox(this);
     XAxis_Kind->setVisible(false);
-    XAxis_Kind->addItem("Seconds");
     XAxis_Kind->addItem("Frames");
+    XAxis_Kind->addItem("Seconds");
+    XAxis_Kind->addItem("Minutes");
+    XAxis_Kind->addItem("Hours");
     XAxis_Kind->setCurrentIndex(XAxis_Kind_index);
     //XAxis_Kind->setEnabled(false);
     connect(XAxis_Kind, SIGNAL(currentIndexChanged(int)), this, SLOT(on_XAxis_Kind_currentIndexChanged(int)));
@@ -125,8 +136,10 @@ void Plots::Plots_Create(PlotType Type)
     plot->setAxisMaxMinor(QwtPlot::yLeft, 0);
     switch (XAxis_Kind_index)
     {
-        case 0 : plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration); break;
-        case 1 : plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoFrameCount); break;
+        case 0 : plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoFrameCount); break;
+        case 1 : plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration); break;
+        case 2 : plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration/60); break;
+        case 3 : plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration/3600); break;
         default: ;
     }
     if (PerPlotGroup[Type].Count>3)
@@ -157,6 +170,14 @@ void Plots::Plots_Create(PlotType Type)
                             default: c=Qt::black;
                         }
                         break;
+             case 2 :
+                        switch (j)
+                        {
+                            case 0: c=Qt::darkGreen; break;
+                            case 1: c=Qt::darkRed; break;
+                            default: c=Qt::black;
+                        }
+                        break;
              case 3 : 
                         switch (j)
                         {
@@ -182,7 +203,15 @@ void Plots::Plots_Create(PlotType Type)
 
         plotsCurves[Type][j]->setPen(c);
         plotsCurves[Type][j]->setRenderHint(QwtPlotItem::RenderAntialiased);
-        plotsCurves[Type][j]->setZ(plotsCurves[Type][j]->z()-j);
+        switch (Type)
+        {
+            case PlotType_Diffs   :
+            case PlotType_MSE     :
+            case PlotType_PSNR    :
+                                    break;  //Invert data order (except for Diffs, MSE, PSNR...)
+            default:
+                                    plotsCurves[Type][j]->setZ(plotsCurves[Type][j]->z()-j);
+        }
         plotsCurves[Type][j]->attach(plot);
      }
 
@@ -200,7 +229,7 @@ void Plots::Plots_Create(PlotType Type)
     legend->setFont(Font);
     connect(plot, SIGNAL(legendDataChanged(const QVariant &, const QList<QwtLegendData> &)), legend, SLOT(updateLegend(const QVariant &, const QList<QwtLegendData> &)));
     plot->updateLegend();
-
+    
     // Assignment
     plots[Type]=plot;
     legends[Type]=legend;
@@ -212,6 +241,14 @@ void Plots::Plots_Create(PlotType Type)
     plotsPickers[Type]->setTrackerPen( QColor( Qt::white ) );
     connect(plotsPickers[Type], SIGNAL(moved(const QPointF&)), SLOT(plot_moved(const QPointF&)));
     connect(plotsPickers[Type], SIGNAL(selected(const QPointF&)), SLOT(plot_moved(const QPointF&)));
+
+    // Marker
+    QwtPlotMarker* plotMarker=new QwtPlotMarker;
+    plotMarker->setLineStyle(QwtPlotMarker::VLine);
+    plotMarker->setLinePen(QPen(Qt::green, 1));
+    plotMarker->setXValue(0);
+    plotMarker->attach(plot);    
+    plotsMarkers[Type]=plotMarker;
 }
 
 //---------------------------------------------------------------------------
@@ -309,12 +346,20 @@ void Plots::Zoom_Move(size_t Begin)
             switch (XAxis_Kind_index)
             {
                 case 0 :
+                        Rect.setLeft(Begin);
+                        Rect.setWidth(Increment);
+                        break;
+                case 1 :
                         Rect.setLeft(FileInfoData->Glue->VideoDuration*Begin/FileInfoData->Glue->VideoFrameCount);
                         Rect.setWidth(FileInfoData->Glue->VideoDuration*Increment/FileInfoData->Glue->VideoFrameCount);
                         break;
-                case 1 :
-                        Rect.setLeft(Begin);
-                        Rect.setWidth(Increment);
+                case 2 :
+                        Rect.setLeft(FileInfoData->Glue->VideoDuration*Begin/FileInfoData->Glue->VideoFrameCount/60);
+                        Rect.setWidth(FileInfoData->Glue->VideoDuration*Increment/FileInfoData->Glue->VideoFrameCount/60);
+                        break;
+                case 3 :
+                        Rect.setLeft(FileInfoData->Glue->VideoDuration*Begin/FileInfoData->Glue->VideoFrameCount/3600);
+                        Rect.setWidth(FileInfoData->Glue->VideoDuration*Increment/FileInfoData->Glue->VideoFrameCount/3600);
                         break;
                 default:;
             }
@@ -472,15 +517,34 @@ void Plots::plot_moved( const QPointF &pos )
     switch (XAxis_Kind_index)
     {
         case 0 :
+                FileInfoData->Frames_Pos_Set(X);
+                break;
+        case 1 :
                 {
                 double FrameRate=FileInfoData->Glue->VideoFrameCount/FileInfoData->Glue->VideoDuration;
                 FileInfoData->Frames_Pos_Set((size_t)(X*FrameRate));
                 }
                 break;
-        case 1 :
-                FileInfoData->Frames_Pos_Set(X);
+        case 2 :
+                {
+                double FrameRate=FileInfoData->Glue->VideoFrameCount/FileInfoData->Glue->VideoDuration;
+                FileInfoData->Frames_Pos_Set((size_t)(X*60*FrameRate));
+                }
+                break;
+        case 3 :
+                {
+                double FrameRate=FileInfoData->Glue->VideoFrameCount/FileInfoData->Glue->VideoDuration;
+                FileInfoData->Frames_Pos_Set((size_t)(X*3600*FrameRate));
+                }
                 break;
         default: return; // Problem
+    }
+
+    for (size_t Type=0; Type<PlotType_Max; ++Type)
+    {
+        plotsMarkers[Type]->setXValue(X);
+        plotsMarkers[Type]->attach(plots[Type]);    
+        plots[Type]->replot();
     }
 }
 
@@ -492,8 +556,10 @@ void Plots::on_XAxis_Kind_currentIndexChanged(int index)
     {
         switch (XAxis_Kind_index)
         {
-            case 0 : plots[Type]->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration); break;
-            case 1 : plots[Type]->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->Frames_Total_Get()); break;
+            case 0 : plots[Type]->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->Frames_Total_Get()); break;
+            case 1 : plots[Type]->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration); break;
+            case 2 : plots[Type]->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration/60); break;
+            case 3 : plots[Type]->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration/3600); break;
             default: ;
         }
 

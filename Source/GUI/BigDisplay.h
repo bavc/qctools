@@ -74,6 +74,8 @@ public:
 protected:
     void enterEvent (QEvent* event);
     void leaveEvent (QEvent* event);
+    void keyPressEvent (QKeyEvent* event);
+    void moveEvent (QMoveEvent * event);
 
     void hidePopup ();
 
@@ -144,14 +146,12 @@ protected:
     options                     Options[2];
     struct previous_values
     {
-        int                     Values[4];
+        int                     Values[Args_Max];
 
         previous_values()
         {
-            Values[0]=-2;
-            Values[1]=-2;
-            Values[2]=-2;
-            Values[3]=-2;
+            for (size_t OptionPos=0; OptionPos<Args_Max; OptionPos++)
+                Values[OptionPos]=-2;
         }
     };
     std::vector<previous_values>PreviousValues[2];

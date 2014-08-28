@@ -140,6 +140,10 @@ void MainWindow::Ui_Init()
     //Temp
     ui->actionFiltersLayout->setVisible(false);
     ui->actionWindowOut->setVisible(false);
+
+    // Not implemented action
+    if (ui->actionExport_XmlGz_Custom)
+        ui->actionExport_XmlGz_Custom->setVisible(false);
 }
 
 //---------------------------------------------------------------------------
@@ -208,7 +212,7 @@ void MainWindow::Zoom_Out()
     if (PlotsArea->ZoomScale>1)
         PlotsArea->ZoomScale/=2;
     configureZoom();
-    size_t Position=Files[Files_CurrentPos]->Glue->VideoFramePos;
+    size_t Position=Files[Files_CurrentPos]->Frames_Pos_Get();
     size_t Increment=Files[Files_CurrentPos]->Glue->VideoFrameCount/PlotsArea->ZoomScale;
     if (Position+Increment/2>Files[Files_CurrentPos]->Glue->VideoFrameCount)
         Position=Files[Files_CurrentPos]->Glue->VideoFrameCount-Increment/2;

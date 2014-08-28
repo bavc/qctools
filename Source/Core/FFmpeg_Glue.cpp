@@ -172,13 +172,13 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
     if (WithStats || !StatsFromExternalData.empty())
     {
         // Configure
-        x = new double*[2];
-        memset(x, 0, 2*sizeof(double*));
+        x = new double*[4];
+        memset(x, 0, 4*sizeof(double*));
         y = new double*[PlotName_Max];
         memset(y, 0, PlotName_Max*sizeof(double*));
         memset(y_Max, 0, PlotType_Max*sizeof(double));
 
-        for(size_t j=0; j<2; ++j)
+        for(size_t j=0; j<4; ++j)
         {
             x[j]=new double[VideoFrameCount_Max];
             memset(x[j], 0x00, VideoFrameCount_Max*sizeof(double));
@@ -216,8 +216,13 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
                             if (Xml.name()=="frame" && Xml.attributes().value("media_type")=="video")
                             {
                                 double Frame_Duration=std::atof(Xml.attributes().value("pkt_duration_time").toUtf8());
-                                x[0][x_Max]=std::atof(Xml.attributes().value("pkt_pts_time").toUtf8());
-                                x[1][x_Max]=x_Max;
+                                x[0][x_Max]=x_Max;
+                                x[1][x_Max]=std::atof(Xml.attributes().value("pkt_pts_time").toUtf8());
+                                x[2][x_Max]=x[1][x_Max]/60;
+                                x[3][x_Max]=x[1][x_Max]/3600;
+
+                                int Width=Xml.attributes().value("width").toInt();
+                                int Height=Xml.attributes().value("height").toInt();
 
                                 while (Xml.readNextStartElement())
                                 {
@@ -230,7 +235,20 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
 
                                         if (j!=PlotName_Max)
                                         {
-                                            y[j][x_Max]=std::atof(Xml.attributes().value("value").toUtf8());
+                                            double value=std::atof(Xml.attributes().value("value").toUtf8());
+                                            
+                                            // Special cases: crop: x2, y2
+                                            if (Width && Xml.attributes().value("key")=="lavfi.cropdetect.x2")
+                                                y[j][x_Max]=Width-value;
+                                            else if (Height && Xml.attributes().value("key")=="lavfi.cropdetect.y2")
+                                                y[j][x_Max]=Height-value;
+                                            else if (Width && Xml.attributes().value("key")=="lavfi.cropdetect.w")
+                                                y[j][x_Max]=Width-value;
+                                            else if (Height && Xml.attributes().value("key")=="lavfi.cropdetect.h")
+                                                y[j][x_Max]=Height-value;
+                                            else
+                                                y[j][x_Max]=value;
+
                                             if (PerPlotName[j].Group1!=PlotType_Max && y_Max[PerPlotName[j].Group1]<y[j][x_Max])
                                                 y_Max[PerPlotName[j].Group1]=y[j][x_Max];
                                             if (PerPlotName[j].Group2!=PlotType_Max && y_Max[PerPlotName[j].Group2]<y[j][x_Max])
@@ -243,7 +261,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
                                 if (VideoFrameCount<x_Max)
                                 {
                                     VideoFrameCount=x_Max;
-                                    VideoDuration=x[0][x_Max-1]+Frame_Duration;
+                                    VideoDuration=x[1][x_Max-1]+Frame_Duration;
                                     if (FormatContext==NULL)
                                         VideoFramePos=VideoFrameCount;
                                 }
@@ -357,7 +375,7 @@ void FFmpeg_Glue::NextFrame()
 
             if (x_Line_Begin) //If not the header
             {
-                x[1][x_Max]=x_Max;
+                x[0][x_Max]=x_Max;
         
                 int Col_Begin=x_Line_Begin;
                 int Col_End;
@@ -370,7 +388,9 @@ void FFmpeg_Glue::NextFrame()
                     string Value(StatsFromExternalData.substr(Col_Begin, Col_End-Col_Begin));
                     if (Pos2==6)
                     {
-                        x[0][x_Max]=std::atof(Value.data());
+                        x[1][x_Max]=std::atof(Value.data());
+                        x[2][x_Max]=x[1][x_Max]/60;
+                        x[3][x_Max]=x[2][x_Max]/60;
                     }
                     else if (Pos2>=PlotName_Begin)
                     {
@@ -717,8 +737,10 @@ bool FFmpeg_Glue::Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, 
         // Stats
         if (WithStats)
         {
-            x[0][x_Max]=((double)Frame->pkt_pts)*VideoStream->time_base.num/VideoStream->time_base.den;
-            x[1][x_Max]=x_Max;
+            x[0][x_Max]=x_Max;
+            x[1][x_Max]=((double)Frame->pkt_pts)*VideoStream->time_base.num/VideoStream->time_base.den;
+            x[2][x_Max]=((double)Frame->pkt_pts)*VideoStream->time_base.num/VideoStream->time_base.den/60;
+            x[3][x_Max]=((double)Frame->pkt_pts)*VideoStream->time_base.num/VideoStream->time_base.den/3600;
 
             AVDictionary * m=av_frame_get_metadata (FilteredFrame);
             AVDictionaryEntry* e=NULL;
@@ -737,7 +759,19 @@ bool FFmpeg_Glue::Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, 
 
                 if (j<PlotName_Max)
                 {
-                    y[j][x_Max]=std::atof(e->value);
+                    double value=std::atof(e->value);
+                                            
+                    // Special cases: crop: x2, y2
+                    if (string(e->key)=="lavfi.cropdetect.x2")
+                        y[j][x_Max]=Width_Get()-value;
+                    else if (string(e->key)=="lavfi.cropdetect.y2")
+                        y[j][x_Max]=Height_Get()-value;
+                    else if (string(e->key)=="lavfi.cropdetect.w")
+                        y[j][x_Max]=Width_Get()-value;
+                    else if (string(e->key)=="lavfi.cropdetect.h")
+                        y[j][x_Max]=Height_Get()-value;
+                    else
+                        y[j][x_Max]=value;
 
                     if (PerPlotName[j].Group1!=PlotType_Max && y_Max[PerPlotName[j].Group1]<y[j][x_Max])
                         y_Max[PerPlotName[j].Group1]=y[j][x_Max];
@@ -1155,7 +1189,7 @@ string FFmpeg_Glue::StatsToExternalData()
     for (size_t Pos=0; Pos<x_Max; Pos++)
     {
         Value<<",,,,,,";
-        Value<<fixed<<setprecision(6)<<x[0][Pos];
+        Value<<fixed<<setprecision(6)<<x[1][Pos];
         Value<<",,,,,,,,,,,,,,";
         for (size_t Pos2=0; Pos2<PlotName_Max; Pos2++)
         {

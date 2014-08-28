@@ -19,6 +19,7 @@ HEADERS = \
     ../../Source/GUI/Help.h \
     ../../Source/GUI/Info.h \
     ../../Source/GUI/mainwindow.h \
+    ../../Source/GUI/preferences.h \
     ../../Source/GUI/Plots.h \
     ../../Source/GUI/TinyDisplay.h
 
@@ -37,10 +38,12 @@ SOURCES = \
     ../../Source/GUI/mainwindow_More.cpp \
     ../../Source/GUI/mainwindow_Ui.cpp \
     ../../Source/GUI/Plots.cpp \
+    ../../Source/GUI/preferences.cpp \
     ../../Source/GUI/TinyDisplay.cpp
 
 FORMS += \
-    ../../Source/GUI/mainwindow.ui
+    ../../Source/GUI/mainwindow.ui \
+    ../../Source/GUI/preferences.ui
 
 RESOURCES += \
     ../../Source/Resource/Resources.qrc
@@ -51,17 +54,18 @@ include( $${QWT_ROOT}/qwtfunctions.pri )
 
 INCLUDEPATH += $$PWD/../../Source
 INCLUDEPATH += $$QWT_ROOT/src
-INCLUDEPATH += $$PWD/../../../FFmpeg-bavc
+INCLUDEPATH += $$PWD/../../../FFmpeg-master
 
 LIBS      += -L$${QWT_ROOT}/lib -lqwt
-LIBS      += -L$${PWD}/../../../FFmpeg-bavc/libavdevice -lavdevice \
-             -L$${PWD}/../../../FFmpeg-bavc/libavcodec -lavcodec \
-             -L$${PWD}/../../../FFmpeg-bavc/libavfilter -lavfilter \
-             -L$${PWD}/../../../FFmpeg-bavc/libavformat -lavformat \
-             -L$${PWD}/../../../FFmpeg-bavc/libavutil -lavutil \
-             -L$${PWD}/../../../FFmpeg-bavc/libpostproc -lpostproc \
-             -L$${PWD}/../../../FFmpeg-bavc/libswresample -lswresample \
-             -L$${PWD}/../../../FFmpeg-bavc/libswscale -lswscale
+LIBS      += -lz
+LIBS      += -L$${PWD}/../../../FFmpeg-master/libavdevice -lavdevice \
+             -L$${PWD}/../../../FFmpeg-master/libavcodec -lavcodec \
+             -L$${PWD}/../../../FFmpeg-master/libavfilter -lavfilter \
+             -L$${PWD}/../../../FFmpeg-master/libavformat -lavformat \
+             -L$${PWD}/../../../FFmpeg-master/libavutil -lavutil \
+             -L$${PWD}/../../../FFmpeg-master/libpostproc -lpostproc \
+             -L$${PWD}/../../../FFmpeg-master/libswresample -lswresample \
+             -L$${PWD}/../../../FFmpeg-master/libswscale -lswscale
 
 macx:
 {

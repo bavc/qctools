@@ -171,9 +171,11 @@ void MainWindow::on_Toolbar_visibilityChanged(bool visible)
 //---------------------------------------------------------------------------
 void MainWindow::on_actionImport_XmlGz_Prompt_triggered()
 {
-    // TODO
-    // Temp
-    statusBar()->showMessage("(Not implemeted) Import from "+QFileDialog::getOpenFileName(this, "Import from qctools..xml.gz", QString(), "Statistic files (*.qctools.xml.gz)"));
+    QString FileName=QFileDialog::getOpenFileName(this, "Import from .qctools.xml.gz", "", "Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml)", 0, QFileDialog::DontUseNativeDialog);
+    if (FileName.size()==0)
+        return;
+
+    processFile(FileName);
 }
 
 //---------------------------------------------------------------------------
@@ -182,10 +184,12 @@ void MainWindow::on_actionExport_XmlGz_Prompt_triggered()
     if (Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
         return;
     
-    // TODO
-    //Files[Files_CurrentPos]->Export_CSV(QFileDialog::getSaveFileName(this, "Import from .xml.gz", Files[Files_CurrentPos]->FileName+".qctools.xml.gz", "Statistic files (*.xml.gz)", 0, QFileDialog::DontUseNativeDialog));
-    // Temp
-    statusBar()->showMessage("(Not implemeted) Export to "+QFileDialog::getSaveFileName(this, "Export to .qctools.xml.gz", Files[Files_CurrentPos]->FileName+".qctools.xml.gz", "Statistic files (*.xml.gz)", 0, QFileDialog::DontUseNativeDialog)+".qctools.xml.gz");
+    QString FileName=QFileDialog::getSaveFileName(this, "Export to .qctools.xml.gz", "", "Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml)", 0, QFileDialog::DontUseNativeDialog);
+    if (FileName.size()==0)
+        return;
+
+    Files[Files_CurrentPos]->Export_XmlGz(FileName);
+    statusBar()->showMessage("Exported to "+FileName);
 }
 
 //---------------------------------------------------------------------------
@@ -194,9 +198,11 @@ void MainWindow::on_actionExport_XmlGz_Sidecar_triggered()
     if (Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
         return;
     
-    // TODO
-    // Temp
-    statusBar()->showMessage("(Not implemeted) Export to "+Files[Files_CurrentPos]->FileName+".qctools.xml.gz");
+    QString FileName=Files[Files_CurrentPos]->FileName+".qctools.xml.gz";
+
+    Files[Files_CurrentPos]->Export_XmlGz(FileName);
+    statusBar()->showMessage("Exported to "+FileName);
+
 }
 
 //---------------------------------------------------------------------------
@@ -271,8 +277,8 @@ void MainWindow::on_actionGraphsLayout_triggered()
         ui->actionExport_XmlGz_Prompt->setVisible(true);
     if (ui->actionExport_XmlGz_Sidecar)
         ui->actionExport_XmlGz_Sidecar->setVisible(true);
-    if (ui->actionExport_XmlGz_Custom)
-        ui->actionExport_XmlGz_Custom->setVisible(true);
+    //if (ui->actionExport_XmlGz_Custom) // Not implemented action
+    //    ui->actionExport_XmlGz_Custom->setVisible(true);
     if (ui->actionCSV)
         ui->actionCSV->setVisible(true);
     if (ui->actionPrint)

@@ -38,6 +38,7 @@
 #include <QPushButton>
 #include <QColorDialog>
 #include <QShortcut>
+#include <QApplication>
 
 #include <sstream>
 //---------------------------------------------------------------------------
@@ -187,9 +188,9 @@ const filter Filters[]=
         "Waveform",
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
-            { Args_Type_Slider,  20,   1, 255,   1, "Scale" },
+            { Args_Type_Slider,  20,   1, 255,   1, "Brightness" },
             { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
-            { Args_Type_Toggle,   0,   0,   0,   0, "Horizontal" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Vertical" },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
@@ -207,21 +208,21 @@ const filter Filters[]=
         "Line Select",
         {
             { Args_Type_Slider,   1,   1,   0,   1, "Line" },
-            { Args_Type_Slider,  10,   1, 255,  10, "Scale" },
+            { Args_Type_Slider, 255,   1, 255,   1, "Brightness" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Columns"},
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
             "crop=iw:2:0:${1},histogram=step=${2}:mode=waveform:waveform_mode=column:display_mode=overlay:waveform_mirror=1,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16",
-            "crop=iw:2:0:${1},transpose=1,histogram=step=${2}:mode=waveform:waveform_mode=column:display_mode=overlay:waveform_mirror=1,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16",
+            "transpose=1,crop=iw:2:0:${1},histogram=step=${2}:mode=waveform:waveform_mode=column:display_mode=overlay:waveform_mirror=1,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16",
         },
     },
     {
         "Vectorscope",
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
-            { Args_Type_Slider,  10,   1, 100,  10, "Scale" },
+            { Args_Type_Slider,   5,   1,  10,   1, "Brightness" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
@@ -263,8 +264,8 @@ const filter Filters[]=
         "Bit Plane",
         {
             { Args_Type_Slider,   1,  -1,   8,   1, "Y bit position" },
-            { Args_Type_Slider,   0,  -1,   8,   1, "U bit position" },
-            { Args_Type_Slider,   0,  -1,   8,   1, "V bit position" },
+            { Args_Type_Slider,   -1, -1,   8,   1, "U bit position" },
+            { Args_Type_Slider,   -1, -1,   8,   1, "V bit position" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
@@ -276,18 +277,14 @@ const filter Filters[]=
         "Value Highlight",
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
-            { Args_Type_YuvA,     2,   0,   0,   0, "Plane" },
-            { Args_Type_Slider, 128,   0, 255,   1, "Min"},
-            { Args_Type_Slider, 128,   0, 255,   1, "Max"},
+            { Args_Type_Yuv,      0,   0,   0,   0, "Plane" },
+            { Args_Type_Slider, 235,   0, 255,   1, "Min"},
+            { Args_Type_Slider, 255,   0, 255,   1, "Max"},
             { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
         },
         {
-            //"extractplanes=${2},lutrgb=r=if(between(val\\,${3}\\,${4})\\,255\\,val):g=if(between(val\\,${3}\\,${4})\\,255\\,val):b=if(between(val\\,${3}\\,${4})\\,0\\,val)",
-            //"extractplanes=${2},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]lutrgb=r=if(between(val\\,${3}\\,${4})\\,255\\,val):g=if(between(val\\,${3}\\,${4})\\,255\\,val):b=if(between(val\\,${3}\\,${4})\\,0\\,val)[a2];[b1]lutrgb=r=if(between(val\\,${3}\\,${4})\\,255\\,val):g=if(between(val\\,${3}\\,${4})\\,255\\,val):b=if(between(val\\,${3}\\,${4})\\,0\\,val)[b2];[a2][b2]framepack=tab",
             "extractplanes=${2},lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)",
-            "lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)",
             "extractplanes=${2},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)[a2];[b1]lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)[b2];[a2][b2]framepack=tab",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)[a2];[b1]lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)[b2];[a2][b2]framepack=tab",
         },
     },
     {
@@ -361,6 +358,7 @@ const filter Filters[]=
         },
     },
     */
+    /*
     {
         "Zoom",
         {
@@ -374,6 +372,7 @@ const filter Filters[]=
             "crop=${3}:${3}/dar:${1}:${2},histeq=strength=${4}:intensity=${5}",
         },
     },
+    */
     {
         "(End)",
         {
@@ -454,13 +453,7 @@ void ImageLabel::paintEvent(QPaintEvent *event)
         Pixmap_MustRedraw=false;
     }
 
-    int width=(event->rect().width()-Pixmap.size().width())/2;
-    if (width%2)
-        width--; //odd number is wanted for filters
-    int height=(event->rect().width()-Pixmap.size().width())/2;
-    if (height%2)
-        height--; //odd number is wanted for filters
-    painter.drawPixmap(width, height, Pixmap);
+    painter.drawPixmap((event->rect().width()-Pixmap.size().width())/2, (event->rect().height()-Pixmap.size().height())/2, Pixmap);
 }
 
 //---------------------------------------------------------------------------
@@ -514,12 +507,15 @@ DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Other
         Font.setPointSize(Font.pointSize()*3/4);
     #endif //_WIN32
     setFont(Font);
+
+    setFocusPolicy(Qt::NoFocus);
 }
 
 //---------------------------------------------------------------------------
 DoubleSpinBoxWithSlider::~DoubleSpinBoxWithSlider()
 {
-    delete Popup; //Popup=NULL;
+    //delete Popup; //Popup=NULL;
+    delete Slider; //Slider=NULL;
 }
 
 //---------------------------------------------------------------------------
@@ -528,31 +524,36 @@ void DoubleSpinBoxWithSlider::enterEvent (QEvent* event)
     if (Slider==NULL)
     {
         //Popup=new QWidget((QWidget*)parent(), Qt::Popup | Qt::Window);
-        Popup=new QWidget((QWidget*)parent(), Qt::FramelessWindowHint);
+        //Popup=new QWidget((QWidget*)parent(), Qt::FramelessWindowHint);
         //Popup->setGeometry(((QWidget*)parent())->geometry().x()+x()+width()-(255+30), ((QWidget*)parent())->geometry().y()+y()+height(), 255+30, height());
-        Popup->setGeometry(x()+width()-(255+30), y()+height(), 255+30, height());
-        Popup->setWindowModality(Qt::NonModal);
-        QLayout* Layout=new QGridLayout();
-        Layout->setContentsMargins(0, 0, 0, 0);
-        Slider=new QSlider(Qt::Horizontal);
+        //Popup->setGeometry(x()+width()-(255+30), y()+height(), 255+30, height());
+        //Popup->setWindowModality(Qt::NonModal);
+        //Popup->setFocusPolicy(Qt::NoFocus);
+        //QLayout* Layout=new QGridLayout();
+        //Layout->setContentsMargins(0, 0, 0, 0);
+        //Layout->setSpacing(0);
+        Slider=new QSlider(Qt::Horizontal, (QWidget*)parent());
         Slider->setFocusPolicy(Qt::NoFocus);
         Slider->setMinimum(Min);
         Slider->setMaximum(Max);
         Slider->setToolTip(toolTip());
+        Slider->setGeometry(x()+width()-(255+30), y()+height(), 255+30, height());
         connect(Slider, SIGNAL(valueChanged(int)), this, SLOT(on_sliderMoved(int)));
         connect(Slider, SIGNAL(sliderMoved(int)), this, SLOT(on_sliderMoved(int)));
-        Layout->addWidget(Slider);
-        Popup->setFocusPolicy(Qt::NoFocus);
-        Popup->setLayout(Layout);
+        Slider->setFocusPolicy(Qt::NoFocus);
+        //Layout->addWidget(Slider);
+        //Popup->setFocusPolicy(Qt::NoFocus);
+        //Popup->setLayout(Layout);
         connect(this, SIGNAL(valueChanged(double)), this, SLOT(on_valueChanged(double)));
     }
     for (size_t Pos=0; Pos<Args_Max; Pos++)
         if (Others[Pos] && Others[Pos]!=this)
             Others[Pos]->hidePopup();
-    if (!Popup->isVisible())
+    //if (!Popup->isVisible())
+    if (!Slider->isVisible())
     {
         on_valueChanged(value());
-        Popup->show();
+        Slider->show();
         ((QWidget*)parent())->repaint();
     }
 }
@@ -561,6 +562,7 @@ void DoubleSpinBoxWithSlider::enterEvent (QEvent* event)
 void DoubleSpinBoxWithSlider::ChangeMax(int Max_)
 {
     Max=Max_;
+    setMaximum(Max);
     if (Slider)
         Slider->setMaximum(Max);
 }
@@ -573,10 +575,31 @@ void DoubleSpinBoxWithSlider::leaveEvent (QEvent* event)
 }
 
 //---------------------------------------------------------------------------
+void DoubleSpinBoxWithSlider::keyPressEvent (QKeyEvent* event)
+{
+    if (event->key()==Qt::Key_Up || event->key()==Qt::Key_Down)
+    {
+        QDoubleSpinBox::keyPressEvent(event);
+    }
+
+    event->ignore();
+}
+
+//---------------------------------------------------------------------------
+void DoubleSpinBoxWithSlider::moveEvent (QMoveEvent* event)
+{
+    if (Slider)
+        //Popup->setGeometry(x()+width()-(255+30), y()+height(), 255+30, height());
+        Slider->setGeometry(x()+width()-(255+30), y()+height(), 255+30, height());
+}
+
+//---------------------------------------------------------------------------
 void DoubleSpinBoxWithSlider::hidePopup ()
 {
-    if (Popup)
-        Popup->hide();
+    //if (Popup)
+    //    Popup->hide();
+    if (Slider)
+        Slider->hide();
 }
 
 //---------------------------------------------------------------------------
@@ -624,9 +647,9 @@ void DoubleSpinBoxWithSlider::showEvent (QShowEvent* event)
 QString DoubleSpinBoxWithSlider::textFromValue (double value) const
 {
     if (IsBitSlice && value==0)
-        return "None";
-    else if (IsBitSlice && value==-1)
         return "All";
+    else if (IsBitSlice && value==-1)
+        return "None";
     else
         return QDoubleSpinBox::textFromValue(value);
 }
@@ -634,9 +657,9 @@ QString DoubleSpinBoxWithSlider::textFromValue (double value) const
 //---------------------------------------------------------------------------
 double DoubleSpinBoxWithSlider::valueFromText (const QString& text) const
 {
-    if (IsBitSlice && text=="None")
+    if (IsBitSlice && text=="All")
         return -1;
-    else if (IsBitSlice && text=="All")
+    else if (IsBitSlice && text=="None")
         return 0;
     else
         return QDoubleSpinBox::valueFromText(text);
@@ -697,13 +720,13 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
 
     Layout=new QGridLayout();
     Layout->setContentsMargins(0, 0, 0, 0);
+    Layout->setSpacing(0);
 
     // Filters
     for (size_t Pos=0; Pos<2; Pos++)
     {
         Options[Pos].FiltersList=new QComboBox(this);
         Options[Pos].FiltersList->setFont(Font);
-        Layout->addWidget(Options[Pos].FiltersList, 0, 0, 1, 1, Pos==0?Qt::AlignLeft:Qt::AlignRight);
         for (size_t FilterPos=0; FilterPos<FiltersListDefault_Count; FilterPos++)
         {
             if (strcmp(Filters[FilterPos].Name, "(Separator)") && strcmp(Filters[FilterPos].Name, "(End)"))
@@ -720,15 +743,25 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     Image1=new ImageLabel(&Picture, 1, this);
     Image1->IsMain=true;
     Image1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    Layout->addWidget(Image1, 1, 0, 1, 1);
-    Layout->setColumnStretch(0, 1);
+    Image1->setMinimumSize(20, 20);
+    //Layout->addWidget(Image1, 1, 0, 1, 1);
+    //Layout->setColumnStretch(0, 1);
 
     //Image2
     Image2=new ImageLabel(&Picture, 2, this);
     Image2->IsMain=false;
     Image2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    Layout->addWidget(Image2, 1, 2, 1, 1);
-    Layout->setColumnStretch(2, 1);
+    Image2->setMinimumSize(20, 20);
+    //Layout->addWidget(Image2, 1, 2, 1, 1);
+    //Layout->setColumnStretch(2, 1);
+
+    // Mixing Image1 and Image2 in one widget
+    QHBoxLayout* ImageLayout=new QHBoxLayout();
+    ImageLayout->setContentsMargins(0, -1, 0, 0);
+    ImageLayout->setSpacing(0);
+    ImageLayout->addWidget(Image1);
+    ImageLayout->addWidget(Image2);
+    Layout->addLayout(ImageLayout, 1, 0, 1, 3);
 
     // Info
     InfoArea=NULL;
@@ -795,11 +828,17 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
     size_t Widget_XPox=1;
     for (size_t OptionPos=0; OptionPos<Args_Max; OptionPos++)
     {
-        PreviousValues[Pos].clear(); //TODO: previous values
         if (FilterPos>=PreviousValues[Pos].size())
             PreviousValues[Pos].resize(FilterPos+1);
         if (PreviousValues[Pos][FilterPos].Values[OptionPos]==-2)
+        {
             PreviousValues[Pos][FilterPos].Values[OptionPos]=Filters[FilterPos].Args[OptionPos].Default;
+
+            //Special case : default for Line Select is Height/2
+            if (Filters[FilterPos].Args[OptionPos].Name && string(Filters[FilterPos].Args[OptionPos].Name)=="Line")
+                PreviousValues[Pos][FilterPos].Values[OptionPos]=FileInfoData->Glue->Height_Get()/2;
+        }
+
         switch (Filters[FilterPos].Args[OptionPos].Type)
         {
             case Args_Type_Toggle:
@@ -819,11 +858,11 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                     string MaxTemp(Filters[FilterPos].Args[OptionPos].Name);
                                     if (MaxTemp=="Line")
                                     {
-                                        bool SelectHeight=false;
+                                        bool SelectWidth=false;
                                         for (size_t OptionPos2=0; OptionPos2<Args_Max; OptionPos2++)
                                             if (Filters[FilterPos].Args[OptionPos2].Type!=Args_Type_None && string(Filters[FilterPos].Args[OptionPos2].Name)=="Columns")
-                                                SelectHeight=Filters[FilterPos].Args[OptionPos2].Default?true:false;
-                                        Max=SelectHeight?FileInfoData->Glue->Height_Get():FileInfoData->Glue->Width_Get();
+                                                SelectWidth=Filters[FilterPos].Args[OptionPos2].Default?true:false;
+                                        Max=SelectWidth?FileInfoData->Glue->Width_Get():FileInfoData->Glue->Height_Get();
                                     }
                                     else if (MaxTemp=="x" || MaxTemp=="s")
                                         Max=FileInfoData->Glue->Width_Get();
@@ -882,7 +921,7 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                     break;
             case Args_Type_ClrPck:
                                     {
-                                    Options[Pos].ColorValue[OptionPos]=Filters[FilterPos].Args[OptionPos].Default;
+                                    Options[Pos].ColorValue[OptionPos]=PreviousValues[Pos][FilterPos].Values[OptionPos];
                                     Options[Pos].ColorButton[OptionPos]=new QPushButton("Color");
                                     Options[Pos].ColorButton[OptionPos]->setFont(Font);
                                     Options[Pos].ColorButton[OptionPos]->setMaximumHeight(Options[Pos].FiltersList->height());
@@ -894,15 +933,46 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
             default:                ;
         }
     }
+
+    // Reorder focus order
+    // Does not work as expected
+    /*
+    if (Pos==1) //Only if left and right blocks are designed
+    {
+        QWidget* First=Options[0].FiltersList;
+        QWidget* Second=NULL;
+        for (Pos=0; Pos<2; Pos++)
+            for (size_t OptionPos=0; OptionPos<Args_Max; OptionPos++)
+            {
+                Second=Options[Pos].Checks[OptionPos];
+                if (Second==NULL)
+                    Second=Options[Pos].Sliders_SpinBox[OptionPos];
+                if (Second==NULL)
+                    Second=Options[Pos].Radios[OptionPos][1];
+                if (Second==NULL)
+                    Second=Options[Pos].ColorButton[OptionPos];
+                if (Second)
+                {
+                    setTabOrder(First, Second);
+                    First=Second;
+                    Second=NULL;
+                }
+            }
+        setTabOrder(First, Options[1].FiltersList);
+    }
+    */
 }
 
 //---------------------------------------------------------------------------
 void BigDisplay::FiltersList1_currentIndexChanged(size_t FilterPos)
 {
     QGridLayout* Layout0=new QGridLayout();
+    Layout0->setContentsMargins(0, 0, 0, 0);
+    Layout0->setSpacing(8);
     Layout0->addWidget(Options[0].FiltersList, 0, 0, Qt::AlignLeft);
     FiltersList_currentIndexChanged(0, FilterPos, Layout0);
     Options[0].FiltersList_Fake=new QLabel(" ");
+    Options[0].FiltersList_Fake->setMinimumHeight(24);
     Layout0->addWidget(Options[0].FiltersList_Fake, 1, 0, Qt::AlignLeft);
     Layout0->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum), 0, 14);
     Layout->addLayout(Layout0, 0, 0, 1, 1, Qt::AlignLeft|Qt::AlignTop);
@@ -921,10 +991,13 @@ void BigDisplay::FiltersList1_currentIndexChanged(size_t FilterPos)
 void BigDisplay::FiltersList2_currentIndexChanged(size_t FilterPos)
 {
     QGridLayout* Layout0=new QGridLayout();
+    Layout0->setContentsMargins(0, 0, 0, 0);
+    Layout0->setSpacing(8);
     Layout0->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum), 0, 0);
     FiltersList_currentIndexChanged(1, FilterPos, Layout0);
     Layout0->addWidget(Options[1].FiltersList, 0, 14, Qt::AlignRight);
     Options[1].FiltersList_Fake=new QLabel(" ");
+    Options[1].FiltersList_Fake->setMinimumHeight(24);
     Layout0->addWidget(Options[1].FiltersList_Fake, 1, 14, Qt::AlignRight);
     Layout->addLayout(Layout0, 0, 2, 1, 1, Qt::AlignRight|Qt::AlignTop);
 
@@ -963,7 +1036,11 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                     if (string(Filters[Picture_Current].Args[OptionPos].Name)=="Columns")
                                         for (size_t OptionPos2=0; OptionPos2<Args_Max; OptionPos2++)
                                             if (Filters[Picture_Current].Args[OptionPos2].Type!=Args_Type_None && string(Filters[Picture_Current].Args[OptionPos2].Name)=="Line")
-                                                Options[Pos].Sliders_SpinBox[OptionPos2]->ChangeMax(Options[Pos].Checks[OptionPos]->isChecked()?FileInfoData->Glue->Height_Get():FileInfoData->Glue->Width_Get());
+                                            {
+                                                Options[Pos].Sliders_SpinBox[OptionPos2]->ChangeMax(Options[Pos].Checks[OptionPos]->isChecked()?FileInfoData->Glue->Width_Get():FileInfoData->Glue->Height_Get());
+                                                // Infinite loop in that case
+                                                //Options[Pos].Sliders_SpinBox[OptionPos2]->setValue(Options[Pos].Sliders_SpinBox[OptionPos2]->maximum()/2);
+                                            }
 
                                     // Special case: RGB
                                     if (string(Filters[Picture_Current].Name)=="Histogram" && Options[Pos].Checks[1])
@@ -1039,11 +1116,11 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                             break;
                                         }
                                     }
+                                    break;
             case Args_Type_ClrPck:
                                     Modified=true;
                                     WithSliders[OptionPos]=Options[Pos].ColorValue[OptionPos];
                                     PreviousValues[Pos][Picture_Current].Values[OptionPos]=Options[Pos].ColorValue[OptionPos];
-                                    break ;
                                     break ;
             default:                ;
         }
@@ -1112,14 +1189,17 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                             if (InsertPos==string::npos)
                                             {
                                                 // Special case RGB
-                                                char ToFind3[4];
-                                                ToFind3[0]='$';
-                                                ToFind3[1]='{';
-                                                ToFind3[2]='1'+OptionPos;
-                                                ToFind3[3]='\0';
-                                                InsertPos=Modified_String.find(ToFind3);
-                                                if (InsertPos!=string::npos)
+                                                for (;;)
                                                 {
+                                                    char ToFind3[4];
+                                                    ToFind3[0]='$';
+                                                    ToFind3[1]='{';
+                                                    ToFind3[2]='1'+OptionPos;
+                                                    ToFind3[3]='\0';
+                                                    InsertPos=Modified_String.find(ToFind3);
+                                                    if (InsertPos==string::npos)
+                                                        break;
+
                                                     if (InsertPos+6<Modified_String.size() && (Modified_String[InsertPos+3]=='R' || Modified_String[InsertPos+3]=='G' ||Modified_String[InsertPos+3]=='B') && Modified_String[InsertPos+4]=='}')
                                                     {
                                                         int Value=(int)WithSliders[OptionPos];
@@ -1387,8 +1467,15 @@ void BigDisplay::on_Color1_click(bool checked)
     while (Sender!=Options[0].ColorButton[OptionPos])
         OptionPos++;
     
-    Options[0].ColorValue[OptionPos] = QColorDialog::getColor(QColor(Options[0].ColorValue[OptionPos]), this).rgb()&0x00FFFFFF;
-    FiltersList1_currentOptionChanged(Picture_Current1);
+    
+    QColor Color=QColorDialog::getColor(QColor(Options[0].ColorValue[OptionPos]), this);
+    if (Color.isValid())
+    {
+        Options[0].ColorValue[OptionPos]=Color.rgb()&0x00FFFFFF;
+        FiltersList2_currentOptionChanged(Picture_Current2);
+    }
+    hide();
+    show();
 }
 
 //---------------------------------------------------------------------------
@@ -1399,8 +1486,14 @@ void BigDisplay::on_Color2_click(bool checked)
     while (Sender!=Options[1].ColorButton[OptionPos])
         OptionPos++;
     
-    Options[1].ColorValue[OptionPos] = QColorDialog::getColor(QColor(Options[1].ColorValue[OptionPos]), this).rgb()&0x00FFFFFF;
-    FiltersList2_currentOptionChanged(Picture_Current2);
+    QColor Color=QColorDialog::getColor(QColor(Options[1].ColorValue[OptionPos]), this);
+    if (Color.isValid())
+    {
+        Options[1].ColorValue[OptionPos]=Color.rgb()&0x00FFFFFF;
+        FiltersList2_currentOptionChanged(Picture_Current2);
+    }
+    hide();
+    show();
 }
 
 //---------------------------------------------------------------------------

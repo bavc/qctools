@@ -14,6 +14,8 @@
     #define UNICODE
 #endif //UNICODE
 
+extern const char* Version;
+
 const size_t PlotName_Begin=21;
 
 enum PlotName

@@ -66,12 +66,12 @@
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>221</width>
+       <width>421</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
-      <string>Automaticly save to .xml.gz sidecar file</string>
+      <string>Automaticly save to .qctools.xml.gz sidecar file</string>
      </property>
     </widget>
     <widget class="QRadioButton" name="XmlGz_Directory">
@@ -79,7 +79,7 @@
       <rect>
        <x>10</x>
        <y>50</y>
-       <width>221</width>
+       <width>421</width>
        <height>17</height>
       </rect>
      </property>

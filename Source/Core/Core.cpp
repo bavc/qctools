@@ -7,6 +7,8 @@
 //---------------------------------------------------------------------------
 #include <Core/Core.h>
 
+const char* Version="0.5.0";
+    
 const struct per_plot_group PerPlotGroup [PlotType_Max]=
 {
     //Y
@@ -204,23 +206,23 @@ const struct per_plot_item PerPlotName [PlotName_Max]=
     { PlotType_Hue,     PlotType_Max,       "HUEMED",     "lavfi.values.HUEMED",  "lavfi.signalstats.HUEMED",  0,  false,  },
     { PlotType_Hue,     PlotType_Max,       "HUEAVG",     "lavfi.values.HUEAVG",  "lavfi.signalstats.HUEAVG",  0,  true,   },
     //Others
-    { PlotType_TOUT,    PlotType_Max,       "TOUT",       "lavfi.values.TOUT",    "lavfi.signalstatsTOUT.",    8,  false,  },
+    { PlotType_TOUT,    PlotType_Max,       "TOUT",       "lavfi.values.TOUT",    "lavfi.signalstats.TOUT",    8,  false,  },
     //{ PlotType_HEAD,    PlotType_Max,       "HEAD",       "lavfi.values.HEAD",    "lavfi.signalstats.HEAD",    8,  false,  },
     { PlotType_VREP,    PlotType_Max,       "VREP",       "lavfi.values.VREP",    "lavfi.signalstats.VREP",    8,  false,  },
     { PlotType_BRNG,    PlotType_Max,       "BRNG",       "lavfi.values.RANG",    "lavfi.signalstats.BRNG",    8,  true,   },
     //Crop
-    { PlotType_CropW,   PlotType_Max,       "Crop x1",    "",                     "lavfi.cropdetect.x1", 0,  false,  },
-    { PlotType_CropW,   PlotType_Max,       "Crop x2",    "",                     "lavfi.cropdetect.x2", 0,  false,  },
-    { PlotType_CropH,   PlotType_Max,       "Crop y1",    "",                     "lavfi.cropdetect.y1", 0,  false,  },
-    { PlotType_CropH,   PlotType_Max,       "Crop y2",    "",                     "lavfi.cropdetect.y1", 0,  true,   },
-    { PlotType_CropF,   PlotType_Max,       "Crop w",     "",                     "lavfi.cropdetect.w",  0,  false,  },
-    { PlotType_CropF,   PlotType_Max,       "Crop h",     "",                     "lavfi.cropdetect.h",  0,  true,   },
+    { PlotType_CropW,   PlotType_Max,       "Crop Left",  "",                     "lavfi.cropdetect.x1", 0,  false,  },
+    { PlotType_CropW,   PlotType_Max,       "Crop Right", "",                     "lavfi.cropdetect.x2", 0,  false,  },
+    { PlotType_CropH,   PlotType_Max,       "Crop Top",   "",                     "lavfi.cropdetect.y1", 0,  false,  },
+    { PlotType_CropH,   PlotType_Max,       "Crop Bottom","",                     "lavfi.cropdetect.y2", 0,  true,   },
+    { PlotType_CropF,   PlotType_Max,       "Crop Width", "",                     "lavfi.cropdetect.w",  0,  false,  },
+    { PlotType_CropF,   PlotType_Max,       "Crop Height","",                     "lavfi.cropdetect.h",  0,  true,   },
     //MSEf
-    { PlotType_MSE,     PlotType_Max,       "MSEf V",     "lavfi.psnr.mse.v",     "lavfi.psnr.mse.v",          2,  true,   },
-    { PlotType_MSE,     PlotType_Max,       "MSEf U",     "lavfi.psnr.mse.u",     "lavfi.psnr.mse.u",          2,  false,  },
     { PlotType_MSE,     PlotType_Max,       "MSEf Y",     "lavfi.psnr.mse.y",     "lavfi.psnr.mse.y",          2,  false,  },
+    { PlotType_MSE,     PlotType_Max,       "MSEf U",     "lavfi.psnr.mse.u",     "lavfi.psnr.mse.u",          2,  false,  },
+    { PlotType_MSE,     PlotType_Max,       "MSEf V",     "lavfi.psnr.mse.v",     "lavfi.psnr.mse.v",          2,  true,   },
     //PSNRf
-    { PlotType_PSNR,    PlotType_Max,       "PSNRf V",    "lavfi.psnr.psnr.v",    "lavfi.psnr.psnr.v",         2,  true,   },
-    { PlotType_PSNR,    PlotType_Max,       "PSNRf U",    "lavfi.psnr.psnr.u",    "lavfi.psnr.psnr.u",         2,  false,  },
     { PlotType_PSNR,    PlotType_Max,       "PSNRf Y",    "lavfi.psnr.psnr.y",    "lavfi.psnr.psnr.y",         2,  false,  },
+    { PlotType_PSNR,    PlotType_Max,       "PSNRf U",    "lavfi.psnr.psnr.u",    "lavfi.psnr.psnr.u",         2,  false,  },
+    { PlotType_PSNR,    PlotType_Max,       "PSNRf V",    "lavfi.psnr.psnr.v",    "lavfi.psnr.psnr.v",         2,  true,   },
 };

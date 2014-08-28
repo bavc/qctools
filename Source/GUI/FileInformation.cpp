@@ -19,9 +19,9 @@
 #include <zlib.h>
 #include <zconf.h>
 
-
+#include <string>
+#include <sstream>
 #ifdef _WIN32
-    #include <string>
     #include <algorithm>
 #endif
 //---------------------------------------------------------------------------
@@ -60,24 +60,26 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_) :
     FileName(FileName_),
     Main(Main_)
 {
-    std::string StatsFromExternalData;
     QString StatsFromExternalData_FileName;
+    bool StatsFromExternalData_FileName_IsCompressed=false;
 
     // Finding the right file names (both media file and stats file)
     if (FileName.indexOf(".qctools.xml.gz")==FileName.length()-15)
     {
         StatsFromExternalData_FileName=FileName;
         FileName.resize(FileName.length()-15);
-    }
-    else if (FileName.indexOf(".xml.gz")==FileName.length()-7)
-    {
-        StatsFromExternalData_FileName=FileName;
-        FileName.resize(FileName.length()-7);
+        StatsFromExternalData_FileName_IsCompressed=true;
     }
     else if (FileName.indexOf(".qctools.xml")==FileName.length()-12)
     {
         StatsFromExternalData_FileName=FileName;
         FileName.resize(FileName.length()-12);
+    }
+    else if (FileName.indexOf(".xml.gz")==FileName.length()-7)
+    {
+        StatsFromExternalData_FileName=FileName;
+        FileName.resize(FileName.length()-7);
+        StatsFromExternalData_FileName_IsCompressed=true;
     }
     else if (FileName.indexOf(".xml")==FileName.length()-4)
     {
@@ -87,26 +89,40 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_) :
     if (StatsFromExternalData_FileName.size()==0)
     {
         if (QFile::exists(StatsFromExternalData_FileName+".qctools.xml.gz"))
+        {
             StatsFromExternalData_FileName=StatsFromExternalData_FileName+".qctools.xml.gz";
+            StatsFromExternalData_FileName_IsCompressed=true;
+        }
         else if (QFile::exists(StatsFromExternalData_FileName+".qctools.xml"))
+        {
             StatsFromExternalData_FileName=StatsFromExternalData_FileName+".qctools.xml";
+        }
+        else if (QFile::exists(StatsFromExternalData_FileName+".xml.gz"))
+        {
+            StatsFromExternalData_FileName=StatsFromExternalData_FileName+".xml.gz";
+            StatsFromExternalData_FileName_IsCompressed=true;
+        }
+        else if (QFile::exists(StatsFromExternalData_FileName+".xml"))
+        {
+            StatsFromExternalData_FileName=StatsFromExternalData_FileName+".xml";
+        }
     }
 
     // External data optional input
-    if (StatsFromExternalData.empty())
+    string StatsFromExternalData;
+    if (!StatsFromExternalData_FileName.size()==0)
     {
-        QFileInfo FileInfo_XmlGz(FileName+".qctools.xml.gz");
-        if (FileInfo_XmlGz.exists())
+        if (StatsFromExternalData_FileName_IsCompressed)
         {
-            QFile F(FileName+".qctools.xml.gz");
+            QFile F(StatsFromExternalData_FileName);
             if (F.open(QIODevice::ReadOnly))
             {
                 QByteArray Compressed=F.readAll();
                 uLongf Buffer_Size=0;
-                Buffer_Size|=Compressed[Compressed.size()-1]<<24;
-                Buffer_Size|=Compressed[Compressed.size()-2]<<16;
-                Buffer_Size|=Compressed[Compressed.size()-3]<<8;
-                Buffer_Size|=Compressed[Compressed.size()-4];
+                Buffer_Size|=((unsigned char)Compressed[Compressed.size()-1])<<24;
+                Buffer_Size|=((unsigned char)Compressed[Compressed.size()-2])<<16;
+                Buffer_Size|=((unsigned char)Compressed[Compressed.size()-3])<<8;
+                Buffer_Size|=((unsigned char)Compressed[Compressed.size()-4]);
                 char* Buffer=new char[Buffer_Size];
                 z_stream strm;  
                 strm.next_in = (Bytef *) Compressed.data();  
@@ -127,13 +143,9 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_) :
                 delete[] Buffer;
             }
         }
-    }
-    if (StatsFromExternalData.empty())
-    {
-        QFileInfo FileInfo_Xml(FileName+".qctools.xml");
-        if (FileInfo_Xml.exists())
+        else
         {
-            QFile F(FileName+".qctools.xml");
+            QFile F(StatsFromExternalData_FileName);
             if (F.open(QIODevice::ReadOnly))
             {
                 QByteArray Data=F.readAll();
@@ -151,7 +163,7 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_) :
     if (!StatsFromExternalData.empty())
         Glue= new FFmpeg_Glue(FileName_string.c_str(), 72, 72, FFmpeg_Glue::Output_JpegList, string(), string(), true, false, false, StatsFromExternalData);
     else
-        Glue= new FFmpeg_Glue(FileName_string.c_str(), 72, 72, FFmpeg_Glue::Output_JpegList, "signalstats=stat=tout+vrep+brng,cropdetect,split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr", "", true, false, true);
+        Glue= new FFmpeg_Glue(FileName_string.c_str(), 72, 72, FFmpeg_Glue::Output_JpegList, "signalstats=stat=tout+vrep+brng,cropdetect=reset=1:round=1,split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr", "", true, false, true);
 
     if (Glue->VideoFrameCount==0 && StatsFromExternalData.empty())
         return; // Problem
@@ -193,15 +205,83 @@ void FileInformation::Parse ()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void FileInformation::Import_XmlGz (const QString &ExportFileName)
-{
-    //TODO
-}
-
-//---------------------------------------------------------------------------
 void FileInformation::Export_XmlGz (const QString &ExportFileName)
 {
-    //TODO
+    string Data;
+    
+    // Header
+    Data+="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    Data+="<ffprobe:ffprobe xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:ffprobe='http://www.ffmpeg.org/schema/ffprobe' xsi:schemaLocation='http://www.ffmpeg.org/schema/ffprobe ffprobe.xsd'>\n";
+    Data+="    <program_version version=\"QCTools "+string(Version)+"\" copyright=\"Copyright (c) BAVC. All Rights Reserved.\"/>\n";
+    Data+="\n";
+    Data+="    <frames>\n";
+
+    // Per frame
+    for (size_t x=0; x<Glue->VideoFrameCount_Max; ++x)
+    {
+        stringstream pkt_pts_time; pkt_pts_time<<Glue->x[1][x];
+        stringstream width; width<<Glue->Width_Get();
+        stringstream height; height<<Glue->Height_Get();
+        Data+="        <frame media_type=\"video\" pkt_pts_time=\""+pkt_pts_time.str()+"\" width=\""+width.str()+"\" height=\""+height.str()+"\">\n";
+
+        for (size_t Plot_Pos=0; Plot_Pos<PlotName_Max; Plot_Pos++)
+        {
+            string key=PerPlotName[Plot_Pos].FFmpeg_Name_2_3;
+
+            stringstream value;
+            switch (Plot_Pos)
+            {
+                case PlotName_Crop_x2 :
+                case PlotName_Crop_w :
+                                        // Special case, values are from width
+                                        value<<Glue->Width_Get()-Glue->y[Plot_Pos][x];
+                                        break;
+                case PlotName_Crop_y2 :
+                case PlotName_Crop_h :
+                                        // Special case, values are from height
+                                        value<<Glue->Height_Get()-Glue->y[Plot_Pos][x];
+                                        break;
+                default:
+                                        value<<Glue->y[Plot_Pos][x];
+            }
+             
+            Data+="            <tag key=\""+key+"\" value=\""+value.str()+"\"/>\n";
+        }
+
+        Data+="        </frame>\n";
+    }
+
+    // Footer
+    Data+="    </frames>";
+    Data+="</ffprobe:ffprobe>";
+
+    QFile F(ExportFileName);
+    if (F.open(QIODevice::WriteOnly))
+    {
+        QByteArray Compressed=F.readAll();
+        uLongf Buffer_Size=65536;
+        char* Buffer=new char[Buffer_Size];
+        z_stream strm;  
+        strm.next_in = (Bytef *) Data.c_str();  
+        strm.avail_in = Data.size() ;  
+        strm.total_out = 0;
+        strm.zalloc = Z_NULL;  
+        strm.zfree = Z_NULL;  
+        if (deflateInit2(&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY)>=0) // 15 + 16 are magic values for gzip
+        {
+            do
+            {
+                strm.next_out = (unsigned char*) Buffer;
+                strm.avail_out = Buffer_Size;
+                if (deflate(&strm, Z_FINISH)<0)
+                    break;
+                F.write(Buffer, Buffer_Size-strm.avail_out);
+            }
+            while (strm.avail_out == 0);
+            deflateEnd (&strm);
+        }
+        delete[] Buffer;
+    }
 }
 
 //---------------------------------------------------------------------------

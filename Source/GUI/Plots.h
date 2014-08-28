@@ -24,6 +24,7 @@ class QwtLegend;
 class QwtPlotZoomer;
 class QwtPlotCurve;
 class QwtPlotPicker;
+class QwtPlotMarker;
 
 class QLabel;
 class QToolButton;
@@ -89,6 +90,7 @@ public:
     QwtPlotCurve*               plotsCurves[PlotType_Max][5];
     QwtPlotZoomer*              plotsZoomers[PlotType_Max];
     QwtPlotPicker*              plotsPickers[PlotType_Max];
+    QwtPlotMarker*              plotsMarkers[PlotType_Max];
 
     // X axis info
     QComboBox*                  XAxis_Kind;
