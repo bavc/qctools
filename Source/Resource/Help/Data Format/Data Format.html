@@ -12,34 +12,34 @@
            <li><b>cropdetect</b><br/> The cropdetect filter detects how a given frame may be cropped to remove black (or nearly black) borders from the edges of the video. It can detect if video has been letterboxed or pillarboxed or other bordering rows or columns of black pixels. More info: <a href="http://ffmpeg.org/ffmpeg-filters.html#cropdetect">http://ffmpeg.org/ffmpeg-filters.html#cropdetect.</a></li>
            <li><b>psnr</b><br/> Within the QCTools Document the psnr filter is used specifically to visually compare field 1 and field 2. The filter accepts field 1 and field 2 as two separate inputs and provides quantification of the visual difference between those two images for each plane (Y, U, and V) as well as for the overall image. This data is presented in both Peak Signal to Noise Ratio (PSNR) and Mean Square Error (MSE). More info: <a href="ffmpeg.org/ffmpeg-filters.html#psnr">ffmpeg.org/ffmpeg-filters.html#psnr.</a></li>
            <li><b>ebur128</b><br/>  The ebur128 filter is a volume detection filter that measures perceived loudness according to the EBU standard. More info: <a href="http://ffmpeg.org/ffmpeg-filters.html#ebur128">http://ffmpeg.org/ffmpeg-filters.html#ebur128.</a></li>
-       
+
        </ol>
         <br/>
-        
+
         The data format of a QCTools xml export contains two main sections:
-     
-      
-             
+
+
+
                 <h3 style="color:blue">1. Library Versions </h3>
-                
-     QCTools incorporates a set of open-source libraries, developed under the ffmpeg project, that were built to process audiovisual data. This section of the 
+
+     QCTools incorporates a set of open-source libraries, developed under the ffmpeg project, that were built to process audiovisual data. This section of the
           the data format calls out the specific libraries referenced by QCTools. They include:
         <ul>
-         <li>libavutil</li> 
+         <li>libavutil</li>
             <li>libavcodec</li>
             <li>libavformat</li>
             <li>libavdevice</li>
             <li>libavfilter</li>
             <li>libswscale</li>
             <li>libswresample</li>
-            <li>libpostproc</li>   
+            <li>libpostproc</li>
         </ul>
         <h3 style="color:blue">2. Frames and Tags </h3>
             The document is further divided into Frames and Tags per <b>media type.</b> <br></br>
-            A <a href="https://github.com/bavc/FFmpeg/blob/master/doc/ffprobe.xsd#L55-L88">frame</a> describes a particular point in the video or audio and has a set of attributes that describe and identify that point (or frame)--including media type, duration, size, position, etc. <br/> A <a href="https://github.com/bavc/FFmpeg/blob/master/doc/ffprobe.xsd#L207-L210">tag</a> contains a key--in this case a reference to the filter name-- and the value for that filter. 
-            
+            A <a href="https://github.com/bavc/FFmpeg/blob/master/doc/ffprobe.xsd#L55-L88">frame</a> describes a particular point in the video or audio and has a set of attributes that describe and identify that point (or frame)--including media type, duration, size, position, etc. <br/> A <a href="https://github.com/bavc/FFmpeg/blob/master/doc/ffprobe.xsd#L207-L210">tag</a> contains a key--in this case a reference to the filter name-- and the value for that filter.
+
         <h4>Media Type: Audio</h4>
-            The Audio frame element contains descriptive information that identifies a particular frame. 
+            The Audio frame element contains descriptive information that identifies a particular frame.
             The tag attributes include values for the following filters (based on EBU R 128):
             <ul>
                 <li> <b>lavfi.r128.M</b>: or 'Momentary loudness' reflects sudden changes in volume over brief intervals of time (up to 400ms)</li>
@@ -53,22 +53,22 @@
         Each frame element contains descritpive information that identifies a particular point in the video. The tag attributes present the various QCTools filters and their values for that frame. For example: <br></br>
         &#60;tag = key "lavfi.signalstats.YMIN" value = "15"&#47;&#62; <br/>
         &#60;tag = key "lavfi.signalstats.YLOW" value = "18"&#47;&#62; <br></br>
-    For more info, please see <b>Filter Descriptions.</b> 
-        
-        
+    For more info, please see <b>Filter Descriptions.</b>
+
+
    <h3 style="color:blue">Creating a QCTools Document</h3>
         The QCTools Document can be created in either of the following ways:
         <ol>
-            <li>Via QCTools (version 0.5 or later)<br/>Open a video file for evaluation and then select "Export > To qctools.xml.gz".</li>  <br/> 
+            <li>Via QCTools (version 0.5 or later)<br/>Open a video file for evaluation and then select "Export > To qctools.xml.gz".</li>  <br/>
             <li>Via FFmpeg (version 2.3 or later)<br/>For a file with video and audio named EXAMPLE.mov <br/>
                 ffprobe -f lavfi -i "movie=EXAMPLE.mov:s=v+a[in0][in1],[in0]signalstats=stat=tout+vrep+brng,cropdetect=reset=1,split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr[out0];[in1]ebur128=metadata=1[out1]" -show_frames -show_versions -of xml=x=1:q=1 -noprivate | gzip &#62; EXAMPLE.qctools.xml.gz <br></br> For a file with video and no audio named EXAMPLE.mov <br/>
                 ffprobe -f lavfi -i "movie=EXAMPLE.mov,signalstats=stat=tout+vrep+brng,cropdetect=reset=1,split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr" -show_frames -show_versions -of xml=x=1:q=1 -noprivate | gzip &#62; EXAMPLE.qctools.xml.gz</li>
-            
-            
+
+
         </ol>
         <h3 style="color:blue">About gzip Compression</h3>
-        Because of the large volume of data contained in a QCTools document, it is necessary to compress the XML file to ensure it is a manageable size. QCTools uses a compression software called gzip to do this (<a href="http://en.wikipedia.org/wiki/Gzip">en.wikipedia.org/wiki/Gzip</a>) which accounts for the .gz file extension. 
-        
+        Because of the large volume of data contained in a QCTools document, it is necessary to compress the XML file to ensure it is a manageable size. QCTools uses a compression software called gzip to do this (<a href="http://en.wikipedia.org/wiki/Gzip">en.wikipedia.org/wiki/Gzip</a>) which accounts for the .gz file extension.
+
    <h3 style="color:blue">Additional Resources</h3>
         For further information about FFmpeg, EBU audio specifications, etc., please see: <br></br>
         <b>FFmpeg / </b> <a href= "https://ffmpeg.org"> ffmpeg.org </a> <br></br>
@@ -76,7 +76,5 @@
         <b>EBU 3341, Loudness Metering: 'EBU Mode' metering to supplement loudness normalizqation in accordance with EBU R 128 / </b> <a href= "https://tech.ebu.ch/docs/tech/tech3341.pdf"> https://tech.ebu.ch/docs/tech/tech3341.pdf</a><br></br>
         <b>EBU R 128, Loudness Normalisation and permitted maximum level of audio signals / </b> <a href= "https://tech.ebu.ch/docs/r/r128-2014.pdf"> https://tech.ebu.ch/docs/r/r128-2014.pdf </a> <br></br>
         <b>GZIP / </b> <a href="http://www.gzip.org/">www.gzip.org</a>
-        
-        
     </body>
 </html>
