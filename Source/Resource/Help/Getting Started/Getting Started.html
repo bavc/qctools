@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html SYSTEM "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml">
+   <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
        <head>
            <title>Getting Started with QCTools - QCTools Help Guide</title>
        </head>
@@ -82,12 +82,12 @@
            
            <h2 style="color:blue"><a id="Graphs">What do the Graphs measure?</a></h2>
            
-           <p>The following provides an overview of QCTools graph functionality. For more detailed descriptions, please see the <a href="FilterDescriptions.html">Filter Descriptions</a> tab.
-		   </p>
+           <p>The following provides an overview of QCTools graph functionality. For more detailed descriptions, please see the <a href="FilterDescriptions.html">Filter Descriptions</a> tab. 
             
             <h3>Y Channel Filters (Y, YDiff, YDiffX)</h3>
             <p>The Y Channel carries brightness information (also called luma). Black and white moving image files will contain only Y data whereas a colorized video with have both Y, and U/V. If you are analyzing a black and white video, then, you should see no U/V data. If you do, this may indicate that your video has color noise. These filters are ideal for determining if your video is overly bright, or dark. The Diff filters simply measure the �difference� in value between the Y values of two consecutive pixels. Large differences would likely indicate a dramatic change in the brightness of your video which may indicate the presence of a problem.  </p>
             
+           </p>
            <h3>U/V Channel Filters (U, V, UDiff, VDiff)</h3>
            <p>These 2 channels together carry color information (or chroma); dramatic activity in these graphs could indicate that your video has color abnormalities. A normal reading indicating consistent color values would show graph values on or around 128. This might manifest as a rainbow effect in your video.</p>
            
@@ -111,9 +111,9 @@
            <p>This filter is helpful for detecting the <q>lossiness</q>of a video. Lossiness is a term often associated with the compression process and it refers to data or information that is <a href="http://en.wikipedia.org/wiki/Lossy_compression">lost</a> when the video undergoes this process. </p>
            
            <h2 style="color:blue"><a id="Choose">What Graphs should I chose?</a></h2>
-           <p>
+           <p><p>
                The graphs dectect a wide array of errors and as you become more familiar with the tool and your video collection, you will likely opt for different graph filters depending on the errors you suspect or anticipate. There are some multipurpose options, however, that may be especially helpful to start with in order to get a high-level sense of where, and what type of errors are present. The YUV and Diffs (Y values, U values, V values, YDiff, YDiffX) are beneficial for detecting light/dark and color issues. The TOUT (Temporal Outliers) filter is targeted to detecting white noise such as white speckle pattern you may find in damaged VHS tape. The HEAD (Head Switching) filter is meant to quantify visible playback issues at the bottom of analog frames of video caused by <a href="http://preservation.bavc.org/artifactatlas/index.php/Head_Switching_Noise">head switching</a>. These graph filters are ideal to start with as a new user.
-           </p>
+           </p></p>
            <h2 style="color:blue"><a id="FFmpeg">What is FFmpeg?</a></h2>
            <p>FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. QCTools utilizes FFmpeg to decode video for analysis. The playback filters use FFmpeg's libavfilter in order to process the decoded audiovisual data for different types of displays. More at <a href="ffmpeg.org">FFmpeg</a></p>
            
