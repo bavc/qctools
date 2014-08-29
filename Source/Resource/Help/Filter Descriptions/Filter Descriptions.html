@@ -1,71 +1,65 @@
-<!DOCTYPE html SYSTEM "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<!-- saved from url=(0073)file:///C:/Users/dlandes/Downloads/filterdescriptions_20140722%20(1).html -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-       
     <head>
         <title>QC Tools Help Guide</title>
     </head>
     <body>
         <h1>Filter Descriptions</h1>
         <ol>
-           <li><a href="#MinMaxAvg">YUV Values/ MIN, AVG, MAX</a></li>
-           <li><a href="#LowHigh">YUV Values/ LOW, HIGH</a></li>
-           <li><a href="#Diff">YUV Values/ Difference</a></li>
-           <li><a href="#Temp">Temporal Outliers</a></li>
+            <li><a href="#MinMaxAvg">YUV Values/ MIN, AVG, MAX</a></li>
+            <li><a href="#LowHigh">YUV Values/ LOW, HIGH</a></li>
+            <li><a href="#Diff">YUV Values/ Difference</a></li>
+            <li><a href="#Temp">Temporal Outliers</a></li>
             <li><a href="#VREP">Vertical Line Repetitions</a></li>
-           <li><a href="#Range">Broadcast Range</a></li>
+            <li><a href="#Range">Broadcast Range</a></li>
             <li><a href="#CropW">Crop Width (CropW)</a></li>
             <li><a href="#CropH">Crop Height (CropH)</a></li>
             <li><a href="#PSNRf">Peak Signal to Noise Ratio (PSNRf)</a></li>
-           <li><a href="#MSEf">Mean Square Error (MSEf)</a></li>
-           </ol>
-       
+            <li><a href="#MSEf">Mean Square Error (MSEf)</a></li>
+        </ol>
+
         <h2 style="color:blue"><a id="MinMaxAvg">1. YUV Values/ MIN, AVG, MAX</a></h2>
         <p>YUV refers to a particular a way of encoding color information in analog video where Y channels carry <q>luma</q>, or brightness information, and U and V channels carry information about color, or <q>chrominance</q>.
-            QC Tools can analyze the YUV Values of a particular encoded video file in order to provide information about the appearance of the video. These filters examine every pixel in a given channel and records the Maximum, Minimum, and then adds up and divides by the total number of pixels to calculate and provide the Average value.<br></br>
-          
-        </p>
+        QC Tools can analyze the YUV Values of a particular encoded video file in order to provide information about the appearance of the video. These filters examine every pixel in a given channel and records the Maximum, Minimum, and then adds up and divides by the total number of pixels to calculate and provide the Average value.<br/></p>
         <h3> Y Value Filters: YMIN, YAVG, YMAX</h3>
-       
         <table border="1">
-            <tbody><tr>
-                <th>Filter Domain</th> 
-                <th>Filter Name(s)</th>
-                <th>Values*</th>
-            </tr>
-            <tr>
-                <td>&nbsp;Y Channel&nbsp;</td>
-                <td>&nbsp;YMIN, YAVG, YMAX&nbsp; </td>
-                <td>&nbsp;0-255</td>   
-            </tr>
-        </tbody></table>
-       
-        <p>*Appropriate for the 8-bit video samples analyzed by this tool.</p>
-         
-        <p>    Y Channels carry data about the brightness of a picture. Problematic variance in Y Channel values will manifest as a picture that is either too light or too dark, also known as containing luma noise. 8-bit video will have values falling in the range of 0-255 code values per pixel. A picture with well-balanced light levels will have an average, or mid-range Y Channel value of around 128 (YAVG). Graph readings outside of that range will indicate a picture that is either
-            too bright or too dark. A Y Value of 0 would indicate total blackness and a value of 255 would present as entirely white. In the range of values, reference black is at value 16, while reference white is at value 235.Except during particular moments like scene changes where one might expect abrupt spikes
-    , the average values of Y channels should remain relatively stable or constant with little variation. Portions of video showing extreme changes in average values (and not corresponding to a scene change or otherwise dramatic edit) likely
-    indicate a picture error. </p>
-        
-            Y values = Combined graph of YMAX, YHIGH, YAVG, YLOW, and YMIN<br></br>
-            YMIN =  Y channel minimum<br>
-            YLOW = Y channel 10th percentile<br>
-            YAVG =  Y channel average<br>
-            YHIGH = Y channel 95th percentile<br>
-            YMAX = Y channel maximum<br>
+            <tbody>
+                <tr>
+                    <th>Filter Domain</th> 
+                    <th>Filter Name(s)</th>
+                    <th>Values*</th>
+                </tr>
+                <tr>
+                    <td>&nbsp;Y Channel&nbsp;</td>
+                    <td>&nbsp;YMIN, YAVG, YMAX&nbsp; </td>
+                    <td>&nbsp;0-255</td>   
+                </tr>
+            </tbody>
+        </table>
 
-          
+        <p>*Appropriate for the 8-bit video samples analyzed by this tool.</p>
+
+        <p>Y Channels carry data about the brightness of a picture. Problematic variance in Y Channel values will manifest as a picture that is either too light or too dark, also known as containing luma noise. 8-bit video will have values falling in the range of 0-255 code values per pixel. A picture with well-balanced light levels will have an average, or mid-range Y Channel value of around 128 (YAVG). Graph readings outside of that range will indicate a picture that is either too bright or too dark. A Y Value of 0 would indicate total blackness and a value of 255 would present as entirely white. In the range of values, reference black is at value 16, while reference white is at value 235.Except during particular moments like scene changes where one might expect abrupt spikes, the average values of Y channels should remain relatively stable or constant with little variation. Portions of video showing extreme changes in average values (and not corresponding to a scene change or otherwise dramatic edit) likely indicate a picture error.</p>
+
+        Y values = Combined graph of YMAX, YHIGH, YAVG, YLOW, and YMIN<br/>
+        YMIN =  Y channel minimum<br>
+        YLOW = Y channel 10th percentile<br>
+        YAVG =  Y channel average<br>
+        YHIGH = Y channel 95th percentile<br>
+        YMAX = Y channel maximum<br>
+
         <h4>Samples which demonstrate Y Value anomalies:</h4>
         <p>In the graph below, you can see the YMAX spikes which would manifest as white lines across the video picture: </p>
-       
+
         <img src="YMAX_DHC0177_trackingerror_ffv1_h264.jpg" alt="YMAX spikes"><br>
-       
-            <p>The graph below illustrates a reading with many luma spikes in the YLOW, YAVG, and YHIGH, most notably in the first second of the graph.</p>
-           
-            <img src="YValues_293_0047_SKEW_ffv1_h264.jpg" alt="luma spikes">           
-            <h3>U, V Value Filters: UMIN, UAVG, UMAX/ VMIN, VAVG, VMAX</h3>
-            <table border="1">
-                <tbody><tr>
+
+        <p>The graph below illustrates a reading with many luma spikes in the YLOW, YAVG, and YHIGH, most notably in the first second of the graph.</p>
+
+        <img src="YValues_293_0047_SKEW_ffv1_h264.jpg" alt="luma spikes">           
+        <h3>U, V Value Filters: UMIN, UAVG, UMAX/ VMIN, VAVG, VMAX</h3>
+        <table border="1">
+            <tbody>
+                <tr>
                     <th>Filter Domain</th> 
                     <th>Filter Name(s)</th>
                     <th>Values</th>
@@ -80,140 +74,144 @@
                     <td>&nbsp;VMIN, VAVG, VMAX&nbsp;</td>
                     <td>&nbsp;0-255</td>
                 </tr>
-            </tbody></table>
-          <br></br>
-            <p>
-                The U and V Channels represent the <a href="http://preservation.bavc.org/artifactatlas/index.php/Chrominance_Noise">chrominance</a>, or color differences of a picture. U and V filters act to detect
-                color abnormalities in video. It can be difficult to derive meaning from U or V values on their own, but they provide supplementary information and can
-                be good indicators of artifacts, especially when occurring in tandem with similar Y Value readings. Black and white video contains no chrominance information so should present flat-lines (or no data) for UV channels. Activity in UV Channels for black and white video content, however, would certainly be an indication of chrominance noise.
-                Alternatively, a color video which shows flat-lines for these channels would be an indicator of a color drop-out scenario. </p>
-            <p>U values, V values = Combined graph of UMIN, ULOW, UAVG, UHIGH, and UMAX, Combined graph of VMIN, VLOW, VAVG, VHIGH, VMAX</p>
-               
-        UMIN, VMIN = U channel minimum, V channel minimum<br>
-        ULOW, VLOW = U channel 10th percentile, V channel 10th percentile<br>
-        UAVG, VAVG = U channel average, V channel average<br>
-        UHIGH, VHIGH = U channel 95th percentile, V channel 95th percentile<br>
-        UMAX, VMAX = U channel maximum, V channel maximum<br><br>
-      
+            </tbody>
+        </table>
+        <br/>
+        <p>The U and V Channels represent the <a href="http://preservation.bavc.org/artifactatlas/index.php/Chrominance_Noise">chrominance</a>, or color differences of a picture. U and V filters act to detect color abnormalities in video. It can be difficult to derive meaning from U or V values on their own, but they provide supplementary information and can be good indicators of artifacts, especially when occurring in tandem with similar Y Value readings. Black and white video contains no chrominance information so should present flat-lines (or no data) for UV channels. Activity in UV Channels for black and white video content, however, would certainly be an indication of chrominance noise.</p>
+        <p>Alternatively, a color video which shows flat-lines for these channels would be an indicator of a color drop-out scenario.</p>
+        <p>U values, V values = Combined graph of UMIN, ULOW, UAVG, UHIGH, and UMAX, Combined graph of VMIN, VLOW, VAVG, VHIGH, VMAX</p>
+
+        UMIN, VMIN = U channel minimum, V channel minimum<br/>
+        ULOW, VLOW = U channel 10th percentile, V channel 10th percentile<br/>
+        UAVG, VAVG = U channel average, V channel average<br/>
+        UHIGH, VHIGH = U channel 95th percentile, V channel 95th percentile<br/>
+        UMAX, VMAX = U channel maximum, V channel maximum<br/>
+
         <h4>Samples which demonstrate U/V Value anomalies:</h4>
-       
-       
+
         <p>The graph of this video file shows dramatic variance in U and V MIN/MAX values, affects UAVG and VAVG values as well. Especially apparent from approximately around 3 and 7s where horizontal black/ white/ colored lines would likely be seen obscuring the image (color loss ).</p>
-        <img src="UV_293_0046_syncloss_ffv1_h264.jpg" alt="UV Values">          
-       
-            <p>This is a good example of dramatic activity in U and V channels showing around the 5s mark, corresponding to chrominance noise in the video (visible rainbow-ed speckles across the picture). </p>
+        <img src="UV_293_0046_syncloss_ffv1_h264.jpg" alt="UV Values">
+
+        <p>This is a good example of dramatic activity in U and V channels showing around the 5s mark, corresponding to chrominance noise in the video (visible rainbow-ed speckles across the picture).</p>
         <img src="UV_293_0050_chrominancenoise_ffv1_h264.jpg" alt="UV Channels">
-       
-            <p>Notice U noise in the graph below from approximately 2.86s to 4.37s. Also seen in UDIF reading.</p> 
+
+        <p>Notice U noise in the graph below from approximately 2.86s to 4.37s. Also seen in UDIF reading.</p> 
         <img src="UNoise_293_0047_JITTERS_ffv1.jpg" alt="U Noise">
-       
+
         <h2 style="color:blue"><a id="LowHigh"> 2. YUV Values/ LOW, HIGH</a></h2>
         <table border="1">
-            <tbody><tr>
+            <tbody>
+            <tr>
                 <th>Filter Domain</th> 
                 <th>Filter Name(s)</th>
                 <th>Values*</th>
             </tr>
             <tr>
                 <td>&nbsp;Y Channel&nbsp;</td>
-                <td>&nbsp;YLOW, YHIGH&nbsp; </td>
-                <td>&nbsp;16-235</td>   
+                <td>&nbsp;YLOW, YHIGH&nbsp;</td>
+                <td>&nbsp;16-235</td>
             </tr>
             <tr>
                 <td>&nbsp;U Channel&nbsp;</td>
-                <td>&nbsp;ULOW, UHIGH&nbsp; </td>
-                <td>&nbsp;16-235</td>   
+                <td>&nbsp;ULOW, UHIGH&nbsp;</td>
+                <td>&nbsp;16-235</td>
             </tr>
             <tr>
                 <td>&nbsp;V Channel&nbsp;</td>
-                <td>&nbsp;VLOW, VHIGH&nbsp; </td>
-                <td>&nbsp;16-235</td>   
+                <td>&nbsp;VLOW, VHIGH&nbsp;</td>
+                <td>&nbsp;16-235</td>
             </tr>
-        </tbody></table>
-        <br></br>
+            </tbody>
+        </table>
+        <br/>
         <p>This filter works in a similar fashion as the YUV *MIN and *MAX filters, but instead of looking at the absolute minimum and maximum value for these
-            channels, it looks at the 10th percentile (LOW, or 16 pixels) and 95th percentile (HIGH, or 235 pixels) which present the outside limits or 'headroom' of the <a href="http://en.wikipedia.org/wiki/Broadcast_range">legal broadcast range</a>. An extreme minimum or maximum value could dramatically skew the graph but because they may be outside the viewable broadcast image, they may not necessarily be meaningful indicators of a problematic visual image. For that reason, it is useful to screen for the low/high values within broadcast range.</p>
-            
-       
+        channels, it looks at the 10th percentile (LOW, or 16 pixels) and 95th percentile (HIGH, or 235 pixels) which present the outside limits or 'headroom' of the <a href="http://en.wikipedia.org/wiki/Broadcast_range">legal broadcast range</a>. An extreme minimum or maximum value could dramatically skew the graph but because they may be outside the viewable broadcast image, they may not necessarily be meaningful indicators of a problematic visual image. For that reason, it is useful to screen for the low/high values within broadcast range.</p>
+
+
         <h4>Samples which demonstrate YUV LOW/HIGH anomalies:</h4>
-           
-        Notice the jagged spikes in the YHIGH values.<br></br>
+
+        Notice the jagged spikes in the YHIGH values.<br/>
         <img src="YValues_DHC0267_trackingerror_ffv1_h264.jpg" alt="YHIGH">     
-       
+
         <h2 style="color:blue"><a id="Diff"> 3. YUV Values/ Difference</a></h2>
         <table border="1">
-            <tbody><tr>
-                <th>Filter Domain</th> 
-                <th>Filter Name(s)</th>
-                <th>Values</th>
-            </tr>
-            <tr>
-                <td>&nbsp;Y Channel&nbsp;</td>
-                <td>&nbsp;YDIF&nbsp; </td>
-                <td>&nbsp;0-84</td>   
-            </tr>
-            <tr>
-                <td>&nbsp;Y Channel&nbsp;</td>
-                <td>&nbsp;YDIF1&nbsp; </td>
-                <td>&nbsp;0-84</td>   
-            </tr>
-            <tr>
-                <td>&nbsp;Y Channel&nbsp;</td>
-                <td>&nbsp;YDIF2&nbsp; </td>
-                <td>&nbsp;0-84</td>   
-            </tr>
-            <tr>
-                <td>&nbsp;U Channel&nbsp;</td>
-                <td>&nbsp;UDIF&nbsp; </td>
-                <td>&nbsp;0-61</td>   
-            </tr>
-            <tr>
-                <td>&nbsp;V Channel&nbsp;</td>
-                <td>&nbsp;VDIF&nbsp; </td>
-                <td>&nbsp;0-18</td>   
-            </tr>
-        </tbody></table>
-        <br></br>
+            <tbody>
+                <tr>
+                    <th>Filter Domain</th> 
+                    <th>Filter Name(s)</th>
+                    <th>Values</th>
+                </tr>
+                <tr>
+                    <td>&nbsp;Y Channel&nbsp;</td>
+                    <td>&nbsp;YDIF&nbsp; </td>
+                    <td>&nbsp;0-84</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;Y Channel&nbsp;</td>
+                    <td>&nbsp;YDIF1&nbsp; </td>
+                    <td>&nbsp;0-84</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;Y Channel&nbsp;</td>
+                    <td>&nbsp;YDIF2&nbsp; </td>
+                    <td>&nbsp;0-84</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;U Channel&nbsp;</td>
+                    <td>&nbsp;UDIF&nbsp; </td>
+                    <td>&nbsp;0-61</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;V Channel&nbsp;</td>
+                    <td>&nbsp;VDIF&nbsp; </td>
+                    <td>&nbsp;0-18</td>
+                </tr>
+            </tbody>
+        </table>
+        <br/>
         <p>This QC Tools filter selects two successive frames of video and subtracts the values of one from the other in order to find the change, or difference, between the two frames (measured in pixels). This information is meaningful in that it indicates the rapidity with which a video picture is changing from one frame to the next. Aside from scene-change scenarios, a video picture should not undergo dramatic changes in these values unless an artifact is present. A scene-change would present as a short but dramatic spike in the graph, and that is normal. Other YUV Difference spikes may be present in cases where picture problems are visible. Often, head problems with corrupted frames will result in large YUV Difference values/graph spikes.</p>
-           
-            <p> The YDIF1 and YDIF2 filters help detect artifacts caused by video deck head clogs, with each filter providing a reading per head. The filter is built on the assumption that one head is functioning (and as such, presents as a stable graph line), and one is corrupt (presenting as a variable line with spikes and troughs). A user, in reading the two results against one another, would see the areas where the two readings diverge as red portions on the graph. See graph below: between 17-19s the YDIF1 and YDIF2 readings vary dramatically, presenting as red portions in the graph.</p>
-          
-            YDIF = Difference of Y Channel between two frames<br>
-            UDIF = Difference of U Channel between two frames<br>
-            VDIF = Difference of V Channel between two frames<br>
-            YDIF1 = YDIF of video deck head 1<br>
-            YDIF2 = YDIF of video deck head 2<br></br>
-           
-            <h4>Samples which demonstrate YUV Difference anomalies:</h4>
-            <img src="yuv_diff.jpg" alt="YUV Differences">
-       
+
+        <p> The YDIF1 and YDIF2 filters help detect artifacts caused by video deck head clogs, with each filter providing a reading per head. The filter is built on the assumption that one head is functioning (and as such, presents as a stable graph line), and one is corrupt (presenting as a variable line with spikes and troughs). A user, in reading the two results against one another, would see the areas where the two readings diverge as red portions on the graph. See graph below: between 17-19s the YDIF1 and YDIF2 readings vary dramatically, presenting as red portions in the graph.</p>
+
+        YDIF = Difference of Y Channel between two frames<br>
+        UDIF = Difference of U Channel between two frames<br>
+        VDIF = Difference of V Channel between two frames<br>
+        YDIF1 = YDIF of video deck head 1<br>
+        YDIF2 = YDIF of video deck head 2<br/>
+
+        <h4>Samples which demonstrate YUV Difference anomalies:</h4>
+        <img src="yuv_diff.jpg" alt="YUV Differences">
+
         <h2 style="color:blue"> <a id="Temp">4. Temporal Outliers (TOUT)</a></h2>
-       
+
         <table border="1">
-            <tbody><tr>
-                <th>Filter Domain</th> 
-                <th>Filter Name(s)</th>
-                <th>Range</th>
-            </tr>
-            <tr>
-                <td>&nbsp;Temporal Outliers&nbsp;</td>
-                <td>&nbsp;TOUT&nbsp; </td>
-                <td>&nbsp;0.00-0.09&nbsp;</td>   
-            </tr>        
-        </tbody></table>
-        <br></br>
+            <tbody>
+                <tr>
+                    <th>Filter Domain</th>
+                    <th>Filter Name(s)</th>
+                    <th>Range</th>
+                </tr>
+                <tr>
+                    <td>&nbsp;Temporal Outliers&nbsp;</td>
+                    <td>&nbsp;TOUT&nbsp; </td>
+                    <td>&nbsp;0.00-0.09&nbsp;</td>
+                </tr>
+            </tbody>
+        </table>
+        <br/>
         <p>This filter was created to detect white speckle noise in analog VHS and 8mm video. It works by analyzing the current pixel against the two above and below and calculates an average value. In cases where the filter detects a pixel value which is dramatically outside of this established average, the graph will show small spikes, or blips, which correspond to white speckling in the video. The range of 0.00-0.09 is considered normal, and anything above that range is a questionable quality issue.</p>
-          
-            TOUT = Temporal Outliers<br></br>
-           
-       
+
+        TOUT = Temporal Outliers<br/>
+
+
         <h4>Samples which demonstrate Temporal Outliers' anomalies:</h4>
-        You can see several blips in the graph reading, especially around 7.5s, 15s, and 24s <br></br>
+        You can see several blips in the graph reading, especially around 7.5s, 15s, and 24s <br/>
         <img src="TOUT_DHC0177_trackingerror_ffv1_h264.jpg" alt="Temp Outliers">
 
         <h2 style="color:blue"> <a id="VREP">5. Vertical Line Repetitions (VREP)</a></h2>
         <table border="1">
-            <tbody><tr>
+            <tbody>
+            <tr>
                 <th>Filter Domain</th> 
                 <th>Filter Name(s)</th>
                 <th>Range</th>
@@ -221,56 +219,55 @@
             <tr>
                 <td>&nbsp;Vertical Line Repetitions&nbsp;</td>
                 <td>&nbsp;VREP&nbsp; </td>
-                <td>&nbsp;0.00-0.92&nbsp;</td>   
-            </tr>        
-        </tbody></table>
-        <br></br>
+                <td>&nbsp;0.00-0.92&nbsp;</td>
+            </tr>
+            </tbody>
+        </table>
+        <br/>
         <p>Vertical Line Repetitions, or the VREP filter, is useful in analyzing pneumatic tapes (such as U-Matic) and detecting artifacts generated in the course of the digitization process. Specifically, VREP detects the repetition of lines in a video. The filter works by taking a given video line and comparing it against a video line that occurs 4 pixels earlier. If the difference in the two is less than 512, the filter reads them as being close enough to be deemed repetitious.</p>
-         
-            VREP = Vertical Line Repetitions<br></br>
-           
+
+        VREP = Vertical Line Repetitions<br/>
+
         <h4>Samples which demonstrate Vertical Repetition anomalies:</h4>
-       
-       
+
         <img src="VREP_293_0047_JITTER.jpg" alt="Vertical Repetitions 1">
-       <br></br>
-       
+        <br/>
+
         <img src="VREP_293_0047_SKEW.jpg" alt="Vertical Repetitions 2">
-           
+
         <h2 style="color:blue"> <a id="Range">6. Broadcast Range (BRNG)</a></h2>
         <table border="1">
-            <tbody><tr>
-                <th>Filter Domain</th> 
-                <th>Filter Name(s)</th>
-                <th>Range</th>
-            </tr>
-            <tr>
-                <td>&nbsp;Broadcast Range&nbsp;</td>
-                <td>&nbsp;BRNG&nbsp; </td>
-                <td>&nbsp;0.00-0.79</td>   
-            </tr>        
-        </tbody></table>
-       
+            <tbody>
+                <tr>
+                    <th>Filter Domain</th> 
+                    <th>Filter Name(s)</th>
+                    <th>Range</th>
+                </tr>
+                <tr>
+                    <td>&nbsp;Broadcast Range&nbsp;</td>
+                    <td>&nbsp;BRNG&nbsp; </td>
+                    <td>&nbsp;0.00-0.79</td>
+                </tr>
+            </tbody>
+        </table>
         <p>The BRNG filter is one that identifies the number of pixels which fall outside the standard video broadcast range of 16-235 pixels. Normal, noise-free video would not trigger this filer, but noise occurring outside of these parameters would read as spikes in the graph. Typically anything with a value over 0.01 will read as an artifact. While the RANG filter is good at detecting the general presence of noise, it can be a bit non-specific in its identification of the causes.</p>
-          
-         BRNG = Broadcast Range<br></br>
+
+        BRNG = Broadcast Range<br/>
         <h4>Samples which demonstrate Broadcast Range anomalies:</h4>
-       
+
         <img src="RANG_293_0046_syncloss2.jpg" alt="Broadcast Range Anomaly 1">
 
         <p>The graph below shows sharp spike in BRNG around 5.5s of the video which likely manifests as an over-brightness of this portion of the video.</p>
         <img src="RANG_DHC0024_dropout.jpg" alt="Broadcast Range Anomaly 2">
-           
-         <h2 style="color:blue"> <a id="CropW">7. Crop Width (CropW)</a></h2>
-            This filter detects portions on either side of your video which may contain not contain any picture data. In the case of pillarboxing, for example, you'll have black bars on the left and right sides of your video. This filter will detect and present that information in the graph reading.
-         <h2 style="color:blue"> <a id="CropH">8. Crop Height (CropH)</a></h2>
-            This filter enables you to view which parts, if any, of your video which contain no picture data. In the case of letterboxing, for example, you'll have black bars both above and below your picture. This filter would detect and present that in the graph reading.
-       
-      
+
+        <h2 style="color:blue"> <a id="CropW">7. Crop Width (CropW)</a></h2>
+        This filter detects portions on either side of your video which may contain not contain any picture data. In the case of pillarboxing, for example, you'll have black bars on the left and right sides of your video. This filter will detect and present that information in the graph reading.
+        <h2 style="color:blue"> <a id="CropH">8. Crop Height (CropH)</a></h2>
+        This filter enables you to view which parts, if any, of your video which contain no picture data. In the case of letterboxing, for example, you'll have black bars both above and below your picture. This filter would detect and present that in the graph reading.
+
         <h2 style="color:blue"><a id="PSNRf">9. Peak Signal to Noise Ratio (PSNRf)</a></h2>
         This filter plots the Peak Signal to Noise Ratio between the video in field 1 (odd lines) versus the video in field 2 (even lines). Lower values indicate that field 1 and field 2 are becoming more different as would happen during a playback error such as a head clog. See http://ffmpeg.org/ffmpeg-filters.html#psnr for more information.
         <h2 style="color:blue"><a id="MSEf">10. Mean Square Error (MSEf)</a></h2>
         This filter is similar to PSNRf but reports on the Mean Square Error between field 1 and field 2. Higher values may be indicative of differences between the images of field 1 and field 2.
-     
     </body>
 </html>
