@@ -184,7 +184,7 @@ void MainWindow::on_actionExport_XmlGz_Prompt_triggered()
     if (Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
         return;
     
-    QString FileName=QFileDialog::getSaveFileName(this, "Export to .qctools.xml.gz", "", "Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml)", 0, QFileDialog::DontUseNativeDialog);
+    QString FileName=QFileDialog::getSaveFileName(this, "Export to .qctools.xml.gz", Files[Files_CurrentPos]->FileName+".qctools.xml.gz", "Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml)", 0, QFileDialog::DontUseNativeDialog);
     if (FileName.size()==0)
         return;
 
