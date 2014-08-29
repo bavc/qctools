@@ -777,7 +777,7 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     Layout->addWidget(Slider, 2, 0, 1, 3);
 
     // Control
-    ControlArea=new Control(this, FileInfoData, Control::Style_Cols, true);
+    ControlArea=new Control(this, FileInfoData, NULL, Control::Style_Cols, true);
     Layout->addWidget(ControlArea, 3, 0, 1, 3, Qt::AlignBottom);
 
     setLayout(Layout);

@@ -13,6 +13,7 @@
 #include "GUI/TinyDisplay.h"
 #include "GUI/Info.h"
 #include "GUI/FileInformation.h"
+#include "GUI/Plots.h"
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -29,9 +30,10 @@
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Control::Control(QWidget *parent, FileInformation* FileInformationData_, style Style_, bool IsSlave_):
+Control::Control(QWidget *parent, FileInformation* FileInformationData_, Plots* PlotsArea_, style Style_, bool IsSlave_):
     QWidget(parent),
     FileInfoData(FileInformationData_),
+    PlotsArea(PlotsArea_),
     Style(Style_),
     IsSlave(IsSlave_)
 {
@@ -393,6 +395,7 @@ void Control::on_Minus_clicked(bool checked)
         return;    
         
     FileInfoData->Frames_Pos_Minus();
+    PlotsArea->Plots_Update();
 }
 
 //---------------------------------------------------------------------------
@@ -402,6 +405,7 @@ void Control::on_Plus_clicked(bool checked)
         return;    
         
     FileInfoData->Frames_Pos_Plus();
+    PlotsArea->Plots_Update();
 }
 
 //---------------------------------------------------------------------------
@@ -411,6 +415,7 @@ void Control::on_M9_clicked(bool checked)
         return;    
         
     FileInfoData->Frames_Pos_Set(0);
+    PlotsArea->Plots_Update();
 }
 
 //---------------------------------------------------------------------------
@@ -716,7 +721,10 @@ void Control::on_P9_clicked(bool checked)
         return;    
         
     if (FileInfoData->Glue->VideoFrameCount)
+    {
         FileInfoData->Frames_Pos_Set(FileInfoData->Glue->VideoFrameCount-1);
+        PlotsArea->Plots_Update();
+    }
 }
 
 //***************************************************************************

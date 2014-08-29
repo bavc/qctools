@@ -287,7 +287,7 @@ void MainWindow::createGraphsLayout()
         TinyDisplayArea->hide();
     ui->verticalLayout->addWidget(TinyDisplayArea);
 
-    ControlArea=new Control(this, Files[Files_CurrentPos], Control::Style_Cols);
+    ControlArea=new Control(this, Files[Files_CurrentPos], PlotsArea, Control::Style_Cols);
     if (!ui->actionGraphsLayout->isChecked())
         ControlArea->hide();
     ui->verticalLayout->addWidget(ControlArea);
