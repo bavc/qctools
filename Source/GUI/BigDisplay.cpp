@@ -189,7 +189,7 @@ const filter Filters[]=
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_Slider,  20,   1, 255,   1, "Brightness" },
-            { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
+            { Args_Type_YuvA,     0,   0,   0,   0, "Plane" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Vertical" },
             { Args_Type_None,     0,   0,   0,   0, },
         },
