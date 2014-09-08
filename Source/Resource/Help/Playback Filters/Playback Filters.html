@@ -1,12 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
         <title>Playback Filter Descriptions - QCTools Help Guide</title>
     </head>
     <body>
-       <h1>Playback Filter Descriptions</h1>
-       <p>The QCTools preview window is intended as an analytical playback environent that allows the user to review video through multiple filters simultaneously. The playback window includes two viewing windows which may be set to different combinations of filters. This allows a user to playback a video by viewing a waveform and a vectorscope or perhaps by viewing a waveform and the video with highlighted pixels that are outside of broadcast range.</p>
+        <h1>Playback Filter Descriptions</h1>
+        <p>The QCTools preview window is intended as an analytical playback environent that allows the user to review video through multiple filters simultaneously. The playback window includes two viewing windows which may be set to different combinations of filters. This allows a user to playback a video by viewing a waveform and a vectorscope or perhaps by viewing a waveform and the video with highlighted pixels that are outside of broadcast range.</p>
         <h2 style="color:blue">Normal</h2>
         <p>This view simply shows the video as QCTools interprets it, no special effects or filtering are added.</p>
 
@@ -25,7 +24,7 @@
         <p>This filter extracts the U/V channel which represents part of the chroma data from the video and then applies a histogram equalization which redistributes the pixel intensities to equalize their distribution across the intensity range. This filter is useful for analyzing compressed video channel signals.</p>
         <h2 style="color:blue">Bit Plane</h2>
         <p>This filter sets the bit position for each plane for display for presentation. Setting -1 means to only send 0x80 for that plane, whereas setting 0 means to send the original plane.</p>
-       <h2 style="color:blue">Vertical Line Repetitions</h2>
+        <h2 style="color:blue">Vertical Line Repetitions</h2>
         <p>This filter displays repetitive lines of video data.</p>
         <h2 style="color:blue">Broadcast Range Pixels</h2>
         <p>This is the same presentation as 'Normal' except that pixels that are outside of broadcast range are highlighted as white. Again here, you have the option of selecting <b>'Field Split'</b> to display field 1 (top) and field 2 (bottom) separately. </p>

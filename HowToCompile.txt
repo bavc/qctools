@@ -2,54 +2,104 @@ Qt
 --
 You can download directly the binaries or compile yourself.
 http://qt-project.org/downloads
-My config:
-Mac: "./configure -release -opensource -confirm-license -static -no-sql-sqlite -no-sql-odbc -no-javascript-jit -no-qml-debug -no-gif -no-nis -no-dbus -no-audio-backend -no-framework -nomake examples"
-Windows: Edit qtbase\mkspecs\win32-msvc* and replace -MD by -MT in order to have  static build of the C library then "configure -opensource -confirm-license -static -ltcg -no-sql-sqlite -no-sql-odbc -no-qml-debug -no-gif -no-dbus -no-opengl -no-audio-backend -nomake examples -mp"
+My config (Qt 5.3.1):
+Mac:
+Download and install qt-opensource-mac-x64-clang-5.3.1.dmg or
+./configure -release -opensource -confirm-license -static -no-sql-sqlite -no-sql-odbc -no-qml-debug -no-gif -no-nis -no-dbus -no-audio-backend -no-framework -nomake examples
+Windows:
+Edit qtbase\mkspecs\win32-msvc* and replace -MD by -MT in order to have  static build of the C library then 
+configure -opensource -confirm-license -static -ltcg -no-sql-sqlite -no-sql-odbc -no-qml-debug -no-gif -no-dbus -no-opengl -no-audio-backend -nomake examples -mp
+
+YASM
+----
+For Ffmpeg speed optimization, you need to install YASM
+http://yasm.tortall.net/Download.html
+My config (YASM 1.2.0):
+Windows: I put the binary from website in /FFmpeg_for_QCTools directory, FFmpeg automaticly detects it
+
+Cmake
+-----
+For OpenJPEG compilation, install Cmake
+My config (Cmake 3.0.0):
+Download and install Cmake
+
+OpenJPEG
+--------
+Download OpenJPEG 1.x (2.x is not supported by Ffmpeg)
+My config (openjpeg 1.5.3):
+Mac:
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=usr .
+make
+Windows:
+cmake .
+Launch the sln, replace -MD by -MT in order to have  static build of the C library then build
 
 FFmpeg
 ------
 My config:
-./configure --enable-gpl --enable-version3 --enable-shared --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug
+Mac:
+./configure --enable-gpl --enable-version3 --enable-shared --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --enable-libopenjpeg --disable-decoder=jpeg2000 --yasmexe=../yasm/yasm --extra-cflags="-I../openjpeg/usr/include" --extra-ldflags="-L../openjpeg/usr/lib"
+Windows:
+Look at http://ffmpeg.org/platform.html#Windows
+./configure --enable-gpl --enable-version3 --enable-shared --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --enable-libopenjpeg --disable-decoder=jpeg2000 --extra-cflags="-I../openjpeg/libopenjpeg" --extra-ldflags="-LIBPATH:../openjpeg/bin/Release" --toolchain=msvc
+Note: not working with openjpeg for the moment, using
+./configure --enable-gpl --enable-version3 --enable-shared --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --toolchain=msvc
 
-On Mac:
-install_name_tool -id @executable_path/../Resources/libavcodec.55.dylib libavcodec.55.dylib
-install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib libavcodec.55.dylib
-install_name_tool -id @executable_path/../Resources/libavdevice.55.dylib libavdevice.55.dylib
-install_name_tool -change /usr/local/lib/libavcodec.55.dylib @executable_path/../Resources/libavcodec.55.dylib libavdevice.55.dylib
-install_name_tool -change /usr/local/lib/libavfilter.4.dylib @executable_path/../Resources/libavfilter.4.dylib libavdevice.55.dylib
-install_name_tool -change /usr/local/lib/libavformat.55.dylib @executable_path/../Resources/libavformat.55.dylib libavdevice.55.dylib
-install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib libavdevice.55.dylib
-install_name_tool -id @executable_path/../Resources/libavfilter.4.dylib libavfilter.4.dylib
-install_name_tool -change /usr/local/lib/libavcodec.55.dylib @executable_path/../Resources/libavcodec.55.dylib libavfilter.4.dylib
-install_name_tool -change /usr/local/lib/libavformat.55.dylib @executable_path/../Resources/libavformat.55.dylib libavfilter.4.dylib
-install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib libavfilter.4.dylib
-install_name_tool -change /usr/local/lib/libpostproc.52.dylib @executable_path/../Resources/libpostproc.52.dylib libavfilter.4.dylib
-install_name_tool -change /usr/local/lib/libswresample.0.dylib @executable_path/../Resources/libswresample.0.dylib libavfilter.4.dylib
-install_name_tool -change /usr/local/lib/libswscale.2.dylib @executable_path/../Resources/libswscale.2.dylib libavfilter.4.dylib
-install_name_tool -id @executable_path/../Resources/libavformat.55.dylib libavformat.55.dylib
-install_name_tool -change /usr/local/lib/libavcodec.55.dylib @executable_path/../Resources/libavcodec.55.dylib libavformat.55.dylib
-install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib libavformat.55.dylib
-install_name_tool -id @executable_path/../Resources/libavutil.52.dylib libavutil.52.dylib
-install_name_tool -id @executable_path/../Resources/libpostproc.52.dylib libpostproc.52.dylib
-install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib libpostproc.52.dylib
-install_name_tool -id @executable_path/../Resources/libswresample.0.dylib libswresample.0.dylib
-install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib libswresample.0.dylib
-install_name_tool -id @executable_path/../Resources/libswscale.2.dylib libswscale.2.dylib
-install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib libswscale.2.dylib
-install_name_tool -change /usr/local/lib/libavcodec.55.dylib @executable_path/../Resources/libavcodec.55.dylib QCTools
-install_name_tool -change /usr/local/lib/libavdevice.55.dylib @executable_path/../Resources/libavdevice.55.dylib QCTools
-install_name_tool -change /usr/local/lib/libavfilter.4.dylib @executable_path/../Resources/libavfilter.4.dylib QCTools
-install_name_tool -change /usr/local/lib/libavformat.55.dylib @executable_path/../Resources/libavformat.55.dylib QCTools
-install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib QCTools
-install_name_tool -change /usr/local/lib/libpostproc.52.dylib @executable_path/../Resources/libpostproc.52.dylib QCTools
-install_name_tool -change /usr/local/lib/libswresample.0.dylib @executable_path/../Resources/libswresample.0.dylib QCTools
-install_name_tool -change /usr/local/lib/libswscale.2.dylib @executable_path/../Resources/libswscale.2.dylib QCTools
+QCTools:
+Mac:
+cd Project/Qt/QtCreator && qmake && make
+cp ../../../FFmpeg-bavc/libavcodec/libavcodec.*.dylib QCTools.app/Contents/Resources/
+cp ../../../FFmpeg-bavc/libavdevice/libavdevice.*.dylib QCTools.app/Contents/Resources/
+cp ../../../FFmpeg-bavc/libavfilter/libavfilter.*.dylib QCTools.app/Contents/Resources/
+cp ../../../FFmpeg-bavc/libavformat/libavformat.*.dylib QCTools.app/Contents/Resources/
+cp ../../../FFmpeg-bavc/libavutil/libavutil.*.dylib QCTools.app/Contents/Resources/
+cp ../../../FFmpeg-bavc/libpostproc/libpostproc.*.dylib QCTools.app/Contents/Resources/
+cp ../../../FFmpeg-bavc/libswresample/libswresample.*.dylib QCTools.app/Contents/Resources/
+cp ../../../FFmpeg-bavc/libswscale/libswscale.*.dylib QCTools.app/Contents/Resources/
+cp ../../../openjpeg/bin/libopenjpeg.5.dylib QCTools.app/Contents/Resources/
+install_name_tool -id @executable_path/../Resources/libavcodec.55.dylib QCTools.app/Contents/Resources/libavcodec.55.dylib
+install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib QCTools.app/Contents/Resources/libavcodec.55.dylib
+install_name_tool -change /usr/local/lib/libswresample.0.dylib @executable_path/../Resources/libswresample.0.dylib QCTools.app/Contents/Resources/libavcodec.55.dylib
+install_name_tool -change libopenjpeg.5.dylib @executable_path/../Resources/libopenjpeg.5.dylib QCTools.app/Contents/Resources/libavcodec.55.dylib
+install_name_tool -id @executable_path/../Resources/libavdevice.55.dylib QCTools.app/Contents/Resources/libavdevice.55.dylib
+install_name_tool -change /usr/local/lib/libavcodec.55.dylib @executable_path/../Resources/libavcodec.55.dylib QCTools.app/Contents/Resources/libavdevice.55.dylib
+install_name_tool -change /usr/local/lib/libavfilter.4.dylib @executable_path/../Resources/libavfilter.4.dylib QCTools.app/Contents/Resources/libavdevice.55.dylib
+install_name_tool -change /usr/local/lib/libavformat.55.dylib @executable_path/../Resources/libavformat.55.dylib QCTools.app/Contents/Resources/libavdevice.55.dylib
+install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib QCTools.app/Contents/Resources/libavdevice.55.dylib
+install_name_tool -change /usr/local/lib/libpostproc.52.dylib @executable_path/../Resources/libpostproc.52.dylib QCTools.app/Contents/Resources/libavdevice.55.dylib
+install_name_tool -change /usr/local/lib/libswresample.0.dylib @executable_path/../Resources/libswresample.0.dylib QCTools.app/Contents/Resources/libavdevice.55.dylib
+install_name_tool -change /usr/local/lib/libswscale.2.dylib @executable_path/../Resources/libswscale.2.dylib QCTools.app/Contents/Resources/libavdevice.55.dylib
+install_name_tool -change libopenjpeg.5.dylib @executable_path/../Resources/libopenjpeg.5.dylib QCTools.app/Contents/Resources/libavdevice.55.dylib
+install_name_tool -id @executable_path/../Resources/libavfilter.4.dylib QCTools.app/Contents/Resources/libavfilter.4.dylib
+install_name_tool -change /usr/local/lib/libavcodec.55.dylib @executable_path/../Resources/libavcodec.55.dylib QCTools.app/Contents/Resources/libavfilter.4.dylib
+install_name_tool -change /usr/local/lib/libavformat.55.dylib @executable_path/../Resources/libavformat.55.dylib QCTools.app/Contents/Resources/libavfilter.4.dylib
+install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib QCTools.app/Contents/Resources/libavfilter.4.dylib
+install_name_tool -change /usr/local/lib/libpostproc.52.dylib @executable_path/../Resources/libpostproc.52.dylib QCTools.app/Contents/Resources/libavfilter.4.dylib
+install_name_tool -change /usr/local/lib/libswresample.0.dylib @executable_path/../Resources/libswresample.0.dylib QCTools.app/Contents/Resources/libavfilter.4.dylib
+install_name_tool -change /usr/local/lib/libswscale.2.dylib @executable_path/../Resources/libswscale.2.dylib QCTools.app/Contents/Resources/libavfilter.4.dylib
+install_name_tool -change libopenjpeg.5.dylib @executable_path/../Resources/libopenjpeg.5.dylib QCTools.app/Contents/Resources/libavfilter.4.dylib
+install_name_tool -id @executable_path/../Resources/libavformat.55.dylib QCTools.app/Contents/Resources/libavformat.55.dylib
+install_name_tool -change /usr/local/lib/libavcodec.55.dylib @executable_path/../Resources/libavcodec.55.dylib QCTools.app/Contents/Resources/libavformat.55.dylib
+install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib QCTools.app/Contents/Resources/libavformat.55.dylib
+install_name_tool -change /usr/local/lib/libswresample.0.dylib @executable_path/../Resources/libswresample.0.dylib QCTools.app/Contents/Resources/libavformat.55.dylib
+install_name_tool -change libopenjpeg.5.dylib @executable_path/../Resources/libopenjpeg.5.dylib QCTools.app/Contents/Resources/libavformat.55.dylib
+install_name_tool -id @executable_path/../Resources/libavutil.52.dylib QCTools.app/Contents/Resources/libavutil.52.dylib
+install_name_tool -change libopenjpeg.5.dylib @executable_path/../Resources/libopenjpeg.5.dylib QCTools.app/Contents/Resources/libavutil.52.dylib
+install_name_tool -id @executable_path/../Resources/libpostproc.52.dylib QCTools.app/Contents/Resources/libpostproc.52.dylib
+install_name_tool -change libopenjpeg.5.dylib @executable_path/../Resources/libopenjpeg.5.dylib QCTools.app/Contents/Resources/libpostproc.52.dylib
+install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib QCTools.app/Contents/Resources/libpostproc.52.dylib
+install_name_tool -id @executable_path/../Resources/libswresample.0.dylib QCTools.app/Contents/Resources/libswresample.0.dylib
+install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib QCTools.app/Contents/Resources/libswresample.0.dylib
+install_name_tool -change libopenjpeg.5.dylib @executable_path/../Resources/libopenjpeg.5.dylib QCTools.app/Contents/Resources/libswresample.0.dylib
+install_name_tool -id @executable_path/../Resources/libswscale.2.dylib QCTools.app/Contents/Resources/libswscale.2.dylib
+install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib QCTools.app/Contents/Resources/libswscale.2.dylib
+install_name_tool -change libopenjpeg.5.dylib @executable_path/../Resources/libopenjpeg.5.dylib QCTools.app/Contents/Resources/libswscale.2.dylib
+install_name_tool -change /usr/local/lib/libavcodec.55.dylib @executable_path/../Resources/libavcodec.55.dylib QCTools.app/Contents/MacOS/QCTools
+install_name_tool -change /usr/local/lib/libavdevice.55.dylib @executable_path/../Resources/libavdevice.55.dylib QCTools.app/Contents/MacOS/QCTools
+install_name_tool -change /usr/local/lib/libavfilter.4.dylib @executable_path/../Resources/libavfilter.4.dylib QCTools.app/Contents/MacOS/QCTools
+install_name_tool -change /usr/local/lib/libavformat.55.dylib @executable_path/../Resources/libavformat.55.dylib QCTools.app/Contents/MacOS/QCTools
+install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib QCTools.app/Contents/MacOS/QCTools
+install_name_tool -change /usr/local/lib/libpostproc.52.dylib @executable_path/../Resources/libpostproc.52.dylib QCTools.app/Contents/MacOS/QCTools
+install_name_tool -change /usr/local/lib/libswresample.0.dylib @executable_path/../Resources/libswresample.0.dylib QCTools.app/Contents/MacOS/QCTools
+install_name_tool -change /usr/local/lib/libswscale.2.dylib @executable_path/../Resources/libswscale.2.dylib QCTools.app/Contents/MacOS/QCTools
 
-
-YASM
-----
-For speed optimization, you need to install YASM
-http://yasm.tortall.net/Download.html
-My config:
-Mac: I compile YASM from source then I put the resulting binary in /FFmpeg_for_QCTools directory, FFmpeg automaticly detects it
-Windows: I put the binary from website in /FFmpeg_for_QCTools directory, FFmpeg automaticly detects it

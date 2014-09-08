@@ -40,7 +40,7 @@ const struct per_plot_group PerPlotGroup [PlotType_Max]=
     },
     //YDiff
     {
-        PlotName_YDIF,      1,    0,  255,  4,  "YDiff", false,
+        PlotName_YDIF,      1,    0,  255,  3,  "YDiff", false,
         "This QCTools filter selects two successive frames of video and subtracts the values of one from the other in order to find the change,\n"
             "or difference, between the two frames (measured in pixels). This information is meaningful in that it indicates the rapidity\n"
             "with which a video picture is changing from one frame to the next. Aside from scene-change scenarios,\n"
@@ -56,7 +56,7 @@ const struct per_plot_group PerPlotGroup [PlotType_Max]=
     },
     //YDiffX
     //{
-    //    PlotName_YDIF1,     2,    0,  255,  4,  "YDiffX", false,
+    //    PlotName_YDIF1,     2,    0,  255,  3,  "YDiffX", false,
     //    "The YDIF1 and YDIF2 filters help detect artifacts caused by video deck head clogs, with each filter providing a reading per head.\n"
     //        "The filter is built on the assumption that one head is functioning (and as such, presents as a stable graph line),\n"
     //        "and one is corrupt (presenting as a variable line with spikes and troughs).\n"
@@ -65,7 +65,7 @@ const struct per_plot_group PerPlotGroup [PlotType_Max]=
     //},
     //UDiff
     {
-        PlotName_UDIF,      1,    0,  255,  4,  "UDiff", false,
+        PlotName_UDIF,      1,    0,  255,  3,  "UDiff", false,
         "The YDIF1 and YDIF2 filters help detect artifacts caused by video deck head clogs, with each filter providing a reading per head.\n"
             "The filter is built on the assumption that one head is functioning (and as such, presents as a stable graph line),\n"
             "and one is corrupt (presenting as a variable line with spikes and troughs).\n"
@@ -74,7 +74,7 @@ const struct per_plot_group PerPlotGroup [PlotType_Max]=
     },
     //VDiff
     {
-        PlotName_VDIF,      1,    0,  255,  4,  "VDiff", false,
+        PlotName_VDIF,      1,    0,  255,  3,  "VDiff", false,
         "The YDIF1 and YDIF2 filters help detect artifacts caused by video deck head clogs, with each filter providing a reading per head.\n"
             "The filter is built on the assumption that one head is functioning (and as such, presents as a stable graph line),\n"
             "and one is corrupt (presenting as a variable line with spikes and troughs).\n"
@@ -83,7 +83,7 @@ const struct per_plot_group PerPlotGroup [PlotType_Max]=
     },
     //Diffs
     {
-        PlotName_YDIF,      3,    0,  255,  4,  "Diffs",  true,
+        PlotName_YDIF,      3,    0,  255,  3,  "Diffs",  true,
         "The YDIF1 and YDIF2 filters help detect artifacts caused by video deck head clogs, with each filter providing a reading per head.\n"
             "The filter is built on the assumption that one head is functioning (and as such, presents as a stable graph line),\n"
             "and one is corrupt (presenting as a variable line with spikes and troughs).\n"

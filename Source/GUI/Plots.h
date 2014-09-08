@@ -65,6 +65,8 @@ public:
     // Plots
     void                        Plots_Create                ();
     void                        Plots_Create                (PlotType Type);
+    void                        Plots_Update                ();
+    void                        Marker_Update               (double X);
     void                        createData_Init             ();
     void                        createData_Update           ();
     void                        createData_Update           (PlotType Type);
@@ -95,6 +97,8 @@ public:
     // X axis info
     QComboBox*                  XAxis_Kind;
     int                         XAxis_Kind_index;
+    qreal                       Zoom_Left;
+    qreal                       Zoom_Width;
 
     // Y axis info
     double                      plots_YMax[PlotType_Max];

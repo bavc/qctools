@@ -16,6 +16,7 @@ class FileInformation;
 class PerPicture;
 class TinyDisplay;
 class Info;
+class Plots;
 
 class QwtPlot;
 class QwtLegend;
@@ -43,7 +44,7 @@ public:
         Style_Cols,
         Style_Grid,
     };
-    explicit Control(QWidget *parent, FileInformation* FileInfoData, style Style, bool IsSlave=false);
+    explicit Control(QWidget *parent, FileInformation* FileInfoData, Plots* PlotsArea, style Style, bool IsSlave=false);
     ~Control();
 
     // Commands
@@ -75,6 +76,7 @@ public:
 protected:
     // File information
     FileInformation*            FileInfoData;
+    Plots*                      PlotsArea;
     int                         Frames_Pos;
     style                       Style;
 

@@ -66,6 +66,8 @@ Plots::Plots(QWidget *parent, FileInformation* FileInformationData_) :
     // X axis info
     XAxis_Kind=NULL;
     XAxis_Kind_index=1;
+    Zoom_Left=0;
+    Zoom_Width=0;
 
     // Y axis info
     memset(plots_YMax, 0, sizeof(double)*PlotType_Max);
@@ -245,10 +247,69 @@ void Plots::Plots_Create(PlotType Type)
     // Marker
     QwtPlotMarker* plotMarker=new QwtPlotMarker;
     plotMarker->setLineStyle(QwtPlotMarker::VLine);
-    plotMarker->setLinePen(QPen(Qt::green, 1));
+    plotMarker->setLinePen(QPen(Qt::magenta, 1));
     plotMarker->setXValue(0);
     plotMarker->attach(plot);    
     plotsMarkers[Type]=plotMarker;
+}
+
+//---------------------------------------------------------------------------
+void Plots::Plots_Update()
+{
+    size_t FramePos=FileInfoData->Frames_Pos_Get();
+    double X=0;
+    switch (XAxis_Kind_index)
+    {
+        case 0 :
+                X=FramePos;
+                break;
+        case 1 :
+                {
+                double FrameRate=FileInfoData->Glue->VideoFrameCount/FileInfoData->Glue->VideoDuration;
+                X=FramePos/FrameRate;
+                }
+                break;
+        case 2 :
+                {
+                double FrameRate=FileInfoData->Glue->VideoFrameCount/FileInfoData->Glue->VideoDuration;
+                X=FramePos/(60*FrameRate);
+                }
+                break;
+        case 3 :
+                {
+                double FrameRate=FileInfoData->Glue->VideoFrameCount/FileInfoData->Glue->VideoDuration;
+                X=FramePos/(3600*FrameRate);
+                }
+                break;
+        default: return; // Problem
+    }
+
+    // Put the current frame in center
+    if (ZoomScale!=1)
+    {
+        size_t Increment=FileInfoData->Glue->VideoFrameCount/ZoomScale;
+        size_t NewBegin=0;
+        if (FramePos>Increment/2)
+        {
+            NewBegin=FramePos-Increment/2;
+            if (NewBegin+Increment>FileInfoData->Glue->VideoFrameCount)
+                NewBegin=FileInfoData->Glue->VideoFrameCount-Increment;
+        }
+        Zoom_Move(NewBegin);
+    }
+
+    Marker_Update(X);
+}
+
+//---------------------------------------------------------------------------
+void Plots::Marker_Update(double X)
+{
+    for (size_t Type=0; Type<PlotType_Max; ++Type)
+    {
+        plotsMarkers[Type]->setXValue(X);
+        plotsMarkers[Type]->attach(plots[Type]);    
+        plots[Type]->replot();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -338,31 +399,35 @@ void Plots::Zoom_Move(size_t Begin)
     size_t Increment=FileInfoData->Glue->VideoFrameCount/ZoomScale;
     if (Begin+Increment>FileInfoData->Glue->VideoFrameCount)
         Begin=FileInfoData->Glue->VideoFrameCount-Increment;
+
+    switch (XAxis_Kind_index)
+    {
+        case 0 :
+                Zoom_Left=Begin;
+                Zoom_Width=Increment;
+                break;
+        case 1 :
+                Zoom_Left=FileInfoData->Glue->VideoDuration*Begin/FileInfoData->Glue->VideoFrameCount;
+                Zoom_Width=FileInfoData->Glue->VideoDuration*Increment/FileInfoData->Glue->VideoFrameCount;
+                break;
+        case 2 :
+                Zoom_Left=FileInfoData->Glue->VideoDuration*Begin/FileInfoData->Glue->VideoFrameCount/60;
+                Zoom_Width=FileInfoData->Glue->VideoDuration*Increment/FileInfoData->Glue->VideoFrameCount/60;
+                break;
+        case 3 :
+                Zoom_Left=FileInfoData->Glue->VideoDuration*Begin/FileInfoData->Glue->VideoFrameCount/3600;
+                Zoom_Width=FileInfoData->Glue->VideoDuration*Increment/FileInfoData->Glue->VideoFrameCount/3600;
+                break;
+        default:;
+    }
+
     for (size_t Type=0; Type<PlotType_Max; Type++)
         if (plots[Type])
         {
             QwtPlotZoomer* zoomer = new QwtPlotZoomer(plots[Type]->canvas());
             QRectF Rect=zoomer->zoomBase();
-            switch (XAxis_Kind_index)
-            {
-                case 0 :
-                        Rect.setLeft(Begin);
-                        Rect.setWidth(Increment);
-                        break;
-                case 1 :
-                        Rect.setLeft(FileInfoData->Glue->VideoDuration*Begin/FileInfoData->Glue->VideoFrameCount);
-                        Rect.setWidth(FileInfoData->Glue->VideoDuration*Increment/FileInfoData->Glue->VideoFrameCount);
-                        break;
-                case 2 :
-                        Rect.setLeft(FileInfoData->Glue->VideoDuration*Begin/FileInfoData->Glue->VideoFrameCount/60);
-                        Rect.setWidth(FileInfoData->Glue->VideoDuration*Increment/FileInfoData->Glue->VideoFrameCount/60);
-                        break;
-                case 3 :
-                        Rect.setLeft(FileInfoData->Glue->VideoDuration*Begin/FileInfoData->Glue->VideoFrameCount/3600);
-                        Rect.setWidth(FileInfoData->Glue->VideoDuration*Increment/FileInfoData->Glue->VideoFrameCount/3600);
-                        break;
-                default:;
-            }
+            Rect.setLeft(Zoom_Left);
+            Rect.setWidth(Zoom_Width);
             zoomer->zoom(Rect);
             delete zoomer;
         }
@@ -540,12 +605,7 @@ void Plots::plot_moved( const QPointF &pos )
         default: return; // Problem
     }
 
-    for (size_t Type=0; Type<PlotType_Max; ++Type)
-    {
-        plotsMarkers[Type]->setXValue(X);
-        plotsMarkers[Type]->attach(plots[Type]);    
-        plots[Type]->replot();
-    }
+    Marker_Update(X);
 }
 
 void Plots::on_XAxis_Kind_currentIndexChanged(int index)
