@@ -14,153 +14,134 @@ const struct per_plot_group PerPlotGroup [PlotType_Max]=
     //Y
     {
         PlotName_YMIN,      5,    0,  255,  3,  "Y",  true,
-        "YUV refers to a particular a way of encoding color information in analog video where Y channels carry luma,\n"
-            "or brightness information, and U and V channels carry information about color, or chrominance.\n"
-            "QCTools can analyze the YUV Values of a particular encoded video file in order to provide information about the appearance of the video.\n"
-            "These filters examine every pixel in a given channel and records the Maximum, Minimum,\n"
-            "and then adds up and divides by the total number of pixels to calculate and provide the Average value.",
+        "For all samples of the Y plane, plot the MAXimum, MIVimum, AVeraGe,\n"
+        "LOW (10th percentile), and HIGH (90th percentile) values for each\n"
+        "frame.\n"
+        "The Y plane provides information about video brightness or luminance.",
     },
     //U
     {
         PlotName_UMIN,      5,    0,  255,  3,  "U",  true,
-        "U and V filters act to detect color abnormalities in video. It can be difficult to derive meaning from U or V values\n"
-            "on their own but they provide supplementary information and can be good indicators of artifacts especially\n"
-            "when occurring in tandem with similar Y Value readings. Black and white videos should present flat-lines (or no data) for UV channels.\n"
-            "Activity in UV Channels for black and white video content, however, would certainly be an indication of chrominance noise.\n"
-            "Alternatively, a color video which shows flat-lines for these channels would be an indicator of a color drop-out scenario.",
+        "For all samples of the U plane, plot the MAXimum, MIVimum, AVeraGe,\n"
+        "LOW (10th percentile), and HIGH (90th percentile) values for each\n"
+        "frame.\n"
+        "The U plane (along with V) provides information about video color.",
     },
     //V
     {
         PlotName_VMIN,      5,    0,  255,  3,  "V",  true,
-        "U and V filters act to detect color abnormalities in video. It can be difficult to derive meaning from U or V values\n"
-            "on their own but they provide supplementary information and can be good indicators of artifacts especially\n"
-            "when occurring in tandem with similar Y Value readings. Black and white videos should present flat-lines (or no data) for UV channels.\n"
-            "Activity in UV Channels for black and white video content, however, would certainly be an indication of chrominance noise.\n"
-            "Alternatively, a color video which shows flat-lines for these channels would be an indicator of a color drop-out scenario.",
+        "For all samples of the V plane, plot the MAXimum, MIVimum, AVeraGe,\n"
+        "LOW (10th percentile), and HIGH (90th percentile) values for each\n"
+        "frame.\n"
+        "The V plane (along with U) provides information about video color.",
     },
     //YDiff
     {
         PlotName_YDIF,      1,    0,  255,  3,  "YDiff", false,
-        "This QCTools filter selects two successive frames of video and subtracts the values of one from the other in order to find the change,\n"
-            "or difference, between the two frames (measured in pixels). This information is meaningful in that it indicates the rapidity\n"
-            "with which a video picture is changing from one frame to the next. Aside from scene-change scenarios,\n"
-            "a video picture should not undergo dramatic changes in these values unless an artifact is present.\n"
-            "A scene-change would present as a short but dramatic spike in the graph.\n"
-            "Other YUV Difference spikes may present in cases where picture problems are visible.\n"
-            "Often, head problems with corrupted frames will result in large YUV Difference values/ graph spikes.\n"
-            "The YDIF1 and YDIF2 filters help detect artifacts caused by video deck head clogs, with each filter providing a reading per head.\n"
-            "The filter is built on the assumption that one head is functioning (and as such, presents as a stable graph line),\n"
-            "and one is corrupt (presenting as a variable line with spikes and troughs).\n"
-            "A user, in reading the two results against one another, would see the areas where the two readings diverge as red portions on the graph.\n"
-            "See graph below: between 17-19s the YDIF1 and YDIF2 readings vary dramatically, presenting as red portions in the graph.",
+        "YDIF plots the amount of differences between the Y plane of the current\n"
+        "frame and the preceding one. It indicates the extent of visual change\n"
+        "from one frame to the next.,"
     },
-    //YDiffX
-    //{
-    //    PlotName_YDIF1,     2,    0,  255,  3,  "YDiffX", false,
-    //    "The YDIF1 and YDIF2 filters help detect artifacts caused by video deck head clogs, with each filter providing a reading per head.\n"
-    //        "The filter is built on the assumption that one head is functioning (and as such, presents as a stable graph line),\n"
-    //        "and one is corrupt (presenting as a variable line with spikes and troughs).\n"
-    //        "A user, in reading the two results against one another, would see the areas where the two readings diverge as red portions on the graph.\n"
-    //        "See graph below: between 17-19s the YDIF1 and YDIF2 readings vary dramatically, presenting as red portions in the graph.",
-    //},
     //UDiff
     {
         PlotName_UDIF,      1,    0,  255,  3,  "UDiff", false,
-        "The YDIF1 and YDIF2 filters help detect artifacts caused by video deck head clogs, with each filter providing a reading per head.\n"
-            "The filter is built on the assumption that one head is functioning (and as such, presents as a stable graph line),\n"
-            "and one is corrupt (presenting as a variable line with spikes and troughs).\n"
-            "A user, in reading the two results against one another, would see the areas where the two readings diverge as red portions on the graph.\n"
-            "See graph below: between 17-19s the YDIF1 and YDIF2 readings vary dramatically, presenting as red portions in the graph.",
+        "UDIF plots the amount of differences between the U plane of the current\n"
+        "frame and the preceding one. It indicates the extent of visual change\n"
+        "from one frame to the next.,"
     },
     //VDiff
     {
         PlotName_VDIF,      1,    0,  255,  3,  "VDiff", false,
-        "The YDIF1 and YDIF2 filters help detect artifacts caused by video deck head clogs, with each filter providing a reading per head.\n"
-            "The filter is built on the assumption that one head is functioning (and as such, presents as a stable graph line),\n"
-            "and one is corrupt (presenting as a variable line with spikes and troughs).\n"
-            "A user, in reading the two results against one another, would see the areas where the two readings diverge as red portions on the graph.\n"
-            "See graph below: between 17-19s the YDIF1 and YDIF2 readings vary dramatically, presenting as red portions in the graph.",
+        "VDIF plots the amount of differences between the V plane of the current\n"
+        "frame and the preceding one. It indicates the extent of visual change\n"
+        "from one frame to the next.,"
     },
     //Diffs
     {
         PlotName_YDIF,      3,    0,  255,  3,  "Diffs",  true,
-        "The YDIF1 and YDIF2 filters help detect artifacts caused by video deck head clogs, with each filter providing a reading per head.\n"
-            "The filter is built on the assumption that one head is functioning (and as such, presents as a stable graph line),\n"
-            "and one is corrupt (presenting as a variable line with spikes and troughs).\n"
-            "A user, in reading the two results against one another, would see the areas where the two readings diverge as red portions on the graph.\n"
-            "See graph below: between 17-19s the YDIF1 and YDIF2 readings vary dramatically, presenting as red portions in the graph.",
+        "Plots YDIF, UDIF, and VDIF all together.",
     },
     //Sat
     {
-        PlotName_SATMIN,    5,    0,  180,  4,  "Sat", false,
-        "This filter does the equivalent of plotting all pixels in a vectorscope and measuring the distance from that plotted point to the center of the vectorscope.\n"
+        PlotName_SATMIN,    5,    0,  180,  4,  "Sat", true,
+        "This filter does the equivalent of plotting all pixels in a vectorscope\n"
+        "and measuring the distance from that plotted points to the center of the\n"
+        "vectorscope. The MAXimum, MIVimum, AVeraGe, LOW (10th percentile), and\n"
+        "HIGH (90th percentile) values for each frame are plotted.\n"
         "The SATAVG will provide an overall idea of how much color saturation exists within a given frame.\n"
         "The plot for SATMAX will highlight a number of errors that cause color levels that exceed broadcast range or are mathematically illegal.\n"
-        "Values form 0 to 88.7 are considered within the 75% chrominance broadcast range, while values from 88.7 to 118.2 fall in between the 75% and 100% chrominance broadcast ranges.\n"
-        "Values from 118.2 to the maximum value of 181.02 represent illegal YUV color data that can not be converted back to RGB without producing negatives or overflows,\n"
+        "Values form 0 to 88.7 are considered within the 75% chrominance broadcast range.\n"
+        "Values from 88.7 to 118.2 fall in between the 75% and 100% chrominance broadcast ranges.\n"
+        "Values from 118.2 to the maximum value of 181.02 represent illegal YUV color data that\n"
+        "can not be converted back to RGB without producing negatives or overflows,\n"
         "such values a indicative errors such as time base corrector errors or Digital Betacam damage.",
     },
     //Hue
     {
         PlotName_HUEMED,    2,    0,  360,  4,  "Hue", false,
-        "Hue (Graph Description TBD)",
+        "The hue filter expresses the average color hue in degrees from 0 to 360.\n"
+        "Degrees are measured clockwise starting from 0 at the bottom side of a\n"
+        "vectorscope. Skin tone is 147 degrees. Hue is plotted via median and average.",
     },
     //TOUT
     {
         PlotName_TOUT,      1,    0,  0.9,  4,  "TOUT", false,
-        "This filter was created to detect white speckle noise in analog VHS and 8mm video.\n"
-            "It works by analyzing the current pixel against the two above and below and calculates an average value.\n"
-            "In cases where the filter detects a pixel value which is dramatically outside of this established average,\n"
-            "the graph will show small spikes, or blips, which correspond to white speckling in the video.",
+        "Pixels are labeled as temporal outliers (TOUT) if they are unlike the corresponding\n"
+        "pixels of the previous and subsequent frames. Peaks in TOUT can show areas with\n"
+        "skew or tracking issues which cause white speckle in the video. It can also\n"
+        "indicate very noisy recordings.",
     },
-    //HEAD
-    //{
-    //    PlotName_HEAD,      1,    0,    0,  4,  "HEAD", false,
-    //    "Head Switching (Graph Description TBD)",
-    //},
     //VREP
     {
         PlotName_VREP,      1,    0,    1,  4,  "VREP", false,
-        "Vertical Line Repetitions, or the VREP filter, is useful in analyzing U-Matic tapes and detecting artifacts generated\n"
-            "in the course of the digitization process. Specifically, VREP detects the repetition of lines in a video.\n"
-            "The filter works by taking a given video line and comparing it against a video line that occurs 4 pixels earlier.\n"
-            "If the difference in the two is less than 512, the filter reads them as being close enough to be deemed repetitious.\n"
-            "Note that the VREP filter is still under development.",
+        "Vertical Line Repetitions, or the VREP filter, is useful in detecting\n"
+        "the use of a dropout compensator in the digitization of analog video. VREP\n"
+        "plots the number of repeated horizontal lines which is untypical for an analog\n"
+        "recording to naturally produce. VREP would also plot clearn born digital \n"
+        "which has many very similar lines of video in the image.",
     },
     //BRNG
     {
         PlotName_BRNG,      1,    0,    1,  4,  "BRNG", false,
-        "The BRNG filter is one that identifies the number of pixels which fall outside the standard video broadcast range of 16-235 pixels.\n"
-            "Normal, noise-free video would not trigger this filer, but noise ocurring outside of these parameters would read as spikes in the graph.\n"
-            "Typically anything with a value over 0.01 will read as an artifact. While the BRNG filter is good at detecting the general presence of noise,\n"
-            "it can be a bit non-specific in its identification of the causes.",
+        "The BRNG filter is one that identifies the amount of pixels that fall\n"
+        "outside the standard video broadcast range of 16-235 pixels for Y or\n"
+        "16-240 for U and V.",
     },
     //CropW
     {
         PlotName_Crop_x1,   2,    0,    0,  4,  "CropW", false,
-        "CropW (Graph Description TBD)",
+        "CropW plots the number of columns of pixels would could be safely removed\n"
+        "from the left or right side of the image without removing any non-black\n"
+        "pixels. It would detect video frames with pillarboxing.",
     },
     //CropH
     {
         PlotName_Crop_y1,   2,    0,    0,  4,  "CropH", false,
-        "CropH (Graph Description TBD)",
+        "CropW plots the number of row of pixels would could be safely removed\n"
+        "from the top or bottom side of the image without removing any non-black\n"
+        "pixels. It would detect video frames with letterboxing.",
     },
     //CropF
     {
         PlotName_Crop_w,   2,    0,    0,  4,  "CropF", false,
-        "CropH (Graph Description TBD)",
+        "Presents the total number of rows (Crop Height) and columns (Crop Width)\n"
+        "which could be removed from the edges to only remove black pixels.",
     },
     //MSEf
     {
         PlotName_MSE_v,     3,    0,    0,  4,  "MSEf", false,
-        "Similar to PSNRf but reports on the Mean Square Error between field 1 and field 2. Higher values may be indicative of differences between the images of field 1 and field 2.",
+        "Plots an assessment of visual difference of field 1 versus field 2 via\n"
+        "Mean Square Error for each plane (Y, U, and V). Higher values may be\n"
+        "indicative of differences between the images of field 1 and field 2 as\n"
+        "may be caused by a head clog or playback error.",
     },
     //PSNRf
     {
         PlotName_PSNR_v,    3,    0,    0,  4,  "PSNRf", false,
-        "Plot the Peak Signal to Noise ratio between the video in field 1 (odd lines) versus the video in field 2 (even lines).\n"
-        "Lower values indicate that field 1 and field 2 are becoming more different as would happen during a playback error such as a head clog.\n"
-        "See http://ffmpeg.org/ffmpeg-filters.html#psnr for more information.",
+        "Plots an assessment of visual difference of field 1 versus field 2 via\n"
+        "Peak Signal to Noise Ratio for each plane (Y, U, and V). Lower values may\n"
+        "be indicative of differences between the images of field 1 and field 2 as\n"
+        "may be caused by a head clog or playback error.",
     },
     //Internal
     {
