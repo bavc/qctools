@@ -10,6 +10,9 @@ Windows:
 Edit qtbase\mkspecs\win32-msvc* and replace -MD by -MT in order to have  static build of the C library then 
 configure -opensource -confirm-license -static -ltcg -no-sql-sqlite -no-sql-odbc -no-qml-debug -no-gif -no-dbus -no-opengl -no-audio-backend -nomake examples -mp
 
+Qwt
+---
+
 YASM
 ----
 For Ffmpeg speed optimization, you need to install YASM
@@ -26,26 +29,35 @@ Download and install Cmake
 OpenJPEG
 --------
 Download OpenJPEG 1.x (2.x is not supported by Ffmpeg)
-My config (openjpeg 1.5.3):
+My config (openjpeg 1.5.2):
+Windows:
+cmake .
+Launch the sln, replace -MD by -MT in order to have static build of the C library then build
+Linux (static build):
+cmake -DBUILD_SHARED_LIBS:BOOL=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=usr .
+make
+make install
 Mac:
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=usr .
 make
-Windows:
-cmake .
-Launch the sln, replace -MD by -MT in order to have  static build of the C library then build
+make install
 
 FFmpeg
 ------
 My config:
-Mac:
-./configure --enable-gpl --enable-version3 --enable-shared --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --enable-libopenjpeg --disable-decoder=jpeg2000 --yasmexe=../yasm/yasm --extra-cflags="-I../openjpeg/usr/include" --extra-ldflags="-L../openjpeg/usr/lib"
 Windows:
 Look at http://ffmpeg.org/platform.html#Windows
 ./configure --enable-gpl --enable-version3 --enable-shared --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --enable-libopenjpeg --disable-decoder=jpeg2000 --extra-cflags="-I../openjpeg/libopenjpeg" --extra-ldflags="-LIBPATH:../openjpeg/bin/Release" --toolchain=msvc
 Note: not working with openjpeg for the moment, using
 ./configure --enable-gpl --enable-version3 --enable-shared --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --toolchain=msvc
+Mac:
+./configure --enable-gpl --enable-version3 --enable-shared --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --enable-libopenjpeg --disable-decoder=jpeg2000 --yasmexe=../yasm/yasm --extra-cflags="-I../openjpeg/usr/include" --extra-ldflags="-L../openjpeg/usr/lib"
+Linux (static build):
+./configure --enable-gpl --enable-version3 --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --enable-libopenjpeg --disable-decoder=jpeg2000 --extra-cflags="-I../openjpeg/usr/include" --extra-ldflags="-L../openjpeg/usr/lib"
 
 QCTools:
+Windows:
+(todo)
 Mac:
 cd Project/Qt/QtCreator && qmake && make
 cp ../../../ffmpeg/libavcodec/libavcodec.*.dylib QCTools.app/Contents/Resources/
@@ -102,4 +114,6 @@ install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../
 install_name_tool -change /usr/local/lib/libpostproc.52.dylib @executable_path/../Resources/libpostproc.52.dylib QCTools.app/Contents/MacOS/QCTools
 install_name_tool -change /usr/local/lib/libswresample.0.dylib @executable_path/../Resources/libswresample.0.dylib QCTools.app/Contents/MacOS/QCTools
 install_name_tool -change /usr/local/lib/libswscale.2.dylib @executable_path/../Resources/libswscale.2.dylib QCTools.app/Contents/MacOS/QCTools
-
+Linux:
+cd Project/Qt/QtCreator && qmake && make
+(todo)

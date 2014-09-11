@@ -8,7 +8,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "GUI/Preferences.h"
+#include "GUI/preferences.h"
 #include "GUI/Help.h"
 #include "Core/Core.h"
 

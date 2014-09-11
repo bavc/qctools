@@ -16,8 +16,8 @@
 
 //---------------------------------------------------------------------------
 #include <QBoxLayout>
-#include <QPushbutton>
-#include <QToolbutton>
+#include <QPushButton>
+#include <QToolButton>
 #include <QLabel>
 #include <QApplication>
 #include <QDesktopWidget>

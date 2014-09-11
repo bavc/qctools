@@ -12,7 +12,6 @@
 #include <QProcess>
 #include <QByteArray>
 #include <QMutex>
-#include <QTemporaryDir>
 
 #include <vector>
 using namespace std;

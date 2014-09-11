@@ -23,7 +23,7 @@
 #include <QLabel>
 #include <QToolButton>
 #include <QPushButton>
-#include <QinputDialog>
+#include <QInputDialog>
 #include <QCheckBox>
 #include <QTimer>
 

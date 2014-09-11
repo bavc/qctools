@@ -250,8 +250,8 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
                                 x[2][x_Max]=x[1][x_Max]/60;
                                 x[3][x_Max]=x[1][x_Max]/3600;
 
-                                int Width=Xml.attributes().value("width").toInt();
-                                int Height=Xml.attributes().value("height").toInt();
+                                int Width=atoi(Xml.attributes().value("width").toUtf8());
+                                int Height=atoi(Xml.attributes().value("height").toUtf8());
 
                                 while (Xml.readNextStartElement())
                                 {

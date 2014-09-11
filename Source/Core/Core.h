@@ -16,7 +16,7 @@
 
 extern const char* Version;
 
-const size_t PlotName_Begin=21;
+const std::size_t PlotName_Begin=21;
 
 enum PlotName
 {
@@ -106,7 +106,7 @@ enum PlotType
 struct per_plot_group
 {
     const   PlotName    Start;
-    const   size_t      Count;
+    const   std::size_t Count;
     const   double      Min;
     const   double      Max;
     const   double      StepsCount;
