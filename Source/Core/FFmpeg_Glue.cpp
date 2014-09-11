@@ -635,10 +635,6 @@ bool FFmpeg_Glue::Scale_Adapt(AVFrame* FilteredFrame)
     double DAR;
     if (FilteredFrame->sample_aspect_ratio.num && FilteredFrame->sample_aspect_ratio.den)
         DAR=((double)FilteredFrame->width)/FilteredFrame->height*FilteredFrame->sample_aspect_ratio.num/FilteredFrame->sample_aspect_ratio.den;
-    else if ((FilteredFrame->width>=704 && FilteredFrame->width<=720) //NTSC / PAL
-          && ((FilteredFrame->height>=480 && FilteredFrame->height<=486)
-           || FilteredFrame->height==576))
-        DAR=((double)4)/3;
     else
         DAR=((double)FilteredFrame->width)/FilteredFrame->height;
     if (DAR)
