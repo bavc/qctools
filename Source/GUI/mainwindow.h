@@ -70,6 +70,7 @@ public:
     void                        Help_HowToUse               ();
     void                        Help_FilterDescriptions     ();
     void                        Help_PlaybackFilters        ();
+    void                        Help_DataFormat             ();
     void                        Help_About                  ();
 
     // Helpers
@@ -134,6 +135,8 @@ private Q_SLOTS:
 
     void on_actionExport_XmlGz_Sidecar_triggered();
 
+    void on_actionExport_XmlGz_SidecarAll_triggered();
+
     void on_actionExport_XmlGz_Custom_triggered();
 
     void on_actionCSV_triggered();
@@ -155,6 +158,8 @@ private Q_SLOTS:
     void on_actionFilterDescriptions_triggered();
 
     void on_actionPlaybackFilters_triggered();
+
+    void on_actionDataFormat_triggered();
 
     void on_actionAbout_triggered();
 

@@ -33,6 +33,7 @@ public:
     void HowToUseThisTool();
     void FilterDescriptions();
     void PlaybackFilters();
+    void DataFormat();
     void About();
 
 private:

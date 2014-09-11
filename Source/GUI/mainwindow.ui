@@ -104,6 +104,7 @@
     <addaction name="actionHowToUseThisTool"/>
     <addaction name="actionFilterDescriptions"/>
     <addaction name="actionPlaybackFilters"/>
+    <addaction name="actionDataFormat"/>
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
    </widget>
@@ -119,6 +120,7 @@
     </property>
     <addaction name="actionExport_XmlGz_Prompt"/>
     <addaction name="actionExport_XmlGz_Sidecar"/>
+    <addaction name="actionExport_XmlGz_SidecarAll"/>
     <addaction name="actionExport_XmlGz_Custom"/>
     <addaction name="separator"/>
     <addaction name="actionCSV"/>
@@ -226,9 +228,24 @@
     <string>Getting started</string>
    </property>
   </action>
+  <action name="actionHowToUseThisTool">
+   <property name="text">
+    <string>How to use this tool</string>
+   </property>
+  </action>
   <action name="actionFilterDescriptions">
    <property name="text">
     <string>Filter Descriptions</string>
+   </property>
+  </action>
+  <action name="actionPlaybackFilters">
+   <property name="text">
+    <string>Playback Filters</string>
+   </property>
+  </action>
+  <action name="actionDataFormat">
+   <property name="text">
+    <string>Data Format</string>
    </property>
   </action>
   <action name="actionAbout">
@@ -247,16 +264,6 @@
   <action name="actionGoTo">
    <property name="text">
     <string>Go to frame at position...</string>
-   </property>
-  </action>
-  <action name="actionHowToUseThisTool">
-   <property name="text">
-    <string>How to use this tool</string>
-   </property>
-  </action>
-  <action name="actionPlaybackFilters">
-   <property name="text">
-    <string>Playback Filters</string>
    </property>
   </action>
   <action name="actionToolbar">
@@ -342,6 +349,11 @@
    </property>
    <property name="text">
     <string>To prefered directory</string>
+   </property>
+  </action>
+  <action name="actionExport_XmlGz_SidecarAll">
+   <property name="text">
+    <string>To sidecar .qctools.xml.gz (All files)</string>
    </property>
   </action>
  </widget>

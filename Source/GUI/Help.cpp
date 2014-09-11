@@ -67,8 +67,14 @@ Help::Help(QWidget * parent)
     QTextBrowser* Text5=new QTextBrowser(this);
     Text5->setReadOnly(true);
     Text5->setOpenExternalLinks(true);
-    Text5->setSource(QUrl("qrc:/Help/About.html"));
-    Central->addTab(Text5, tr("About"));
+    Text5->setSource(QUrl("qrc:/Help/Data Format/Data Format.html"));
+    Central->addTab(Text5, tr("Data Format"));
+
+    QTextBrowser* Text6=new QTextBrowser(this);
+    Text6->setReadOnly(true);
+    Text6->setOpenExternalLinks(true);
+    Text6->setSource(QUrl("qrc:/Help/About.html"));
+    Central->addTab(Text6, tr("About"));
 
     L->addWidget(Central);
     L->addWidget(Close);
@@ -108,8 +114,15 @@ void Help::PlaybackFilters ()
 }
 
 //---------------------------------------------------------------------------
-void Help::About ()
+void Help::DataFormat ()
 {
     Central->setCurrentIndex(4);
+    show();
+}
+
+//---------------------------------------------------------------------------
+void Help::About ()
+{
+    Central->setCurrentIndex(5);
     show();
 }

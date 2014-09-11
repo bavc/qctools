@@ -206,6 +206,19 @@ void MainWindow::on_actionExport_XmlGz_Sidecar_triggered()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_actionExport_XmlGz_SidecarAll_triggered()
+{
+    for (size_t Pos=0; Pos<Files.size(); ++Pos)
+    {
+        QString FileName=Files[Pos]->FileName+".qctools.xml.gz";
+
+        Files[Pos]->Export_XmlGz(FileName);
+    }
+
+    statusBar()->showMessage("All files exported to sidecar file");
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::on_actionExport_XmlGz_Custom_triggered()
 {
     if (Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
@@ -342,6 +355,12 @@ void MainWindow::on_actionFilterDescriptions_triggered()
 void MainWindow::on_actionPlaybackFilters_triggered()
 {
     Help_PlaybackFilters();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionDataFormat_triggered()
+{
+    Help_DataFormat();
 }
 
 //---------------------------------------------------------------------------

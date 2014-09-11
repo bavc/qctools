@@ -313,6 +313,13 @@ void MainWindow::Help_PlaybackFilters()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::Help_DataFormat()
+{
+    Help* Frame=new Help(this);
+    Frame->DataFormat();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::Help_About()
 {
     Help* Frame=new Help(this);

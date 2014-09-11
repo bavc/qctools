@@ -1,7 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
-        <title>QCTools Data Format</title>
+        <title>QCTools Data Format - QCTools Help Guide</title>
     </head>
     <body>
         <h1>Reading a QCTools Document</h1>
@@ -15,7 +16,7 @@
         </ol>
         <p>The data format of a QCTools xml export contains two main sections:</p>
         <h3 style="color:blue">1. Library Versions</h3>
-        QCTools incorporates a set of open-source libraries, developed under the ffmpeg project, that were built to process audiovisual data. This section of the data format calls out the specific libraries referenced by QCTools. They include:
+        <p>QCTools incorporates a set of open-source libraries, developed under the ffmpeg project, that were built to process audiovisual data. This section of the data format calls out the specific libraries referenced by QCTools. They include:</p>
         <ul>
             <li>libavutil</li>
             <li>libavcodec</li>
@@ -30,8 +31,8 @@
         <p>The document is further divided into Frames and Tags per <b>media type</b>.</p>
         <p>A <a href="https://github.com/bavc/FFmpeg/blob/master/doc/ffprobe.xsd#L55-L88">frame</a> describes a particular point in the video or audio and has a set of attributes that describe and identify that point (or frame)--including media type, duration, size, position, etc.<br/>A <a href="https://github.com/bavc/FFmpeg/blob/master/doc/ffprobe.xsd#L207-L210">tag</a> contains a key--in this case a reference to the filter name-- and the value for that filter.</p>
         <h4>Media Type: Audio</h4>
-        The Audio frame element contains descriptive information that identifies a particular frame.
-        The tag attributes include values for the following filters (based on EBU R 128):
+        <p>The Audio frame element contains descriptive information that identifies a particular frame.
+        The tag attributes include values for the following filters (based on EBU R 128):</p>
         <ul>
             <li><b>lavfi.r128.M</b>: or 'Momentary loudness' reflects sudden changes in volume over brief intervals of time (up to 400ms)</li>
             <li><b>lavri.r128.S</b>: 'Short term loudness', measured in intervals of up to 3s in duration</li>
@@ -41,28 +42,28 @@
             <li><b>lavfi.r128LRA.high</b></li>
         </ul>
         <h4>Media Type: Video</h4>
-        Each frame element contains descritpive information that identifies a particular point in the video. The tag attributes present the various QCTools filters and their values for that frame. For example:<br/>
+        <p>Each frame element contains descritpive information that identifies a particular point in the video. The tag attributes present the various QCTools filters and their values for that frame. For example:<br/>
         &#60;tag = key "lavfi.signalstats.YMIN" value = "15"&#47;&#62; <br/>
         &#60;tag = key "lavfi.signalstats.YLOW" value = "18"&#47;&#62; <br/>
-        For more info, please see <b>Filter Descriptions.</b>
+        For more info, please see <b>Filter Descriptions.</b></p>
 
         <h3 style="color:blue">Creating a QCTools Document</h3>
-        The QCTools Document can be created in either of the following ways:
+        <p>The QCTools Document can be created in either of the following ways:</p>
         <ol>
-            <li>Via QCTools (version 0.5 or later)<br/>Open a video file for evaluation and then select "Export > To qctools.xml.gz".</li>  <br/>
+            <li>Via QCTools (version 0.5 or later)<br/>Open a video file for evaluation and then select "Export > To qctools.xml.gz".</li>
             <li>Via FFmpeg (version 2.3 or later)<br/>For a file with video and audio named EXAMPLE.mov <br/>
             ffprobe -f lavfi -i "movie=EXAMPLE.mov:s=v+a[in0][in1],[in0]signalstats=stat=tout+vrep+brng,cropdetect=reset=1,split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr[out0];[in1]ebur128=metadata=1[out1]" -show_frames -show_versions -of xml=x=1:q=1 -noprivate | gzip &#62; EXAMPLE.qctools.xml.gz <br/> For a file with video and no audio named EXAMPLE.mov <br/>
             ffprobe -f lavfi -i "movie=EXAMPLE.mov,signalstats=stat=tout+vrep+brng,cropdetect=reset=1,split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr" -show_frames -show_versions -of xml=x=1:q=1 -noprivate | gzip &#62; EXAMPLE.qctools.xml.gz</li>
         </ol>
         <h3 style="color:blue">About gzip Compression</h3>
-        Because of the large volume of data contained in a QCTools document, it is necessary to compress the XML file to ensure it is a manageable size. QCTools uses a compression software called gzip to do this (<a href="http://en.wikipedia.org/wiki/Gzip">en.wikipedia.org/wiki/Gzip</a>) which accounts for the .gz file extension.
+        <p>Because of the large volume of data contained in a QCTools document, it is necessary to compress the XML file to ensure it is a manageable size. QCTools uses a compression software called gzip to do this (<a href="http://en.wikipedia.org/wiki/Gzip">en.wikipedia.org/wiki/Gzip</a>) which accounts for the .gz file extension.</p>
 
         <h3 style="color:blue">Additional Resources</h3>
-        For further information about FFmpeg, EBU audio specifications, etc., please see: <br/>
+        <p>For further information about FFmpeg, EBU audio specifications, etc., please see: <br/>
         <b>FFmpeg / </b> <a href= "https://ffmpeg.org"> ffmpeg.org </a> <br/>
         <b>FFmpeg Documentation / </b> <a href= "http://ffmpeg.org/documentation.html"> http://ffmpeg.org/documentation.html </a><br/>
         <b>EBU 3341, Loudness Metering: 'EBU Mode' metering to supplement loudness normalizqation in accordance with EBU R 128 / </b> <a href= "https://tech.ebu.ch/docs/tech/tech3341.pdf"> https://tech.ebu.ch/docs/tech/tech3341.pdf</a><br/>
         <b>EBU R 128, Loudness Normalisation and permitted maximum level of audio signals / </b> <a href= "https://tech.ebu.ch/docs/r/r128-2014.pdf"> https://tech.ebu.ch/docs/r/r128-2014.pdf </a> <br/>
-        <b>GZIP / </b> <a href="http://www.gzip.org/">www.gzip.org</a>
+        <b>GZIP / </b> <a href="http://www.gzip.org/">www.gzip.org</a></p>
     </body>
 </html>
