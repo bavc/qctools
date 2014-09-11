@@ -140,6 +140,7 @@ void MainWindow::Ui_Init()
     //Temp
     ui->actionFiltersLayout->setVisible(false);
     ui->actionWindowOut->setVisible(false);
+    ui->actionPrint->setVisible(false);
 
     // Not implemented action
     if (ui->actionExport_XmlGz_Custom)
@@ -163,7 +164,7 @@ void MainWindow::configureZoom()
         ui->actionExport_XmlGz_Sidecar->setEnabled(!Files.empty());
         ui->actionExport_XmlGz_Custom->setEnabled(!Files.empty());
         ui->actionCSV->setEnabled(!Files.empty());
-        ui->actionPrint->setEnabled(!Files.empty());
+        //ui->actionPrint->setEnabled(!Files.empty());
         return;
     }
 
@@ -179,7 +180,7 @@ void MainWindow::configureZoom()
     ui->actionExport_XmlGz_Sidecar->setEnabled(true);
     ui->actionExport_XmlGz_Custom->setEnabled(true);
     ui->actionCSV->setEnabled(true);
-    ui->actionPrint->setEnabled(true);
+    //ui->actionPrint->setEnabled(true);
 }
 
 //---------------------------------------------------------------------------

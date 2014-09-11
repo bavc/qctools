@@ -281,8 +281,8 @@ void MainWindow::on_actionGraphsLayout_triggered()
     //    ui->actionExport_XmlGz_Custom->setVisible(true);
     if (ui->actionCSV)
         ui->actionCSV->setVisible(true);
-    if (ui->actionPrint)
-        ui->actionPrint->setVisible(true);
+    //if (ui->actionPrint)
+    //    ui->actionPrint->setVisible(true);
     if (ui->actionZoomIn)
         ui->actionZoomIn->setVisible(true);
     if (ui->actionZoomOut)
