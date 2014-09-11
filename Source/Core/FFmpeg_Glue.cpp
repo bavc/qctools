@@ -26,12 +26,38 @@ extern "C"
 #include <libavfilter/avfiltergraph.h>
 #include <libavfilter/buffersink.h>
 #include <libavfilter/buffersrc.h>
+
+#include <config.h>
+#include <libavutil\ffversion.h>
 }
 
 #include <sstream>
 #include <iomanip>
 #include <cstdlib>
 //---------------------------------------------------------------------------
+
+void LibsVersion_Inject(stringstream &LibsVersion, const char* Name, int Value)
+{
+    LibsVersion<<' ' << Name << "=\"" << Value << '\"';
+}
+void LibsVersion_Inject(stringstream &LibsVersion, const char* Name, const char* Value)
+{
+    LibsVersion<<' ' << Name << "=\"" << Value << '\"';
+}
+
+#define LIBSVERSION(libname, LIBNAME)                                               \
+    if (CONFIG_##LIBNAME)                                                           \
+    {                                                                               \
+        unsigned int version = libname##_version();                                 \
+        LibsVersion<<"        <library_version";                                    \
+        LibsVersion_Inject(LibsVersion, "name",    "lib" #libname);                 \
+        LibsVersion_Inject(LibsVersion, "major",   LIB##LIBNAME##_VERSION_MAJOR);   \
+        LibsVersion_Inject(LibsVersion, "minor",   LIB##LIBNAME##_VERSION_MINOR);   \
+        LibsVersion_Inject(LibsVersion, "micro",   LIB##LIBNAME##_VERSION_MICRO);   \
+        LibsVersion_Inject(LibsVersion, "version", version);                        \
+        LibsVersion_Inject(LibsVersion, "ident",   LIB##LIBNAME##_IDENT);           \
+        LibsVersion<<"/>\n";                                                        \
+    }                                                                               \
 
 //***************************************************************************
 // Error manager of FFmpeg
@@ -1225,3 +1251,40 @@ string FFmpeg_Glue::StatsToExternalData()
 
     return Value.str();
 }
+
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::FFmpeg_Version()
+{
+    return FFMPEG_VERSION;
+}
+
+//---------------------------------------------------------------------------
+int FFmpeg_Glue::FFmpeg_Year()
+{
+    return CONFIG_THIS_YEAR;
+}
+
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::FFmpeg_Compiler()
+{
+    return CC_IDENT;
+}
+
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::FFmpeg_Configuration()
+{
+    return FFMPEG_CONFIGURATION;
+}
+
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::FFmpeg_LibsVersion()
+{
+    stringstream LibsVersion;
+    LIBSVERSION(avutil,     AVUTIL);
+    LIBSVERSION(avcodec,    AVCODEC);
+    LIBSVERSION(avformat,   AVFORMAT);
+    LIBSVERSION(avfilter,   AVFILTER);
+    LIBSVERSION(swscale,    SWSCALE);
+    return LibsVersion.str();
+}
+

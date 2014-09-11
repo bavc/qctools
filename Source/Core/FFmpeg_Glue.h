@@ -84,6 +84,11 @@ public:
     string                      ChannelLayout_Get();
     int                         BitDepth_Get();
     string                      StatsToExternalData();
+    string                      FFmpeg_Version();
+    int                         FFmpeg_Year();
+    string                      FFmpeg_Compiler();
+    string                      FFmpeg_Configuration();
+    string                      FFmpeg_LibsVersion();
 
     // Actions
     void                        Seek (size_t Pos);

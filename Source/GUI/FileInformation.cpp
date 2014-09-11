@@ -207,14 +207,19 @@ void FileInformation::Parse ()
 //---------------------------------------------------------------------------
 void FileInformation::Export_XmlGz (const QString &ExportFileName)
 {
-    string Data;
+    stringstream Data;
     
     // Header
-    Data+="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-    Data+="<ffprobe:ffprobe xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:ffprobe='http://www.ffmpeg.org/schema/ffprobe' xsi:schemaLocation='http://www.ffmpeg.org/schema/ffprobe ffprobe.xsd'>\n";
-    Data+="    <program_version version=\"QCTools "+string(Version)+"\" copyright=\"Copyright (c) BAVC. All Rights Reserved.\"/>\n";
-    Data+="\n";
-    Data+="    <frames>\n";
+    Data<<"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    Data<<"<!-- Created by QCTools 0.5.0 -->\n";
+    Data<<"<ffprobe:ffprobe xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:ffprobe='http://www.ffmpeg.org/schema/ffprobe' xsi:schemaLocation='http://www.ffmpeg.org/schema/ffprobe ffprobe.xsd'>\n";
+    Data<<"    <program_version version=\"" << Glue->FFmpeg_Version() << "\" copyright=\"Copyright (c) 2007-" << Glue->FFmpeg_Year() << " the FFmpeg developers\" build_date=\""__DATE__"\" build_time=\""__TIME__"\" compiler_ident=\"" << Glue->FFmpeg_Compiler() << "\" configuration=\"" << Glue->FFmpeg_Configuration() << "\"/>\n";
+    Data<<"\n";
+    Data<<"    <library_versions>\n";
+    Data<<Glue->FFmpeg_LibsVersion();
+    Data<<"    </library_versions>\n";
+    Data<<"\n";
+    Data<<"    <frames>\n";
 
     // Per frame
     for (size_t x=0; x<Glue->VideoFrameCount_Max; ++x)
@@ -223,7 +228,7 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
         stringstream width; width<<Glue->Width_Get();
         stringstream height; height<<Glue->Height_Get();
         stringstream key_frame; key_frame<<Glue->KeyFrame_Get(x);
-        Data+="        <frame media_type=\"video\" key_frame=\""+key_frame.str()+"\" pkt_pts_time=\""+pkt_pts_time.str()+"\" width=\""+width.str()+"\" height=\""+height.str()+"\">\n";
+        Data<<"        <frame media_type=\"video\" key_frame=\"" << key_frame.str() << "\" pkt_pts_time=\"" << pkt_pts_time.str() << "\" width=\"" << width.str() << "\" height=\"" << height.str() <<"\">\n";
 
         for (size_t Plot_Pos=0; Plot_Pos<PlotName_Max; Plot_Pos++)
         {
@@ -246,25 +251,26 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
                                         value<<Glue->y[Plot_Pos][x];
             }
              
-            Data+="            <tag key=\""+key+"\" value=\""+value.str()+"\"/>\n";
+            Data<<"            <tag key=\""+key+"\" value=\""+value.str()+"\"/>\n";
         }
 
-        Data+="        </frame>\n";
+        Data<<"        </frame>\n";
     }
 
     // Footer
-    Data+="    </frames>";
-    Data+="</ffprobe:ffprobe>";
+    Data<<"    </frames>\n";
+    Data<<"</ffprobe:ffprobe>";
 
     QFile F(ExportFileName);
     if (F.open(QIODevice::WriteOnly))
     {
+        string DataS=Data.str();
         QByteArray Compressed=F.readAll();
         uLongf Buffer_Size=65536;
         char* Buffer=new char[Buffer_Size];
         z_stream strm;  
-        strm.next_in = (Bytef *) Data.c_str();  
-        strm.avail_in = Data.size() ;  
+        strm.next_in = (Bytef *) DataS.c_str();  
+        strm.avail_in = DataS.size() ;  
         strm.total_out = 0;
         strm.zalloc = Z_NULL;  
         strm.zfree = Z_NULL;  
