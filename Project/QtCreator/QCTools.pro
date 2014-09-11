@@ -54,18 +54,18 @@ include( $${QWT_ROOT}/qwtfunctions.pri )
 
 INCLUDEPATH += $$PWD/../../Source
 INCLUDEPATH += $$QWT_ROOT/src
-INCLUDEPATH += $$PWD/../../../FFmpeg-master
+INCLUDEPATH += $$PWD/../../../ffmpeg
 
 LIBS      += -L$${QWT_ROOT}/lib -lqwt
 LIBS      += -lz
-LIBS      += -L$${PWD}/../../../FFmpeg-master/libavdevice -lavdevice \
-             -L$${PWD}/../../../FFmpeg-master/libavcodec -lavcodec \
-             -L$${PWD}/../../../FFmpeg-master/libavfilter -lavfilter \
-             -L$${PWD}/../../../FFmpeg-master/libavformat -lavformat \
-             -L$${PWD}/../../../FFmpeg-master/libavutil -lavutil \
-             -L$${PWD}/../../../FFmpeg-master/libpostproc -lpostproc \
-             -L$${PWD}/../../../FFmpeg-master/libswresample -lswresample \
-             -L$${PWD}/../../../FFmpeg-master/libswscale -lswscale
+LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
+             -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
+             -L$${PWD}/../../../ffmpeg/libavfilter -lavfilter \
+             -L$${PWD}/../../../ffmpeg/libavformat -lavformat \
+             -L$${PWD}/../../../ffmpeg/libavutil -lavutil \
+             -L$${PWD}/../../../ffmpeg/libpostproc -lpostproc \
+             -L$${PWD}/../../../ffmpeg/libswresample -lswresample \
+             -L$${PWD}/../../../ffmpeg/libswscale -lswscale
 
 macx:
 {

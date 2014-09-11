@@ -48,14 +48,14 @@ Note: not working with openjpeg for the moment, using
 QCTools:
 Mac:
 cd Project/Qt/QtCreator && qmake && make
-cp ../../../FFmpeg-bavc/libavcodec/libavcodec.*.dylib QCTools.app/Contents/Resources/
-cp ../../../FFmpeg-bavc/libavdevice/libavdevice.*.dylib QCTools.app/Contents/Resources/
-cp ../../../FFmpeg-bavc/libavfilter/libavfilter.*.dylib QCTools.app/Contents/Resources/
-cp ../../../FFmpeg-bavc/libavformat/libavformat.*.dylib QCTools.app/Contents/Resources/
-cp ../../../FFmpeg-bavc/libavutil/libavutil.*.dylib QCTools.app/Contents/Resources/
-cp ../../../FFmpeg-bavc/libpostproc/libpostproc.*.dylib QCTools.app/Contents/Resources/
-cp ../../../FFmpeg-bavc/libswresample/libswresample.*.dylib QCTools.app/Contents/Resources/
-cp ../../../FFmpeg-bavc/libswscale/libswscale.*.dylib QCTools.app/Contents/Resources/
+cp ../../../ffmpeg/libavcodec/libavcodec.*.dylib QCTools.app/Contents/Resources/
+cp ../../../ffmpeg/libavdevice/libavdevice.*.dylib QCTools.app/Contents/Resources/
+cp ../../../ffmpeg/libavfilter/libavfilter.*.dylib QCTools.app/Contents/Resources/
+cp ../../../ffmpeg/libavformat/libavformat.*.dylib QCTools.app/Contents/Resources/
+cp ../../../ffmpeg/libavutil/libavutil.*.dylib QCTools.app/Contents/Resources/
+cp ../../../ffmpeg/libpostproc/libpostproc.*.dylib QCTools.app/Contents/Resources/
+cp ../../../ffmpeg/libswresample/libswresample.*.dylib QCTools.app/Contents/Resources/
+cp ../../../ffmpeg/libswscale/libswscale.*.dylib QCTools.app/Contents/Resources/
 cp ../../../openjpeg/bin/libopenjpeg.5.dylib QCTools.app/Contents/Resources/
 install_name_tool -id @executable_path/../Resources/libavcodec.55.dylib QCTools.app/Contents/Resources/libavcodec.55.dylib
 install_name_tool -change /usr/local/lib/libavutil.52.dylib @executable_path/../Resources/libavutil.52.dylib QCTools.app/Contents/Resources/libavcodec.55.dylib

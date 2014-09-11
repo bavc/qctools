@@ -28,7 +28,7 @@ extern "C"
 #include <libavfilter/buffersrc.h>
 
 #include <config.h>
-#include <libavutil\ffversion.h>
+#include <libavutil/ffversion.h>
 }
 
 #include <sstream>
@@ -159,7 +159,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
     }
 
     // Frame
-    Frame = avcodec_alloc_frame();
+    Frame = av_frame_alloc();
     if (!Frame)
         return;
 
@@ -700,7 +700,7 @@ bool FFmpeg_Glue::Scale_Init(AVFrame* FilteredFrame, SwsContext* &Scale_Context,
                                     Scale_Width, Scale_Height,
                                     OutputMethod==Output_QImage?PIX_FMT_RGB24:PIX_FMT_YUVJ420P,
                                     SWS_BICUBIC, NULL, NULL, NULL);
-    Scale_Frame=avcodec_alloc_frame();
+    Scale_Frame=av_frame_alloc();
     Scale_Frame->width=Scale_Width;
     Scale_Frame->height=Scale_Height;
     avpicture_alloc((AVPicture*)Scale_Frame, OutputMethod==Output_QImage?PIX_FMT_RGB24:PIX_FMT_YUVJ420P, Scale_Width, Scale_Height);
@@ -720,7 +720,7 @@ void FFmpeg_Glue::Scale_Free(AVFrame* FilteredFrame, SwsContext* &Scale_Context,
 
     if (Scale_Frame)
     {
-        avcodec_free_frame(&Scale_Frame);
+        av_frame_free(&Scale_Frame);
         Scale_Frame=NULL;
     }
 }
