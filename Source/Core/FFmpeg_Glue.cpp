@@ -190,6 +190,9 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
         }
         for(size_t j=0; j<PlotType_Max; ++j)
             y_Max[j]=0; //PerPlotGroup[j].Max;
+
+        key_frame=new bool[VideoFrameCount_Max];
+        memset(key_frame, 0x00, VideoFrameCount_Max*sizeof(bool));
     }
     x_Max=0;
     x_Line_Begin=0;
@@ -257,6 +260,13 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
                                     }
                                     Xml.skipCurrentElement();
                                 }
+
+                                QStringRef key_frame_String=Xml.attributes().value("key_frame");
+                                if (key_frame_String.size()>0)
+                                    key_frame[x_Max]=std::atof(key_frame_String.toUtf8());
+                                else
+                                    key_frame[x_Max]=1; //Forcing key_frame to 1 if it is missing from the XML, for decoding
+
                                 x_Max++;
                                 if (VideoFrameCount<x_Max)
                                 {
@@ -783,6 +793,8 @@ bool FFmpeg_Glue::Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, 
                 */
             }
 
+            key_frame[x_Max]=Frame->key_frame;
+
             x_Max++;
         }
 
@@ -912,6 +924,15 @@ int FFmpeg_Glue::Height_Get()
         return 0;
 
     return VideoStream->codec->height;
+}
+
+//---------------------------------------------------------------------------
+int FFmpeg_Glue::KeyFrame_Get(size_t FramePos)
+{
+    if (FramePos>=VideoFrameCount)
+        return 1;
+
+    return key_frame[FramePos];
 }
 
 //---------------------------------------------------------------------------

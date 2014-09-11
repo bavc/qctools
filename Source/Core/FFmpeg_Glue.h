@@ -59,6 +59,7 @@ public:
     std::vector<bytes*>         JpegList;
     double**                    x; //PTS of frame number
     double**                    y; //Data
+    bool*                       key_frame; //May be useful for FFmpeg XML output
     double                      y_Max[PlotType_Max];
     size_t                      x_Max;
     size_t                      VideoFramePos;
@@ -74,6 +75,7 @@ public:
     string                      VideoFormat_Get();
     int                         Width_Get();
     int                         Height_Get();
+    int                         KeyFrame_Get(size_t FramePos);
     double                      DAR_Get();
     string                      PixFormat_Get();
     string                      AudioFormat_Get();

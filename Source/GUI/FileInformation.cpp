@@ -222,7 +222,8 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
         stringstream pkt_pts_time; pkt_pts_time<<Glue->x[1][x];
         stringstream width; width<<Glue->Width_Get();
         stringstream height; height<<Glue->Height_Get();
-        Data+="        <frame media_type=\"video\" pkt_pts_time=\""+pkt_pts_time.str()+"\" width=\""+width.str()+"\" height=\""+height.str()+"\">\n";
+        stringstream key_frame; key_frame<<Glue->KeyFrame_Get(x);
+        Data+="        <frame media_type=\"video\" key_frame=\""+key_frame.str()+"\" pkt_pts_time=\""+pkt_pts_time.str()+"\" width=\""+width.str()+"\" height=\""+height.str()+"\">\n";
 
         for (size_t Plot_Pos=0; Plot_Pos<PlotName_Max; Plot_Pos++)
         {
