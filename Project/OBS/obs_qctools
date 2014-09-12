@@ -1,0 +1,115 @@
+#!/bin/sh
+
+#-----------------------------------------------------------------------
+# $1=qctools Package version,
+# $2=
+# $3=
+# $4=,
+# $5=,
+# $6=Distro extension from OBS,
+# $7=Platform, $8=CPU, $9=CPU target
+Download_Packages()
+{
+#-----------------------------------------------------------------------
+# Downloading
+wget "http://download.opensuse.org/repositories/home:/MediaArea_net/$7/$8/qctools$dash$qctoolsv-$1$6$9.$type"
+mv qctools$dash$qctoolsv-$1$6$9.$type \
+ download/binary/qctools/$qctoolsv/qctools$dash$qctoolsv-$destversion$9.$7.$type
+}
+
+#-----------------------------------------------------------------------
+# $1=QCTools version
+Download_Global()
+{
+#-----------------------------------------------------------------------
+# Clean up
+#rm download/binary/qctools/$qctoolsv/*.rpm -f
+#rm download/binary/qctools/$qctoolsv/*.deb -f
+mkdir download/binary/qctools/$qctoolsv
+
+#-----------------------------------------------------------------------
+# Downloading
+type="deb"
+devext="dev"
+dash="_"
+Download_Packages 1  x  x   x x ""           Debian_6.0    i386   _i386
+Download_Packages 1  x  x   x x ""           Debian_6.0    amd64  _amd64
+Download_Packages 1  x  x   x x ""           Debian_7.0    i386   _i386
+Download_Packages 1  x  x   x x ""           Debian_7.0    amd64  _amd64
+Download_Packages 1  x  x   x x ""           xUbuntu_10.04  i386   _i386
+Download_Packages 1  x  x   x x ""           xUbuntu_10.04  amd64  _amd64
+Download_Packages 1  x  x   x x ""           xUbuntu_11.10  i386   _i386
+Download_Packages 1  x  x   x x ""           xUbuntu_11.10  amd64  _amd64
+Download_Packages 1  x  x   x x ""           xUbuntu_12.04  i386   _i386
+Download_Packages 1  x  x   x x ""           xUbuntu_12.04  amd64  _amd64
+Download_Packages 1  x  x   x x ""           xUbuntu_12.10  i386   _i386
+Download_Packages 1  x  x   x x ""           xUbuntu_12.10  amd64  _amd64
+Download_Packages 1  x  x   x x ""           xUbuntu_13.04  i386   _i386
+Download_Packages 1  x  x   x x ""           xUbuntu_13.04  amd64  _amd64
+Download_Packages 1  x  x   x x ""           xUbuntu_13.10  i386   _i386
+Download_Packages 1  x  x   x x ""           xUbuntu_13.10  amd64  _amd64
+Download_Packages 1  x  x   x x ""           xUbuntu_14.04  i386   _i386
+Download_Packages 1  x  x   x x ""           xUbuntu_14.04  amd64  _amd64
+
+type="rpm"
+devext="devel"
+dash="-"
+Download_Packages $1 x  x   x x ""           CentOS_5        i386   .i386
+Download_Packages $1 x  x   x x ""           CentOS_5        x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           CentOS_6        i686   .i686
+Download_Packages $1 x  x   x x ""           CentOS_6        x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           CentOS_7        x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           Fedora_17       i686   .i686
+Download_Packages $1 x  x   x x ""           Fedora_17       x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           Fedora_18       i686   .i686
+Download_Packages $1 x  x   x x ""           Fedora_18       x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           Fedora_19       i686   .i686
+Download_Packages $1 x  x   x x ""           Fedora_19       x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           Fedora_20       i686   .i686
+Download_Packages $1 x  x   x x ""           Fedora_20       x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           Fedora_20       armv7hl .armv7hl
+Download_Packages $1 x  x   x x ""           Mandriva_2009.1 i586   .i586
+Download_Packages $1 x  x   x x ""           Mandriva_2009.1 x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           Mandriva_2010   i586   .i586
+Download_Packages $1 x  x   x x ""           Mandriva_2010   x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           Mandriva_2010.1 i586   .i586
+Download_Packages $1 x  x   x x ""           Mandriva_2010.1 x86_64 .x86_64
+Download_Packages $1 x  x   x x -mdv2011.0   Mandriva_2011   i586   .i586
+Download_Packages $1 x  x   x x -mdv2011.0   Mandriva_2011   x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           RHEL_5          i386   .i386
+Download_Packages $1 x  x   x x ""           RHEL_5          x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           RHEL_6          i686   .i686
+Download_Packages $1 x  x   x x ""           RHEL_6          x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           RHEL_7          x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           RHEL_7          ppc64  .ppc64
+Download_Packages $1 x  x   x x ""           SLE_11          i586   .i586
+Download_Packages $1 x  x   x x ""           SLE_11          x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           SLE_11_SP1      i586   .i586
+Download_Packages $1 x  x   x x ""           SLE_11_SP1      x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           SLE_11_SP2      i586   .i586
+Download_Packages $1 x  x   x x ""           SLE_11_SP2      x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           SLE_11_SP2      ppc64  .ppc64
+Download_Packages $1 x  x   x x ""           SLE_11_SP3      i586   .i586
+Download_Packages $1 x  x   x x ""           SLE_11_SP3      x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           openSUSE_11.4   i586   .i586
+Download_Packages $1 x  x   x x ""           openSUSE_11.4   x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           openSUSE_12.1   i586   .i586
+Download_Packages $1 x  x   x x ""           openSUSE_12.1   x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           openSUSE_12.2   i586   .i586
+Download_Packages $1 x  x   x x ""           openSUSE_12.2   x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           openSUSE_12.3   i586   .i586
+Download_Packages $1 x  x   x x ""           openSUSE_12.3   x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           openSUSE_13.1   i586   .i586
+Download_Packages $1 x  x   x x ""           openSUSE_13.1   x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           openSUSE_Factory i586   .i586
+Download_Packages $1 x  x   x x ""           openSUSE_Factory x86_64 .x86_64
+Download_Packages $1 x  x   x x ""           openSUSE_Tumbleweed i586   .i586
+Download_Packages $1 x  x   x x ""           openSUSE_Tumbleweed x86_64 .x86_64
+}
+
+
+qctoolsv="0.5.0"
+destversion="1"
+
+Download_Global 40.1
+
