@@ -244,14 +244,14 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
                         {
                             if (Xml.name()=="frame" && Xml.attributes().value("media_type")=="video")
                             {
-                                double Frame_Duration=std::atof(Xml.attributes().value("pkt_duration_time").toUtf8());
+                                double Frame_Duration=std::atof(Xml.attributes().value("pkt_duration_time").string()->toUtf8());
                                 x[0][x_Max]=x_Max;
-                                x[1][x_Max]=std::atof(Xml.attributes().value("pkt_pts_time").toUtf8());
+                                x[1][x_Max]=std::atof(Xml.attributes().value("pkt_pts_time").string()->toUtf8());
                                 x[2][x_Max]=x[1][x_Max]/60;
                                 x[3][x_Max]=x[1][x_Max]/3600;
 
-                                int Width=atoi(Xml.attributes().value("width").toUtf8());
-                                int Height=atoi(Xml.attributes().value("height").toUtf8());
+                                int Width=atoi(Xml.attributes().value("width").string()->toUtf8());
+                                int Height=atoi(Xml.attributes().value("height").string()->toUtf8());
 
                                 while (Xml.readNextStartElement())
                                 {
@@ -264,7 +264,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
 
                                         if (j!=PlotName_Max)
                                         {
-                                            double value=std::atof(Xml.attributes().value("value").toUtf8());
+                                            double value=std::atof(Xml.attributes().value("value").string()->toUtf8());
                                             
                                             // Special cases: crop: x2, y2
                                             if (Width && Xml.attributes().value("key")=="lavfi.cropdetect.x2")
@@ -289,7 +289,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
 
                                 QStringRef key_frame_String=Xml.attributes().value("key_frame");
                                 if (key_frame_String.size()>0)
-                                    key_frame[x_Max]=std::atof(key_frame_String.toUtf8());
+                                    key_frame[x_Max]=std::atof(key_frame_String.string()->toUtf8());
                                 else
                                     key_frame[x_Max]=1; //Forcing key_frame to 1 if it is missing from the XML, for decoding
 
