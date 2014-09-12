@@ -19,8 +19,8 @@
         </ol>
 
         <h2 style="color:blue"><a id="MinMaxAvg">1. YUV Values/ MIN, AVG, MAX</a></h2>
-        <p>YUV refers to a particular a way of encoding color information in analog video where the Y channel carries <q>luma</q>, or brightness information, and U and V channels carry color information, or <q>chroma</q>.
-        QC Tools can analyze the Y, U, and V Values of a particular encoded video file in order to provide information about the appearance of the video. These filters examine every pixel in a given channel and records the Maximum, Minimum, and then adds up and divides by the total number of pixels to calculate and provide the Average value.<br/></p>
+        <p>YUV refers to a particular way of encoding signal information in video where the Y channel carries <q>luma</q>, or brightness information, and the U and V channels carry <q>chroma</q>, or color difference information. In the context of QCTools, YUV is used synonymously with Y'CbCr, the color encoding specification for digital component video. 
+        QCTools can analyze the Y, U, and V components of a digital video signal and report on specific characteristics pertaining to a video's appearance. These filters examine each pixel in a given channel, recording the maximum and minimum values (eg. YMIN, YMAX). These values are then added up and divided by the total number of pixels to calculate the Average value (eg. YAVG).<br/></p>
         <h3> Y Value Filters: YMIN, YAVG, YMAX</h3>
         <table border="1">
             <tbody>
@@ -39,7 +39,7 @@
 
         <p>*Appropriate for the 8-bit video samples analyzed by this tool.</p>
 
-        <p>Y Channels carry data about the brightness of a picture. Problematic variance in Y Channel values will manifest as a picture that is either too light or too dark, also known as containing luma noise. 8-bit video will have values falling in the range of 0-255 code values per pixel. A picture with well-balanced light levels will have an average, or mid-range Y Channel value of around 128 (YAVG). Graph readings outside of that range will indicate a picture that is either too bright or too dark. A Y Value of 0 would indicate total blackness and a value of 255 would present as entirely white. In the range of values, reference black is at value 16, while reference white is at value 235.Except during particular moments like scene changes where one might expect abrupt spikes, the average values of Y channels should remain relatively stable or constant with little variation. Portions of video showing extreme changes in average values (and not corresponding to a scene change or otherwise dramatic edit) likely indicate a picture error.</p>
+        <p>The Y Channel carries information about the brightness of a video signal. Problematic variance in the Y Channel will manifest as a picture that is either too light or too dark, also known as containing luma noise. 8-bit video will have values falling in the range of 0-255 code values per pixel. A picture with well-balanced light levels will have an average, or mid-range Y Channel value of around 128 (YAVG). Graph readings outside of that range will indicate a picture that is either too bright or too dark. A Y Value of 0 would indicate total blackness and a value of 255 would present as entirely white. In the range of values, reference black is at value 16, while reference white is at value 235.Except during particular moments like scene changes where one might expect abrupt spikes, the average values of Y channels should remain relatively stable or constant with little variation. Portions of video showing extreme changes in average values (and not corresponding to a scene change or otherwise dramatic edit) likely indicate a picture error.</p>
 
         Y values = Combined graph of YMAX, YHIGH, YAVG, YLOW, and YMIN<br/>
         YMIN =  Y channel minimum<br>
