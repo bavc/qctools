@@ -62,10 +62,13 @@ LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
              -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
              -L$${PWD}/../../../ffmpeg/libavfilter -lavfilter \
              -L$${PWD}/../../../ffmpeg/libavformat -lavformat \
-             -L$${PWD}/../../../ffmpeg/libavutil -lavutil \
              -L$${PWD}/../../../ffmpeg/libpostproc -lpostproc \
              -L$${PWD}/../../../ffmpeg/libswresample -lswresample \
-             -L$${PWD}/../../../ffmpeg/libswscale -lswscale
+             -L$${PWD}/../../../ffmpeg/libswscale -lswscale \
+             -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
+             -L$${PWD}/../../../ffmpeg/libavutil -lavutil
+LIBS      += -L$${PWD}/../../../openjpeg/usr/lib -lopenjpeg
+LIBS      += -lrt
 
 macx:
 {

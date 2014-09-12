@@ -12,6 +12,9 @@ configure -opensource -confirm-license -static -ltcg -no-sql-sqlite -no-sql-odbc
 
 Qwt
 ---
+Linux:
+Edit qwtconfig.pri, comment QwtDll and QwtSvg lines
+qmake
 
 YASM
 ----
