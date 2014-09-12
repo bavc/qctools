@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=qctools.desktop
+ServiceTypes=audio/*,video/*,image/*,application/x-flash-video
+Actions=qctools
+X-KDE-Priority=TopLevel
+
+[Desktop Action qctools]
+Name=QCTools
+GenericName=QCTools
+Exec=qctools %u
+Icon=qctools

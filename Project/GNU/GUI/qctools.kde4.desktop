@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Service
+Name=qctools.desktop
+ServiceTypes=KonqPopupMenu/Plugin,audio/*,video/*,image/*,application/x-flash-video
+Actions=QCTools
+X-KDE-Priority=TopLevel
+
+[Desktop Action QCTools]
+Name=QCTools
+GenericName=Media Analyzer
+Exec=QCTools %u
+Icon=qctools
