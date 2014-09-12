@@ -1,4 +1,4 @@
-0.5.0, 2014-09-
+0.5.0, 2014-09-12
 -----
 + New graph filters (Crop...)
 + Updated playback filters (with more options e.g. color picker, vertical filters)
