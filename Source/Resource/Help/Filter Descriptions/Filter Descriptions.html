@@ -19,11 +19,10 @@
         </ol>
        
         <h2 style="color:blue"><a id="MinMaxAvgLowHigh">1. YUV Values/ MIN, AVG, MAX, LOW, HIGH</a></h2>
-        <p>
-		YUV refers to a particular a way of encoding color information in analog video where Y channels carry <q>luma</q>, or brightness information (<a href="http://en.wikipedia.org/wiki/Luma_(video)">wikipedia.org/wiki/Luma</a>), and U and V channels carry information about color, or <q>chrominance</q> (<a href="http://en.wikipedia.org/wiki/Chrominance">wikipedia.org/wiki/Chrominance</a>).<br/>
-        QCTools can analyze the YUV Values of a particular encoded video file in order to provide information about the appearance of the video. These filters examine every pixel in a given channel and records the Maximum, Minimum, and Average values.<br/>
+         <p>YUV refers to the common method of encoding signal information in video using three distinct components: Y, U, and V. The Y channel carries <q>luma</q>, or brightness information (<a href="http://en.wikipedia.org/wiki/Luma_(video)">wikipedia.org/wiki/Luma</a>), while the U and V channels carry <q>chroma</q> (<a href="http://en.wikipedia.org/wiki/Chrominance">wikipedia.org/wiki/Chrominance</a>), or color difference information. Specifically in the context of QCTools, YUV is used synonymously with the color encoding specification for digital component video, Y'CbCr, where Cb and Cr represent the color difference components.<br/>
+        Using individual filters, QCTools can analyze the Y, U, and V components of a digital video signal and report on specific characteristics relating to a video's appearance. These filters examine each pixel in a given channel, displaying the maximum (MIN) and minimum (MIN) values at a range of 0 through 255. These values are added up and divided by the total number of pixels to calculate the Average (AVG) value.<br/>
         <i>(For in-depth descriptions of how luma and/or chroma noise -- and other types of artifacts-- may present, the <b><a href= "http://avaa.bavc.org/artifactatlas/index.php/Table_of_Contents">A/V Artifact Atlas</a></b> is an excellent reference.)</i><br/>
-		</p>
+        </p>
 
         <h3>Y Value Filters: YMIN, YAVG, YMAX</h3>
         <table border="1">
