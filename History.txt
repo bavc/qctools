@@ -1,6 +1,7 @@
 0.6.0
 -----
 + pkt_duration_time is added to tha sidecar stats file in order to get the real end timestamp of the stream
+x YUVJ (full range) were shrinked to broadcast range, now using Ffmpeg update for better YUVJ handling (gitHub issue #36)
 x Wrong graphs in case FFmpeg does not provide a PTS e.g. with AVI (GitHub issue #12)
 x Slight documentation corrections
 x The sidecar stats file was not correctly detected if the media file is open instead of the sidecar stats file
