@@ -88,23 +88,23 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_) :
     }
     if (StatsFromExternalData_FileName.size()==0)
     {
-        if (QFile::exists(StatsFromExternalData_FileName+".qctools.xml.gz"))
+        if (QFile::exists(FileName+".qctools.xml.gz"))
         {
-            StatsFromExternalData_FileName=StatsFromExternalData_FileName+".qctools.xml.gz";
+            StatsFromExternalData_FileName=FileName+".qctools.xml.gz";
             StatsFromExternalData_FileName_IsCompressed=true;
         }
-        else if (QFile::exists(StatsFromExternalData_FileName+".qctools.xml"))
+        else if (QFile::exists(FileName+".qctools.xml"))
         {
-            StatsFromExternalData_FileName=StatsFromExternalData_FileName+".qctools.xml";
+            StatsFromExternalData_FileName=FileName+".qctools.xml";
         }
-        else if (QFile::exists(StatsFromExternalData_FileName+".xml.gz"))
+        else if (QFile::exists(FileName+".xml.gz"))
         {
-            StatsFromExternalData_FileName=StatsFromExternalData_FileName+".xml.gz";
+            StatsFromExternalData_FileName=FileName+".xml.gz";
             StatsFromExternalData_FileName_IsCompressed=true;
         }
-        else if (QFile::exists(StatsFromExternalData_FileName+".xml"))
+        else if (QFile::exists(FileName+".xml"))
         {
-            StatsFromExternalData_FileName=StatsFromExternalData_FileName+".xml";
+            StatsFromExternalData_FileName=FileName+".xml";
         }
     }
 
