@@ -246,9 +246,15 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
                             {
                                 double Frame_Duration=std::atof(Xml.attributes().value("pkt_duration_time").toString().toUtf8());
                                 x[0][x_Max]=x_Max;
-                                x[1][x_Max]=std::atof(Xml.attributes().value("pkt_pts_time").string()->toUtf8());
-                                x[2][x_Max]=x[1][x_Max]/60;
-                                x[3][x_Max]=x[1][x_Max]/3600;
+                                string ts=Xml.attributes().value("pkt_pts_time").toString().toUtf8();
+                                if (ts.empty() || ts=="N/A")
+                                    ts=Xml.attributes().value("pkt_dts_time").toString().toUtf8(); // Using DTS is PTS is not available
+                                if (!ts.empty() && ts!="N/A")
+                                {
+                                    x[1][x_Max]=std::atof(ts.c_str());
+                                    x[2][x_Max]=x[1][x_Max]/60;
+                                    x[3][x_Max]=x[2][x_Max]/60;
+                                }
 
                                 int Width=atoi(Xml.attributes().value("width").toString().toUtf8());
                                 int Height=atoi(Xml.attributes().value("height").toString().toUtf8());
@@ -297,7 +303,8 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
                                 if (VideoFrameCount<x_Max)
                                 {
                                     VideoFrameCount=x_Max;
-                                    VideoDuration=x[1][x_Max-1]+Frame_Duration;
+                                    if (!ts.empty() && ts!="N/A")
+                                        VideoDuration=x[1][x_Max-1]+Frame_Duration;
                                     if (FormatContext==NULL)
                                         VideoFramePos=VideoFrameCount;
                                 }
@@ -770,9 +777,13 @@ bool FFmpeg_Glue::Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, 
         if (WithStats)
         {
             x[0][x_Max]=x_Max;
-            x[1][x_Max]=((double)Frame->pkt_pts)*VideoStream->time_base.num/VideoStream->time_base.den;
-            x[2][x_Max]=((double)Frame->pkt_pts)*VideoStream->time_base.num/VideoStream->time_base.den/60;
-            x[3][x_Max]=((double)Frame->pkt_pts)*VideoStream->time_base.num/VideoStream->time_base.den/3600;
+            int64_t ts=(Frame->pkt_pts==AV_NOPTS_VALUE)?Frame->pkt_dts:Frame->pkt_pts; // Using DTS is PTS is not available
+            if (ts!=AV_NOPTS_VALUE)
+            {
+                x[1][x_Max]=((double)ts)*VideoStream->time_base.num/VideoStream->time_base.den;
+                x[2][x_Max]=x[1][x_Max]/60;
+                x[3][x_Max]=x[2][x_Max]/60;
+            }
 
             AVDictionary * m=av_frame_get_metadata (FilteredFrame);
             AVDictionaryEntry* e=NULL;

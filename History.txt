@@ -1,5 +1,6 @@
 0.6.0
 -----
+x Wrong graphs in case FFmpeg does not provide a PTS e.g. with AVI (GitHub issue #12)
 x Slight documentation corrections
 x The sidecar stats file was not correctly detected if the media file is open instead of the sidecar stats file
 x Linux only: The sidecar stats file was not correctly loaded
