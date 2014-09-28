@@ -386,6 +386,9 @@ void Control::Update()
             }
         }
     }
+
+    if (PlotsArea)
+        PlotsArea->Marker_Update();
 }
 
 //---------------------------------------------------------------------------

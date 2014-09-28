@@ -302,6 +302,40 @@ void Plots::Plots_Update()
 }
 
 //---------------------------------------------------------------------------
+void Plots::Marker_Update()
+{
+    size_t FramePos=FileInfoData->Frames_Pos_Get();
+    double X=0;
+    switch (XAxis_Kind_index)
+    {
+        case 0 :
+                X=FramePos;
+                break;
+        case 1 :
+                {
+                double FrameRate=FileInfoData->Glue->VideoFrameCount/FileInfoData->Glue->VideoDuration;
+                X=FramePos/FrameRate;
+                }
+                break;
+        case 2 :
+                {
+                double FrameRate=FileInfoData->Glue->VideoFrameCount/FileInfoData->Glue->VideoDuration;
+                X=FramePos/(60*FrameRate);
+                }
+                break;
+        case 3 :
+                {
+                double FrameRate=FileInfoData->Glue->VideoFrameCount/FileInfoData->Glue->VideoDuration;
+                X=FramePos/(3600*FrameRate);
+                }
+                break;
+        default: return; // Problem
+    }
+
+    Marker_Update(X);
+}
+
+//---------------------------------------------------------------------------
 void Plots::Marker_Update(double X)
 {
     for (size_t Type=0; Type<PlotType_Max; ++Type)

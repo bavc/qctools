@@ -66,6 +66,7 @@ public:
     void                        Plots_Create                ();
     void                        Plots_Create                (PlotType Type);
     void                        Plots_Update                ();
+    void                        Marker_Update               ();
     void                        Marker_Update               (double X);
     void                        createData_Init             ();
     void                        createData_Update           ();
