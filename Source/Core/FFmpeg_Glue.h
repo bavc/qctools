@@ -58,6 +58,7 @@ public:
     bytes                       Jpeg;
     std::vector<bytes*>         JpegList;
     double**                    x; //PTS of frame number
+    double*                     d; //Duration of frame number
     double**                    y; //Data
     bool*                       key_frame; //May be useful for FFmpeg XML output
     double                      y_Max[PlotType_Max];

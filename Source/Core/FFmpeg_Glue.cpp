@@ -200,6 +200,8 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
         // Configure
         x = new double*[4];
         memset(x, 0, 4*sizeof(double*));
+        d = new double[VideoFrameCount_Max];
+        memset(d, 0x00, VideoFrameCount_Max*sizeof(double));
         y = new double*[PlotName_Max];
         memset(y, 0, PlotName_Max*sizeof(double*));
         memset(y_Max, 0, PlotType_Max*sizeof(double));
@@ -244,8 +246,8 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
                         {
                             if (Xml.name()=="frame" && Xml.attributes().value("media_type")=="video")
                             {
-                                double Frame_Duration=std::atof(Xml.attributes().value("pkt_duration_time").toString().toUtf8());
                                 x[0][x_Max]=x_Max;
+                                d[x_Max]=std::atof(Xml.attributes().value("pkt_duration_time").toString().toUtf8());
                                 string ts=Xml.attributes().value("pkt_pts_time").toString().toUtf8();
                                 if (ts.empty() || ts=="N/A")
                                     ts=Xml.attributes().value("pkt_dts_time").toString().toUtf8(); // Using DTS is PTS is not available
@@ -304,7 +306,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
                                 {
                                     VideoFrameCount=x_Max;
                                     if (!ts.empty() && ts!="N/A")
-                                        VideoDuration=x[1][x_Max-1]+Frame_Duration;
+                                        VideoDuration=x[1][x_Max-1]+d[x_Max-1];
                                     if (FormatContext==NULL)
                                         VideoFramePos=VideoFrameCount;
                                 }
@@ -784,6 +786,8 @@ bool FFmpeg_Glue::Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, 
                 x[2][x_Max]=x[1][x_Max]/60;
                 x[3][x_Max]=x[2][x_Max]/60;
             }
+            if (Frame->pkt_duration!=AV_NOPTS_VALUE)
+                d[x_Max]=((double)Frame->pkt_duration)*VideoStream->time_base.num/VideoStream->time_base.den;
 
             AVDictionary * m=av_frame_get_metadata (FilteredFrame);
             AVDictionaryEntry* e=NULL;
