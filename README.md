@@ -42,3 +42,17 @@ Incorporating a set of open source libraries developed under the ffmpeg project,
 a/v artifact atlas
 =======
 Once you check your files using QCTools, consider using the [A/V Artifacts Atlas](http://avaa.bavc.org/artifactatlas/index.php/A/V_Artifact_Atlas) to gain further clarification and appropriate descriptive terminology for any anomalies or errors you might encounter in your video content.  Users are invited to contribute unidentified errors they come across to the atlas.
+
+license
+=======
+Qwt License
+Version 1.0, January 1, 2003
+
+The Qwt library and included programs are provided under the terms of the GNU LESSER GENERAL PUBLIC LICENSE (LGPL) with the following exceptions:
+
+ 1. Widgets that are subclassed from Qwt widgets do not constitute a derivative work.
+
+ 2. Static linking of applications and widgets to the Qwt library does not constitute a derivative work and does not require the author to provide source code for the application or widget, use the shared Qwt libraries, or link their applications or widgets against a user-supplied version of Qwt.
+If you link the application or widget to a modified version of Qwt, then the changes to Qwt must be provided under the terms of the LGPL in sections 1, 2, and 4.
+
+ 3. You do not have to provide a copy of the Qwt license with programs that are linked to the Qwt library, nor do you have to identify the Qwt license in your program or documentation as required by section 6 of the LGPL. 
