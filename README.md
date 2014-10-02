@@ -21,7 +21,7 @@ Currently QCTools accepts a variety of video formats, including *.avi, *.mkv, *.
 filter descriptions
 =======
 
-
+QCTools offers a variety of [Filtering Options] (http://htmlpreview.github.io/?https://github.com/bavc/qctools/blob/master/Source/Resource/Help/Filter%20Descriptions/Filter%20Descriptions.html) including: YUV Values, Temporal Outliers, Vertical Line Repititions, Broadcast Range, Crop Width and Height, Peak Signal to Noise Ratio and Mean Square Error
 
 
 
