@@ -20,7 +20,8 @@ Currently QCTools accepts a variety of video formats, including *.avi, *.mkv, *.
 
 filter descriptions
 =======
-[Filter Descrptions](http://htmlpreview.github.io/?https://github.com/bavc/qctools/blob/master/Source/Resource/Help/Filter%20Descriptions/Filter%20Descriptions.html)
+
+
 
 
 
