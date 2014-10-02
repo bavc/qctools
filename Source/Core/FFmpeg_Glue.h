@@ -12,6 +12,7 @@
 
 #include <string>
 #include <vector>
+#include <stdint.h>
 using namespace std;
 
 struct AVFormatContext;
@@ -91,6 +92,13 @@ public:
     string                      FFmpeg_Configuration();
     string                      FFmpeg_LibsVersion();
 
+    //Stats
+    string                      Stats_Average_Get(PlotName Pos);
+    string                      Stats_Average_Get(PlotName Pos, PlotName Pos2);
+    string                      Stats_Count_Get(PlotName Pos);
+    string                      Stats_Count2_Get(PlotName Pos);
+    string                      Stats_Percent_Get(PlotName Pos);
+ 
     // Actions
     void                        Seek (size_t Pos);
     void                        FrameAtPosition(size_t Pos);
@@ -157,6 +165,11 @@ private:
     size_t                      x_Line_Begin;
     size_t                      x_Line_EolSize;
     char                        x_Line_EolChar;
+
+    //Stats
+    double                      Stats_Totals[PlotName_Max];
+    uint64_t                    Stats_Counts[PlotName_Max];
+    uint64_t                    Stats_Counts2[PlotName_Max];
 };
 
 #endif // FFmpeg_Glue_H

@@ -21,6 +21,17 @@
 enum col_names
 {
     Col_Processed,
+    Col_Yav,
+    Col_Yrang,
+    Col_Uav,
+    Col_Vav,
+    Col_TOUTav,
+    Col_TOUTc,
+    Col_SATb,
+    Col_SATi,
+    Col_BRNGav,
+    Col_BRNGc,
+    Col_MSEfY,
     Col_Format,
     Col_StreamCount,
     Col_Duration,
@@ -33,10 +44,10 @@ enum col_names
     Col_PixFormat,
     Col_FrameRate,
     Col_AudioFormat,
-    Col_SampleFormat,
+    //Col_SampleFormat,
     Col_SamplingRate,
-    Col_ChannelLayout,
-    Col_BitDepth,
+    //Col_ChannelLayout,
+    //Col_BitDepth,
     Col_Max
 };
 
@@ -84,10 +95,21 @@ void FilesList::showEvent(QShowEvent * Event)
     setHorizontalHeaderItem(Col_PixFormat,      new QTableWidgetItem("Pix Format"));
     setHorizontalHeaderItem(Col_FrameRate,      new QTableWidgetItem("Frame rate"));
     setHorizontalHeaderItem(Col_AudioFormat,    new QTableWidgetItem("A. Format"));
-    setHorizontalHeaderItem(Col_SampleFormat,   new QTableWidgetItem("Sample format"));
+    //setHorizontalHeaderItem(Col_SampleFormat,   new QTableWidgetItem("Sample format"));
     setHorizontalHeaderItem(Col_SamplingRate,   new QTableWidgetItem("Sampling rate"));
-    setHorizontalHeaderItem(Col_ChannelLayout,  new QTableWidgetItem("Channel layout"));
-    setHorizontalHeaderItem(Col_BitDepth,       new QTableWidgetItem("Bit depth"));
+    //setHorizontalHeaderItem(Col_ChannelLayout,  new QTableWidgetItem("Channel layout"));
+    //setHorizontalHeaderItem(Col_BitDepth,       new QTableWidgetItem("Bit depth"));
+    setHorizontalHeaderItem(Col_Yav,            new QTableWidgetItem("Yav")); horizontalHeaderItem(Col_Yav)->setToolTip("average of Y values");
+    setHorizontalHeaderItem(Col_Yrang,          new QTableWidgetItem("Yrang")); horizontalHeaderItem(Col_Yrang)->setToolTip("average of ( YHIGH - YLOW ), gives an idea of contrast range");
+    setHorizontalHeaderItem(Col_Uav,            new QTableWidgetItem("Uav")); horizontalHeaderItem(Col_Uav)->setToolTip("average of U values");
+    setHorizontalHeaderItem(Col_Vav,            new QTableWidgetItem("Vav")); horizontalHeaderItem(Col_Vav)->setToolTip("average of V values");
+    setHorizontalHeaderItem(Col_TOUTav,         new QTableWidgetItem("TOUTav")); horizontalHeaderItem(Col_TOUTav)->setToolTip("average of TOUT values");
+    setHorizontalHeaderItem(Col_TOUTc,          new QTableWidgetItem("TOUTc")); horizontalHeaderItem(Col_TOUTc)->setToolTip("count of TOUT > 0.005 (the 0.005 should eventually be a preference)");
+    setHorizontalHeaderItem(Col_SATb,           new QTableWidgetItem("SATi")); horizontalHeaderItem(Col_SATb)->setToolTip("count of frames with MAXSAT > 88.7, outside of broadcast color levels");
+    setHorizontalHeaderItem(Col_SATi,           new QTableWidgetItem("SATi")); horizontalHeaderItem(Col_SATi)->setToolTip("count of frames with MAXSAT > 118.2, illegal YUV color");
+    setHorizontalHeaderItem(Col_BRNGav,         new QTableWidgetItem("BRNGav")); horizontalHeaderItem(Col_BRNGav)->setToolTip("percent of frames with BRNG > 0");
+    setHorizontalHeaderItem(Col_BRNGc,          new QTableWidgetItem("BRNGc")); horizontalHeaderItem(Col_BRNGc)->setToolTip("count of frames with BRNG > 0 (the 0 should eventually be a preference)");
+    setHorizontalHeaderItem(Col_MSEfY,          new QTableWidgetItem("MSEfY")); horizontalHeaderItem(Col_MSEfY)->setToolTip("count of frames with MSEfY over 1000 (the 1000 should eventually be a preference)");
 
     UpdateAll();
 }
@@ -184,10 +206,10 @@ void FilesList::UpdateAll()
         setItem((int)Files_Pos, Col_PixFormat,      new QTableWidgetItem(Main->Files[Files_Pos]->Glue->PixFormat_Get().c_str()));
         setItem((int)Files_Pos, Col_FrameRate,      new QTableWidgetItem(QString::number(FrameRate, 'f', 3)));
         setItem((int)Files_Pos, Col_AudioFormat,    new QTableWidgetItem(Main->Files[Files_Pos]->Glue->AudioFormat_Get().c_str()));
-        setItem((int)Files_Pos, Col_SampleFormat,   new QTableWidgetItem(Main->Files[Files_Pos]->Glue->SampleFormat_Get().c_str()));
+        //setItem((int)Files_Pos, Col_SampleFormat,   new QTableWidgetItem(Main->Files[Files_Pos]->Glue->SampleFormat_Get().c_str()));
         setItem((int)Files_Pos, Col_SamplingRate,   new QTableWidgetItem(SamplingRate_String));
-        setItem((int)Files_Pos, Col_ChannelLayout,  new QTableWidgetItem(Main->Files[Files_Pos]->Glue->ChannelLayout_Get().c_str()));
-        setItem((int)Files_Pos, Col_BitDepth,       new QTableWidgetItem(BitDepth_String));
+        //setItem((int)Files_Pos, Col_ChannelLayout,  new QTableWidgetItem(Main->Files[Files_Pos]->Glue->ChannelLayout_Get().c_str()));
+        //setItem((int)Files_Pos, Col_BitDepth,       new QTableWidgetItem(BitDepth_String));
 
         for (int Pos=0; Pos<Col_Max; Pos++)
         {
@@ -215,6 +237,17 @@ void FilesList::Update()
             stringstream Message;
             Message<<(int)((double)Main->Files[Files_Pos]->Glue->VideoFramePos)*100/Main->Files[Files_Pos]->Glue->VideoFrameCount<<"%";
             setItem((int)Files_Pos, 0, new QTableWidgetItem(QString::fromStdString(Message.str())));
+            setItem((int)Files_Pos, Col_Yav,            new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Average_Get(PlotName_YAVG).c_str()));
+            setItem((int)Files_Pos, Col_Yrang,          new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Average_Get(PlotName_YHIGH, PlotName_YLOW).c_str()));
+            setItem((int)Files_Pos, Col_Uav,            new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Average_Get(PlotName_UAVG).c_str()));
+            setItem((int)Files_Pos, Col_Vav,            new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Average_Get(PlotName_VAVG).c_str()));
+            setItem((int)Files_Pos, Col_TOUTav,         new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Average_Get(PlotName_TOUT).c_str()));
+            setItem((int)Files_Pos, Col_TOUTc,          new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Count_Get(PlotName_TOUT).c_str()));
+            setItem((int)Files_Pos, Col_SATb,           new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Count_Get(PlotName_SATMAX).c_str()));
+            setItem((int)Files_Pos, Col_SATi,           new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Count2_Get(PlotName_SATMAX).c_str()));
+            setItem((int)Files_Pos, Col_BRNGav,         new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Percent_Get(PlotName_BRNG).c_str()));
+            setItem((int)Files_Pos, Col_BRNGc,          new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Count_Get(PlotName_BRNG).c_str()));
+            setItem((int)Files_Pos, Col_MSEfY,          new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Count_Get(PlotName_MSE_y).c_str()));
             QTableWidgetItem* Item=item((int)Files_Pos, 0);
             if (Item)
                 Item->setFlags(Item->flags()&((Qt::ItemFlags)-1-Qt::ItemIsEditable));

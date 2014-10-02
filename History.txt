@@ -1,5 +1,6 @@
 0.6.0
 -----
++ Summarization statistics
 + pkt_duration_time is added to tha sidecar stats file in order to get the real end timestamp of the stream
 x Minimize/maximize button on video preview window (GitHub issue #24)
 x Position of cursor in graph not updated, when moving in preview window (GitHub issue #18)

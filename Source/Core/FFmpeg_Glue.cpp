@@ -34,6 +34,7 @@ extern "C"
 #include <sstream>
 #include <iomanip>
 #include <cstdlib>
+#include <cfloat>
 //---------------------------------------------------------------------------
 
 void LibsVersion_Inject(stringstream &LibsVersion, const char* Name, int Value)
@@ -114,6 +115,11 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
     Scale2_Context=NULL;
     Scale1_Frame=NULL;
     Scale2_Frame=NULL;
+
+    //Stats
+    memset(Stats_Totals, 0x00, PlotName_Max*sizeof(double));
+    memset(Stats_Counts, 0x00, PlotName_Max*sizeof(uint64_t));
+    memset(Stats_Counts2, 0x00, PlotName_Max*sizeof(uint64_t));
 
     // FFmpeg init
     av_register_all();
@@ -247,10 +253,10 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
                             if (Xml.name()=="frame" && Xml.attributes().value("media_type")=="video")
                             {
                                 x[0][x_Max]=x_Max;
-                                d[x_Max]=std::atof(Xml.attributes().value("pkt_duration_time").toString().toUtf8().data());
-                                string ts=Xml.attributes().value("pkt_pts_time").toString().toUtf8().data();
+                                d[x_Max]=std::atof(Xml.attributes().value("pkt_duration_time").toString().toUtf8());
+                                string ts=Xml.attributes().value("pkt_pts_time").toString().toUtf8();
                                 if (ts.empty() || ts=="N/A")
-                                    ts=Xml.attributes().value("pkt_dts_time").toString().toUtf8().data(); // Using DTS is PTS is not available
+                                    ts=Xml.attributes().value("pkt_dts_time").toString().toUtf8(); // Using DTS is PTS is not available
                                 if (!ts.empty() && ts!="N/A")
                                 {
                                     x[1][x_Max]=std::atof(ts.c_str());
@@ -258,8 +264,8 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
                                     x[3][x_Max]=x[2][x_Max]/60;
                                 }
 
-                                int Width=atoi(Xml.attributes().value("width").toString().toUtf8().data());
-                                int Height=atoi(Xml.attributes().value("height").toString().toUtf8().data());
+                                int Width=atoi(Xml.attributes().value("width").toString().toUtf8());
+                                int Height=atoi(Xml.attributes().value("height").toString().toUtf8());
 
                                 while (Xml.readNextStartElement())
                                 {
@@ -272,7 +278,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
 
                                         if (j!=PlotName_Max)
                                         {
-                                            double value=std::atof(Xml.attributes().value("value").toString().toUtf8().data());
+                                            double value=std::atof(Xml.attributes().value("value").toString().toUtf8());
                                             
                                             // Special cases: crop: x2, y2
                                             if (Width && Xml.attributes().value("key")=="lavfi.cropdetect.x2")
@@ -290,6 +296,16 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
                                                 y_Max[PerPlotName[j].Group1]=y[j][x_Max];
                                             if (PerPlotName[j].Group2!=PlotType_Max && y_Max[PerPlotName[j].Group2]<y[j][x_Max])
                                                 y_Max[PerPlotName[j].Group2]=y[j][x_Max];
+
+                                            //Stats
+                                            Stats_Totals[j]+=y[j][x_Max];
+                                            if (PerPlotName[j].DefaultLimit!=DBL_MAX)
+                                            {
+                                                if (y[j][x_Max]>PerPlotName[j].DefaultLimit)
+                                                    Stats_Counts[j]++;
+                                                if (PerPlotName[j].DefaultLimit2!=DBL_MAX && y[j][x_Max]>PerPlotName[j].DefaultLimit2)
+                                                    Stats_Counts2[j]++;
+                                            }
                                         }
                                     }
                                     Xml.skipCurrentElement();
@@ -297,7 +313,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
 
                                 QStringRef key_frame_String=Xml.attributes().value("key_frame");
                                 if (key_frame_String.size()>0)
-                                    key_frame[x_Max]=std::atof(key_frame_String.toString().toUtf8().data());
+                                    key_frame[x_Max]=std::atof(key_frame_String.toString().toUtf8());
                                 else
                                     key_frame[x_Max]=1; //Forcing key_frame to 1 if it is missing from the XML, for decoding
 
@@ -346,6 +362,68 @@ FFmpeg_Glue::~FFmpeg_Glue()
         avpicture_free((AVPicture*)Scale1_Frame);
     if (Scale1_Context)
         sws_freeContext(Scale1_Context);
+}
+
+//***************************************************************************
+// Stats
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::Stats_Average_Get(PlotName Pos)
+{
+    if (x_Max==0)
+        return string();
+
+    double Value=Stats_Totals[Pos]/x_Max;
+    stringstream str;
+    str<<fixed<<setprecision(PerPlotName[Pos].DigitsAfterComma)<<Value;
+    return str.str();
+}
+
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::Stats_Average_Get(PlotName Pos, PlotName Pos2)
+{
+    if (x_Max==0)
+        return string();
+
+    double Value=(Stats_Totals[Pos]-Stats_Totals[Pos2])/x_Max;
+    stringstream str;
+    str<<fixed<<setprecision(PerPlotName[Pos].DigitsAfterComma)<<Value;
+    return str.str();
+}
+
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::Stats_Count_Get(PlotName Pos)
+{
+    if (x_Max==0)
+        return string();
+
+    stringstream str;
+    str<<Stats_Counts[Pos];
+    return str.str();
+}
+
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::Stats_Count2_Get(PlotName Pos)
+{
+    if (x_Max==0)
+        return string();
+
+    stringstream str;
+    str<<Stats_Counts2[Pos];
+    return str.str();
+}
+
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::Stats_Percent_Get(PlotName Pos)
+{
+    if (x_Max==0)
+        return string();
+
+    double Value=Stats_Counts[Pos]/x_Max;
+    stringstream str;
+    str<<Value*100<<"%";
+    return str.str();
 }
 
 //***************************************************************************
@@ -824,6 +902,16 @@ bool FFmpeg_Glue::Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, 
                         y_Max[PerPlotName[j].Group1]=y[j][x_Max];
                     if (PerPlotName[j].Group2!=PlotType_Max && y_Max[PerPlotName[j].Group2]<y[j][x_Max])
                         y_Max[PerPlotName[j].Group2]=y[j][x_Max];
+
+                    //Stats
+                    Stats_Totals[j]+=y[j][x_Max];
+                    if (PerPlotName[j].DefaultLimit!=DBL_MAX)
+                    {
+                        if (y[j][x_Max]>PerPlotName[j].DefaultLimit)
+                            Stats_Counts[j]++;
+                        if (PerPlotName[j].DefaultLimit2!=DBL_MAX && y[j][x_Max]>PerPlotName[j].DefaultLimit2)
+                            Stats_Counts2[j]++;
+                    }
                 }
 
                 /*

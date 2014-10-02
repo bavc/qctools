@@ -123,6 +123,8 @@ struct per_plot_item
     const   char*       FFmpeg_Name_2_3;
     const   int         DigitsAfterComma;
     const   bool        NewLine;
+    const   double      DefaultLimit;
+    const   double      DefaultLimit2;
 };
 extern const struct per_plot_group  PerPlotGroup    [PlotType_Max];
 extern const struct per_plot_item   PerPlotName     [PlotName_Max];
