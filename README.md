@@ -10,11 +10,13 @@ Now in version 0.5.0, QCTools allows archivists, curators, preservationists and 
 
 For more information about the project, or to download the latest Mac/Winddows/Ubuntu release, please visit [BAVC's QCTools homepage](http://www.bavc.org/qctools)
 
+installation
+=======
+Go to http://bavc.org/qctools and download QCTools for your operating system (currently Windows or Mac OS X are supported). Initiate the install by double-clicking the icon, and follow the steps. New releases of QCTools will be periodically available at the QCTools Project website.
+
+
 getting started
 =======
-
-
-
 Currently QCTools accepts a variety of video formats, including *.avi, *.mkv, *.mov, and *.mp4, as well as a diverse selection of codecs. Uncompressed 8-bit formats are ideal for the most accurate interpretation of the video. Relying upon ffmpeg's libavcodec and libformat libraries allows QCTools to support a wide variety of digital audiovisual formats.
 
 
