@@ -10,6 +10,9 @@ Now in version 0.5.0, QCTools allows archivists, curators, preservationists and 
 
 For more information about the project, or to download the latest Mac/Winddows/Ubuntu release, please visit [BAVC's QCTools homepage](http://www.bavc.org/qctools)
 
+An overview of QCTools and how to use it can be found [here.] (http://htmlpreview.github.io/?https://github.com/bavc/qctools/blob/master/Source/Resource/Help/How%20To%20Use/How%20To%20Use.html) 
+
+
 installation
 =======
 Go to http://bavc.org/qctools and download QCTools for your operating system (currently Windows or Mac OS X are supported). Initiate the install by double-clicking the icon, and follow the steps. New releases of QCTools will be periodically available at the QCTools Project website.
@@ -25,7 +28,9 @@ filter descriptions
 
 QCTools offers a variety of [Filtering Options] (http://htmlpreview.github.io/?https://github.com/bavc/qctools/blob/master/Source/Resource/Help/Filter%20Descriptions/Filter%20Descriptions.html) including: YUV Values, Temporal Outliers, Vertical Line Repititions, Broadcast Range, Crop Width and Height, Peak Signal to Noise Ratio and Mean Square Error
 
-
+playback filters
+=======
+The QCTools preview window is intended as an analytical playback environent that allows the user to review video through multiple filters simultaneously. The playback window includes two viewing windows which may be set to different combinations of [filters] (http://htmlpreview.github.io/?https://github.com/bavc/qctools/blob/master/Source/Resource/Help/Playback%20Filters/Playback%20Filters.html).
 
 reading a qctools document
 =======
