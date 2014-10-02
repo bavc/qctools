@@ -15,18 +15,18 @@ An overview of QCTools and how to use it can be found [here.] (http://htmlprevie
 
 installation
 =======
-Go to http://bavc.org/qctools and download QCTools for your operating system (currently Windows or Mac OS X are supported). Initiate the install by double-clicking the icon, and follow the steps. New releases of QCTools will be periodically available at the QCTools Project website.
+Go to http://bavc.org/qctools and download QCTools for your operating system. Initiate the install by double-clicking the icon, and follow the steps. New releases of QCTools will be periodically available at the QCTools Project website.
 
 
 getting started
 =======
-Currently QCTools accepts a variety of video formats, including *.avi, *.mkv, *.mov, and *.mp4, as well as a diverse selection of codecs. Uncompressed 8-bit formats are ideal for the most accurate interpretation of the video. Relying upon ffmpeg's libavcodec and libformat libraries allows QCTools to support a wide variety of digital audiovisual formats.
+Currently QCTools accepts a variety of video formats, including *.avi, *.mkv, *.mov, and *.mp4, as well as a diverse selection of codecs. Uncompressed 8-bit formats are ideal for the most accurate interpretation of the video. By relying upon ffmpeg's libavcodec and libformat libraries, QCTools can support a wide variety of digital audiovisual formats.
 
 
 filter descriptions
 =======
 
-QCTools offers a variety of [Filtering Options] (http://htmlpreview.github.io/?https://github.com/bavc/qctools/blob/master/Source/Resource/Help/Filter%20Descriptions/Filter%20Descriptions.html) including: YUV Values, Temporal Outliers, Vertical Line Repititions, Broadcast Range, Crop Width and Height, Peak Signal to Noise Ratio and Mean Square Error
+QCTools offers a variety of [Filtering Options](http://htmlpreview.github.io/?https://github.com/bavc/qctools/blob/master/Source/Resource/Help/Filter%20Descriptions/Filter%20Descriptions.html) including: YUV Values, Temporal Outliers (TOUT), Vertical Line Repetitions (VREP), Broadcast Range (BRNG), Crop Width and Height (CropW and CropH), Peak Signal to Noise Ratio (PSNRf) and Mean Square Error (MSEf).
 
 playback filters
 =======
