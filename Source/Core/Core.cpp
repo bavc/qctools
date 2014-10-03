@@ -16,24 +16,21 @@ const struct per_plot_group PerPlotGroup [PlotType_Max]=
     {
         PlotName_YMIN,      5,    0,  255,  3,  "Y",  true,
         "For all samples of the Y plane, plot the MAXimum, MIVimum, AVeraGe,\n"
-        "LOW (10th percentile), and HIGH (90th percentile) values for each\n"
-        "frame.\n"
+        "LOW (10th percentile), and HIGH (90th percentile) values for each frame.\n"
         "The Y plane provides information about video brightness or luminance.",
     },
     //U
     {
         PlotName_UMIN,      5,    0,  255,  3,  "U",  true,
         "For all samples of the U plane, plot the MAXimum, MIVimum, AVeraGe,\n"
-        "LOW (10th percentile), and HIGH (90th percentile) values for each\n"
-        "frame.\n"
+        "LOW (10th percentile), and HIGH (90th percentile) values for each frame.\n"
         "The U plane (along with V) provides information about video color.",
     },
     //V
     {
         PlotName_VMIN,      5,    0,  255,  3,  "V",  true,
         "For all samples of the V plane, plot the MAXimum, MIVimum, AVeraGe,\n"
-        "LOW (10th percentile), and HIGH (90th percentile) values for each\n"
-        "frame.\n"
+        "LOW (10th percentile), and HIGH (90th percentile) values for each frame.\n"
         "The V plane (along with U) provides information about video color.",
     },
     //YDiff
