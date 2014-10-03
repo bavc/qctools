@@ -46,7 +46,7 @@ class Info;
 class Plots : public QWidget
 {
     Q_OBJECT
-    
+
 public:
     explicit Plots(QWidget *parent, FileInformation* FileInfoData);
     ~Plots();
@@ -58,7 +58,7 @@ public:
     TinyDisplay*                TinyDisplayArea;
     Control*                    ControlArea;
     Info*                       InfoArea;
-    
+
     // Positioning info
     size_t                      ZoomScale;
 
@@ -76,12 +76,12 @@ public:
     bool                        Status[PlotType_Max];
     void                        refreshDisplay              ();
     void                        refreshDisplay_Axis         ();
-    
+
     // Zoom
     void                        Zoom_Move                   (size_t Begin);
     void                        Zoom_In                     ();
     void                        Zoom_Out                    ();
-    
+
     // Widgets
     QVBoxLayout*                Layout;
     QHBoxLayout*                Layouts[PlotType_Max];

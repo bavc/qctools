@@ -71,7 +71,7 @@ MainWindow::~MainWindow()
 {
     // Files (must be deleted first in order to stop ffmpeg processes)
     for (size_t Pos=0; Pos<Files.size(); Pos++)
-        delete Files[Pos];    
+        delete Files[Pos];
 
     // Plots
     delete PlotsArea;
@@ -145,7 +145,7 @@ void MainWindow::on_actionGoTo_triggered()
 
     if (Files_CurrentPos>=Files.size())
         return;
-    
+
     bool ok;
     int i = QInputDialog::getInt(this, tr("Go to frame at position..."), Files[Files_CurrentPos]->Glue->VideoFrameCount?("frame position (0-"+QString::number(Files[Files_CurrentPos]->Glue->VideoFrameCount-1)+"):"):QString("frame position (0-based)"), Files[Files_CurrentPos]->Frames_Pos_Get(), 0, Files[Files_CurrentPos]->Glue->VideoFrameCount-1, 1, &ok);
     if (Files[Files_CurrentPos]->Glue->VideoFrameCount && i>=Files[Files_CurrentPos]->Glue->VideoFrameCount)
@@ -183,7 +183,7 @@ void MainWindow::on_actionExport_XmlGz_Prompt_triggered()
 {
     if (Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
         return;
-    
+
     QString FileName=QFileDialog::getSaveFileName(this, "Export to .qctools.xml.gz", Files[Files_CurrentPos]->FileName+".qctools.xml.gz", "Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml)", 0, QFileDialog::DontUseNativeDialog);
     if (FileName.size()==0)
         return;
@@ -197,7 +197,7 @@ void MainWindow::on_actionExport_XmlGz_Sidecar_triggered()
 {
     if (Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
         return;
-    
+
     QString FileName=Files[Files_CurrentPos]->FileName+".qctools.xml.gz";
 
     Files[Files_CurrentPos]->Export_XmlGz(FileName);
@@ -223,7 +223,7 @@ void MainWindow::on_actionExport_XmlGz_Custom_triggered()
 {
     if (Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
         return;
-    
+
     // TODO
     // Temp
     QString Name=Files[Files_CurrentPos]->FileName;
@@ -443,7 +443,7 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
     event->acceptProposedAction();
 }
- 
+
 //---------------------------------------------------------------------------
 void MainWindow::dropEvent(QDropEvent *Event)
 {

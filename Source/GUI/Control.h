@@ -37,7 +37,7 @@ class QTimer;
 class Control : public QWidget
 {
     Q_OBJECT
-    
+
 public:
     enum style
     {
@@ -102,7 +102,7 @@ public:
     selectedspeed SelectedSpeed;
 protected:
     bool    IsSlave;
-    
+
     void TimeOut_Init();
 
 public Q_SLOTS:

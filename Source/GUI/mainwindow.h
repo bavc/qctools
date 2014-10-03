@@ -42,7 +42,7 @@ class PerPicture;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-    
+
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
@@ -50,7 +50,7 @@ public:
     //Functions
     void dragEnterEvent         (QDragEnterEvent *event);
     void dropEvent              (QDropEvent *event);
-    
+
     // UI
     void                        Ui_Init                     ();
     void                        configureZoom               ();
@@ -163,7 +163,7 @@ private Q_SLOTS:
     void on_actionAbout_triggered();
 
     void on_fileNamesBox_currentIndexChanged(int index);
-    
+
     void on_check_toggled(bool checked);
 
     void on_M1_triggered();

@@ -32,7 +32,7 @@
 void MainWindow::openFile()
 {
     //processFile(QFileDialog::getOpenFileName(this, "Open file", "", "Video files (*.avi *.mkv *.mov *.mxf *.mp4);;Statistic files (*.csv);;All (*.*)"));
-    
+
     QStringList List=QFileDialog::getOpenFileNames(this, "Open file", "", "Video files (*.avi *.mkv *.mov *.mxf *.mp4);;Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
     if (List.empty())
         return;
@@ -87,7 +87,7 @@ void MainWindow::processFile(const QString &FileName)
 
     // Files (must be deleted first in order to stop ffmpeg processes)
     for (size_t Pos=0; Pos<Files.size(); Pos++)
-        delete Files[Pos];    
+        delete Files[Pos];
     Files.clear();
     ui->fileNamesBox->clear();
 
@@ -142,7 +142,7 @@ void MainWindow::clearFiles()
 {
     // Files (must be deleted first in order to stop ffmpeg processes)
     for (size_t Pos=0; Pos<Files.size(); Pos++)
-        delete Files[Pos];    
+        delete Files[Pos];
     Files.clear();
     ui->fileNamesBox->clear();
 
@@ -265,7 +265,7 @@ void MainWindow::createGraphsLayout()
                 CheckBoxes[Pos]->hide();
         if (ui->fileNamesBox)
             ui->fileNamesBox->hide();
-        
+
         createDragDrop();
         return;
     }

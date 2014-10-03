@@ -18,7 +18,7 @@
 #ifdef __MACOSX__
     #include <ApplicationServices/ApplicationServices.h>
 #endif //__MACOSX__
- 
+
 using namespace std;
 
 #include "mainwindow.h"

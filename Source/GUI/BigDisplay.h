@@ -105,7 +105,7 @@ public Q_SLOTS:
 class BigDisplay : public QDialog
 {
     Q_OBJECT
-    
+
 public:
     // Constructor/Destructor
     explicit BigDisplay(QWidget *parent, FileInformation* FileInfoData);
@@ -165,7 +165,7 @@ protected:
     int                         Image_Height;
     QGridLayout*                Layout;
     size_t                      FiltersListDefault_Count;
-    
+
     // Events
     void                        resizeEvent (QResizeEvent * event);
     void                        FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, QGridLayout* Layout0);

@@ -27,7 +27,7 @@ class QToolButton;
 class TinyDisplay : public QWidget
 {
     Q_OBJECT
-    
+
 public:
     explicit TinyDisplay(QWidget *parent, FileInformation* FileInfoData);
     ~TinyDisplay();

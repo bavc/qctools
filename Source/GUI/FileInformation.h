@@ -37,7 +37,7 @@ public:
     // Dumps
     void                        Export_XmlGz                (const QString &ExportFileName);
     void                        Export_CSV                  (const QString &ExportFileName);
-    
+
     // Infos
     QPixmap*                    Picture_Get                 (size_t Pos);
     QString                     FileName;

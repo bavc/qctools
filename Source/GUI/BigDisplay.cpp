@@ -431,7 +431,7 @@ void ImageLabel::paintEvent(QPaintEvent *event)
         case 1 : Image=(*Picture)->Image1; break;
         case 2 : Image=(*Picture)->Image2; break;
         default: return;
-    }  
+    }
     if (!Image)
     {
         painter.drawPixmap(0, 0, QPixmap().scaled(event->rect().width(), event->rect().height()));
@@ -1128,7 +1128,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
             default:                ;
         }
     }
-    
+
     Modified_String=Filters[Picture_Current].Formula[Value_Pos];
     if (Modified)
     {
@@ -1213,7 +1213,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                                             case 'B' :             Value&=0xFF; break;
                                                             default  : ;
                                                         }
-                                                            
+
                                                         Modified_String.erase(InsertPos, 5);
                                                         Modified_String.insert(InsertPos, QString::number(Value).toUtf8());
                                                     }
@@ -1303,7 +1303,7 @@ void BigDisplay::ShowPicture ()
         return;
     Frames_Pos=FileInfoData->Frames_Pos_Get();
     ShouldUpate=false;
-    
+
     // Stats
     if (ControlArea)
         ControlArea->Update();
@@ -1351,7 +1351,7 @@ void BigDisplay::ShowPicture ()
 void BigDisplay::on_Slider_sliderMoved(int value)
 {
     ControlArea->Pause->click();
-        
+
     FileInfoData->Frames_Pos_Set(value);
 }
 
@@ -1362,7 +1362,7 @@ void BigDisplay::on_Slider_actionTriggered(int action )
         return;
 
     ControlArea->Pause->click();
-        
+
     FileInfoData->Frames_Pos_Set(Slider->sliderPosition());
 }
 
@@ -1469,8 +1469,8 @@ void BigDisplay::on_Color1_click(bool checked)
     size_t OptionPos=0;
     while (Sender!=Options[0].ColorButton[OptionPos])
         OptionPos++;
-    
-    
+
+
     QColor Color=QColorDialog::getColor(QColor(Options[0].ColorValue[OptionPos]), this);
     if (Color.isValid())
     {
@@ -1488,7 +1488,7 @@ void BigDisplay::on_Color2_click(bool checked)
     size_t OptionPos=0;
     while (Sender!=Options[1].ColorButton[OptionPos])
         OptionPos++;
-    
+
     QColor Color=QColorDialog::getColor(QColor(Options[1].ColorValue[OptionPos]), this);
     if (Color.isValid())
     {

@@ -25,7 +25,7 @@ class FileInformation;
 class Info : public QWidget
 {
     Q_OBJECT
-    
+
 public:
     // Constructor/Destructor
     enum style

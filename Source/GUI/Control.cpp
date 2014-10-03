@@ -330,7 +330,7 @@ void Control::Update()
         }
     }
     else
-    {    
+    {
         if (SelectedSpeed==Speed_O && Frames_Pos)
         {
             M2->setEnabled(true);
@@ -395,8 +395,8 @@ void Control::Update()
 void Control::on_Minus_clicked(bool checked)
 {
     if (IsSlave)
-        return;    
-        
+        return;
+
     FileInfoData->Frames_Pos_Minus();
     PlotsArea->Plots_Update();
 }
@@ -405,8 +405,8 @@ void Control::on_Minus_clicked(bool checked)
 void Control::on_Plus_clicked(bool checked)
 {
     if (IsSlave)
-        return;    
-        
+        return;
+
     FileInfoData->Frames_Pos_Plus();
     PlotsArea->Plots_Update();
 }
@@ -415,8 +415,8 @@ void Control::on_Plus_clicked(bool checked)
 void Control::on_M9_clicked(bool checked)
 {
     if (IsSlave)
-        return;    
-        
+        return;
+
     FileInfoData->Frames_Pos_Set(0);
     PlotsArea->Plots_Update();
 }
@@ -425,8 +425,8 @@ void Control::on_M9_clicked(bool checked)
 void Control::on_M2_clicked(bool checked)
 {
     if (IsSlave)
-        return;    
-        
+        return;
+
     SelectedSpeed=Speed_M2;
     Timer_Duration=17;
     Time_MinusPlus=false;
@@ -466,8 +466,8 @@ void Control::on_M2_clicked(bool checked)
 void Control::on_M1_clicked(bool checked)
 {
     if (IsSlave)
-        return;    
-        
+        return;
+
     SelectedSpeed=Speed_M1;
     Timer_Duration=33;
     Time_MinusPlus=false;
@@ -507,8 +507,8 @@ void Control::on_M1_clicked(bool checked)
 void Control::on_M0_clicked(bool checked)
 {
     if (IsSlave)
-        return;    
-        
+        return;
+
     SelectedSpeed=Speed_M0;
     Timer_Duration=67;
     Time_MinusPlus=false;
@@ -557,8 +557,8 @@ void Control::on_PlayPause_clicked(bool checked)
 void Control::on_Pause_clicked(bool checked)
 {
     if (IsSlave)
-        return;    
-        
+        return;
+
     SelectedSpeed=Speed_O;
     Minus->setEnabled(Frames_Pos);
     Plus->setEnabled(Frames_Pos+1!=FileInfoData->Glue->VideoFrameCount);
@@ -597,8 +597,8 @@ void Control::on_Pause_clicked(bool checked)
 void Control::on_P0_clicked(bool checked)
 {
     if (IsSlave)
-        return;    
-        
+        return;
+
     SelectedSpeed=Speed_P1;
     Timer_Duration=67;
     Time_MinusPlus=true;
@@ -638,8 +638,8 @@ void Control::on_P0_clicked(bool checked)
 void Control::on_P1_clicked(bool checked)
 {
     if (IsSlave)
-        return;    
-        
+        return;
+
     SelectedSpeed=Speed_P1;
     Timer_Duration=33;
     Time_MinusPlus=true;
@@ -679,8 +679,8 @@ void Control::on_P1_clicked(bool checked)
 void Control::on_P2_clicked(bool checked)
 {
     if (IsSlave)
-        return;    
-        
+        return;
+
     SelectedSpeed=Speed_P2;
     Timer_Duration=17;
     Time_MinusPlus=true;
@@ -721,8 +721,8 @@ void Control::on_P2_clicked(bool checked)
 void Control::on_P9_clicked(bool checked)
 {
     if (IsSlave)
-        return;    
-        
+        return;
+
     if (FileInfoData->Glue->VideoFrameCount)
     {
         FileInfoData->Frames_Pos_Set(FileInfoData->Glue->VideoFrameCount-1);

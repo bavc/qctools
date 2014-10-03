@@ -14,10 +14,10 @@
 
 class MainWindow;
 
-class FilesList : public QTableWidget 
+class FilesList : public QTableWidget
 {
     Q_OBJECT
-    
+
 public:
     explicit FilesList(MainWindow* Main);
     ~FilesList();

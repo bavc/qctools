@@ -90,10 +90,10 @@ void TinyDisplay::Update()
         return;
     Frames_Pos=FileInfoData->Frames_Pos_Get();
     ShouldUpate=false;
-    
+
     if (Frames_Pos>=FileInfoData->Glue->VideoFrameCount)
         Frames_Pos=FileInfoData->Glue->VideoFrameCount-1;
-        
+
     for (size_t Pos=0; Pos<9; Pos++)
     {
         if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->Glue->VideoFramePos)
@@ -139,7 +139,7 @@ void TinyDisplay::on_Labels_Middle_clicked(bool checked)
         if (Pos<10)
             FileInfoData->Frames_Pos_Set(FileInfoData->Frames_Pos_Get()+Pos-4);
     }
-    
+
     if (BigDisplayArea==NULL)
     {
         BigDisplayArea=new BigDisplay(this, FileInfoData);

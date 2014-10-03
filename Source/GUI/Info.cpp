@@ -85,7 +85,7 @@ void Info::Update()
         return;
     Frames_Pos=FileInfoData->Frames_Pos_Get();
     ShouldUpate=false;
-        
+
     if (Frames_Pos<FileInfoData->Glue->x_Max)
         for (size_t Pos=0; Pos<PlotName_Max; Pos++)
         {

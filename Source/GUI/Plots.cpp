@@ -62,7 +62,7 @@ Plots::Plots(QWidget *parent, FileInformation* FileInformationData_) :
     memset(plotsZoomers , 0, sizeof(QwtPlotZoomer*)*PlotType_Max);
     memset(plotsPickers , 0, sizeof(QwtPlotPicker*)*PlotType_Max);
     memset(plotsMarkers , 0, sizeof(QwtPlotMarker*)*PlotType_Max);
-    
+
     // X axis info
     XAxis_Kind=NULL;
     XAxis_Kind_index=1;
@@ -160,7 +160,7 @@ void Plots::Plots_Create(PlotType Type)
     {
         plotsCurves[Type][j] = new QwtPlotCurve(PerPlotName[PerPlotGroup[Type].Start+j].Name);
         QColor c;
-        
+
         switch (PerPlotGroup[Type].Count)
         {
              case 1 :
@@ -180,7 +180,7 @@ void Plots::Plots_Create(PlotType Type)
                             default: c=Qt::black;
                         }
                         break;
-             case 3 : 
+             case 3 :
                         switch (j)
                         {
                             case 0: c=Qt::darkGreen; break;
@@ -189,7 +189,7 @@ void Plots::Plots_Create(PlotType Type)
                             default: c=Qt::black;
                         }
                         break;
-             case 5 : 
+             case 5 :
                         switch (j)
                         {
                             case 0: c=Qt::red; break;
@@ -231,7 +231,7 @@ void Plots::Plots_Create(PlotType Type)
     legend->setFont(Font);
     connect(plot, SIGNAL(legendDataChanged(const QVariant &, const QList<QwtLegendData> &)), legend, SLOT(updateLegend(const QVariant &, const QList<QwtLegendData> &)));
     plot->updateLegend();
-    
+
     // Assignment
     plots[Type]=plot;
     legends[Type]=legend;
@@ -249,7 +249,7 @@ void Plots::Plots_Create(PlotType Type)
     plotMarker->setLineStyle(QwtPlotMarker::VLine);
     plotMarker->setLinePen(QPen(Qt::magenta, 1));
     plotMarker->setXValue(0);
-    plotMarker->attach(plot);    
+    plotMarker->attach(plot);
     plotsMarkers[Type]=plotMarker;
 }
 
@@ -341,7 +341,7 @@ void Plots::Marker_Update(double X)
     for (size_t Type=0; Type<PlotType_Max; ++Type)
     {
         plotsMarkers[Type]->setXValue(X);
-        plotsMarkers[Type]->attach(plots[Type]);    
+        plotsMarkers[Type]->attach(plots[Type]);
         plots[Type]->replot();
     }
 }
@@ -356,7 +356,7 @@ void Plots::createData_Init()
 
 //---------------------------------------------------------------------------
 void Plots::createData_Update()
-{    
+{
     //Creating data
     for (size_t Type=0; Type<PlotType_Max; Type++)
         if (plots[Type] && plots[Type]->isVisible())
@@ -369,7 +369,7 @@ void Plots::createData_Update(PlotType Type)
     if (PerPlotGroup[Type].Min!=PerPlotGroup[Type].Max && FileInfoData->Glue->y_Max[Type]>=PerPlotGroup[Type].Max/2)
         FileInfoData->Glue->y_Max[Type]=PerPlotGroup[Type].Max;
     double y_Max_ForThisPlot=FileInfoData->Glue->y_Max[Type];
-    
+
     //plot->setMinimumHeight(0);
 
     if (y_Max_ForThisPlot)
@@ -495,7 +495,7 @@ void Plots::refreshDisplay()
 
                 Layouts[Type]->addWidget(paddings[Type]);
                 //paddings[Type]->setStyleSheet("background-color:blue;"); // For GUI debug
-                
+
                 Layouts[Type]->addWidget(plots[Type]);
                 Layouts[Type]->setStretchFactor(plots[Type], 1);
                 //plots[Type]->setStyleSheet("background-color:green;"); // For GUI debug
@@ -540,7 +540,7 @@ void Plots::refreshDisplay()
             Layout->removeItem(Layouts[Type]);
             delete Layouts[Type]; Layouts[Type]=NULL;
         }
-    
+
     setLayout(Layout);
     createData_Update();
 }
@@ -670,4 +670,3 @@ void Plots::on_XAxis_Kind_currentIndexChanged(int index)
         Pos=0;
     Zoom_Move(Pos);
 }
- 

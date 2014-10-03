@@ -124,14 +124,14 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_) :
                 Buffer_Size|=((unsigned char)Compressed[Compressed.size()-3])<<8;
                 Buffer_Size|=((unsigned char)Compressed[Compressed.size()-4]);
                 char* Buffer=new char[Buffer_Size];
-                z_stream strm;  
-                strm.next_in = (Bytef *) Compressed.data();  
-                strm.avail_in = Compressed.size() ;  
+                z_stream strm;
+                strm.next_in = (Bytef *) Compressed.data();
+                strm.avail_in = Compressed.size() ;
                 strm.next_out = (unsigned char*) Buffer;
                 strm.avail_out = Buffer_Size;
                 strm.total_out = 0;
-                strm.zalloc = Z_NULL;  
-                strm.zfree = Z_NULL;  
+                strm.zalloc = Z_NULL;
+                strm.zfree = Z_NULL;
                 if (inflateInit2(&strm, 15 + 16)>=0) // 15 + 16 are magic values for gzip
                 {
                     if (inflate(&strm, Z_SYNC_FLUSH)>=0)
@@ -208,7 +208,7 @@ void FileInformation::Parse ()
 void FileInformation::Export_XmlGz (const QString &ExportFileName)
 {
     stringstream Data;
-    
+
     // Header
     Data<<"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
     Data<<"<!-- Created by QCTools 0.5.0 -->\n";
@@ -254,7 +254,7 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
                 default:
                                         value<<Glue->y[Plot_Pos][x];
             }
-             
+
             Data<<"            <tag key=\""+key+"\" value=\""+value.str()+"\"/>\n";
         }
 
@@ -272,12 +272,12 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
         QByteArray Compressed=F.readAll();
         uLongf Buffer_Size=65536;
         char* Buffer=new char[Buffer_Size];
-        z_stream strm;  
-        strm.next_in = (Bytef *) DataS.c_str();  
-        strm.avail_in = DataS.size() ;  
+        z_stream strm;
+        strm.next_in = (Bytef *) DataS.c_str();
+        strm.avail_in = DataS.size() ;
         strm.total_out = 0;
-        strm.zalloc = Z_NULL;  
-        strm.zfree = Z_NULL;  
+        strm.zalloc = Z_NULL;
+        strm.zfree = Z_NULL;
         if (deflateInit2(&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY)>=0) // 15 + 16 are magic values for gzip
         {
             do
@@ -302,7 +302,7 @@ void FileInformation::Export_CSV (const QString &ExportFileName)
         return;
 
     string StatsToExternalData=Glue->StatsToExternalData();
-        
+
     QFile F(ExportFileName);
     F.open(QIODevice::WriteOnly|QIODevice::Truncate);
     F.write(StatsToExternalData.c_str(), StatsToExternalData.size());
@@ -323,7 +323,7 @@ QPixmap* FileInformation::Picture_Get (size_t Pos)
     }
     else
         Pixmap.loadFromData(Glue->JpegList[Pos]->Data, Glue->JpegList[Pos]->Size);
-    return &Pixmap;    
+    return &Pixmap;
 }
 
 //---------------------------------------------------------------------------
@@ -333,7 +333,7 @@ void FileInformation::Frames_Pos_Set (int Pos)
         Pos=0;
     if (Pos>=Glue->VideoFrameCount)
         Pos=Glue->VideoFrameCount-1;
-    
+
     if (Frames_Pos==Pos)
         return;
     Frames_Pos=Pos;
@@ -347,7 +347,7 @@ void FileInformation::Frames_Pos_Minus ()
 {
     if (Frames_Pos==0)
         return;
-    
+
     Frames_Pos--;
 
     if (Main)
@@ -359,7 +359,7 @@ void FileInformation::Frames_Pos_Plus ()
 {
     if (Frames_Pos+1>=Glue->VideoFrameCount)
         return;
-    
+
     Frames_Pos++;
 
     if (Main)

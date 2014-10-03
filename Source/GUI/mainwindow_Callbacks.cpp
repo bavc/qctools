@@ -51,7 +51,7 @@ void MainWindow::TimeOut ()
         if (Files[Files_Pos]->Glue->VideoFramePos!=Files[Files_Pos]->Glue->VideoFrameCount)
             Files[Files_Pos]->Parse();
     }
-    
+
     // Status
     stringstream Message_Total;
     int Files_Completed=0;

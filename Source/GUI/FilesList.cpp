@@ -274,7 +274,7 @@ void FilesList::contextMenuEvent (QContextMenuEvent* Event)
     menu.addAction(new QAction("Show filters", this)); //If you change this, change the test text too
     menu.addSeparator();
     menu.addAction(new QAction("Close", this)); //If you change this, change the test text too
-   
+
     //Displaying
     QAction* Action=menu.exec(Event->globalPos());
     if (Action==NULL)

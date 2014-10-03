@@ -229,7 +229,7 @@ void MainWindow::Export_CSV()
 {
     if (Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
         return;
-    
+
     Files[Files_CurrentPos]->Export_CSV(QFileDialog::getSaveFileName(this, "Export to CSV", Files[Files_CurrentPos]->FileName+".qctools.csv", "Statistic files (*.csv)", 0, QFileDialog::DontUseNativeDialog));
 }
 
@@ -238,16 +238,16 @@ void MainWindow::Export_PDF()
 {
     if (Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
         return;
-    
+
     QString SaveFileName=QFileDialog::getSaveFileName(this, "Acrobat Reader file (PDF)", Files[Files_CurrentPos]->FileName+".qctools.pdf", "PDF (*.pdf)", 0, QFileDialog::DontUseNativeDialog);
 
     if (SaveFileName.isEmpty())
         return;
 
-    /*QPrinter printer(QPrinter::HighResolution);  
-    printer.setOutputFormat(QPrinter::PdfFormat);  
-    printer.setOutputFileName(FileName);  
-    printer.setPageMargins(8,3,3,5,QPrinter::Millimeter);  
+    /*QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(FileName);
+    printer.setPageMargins(8,3,3,5,QPrinter::Millimeter);
     QPainter painter(&printer);  */
 
     QwtPlotRenderer PlotRenderer;
