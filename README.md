@@ -45,6 +45,6 @@ Once you check your files using QCTools, consider using the [A/V Artifacts Atlas
 
 license
 =======
-QCTools deliverable is licensed under a GPLv3 License.
-QCTools GUI part and FFmpeg statistics filter are licensed under the 3-Clause BSD license.
-This software uses libraries from the FFmpeg project under the GPLv3, Qt and Qwt libraries under the LGPLv2.1, OpenJPEG library under the 2-Clause BSD license.
+QCTools deliverable is licensed under a GPLv3 License.  
+QCTools GUI part and FFmpeg statistics filter are licensed under the 3-Clause BSD license.  
+This software uses libraries from the FFmpeg project under the GPLv3, Qt and Qwt libraries under the LGPLv2.1, OpenJPEG library under the 2-Clause BSD license.  
