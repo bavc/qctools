@@ -172,8 +172,6 @@ const struct per_plot_item PerPlotName [PlotName_Max]=
     { PlotType_YDiff,   PlotType_Diffs,     "YDIF",       "lavfi.values.YDIF",    "lavfi.signalstats.YDIF",    5,  false,  DBL_MAX, DBL_MAX },
     { PlotType_UDiff,   PlotType_Diffs,     "UDIF",       "lavfi.values.UDIF",    "lavfi.signalstats.UDIF",    5,  false,  DBL_MAX, DBL_MAX },
     { PlotType_VDiff,   PlotType_Diffs,     "VDIF",       "lavfi.values.VDIF",    "lavfi.signalstats.VDIF",    5,  false,  DBL_MAX, DBL_MAX },
-  //{ PlotType_YDiffX,  PlotType_Max,       "YDIF1",      "lavfi.values.YDIF1",   "lavfi.signalstats.YDIF1",   5,  false,  DBL_MAX, DBL_MAX },
-  //{ PlotType_YDiffX,  PlotType_Max,       "YDIF2",      "lavfi.values.YDIF2",   "lavfi.signalstats.YDIF2",   5,  true,   DBL_MAX, DBL_MAX },
     //Sat
     { PlotType_Sat,     PlotType_Max,       "SATMIN",     "lavfi.values.SATMIN",  "lavfi.signalstats.SATMIN",  0,  false,  DBL_MAX, DBL_MAX },
     { PlotType_Sat,     PlotType_Max,       "SATLOW",     "lavfi.values.SATLOW",  "lavfi.signalstats.SATLOW",  0,  false,  DBL_MAX, DBL_MAX },
@@ -181,12 +179,10 @@ const struct per_plot_item PerPlotName [PlotName_Max]=
     { PlotType_Sat,     PlotType_Max,       "SATHIGH",    "lavfi.values.SATHIGH", "lavfi.signalstats.SATHIGH", 0,  false,  DBL_MAX, DBL_MAX },
     { PlotType_Sat,     PlotType_Max,       "SATMAX",     "lavfi.values.SATMAX",  "lavfi.signalstats.SATMAX",  0,  true,      88.7,   118.2 },
     //Hue
-  //{ PlotType_Hue,     PlotType_Max,       "HUEMOD",     "lavfi.values.HUEMOD",  "lavfi.signalstats.HUEMOD",  0,  false,  DBL_MAX, DBL_MAX },
     { PlotType_Hue,     PlotType_Max,       "HUEMED",     "lavfi.values.HUEMED",  "lavfi.signalstats.HUEMED",  0,  false,  DBL_MAX, DBL_MAX },
     { PlotType_Hue,     PlotType_Max,       "HUEAVG",     "lavfi.values.HUEAVG",  "lavfi.signalstats.HUEAVG",  0,  true,   DBL_MAX, DBL_MAX },
     //Others
     { PlotType_TOUT,    PlotType_Max,       "TOUT",       "lavfi.values.TOUT",    "lavfi.signalstats.TOUT",    8,  false,    0.005, DBL_MAX },
-  //{ PlotType_HEAD,    PlotType_Max,       "HEAD",       "lavfi.values.HEAD",    "lavfi.signalstats.HEAD",    8,  false,  DBL_MAX, DBL_MAX },
     { PlotType_VREP,    PlotType_Max,       "VREP",       "lavfi.values.VREP",    "lavfi.signalstats.VREP",    8,  false,  DBL_MAX, DBL_MAX },
     { PlotType_BRNG,    PlotType_Max,       "BRNG",       "lavfi.values.RANG",    "lavfi.signalstats.BRNG",    8,  true,         0, DBL_MAX },
     //Crop
