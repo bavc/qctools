@@ -100,16 +100,16 @@ void FilesList::showEvent(QShowEvent * Event)
     //setHorizontalHeaderItem(Col_ChannelLayout,  new QTableWidgetItem("Channel layout"));
     //setHorizontalHeaderItem(Col_BitDepth,       new QTableWidgetItem("Bit depth"));
     setHorizontalHeaderItem(Col_Yav,            new QTableWidgetItem("Yav")); horizontalHeaderItem(Col_Yav)->setToolTip("average of Y values");
-    setHorizontalHeaderItem(Col_Yrang,          new QTableWidgetItem("Yrang")); horizontalHeaderItem(Col_Yrang)->setToolTip("average of ( YHIGH - YLOW ), gives an idea of contrast range");
+    setHorizontalHeaderItem(Col_Yrang,          new QTableWidgetItem("Yrang")); horizontalHeaderItem(Col_Yrang)->setToolTip("average of ( YHIGH - YLOW ), indicative of contrast range");
     setHorizontalHeaderItem(Col_Uav,            new QTableWidgetItem("Uav")); horizontalHeaderItem(Col_Uav)->setToolTip("average of U values");
     setHorizontalHeaderItem(Col_Vav,            new QTableWidgetItem("Vav")); horizontalHeaderItem(Col_Vav)->setToolTip("average of V values");
     setHorizontalHeaderItem(Col_TOUTav,         new QTableWidgetItem("TOUTav")); horizontalHeaderItem(Col_TOUTav)->setToolTip("average of TOUT values");
-    setHorizontalHeaderItem(Col_TOUTc,          new QTableWidgetItem("TOUTc")); horizontalHeaderItem(Col_TOUTc)->setToolTip("count of TOUT > 0.005 (the 0.005 should eventually be a preference)");
+    setHorizontalHeaderItem(Col_TOUTc,          new QTableWidgetItem("TOUTc")); horizontalHeaderItem(Col_TOUTc)->setToolTip("count of TOUT > 0.005");
     setHorizontalHeaderItem(Col_SATb,           new QTableWidgetItem("SATi")); horizontalHeaderItem(Col_SATb)->setToolTip("count of frames with MAXSAT > 88.7, outside of broadcast color levels");
     setHorizontalHeaderItem(Col_SATi,           new QTableWidgetItem("SATi")); horizontalHeaderItem(Col_SATi)->setToolTip("count of frames with MAXSAT > 118.2, illegal YUV color");
     setHorizontalHeaderItem(Col_BRNGav,         new QTableWidgetItem("BRNGav")); horizontalHeaderItem(Col_BRNGav)->setToolTip("percent of frames with BRNG > 0");
-    setHorizontalHeaderItem(Col_BRNGc,          new QTableWidgetItem("BRNGc")); horizontalHeaderItem(Col_BRNGc)->setToolTip("count of frames with BRNG > 0 (the 0 should eventually be a preference)");
-    setHorizontalHeaderItem(Col_MSEfY,          new QTableWidgetItem("MSEfY")); horizontalHeaderItem(Col_MSEfY)->setToolTip("count of frames with MSEfY over 1000 (the 1000 should eventually be a preference)");
+    setHorizontalHeaderItem(Col_BRNGc,          new QTableWidgetItem("BRNGc")); horizontalHeaderItem(Col_BRNGc)->setToolTip("count of frames with BRNG > 0");
+    setHorizontalHeaderItem(Col_MSEfY,          new QTableWidgetItem("MSEfY")); horizontalHeaderItem(Col_MSEfY)->setToolTip("count of frames with MSEfY over 1000");
 
     UpdateAll();
 }
