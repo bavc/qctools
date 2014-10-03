@@ -9,7 +9,7 @@
 #include <cfloat>
 
 const char* Version="0.5.0";
-    
+
 const struct per_plot_group PerPlotGroup [PlotType_Max]=
 {
     //Y
