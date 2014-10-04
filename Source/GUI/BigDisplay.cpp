@@ -1245,7 +1245,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
     {
         Modified_String.erase(Pos, 8);
         stringstream ss;
-        ss<<Image_Width;
+        ss<<FileInfoData->Glue->Width_Get();
         Modified_String.insert(Pos, ss.str());
     }
     Pos=Modified_String.find("${height}");
@@ -1253,7 +1253,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
     {
         Modified_String.erase(Pos, 9);
         stringstream ss;
-        ss<<Image_Height;
+        ss<<FileInfoData->Glue->Height_Get();
         Modified_String.insert(Pos, ss.str());
     }
     Pos=Modified_String.find("${dar}");
@@ -1261,7 +1261,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
     {
         Modified_String.erase(Pos, 6);
         stringstream ss;
-        ss<<1.333;
+        ss<<FileInfoData->Glue->DAR_Get();
         Modified_String.insert(Pos, ss.str());
     }
 
