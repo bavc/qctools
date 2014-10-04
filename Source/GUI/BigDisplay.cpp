@@ -313,8 +313,8 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "signalstats=out=brng:c=${2}",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]signalstats=out=brng:c=${2}[a2];[b1]signalstats=out=brng:c=${2}[b2];[a2][b2]framepack=tab",
+            "signalstats=out=brng:c=${2},format=yuv444p",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]signalstats=out=brng:c=${2},format=yuv444p[a2];[b1]signalstats=out=brng:c=${2},format=yuv444p[b2];[a2][b2]framepack=tab",
         },
     },
     {
