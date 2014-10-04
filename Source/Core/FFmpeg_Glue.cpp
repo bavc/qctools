@@ -253,10 +253,10 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
                             if (Xml.name()=="frame" && Xml.attributes().value("media_type")=="video")
                             {
                                 x[0][x_Max]=x_Max;
-                                d[x_Max]=std::atof(Xml.attributes().value("pkt_duration_time").toString().toUtf8());
-                                string ts=Xml.attributes().value("pkt_pts_time").toString().toUtf8();
+                                d[x_Max]=std::atof(Xml.attributes().value("pkt_duration_time").toString().toUtf8().data());
+                                string ts=Xml.attributes().value("pkt_pts_time").toString().toUtf8().data();
                                 if (ts.empty() || ts=="N/A")
-                                    ts=Xml.attributes().value("pkt_dts_time").toString().toUtf8(); // Using DTS is PTS is not available
+                                    ts=Xml.attributes().value("pkt_dts_time").toString().toUtf8().data(); // Using DTS is PTS is not available
                                 if (!ts.empty() && ts!="N/A")
                                 {
                                     x[1][x_Max]=std::atof(ts.c_str());
@@ -264,8 +264,8 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
                                     x[3][x_Max]=x[2][x_Max]/60;
                                 }
 
-                                int Width=atoi(Xml.attributes().value("width").toString().toUtf8());
-                                int Height=atoi(Xml.attributes().value("height").toString().toUtf8());
+                                int Width=atoi(Xml.attributes().value("width").toString().toUtf8().data());
+                                int Height=atoi(Xml.attributes().value("height").toString().toUtf8().data());
 
                                 while (Xml.readNextStartElement())
                                 {
@@ -278,7 +278,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
 
                                         if (j!=PlotName_Max)
                                         {
-                                            double value=std::atof(Xml.attributes().value("value").toString().toUtf8());
+                                            double value=std::atof(Xml.attributes().value("value").toString().toUtf8().data());
                                             
                                             // Special cases: crop: x2, y2
                                             if (Width && Xml.attributes().value("key")=="lavfi.cropdetect.x2")
@@ -313,7 +313,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
 
                                 QStringRef key_frame_String=Xml.attributes().value("key_frame");
                                 if (key_frame_String.size()>0)
-                                    key_frame[x_Max]=std::atof(key_frame_String.toString().toUtf8());
+                                    key_frame[x_Max]=std::atof(key_frame_String.toString().toUtf8().data());
                                 else
                                     key_frame[x_Max]=1; //Forcing key_frame to 1 if it is missing from the XML, for decoding
 
