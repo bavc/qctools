@@ -244,8 +244,8 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "format=yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:intensity=${3}",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:strength=${3}[a2];[b1]format=yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:intensity=${3}[b2];[a2][b2]framepack=tab",
+            "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:intensity=${3}",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:strength=${3}[a2];[b1]format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:intensity=${3}[b2];[a2][b2]framepack=tab",
         },
     },
     {
@@ -258,8 +258,8 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "format=yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:intensity=${4}",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:strength=${4}[a2];[b1]format=yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:intensity=${4}[b2];[a2][b2]framepack=tab",
+            "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:intensity=${4}",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:strength=${4}[a2];[b1]format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:intensity=${4}[b2];[a2][b2]framepack=tab",
         },
     },
     {
@@ -272,7 +272,7 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "lutyuv=y=if(eq(${1}\\,-1)\\,128\\,if(eq(${1}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${1}))*pow(2\\,${1}))):u=if(eq(${2}\\,-1)\\,128\\,if(eq(${2}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${2}))*pow(2\\,${2}))):v=if(eq(${3}\\,-1)\\,128\\,if(eq(${3}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${3}))*pow(2\\,${3}))),format=yuv444p",
+            "lutyuv=y=if(eq(${1}\\,-1)\\,128\\,if(eq(${1}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${1}))*pow(2\\,${1}))):u=if(eq(${2}\\,-1)\\,128\\,if(eq(${2}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${2}))*pow(2\\,${2}))):v=if(eq(${3}\\,-1)\\,128\\,if(eq(${3}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${3}))*pow(2\\,${3}))),format=yuv444p|rgb24",
         },
     },
     {
@@ -313,8 +313,8 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "signalstats=out=brng:c=${2},format=yuv444p",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]signalstats=out=brng:c=${2},format=yuv444p[a2];[b1]signalstats=out=brng:c=${2},format=yuv444p[b2];[a2][b2]framepack=tab",
+            "signalstats=out=brng:c=${2},format=yuv444p|rgb24",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]signalstats=out=brng:c=${2},format=yuv444p|rgb24[a2];[b1]signalstats=out=brng:c=${2},format=yuv444p|rgb24[b2];[a2][b2]framepack=tab",
         },
     },
     {
