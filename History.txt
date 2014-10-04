@@ -10,6 +10,7 @@ x Slight documentation corrections
 x The sidecar stats file was not correctly detected if the media file is open instead of the sidecar stats file
 x Linux only: The sidecar stats file was not correctly loaded
 x Fix corrupted Broadcast Range display in some inputs (GitHub issue #10)
+x Line select now plots one line in a waveform, previous the next line and next line were plotted
 
 0.5.0, 2014-09-12
 -----
