@@ -48,7 +48,7 @@ void MainWindow::TimeOut ()
     // Simultaneous parsing
     for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
     {
-        if (Files[Files_Pos]->Glue->VideoFramePos!=Files[Files_Pos]->Glue->VideoFrameCount)
+        if (!Files[Files_Pos]->Glue->IsComplete)
             Files[Files_Pos]->Parse();
     }
 
@@ -62,24 +62,24 @@ void MainWindow::TimeOut ()
         int VideoFramePos_Total=0;
         for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
         {
-            VideoFramePos_Total+=Files[Files_Pos]->Glue->VideoFramePos;
-            VideoFrameCount_Total+=Files[Files_Pos]->Glue->VideoFrameCount;
+            VideoFramePos_Total+=Files[Files_Pos]->Glue->VideoFramePos_Get();
+            VideoFrameCount_Total+=Files[Files_Pos]->Glue->VideoFrameCount_Get();
         }
         if (Files_Completed!=Files.size())
             Message_Total<<(int)((double)VideoFramePos_Total)*100/VideoFrameCount_Total<<"%";
     }
     for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
-        if (Files[Files_Pos]->Glue->VideoFramePos==Files[Files_Pos]->Glue->VideoFrameCount)
+        if (Files[Files_Pos]->Glue->IsComplete)
             Files_Completed++;
 
     if (Files_CurrentPos!=(size_t)-1)
     {
-        if (Files[Files_CurrentPos]->Glue->VideoFramePos<Files[Files_CurrentPos]->Glue->VideoFrameCount)
+        if (!Files[Files_CurrentPos]->Glue->IsComplete)
         {
             stringstream Message;
-            Message<<"Parsing frame "<<Files[Files_CurrentPos]->Glue->VideoFramePos;
-            if (Files[Files_CurrentPos]->Glue->VideoFrameCount)
-                Message<<"/"<<Files[Files_CurrentPos]->Glue->VideoFrameCount<<" ("<<(int)((double)Files[Files_CurrentPos]->Glue->VideoFramePos)*100/Files[Files_CurrentPos]->Glue->VideoFrameCount<<"%)";
+            Message<<"Parsing frame "<<Files[Files_CurrentPos]->Glue->VideoFramePos_Get();
+            if (Files[Files_CurrentPos]->Glue->VideoFrameCount_Get())
+                Message<<"/"<<Files[Files_CurrentPos]->Glue->VideoFrameCount_Get()<<" ("<<(int)((double)Files[Files_CurrentPos]->Glue->VideoFramePos_Get())*100/Files[Files_CurrentPos]->Glue->VideoFrameCount_Get()<<"%)";
             QStatusBar* StatusBar=statusBar();
             if (StatusBar)
                 StatusBar->showMessage((Message.str()+Message_Total.str()).c_str());

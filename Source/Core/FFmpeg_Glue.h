@@ -64,17 +64,17 @@ public:
     bool*                       key_frame; //May be useful for FFmpeg XML output
     double                      y_Max[PlotType_Max];
     size_t                      x_Max;
-    size_t                      VideoFramePos;
-    size_t                      VideoFrameCount;
-    size_t                      VideoFrameCount_Max;
-    double                      VideoDuration;
+    size_t                      VideoFramePos_Get()                                                                     {return VideoFramePos;}
+    double                      State_Get();
+    bool                        IsComplete;
 
     // Infos
-    size_t                      Frames_Total_Get()                                                                      {return VideoFrameCount;}
-    double                      Duration_Get()                                                                          {return VideoDuration;}
     string                      ContainerFormat_Get();
     int                         StreamCount_Get();
     string                      VideoFormat_Get();
+    double                      VideoDuration_Get()                                                                     {return VideoDuration;}
+    double                      VideoFrameRate_Get();
+    size_t                      VideoFrameCount_Get()                                                                   {return VideoFrameCount;}
     int                         Width_Get();
     int                         Height_Get();
     int                         KeyFrame_Get(size_t FramePos);
@@ -159,6 +159,12 @@ private:
     bool                        WithStats;
     bool                        With1;
     bool                        With2;
+
+    // Status information
+    size_t                      VideoFramePos;          // Current pos
+    size_t                      VideoFrameCount;        // Total count of frames (may be estimated)
+    size_t                      VideoFrameCount_Max;    // Max reserved memory
+    double                      VideoDuration;          // Duration is seconds
 
     // Temp
     int                         DTS_Target;

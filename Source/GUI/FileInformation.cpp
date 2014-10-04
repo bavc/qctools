@@ -36,9 +36,9 @@ void FileInformation::run()
     for (;;)
     {
         Glue->NextFrame();
-        if (Glue->VideoFramePos>=Glue->VideoFrameCount)
+        if (Glue->IsComplete)
             break;
-        if ((Glue->VideoFramePos%10)==0)
+        if ((Glue->VideoFramePos_Get()%100)==0)
         {
             if (WantToStop)
                 break;
@@ -165,7 +165,7 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_) :
     else
         Glue= new FFmpeg_Glue(FileName_string.c_str(), 72, 72, FFmpeg_Glue::Output_JpegList, "signalstats=stat=tout+vrep+brng,cropdetect=reset=1:round=1,split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr", "", true, false, true);
 
-    if (Glue->VideoFrameCount==0 && StatsFromExternalData.empty())
+    if (Glue->VideoFrameCount_Get()==0 && StatsFromExternalData.empty())
         return; // Problem
 
     Frames_Pos=0;
@@ -222,7 +222,7 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
     Data<<"    <frames>\n";
 
     // Per frame
-    for (size_t x=0; x<Glue->VideoFrameCount_Max; ++x)
+    for (size_t x=0; x<Glue->VideoFramePos_Get(); ++x)
     {
         stringstream pkt_pts_time; pkt_pts_time<<Glue->x[1][x];
         stringstream pkt_duration_time; pkt_duration_time<<Glue->d[x];
@@ -316,7 +316,7 @@ void FileInformation::Export_CSV (const QString &ExportFileName)
 //---------------------------------------------------------------------------
 QPixmap* FileInformation::Picture_Get (size_t Pos)
 {
-    if (Glue==NULL || Pos>=Glue->VideoFramePos || Pos>=Glue->JpegList.size())
+    if (Glue==NULL || Pos>=Glue->VideoFramePos_Get() || Pos>=Glue->JpegList.size())
     {
         Pixmap.load(":/icon/logo.png");
         Pixmap=Pixmap.scaled(72, 72);
@@ -331,8 +331,8 @@ void FileInformation::Frames_Pos_Set (int Pos)
 {
     if (Pos<0)
         Pos=0;
-    if (Pos>=Glue->VideoFrameCount)
-        Pos=Glue->VideoFrameCount-1;
+    if (Pos>=Glue->VideoFrameCount_Get())
+        Pos=Glue->VideoFrameCount_Get()-1;
 
     if (Frames_Pos==Pos)
         return;
@@ -357,7 +357,7 @@ void FileInformation::Frames_Pos_Minus ()
 //---------------------------------------------------------------------------
 void FileInformation::Frames_Pos_Plus ()
 {
-    if (Frames_Pos+1>=Glue->VideoFrameCount)
+    if (Frames_Pos+1>=Glue->VideoFrameCount_Get())
         return;
 
     Frames_Pos++;

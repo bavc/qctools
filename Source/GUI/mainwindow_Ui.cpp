@@ -168,8 +168,8 @@ void MainWindow::configureZoom()
         return;
     }
 
-    size_t Increment=Files[Files_CurrentPos]->Glue->VideoFrameCount/PlotsArea->ZoomScale;
-    ui->horizontalScrollBar->setMaximum(Files[Files_CurrentPos]->Glue->VideoFrameCount-Increment);
+    size_t Increment=Files[Files_CurrentPos]->Glue->VideoFrameCount_Get()/PlotsArea->ZoomScale;
+    ui->horizontalScrollBar->setMaximum(Files[Files_CurrentPos]->Glue->VideoFrameCount_Get()-Increment);
     ui->horizontalScrollBar->setPageStep(Increment);
     ui->horizontalScrollBar->setSingleStep(Increment);
     ui->horizontalScrollBar->setEnabled(true);
@@ -197,9 +197,9 @@ void MainWindow::Zoom_In()
     PlotsArea->ZoomScale*=2;
     configureZoom();
     size_t Position=Files[Files_CurrentPos]->Frames_Pos_Get();
-    size_t Increment=Files[Files_CurrentPos]->Glue->VideoFrameCount/PlotsArea->ZoomScale;
-    if (Position+Increment/2>Files[Files_CurrentPos]->Glue->VideoFrameCount)
-        Position=Files[Files_CurrentPos]->Glue->VideoFrameCount-Increment/2;
+    size_t Increment=Files[Files_CurrentPos]->Glue->VideoFrameCount_Get()/PlotsArea->ZoomScale;
+    if (Position+Increment/2>Files[Files_CurrentPos]->Glue->VideoFrameCount_Get())
+        Position=Files[Files_CurrentPos]->Glue->VideoFrameCount_Get()-Increment/2;
     if (Position>Increment/2)
         Position-=Increment/2;
     else
@@ -214,9 +214,9 @@ void MainWindow::Zoom_Out()
         PlotsArea->ZoomScale/=2;
     configureZoom();
     size_t Position=Files[Files_CurrentPos]->Frames_Pos_Get();
-    size_t Increment=Files[Files_CurrentPos]->Glue->VideoFrameCount/PlotsArea->ZoomScale;
-    if (Position+Increment/2>Files[Files_CurrentPos]->Glue->VideoFrameCount)
-        Position=Files[Files_CurrentPos]->Glue->VideoFrameCount-Increment/2;
+    size_t Increment=Files[Files_CurrentPos]->Glue->VideoFrameCount_Get()/PlotsArea->ZoomScale;
+    if (Position+Increment/2>Files[Files_CurrentPos]->Glue->VideoFrameCount_Get())
+        Position=Files[Files_CurrentPos]->Glue->VideoFrameCount_Get()-Increment/2;
     if (Position>Increment/2)
         Position-=Increment/2;
     else

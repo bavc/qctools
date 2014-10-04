@@ -103,6 +103,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
     VideoFrameCount=0;
     VideoFrameCount_Max=0;
     VideoDuration=0;
+    IsComplete=false;
     
     // FFmpeg pointers
     FormatContext=NULL;
@@ -181,7 +182,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
         VideoFrameCount_Max=VideoFrameCount=VideoStream->nb_frames;
         VideoDuration=((double)VideoStream->duration)*VideoStream->time_base.num/VideoStream->time_base.den;
     }
-    else
+    if (VideoFrameCount_Max==0)
     {
         VideoFrameCount_Max=3*60*60*30; // 3 hours max for the moment
     }
@@ -436,7 +437,7 @@ void FFmpeg_Glue::Seek(size_t Pos)
     // DTS computing
     long long DTS=Pos;
     DTS*=VideoStream->duration;
-    DTS/=VideoStream->nb_frames;
+    DTS/=VideoFrameCount;
     DTS_Target=(int)DTS;
     
     // Seek
@@ -573,6 +574,9 @@ void FFmpeg_Glue::NextFrame()
     Packet->data=NULL;
     Packet->size=0;
     while (!OutputFrame(Packet));
+    
+    //Complete
+    IsComplete=true;
 }
 
 //---------------------------------------------------------------------------
@@ -609,6 +613,8 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
             Process(Filtered1_Frame, FilterGraph2, FilterGraph2_Source_Context, FilterGraph2_Sink_Context, Filter2, Scale2_Context, Scale2_Frame, Image2);
         
         VideoFramePos++;
+        if (VideoFramePos>VideoFrameCount)
+            VideoFrameCount=VideoFramePos;
         return true;
     }
 
@@ -1007,6 +1013,24 @@ bool FFmpeg_Glue::Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, 
 }
 
 //***************************************************************************
+// Real time information
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+double FFmpeg_Glue::State_Get()
+{
+    if (IsComplete || VideoFrameCount==0)
+        return 1;
+
+    double Value=((double)VideoFramePos)/VideoFrameCount;
+    if (Value>=1)
+        Value=0.99999; // It is not yet complete, so not 100%
+
+    return Value;
+}
+
+
+//***************************************************************************
 // Export
 //***************************************************************************
 
@@ -1035,6 +1059,21 @@ string FFmpeg_Glue::VideoFormat_Get()
         return "";
 
     return VideoStream->codec->codec->long_name;
+}
+
+//---------------------------------------------------------------------------
+double FFmpeg_Glue::VideoFrameRate_Get()
+{
+    if (VideoStream==NULL || VideoStream->codec==NULL || VideoStream->codec->codec==NULL || VideoStream->codec->codec->long_name==NULL)
+        return 0;
+
+    if (VideoStream->avg_frame_rate.num && VideoStream->avg_frame_rate.den)
+        return ((double)VideoStream->avg_frame_rate.num)/VideoStream->avg_frame_rate.den;
+    
+    if (VideoFrameCount && VideoDuration)
+        return VideoFrameCount/VideoDuration;
+
+    return 0; // Unknown
 }
 
 //---------------------------------------------------------------------------

@@ -147,9 +147,9 @@ void MainWindow::on_actionGoTo_triggered()
         return;
 
     bool ok;
-    int i = QInputDialog::getInt(this, tr("Go to frame at position..."), Files[Files_CurrentPos]->Glue->VideoFrameCount?("frame position (0-"+QString::number(Files[Files_CurrentPos]->Glue->VideoFrameCount-1)+"):"):QString("frame position (0-based)"), Files[Files_CurrentPos]->Frames_Pos_Get(), 0, Files[Files_CurrentPos]->Glue->VideoFrameCount-1, 1, &ok);
-    if (Files[Files_CurrentPos]->Glue->VideoFrameCount && i>=Files[Files_CurrentPos]->Glue->VideoFrameCount)
-        i=Files[Files_CurrentPos]->Glue->VideoFrameCount-1;
+    int i = QInputDialog::getInt(this, tr("Go to frame at position..."), Files[Files_CurrentPos]->Glue->VideoFrameCount_Get()?("frame position (0-"+QString::number(Files[Files_CurrentPos]->Glue->VideoFrameCount_Get()-1)+"):"):QString("frame position (0-based)"), Files[Files_CurrentPos]->Frames_Pos_Get(), 0, Files[Files_CurrentPos]->Glue->VideoFrameCount_Get()-1, 1, &ok);
+    if (Files[Files_CurrentPos]->Glue->VideoFrameCount_Get() && i>=Files[Files_CurrentPos]->Glue->VideoFrameCount_Get())
+        i=Files[Files_CurrentPos]->Glue->VideoFrameCount_Get()-1;
     if (ok)
     {
         Files[Files_CurrentPos]->Frames_Pos_Set(i);

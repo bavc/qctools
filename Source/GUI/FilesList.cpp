@@ -130,31 +130,34 @@ void FilesList::UpdateAll()
     setRowCount(Main->Files.size());
     for (size_t Files_Pos=0; Files_Pos<Main->Files.size(); Files_Pos++)
     {
-        int Milliseconds;
-        double FrameRate=Main->Files[Files_Pos]->Glue->VideoFrameCount/Main->Files[Files_Pos]->Glue->VideoDuration;
-        Milliseconds=(int)((Main->Files[Files_Pos]->Glue->VideoFrameCount/FrameRate*1000)+0.5); //Rounding
         string Time;
-        int H1=Milliseconds/36000000; Milliseconds%=36000000;
-        int H2=Milliseconds/ 3600000; Milliseconds%= 3600000;
-        int M1=Milliseconds/  600000; Milliseconds%=  600000;
-        int M2=Milliseconds/   60000; Milliseconds%=   60000;
-        int S1=Milliseconds/   10000; Milliseconds%=   10000;
-        int S2=Milliseconds/    1000; Milliseconds%=    1000;
-        int m1=Milliseconds/     100; Milliseconds%=     100;
-        int m2=Milliseconds/      10; Milliseconds%=      10;
-        int m3=Milliseconds         ;
-        Time.append(1, '0'+H1);
-        Time.append(1, '0'+H2);
-        Time.append(1, ':');
-        Time.append(1, '0'+M1);
-        Time.append(1, '0'+M2);
-        Time.append(1, ':');
-        Time.append(1, '0'+S1);
-        Time.append(1, '0'+S2);
-        Time.append(1, '.');
-        Time.append(1, '0'+m1);
-        Time.append(1, '0'+m2);
-        Time.append(1, '0'+m3);
+        double FrameRate=Main->Files[Files_Pos]->Glue->VideoFrameRate_Get();
+        if (FrameRate)
+        {
+            int Milliseconds=(int)((Main->Files[Files_Pos]->Glue->VideoFrameCount_Get()/FrameRate*1000)+0.5); //Rounding
+        
+            int H1=Milliseconds/36000000; Milliseconds%=36000000;
+            int H2=Milliseconds/ 3600000; Milliseconds%= 3600000;
+            int M1=Milliseconds/  600000; Milliseconds%=  600000;
+            int M2=Milliseconds/   60000; Milliseconds%=   60000;
+            int S1=Milliseconds/   10000; Milliseconds%=   10000;
+            int S2=Milliseconds/    1000; Milliseconds%=    1000;
+            int m1=Milliseconds/     100; Milliseconds%=     100;
+            int m2=Milliseconds/      10; Milliseconds%=      10;
+            int m3=Milliseconds         ;
+            Time.append(1, '0'+H1);
+            Time.append(1, '0'+H2);
+            Time.append(1, ':');
+            Time.append(1, '0'+M1);
+            Time.append(1, '0'+M2);
+            Time.append(1, ':');
+            Time.append(1, '0'+S1);
+            Time.append(1, '0'+S2);
+            Time.append(1, '.');
+            Time.append(1, '0'+m1);
+            Time.append(1, '0'+m2);
+            Time.append(1, '0'+m3);
+        }
 
         double DAR=Main->Files[Files_Pos]->Glue->DAR_Get();
         QString DAR_String;
@@ -232,10 +235,10 @@ void FilesList::UpdateAll()
 void FilesList::Update()
 {
     for (size_t Files_Pos=0; Files_Pos<Main->Files.size(); Files_Pos++)
-        if (Main->Files[Files_Pos]->Glue->VideoFrameCount)
+        if (Main->Files[Files_Pos]->Glue->VideoFrameCount_Get())
         {
             stringstream Message;
-            Message<<(int)((double)Main->Files[Files_Pos]->Glue->VideoFramePos)*100/Main->Files[Files_Pos]->Glue->VideoFrameCount<<"%";
+            Message<<(int)(Main->Files[Files_Pos]->Glue->State_Get()*100)<<"%";
             setItem((int)Files_Pos, 0, new QTableWidgetItem(QString::fromStdString(Message.str())));
             setItem((int)Files_Pos, Col_Yav,            new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Average_Get(PlotName_YAVG).c_str()));
             setItem((int)Files_Pos, Col_Yrang,          new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Average_Get(PlotName_YHIGH, PlotName_YLOW).c_str()));

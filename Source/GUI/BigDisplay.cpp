@@ -774,7 +774,7 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
 
     // Slider
     Slider=new QSlider(Qt::Horizontal);
-    Slider->setMaximum(FileInfoData->Glue->VideoFrameCount);
+    Slider->setMaximum(FileInfoData->Glue->VideoFrameCount_Get());
     connect(Slider, SIGNAL(sliderMoved(int)), this, SLOT(on_Slider_sliderMoved(int)));
     connect(Slider, SIGNAL(actionTriggered(int)), this, SLOT(on_Slider_actionTriggered(int)));
     Layout->addWidget(Slider, 2, 0, 1, 3);

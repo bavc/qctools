@@ -138,10 +138,10 @@ void Plots::Plots_Create(PlotType Type)
     plot->setAxisMaxMinor(QwtPlot::yLeft, 0);
     switch (XAxis_Kind_index)
     {
-        case 0 : plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoFrameCount); break;
-        case 1 : plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration); break;
-        case 2 : plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration/60); break;
-        case 3 : plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration/3600); break;
+        case 0 : plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoFrameCount_Get()); break;
+        case 1 : plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration_Get()); break;
+        case 2 : plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration_Get()/60); break;
+        case 3 : plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration_Get()/3600); break;
         default: ;
     }
     if (PerPlotGroup[Type].Count>3)
@@ -265,20 +265,23 @@ void Plots::Plots_Update()
                 break;
         case 1 :
                 {
-                double FrameRate=FileInfoData->Glue->VideoFrameCount/FileInfoData->Glue->VideoDuration;
-                X=FramePos/FrameRate;
+                double FrameRate=FileInfoData->Glue->VideoFrameRate_Get();
+                if (FrameRate)
+                    X=FramePos/FrameRate;
                 }
                 break;
         case 2 :
                 {
-                double FrameRate=FileInfoData->Glue->VideoFrameCount/FileInfoData->Glue->VideoDuration;
-                X=FramePos/(60*FrameRate);
+                double FrameRate=FileInfoData->Glue->VideoFrameRate_Get();
+                if (FrameRate)
+                    X=FramePos/(60*FrameRate);
                 }
                 break;
         case 3 :
                 {
-                double FrameRate=FileInfoData->Glue->VideoFrameCount/FileInfoData->Glue->VideoDuration;
-                X=FramePos/(3600*FrameRate);
+                double FrameRate=FileInfoData->Glue->VideoFrameRate_Get();
+                if (FrameRate)
+                    X=FramePos/(3600*FrameRate);
                 }
                 break;
         default: return; // Problem
@@ -287,13 +290,13 @@ void Plots::Plots_Update()
     // Put the current frame in center
     if (ZoomScale!=1)
     {
-        size_t Increment=FileInfoData->Glue->VideoFrameCount/ZoomScale;
+        size_t Increment=FileInfoData->Glue->VideoFrameCount_Get()/ZoomScale;
         size_t NewBegin=0;
         if (FramePos>Increment/2)
         {
             NewBegin=FramePos-Increment/2;
-            if (NewBegin+Increment>FileInfoData->Glue->VideoFrameCount)
-                NewBegin=FileInfoData->Glue->VideoFrameCount-Increment;
+            if (NewBegin+Increment>FileInfoData->Glue->VideoFrameCount_Get())
+                NewBegin=FileInfoData->Glue->VideoFrameCount_Get()-Increment;
         }
         Zoom_Move(NewBegin);
     }
@@ -313,20 +316,23 @@ void Plots::Marker_Update()
                 break;
         case 1 :
                 {
-                double FrameRate=FileInfoData->Glue->VideoFrameCount/FileInfoData->Glue->VideoDuration;
-                X=FramePos/FrameRate;
+                double FrameRate=FileInfoData->Glue->VideoFrameRate_Get();
+                if (FrameRate)
+                    X=FramePos/FrameRate;
                 }
                 break;
         case 2 :
                 {
-                double FrameRate=FileInfoData->Glue->VideoFrameCount/FileInfoData->Glue->VideoDuration;
-                X=FramePos/(60*FrameRate);
+                double FrameRate=FileInfoData->Glue->VideoFrameRate_Get();
+                if (FrameRate)
+                    X=FramePos/(60*FrameRate);
                 }
                 break;
         case 3 :
                 {
-                double FrameRate=FileInfoData->Glue->VideoFrameCount/FileInfoData->Glue->VideoDuration;
-                X=FramePos/(3600*FrameRate);
+                double FrameRate=FileInfoData->Glue->VideoFrameRate_Get();
+                if (FrameRate)
+                    X=FramePos/(3600*FrameRate);
                 }
                 break;
         default: return; // Problem
@@ -430,9 +436,9 @@ void Plots::createData_Update(PlotType Type)
 //---------------------------------------------------------------------------
 void Plots::Zoom_Move(size_t Begin)
 {
-    size_t Increment=FileInfoData->Glue->VideoFrameCount/ZoomScale;
-    if (Begin+Increment>FileInfoData->Glue->VideoFrameCount)
-        Begin=FileInfoData->Glue->VideoFrameCount-Increment;
+    size_t Increment=FileInfoData->Glue->VideoFrameCount_Get()/ZoomScale;
+    if (Begin+Increment>FileInfoData->Glue->VideoFrameCount_Get())
+        Begin=FileInfoData->Glue->VideoFrameCount_Get()-Increment;
 
     switch (XAxis_Kind_index)
     {
@@ -441,16 +447,16 @@ void Plots::Zoom_Move(size_t Begin)
                 Zoom_Width=Increment;
                 break;
         case 1 :
-                Zoom_Left=FileInfoData->Glue->VideoDuration*Begin/FileInfoData->Glue->VideoFrameCount;
-                Zoom_Width=FileInfoData->Glue->VideoDuration*Increment/FileInfoData->Glue->VideoFrameCount;
+                Zoom_Left=FileInfoData->Glue->VideoDuration_Get()*Begin/FileInfoData->Glue->VideoFrameCount_Get();
+                Zoom_Width=FileInfoData->Glue->VideoDuration_Get()*Increment/FileInfoData->Glue->VideoFrameCount_Get();
                 break;
         case 2 :
-                Zoom_Left=FileInfoData->Glue->VideoDuration*Begin/FileInfoData->Glue->VideoFrameCount/60;
-                Zoom_Width=FileInfoData->Glue->VideoDuration*Increment/FileInfoData->Glue->VideoFrameCount/60;
+                Zoom_Left=FileInfoData->Glue->VideoDuration_Get()*Begin/FileInfoData->Glue->VideoFrameCount_Get()/60;
+                Zoom_Width=FileInfoData->Glue->VideoDuration_Get()*Increment/FileInfoData->Glue->VideoFrameCount_Get()/60;
                 break;
         case 3 :
-                Zoom_Left=FileInfoData->Glue->VideoDuration*Begin/FileInfoData->Glue->VideoFrameCount/3600;
-                Zoom_Width=FileInfoData->Glue->VideoDuration*Increment/FileInfoData->Glue->VideoFrameCount/3600;
+                Zoom_Left=FileInfoData->Glue->VideoDuration_Get()*Begin/FileInfoData->Glue->VideoFrameCount_Get()/3600;
+                Zoom_Width=FileInfoData->Glue->VideoDuration_Get()*Increment/FileInfoData->Glue->VideoFrameCount_Get()/3600;
                 break;
         default:;
     }
@@ -620,20 +626,23 @@ void Plots::plot_moved( const QPointF &pos )
                 break;
         case 1 :
                 {
-                double FrameRate=FileInfoData->Glue->VideoFrameCount/FileInfoData->Glue->VideoDuration;
-                FileInfoData->Frames_Pos_Set((size_t)(X*FrameRate));
+                double FrameRate=FileInfoData->Glue->VideoFrameRate_Get();
+                if (FrameRate)
+                    FileInfoData->Frames_Pos_Set((size_t)(X*FrameRate));
                 }
                 break;
         case 2 :
                 {
-                double FrameRate=FileInfoData->Glue->VideoFrameCount/FileInfoData->Glue->VideoDuration;
-                FileInfoData->Frames_Pos_Set((size_t)(X*60*FrameRate));
+                double FrameRate=FileInfoData->Glue->VideoFrameRate_Get();
+                if (FrameRate)
+                    FileInfoData->Frames_Pos_Set((size_t)(X*60*FrameRate));
                 }
                 break;
         case 3 :
                 {
-                double FrameRate=FileInfoData->Glue->VideoFrameCount/FileInfoData->Glue->VideoDuration;
-                FileInfoData->Frames_Pos_Set((size_t)(X*3600*FrameRate));
+                double FrameRate=FileInfoData->Glue->VideoFrameRate_Get();
+                if (FrameRate)
+                    FileInfoData->Frames_Pos_Set((size_t)(X*3600*FrameRate));
                 }
                 break;
         default: return; // Problem
@@ -650,10 +659,10 @@ void Plots::on_XAxis_Kind_currentIndexChanged(int index)
     {
         switch (XAxis_Kind_index)
         {
-            case 0 : plots[Type]->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->Frames_Total_Get()); break;
-            case 1 : plots[Type]->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration); break;
-            case 2 : plots[Type]->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration/60); break;
-            case 3 : plots[Type]->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration/3600); break;
+            case 0 : plots[Type]->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoFrameCount_Get()); break;
+            case 1 : plots[Type]->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration_Get()); break;
+            case 2 : plots[Type]->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration_Get()/60); break;
+            case 3 : plots[Type]->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration_Get()/3600); break;
             default: ;
         }
 
@@ -662,7 +671,7 @@ void Plots::on_XAxis_Kind_currentIndexChanged(int index)
         plots[Type]->replot();
     }
 
-    size_t Increment=FileInfoData->Glue->VideoFrameCount/ZoomScale;
+    size_t Increment=FileInfoData->Glue->VideoFrameCount_Get()/ZoomScale;
     int Pos=FileInfoData->Frames_Pos_Get();
     if (Pos>Increment/2)
         Pos-=Increment/2;

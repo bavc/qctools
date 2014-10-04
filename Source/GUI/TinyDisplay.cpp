@@ -91,14 +91,14 @@ void TinyDisplay::Update()
     Frames_Pos=FileInfoData->Frames_Pos_Get();
     ShouldUpate=false;
 
-    if (Frames_Pos>=FileInfoData->Glue->VideoFrameCount)
-        Frames_Pos=FileInfoData->Glue->VideoFrameCount-1;
+    if (Frames_Pos>=FileInfoData->Glue->VideoFrameCount_Get())
+        Frames_Pos=FileInfoData->Glue->VideoFrameCount_Get()-1;
 
     for (size_t Pos=0; Pos<9; Pos++)
     {
-        if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->Glue->VideoFramePos)
+        if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->Glue->VideoFramePos_Get())
             Labels[Pos]->setIcon(FileInfoData->Picture_Get(Frames_Pos-4+Pos)->copy(0, 0, 72, 72));
-        else if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->Glue->VideoFrameCount)
+        else if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->Glue->VideoFrameCount_Get())
         {
             Labels[Pos]->setIcon(QPixmap());
             ShouldUpate=true;

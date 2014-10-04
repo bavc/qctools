@@ -128,7 +128,7 @@ void MainWindow::processFile(const QString &FileName)
     ui->fileNamesBox->addItem(FileName);
 
     // Coherency
-    if (Files[Files_CurrentPos]->Glue->VideoFrameCount==0)
+    if (Files[Files_CurrentPos]->Glue->VideoFrameCount_Get()==0)
     {
         statusBar()->showMessage("Unsupported format", 10000);
         return;
@@ -319,7 +319,7 @@ void MainWindow::addFile(const QString &FileName)
     FileInformation* Temp=new FileInformation(this, FileName);
 
     // Coherency
-    if (Temp->Glue->VideoFrameCount==0)
+    if (Temp->Glue->VideoFrameCount_Get()==0)
     {
         delete Temp;
         QMessageBox msgBox;
