@@ -272,7 +272,7 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "lutyuv=y=if(eq(${1}\\,-1)\\,128\\,if(eq(${1}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${1}))*pow(2\\,${1}))):u=if(eq(${2}\\,-1)\\,128\\,if(eq(${2}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${2}))*pow(2\\,${2}))):v=if(eq(${3}\\,-1)\\,128\\,if(eq(${3}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${3}))*pow(2\\,${3})))",
+            "lutyuv=y=if(eq(${1}\\,-1)\\,128\\,if(eq(${1}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${1}))*pow(2\\,${1}))):u=if(eq(${2}\\,-1)\\,128\\,if(eq(${2}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${2}))*pow(2\\,${2}))):v=if(eq(${3}\\,-1)\\,128\\,if(eq(${3}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${3}))*pow(2\\,${3}))),format=yuv444p",
         },
     },
     {
