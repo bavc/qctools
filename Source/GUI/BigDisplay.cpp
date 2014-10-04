@@ -215,8 +215,8 @@ const filter Filters[]=
         },
         {
             "crop=iw:2:0:${1},histogram=step=${2}:mode=waveform:waveform_mode=column:display_mode=overlay:waveform_mirror=1,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16",
-            "transpose=0,crop=iw:2:0:${1},histogram=step=${2}:mode=waveform:waveform_mode=column:display_mode=overlay:waveform_mirror=1,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,transpose=1",
             "split[a][b];[a]crop=iw:2:0:${1},histogram=step=${2}:mode=waveform:waveform_mode=column:display_mode=overlay:waveform_mirror=1,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,scale=iw:${height},drawbox=y=${1}:w=iw:h=2:color=yellow,setsar=1/1[a1];[b]setsar=1/1[b1];[a1][b1]blend=addition",
+            "transpose=0,crop=iw:2:0:${1},histogram=step=${2}:mode=waveform:waveform_mode=column:display_mode=overlay:waveform_mirror=1,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,transpose=1",
             "split[a][b];[a]transpose=0,crop=iw:2:0:${1},histogram=step=${2}:mode=waveform:waveform_mode=column:display_mode=overlay:waveform_mirror=1,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,transpose=1,scale=${width}:ih,drawbox=x=${1}:w=2:h=ih:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
         },
     },
