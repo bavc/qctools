@@ -18,6 +18,24 @@
 #include <sstream>
 //---------------------------------------------------------------------------
 
+enum statstype
+{
+    StatsType_None,
+    StatsType_Average,
+    StatsType_Count,
+    StatsType_Count2,
+    StatsType_Percent,
+};
+
+struct percolumn
+{
+    statstype       Stats_Type;
+    PlotName        Stats_PlotName;
+    PlotName        Stats_PlotName2;
+    const char*     HeaderName;
+    const char*     ToolTip;
+};
+
 enum col_names
 {
     Col_Processed,
@@ -36,7 +54,7 @@ enum col_names
     Col_StreamCount,
     Col_Duration,
     Col_FileSize,
-    //Col_Encoder,
+  //Col_Encoder,
     Col_VideoFormat,
     Col_Width,
     Col_Height,
@@ -44,12 +62,45 @@ enum col_names
     Col_PixFormat,
     Col_FrameRate,
     Col_AudioFormat,
-    //Col_SampleFormat,
+  //Col_SampleFormat,
     Col_SamplingRate,
-    //Col_ChannelLayout,
-    //Col_BitDepth,
+  //Col_ChannelLayout,
+  //Col_BitDepth,
     Col_Max
 };
+
+percolumn PerColumn[Col_Max]=
+{
+    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Processed",        NULL, },
+    { StatsType_Average,    PlotName_YAVG,          PlotName_Max,           "Yav",              "average of Y values", },
+    { StatsType_Average,    PlotName_YHIGH,         PlotName_YLOW,          "Yrang",            "average of ( YHIGH - YLOW ), indicative of contrast range", },
+    { StatsType_Average,    PlotName_UAVG,          PlotName_Max,           "Uav",              NULL, },
+    { StatsType_Average,    PlotName_VAVG,          PlotName_Max,           "Vav",              "average of V values", },
+    { StatsType_Average,    PlotName_TOUT,          PlotName_Max,           "TOUTav",           "average of TOUT values", },
+    { StatsType_Count,      PlotName_TOUT,          PlotName_Max,           "TOUTc",            "count of TOUT > 0.005", },
+    { StatsType_Count,      PlotName_SATMAX,        PlotName_Max,           "SATb",             "count of frames with MAXSAT > 88.7, outside of broadcast color levels", },
+    { StatsType_Count2,     PlotName_SATMAX,        PlotName_Max,           "SATi",             "count of frames with MAXSAT > 118.2, illegal YUV color", },
+    { StatsType_Percent,    PlotName_BRNG,          PlotName_Max,           "BRNGav",           "percent of frames with BRNG > 0", },
+    { StatsType_Count,      PlotName_BRNG,          PlotName_Max,           "BRNGc",            "count of frames with BRNG > 0", },
+    { StatsType_Count,      PlotName_MSE_y,         PlotName_Max,           "MSEfY",            "count of frames with MSEfY over 1000", },
+    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Format",           NULL, },
+    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Streams count",    NULL, },
+    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Duration",         NULL, },
+    { StatsType_None,       PlotName_Max,           PlotName_Max,           "File size",        NULL, },
+  //{ StatsType_None,       PlotName_Max,           PlotName_Max,           "Encoder",          NULL, },
+    { StatsType_None,       PlotName_Max,           PlotName_Max,           "V. Format",        NULL, },
+    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Width",            NULL, },
+    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Height",           NULL, },
+    { StatsType_None,       PlotName_Max,           PlotName_Max,           "DAR",              NULL, },
+    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Pix Format",       NULL, },
+    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Frame rate",       NULL, },
+    { StatsType_None,       PlotName_Max,           PlotName_Max,           "A. Format",        NULL, },
+  //{ StatsType_None,       PlotName_Max,           PlotName_Max,           "Sample format",    NULL, },
+    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Sampling rate",    NULL, },
+  //{ StatsType_None,       PlotName_Max,           PlotName_Max,           "Channel layout",   NULL, },
+  //{ StatsType_None,       PlotName_Max,           PlotName_Max,           "Bit depth",        NULL, },
+};
+
 
 //***************************************************************************
 // Constructor / Desructor
@@ -82,34 +133,13 @@ void FilesList::showEvent(QShowEvent * Event)
     setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
     setColumnCount(Col_Max);
-    setHorizontalHeaderItem(Col_Processed,      new QTableWidgetItem("Processed"));
-    setHorizontalHeaderItem(Col_Format,         new QTableWidgetItem("Format"));
-    setHorizontalHeaderItem(Col_StreamCount,    new QTableWidgetItem("Streams count"));
-    setHorizontalHeaderItem(Col_Duration,       new QTableWidgetItem("Duration"));
-    setHorizontalHeaderItem(Col_FileSize,       new QTableWidgetItem("File size"));
-    //setHorizontalHeaderItem(Col_Encoder,        new QTableWidgetItem("Encoder"));
-    setHorizontalHeaderItem(Col_VideoFormat,    new QTableWidgetItem("V. Format"));
-    setHorizontalHeaderItem(Col_Width,          new QTableWidgetItem("Width"));
-    setHorizontalHeaderItem(Col_Height,         new QTableWidgetItem("Height"));
-    setHorizontalHeaderItem(Col_DAR,            new QTableWidgetItem("DAR"));
-    setHorizontalHeaderItem(Col_PixFormat,      new QTableWidgetItem("Pix Format"));
-    setHorizontalHeaderItem(Col_FrameRate,      new QTableWidgetItem("Frame rate"));
-    setHorizontalHeaderItem(Col_AudioFormat,    new QTableWidgetItem("A. Format"));
-    //setHorizontalHeaderItem(Col_SampleFormat,   new QTableWidgetItem("Sample format"));
-    setHorizontalHeaderItem(Col_SamplingRate,   new QTableWidgetItem("Sampling rate"));
-    //setHorizontalHeaderItem(Col_ChannelLayout,  new QTableWidgetItem("Channel layout"));
-    //setHorizontalHeaderItem(Col_BitDepth,       new QTableWidgetItem("Bit depth"));
-    setHorizontalHeaderItem(Col_Yav,            new QTableWidgetItem("Yav")); horizontalHeaderItem(Col_Yav)->setToolTip("average of Y values");
-    setHorizontalHeaderItem(Col_Yrang,          new QTableWidgetItem("Yrang")); horizontalHeaderItem(Col_Yrang)->setToolTip("average of ( YHIGH - YLOW ), indicative of contrast range");
-    setHorizontalHeaderItem(Col_Uav,            new QTableWidgetItem("Uav")); horizontalHeaderItem(Col_Uav)->setToolTip("average of U values");
-    setHorizontalHeaderItem(Col_Vav,            new QTableWidgetItem("Vav")); horizontalHeaderItem(Col_Vav)->setToolTip("average of V values");
-    setHorizontalHeaderItem(Col_TOUTav,         new QTableWidgetItem("TOUTav")); horizontalHeaderItem(Col_TOUTav)->setToolTip("average of TOUT values");
-    setHorizontalHeaderItem(Col_TOUTc,          new QTableWidgetItem("TOUTc")); horizontalHeaderItem(Col_TOUTc)->setToolTip("count of TOUT > 0.005");
-    setHorizontalHeaderItem(Col_SATb,           new QTableWidgetItem("SATb")); horizontalHeaderItem(Col_SATb)->setToolTip("count of frames with MAXSAT > 88.7, outside of broadcast color levels");
-    setHorizontalHeaderItem(Col_SATi,           new QTableWidgetItem("SATi")); horizontalHeaderItem(Col_SATi)->setToolTip("count of frames with MAXSAT > 118.2, illegal YUV color");
-    setHorizontalHeaderItem(Col_BRNGav,         new QTableWidgetItem("BRNGav")); horizontalHeaderItem(Col_BRNGav)->setToolTip("percent of frames with BRNG > 0");
-    setHorizontalHeaderItem(Col_BRNGc,          new QTableWidgetItem("BRNGc")); horizontalHeaderItem(Col_BRNGc)->setToolTip("count of frames with BRNG > 0");
-    setHorizontalHeaderItem(Col_MSEfY,          new QTableWidgetItem("MSEfY")); horizontalHeaderItem(Col_MSEfY)->setToolTip("count of frames with MSEfY over 1000");
+    for (size_t Col=0; Col<Col_Max; Col++)
+    {
+        QTableWidgetItem* Item=new QTableWidgetItem(PerColumn[Col].HeaderName);
+        if (PerColumn[Col].ToolTip)
+            Item->setToolTip(PerColumn[Col].ToolTip);
+        setHorizontalHeaderItem(Col, Item);
+    }
 
     UpdateAll();
 }
@@ -235,28 +265,49 @@ void FilesList::UpdateAll()
 void FilesList::Update()
 {
     for (size_t Files_Pos=0; Files_Pos<Main->Files.size(); Files_Pos++)
-        if (Main->Files[Files_Pos]->Glue->VideoFrameCount_Get())
-        {
-            stringstream Message;
-            Message<<(int)(Main->Files[Files_Pos]->Glue->State_Get()*100)<<"%";
-            setItem((int)Files_Pos, 0, new QTableWidgetItem(QString::fromStdString(Message.str())));
-            setItem((int)Files_Pos, Col_Yav,            new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Average_Get(PlotName_YAVG).c_str()));
-            setItem((int)Files_Pos, Col_Yrang,          new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Average_Get(PlotName_YHIGH, PlotName_YLOW).c_str()));
-            setItem((int)Files_Pos, Col_Uav,            new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Average_Get(PlotName_UAVG).c_str()));
-            setItem((int)Files_Pos, Col_Vav,            new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Average_Get(PlotName_VAVG).c_str()));
-            setItem((int)Files_Pos, Col_TOUTav,         new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Average_Get(PlotName_TOUT).c_str()));
-            setItem((int)Files_Pos, Col_TOUTc,          new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Count_Get(PlotName_TOUT).c_str()));
-            setItem((int)Files_Pos, Col_SATb,           new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Count_Get(PlotName_SATMAX).c_str()));
-            setItem((int)Files_Pos, Col_SATi,           new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Count2_Get(PlotName_SATMAX).c_str()));
-            setItem((int)Files_Pos, Col_BRNGav,         new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Percent_Get(PlotName_BRNG).c_str()));
-            setItem((int)Files_Pos, Col_BRNGc,          new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Count_Get(PlotName_BRNG).c_str()));
-            setItem((int)Files_Pos, Col_MSEfY,          new QTableWidgetItem(Main->Files[Files_Pos]->Glue->Stats_Count_Get(PlotName_MSE_y).c_str()));
-            QTableWidgetItem* Item=item((int)Files_Pos, 0);
-            if (Item)
-                Item->setFlags(Item->flags()&((Qt::ItemFlags)-1-Qt::ItemIsEditable));
-        }
+    {
+        QTableWidgetItem* Item=item((int)Files_Pos, 0);
+        if (!Item || Item->text()!="100%")
+            Update(Files_Pos);
+    }
 
     resizeColumnsToContents();
+}
+
+//---------------------------------------------------------------------------
+void FilesList::Update(size_t Files_Pos)
+{
+    stringstream Message;
+    Message<<(int)(Main->Files[Files_Pos]->Glue->State_Get()*100)<<"%";
+    setItem((int)Files_Pos, Col_Processed, new QTableWidgetItem(QString::fromStdString(Message.str())));
+    
+    // Stats
+    for (size_t Col=0; Col<Col_Max; Col++)
+        if (PerColumn[Col].Stats_Type!=StatsType_None)
+        {
+            QTableWidgetItem* Item=new QTableWidgetItem();
+            switch (PerColumn[Col].Stats_Type)
+            {
+                case StatsType_Average : 
+                                            if (PerColumn[Col].Stats_PlotName2==PlotName_Max)
+                                                Item->setText(Main->Files[Files_Pos]->Glue->Stats_Average_Get(PerColumn[Col].Stats_PlotName).c_str());
+                                            else
+                                                Item->setText(Main->Files[Files_Pos]->Glue->Stats_Average_Get(PerColumn[Col].Stats_PlotName, PerColumn[Col].Stats_PlotName2).c_str());
+                                            break;
+                case StatsType_Count : 
+                                            Item->setText(Main->Files[Files_Pos]->Glue->Stats_Count_Get(PerColumn[Col].Stats_PlotName).c_str());
+                                            break;
+                case StatsType_Count2 :
+                                            Item->setText(Main->Files[Files_Pos]->Glue->Stats_Count2_Get(PerColumn[Col].Stats_PlotName).c_str());
+                                            break;
+                case StatsType_Percent : 
+                                            Item->setText(Main->Files[Files_Pos]->Glue->Stats_Percent_Get(PerColumn[Col].Stats_PlotName).c_str());
+                                            break;
+                default:    ;
+            }
+            Item->setFlags(Item->flags()&((Qt::ItemFlags)-1-Qt::ItemIsEditable));
+            setItem((int)Files_Pos, Col, Item);
+        }
 }
 
 //***************************************************************************

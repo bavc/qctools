@@ -24,6 +24,7 @@ public:
 
     // Commands
     void                        Update                      ();
+    void                        Update                      (size_t File_Pos);
     void                        UpdateAll                   ();
 
 protected:
