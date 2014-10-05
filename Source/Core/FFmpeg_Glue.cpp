@@ -103,6 +103,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
     VideoFrameCount=0;
     VideoFrameCount_Max=0;
     VideoDuration=0;
+    VideoFirstTimeStamp=(uint64_t)-1;
     IsComplete=false;
     
     // FFmpeg pointers
@@ -180,7 +181,20 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
     if (VideoStream)
     {
         VideoFrameCount_Max=VideoFrameCount=VideoStream->nb_frames;
-        VideoDuration=((double)VideoStream->duration)*VideoStream->time_base.num/VideoStream->time_base.den;
+        if (VideoStream->duration!=AV_NOPTS_VALUE)
+            VideoDuration=((double)VideoStream->duration)*VideoStream->time_base.num/VideoStream->time_base.den;
+
+        // If video duration is not known, estimating it
+        if (VideoDuration==0 && FormatContext->duration!=AV_NOPTS_VALUE)
+            VideoDuration=((double)FormatContext->duration)/AV_TIME_BASE;
+
+        // If frame count is not known, estimating it
+        if (VideoFrameCount==0 && VideoStream->avg_frame_rate.num && VideoStream->avg_frame_rate.den && VideoDuration)
+            VideoFrameCount=VideoDuration*VideoStream->avg_frame_rate.num/VideoStream->avg_frame_rate.den;
+        if (VideoFrameCount==0
+         && ((VideoStream->time_base.num==1 && VideoStream->time_base.den>=24 && VideoStream->time_base.den<=60)
+          || (VideoStream->time_base.num==1001 && VideoStream->time_base.den>=24000 && VideoStream->time_base.den<=60000)))
+            VideoFrameCount=VideoStream->duration;
     }
     if (VideoFrameCount_Max==0)
     {
@@ -319,9 +333,9 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
                                     key_frame[x_Max]=1; //Forcing key_frame to 1 if it is missing from the XML, for decoding
 
                                 x_Max++;
-                                if (VideoFrameCount<x_Max)
+                                if (x_Max>=VideoFrameCount)
                                 {
-                                    VideoFrameCount=x_Max;
+                                    VideoFrameCount=x_Max+1;
                                     if (!ts.empty() && ts!="N/A")
                                         VideoDuration=x[1][x_Max-1]+d[x_Max-1];
                                     if (FormatContext==NULL)
@@ -437,7 +451,7 @@ void FFmpeg_Glue::Seek(size_t Pos)
     // DTS computing
     long long DTS=Pos;
     DTS*=VideoStream->duration;
-    DTS/=VideoFrameCount;
+    DTS/=VideoFrameCount;  // TODO: seek based on time stamp
     DTS_Target=(int)DTS;
     
     // Seek
@@ -595,6 +609,8 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
             Image2=NULL;
             Jpeg.Data=NULL;
             Jpeg.Size=0;
+            TempPacket->data+=TempPacket->size;
+            TempPacket->size=0;
             return true;
         }
         TempPacket->data+=Bytes;
@@ -863,10 +879,27 @@ bool FFmpeg_Glue::Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, 
         if (WithStats)
         {
             x[0][x_Max]=x_Max;
-            int64_t ts=(Frame->pkt_pts==AV_NOPTS_VALUE)?Frame->pkt_dts:Frame->pkt_pts; // Using DTS is PTS is not available
+            int64_t ts=Frame->pkt_dts;
+            if (ts==AV_NOPTS_VALUE && x_Max)
+                ts=(int)((x[1][x_Max-1]*x_Max/(x_Max-1))/VideoStream->time_base.num*VideoStream->time_base.den)+VideoFirstTimeStamp; //TODO: understand how to do with first timestamp not being 0 and last timestamp being AV_NOPTS_VALUE e.g. op1a-mpeg2-wave_hd.mxf
+            //int64_t ts=(Frame->pkt_pts==AV_NOPTS_VALUE)?Frame->pkt_dts:Frame->pkt_pts; // Using DTS is PTS is not available // TODO: check if stats are based on DTS or PTS
+            if (VideoFirstTimeStamp==(uint64_t)-1)
+                VideoFirstTimeStamp=ts;
+            if (ts<VideoFirstTimeStamp)
+            {
+                for (size_t Pos=0; Pos<x_Max; Pos++)
+                {
+                    x[1][Pos]-=VideoFirstTimeStamp-ts;
+                    x[2][Pos]=x[1][Pos]/60;
+                    x[3][Pos]=x[2][Pos]/60;
+                }
+            }
+            ts-=VideoFirstTimeStamp;
             if (ts!=AV_NOPTS_VALUE)
             {
                 x[1][x_Max]=((double)ts)*VideoStream->time_base.num/VideoStream->time_base.den;
+                if (x[1][x_Max]>VideoDuration)
+                    VideoDuration=x[1][x_Max];
                 x[2][x_Max]=x[1][x_Max]/60;
                 x[3][x_Max]=x[2][x_Max]/60;
             }
@@ -931,6 +964,8 @@ bool FFmpeg_Glue::Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, 
             key_frame[x_Max]=Frame->key_frame;
 
             x_Max++;
+            if (x_Max>=VideoFrameCount)
+                VideoFrameCount=x_Max+1;
         }
 
         if (GetAnswer==AVERROR(EAGAIN) || GetAnswer==AVERROR_EOF)

@@ -78,6 +78,7 @@ public:
     void                        refreshDisplay_Axis         ();
 
     // Zoom
+    void                        Zoom_Update                 ();
     void                        Zoom_Move                   (size_t Begin);
     void                        Zoom_In                     ();
     void                        Zoom_Out                    ();
@@ -103,6 +104,7 @@ public:
 
     // Y axis info
     double                      plots_YMax[PlotType_Max];
+    uint64_t                    VideoFrameCount;
 
 private Q_SLOTS:
     void plot_moved( const QPointF & );

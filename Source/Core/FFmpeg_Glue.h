@@ -161,10 +161,11 @@ private:
     bool                        With2;
 
     // Status information
-    size_t                      VideoFramePos;          // Current pos
+    size_t                      VideoFramePos;          // Current position of playback
     size_t                      VideoFrameCount;        // Total count of frames (may be estimated)
     size_t                      VideoFrameCount_Max;    // Max reserved memory
     double                      VideoDuration;          // Duration is seconds
+    uint64_t                    VideoFirstTimeStamp;    // Timestamp of the first frame
 
     // Temp
     int                         DTS_Target;

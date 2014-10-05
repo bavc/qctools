@@ -71,6 +71,7 @@ Plots::Plots(QWidget *parent, FileInformation* FileInformationData_) :
 
     // Y axis info
     memset(plots_YMax, 0, sizeof(double)*PlotType_Max);
+    VideoFrameCount=0;
 
     // Plots
     Plots_Create();
@@ -367,6 +368,13 @@ void Plots::createData_Update()
     for (size_t Type=0; Type<PlotType_Max; Type++)
         if (plots[Type] && plots[Type]->isVisible())
             createData_Update((PlotType)Type);
+    
+    //Update of zoom in case of total duration change
+    if (VideoFrameCount!=FileInfoData->Glue->VideoFrameCount_Get())
+    {
+        VideoFrameCount=FileInfoData->Glue->VideoFrameCount_Get();
+        Zoom_Update();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -431,6 +439,18 @@ void Plots::createData_Update(PlotType Type)
     for(unsigned j=0; j<PerPlotGroup[Type].Count; ++j)
         plotsCurves[Type][j]->setRawSamples(FileInfoData->Glue->x[XAxis_Kind_index], FileInfoData->Glue->y[PerPlotGroup[Type].Start+j], FileInfoData->Glue->x_Max);
     plots[Type]->replot();
+}
+
+//---------------------------------------------------------------------------
+void Plots::Zoom_Update()
+{
+    size_t Increment=FileInfoData->Glue->VideoFrameCount_Get()/ZoomScale;
+    int Pos=FileInfoData->Frames_Pos_Get();
+    if (Pos>Increment/2)
+        Pos-=Increment/2;
+    else
+        Pos=0;
+    Zoom_Move(Pos);
 }
 
 //---------------------------------------------------------------------------
@@ -671,11 +691,5 @@ void Plots::on_XAxis_Kind_currentIndexChanged(int index)
         plots[Type]->replot();
     }
 
-    size_t Increment=FileInfoData->Glue->VideoFrameCount_Get()/ZoomScale;
-    int Pos=FileInfoData->Frames_Pos_Get();
-    if (Pos>Increment/2)
-        Pos-=Increment/2;
-    else
-        Pos=0;
-    Zoom_Move(Pos);
+    Zoom_Update();
 }

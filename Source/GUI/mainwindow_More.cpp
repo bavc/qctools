@@ -127,13 +127,6 @@ void MainWindow::processFile(const QString &FileName)
     Files_CurrentPos=0;
     ui->fileNamesBox->addItem(FileName);
 
-    // Coherency
-    if (Files[Files_CurrentPos]->Glue->VideoFrameCount_Get()==0)
-    {
-        statusBar()->showMessage("Unsupported format", 10000);
-        return;
-    }
-
     TimeOut();
 }
 
@@ -317,16 +310,6 @@ void MainWindow::addFile(const QString &FileName)
 
     // Launch analysis
     FileInformation* Temp=new FileInformation(this, FileName);
-
-    // Coherency
-    if (Temp->Glue->VideoFrameCount_Get()==0)
-    {
-        delete Temp;
-        QMessageBox msgBox;
-        msgBox.setText("The file format of "+FileName+" is not yet supported.");
-        msgBox.exec();
-        return;
-    }
 
     Files.push_back(Temp);
     ui->fileNamesBox->addItem(Temp->FileName);
