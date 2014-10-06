@@ -72,6 +72,8 @@ void MainWindow::closeAllFiles()
     if (FilesListArea)
         FilesListArea->hide();
     clearGraphsLayout();
+    for (size_t Pos=0; Pos<Files.size(); Pos++)
+        delete Files[Pos];
     Files.clear();
     ui->fileNamesBox->clear();
     createDragDrop();
