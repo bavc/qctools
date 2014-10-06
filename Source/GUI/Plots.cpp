@@ -392,6 +392,8 @@ void Plots::Zoom_Update()
 {
     size_t Increment=Data_FramePos_Max/ZoomScale;
     int Pos=FileInfoData->Frames_Pos_Get();
+    if (Pos==(int)-1)
+        return;    
     if (Pos>Increment/2)
         Pos-=Increment/2;
     else
