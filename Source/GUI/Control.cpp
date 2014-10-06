@@ -228,10 +228,13 @@ void Control::Update()
     ShouldUpate=false;
 
     int Milliseconds=(int)-1;
-    if (FileInfoData && Frames_Pos<FileInfoData->Videos[0]->x_Current || FileInfoData->Videos[0]->x[1][Frames_Pos]) //Also includes when stats are not ready but timestamp is available
+    if (FileInfoData && Frames_Pos<FileInfoData->Videos[0]->x_Current || (Frames_Pos<FileInfoData->Videos[0]->x_Current_Max && FileInfoData->Videos[0]->x[1][Frames_Pos])) //Also includes when stats are not ready but timestamp is available
         Milliseconds=(int)(FileInfoData->Videos[0]->x[1][Frames_Pos]*1000);
 
-    Info_Frames->setText("Frame "+QString::number(Frames_Pos));
+    if (Frames_Pos!=(int)-1)
+        Info_Frames->setText("Frame "+QString::number(Frames_Pos));
+    else
+        Info_Frames->setText(QString());
     if (Milliseconds!=(int)-1)
     {
         string Time;
