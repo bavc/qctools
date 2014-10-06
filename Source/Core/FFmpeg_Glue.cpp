@@ -173,7 +173,6 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<VideoStats*>* Vid
     // Output
     if (VideoStream)
     {
-        /*
         VideoFrameCount_Max=VideoFrameCount=VideoStream->nb_frames;
         if (VideoStream->duration!=AV_NOPTS_VALUE)
             VideoDuration=((double)VideoStream->duration)*VideoStream->time_base.num/VideoStream->time_base.den;
@@ -189,7 +188,6 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<VideoStats*>* Vid
          && ((VideoStream->time_base.num==1 && VideoStream->time_base.den>=24 && VideoStream->time_base.den<=60)
           || (VideoStream->time_base.num==1001 && VideoStream->time_base.den>=24000 && VideoStream->time_base.den<=60000)))
             VideoFrameCount=VideoStream->duration;
-            */
     }
     if (OutputMethod==Output_Jpeg)
     {
