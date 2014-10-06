@@ -36,9 +36,10 @@ void FileInformation::run()
     for (;;)
     {
         if (Glue)
-            Glue->NextFrame();
-        if (Videos[0]->State_Get()>=1)
-            break;
+        {
+            if (!Glue->NextFrame())
+                break;
+        }
         if (WantToStop)
             break;
         yieldCurrentThread();

@@ -92,7 +92,7 @@ public:
     // Actions
     void                        Seek(size_t Pos);
     void                        FrameAtPosition(size_t Pos);
-    void                        NextFrame();
+    bool                        NextFrame();
     bool                        OutputFrame(AVPacket* Packet, bool Decode=true);
     void                        Filter1_Change(const string &Filter);
     void                        Filter2_Change(const string &Filter);

@@ -287,14 +287,14 @@ void FFmpeg_Glue::FrameAtPosition(size_t Pos)
 {
     if (VideoFramePos!=Pos)
         Seek(Pos);
-    return NextFrame();
+    NextFrame();
 }
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::NextFrame()
+bool FFmpeg_Glue::NextFrame()
 {
     if (!FormatContext)
-        return;
+        return false;
 
     // Next frame
     while (Packet->size || av_read_frame(FormatContext, Packet) >= 0)
@@ -305,7 +305,7 @@ void FFmpeg_Glue::NextFrame()
             do
             {
                 if (OutputFrame(Packet))
-                    return;
+                    return true;
             }
             while (Packet->size > 0);
         }
@@ -322,6 +322,8 @@ void FFmpeg_Glue::NextFrame()
     // Complete
     if (WithStats)
         (*Videos)[0]->VideoStatsFinish();
+
+    return false;
 }
 
 //---------------------------------------------------------------------------
