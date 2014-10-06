@@ -537,7 +537,7 @@ bool FFmpeg_Glue::Scale_Init(AVFrame* FilteredFrame, SwsContext* &Scale_Context,
                                     (AVPixelFormat)FilteredFrame->format,
                                     Scale_Width, Scale_Height,
                                     OutputMethod==Output_QImage?PIX_FMT_RGB24:PIX_FMT_YUVJ420P,
-                                    SWS_BICUBIC, NULL, NULL, NULL);
+                                    Output_QImage?SWS_BICUBIC:SWS_FAST_BILINEAR, NULL, NULL, NULL);
     Scale_Frame=av_frame_alloc();
     Scale_Frame->width=Scale_Width;
     Scale_Frame->height=Scale_Height;
