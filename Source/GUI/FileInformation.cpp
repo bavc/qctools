@@ -39,12 +39,9 @@ void FileInformation::run()
             Glue->NextFrame();
         if (Videos[0]->State_Get()>=1)
             break;
-        if ((Videos[0]->x_Current%10)==0)
-        {
-            if (WantToStop)
-                break;
-            yieldCurrentThread();
-        }
+        if (WantToStop)
+            break;
+        yieldCurrentThread();
     }
 
     ActiveParsing_Count--;
