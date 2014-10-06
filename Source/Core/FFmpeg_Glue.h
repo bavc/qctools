@@ -155,9 +155,7 @@ private:
 
     // Video information
     size_t                      VideoFrameCount;        // Total count of frames (may be estimated)
-    size_t                      VideoFrameCount_Max;    // Max reserved memory
     double                      VideoDuration;          // Duration is seconds
-    uint64_t                    VideoFirstTimeStamp;    // Timestamp of the first frame
 
     // Seek
     int                         Seek_TimeStamp;

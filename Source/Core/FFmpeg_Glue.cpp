@@ -100,9 +100,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<VideoStats*>* Vid
     Image1=NULL;
     Image2=NULL;
     VideoFrameCount=0;
-    VideoFrameCount_Max=0;
     VideoDuration=0;
-    VideoFirstTimeStamp=(uint64_t)-1;
     
     // FFmpeg pointers
     FormatContext=NULL;
@@ -171,6 +169,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<VideoStats*>* Vid
     Packet->size = 0;
 
     // Output
+    size_t VideoFrameCount_Max=0;
     if (VideoStream)
     {
         VideoFrameCount_Max=VideoFrameCount=VideoStream->nb_frames;
@@ -219,9 +218,6 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<VideoStats*>* Vid
 //---------------------------------------------------------------------------
 FFmpeg_Glue::~FFmpeg_Glue()
 {
-    if (VideoFrameCount_Max==0)
-        return; // Nothing was initialized    
-        
     // Clear
     if (Packet)
     {
@@ -323,7 +319,7 @@ void FFmpeg_Glue::NextFrame()
     Packet->size=0;
     while (OutputFrame(Packet));
     
-    //Complete
+    // Complete
     if (WithStats)
         (*Videos)[0]->VideoStatsFinish();
 }
