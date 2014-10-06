@@ -47,6 +47,8 @@ protected:
     // File information
     FileInformation*            FileInfoData;
     int                         Frames_Pos;
+    int                         Labels_MustUpdateFrom;
+    int                         Labels_MustUpdateTo;
 
     // Widgets
     QToolButton*                Labels[9];

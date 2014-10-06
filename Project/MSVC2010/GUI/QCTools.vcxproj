@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -76,6 +76,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Core\Core.cpp" />
     <ClCompile Include="..\..\..\Source\Core\FFmpeg_Glue.cpp" />
+    <ClCompile Include="..\..\..\Source\Core\VideoStats.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Control.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\FileInformation.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\FilesList.cpp" />
@@ -105,6 +106,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Core\Core.h" />
     <ClInclude Include="..\..\..\Source\Core\FFmpeg_Glue.h" />
+    <ClInclude Include="..\..\..\Source\Core\VideoStats.h" />
     <ClInclude Include="..\..\..\Source\GUI\Control.h" />
     <ClInclude Include="..\..\..\Source\GUI\FileInformation.h" />
     <ClInclude Include="..\..\..\Source\GUI\FilesList.h" />

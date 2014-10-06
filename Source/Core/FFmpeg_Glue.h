@@ -30,6 +30,7 @@ struct AVFilterInOut;
 struct AVFilterInOut;
 
 class QImage;
+class VideoStats;
 
 class FFmpeg_Glue
 {
@@ -40,15 +41,11 @@ public:
         Output_None,
         Output_QImage,
         Output_Jpeg,
-        Output_JpegList,
     };
-    FFmpeg_Glue(const string &FileName, int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, const string &Filter1=string(), const string &Filter2=string(), bool With1=true, bool With2=false, bool WithStats=false, const string &StatsFromExternalData=string());
+    FFmpeg_Glue(const string &FileName, std::vector<VideoStats*>* Videos, int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, const string &Filter1=string(), const string &Filter2=string(), bool With1=true, bool With2=false, bool WithStats=false);
     ~FFmpeg_Glue();
 
-    // In
-    string                      StatsFromExternalData;
-
-    // Out
+    // Images
     QImage*                     Image1;
     QImage*                     Image2;
     struct bytes
@@ -56,51 +53,44 @@ public:
         unsigned char* Data;
         size_t         Size;
     };
-    bytes                       Jpeg;
     std::vector<bytes*>         JpegList;
-    double**                    x; //PTS of frame number
-    double*                     d; //Duration of frame number
-    double**                    y; //Data
-    bool*                       key_frame; //May be useful for FFmpeg XML output
-    double                      y_Max[PlotType_Max];
-    size_t                      x_Max;
+    
+    // Status
     size_t                      VideoFramePos_Get()                                                                     {return VideoFramePos;}
-    double                      State_Get();
-    bool                        IsComplete;
 
-    // Infos
+    // Data
+    std::vector<VideoStats*>*   Videos;
+
+    // Container information
     string                      ContainerFormat_Get();
     int                         StreamCount_Get();
+
+    // Video information
     string                      VideoFormat_Get();
     double                      VideoDuration_Get()                                                                     {return VideoDuration;}
     double                      VideoFrameRate_Get();
     size_t                      VideoFrameCount_Get()                                                                   {return VideoFrameCount;}
     int                         Width_Get();
     int                         Height_Get();
-    int                         KeyFrame_Get(size_t FramePos);
     double                      DAR_Get();
     string                      PixFormat_Get();
+    
+    // Audio information
     string                      AudioFormat_Get();
     string                      SampleFormat_Get();
     int                         SamplingRate_Get();
     string                      ChannelLayout_Get();
     int                         BitDepth_Get();
-    string                      StatsToExternalData();
+    
+    // FFmpeg information
     string                      FFmpeg_Version();
     int                         FFmpeg_Year();
     string                      FFmpeg_Compiler();
     string                      FFmpeg_Configuration();
     string                      FFmpeg_LibsVersion();
-
-    //Stats
-    string                      Stats_Average_Get(PlotName Pos);
-    string                      Stats_Average_Get(PlotName Pos, PlotName Pos2);
-    string                      Stats_Count_Get(PlotName Pos);
-    string                      Stats_Count2_Get(PlotName Pos);
-    string                      Stats_Percent_Get(PlotName Pos);
  
     // Actions
-    void                        Seek (size_t Pos);
+    void                        Seek(size_t Pos);
     void                        FrameAtPosition(size_t Pos);
     void                        NextFrame();
     bool                        OutputFrame(AVPacket* Packet, bool Decode=true);
@@ -160,23 +150,17 @@ private:
     bool                        With1;
     bool                        With2;
 
-    // Status information
+    // Status
     size_t                      VideoFramePos;          // Current position of playback
+
+    // Video information
     size_t                      VideoFrameCount;        // Total count of frames (may be estimated)
     size_t                      VideoFrameCount_Max;    // Max reserved memory
     double                      VideoDuration;          // Duration is seconds
     uint64_t                    VideoFirstTimeStamp;    // Timestamp of the first frame
 
-    // Temp
-    int                         DTS_Target;
-    size_t                      x_Line_Begin;
-    size_t                      x_Line_EolSize;
-    char                        x_Line_EolChar;
-
-    //Stats
-    double                      Stats_Totals[PlotName_Max];
-    uint64_t                    Stats_Counts[PlotName_Max];
-    uint64_t                    Stats_Counts2[PlotName_Max];
+    // Seek
+    int                         Seek_TimeStamp;
 };
 
 #endif // FFmpeg_Glue_H

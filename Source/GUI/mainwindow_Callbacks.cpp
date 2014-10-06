@@ -48,7 +48,7 @@ void MainWindow::TimeOut ()
     // Simultaneous parsing
     for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
     {
-        if (!Files[Files_Pos]->Glue->IsComplete)
+        if (Files[Files_Pos]->Videos[0]->State_Get()<1)
             Files[Files_Pos]->Parse();
     }
 
@@ -62,24 +62,29 @@ void MainWindow::TimeOut ()
         int VideoFramePos_Total=0;
         for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
         {
-            VideoFramePos_Total+=Files[Files_Pos]->Glue->VideoFramePos_Get();
-            VideoFrameCount_Total+=Files[Files_Pos]->Glue->VideoFrameCount_Get();
+            VideoFramePos_Total+=Files[Files_Pos]->Videos[0]->x_Current;
+            VideoFrameCount_Total+=Files[Files_Pos]->Videos[0]->x_Current_Max;
         }
         if (Files_Completed!=Files.size())
-            Message_Total<<(int)((double)VideoFramePos_Total)*100/VideoFrameCount_Total<<"%";
+        {
+            if (VideoFrameCount_Total)
+                Message_Total<<(int)((double)VideoFramePos_Total)*100/VideoFrameCount_Total<<"%";
+            else
+                Message_Total<<"100%";
+        }
     }
     for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
-        if (Files[Files_Pos]->Glue->IsComplete)
+        if (Files[Files_Pos]->Videos[0]->State_Get()>=1)
             Files_Completed++;
 
     if (Files_CurrentPos!=(size_t)-1)
     {
-        if (!Files[Files_CurrentPos]->Glue->IsComplete)
+        if (Files[Files_CurrentPos]->Videos[0]->State_Get()<1)
         {
             stringstream Message;
-            Message<<"Parsing frame "<<Files[Files_CurrentPos]->Glue->VideoFramePos_Get();
-            if (Files[Files_CurrentPos]->Glue->VideoFrameCount_Get())
-                Message<<"/"<<Files[Files_CurrentPos]->Glue->VideoFrameCount_Get()<<" ("<<(int)((double)Files[Files_CurrentPos]->Glue->VideoFramePos_Get())*100/Files[Files_CurrentPos]->Glue->VideoFrameCount_Get()<<"%)";
+            Message<<"Parsing frame "<<Files[Files_CurrentPos]->Videos[0]->x_Current;
+            if (Files[Files_CurrentPos]->Videos[0]->x_Current_Max)
+                Message<<"/"<<Files[Files_CurrentPos]->Videos[0]->x_Current_Max<<" ("<<(int)((double)Files[Files_CurrentPos]->Videos[0]->x_Current)*100/Files[Files_CurrentPos]->Videos[0]->x_Current_Max<<"%)";
             QStatusBar* StatusBar=statusBar();
             if (StatusBar)
                 StatusBar->showMessage((Message.str()+Message_Total.str()).c_str());

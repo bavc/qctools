@@ -9,6 +9,7 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
+#include "Core/VideoStats.h"
 #include <QImage>
 #include <QXmlStreamReader>
 
@@ -80,8 +81,9 @@ static void avlog_cb(void *, int level, const char * szFmt, va_list varg)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_Height_, outputmethod OutputMethod_, const string &Filter1_, const string &Filter2_, bool With1_, bool With2_, bool WithStats_, const string &StatsFromExternalData_) :
+FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<VideoStats*>* Videos_, int Scale_Width_, int Scale_Height_, outputmethod OutputMethod_, const string &Filter1_, const string &Filter2_, bool With1_, bool With2_, bool WithStats_) :
     FileName(FileName_),
+    Videos(Videos_),
     Scale_Width(Scale_Width_),
     Scale_Height(Scale_Height_),
     OutputMethod(OutputMethod_),
@@ -89,8 +91,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
     Filter2(Filter2_),
     WithStats(WithStats_),
     With1(With1_),
-    With2(With2_),
-    StatsFromExternalData(StatsFromExternalData_)
+    With2(With2_)
 {
     // In
     Scale_Adapted=false;
@@ -98,13 +99,10 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
     // Out
     Image1=NULL;
     Image2=NULL;
-    Jpeg.Data=NULL;
-    Jpeg.Size=0;
     VideoFrameCount=0;
     VideoFrameCount_Max=0;
     VideoDuration=0;
     VideoFirstTimeStamp=(uint64_t)-1;
-    IsComplete=false;
     
     // FFmpeg pointers
     FormatContext=NULL;
@@ -117,11 +115,6 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
     Scale2_Context=NULL;
     Scale1_Frame=NULL;
     Scale2_Frame=NULL;
-
-    //Stats
-    memset(Stats_Totals, 0x00, PlotName_Max*sizeof(double));
-    memset(Stats_Counts, 0x00, PlotName_Max*sizeof(uint64_t));
-    memset(Stats_Counts2, 0x00, PlotName_Max*sizeof(uint64_t));
 
     // FFmpeg init
     av_register_all();
@@ -180,6 +173,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
     // Output
     if (VideoStream)
     {
+        /*
         VideoFrameCount_Max=VideoFrameCount=VideoStream->nb_frames;
         if (VideoStream->duration!=AV_NOPTS_VALUE)
             VideoDuration=((double)VideoStream->duration)*VideoStream->time_base.num/VideoStream->time_base.den;
@@ -195,16 +189,13 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
          && ((VideoStream->time_base.num==1 && VideoStream->time_base.den>=24 && VideoStream->time_base.den<=60)
           || (VideoStream->time_base.num==1001 && VideoStream->time_base.den>=24000 && VideoStream->time_base.den<=60000)))
             VideoFrameCount=VideoStream->duration;
+            */
     }
-    if (VideoFrameCount_Max==0)
-    {
-        VideoFrameCount_Max=3*60*60*30; // 3 hours max for the moment
-    }
-    if (OutputMethod==Output_JpegList)
+    if (OutputMethod==Output_Jpeg)
     {
         JpegList.reserve(VideoFrameCount_Max);
     }
-    if (OutputMethod==Output_Jpeg || OutputMethod==Output_JpegList)
+    if (OutputMethod==Output_Jpeg)
     {
         JpegOutput_CodecContext=NULL;
     }
@@ -215,145 +206,16 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, int Scale_Width_, int Scale_H
     JpegOutput_Packet->data=NULL;
     JpegOutput_Packet->size=0;
 
-    // frame info
-    if (WithStats || !StatsFromExternalData.empty())
+    // Frame info
+    if (WithStats)
     {
-        // Configure
-        x = new double*[4];
-        memset(x, 0, 4*sizeof(double*));
-        d = new double[VideoFrameCount_Max];
-        memset(d, 0x00, VideoFrameCount_Max*sizeof(double));
-        y = new double*[PlotName_Max];
-        memset(y, 0, PlotName_Max*sizeof(double*));
-        memset(y_Max, 0, PlotType_Max*sizeof(double));
-
-        for(size_t j=0; j<4; ++j)
-        {
-            x[j]=new double[VideoFrameCount_Max];
-            memset(x[j], 0x00, VideoFrameCount_Max*sizeof(double));
-        }
-        for(size_t j=0; j<PlotName_Max; ++j)
-        {
-            y[j] = new double[VideoFrameCount_Max];
-            memset(y[j], 0x00, VideoFrameCount_Max*sizeof(double));
-        }
-        for(size_t j=0; j<PlotType_Max; ++j)
-            y_Max[j]=0; //PerPlotGroup[j].Max;
-
-        key_frame=new bool[VideoFrameCount_Max];
-        memset(key_frame, 0x00, VideoFrameCount_Max*sizeof(bool));
+        VideoStats* Video=new VideoStats(VideoFrameCount, VideoDuration, VideoFrameCount_Max, VideoStream?(((double)VideoStream->time_base.den)/VideoStream->time_base.num):0);
+        Videos->push_back(Video);
     }
-    x_Max=0;
-    x_Line_Begin=0;
     VideoFramePos=0;
 
     // Temp
-    DTS_Target=-1;
-
-    // Stats from external data
-    // XML input
-    QXmlStreamReader Xml(StatsFromExternalData.c_str());
-    while (!Xml.atEnd())
-    {
-        if (Xml.readNextStartElement())
-        {
-            if (Xml.name()=="ffprobe")
-            {
-                while (Xml.readNextStartElement())
-                {
-                    if (Xml.name()=="frames")
-                    {
-                        while (Xml.readNextStartElement())
-                        {
-                            if (Xml.name()=="frame" && Xml.attributes().value("media_type")=="video")
-                            {
-                                x[0][x_Max]=x_Max;
-                                d[x_Max]=std::atof(Xml.attributes().value("pkt_duration_time").toString().toUtf8().data());
-                                string ts=Xml.attributes().value("pkt_pts_time").toString().toUtf8().data();
-                                if (ts.empty() || ts=="N/A")
-                                    ts=Xml.attributes().value("pkt_dts_time").toString().toUtf8().data(); // Using DTS is PTS is not available
-                                if (!ts.empty() && ts!="N/A")
-                                {
-                                    x[1][x_Max]=std::atof(ts.c_str());
-                                    x[2][x_Max]=x[1][x_Max]/60;
-                                    x[3][x_Max]=x[2][x_Max]/60;
-                                }
-
-                                int Width=atoi(Xml.attributes().value("width").toString().toUtf8().data());
-                                int Height=atoi(Xml.attributes().value("height").toString().toUtf8().data());
-
-                                while (Xml.readNextStartElement())
-                                {
-                                    if (Xml.name()=="tag")
-                                    {
-                                        PlotName j=PlotName_Max;
-                                        for (size_t Plot_Pos=0; Plot_Pos<PlotName_Max; Plot_Pos++)
-                                            if (Xml.attributes().value("key")==PerPlotName[Plot_Pos].FFmpeg_Name_2_3)
-                                                j=(PlotName)Plot_Pos;
-
-                                        if (j!=PlotName_Max)
-                                        {
-                                            double value=std::atof(Xml.attributes().value("value").toString().toUtf8().data());
-                                            
-                                            // Special cases: crop: x2, y2
-                                            if (Width && Xml.attributes().value("key")=="lavfi.cropdetect.x2")
-                                                y[j][x_Max]=Width-value;
-                                            else if (Height && Xml.attributes().value("key")=="lavfi.cropdetect.y2")
-                                                y[j][x_Max]=Height-value;
-                                            else if (Width && Xml.attributes().value("key")=="lavfi.cropdetect.w")
-                                                y[j][x_Max]=Width-value;
-                                            else if (Height && Xml.attributes().value("key")=="lavfi.cropdetect.h")
-                                                y[j][x_Max]=Height-value;
-                                            else
-                                                y[j][x_Max]=value;
-
-                                            if (PerPlotName[j].Group1!=PlotType_Max && y_Max[PerPlotName[j].Group1]<y[j][x_Max])
-                                                y_Max[PerPlotName[j].Group1]=y[j][x_Max];
-                                            if (PerPlotName[j].Group2!=PlotType_Max && y_Max[PerPlotName[j].Group2]<y[j][x_Max])
-                                                y_Max[PerPlotName[j].Group2]=y[j][x_Max];
-
-                                            //Stats
-                                            Stats_Totals[j]+=y[j][x_Max];
-                                            if (PerPlotName[j].DefaultLimit!=DBL_MAX)
-                                            {
-                                                if (y[j][x_Max]>PerPlotName[j].DefaultLimit)
-                                                    Stats_Counts[j]++;
-                                                if (PerPlotName[j].DefaultLimit2!=DBL_MAX && y[j][x_Max]>PerPlotName[j].DefaultLimit2)
-                                                    Stats_Counts2[j]++;
-                                            }
-                                        }
-                                    }
-                                    Xml.skipCurrentElement();
-                                }
-
-                                QStringRef key_frame_String=Xml.attributes().value("key_frame");
-                                if (key_frame_String.size()>0)
-                                    key_frame[x_Max]=std::atof(key_frame_String.toString().toUtf8().data());
-                                else
-                                    key_frame[x_Max]=1; //Forcing key_frame to 1 if it is missing from the XML, for decoding
-
-                                x_Max++;
-                                if (x_Max>=VideoFrameCount)
-                                {
-                                    VideoFrameCount=x_Max+1;
-                                    if (!ts.empty() && ts!="N/A")
-                                        VideoDuration=x[1][x_Max-1]+d[x_Max-1];
-                                    if (FormatContext==NULL)
-                                        VideoFramePos=VideoFrameCount;
-                                }
-                            }
-                            else
-                                Xml.skipCurrentElement();
-                        }
-                    }
-                    else
-                        Xml.skipCurrentElement();
-                }
-            }
-            else
-                Xml.skipCurrentElement();
-        }
-    }
+    Seek_TimeStamp=-1;
 }
 
 //---------------------------------------------------------------------------
@@ -380,85 +242,46 @@ FFmpeg_Glue::~FFmpeg_Glue()
 }
 
 //***************************************************************************
-// Stats
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-string FFmpeg_Glue::Stats_Average_Get(PlotName Pos)
-{
-    if (x_Max==0)
-        return string();
-
-    double Value=Stats_Totals[Pos]/x_Max;
-    stringstream str;
-    str<<fixed<<setprecision(PerPlotName[Pos].DigitsAfterComma)<<Value;
-    return str.str();
-}
-
-//---------------------------------------------------------------------------
-string FFmpeg_Glue::Stats_Average_Get(PlotName Pos, PlotName Pos2)
-{
-    if (x_Max==0)
-        return string();
-
-    double Value=(Stats_Totals[Pos]-Stats_Totals[Pos2])/x_Max;
-    stringstream str;
-    str<<fixed<<setprecision(PerPlotName[Pos].DigitsAfterComma)<<Value;
-    return str.str();
-}
-
-//---------------------------------------------------------------------------
-string FFmpeg_Glue::Stats_Count_Get(PlotName Pos)
-{
-    if (x_Max==0)
-        return string();
-
-    stringstream str;
-    str<<Stats_Counts[Pos];
-    return str.str();
-}
-
-//---------------------------------------------------------------------------
-string FFmpeg_Glue::Stats_Count2_Get(PlotName Pos)
-{
-    if (x_Max==0)
-        return string();
-
-    stringstream str;
-    str<<Stats_Counts2[Pos];
-    return str.str();
-}
-
-//---------------------------------------------------------------------------
-string FFmpeg_Glue::Stats_Percent_Get(PlotName Pos)
-{
-    if (x_Max==0)
-        return string();
-
-    double Value=Stats_Counts[Pos]/x_Max;
-    stringstream str;
-    str<<Value*100<<"%";
-    return str.str();
-}
-
-//***************************************************************************
 // Actions
 //***************************************************************************
 
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::Seek(size_t Pos)
 {
+    // Finding the right source
+    int64_t Duration;
+    int64_t FrameCount;
+    if (Videos && !Videos->empty() && (*Videos)[0])
+    {
+        if ((*Videos)[0]->State_Get()==1)
+        {
+            Duration=(*Videos)[0]->x_Max[1];
+            FrameCount=(*Videos)[0]->x_Current_Max;
+        }
+        else
+        {
+            Duration=max(((int64_t)((*Videos)[0]->x_Max[1]*((double)VideoStream->time_base.den)/VideoStream->time_base.num)), VideoStream->duration);
+            FrameCount=max((*Videos)[0]->x_Current_Max, VideoFrameCount);
+        }
+    }
+    else
+    {
+        Duration=VideoStream->duration;
+        FrameCount=VideoFrameCount;
+    }
+
+
     // DTS computing
     long long DTS=Pos;
-    DTS*=VideoStream->duration;
-    DTS/=VideoFrameCount;  // TODO: seek based on time stamp
-    DTS_Target=(int)DTS;
+    DTS*=Duration;
+    DTS/=FrameCount;  // TODO: seek based on time stamp
+    Seek_TimeStamp=(int)DTS;
     
     // Seek
-    if (DTS_Target)
-        avformat_seek_file(FormatContext,VideoStream_Index,0,DTS_Target,DTS_Target,0);
+    if (Seek_TimeStamp)
+        avformat_seek_file(FormatContext, VideoStream_Index, 0, Seek_TimeStamp, Seek_TimeStamp, 0);
     else
-        avformat_seek_file(FormatContext,VideoStream_Index,0,1,1,0); //Found some cases such seek fails
+        avformat_seek_file(FormatContext, VideoStream_Index, 0, 1, 1, 0); //Found some cases such seek fails
     VideoFramePos=Pos;
 
     // Flushing
@@ -476,96 +299,9 @@ void FFmpeg_Glue::FrameAtPosition(size_t Pos)
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::NextFrame()
 {
-    if (!StatsFromExternalData.empty())
-    {
-        /* CSV input disabled
-        if (!x_Line_Begin)
-        {
-            size_t Line_End=StatsFromExternalData.find('\r');
-            if (Line_End==-1)
-            {
-                Line_End=StatsFromExternalData.find('\n');
-                if (Line_End==-1)
-                    StatsFromExternalData.clear();
-                else
-                {
-                    x_Line_EolChar='\n';
-                    x_Line_EolSize=1;
-                }
-            }
-            else
-            {
-                x_Line_EolChar='\r';
-                if (Line_End+1>StatsFromExternalData.size() || StatsFromExternalData[Line_End]!='\n')
-                    x_Line_EolSize=1;
-                else
-                    x_Line_EolSize=2;
-            }
-        }
-            
-        size_t Frames_Begin=x_Max;
-        int Line_End;
-        for (;;)
-        {
-            Line_End=StatsFromExternalData.find(x_Line_EolChar, x_Line_Begin);
-            if (Line_End==-1 || x_Max>=Frames_Begin+100)
-                break;
-
-            if (x_Line_Begin) //If not the header
-            {
-                x[0][x_Max]=x_Max;
-        
-                int Col_Begin=x_Line_Begin;
-                int Col_End;
-                unsigned Pos2=0;
-                for (;;)
-                {
-                    Col_End=StatsFromExternalData.find(',', Col_Begin);
-                    if (Col_End>Line_End || Col_End==-1)
-                        Col_End=Line_End;
-                    string Value(StatsFromExternalData.substr(Col_Begin, Col_End-Col_Begin));
-                    if (Pos2==6)
-                    {
-                        x[1][x_Max]=std::atof(Value.data());
-                        x[2][x_Max]=x[1][x_Max]/60;
-                        x[3][x_Max]=x[2][x_Max]/60;
-                    }
-                    else if (Pos2>=PlotName_Begin)
-                    {
-                        size_t j=Pos2-PlotName_Begin;
-                        y[j][x_Max]=std::atof(Value.data());
-
-                        //TODO
-                        if (PerPlotName[j].Group1!=PlotType_Max && y_Max[PerPlotName[j].Group1]<y[j][x_Max])
-                            y_Max[PerPlotName[j].Group1]=y[j][x_Max];
-                        if (PerPlotName[j].Group2!=PlotType_Max && y_Max[PerPlotName[j].Group2]<y[j][x_Max])
-                            y_Max[PerPlotName[j].Group2]=y[j][x_Max];
-                    }
-
-                    if (Col_End>=Line_End)
-                        break;
-                    Col_Begin=Col_End+1;
-                    Pos2++;
-                }
-
-                x_Max++;
-            }
-
-            x_Line_Begin=Line_End+x_Line_EolSize;
-        }
-
-        if (Line_End==-1)
-            StatsFromExternalData.clear();
-        */
-    }
-    
     if (!FormatContext)
         return;
 
-    // Clear
-    Jpeg.Data=NULL;
-    Jpeg.Size=0;
-    
     // Next frame
     while (Packet->size || av_read_frame(FormatContext, Packet) >= 0)
     {
@@ -587,10 +323,11 @@ void FFmpeg_Glue::NextFrame()
     // Flushing
     Packet->data=NULL;
     Packet->size=0;
-    while (!OutputFrame(Packet));
+    while (OutputFrame(Packet));
     
     //Complete
-    IsComplete=true;
+    if (WithStats)
+        (*Videos)[0]->VideoStatsFinish();
 }
 
 //---------------------------------------------------------------------------
@@ -607,11 +344,9 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
             // Should not happen, NULL image
             Image1=NULL;
             Image2=NULL;
-            Jpeg.Data=NULL;
-            Jpeg.Size=0;
             TempPacket->data+=TempPacket->size;
             TempPacket->size=0;
-            return true;
+            return false;
         }
         TempPacket->data+=Bytes;
         TempPacket->size-=Bytes;
@@ -620,14 +355,14 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
         got_frame=1;
 
     // Analyzing frame
-    if (got_frame && (DTS_Target==-1 || Frame->pkt_pts>=(DTS_Target?(DTS_Target-1):DTS_Target)))
+    if (got_frame && (Seek_TimeStamp==-1 || Frame->pkt_pts>=(Seek_TimeStamp?(Seek_TimeStamp-1):Seek_TimeStamp)))
     {
         if (With1)
             Process(Filtered1_Frame, FilterGraph1, FilterGraph1_Source_Context, FilterGraph1_Sink_Context, Filter1, Scale1_Context, Scale1_Frame, Image1);
 
         if (With2)
             Process(Filtered1_Frame, FilterGraph2, FilterGraph2_Source_Context, FilterGraph2_Sink_Context, Filter2, Scale2_Context, Scale2_Frame, Image2);
-        
+
         VideoFramePos++;
         if (VideoFramePos>VideoFrameCount)
             VideoFrameCount=VideoFramePos;
@@ -876,97 +611,10 @@ bool FFmpeg_Glue::Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, 
         int GetAnswer = av_buffersink_get_frame(FilterGraph_Sink_Context, FilteredFrame); //TODO: handling of multiple output per input
             
         // Stats
+        if (Videos && (VideoFramePos>=(*Videos)[0]->x_Current_Max || (*Videos)[0]->x[1][VideoFramePos]==0))
+            (*Videos)[0]->TimeStampFromFrame(Frame, VideoFramePos);
         if (WithStats)
-        {
-            x[0][x_Max]=x_Max;
-            int64_t ts=Frame->pkt_dts;
-            if (ts==AV_NOPTS_VALUE && x_Max)
-                ts=(int)((x[1][x_Max-1]*x_Max/(x_Max-1))/VideoStream->time_base.num*VideoStream->time_base.den)+VideoFirstTimeStamp; //TODO: understand how to do with first timestamp not being 0 and last timestamp being AV_NOPTS_VALUE e.g. op1a-mpeg2-wave_hd.mxf
-            //int64_t ts=(Frame->pkt_pts==AV_NOPTS_VALUE)?Frame->pkt_dts:Frame->pkt_pts; // Using DTS is PTS is not available // TODO: check if stats are based on DTS or PTS
-            if (VideoFirstTimeStamp==(uint64_t)-1)
-                VideoFirstTimeStamp=ts;
-            if (ts<VideoFirstTimeStamp)
-            {
-                for (size_t Pos=0; Pos<x_Max; Pos++)
-                {
-                    x[1][Pos]-=VideoFirstTimeStamp-ts;
-                    x[2][Pos]=x[1][Pos]/60;
-                    x[3][Pos]=x[2][Pos]/60;
-                }
-            }
-            ts-=VideoFirstTimeStamp;
-            if (ts!=AV_NOPTS_VALUE)
-            {
-                x[1][x_Max]=((double)ts)*VideoStream->time_base.num/VideoStream->time_base.den;
-                if (x[1][x_Max]>VideoDuration)
-                    VideoDuration=x[1][x_Max];
-                x[2][x_Max]=x[1][x_Max]/60;
-                x[3][x_Max]=x[2][x_Max]/60;
-            }
-            if (Frame->pkt_duration!=AV_NOPTS_VALUE)
-                d[x_Max]=((double)Frame->pkt_duration)*VideoStream->time_base.num/VideoStream->time_base.den;
-
-            AVDictionary * m=av_frame_get_metadata (FilteredFrame);
-            AVDictionaryEntry* e=NULL;
-            string A;
-            for (;;)
-            {
-                e=av_dict_get 	(m, "", e, AV_DICT_IGNORE_SUFFIX);
-                if (!e)
-                    break;
-                size_t j=0;
-                for (; j<PlotName_Max; j++)
-                {
-                    if (strcmp(e->key, PerPlotName[j].FFmpeg_Name_2_3)==0)
-                        break;
-                }
-
-                if (j<PlotName_Max)
-                {
-                    double value=std::atof(e->value);
-                                            
-                    // Special cases: crop: x2, y2
-                    if (string(e->key)=="lavfi.cropdetect.x2")
-                        y[j][x_Max]=Width_Get()-value;
-                    else if (string(e->key)=="lavfi.cropdetect.y2")
-                        y[j][x_Max]=Height_Get()-value;
-                    else if (string(e->key)=="lavfi.cropdetect.w")
-                        y[j][x_Max]=Width_Get()-value;
-                    else if (string(e->key)=="lavfi.cropdetect.h")
-                        y[j][x_Max]=Height_Get()-value;
-                    else
-                        y[j][x_Max]=value;
-
-                    if (PerPlotName[j].Group1!=PlotType_Max && y_Max[PerPlotName[j].Group1]<y[j][x_Max])
-                        y_Max[PerPlotName[j].Group1]=y[j][x_Max];
-                    if (PerPlotName[j].Group2!=PlotType_Max && y_Max[PerPlotName[j].Group2]<y[j][x_Max])
-                        y_Max[PerPlotName[j].Group2]=y[j][x_Max];
-
-                    //Stats
-                    Stats_Totals[j]+=y[j][x_Max];
-                    if (PerPlotName[j].DefaultLimit!=DBL_MAX)
-                    {
-                        if (y[j][x_Max]>PerPlotName[j].DefaultLimit)
-                            Stats_Counts[j]++;
-                        if (PerPlotName[j].DefaultLimit2!=DBL_MAX && y[j][x_Max]>PerPlotName[j].DefaultLimit2)
-                            Stats_Counts2[j]++;
-                    }
-                }
-
-                /*
-                A+=e->key;
-                A+=',';
-                A+=e->value;
-                A+="\r\n";
-                */
-            }
-
-            key_frame[x_Max]=Frame->key_frame;
-
-            x_Max++;
-            if (x_Max>=VideoFrameCount)
-                VideoFrameCount=x_Max+1;
-        }
+            (*Videos)[0]->VideoStatsFromFrame(FilteredFrame, VideoStream->codec->width, VideoStream->codec->height);
 
         if (GetAnswer==AVERROR(EAGAIN) || GetAnswer==AVERROR_EOF)
             return true; // TODO: handle such cases
@@ -1005,7 +653,6 @@ bool FFmpeg_Glue::Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, 
                                 memcpy(Image->scanLine(y), Scale_Frame->data[0]+y*Scale_Frame->linesize[0], Scale_Frame->width*3);
                             break;
         case Output_Jpeg :
-        case Output_JpegList :
                             {
                             int got_packet=0;
                             JpegOutput_Packet->data=NULL;
@@ -1017,18 +664,13 @@ bool FFmpeg_Glue::Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, 
 
                             if (got_packet)
                             {
-                                if (OutputMethod==Output_JpegList)
+                                if (OutputMethod==Output_Jpeg)
                                 {
                                     bytes* JpegItem=new bytes;
                                     JpegItem->Data=new unsigned char[JpegOutput_Packet->size];
                                     memcpy(JpegItem->Data, JpegOutput_Packet->data, JpegOutput_Packet->size);
                                     JpegItem->Size=JpegOutput_Packet->size;
                                     JpegList.push_back(JpegItem);
-                                }
-                                else
-                                {
-                                    Jpeg.Data=JpegOutput_Packet->data;
-                                    Jpeg.Size=JpegOutput_Packet->size;
                                 }
                                 av_free_packet(Packet);
                             }
@@ -1046,24 +688,6 @@ bool FFmpeg_Glue::Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, 
     // All is OK
     return true;
 }
-
-//***************************************************************************
-// Real time information
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-double FFmpeg_Glue::State_Get()
-{
-    if (IsComplete || VideoFrameCount==0)
-        return 1;
-
-    double Value=((double)VideoFramePos)/VideoFrameCount;
-    if (Value>=1)
-        Value=0.99999; // It is not yet complete, so not 100%
-
-    return Value;
-}
-
 
 //***************************************************************************
 // Export
@@ -1127,15 +751,6 @@ int FFmpeg_Glue::Height_Get()
         return 0;
 
     return VideoStream->codec->height;
-}
-
-//---------------------------------------------------------------------------
-int FFmpeg_Glue::KeyFrame_Get(size_t FramePos)
-{
-    if (FramePos>=VideoFrameCount)
-        return 1;
-
-    return key_frame[FramePos];
 }
 
 //---------------------------------------------------------------------------
@@ -1390,43 +1005,6 @@ int FFmpeg_Glue::BitDepth_Get()
         return 0;
 
     return 0;
-}
-
-//---------------------------------------------------------------------------
-string FFmpeg_Glue::StatsToExternalData()
-{
-    stringstream Value;
-    Value<<",,,,,,pts,,,,,,,,,,,,,,,YMIN,YLOW,YAVG,YHIGH,YMAX,UMIN,ULOW,UAVG,UHIGH,UMAX,VMIN,VLOW,VAVG,VHIGH,VMAX,YDIF,UDIF,VDIF,SATMIN,SATLOW,SATAVG,SATHIGH,SATMAX,HUEMED,HUEAVG,TOUT,VREP,BRNG,CROPx1,CROPx2,CROPy1,CROPy2,CROPw,CROPh,MSEy,MSEu,MSEv,PSNRy,PSNRu,PSNRv";
-    #ifdef _WIN32
-        Value<<"\r\n";
-    #else
-        #ifdef __APPLE__
-            Value<<"\r";
-        #else
-            Value<<"\n";
-        #endif
-    #endif
-    for (size_t Pos=0; Pos<x_Max; Pos++)
-    {
-        Value<<",,,,,,";
-        Value<<fixed<<setprecision(6)<<x[1][Pos];
-        Value<<",,,,,,,,,,,,,,";
-        for (size_t Pos2=0; Pos2<PlotName_Max; Pos2++)
-        {
-            Value<<','<<fixed<<setprecision(PerPlotName[Pos2].DigitsAfterComma)<<y[Pos2][Pos];
-        }
-        #ifdef _WIN32
-            Value<<"\r\n";
-        #else
-            #ifdef __APPLE__
-                Value<<"\r";
-            #else
-                Value<<"\n";
-            #endif
-        #endif
-    }
-
-    return Value.str();
 }
 
 //---------------------------------------------------------------------------

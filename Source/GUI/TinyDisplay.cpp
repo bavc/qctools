@@ -38,6 +38,8 @@ TinyDisplay::TinyDisplay(QWidget *parent, FileInformation* FileInformationData_)
 
     // Positioning info
     Frames_Pos=0;
+    Labels_MustUpdateFrom=(int)-1;
+    Labels_MustUpdateTo=(int)-1;
 
     BigDisplayArea=NULL;
 
@@ -85,31 +87,41 @@ TinyDisplay::~TinyDisplay()
 //---------------------------------------------------------------------------
 void TinyDisplay::Update()
 {
-    if ((!ShouldUpate && Frames_Pos==FileInfoData->Frames_Pos_Get())
-     || ( ShouldUpate && false)) // ToDo: try to optimize
-        return;
-    Frames_Pos=FileInfoData->Frames_Pos_Get();
-    ShouldUpate=false;
-
-    if (Frames_Pos>=FileInfoData->Glue->VideoFrameCount_Get())
-        Frames_Pos=FileInfoData->Glue->VideoFrameCount_Get()-1;
-
-    for (size_t Pos=0; Pos<9; Pos++)
+    for (; Labels_MustUpdateFrom<Labels_MustUpdateTo; Labels_MustUpdateFrom++)
     {
-        if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->Glue->VideoFramePos_Get())
-            Labels[Pos]->setIcon(FileInfoData->Picture_Get(Frames_Pos-4+Pos)->copy(0, 0, 72, 72));
-        else if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->Glue->VideoFrameCount_Get())
-        {
-            Labels[Pos]->setIcon(QPixmap());
-            ShouldUpate=true;
-        }
-        else
-            Labels[Pos]->setIcon(QPixmap());
+        if (Frames_Pos-4+Labels_MustUpdateFrom>=FileInfoData->Videos[0]->x_Current)
+            break;
+        Labels[Labels_MustUpdateFrom]->setIcon(FileInfoData->Picture_Get(Frames_Pos-4+Labels_MustUpdateFrom)->copy(0, 0, 72, 72));
     }
 
-    // BigDisplayArea
-    if (BigDisplayArea)
-        BigDisplayArea->ShowPicture();
+    if (Frames_Pos!=FileInfoData->Frames_Pos_Get())
+    {
+        Frames_Pos=FileInfoData->Frames_Pos_Get();
+
+        if (Frames_Pos>=FileInfoData->Videos[0]->x_Current_Max)
+            Frames_Pos=FileInfoData->Videos[0]->x_Current_Max-1;
+
+        Labels_MustUpdateFrom=(int)-1;
+        Labels_MustUpdateTo=(int)-1;
+        for (size_t Pos=0; Pos<9; Pos++)
+        {
+            if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->Videos[0]->x_Current)
+                Labels[Pos]->setIcon(FileInfoData->Picture_Get(Frames_Pos-4+Pos)->copy(0, 0, 72, 72));
+            else if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->Videos[0]->x_Current_Max)
+            {
+                Labels[Pos]->setIcon(QPixmap());
+                if (Labels_MustUpdateFrom==(int)-1)
+                    Labels_MustUpdateFrom=Pos;
+                Labels_MustUpdateTo=Pos+1;
+            }
+            else
+                Labels[Pos]->setIcon(QPixmap());
+        }
+
+        // BigDisplayArea
+        if (BigDisplayArea)
+            BigDisplayArea->ShowPicture();
+    }
 }
 
 //---------------------------------------------------------------------------

@@ -12,6 +12,7 @@ CONFIG += no_keywords
 HEADERS = \
     ../../Source/Core/Core.h \
     ../../Source/Core/FFmpeg_Glue.h \
+    ../../Source/Core/VideoStats.h \
     ../../Source/GUI/BigDisplay.h \
     ../../Source/GUI/Control.h \
     ../../Source/GUI/FileInformation.h \
@@ -26,6 +27,7 @@ HEADERS = \
 SOURCES = \
     ../../Source/Core/Core.cpp \
     ../../Source/Core/FFmpeg_Glue.cpp \
+    ../../Source/Core/VideoStats.cpp \
     ../../Source/GUI/BigDisplay.cpp \
     ../../Source/GUI/Control.cpp \
     ../../Source/GUI/FileInformation.cpp \

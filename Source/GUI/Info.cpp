@@ -86,14 +86,14 @@ void Info::Update()
     Frames_Pos=FileInfoData->Frames_Pos_Get();
     ShouldUpate=false;
 
-    if (Frames_Pos<FileInfoData->Glue->x_Max)
+    if (Frames_Pos<FileInfoData->Videos[0]->x_Current)
         for (size_t Pos=0; Pos<PlotName_Max; Pos++)
         {
             if (PerPlotName[Pos].DigitsAfterComma==0)
-                Values[Pos]->setText(PerPlotName[Pos].Name+QString("= ")+QString::number((int)FileInfoData->Glue->y[Pos][Frames_Pos]));
+                Values[Pos]->setText(PerPlotName[Pos].Name+QString("= ")+QString::number((int)FileInfoData->Videos[0]->y[Pos][Frames_Pos]));
             else
             {
-                QString Value=QString::number(FileInfoData->Glue->y[Pos][Frames_Pos], 'f', PerPlotName[Pos].DigitsAfterComma);
+                QString Value=QString::number(FileInfoData->Videos[0]->y[Pos][Frames_Pos], 'f', PerPlotName[Pos].DigitsAfterComma);
                 int Point=Value.indexOf('.');
                 if (Point==-1)
                 {

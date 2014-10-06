@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -93,9 +93,6 @@
     <ClCompile Include="..\..\..\Source\GUI\Info.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Core\FFmpeg_Glue.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\FileInformation.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
@@ -113,6 +110,12 @@
     </ClCompile>
     <ClCompile Include="_Automated\moc_preferences.cpp">
       <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Core\VideoStats.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Core\FFmpeg_Glue.cpp">
+      <Filter>Source Files\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -157,6 +160,9 @@
     </ClInclude>
     <ClInclude Include="_Automated\ui_preferences.h">
       <Filter>Header Files\_Automated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Core\VideoStats.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

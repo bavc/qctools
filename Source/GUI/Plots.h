@@ -101,10 +101,13 @@ public:
     int                         XAxis_Kind_index;
     qreal                       Zoom_Left;
     qreal                       Zoom_Width;
+    QPointF                     Marker_RealPoint;
+    size_t                      Marker_FramePos;
+    size_t                      Data_FramePos_Max;
+    size_t                      Data_FramePos_Current;
 
     // Y axis info
     double                      plots_YMax[PlotType_Max];
-    uint64_t                    VideoFrameCount;
 
 private Q_SLOTS:
     void plot_moved( const QPointF & );

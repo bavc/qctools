@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 #include "Core/Core.h"
 #include "Core/FFmpeg_Glue.h"
+#include "Core/VideoStats.h"
 
 #include <QThread>
 #include <QPixmap>
@@ -49,6 +50,7 @@ public:
 
     // FFmpeg glue
     FFmpeg_Glue*                Glue;
+    std::vector<VideoStats*>    Videos;
 
 private:
     // Info

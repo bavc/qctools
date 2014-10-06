@@ -1304,12 +1304,6 @@ void BigDisplay::ShowPicture ()
     Frames_Pos=FileInfoData->Frames_Pos_Get();
     ShouldUpate=false;
 
-    // Stats
-    if (ControlArea)
-        ControlArea->Update();
-    if (InfoArea)
-        InfoArea->Update();
-
     // Picture
     if (!Picture)
     {
@@ -1323,7 +1317,7 @@ void BigDisplay::ShowPicture ()
         int height=QDesktopWidget().screenGeometry().height()*2/5;
         if (height%2)
             height--; //odd number is wanted for filters
-        Picture=new FFmpeg_Glue(FileName_string.c_str(), width, height, FFmpeg_Glue::Output_QImage, "", "", Picture_Current1<FiltersListDefault_Count, Picture_Current2<FiltersListDefault_Count); ///*Filters[Picture_Current1].Value[0], Filters[Picture_Current2].Value[0] removed else there is random crashs in libavfilters, maybe due to bad libavfilter config
+        Picture=new FFmpeg_Glue(FileName_string.c_str(), &FileInfoData->Videos, width, height, FFmpeg_Glue::Output_QImage, "", "", Picture_Current1<FiltersListDefault_Count, Picture_Current2<FiltersListDefault_Count); ///*Filters[Picture_Current1].Value[0], Filters[Picture_Current2].Value[0] removed else there is random crashs in libavfilters, maybe due to bad libavfilter config
         FiltersList1_currentIndexChanged(Picture_Current1);
         FiltersList2_currentIndexChanged(Picture_Current2);
     }
@@ -1341,6 +1335,12 @@ void BigDisplay::ShowPicture ()
     Image1->repaint();
     Image2->Pixmap_MustRedraw=true;
     Image2->repaint();
+
+    // Stats
+    if (ControlArea)
+        ControlArea->Update();
+    if (InfoArea)
+        InfoArea->Update();
 }
 
 //***************************************************************************

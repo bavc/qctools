@@ -68,10 +68,12 @@ Plots::Plots(QWidget *parent, FileInformation* FileInformationData_) :
     XAxis_Kind_index=1;
     Zoom_Left=0;
     Zoom_Width=0;
+    Marker_FramePos=(size_t)-1;
+    Data_FramePos_Max=0;
+    Data_FramePos_Current=0;
 
     // Y axis info
     memset(plots_YMax, 0, sizeof(double)*PlotType_Max);
-    VideoFrameCount=0;
 
     // Plots
     Plots_Create();
@@ -137,14 +139,7 @@ void Plots::Plots_Create(PlotType Type)
     plot->enableAxis(QwtPlot::xBottom, Type==PlotType_Axis);
     plot->setAxisMaxMajor(QwtPlot::yLeft, 0);
     plot->setAxisMaxMinor(QwtPlot::yLeft, 0);
-    switch (XAxis_Kind_index)
-    {
-        case 0 : plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoFrameCount_Get()); break;
-        case 1 : plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration_Get()); break;
-        case 2 : plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration_Get()/60); break;
-        case 3 : plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration_Get()/3600); break;
-        default: ;
-    }
+    plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Videos[0]->x_Max[XAxis_Kind_index]);
     if (PerPlotGroup[Type].Count>3)
         plot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -258,46 +253,18 @@ void Plots::Plots_Create(PlotType Type)
 void Plots::Plots_Update()
 {
     size_t FramePos=FileInfoData->Frames_Pos_Get();
-    double X=0;
-    switch (XAxis_Kind_index)
-    {
-        case 0 :
-                X=FramePos;
-                break;
-        case 1 :
-                {
-                double FrameRate=FileInfoData->Glue->VideoFrameRate_Get();
-                if (FrameRate)
-                    X=FramePos/FrameRate;
-                }
-                break;
-        case 2 :
-                {
-                double FrameRate=FileInfoData->Glue->VideoFrameRate_Get();
-                if (FrameRate)
-                    X=FramePos/(60*FrameRate);
-                }
-                break;
-        case 3 :
-                {
-                double FrameRate=FileInfoData->Glue->VideoFrameRate_Get();
-                if (FrameRate)
-                    X=FramePos/(3600*FrameRate);
-                }
-                break;
-        default: return; // Problem
-    }
+    double X=FileInfoData->Videos[0]->x[XAxis_Kind_index][FramePos];
 
     // Put the current frame in center
     if (ZoomScale!=1)
     {
-        size_t Increment=FileInfoData->Glue->VideoFrameCount_Get()/ZoomScale;
+        size_t Increment=Data_FramePos_Max/ZoomScale;
         size_t NewBegin=0;
         if (FramePos>Increment/2)
         {
             NewBegin=FramePos-Increment/2;
-            if (NewBegin+Increment>FileInfoData->Glue->VideoFrameCount_Get())
-                NewBegin=FileInfoData->Glue->VideoFrameCount_Get()-Increment;
+            if (NewBegin+Increment>Data_FramePos_Max)
+                NewBegin=Data_FramePos_Max-Increment;
         }
         Zoom_Move(NewBegin);
     }
@@ -308,38 +275,11 @@ void Plots::Plots_Update()
 //---------------------------------------------------------------------------
 void Plots::Marker_Update()
 {
-    size_t FramePos=FileInfoData->Frames_Pos_Get();
-    double X=0;
-    switch (XAxis_Kind_index)
-    {
-        case 0 :
-                X=FramePos;
-                break;
-        case 1 :
-                {
-                double FrameRate=FileInfoData->Glue->VideoFrameRate_Get();
-                if (FrameRate)
-                    X=FramePos/FrameRate;
-                }
-                break;
-        case 2 :
-                {
-                double FrameRate=FileInfoData->Glue->VideoFrameRate_Get();
-                if (FrameRate)
-                    X=FramePos/(60*FrameRate);
-                }
-                break;
-        case 3 :
-                {
-                double FrameRate=FileInfoData->Glue->VideoFrameRate_Get();
-                if (FrameRate)
-                    X=FramePos/(3600*FrameRate);
-                }
-                break;
-        default: return; // Problem
-    }
-
-    Marker_Update(X);
+    if (Marker_FramePos==FileInfoData->Frames_Pos_Get())
+        return;
+        
+    Marker_FramePos=FileInfoData->Frames_Pos_Get();
+    Marker_Update(FileInfoData->Videos[0]->x[XAxis_Kind_index][Marker_FramePos]);
 }
 
 //---------------------------------------------------------------------------
@@ -348,7 +288,6 @@ void Plots::Marker_Update(double X)
     for (size_t Type=0; Type<PlotType_Max; ++Type)
     {
         plotsMarkers[Type]->setXValue(X);
-        plotsMarkers[Type]->attach(plots[Type]);
         plots[Type]->replot();
     }
 }
@@ -370,19 +309,26 @@ void Plots::createData_Update()
             createData_Update((PlotType)Type);
     
     //Update of zoom in case of total duration change
-    if (VideoFrameCount!=FileInfoData->Glue->VideoFrameCount_Get())
+    if (Data_FramePos_Max+1!=FileInfoData->Videos[0]->x_Current_Max)
     {
-        VideoFrameCount=FileInfoData->Glue->VideoFrameCount_Get();
+        Data_FramePos_Max=FileInfoData->Videos[0]->x_Current_Max-1;
         Zoom_Update();
     }
+
+    //Update of zoom in case of total duration change
+    //if (Data_FramePos_Current!=FileInfoData->Videos[0]->x_Current)
+    //{
+    //    Data_FramePos_Current=FileInfoData->Videos[0]->x_Current;
+    //    plot_moved(Marker_RealPoint);
+    //}
 }
 
 //---------------------------------------------------------------------------
 void Plots::createData_Update(PlotType Type)
 {
-    if (PerPlotGroup[Type].Min!=PerPlotGroup[Type].Max && FileInfoData->Glue->y_Max[Type]>=PerPlotGroup[Type].Max/2)
-        FileInfoData->Glue->y_Max[Type]=PerPlotGroup[Type].Max;
-    double y_Max_ForThisPlot=FileInfoData->Glue->y_Max[Type];
+    if (PerPlotGroup[Type].Min!=PerPlotGroup[Type].Max && FileInfoData->Videos[0]->y_Max[Type]>=PerPlotGroup[Type].Max/2)
+        FileInfoData->Videos[0]->y_Max[Type]=PerPlotGroup[Type].Max;
+    double y_Max_ForThisPlot=FileInfoData->Videos[0]->y_Max[Type];
 
     //plot->setMinimumHeight(0);
 
@@ -418,15 +364,15 @@ void Plots::createData_Update(PlotType Type)
                 }
             }
 
-            if (FileInfoData->Glue->y_Max[Type]==0)
+            if (FileInfoData->Videos[0]->y_Max[Type]==0)
             {
-                FileInfoData->Glue->y_Max[Type]=1; //Special case, in order to force a scale instead of -1 to 1
+                FileInfoData->Videos[0]->y_Max[Type]=1; //Special case, in order to force a scale instead of -1 to 1
                 Step=1;
             };
 
             if (Step)
             {
-                plots_YMax[Type]=FileInfoData->Glue->y_Max[Type];
+                plots_YMax[Type]=FileInfoData->Videos[0]->y_Max[Type];
                 plots[Type]->setAxisScale(QwtPlot::yLeft, 0, plots_YMax[Type], Step);
             }
         }
@@ -437,14 +383,14 @@ void Plots::createData_Update(PlotType Type)
     }
 
     for(unsigned j=0; j<PerPlotGroup[Type].Count; ++j)
-        plotsCurves[Type][j]->setRawSamples(FileInfoData->Glue->x[XAxis_Kind_index], FileInfoData->Glue->y[PerPlotGroup[Type].Start+j], FileInfoData->Glue->x_Max);
+        plotsCurves[Type][j]->setRawSamples(FileInfoData->Videos[0]->x[XAxis_Kind_index], FileInfoData->Videos[0]->y[PerPlotGroup[Type].Start+j], FileInfoData->Videos[0]->x_Current);
     plots[Type]->replot();
 }
 
 //---------------------------------------------------------------------------
 void Plots::Zoom_Update()
 {
-    size_t Increment=FileInfoData->Glue->VideoFrameCount_Get()/ZoomScale;
+    size_t Increment=Data_FramePos_Max/ZoomScale;
     int Pos=FileInfoData->Frames_Pos_Get();
     if (Pos>Increment/2)
         Pos-=Increment/2;
@@ -456,30 +402,12 @@ void Plots::Zoom_Update()
 //---------------------------------------------------------------------------
 void Plots::Zoom_Move(size_t Begin)
 {
-    size_t Increment=FileInfoData->Glue->VideoFrameCount_Get()/ZoomScale;
-    if (Begin+Increment>FileInfoData->Glue->VideoFrameCount_Get())
-        Begin=FileInfoData->Glue->VideoFrameCount_Get()-Increment;
+    size_t Increment=Data_FramePos_Max/ZoomScale;
+    if (Begin+Increment>Data_FramePos_Max)
+        Begin=Data_FramePos_Max-Increment;
 
-    switch (XAxis_Kind_index)
-    {
-        case 0 :
-                Zoom_Left=Begin;
-                Zoom_Width=Increment;
-                break;
-        case 1 :
-                Zoom_Left=FileInfoData->Glue->VideoDuration_Get()*Begin/FileInfoData->Glue->VideoFrameCount_Get();
-                Zoom_Width=FileInfoData->Glue->VideoDuration_Get()*Increment/FileInfoData->Glue->VideoFrameCount_Get();
-                break;
-        case 2 :
-                Zoom_Left=FileInfoData->Glue->VideoDuration_Get()*Begin/FileInfoData->Glue->VideoFrameCount_Get()/60;
-                Zoom_Width=FileInfoData->Glue->VideoDuration_Get()*Increment/FileInfoData->Glue->VideoFrameCount_Get()/60;
-                break;
-        case 3 :
-                Zoom_Left=FileInfoData->Glue->VideoDuration_Get()*Begin/FileInfoData->Glue->VideoFrameCount_Get()/3600;
-                Zoom_Width=FileInfoData->Glue->VideoDuration_Get()*Increment/FileInfoData->Glue->VideoFrameCount_Get()/3600;
-                break;
-        default:;
-    }
+    Zoom_Left=FileInfoData->Videos[0]->x[XAxis_Kind_index][Begin];
+    Zoom_Width=FileInfoData->Videos[0]->x_Max[XAxis_Kind_index]/ZoomScale;
 
     for (size_t Type=0; Type<PlotType_Max; Type++)
         if (plots[Type])
@@ -491,9 +419,6 @@ void Plots::Zoom_Move(size_t Begin)
             zoomer->zoom(Rect);
             delete zoomer;
         }
-
-    memset(plots_YMax, 0, sizeof(double)*PlotType_Max); //Reseting Y axis
-    createData_Update();
 }
 
 //---------------------------------------------------------------------------
@@ -634,40 +559,29 @@ void Plots::refreshDisplay_Axis()
 
 void Plots::plot_moved( const QPointF &pos )
 {
-    QString info;
+    Marker_RealPoint=pos;
 
     double X=pos.x();
     if (X<0)
         X=0;
-    switch (XAxis_Kind_index)
-    {
-        case 0 :
-                FileInfoData->Frames_Pos_Set(X);
-                break;
-        case 1 :
-                {
-                double FrameRate=FileInfoData->Glue->VideoFrameRate_Get();
-                if (FrameRate)
-                    FileInfoData->Frames_Pos_Set((size_t)(X*FrameRate));
-                }
-                break;
-        case 2 :
-                {
-                double FrameRate=FileInfoData->Glue->VideoFrameRate_Get();
-                if (FrameRate)
-                    FileInfoData->Frames_Pos_Set((size_t)(X*60*FrameRate));
-                }
-                break;
-        case 3 :
-                {
-                double FrameRate=FileInfoData->Glue->VideoFrameRate_Get();
-                if (FrameRate)
-                    FileInfoData->Frames_Pos_Set((size_t)(X*3600*FrameRate));
-                }
-                break;
-        default: return; // Problem
-    }
 
+    double* x=FileInfoData->Videos[0]->x[XAxis_Kind_index];
+    size_t Pos=0;  
+    while (Pos<FileInfoData->Videos[0]->x_Current_Max && X>=x[Pos])
+        Pos++;
+    if (Pos)
+    {
+        if (Pos>=FileInfoData->Videos[0]->x_Current)
+            Pos=FileInfoData->Videos[0]->x_Current-1;
+
+        double Distance1=X-x[Pos-1];
+        double Distance2=x[Pos]-X;
+        if (Distance1<Distance2)
+            Pos--;
+    }
+    X=x[Pos];
+
+    FileInfoData->Frames_Pos_Set(Pos);
     Marker_Update(X);
 }
 
@@ -675,21 +589,6 @@ void Plots::on_XAxis_Kind_currentIndexChanged(int index)
 {
     XAxis_Kind_index=index;
 
-    for (size_t Type=0; Type<PlotType_Max; Type++)
-    {
-        switch (XAxis_Kind_index)
-        {
-            case 0 : plots[Type]->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoFrameCount_Get()); break;
-            case 1 : plots[Type]->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration_Get()); break;
-            case 2 : plots[Type]->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration_Get()/60); break;
-            case 3 : plots[Type]->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Glue->VideoDuration_Get()/3600); break;
-            default: ;
-        }
-
-        for(unsigned j=0; j<PerPlotGroup[Type].Count; ++j)
-            plotsCurves[Type][j]->setRawSamples(FileInfoData->Glue->x[XAxis_Kind_index], FileInfoData->Glue->y[PerPlotGroup[Type].Start+j], FileInfoData->Glue->x_Max);
-        plots[Type]->replot();
-    }
-
+    createData_Update();
     Zoom_Update();
 }
