@@ -22,7 +22,8 @@ HEADERS = \
     ../../Source/GUI/mainwindow.h \
     ../../Source/GUI/preferences.h \
     ../../Source/GUI/Plots.h \
-    ../../Source/GUI/TinyDisplay.h
+    ../../Source/GUI/TinyDisplay.h \
+    ../../Source/ThirdParty/tinyxml2/tinyxml2.h
 
 SOURCES = \
     ../../Source/Core/Core.cpp \
@@ -41,7 +42,8 @@ SOURCES = \
     ../../Source/GUI/mainwindow_Ui.cpp \
     ../../Source/GUI/Plots.cpp \
     ../../Source/GUI/preferences.cpp \
-    ../../Source/GUI/TinyDisplay.cpp
+    ../../Source/GUI/TinyDisplay.cpp \
+    ../../Source/ThirdParty/tinyxml2/tinyxml2.cpp
 
 FORMS += \
     ../../Source/GUI/mainwindow.ui \
@@ -55,6 +57,7 @@ include( $${QWT_ROOT}/qwtbuild.pri )
 include( $${QWT_ROOT}/qwtfunctions.pri )
 
 INCLUDEPATH += $$PWD/../../Source
+INCLUDEPATH += $$PWD/../../Source/ThirdParty/tinyxml2
 INCLUDEPATH += $$QWT_ROOT/src
 INCLUDEPATH += $$PWD/../../../ffmpeg
 

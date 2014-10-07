@@ -20,10 +20,12 @@ extern "C"
 }
 #include <QXmlStreamReader>
 
+#include "tinyxml2.h"
 #include <sstream>
 #include <iomanip>
 #include <cstdlib>
 #include <cfloat>
+using namespace tinyxml2;
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -124,111 +126,134 @@ void VideoStats::VideoStatsFromExternalData (const string &Data)
 {
     // VideoStats from external data
     // XML input
-    QXmlStreamReader Xml(Data.c_str());
-    while (!Xml.atEnd())
+    XMLDocument Document;
+    if (Document.Parse(Data.c_str()))
+       return;
+
+    XMLElement* Root=Document.FirstChildElement("ffprobe:ffprobe");
+    if (Root)
     {
-        if (Xml.readNextStartElement())
+        XMLElement* Frames=Root->FirstChildElement("frames");
+        if (Frames)
         {
-            if (Xml.name()=="ffprobe")
+            XMLElement* Frame=Frames->FirstChildElement();
+            while (Frame)
             {
-                while (Xml.readNextStartElement())
+                if (!strcmp(Frame->Value(), "frame"))
                 {
-                    if (Xml.name()=="frames")
+                    const char* media_type=Frame->Attribute("media_type");
+                    if (media_type && !strcmp(media_type, "video"))
                     {
-                        while (Xml.readNextStartElement())
+                        const char* Attribute;
+                            
+                        x[0][x_Current]=x_Current;
+
+                        Attribute=Frame->Attribute("pkt_duration_time");
+                        if (Attribute)
+                            durations[x_Current]=std::atof(Attribute);
+
+                        Attribute=Frame->Attribute("pkt_pts_time");
+                        if (!Attribute || !strcmp(Attribute, "N/A"))
+                            Attribute=Frame->Attribute("pkt_dts_time");
+                        if (Attribute && strcmp(Attribute, "N/A"))
                         {
-                            if (Xml.name()=="frame" && Xml.attributes().value("media_type")=="video")
+                            x[1][x_Current]=std::atof(Attribute);
+                            x[2][x_Current]=x[1][x_Current]/60;
+                            x[3][x_Current]=x[2][x_Current]/60;
+                        }
+
+                        int Width;
+                        Attribute=Frame->Attribute("width");
+                        if (Attribute)
+                            Width=std::atof(Attribute);
+                        else
+                            Width=0;
+
+                        int Height;
+                        Attribute=Frame->Attribute("width");
+                        if (Attribute)
+                            Height=std::atof(Attribute);
+                        else
+                            Height=0;
+
+                        XMLElement* Tag=Frame->FirstChildElement();
+                        while (Tag)
+                        {
+                            if (!strcmp(Tag->Value(), "tag"))
                             {
-                                x[0][x_Current]=x_Current;
-                                durations[x_Current]=std::atof(Xml.attributes().value("pkt_duration_time").toString().toUtf8().data());
-                                string ts=Xml.attributes().value("pkt_pts_time").toString().toUtf8().data();
-                                if (ts.empty() || ts=="N/A")
-                                    ts=Xml.attributes().value("pkt_dts_time").toString().toUtf8().data(); // Using DTS is PTS is not available
-                                if (!ts.empty() && ts!="N/A")
-                                {
-                                    x[1][x_Current]=std::atof(ts.c_str());
-                                    x[2][x_Current]=x[1][x_Current]/60;
-                                    x[3][x_Current]=x[2][x_Current]/60;
-                                }
-
-                                int Width=atoi(Xml.attributes().value("width").toString().toUtf8().data());
-                                int Height=atoi(Xml.attributes().value("height").toString().toUtf8().data());
-
-                                while (Xml.readNextStartElement())
-                                {
-                                    if (Xml.name()=="tag")
-                                    {
-                                        PlotName j=PlotName_Max;
-                                        for (size_t Plot_Pos=0; Plot_Pos<PlotName_Max; Plot_Pos++)
-                                            if (Xml.attributes().value("key")==PerPlotName[Plot_Pos].FFmpeg_Name_2_3)
-                                                j=(PlotName)Plot_Pos;
-
-                                        if (j!=PlotName_Max)
+                                PlotName j=PlotName_Max;
+                                const char* key=Tag->Attribute("key");
+                                if (key)
+                                    for (size_t Plot_Pos=0; Plot_Pos<PlotName_Max; Plot_Pos++)
+                                        if (!strcmp(key, PerPlotName[Plot_Pos].FFmpeg_Name_2_3))
                                         {
-                                            double value=std::atof(Xml.attributes().value("value").toString().toUtf8().data());
-                                            
-                                            // Special cases: crop: x2, y2
-                                            if (Width && Xml.attributes().value("key")=="lavfi.cropdetect.x2")
-                                                y[j][x_Current]=Width-value;
-                                            else if (Height && Xml.attributes().value("key")=="lavfi.cropdetect.y2")
-                                                y[j][x_Current]=Height-value;
-                                            else if (Width && Xml.attributes().value("key")=="lavfi.cropdetect.w")
-                                                y[j][x_Current]=Width-value;
-                                            else if (Height && Xml.attributes().value("key")=="lavfi.cropdetect.h")
-                                                y[j][x_Current]=Height-value;
-                                            else
-                                                y[j][x_Current]=value;
-
-                                            if (PerPlotName[j].Group1!=PlotType_Max && y_Max[PerPlotName[j].Group1]<y[j][x_Current])
-                                                y_Max[PerPlotName[j].Group1]=y[j][x_Current];
-                                            if (PerPlotName[j].Group2!=PlotType_Max && y_Max[PerPlotName[j].Group2]<y[j][x_Current])
-                                                y_Max[PerPlotName[j].Group2]=y[j][x_Current];
-
-                                            //VideoStats
-                                            Stats_Totals[j]+=y[j][x_Current];
-                                            if (PerPlotName[j].DefaultLimit!=DBL_MAX)
-                                            {
-                                                if (y[j][x_Current]>PerPlotName[j].DefaultLimit)
-                                                    Stats_Counts[j]++;
-                                                if (PerPlotName[j].DefaultLimit2!=DBL_MAX && y[j][x_Current]>PerPlotName[j].DefaultLimit2)
-                                                    Stats_Counts2[j]++;
-                                            }
+                                            j=(PlotName)Plot_Pos;
+                                            break;
                                         }
+
+                                if (j!=PlotName_Max)
+                                {
+                                    double value;
+                                    Attribute=Tag->Attribute("value");
+                                    if (Attribute)
+                                        value=std::atof(Attribute);
+                                    else
+                                        value=0;
+                                            
+                                    // Special cases: crop: x2, y2
+                                    if (Width && !strcmp(key, "lavfi.cropdetect.x2"))
+                                        y[j][x_Current]=Width-value;
+                                    else if (Height && !strcmp(key, "lavfi.cropdetect.y2"))
+                                        y[j][x_Current]=Height-value;
+                                    else if (Width && !strcmp(key, "lavfi.cropdetect.w"))
+                                        y[j][x_Current]=Width-value;
+                                    else if (Height && !strcmp(key, "lavfi.cropdetect.h"))
+                                        y[j][x_Current]=Height-value;
+                                    else
+                                        y[j][x_Current]=value;
+
+                                    if (PerPlotName[j].Group1!=PlotType_Max && y_Max[PerPlotName[j].Group1]<y[j][x_Current])
+                                        y_Max[PerPlotName[j].Group1]=y[j][x_Current];
+                                    if (PerPlotName[j].Group2!=PlotType_Max && y_Max[PerPlotName[j].Group2]<y[j][x_Current])
+                                        y_Max[PerPlotName[j].Group2]=y[j][x_Current];
+
+                                    //VideoStats
+                                    Stats_Totals[j]+=y[j][x_Current];
+                                    if (PerPlotName[j].DefaultLimit!=DBL_MAX)
+                                    {
+                                        if (y[j][x_Current]>PerPlotName[j].DefaultLimit)
+                                            Stats_Counts[j]++;
+                                        if (PerPlotName[j].DefaultLimit2!=DBL_MAX && y[j][x_Current]>PerPlotName[j].DefaultLimit2)
+                                            Stats_Counts2[j]++;
                                     }
-                                    Xml.skipCurrentElement();
-                                }
-
-                                QStringRef key_frame_String=Xml.attributes().value("key_frame");
-                                if (key_frame_String.size()>0)
-                                    key_frames[x_Current]=std::atof(key_frame_String.toString().toUtf8().data());
-                                else
-                                    key_frames[x_Current]=1; //Forcing key_frame to 1 if it is missing from the XML, for decoding
-
-                                if (x_Max[0]<=x[0][x_Current])
-                                {
-                                    x_Max[0]=x[0][x_Current];
-                                    x_Max[1]=x[1][x_Current];
-                                    x_Max[2]=x[2][x_Current];
-                                    x_Max[3]=x[3][x_Current];
-                                }
-                                x_Current++;
-                                if (x_Current_Max<=x_Current)
-                                {
-                                    x_Current_Max=x_Current;
-                                    if (x_Current_Max>Data_Reserved)
-                                        Data_Reserve(x_Current_Max);
                                 }
                             }
-                            else
-                                Xml.skipCurrentElement();
+
+                            Tag=Tag->NextSiblingElement();
+                        }
+
+
+
+
+                        if (x_Max[0]<=x[0][x_Current])
+                        {
+                            x_Max[0]=x[0][x_Current];
+                            x_Max[1]=x[1][x_Current];
+                            x_Max[2]=x[2][x_Current];
+                            x_Max[3]=x[3][x_Current];
+                        }
+                        x_Current++;
+                        if (x_Current_Max<=x_Current)
+                        {
+                            x_Current_Max=x_Current;
+                            if (x_Current_Max>Data_Reserved)
+                                Data_Reserve(x_Current_Max);
                         }
                     }
-                    else
-                        Xml.skipCurrentElement();
                 }
+
+                Frame=Frame->NextSiblingElement();
             }
-            else
-                Xml.skipCurrentElement();
         }
     }
 

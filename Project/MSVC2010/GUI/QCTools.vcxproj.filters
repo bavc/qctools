@@ -31,6 +31,18 @@
     <Filter Include="Header Files\Core">
       <UniqueIdentifier>{4e4fa5d7-7494-4115-97db-f95a656bf04e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ThirdParty">
+      <UniqueIdentifier>{bd4b5871-6087-439d-863b-98dbe501aeba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ThirdParty\tinyxml2">
+      <UniqueIdentifier>{6eafae8d-37b4-4620-90de-311c02fccb67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ThirdParty">
+      <UniqueIdentifier>{219ebfd6-6c05-4a3a-abe6-88902d242938}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ThirdParty\tinyxml2">
+      <UniqueIdentifier>{128f4702-bb86-46b3-a112-735dbaee62a1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\GUI\main.cpp">
@@ -117,6 +129,9 @@
     <ClCompile Include="..\..\..\Source\Core\FFmpeg_Glue.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\ThirdParty\tinyxml2\tinyxml2.cpp">
+      <Filter>Source Files\ThirdParty\tinyxml2</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="_Automated\ui_mainwindow.h">
@@ -163,6 +178,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Core\VideoStats.h">
       <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\ThirdParty\tinyxml2\tinyxml2.h">
+      <Filter>Header Files\ThirdParty\tinyxml2</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -42,7 +42,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../../Source;../../../../ffmpeg;../../../../Qt/qtbase/include/QtGui;../../../../Qt/qtbase/include/QtWidgets;../../../../Qt/qtbase/include/QtCore;../../../../Qt/qtbase/include;./;../../../../qwt/src;./_Automated;../../../../Qt/qtbase/include/QtPrintSupport;../../../../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Source;../../../Source/ThirdParty/tinyxml2;../../../../ffmpeg;../../../../Qt/qtbase/include/QtGui;../../../../Qt/qtbase/include/QtWidgets;../../../../Qt/qtbase/include/QtCore;../../../../Qt/qtbase/include;./;../../../../qwt/src;./_Automated;../../../../Qt/qtbase/include/QtPrintSupport;../../../../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4018</DisableSpecificWarnings>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
@@ -91,6 +91,7 @@
     <ClCompile Include="..\..\..\Source\GUI\preferences.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\TinyDisplay.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Plots.cpp" />
+    <ClCompile Include="..\..\..\Source\ThirdParty\tinyxml2\tinyxml2.cpp" />
     <ClCompile Include="_Automated\moc_Control.cpp" />
     <ClCompile Include="_Automated\moc_FileInformation.cpp" />
     <ClCompile Include="_Automated\moc_FilesList.cpp" />
@@ -117,6 +118,7 @@
     <ClInclude Include="..\..\..\Source\GUI\Plots.h" />
     <ClInclude Include="..\..\..\Source\GUI\preferences.h" />
     <ClInclude Include="..\..\..\Source\GUI\TinyDisplay.h" />
+    <ClInclude Include="..\..\..\Source\ThirdParty\tinyxml2\tinyxml2.h" />
     <ClInclude Include="_Automated\ui_mainwindow.h" />
     <ClInclude Include="_Automated\ui_preferences.h" />
   </ItemGroup>
