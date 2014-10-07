@@ -242,7 +242,7 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
         stringstream pkt_duration_time; pkt_duration_time<<Videos[0]->durations[x];
         stringstream width; width<<Glue->Width_Get();
         stringstream height; height<<Glue->Height_Get();
-        stringstream key_frame; key_frame<<Videos[0]->durations[x];
+        stringstream key_frame; key_frame<<Videos[0]->key_frames[x]?'1':'0';
         Data<<"        <frame media_type=\"video\" key_frame=\"" << key_frame.str() << "\" pkt_pts_time=\"" << pkt_pts_time.str() << "\"";
         if (pkt_duration_time)
             Data<<" pkt_duration_time=\"" << pkt_duration_time.str() << "\"";
