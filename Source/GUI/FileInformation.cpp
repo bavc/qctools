@@ -225,7 +225,7 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
 
     // Header
     Data<<"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-    Data<<"<!-- Created by QCTools 0.5.0 -->\n";
+    Data<<"<!-- Created by QCTools " << Version << " -->\n";
     Data<<"<ffprobe:ffprobe xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:ffprobe='http://www.ffmpeg.org/schema/ffprobe' xsi:schemaLocation='http://www.ffmpeg.org/schema/ffprobe ffprobe.xsd'>\n";
     Data<<"    <program_version version=\"" << Glue->FFmpeg_Version() << "\" copyright=\"Copyright (c) 2007-" << Glue->FFmpeg_Year() << " the FFmpeg developers\" build_date=\""__DATE__"\" build_time=\""__TIME__"\" compiler_ident=\"" << Glue->FFmpeg_Compiler() << "\" configuration=\"" << Glue->FFmpeg_Configuration() << "\"/>\n";
     Data<<"\n";
@@ -235,45 +235,8 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
     Data<<"\n";
     Data<<"    <frames>\n";
 
-    // Per frame
-    for (size_t x=0; x<Videos[0]->x_Current; ++x)
-    {
-        stringstream pkt_pts_time; pkt_pts_time<<Videos[0]->x[1][x];
-        stringstream pkt_duration_time; pkt_duration_time<<Videos[0]->durations[x];
-        stringstream width; width<<Glue->Width_Get();
-        stringstream height; height<<Glue->Height_Get();
-        stringstream key_frame; key_frame<<Videos[0]->key_frames[x]?'1':'0';
-        Data<<"        <frame media_type=\"video\" key_frame=\"" << key_frame.str() << "\" pkt_pts_time=\"" << pkt_pts_time.str() << "\"";
-        if (pkt_duration_time)
-            Data<<" pkt_duration_time=\"" << pkt_duration_time.str() << "\"";
-        Data<<" width=\"" << width.str() << "\" height=\"" << height.str() <<"\">\n";
-
-        for (size_t Plot_Pos=0; Plot_Pos<PlotName_Max; Plot_Pos++)
-        {
-            string key=PerPlotName[Plot_Pos].FFmpeg_Name_2_3;
-
-            stringstream value;
-            switch (Plot_Pos)
-            {
-                case PlotName_Crop_x2 :
-                case PlotName_Crop_w :
-                                        // Special case, values are from width
-                                        value<<Glue->Width_Get()-Videos[0]->y[Plot_Pos][x];
-                                        break;
-                case PlotName_Crop_y2 :
-                case PlotName_Crop_h :
-                                        // Special case, values are from height
-                                        value<<Glue->Height_Get()-Videos[0]->y[Plot_Pos][x];
-                                        break;
-                default:
-                                        value<<Videos[0]->y[Plot_Pos][x];
-            }
-
-            Data<<"            <tag key=\""+key+"\" value=\""+value.str()+"\"/>\n";
-        }
-
-        Data<<"        </frame>\n";
-    }
+    // From stats
+    Data<<Videos[0]->StatsToXML(Glue->Width_Get(), Glue->Height_Get());
 
     // Footer
     Data<<"    </frames>\n";

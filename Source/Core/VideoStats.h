@@ -50,6 +50,7 @@ public:
     void                        TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos);
     void                        VideoStatsFinish();
     string                      StatsToCSV();
+    string                      StatsToXML(int Width, int Height);
 
 private:
     // Status

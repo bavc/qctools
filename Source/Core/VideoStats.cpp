@@ -18,7 +18,6 @@ extern "C"
 
 #include <libavutil/frame.h>
 }
-#include <QXmlStreamReader>
 
 #include "tinyxml2.h"
 #include <sstream>
@@ -165,14 +164,14 @@ void VideoStats::VideoStatsFromExternalData (const string &Data)
                         int Width;
                         Attribute=Frame->Attribute("width");
                         if (Attribute)
-                            Width=std::atof(Attribute);
+                            Width=std::atoi(Attribute);
                         else
                             Width=0;
 
                         int Height;
                         Attribute=Frame->Attribute("width");
                         if (Attribute)
-                            Height=std::atof(Attribute);
+                            Height=std::atoi(Attribute);
                         else
                             Height=0;
 
@@ -318,7 +317,7 @@ void VideoStats::VideoStatsFromFrame (struct AVFrame* Frame, int Width, int Heig
         */
     }
 
-    key_frames[x_Current]=Frame->key_frame;
+    key_frames[x_Current]=Frame->key_frame?true:false;
 
     if (x_Max[0]<=x[0][x_Current])
     {
@@ -439,6 +438,54 @@ string VideoStats::StatsToCSV()
     }
 
     return Value.str();
+}
+
+//---------------------------------------------------------------------------
+string VideoStats::StatsToXML (int Width, int Height)
+{
+    stringstream Data;
+
+    // Per frame (note: the XML header and footer are not created here)
+    stringstream width; width<<Width; // Note: we use the same value for all frame, we should later use the right value per frame
+    stringstream height; height<<Height; // Note: we use the same value for all frame, we should later use the right value per frame
+    for (size_t x_Pos=0; x_Pos<x_Current; ++x_Pos)
+    {
+        stringstream pkt_pts_time; pkt_pts_time<<x[1][x_Pos];
+        stringstream pkt_duration_time; pkt_duration_time<<durations[x_Pos];
+        stringstream key_frame; key_frame<<key_frames[x_Pos]?'1':'0';
+        Data<<"        <frame media_type=\"video\" key_frame=\"" << key_frame.str() << "\" pkt_pts_time=\"" << pkt_pts_time.str() << "\"";
+        if (pkt_duration_time)
+            Data<<" pkt_duration_time=\"" << pkt_duration_time.str() << "\"";
+        Data<<" width=\"" << width.str() << "\" height=\"" << height.str() <<"\">\n";
+
+        for (size_t Plot_Pos=0; Plot_Pos<PlotName_Max; Plot_Pos++)
+        {
+            string key=PerPlotName[Plot_Pos].FFmpeg_Name_2_3;
+
+            stringstream value;
+            switch (Plot_Pos)
+            {
+                case PlotName_Crop_x2 :
+                case PlotName_Crop_w :
+                                        // Special case, values are from width
+                                        value<<Width-y[Plot_Pos][x_Pos];
+                                        break;
+                case PlotName_Crop_y2 :
+                case PlotName_Crop_h :
+                                        // Special case, values are from height
+                                        value<<Height-y[Plot_Pos][x_Pos];
+                                        break;
+                default:
+                                        value<<y[Plot_Pos][x_Pos];
+            }
+
+            Data<<"            <tag key=\""+key+"\" value=\""+value.str()+"\"/>\n";
+        }
+
+        Data<<"        </frame>\n";
+    }
+
+   return Data.str();
 }
 
 //***************************************************************************
