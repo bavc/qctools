@@ -81,7 +81,7 @@ percolumn PerColumn[Col_Max]=
     { StatsType_Count,      PlotName_SATMAX,        PlotName_Max,           "SATb",             "count of frames with MAXSAT > 88.7, outside of broadcast color levels", },
     { StatsType_Count2,     PlotName_SATMAX,        PlotName_Max,           "SATi",             "count of frames with MAXSAT > 118.2, illegal YUV color", },
     { StatsType_Percent,    PlotName_BRNG,          PlotName_Max,           "BRNGav",           "percent of frames with BRNG > 0", },
-    { StatsType_Count,      PlotName_BRNG,          PlotName_Max,           "BRNGc",            "count of frames with BRNG > 0", },
+    { StatsType_Count,      PlotName_BRNG,          PlotName_Max,           "BRNGc",            "count of frames with BRNG > 0.02", },
     { StatsType_Count,      PlotName_MSE_y,         PlotName_Max,           "MSEfY",            "count of frames with MSEfY over 1000", },
     { StatsType_None,       PlotName_Max,           PlotName_Max,           "Format",           NULL, },
     { StatsType_None,       PlotName_Max,           PlotName_Max,           "Streams count",    NULL, },

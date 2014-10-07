@@ -184,7 +184,7 @@ const struct per_plot_item PerPlotName [PlotName_Max]=
     //Others
     { PlotType_TOUT,    PlotType_Max,       "TOUT",       "lavfi.values.TOUT",    "lavfi.signalstats.TOUT",    8,  false,    0.005, DBL_MAX },
     { PlotType_VREP,    PlotType_Max,       "VREP",       "lavfi.values.VREP",    "lavfi.signalstats.VREP",    8,  false,  DBL_MAX, DBL_MAX },
-    { PlotType_BRNG,    PlotType_Max,       "BRNG",       "lavfi.values.RANG",    "lavfi.signalstats.BRNG",    8,  true,         0, DBL_MAX },
+    { PlotType_BRNG,    PlotType_Max,       "BRNG",       "lavfi.values.RANG",    "lavfi.signalstats.BRNG",    8,  true,      0.02, DBL_MAX },
     //Crop
     { PlotType_CropW,   PlotType_Max,       "Crop Left",  "",                     "lavfi.cropdetect.x1",       0,  false,  DBL_MAX, DBL_MAX },
     { PlotType_CropW,   PlotType_Max,       "Crop Right", "",                     "lavfi.cropdetect.x2",       0,  false,  DBL_MAX, DBL_MAX },
