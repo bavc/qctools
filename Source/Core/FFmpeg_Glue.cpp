@@ -249,7 +249,7 @@ void FFmpeg_Glue::Seek(size_t Pos)
     {
         if ((*Videos)[0]->State_Get()==1)
         {
-            Duration=(*Videos)[0]->x_Max[1];
+            Duration=((int64_t)((*Videos)[0]->x_Max[1]*((double)VideoStream->time_base.den)/VideoStream->time_base.num));
             FrameCount=(*Videos)[0]->x_Current_Max;
         }
         else
