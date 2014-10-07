@@ -155,10 +155,11 @@ private:
 
     // Video information
     size_t                      VideoFrameCount;        // Total count of frames (may be estimated)
+    uint64_t                    VideoFirstPts;          // First PTS met
     double                      VideoDuration;          // Duration is seconds
 
     // Seek
-    int                         Seek_TimeStamp;
+    int64_t                     Seek_TimeStamp;
 };
 
 #endif // FFmpeg_Glue_H

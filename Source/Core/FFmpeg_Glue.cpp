@@ -101,6 +101,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<VideoStats*>* Vid
     Image2=NULL;
     VideoFrameCount=0;
     VideoDuration=0;
+    VideoFirstPts=(uint64_t)-1;
     
     // FFmpeg pointers
     FormatContext=NULL;
@@ -212,7 +213,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<VideoStats*>* Vid
     VideoFramePos=0;
 
     // Temp
-    Seek_TimeStamp=-1;
+    Seek_TimeStamp=AV_NOPTS_VALUE;
 }
 
 //---------------------------------------------------------------------------
@@ -269,7 +270,9 @@ void FFmpeg_Glue::Seek(size_t Pos)
     long long DTS=Pos;
     DTS*=Duration;
     DTS/=FrameCount;  // TODO: seek based on time stamp
-    Seek_TimeStamp=(int)DTS;
+    if (VideoFirstPts!=(uint64_t)-1)
+        DTS+=VideoFirstPts;
+    Seek_TimeStamp=(int64_t)DTS;
     
     // Seek
     if (Seek_TimeStamp)
@@ -351,8 +354,13 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
         got_frame=1;
 
     // Analyzing frame
-    if (got_frame && (Seek_TimeStamp==-1 || Frame->pkt_pts>=(Seek_TimeStamp?(Seek_TimeStamp-1):Seek_TimeStamp)))
+    if (got_frame && (Seek_TimeStamp==AV_NOPTS_VALUE || Frame->pkt_pts>=(Seek_TimeStamp?(Seek_TimeStamp-1):Seek_TimeStamp)))
     {
+        Seek_TimeStamp=AV_NOPTS_VALUE;
+        int64_t ts=(Frame->pkt_pts==AV_NOPTS_VALUE)?Frame->pkt_dts:Frame->pkt_pts;
+        if (ts<VideoFirstPts)
+            VideoFirstPts=ts;
+        
         if (With1)
             Process(Filtered1_Frame, FilterGraph1, FilterGraph1_Source_Context, FilterGraph1_Sink_Context, Filter1, Scale1_Context, Scale1_Frame, Image1);
 

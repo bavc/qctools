@@ -156,7 +156,20 @@ void VideoStats::VideoStatsFromExternalData (const string &Data)
                             Attribute=Frame->Attribute("pkt_dts_time");
                         if (Attribute && strcmp(Attribute, "N/A"))
                         {
-                            x[1][x_Current]=std::atof(Attribute);
+                            double ts=std::atof(Attribute);
+                            if (VideoFirstTimeStamp==(uint64_t)-1)
+                                VideoFirstTimeStamp=ts;
+                            if (ts<VideoFirstTimeStamp)
+                            {
+                                for (size_t Pos=0; Pos<x_Current; Pos++)
+                                {
+                                    x[1][Pos]-=VideoFirstTimeStamp-ts;
+                                    x[2][Pos]=x[1][Pos]/60;
+                                    x[3][Pos]=x[2][Pos]/60;
+                                }
+                            }
+                            ts-=VideoFirstTimeStamp;
+                            x[1][x_Current]=ts;
                             x[2][x_Current]=x[1][x_Current]/60;
                             x[3][x_Current]=x[2][x_Current]/60;
                         }
@@ -349,20 +362,20 @@ void VideoStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
     int64_t ts=(Frame->pkt_pts==AV_NOPTS_VALUE)?Frame->pkt_dts:Frame->pkt_pts; // Using DTS is PTS is not available // TODO: check if stats are based on DTS or PTS
     //if (ts==AV_NOPTS_VALUE && x_Current)
     //    ts=(int)((x[1][x_Current-1]*x_Current/(x_Current-1))/VideoStream->time_base.num*VideoStream->time_base.den)+VideoFirstTimeStamp; //TODO: understand how to do with first timestamp not being 0 and last timestamp being AV_NOPTS_VALUE e.g. op1a-mpeg2-wave_hd.mxf
-    if (VideoFirstTimeStamp==(uint64_t)-1)
-        VideoFirstTimeStamp=ts;
-    if (ts<VideoFirstTimeStamp)
-    {
-        for (size_t Pos=0; Pos<x_Current; Pos++)
-        {
-            x[1][Pos]-=VideoFirstTimeStamp-ts;
-            x[2][Pos]=x[1][Pos]/60;
-            x[3][Pos]=x[2][Pos]/60;
-        }
-    }
-    ts-=VideoFirstTimeStamp;
     if (ts!=AV_NOPTS_VALUE)
     {
+        if (VideoFirstTimeStamp==(uint64_t)-1)
+            VideoFirstTimeStamp=ts;
+        if (ts<VideoFirstTimeStamp)
+        {
+            for (size_t Pos=0; Pos<x_Current; Pos++)
+            {
+                x[1][Pos]-=VideoFirstTimeStamp-ts;
+                x[2][Pos]=x[1][Pos]/60;
+                x[3][Pos]=x[2][Pos]/60;
+            }
+        }
+        ts-=VideoFirstTimeStamp;
         x[1][FramePos]=((double)ts)/Frequency;
         /*
         if (x[1][x_Current]>VideoDuration)
@@ -450,8 +463,8 @@ string VideoStats::StatsToXML (int Width, int Height)
     stringstream height; height<<Height; // Note: we use the same value for all frame, we should later use the right value per frame
     for (size_t x_Pos=0; x_Pos<x_Current; ++x_Pos)
     {
-        stringstream pkt_pts_time; pkt_pts_time<<x[1][x_Pos];
-        stringstream pkt_duration_time; pkt_duration_time<<durations[x_Pos];
+        stringstream pkt_pts_time; pkt_pts_time<<fixed<<setprecision(7)<<(x[1][x_Pos]+(Frequency?(VideoFirstTimeStamp/Frequency):0));
+        stringstream pkt_duration_time; pkt_duration_time<<fixed<<setprecision(7)<<durations[x_Pos];
         stringstream key_frame; key_frame<<key_frames[x_Pos]?'1':'0';
         Data<<"        <frame media_type=\"video\" key_frame=\"" << key_frame.str() << "\" pkt_pts_time=\"" << pkt_pts_time.str() << "\"";
         if (pkt_duration_time)
