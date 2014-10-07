@@ -310,6 +310,9 @@ void VideoStats::VideoStatsFromFrame (struct AVFrame* Frame, int Width, int Heig
 //---------------------------------------------------------------------------
 void VideoStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
 {
+    if (Frequency==0)
+        return; // Not supported
+
     if (FramePos>=x_Current_Max)
     {
         x_Current_Max=FramePos+1;
