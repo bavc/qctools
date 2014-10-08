@@ -8,7 +8,7 @@
 #include <Core/Core.h>
 #include <cfloat>
 
-const char* Version="0.5.0";
+const char* Version="0.6.0";
 
 const struct per_plot_group PerPlotGroup [PlotType_Max]=
 {

@@ -1,4 +1,4 @@
-0.6.0
+0.6.0, 2014-10-09
 -----
 + Summarization statistics
 + pkt_duration_time is added to tha sidecar stats file in order to get the real end timestamp of the stream
