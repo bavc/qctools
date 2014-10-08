@@ -347,8 +347,8 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
     {
         Seek_TimeStamp=AV_NOPTS_VALUE;
         int64_t ts=(Frame->pkt_pts==AV_NOPTS_VALUE)?Frame->pkt_dts:Frame->pkt_pts;
-        if (ts<VideoFirstTimeStamp*VideoStream->time_base.den/VideoStream->time_base.num)
-            VideoFirstTimeStamp=ts;
+        if (ts!=AV_NOPTS_VALUE && ts<VideoFirstTimeStamp*VideoStream->time_base.den/VideoStream->time_base.num)
+            VideoFirstTimeStamp=((double)ts)*VideoStream->time_base.num/VideoStream->time_base.den;
         
         if (With1)
             Process(Filtered1_Frame, FilterGraph1, FilterGraph1_Source_Context, FilterGraph1_Sink_Context, Filter1, Scale1_Context, Scale1_Frame, Image1);

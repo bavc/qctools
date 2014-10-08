@@ -365,6 +365,8 @@ void VideoStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
     x[0][FramePos]=FramePos;
 
     int64_t ts=(Frame->pkt_pts==AV_NOPTS_VALUE)?Frame->pkt_dts:Frame->pkt_pts; // Using DTS is PTS is not available
+    if (ts==AV_NOPTS_VALUE && FramePos)
+        ts=(VideoFirstTimeStamp+x[1][FramePos-1]+durations[FramePos-1])*Frequency; // If time stamp is not present, creating a fake one from last frame duration
     if (ts!=AV_NOPTS_VALUE)
     {
         if (VideoFirstTimeStamp==DBL_MAX)
@@ -407,9 +409,12 @@ void VideoStats::VideoStatsFinish ()
     if (x_Current)
     {
         x_Max[0]=x[0][x_Current-1];
-        x_Max[1]=x[1][x_Current-1];
-        x_Max[2]=x[2][x_Current-1];
-        x_Max[3]=x[3][x_Current-1];
+        if (x[1][x_Current-1])
+        {
+            x_Max[1]=x[1][x_Current-1];
+            x_Max[2]=x[2][x_Current-1];
+            x_Max[3]=x[3][x_Current-1];
+        }
     }
 
     x_Current_Max=x_Current;
