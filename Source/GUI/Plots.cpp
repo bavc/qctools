@@ -179,9 +179,9 @@ void Plots::Plots_Create(PlotType Type)
              case 3 :
                         switch (j)
                         {
-                            case 0: c=Qt::darkGreen; break;
+                            case 0: c=Qt::darkRed; break;
                             case 1: c=Qt::darkBlue; break;
-                            case 2: c=Qt::darkRed; break;
+                            case 2: c=Qt::darkGreen; break;
                             default: c=Qt::black;
                         }
                         break;
@@ -201,15 +201,7 @@ void Plots::Plots_Create(PlotType Type)
 
         plotsCurves[Type][j]->setPen(c);
         plotsCurves[Type][j]->setRenderHint(QwtPlotItem::RenderAntialiased);
-        switch (Type)
-        {
-            case PlotType_Diffs   :
-            case PlotType_MSE     :
-            case PlotType_PSNR    :
-                                    break;  //Invert data order (except for Diffs, MSE, PSNR...)
-            default:
-                                    plotsCurves[Type][j]->setZ(plotsCurves[Type][j]->z()-j);
-        }
+        plotsCurves[Type][j]->setZ(plotsCurves[Type][j]->z()-j); //Invert data order (e.g. MAX before MIN)
         plotsCurves[Type][j]->attach(plot);
      }
 

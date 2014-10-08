@@ -56,7 +56,7 @@ const struct per_plot_group PerPlotGroup [PlotType_Max]=
     },
     //Diffs
     {
-        PlotName_YDIF,      3,    0,  255,  3,  "Diffs",  true,
+        PlotName_VDIF,      3,    0,  255,  3,  "Diffs",  true,
         "Plots YDIF, UDIF, and VDIF all together.",
     },
     //Sat
@@ -169,9 +169,9 @@ const struct per_plot_item PerPlotName [PlotName_Max]=
     { PlotType_V,       PlotType_Max,       "VHIGH",      "lavfi.values.VHIGH",   "lavfi.signalstats.VHIGH",   0,  false,  DBL_MAX, DBL_MAX },
     { PlotType_V,       PlotType_Max,       "VMAX",       "lavfi.values.VMAX",    "lavfi.signalstats.VMAX",    0,  true,   DBL_MAX, DBL_MAX },
     //Diffs
-    { PlotType_YDiff,   PlotType_Diffs,     "YDIF",       "lavfi.values.YDIF",    "lavfi.signalstats.YDIF",    5,  false,  DBL_MAX, DBL_MAX },
-    { PlotType_UDiff,   PlotType_Diffs,     "UDIF",       "lavfi.values.UDIF",    "lavfi.signalstats.UDIF",    5,  false,  DBL_MAX, DBL_MAX },
     { PlotType_VDiff,   PlotType_Diffs,     "VDIF",       "lavfi.values.VDIF",    "lavfi.signalstats.VDIF",    5,  false,  DBL_MAX, DBL_MAX },
+    { PlotType_UDiff,   PlotType_Diffs,     "UDIF",       "lavfi.values.UDIF",    "lavfi.signalstats.UDIF",    5,  false,  DBL_MAX, DBL_MAX },
+    { PlotType_YDiff,   PlotType_Diffs,     "YDIF",       "lavfi.values.YDIF",    "lavfi.signalstats.YDIF",    5,  false,  DBL_MAX, DBL_MAX },
     //Sat
     { PlotType_Sat,     PlotType_Max,       "SATMIN",     "lavfi.values.SATMIN",  "lavfi.signalstats.SATMIN",  0,  false,  DBL_MAX, DBL_MAX },
     { PlotType_Sat,     PlotType_Max,       "SATLOW",     "lavfi.values.SATLOW",  "lavfi.signalstats.SATLOW",  0,  false,  DBL_MAX, DBL_MAX },
@@ -193,11 +193,11 @@ const struct per_plot_item PerPlotName [PlotName_Max]=
     { PlotType_CropF,   PlotType_Max,       "Crop Width", "",                     "lavfi.cropdetect.w",        0,  false,  DBL_MAX, DBL_MAX },
     { PlotType_CropF,   PlotType_Max,       "Crop Height","",                     "lavfi.cropdetect.h",        0,  true,   DBL_MAX, DBL_MAX },
     //MSEf
-    { PlotType_MSE,     PlotType_Max,       "MSEf Y",     "lavfi.psnr.mse.y",     "lavfi.psnr.mse.y",          2,  false,     1000, DBL_MAX },
-    { PlotType_MSE,     PlotType_Max,       "MSEf U",     "lavfi.psnr.mse.u",     "lavfi.psnr.mse.u",          2,  false,  DBL_MAX, DBL_MAX },
     { PlotType_MSE,     PlotType_Max,       "MSEf V",     "lavfi.psnr.mse.v",     "lavfi.psnr.mse.v",          2,  true,   DBL_MAX, DBL_MAX },
+    { PlotType_MSE,     PlotType_Max,       "MSEf U",     "lavfi.psnr.mse.u",     "lavfi.psnr.mse.u",          2,  false,  DBL_MAX, DBL_MAX },
+    { PlotType_MSE,     PlotType_Max,       "MSEf Y",     "lavfi.psnr.mse.y",     "lavfi.psnr.mse.y",          2,  false,     1000, DBL_MAX },
     //PSNRf
-    { PlotType_PSNR,    PlotType_Max,       "PSNRf Y",    "lavfi.psnr.psnr.y",    "lavfi.psnr.psnr.y",         2,  false,  DBL_MAX, DBL_MAX },
-    { PlotType_PSNR,    PlotType_Max,       "PSNRf U",    "lavfi.psnr.psnr.u",    "lavfi.psnr.psnr.u",         2,  false,  DBL_MAX, DBL_MAX },
     { PlotType_PSNR,    PlotType_Max,       "PSNRf V",    "lavfi.psnr.psnr.v",    "lavfi.psnr.psnr.v",         2,  true,   DBL_MAX, DBL_MAX },
+    { PlotType_PSNR,    PlotType_Max,       "PSNRf U",    "lavfi.psnr.psnr.u",    "lavfi.psnr.psnr.u",         2,  false,  DBL_MAX, DBL_MAX },
+    { PlotType_PSNR,    PlotType_Max,       "PSNRf Y",    "lavfi.psnr.psnr.y",    "lavfi.psnr.psnr.y",         2,  false,  DBL_MAX, DBL_MAX },
 };

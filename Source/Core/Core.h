@@ -39,9 +39,9 @@ enum PlotName
     PlotName_VHIGH,
     PlotName_VMAX,
     //Diffs
-    PlotName_YDIF,
-    PlotName_UDIF,
     PlotName_VDIF,
+    PlotName_UDIF,
+    PlotName_YDIF,
     //PlotName_YDIF1,
     //PlotName_YDIF2,
     //Sat
