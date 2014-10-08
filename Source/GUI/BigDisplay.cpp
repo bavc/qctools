@@ -451,7 +451,11 @@ void ImageLabel::paintEvent(QPaintEvent *event)
                 default: return;
             }
         }
-        Pixmap.convertFromImage(*Image);
+        #if QT_VERSION>0x040700
+            Pixmap.convertFromImage(*Image);
+        #else //QT_VERSION>0x040700
+            Pixmap=QPixmap::fromImage(*Image);
+        #endif //QT_VERSION>0x040700
         Pixmap_MustRedraw=false;
     }
 
