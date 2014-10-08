@@ -77,7 +77,7 @@ FunctionEnd
 Section "SectionPrincipale" SEC01
   SetOverwrite on
   SetOutPath "$SMPROGRAMS"
-  CreateShortCut "$SMPROGRAMS\QCTools.lnk" "$INSTDIR\QCTools.exe" "" "" "" "" "" ""
+  CreateShortCut "$SMPROGRAMS\QCTools.lnk" "$INSTDIR\QCTools.exe" "" "$SMPROGRAMS\QCTools.lnk" "" "" "" ""
   SetOutPath "$INSTDIR"
   File "..\..\Project\MSVC2010\Release\QCTools.exe"
   File "..\..\Project\MSVC2010\Release\avcodec-55.dll"
