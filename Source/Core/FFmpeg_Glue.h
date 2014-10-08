@@ -155,8 +155,8 @@ private:
 
     // Video information
     size_t                      VideoFrameCount;        // Total count of frames (may be estimated)
-    uint64_t                    VideoFirstPts;          // First PTS met
-    double                      VideoDuration;          // Duration is seconds
+    double                      VideoFirstTimeStamp;    // First PTS met in seconds
+    double                      VideoDuration;          // Duration in seconds
 
     // Seek
     int64_t                     Seek_TimeStamp;

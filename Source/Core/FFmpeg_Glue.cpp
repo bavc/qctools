@@ -101,7 +101,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<VideoStats*>* Vid
     Image2=NULL;
     VideoFrameCount=0;
     VideoDuration=0;
-    VideoFirstPts=(uint64_t)-1;
+    VideoFirstTimeStamp=DBL_MAX;
     
     // FFmpeg pointers
     FormatContext=NULL;
@@ -241,45 +241,34 @@ FFmpeg_Glue::~FFmpeg_Glue()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::Seek(size_t Pos)
+void FFmpeg_Glue::Seek(size_t FramePos)
 {
-    // Finding the right source
-    int64_t Duration;
-    int64_t FrameCount;
-    if (Videos && !Videos->empty() && (*Videos)[0])
+    VideoFramePos=FramePos;
+
+    // Getting first time stamp
+    if (VideoFirstTimeStamp==DBL_MAX && Videos && !Videos->empty() && (*Videos)[0])
+        VideoFirstTimeStamp=(*Videos)[0]->VideoFirstTimeStamp;
+
+    // Finding the right source and time stamp computing
+    if (Videos && !Videos->empty() && (*Videos)[0] && FramePos<(*Videos)[0]->x_Current_Max)
     {
-        if ((*Videos)[0]->State_Get()==1)
-        {
-            Duration=((int64_t)((*Videos)[0]->x_Max[1]*((double)VideoStream->time_base.den)/VideoStream->time_base.num));
-            FrameCount=(*Videos)[0]->x_Current_Max;
-        }
-        else
-        {
-            Duration=max(((int64_t)((*Videos)[0]->x_Max[1]*((double)VideoStream->time_base.den)/VideoStream->time_base.num)), VideoStream->duration);
-            FrameCount=max((*Videos)[0]->x_Current_Max, VideoFrameCount);
-        }
+        double TimeStamp=(*Videos)[0]->x[1][FramePos];
+        if (VideoFirstTimeStamp!=DBL_MAX)
+            TimeStamp+=VideoFirstTimeStamp;
+        Seek_TimeStamp=(int64_t)(TimeStamp*VideoStream->time_base.den/VideoStream->time_base.num);
     }
     else
     {
-        Duration=VideoStream->duration;
-        FrameCount=VideoFrameCount;
+        Seek_TimeStamp=FramePos;
+        Seek_TimeStamp*=VideoStream->duration;
+        Seek_TimeStamp/=VideoFrameCount;  // TODO: seek based on time stamp
     }
-
-
-    // DTS computing
-    long long DTS=Pos;
-    DTS*=Duration;
-    DTS/=FrameCount;  // TODO: seek based on time stamp
-    if (VideoFirstPts!=(uint64_t)-1)
-        DTS+=VideoFirstPts;
-    Seek_TimeStamp=(int64_t)DTS;
     
     // Seek
     if (Seek_TimeStamp)
         avformat_seek_file(FormatContext, VideoStream_Index, 0, Seek_TimeStamp, Seek_TimeStamp, 0);
     else
         avformat_seek_file(FormatContext, VideoStream_Index, 0, 1, 1, 0); //Found some cases such seek fails
-    VideoFramePos=Pos;
 
     // Flushing
     avcodec_flush_buffers(VideoStream->codec);
@@ -358,8 +347,8 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
     {
         Seek_TimeStamp=AV_NOPTS_VALUE;
         int64_t ts=(Frame->pkt_pts==AV_NOPTS_VALUE)?Frame->pkt_dts:Frame->pkt_pts;
-        if (ts<VideoFirstPts)
-            VideoFirstPts=ts;
+        if (ts<VideoFirstTimeStamp*VideoStream->time_base.den/VideoStream->time_base.num)
+            VideoFirstTimeStamp=ts;
         
         if (With1)
             Process(Filtered1_Frame, FilterGraph1, FilterGraph1_Source_Context, FilterGraph1_Sink_Context, Filter1, Scale1_Context, Scale1_Frame, Image1);

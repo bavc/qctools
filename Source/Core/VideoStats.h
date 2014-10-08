@@ -33,6 +33,7 @@ public:
     size_t                      x_Current_Max;              // Data will be filled up to
     double                      x_Max[4];                   // Maximum x by plot
     double                      y_Max[PlotType_Max];        // Maximum y by plot
+    double                      VideoFirstTimeStamp;        // Time stamp of the first frame
 
     // Status
     double                      State_Get();
@@ -55,7 +56,6 @@ public:
 private:
     // Status
     bool                        IsComplete;
-    uint64_t                    VideoFirstTimeStamp;                      
 
     // VideoStats
     double                      Stats_Totals[PlotName_Max];
