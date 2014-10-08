@@ -460,14 +460,6 @@ void MainWindow::dropEvent(QDropEvent *Event)
     }
 
     clearDragDrop();
-    if (FilesListArea)
-    {
-        FilesListArea->UpdateAll();
-        FilesListArea->show();
-    }
-    if (Files.size()>1)
-        ui->actionFilesList->trigger();
-    else
-        ui->actionGraphsLayout->trigger();
+    addFile_finish();
 }
 

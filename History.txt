@@ -15,6 +15,8 @@ x The sidecar stats file was not correctly detected if the media file is open in
 x Linux only: The sidecar stats file was not correctly loaded
 x Fix corrupted Broadcast Range display in some inputs (GitHub issue #10)
 x Line select now plots one line in a waveform, previous the next line and next line were plotted
+x MSEf, PSNR: Y and V were inverted
+x UI was not showing graphs if the file is open via the menu
 
 0.5.0, 2014-09-12
 -----
