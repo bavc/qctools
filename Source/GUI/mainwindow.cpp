@@ -16,7 +16,6 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QCoreApplication>
-#include <QShortcut>
 #include <QDropEvent>
 #include <QDragEnterEvent>
 #include <QMimeData>
