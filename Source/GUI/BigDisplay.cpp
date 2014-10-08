@@ -789,7 +789,7 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
 
     // Shortcuts
     QShortcut *shortcutJ = new QShortcut(QKeySequence(Qt::Key_J), this);
-    QObject::connect(shortcutJ, SIGNAL(activated()), ControlArea->P1, SLOT(click()));
+    QObject::connect(shortcutJ, SIGNAL(activated()), ControlArea->M1, SLOT(click()));
     QShortcut *shortcutLeft = new QShortcut(QKeySequence(Qt::Key_Left), this);
     QObject::connect(shortcutLeft, SIGNAL(activated()), ControlArea->Minus, SLOT(click()));
     QShortcut *shortcutK = new QShortcut(QKeySequence(Qt::Key_K), this);
