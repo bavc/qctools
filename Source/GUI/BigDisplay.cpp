@@ -685,21 +685,6 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     setWindowFlags(windowFlags() &(0xFFFFFFFF-Qt::WindowContextHelpButtonHint));
     resize(QDesktopWidget().screenGeometry().width()*2/5, QDesktopWidget().screenGeometry().height()*2/5);
 
-    QShortcut *shortcutJ = new QShortcut(QKeySequence(Qt::Key_J), this);
-    QObject::connect(shortcutJ, SIGNAL(activated()), this, SLOT(on_M1_triggered()));
-    QShortcut *shortcutLeft = new QShortcut(QKeySequence(Qt::Key_Left), this);
-    QObject::connect(shortcutLeft, SIGNAL(activated()), this, SLOT(on_Minus_triggered()));
-    QShortcut *shortcutK = new QShortcut(QKeySequence(Qt::Key_K), this);
-    QObject::connect(shortcutK, SIGNAL(activated()), this, SLOT(on_Pause_triggered()));
-    QShortcut *shortcutRight = new QShortcut(QKeySequence(Qt::Key_Right), this);
-    QObject::connect(shortcutRight, SIGNAL(activated()), this, SLOT(on_Plus_triggered()));
-    QShortcut *shortcutL = new QShortcut(QKeySequence(Qt::Key_L), this);
-    QObject::connect(shortcutL, SIGNAL(activated()), this, SLOT(on_P1_triggered()));
-    QShortcut *shortcutSpace = new QShortcut(QKeySequence(Qt::Key_Space), this);
-    QObject::connect(shortcutSpace, SIGNAL(activated()), this, SLOT(on_PlayPause_triggered()));
-    QShortcut *shortcutF = new QShortcut(QKeySequence(Qt::Key_F), this);
-    QObject::connect(shortcutF, SIGNAL(activated()), this, SLOT(on_Full_triggered()));
-
     // FiltersListDefault_Count
     FiltersListDefault_Count=0;
     while (strcmp(Filters[FiltersListDefault_Count].Name, "(End)"))
@@ -801,6 +786,22 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     // Info
     Frames_Pos=-1;
     ShouldUpate=false;
+
+    // Shortcuts
+    QShortcut *shortcutJ = new QShortcut(QKeySequence(Qt::Key_J), this);
+    QObject::connect(shortcutJ, SIGNAL(activated()), ControlArea->P1, SLOT(click()));
+    QShortcut *shortcutLeft = new QShortcut(QKeySequence(Qt::Key_Left), this);
+    QObject::connect(shortcutLeft, SIGNAL(activated()), ControlArea->Minus, SLOT(click()));
+    QShortcut *shortcutK = new QShortcut(QKeySequence(Qt::Key_K), this);
+    QObject::connect(shortcutK, SIGNAL(activated()), ControlArea->Pause, SLOT(click()));
+    QShortcut *shortcutRight = new QShortcut(QKeySequence(Qt::Key_Right), this);
+    QObject::connect(shortcutRight, SIGNAL(activated()), ControlArea->Plus, SLOT(click()));
+    QShortcut *shortcutL = new QShortcut(QKeySequence(Qt::Key_L), this);
+    QObject::connect(shortcutL, SIGNAL(activated()), ControlArea->P1, SLOT(click()));
+    QShortcut *shortcutSpace = new QShortcut(QKeySequence(Qt::Key_Space), this);
+    QObject::connect(shortcutSpace, SIGNAL(activated()), ControlArea->PlayPause, SLOT(click()));
+    QShortcut *shortcutF = new QShortcut(QKeySequence(Qt::Key_F), this);
+    QObject::connect(shortcutF, SIGNAL(activated()), this, SLOT(on_Full_triggered()));
 }
 
 //---------------------------------------------------------------------------
@@ -1686,50 +1687,6 @@ void BigDisplay::resizeEvent(QResizeEvent* Event)
     //ShowPicture ();
     Image1->Pixmap_MustRedraw=true;
     Image2->Pixmap_MustRedraw=true;
-}
-
-//---------------------------------------------------------------------------
-void BigDisplay::on_M1_triggered()
-{
-    if (ControlArea)
-        ControlArea->M1->clicked(true);
-}
-
-//---------------------------------------------------------------------------
-void BigDisplay::on_Minus_triggered()
-{
-    on_Pause_triggered();
-    if (ControlArea)
-        ControlArea->Minus->clicked(true);
-}
-
-//---------------------------------------------------------------------------
-void BigDisplay::on_PlayPause_triggered()
-{
-    if (ControlArea)
-        ControlArea->PlayPause->clicked(true);
-}
-
-//---------------------------------------------------------------------------
-void BigDisplay::on_Pause_triggered()
-{
-    if (ControlArea)
-        ControlArea->Pause->clicked(true);
-}
-
-//---------------------------------------------------------------------------
-void BigDisplay::on_Plus_triggered()
-{
-    on_Pause_triggered();
-    if (ControlArea)
-        ControlArea->Plus->clicked(true);
-}
-
-//---------------------------------------------------------------------------
-void BigDisplay::on_P1_triggered()
-{
-    if (ControlArea)
-        ControlArea->P1->clicked(true);
 }
 
 //---------------------------------------------------------------------------
