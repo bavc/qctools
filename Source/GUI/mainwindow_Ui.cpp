@@ -141,6 +141,10 @@ void MainWindow::Ui_Init()
     ui->actionFiltersLayout->setVisible(false);
     ui->actionWindowOut->setVisible(false);
     ui->actionPrint->setVisible(false);
+    ui->actionPreferences->setVisible(false);
+    ui->menuOptions->setVisible(false);
+    ui->menuOptions->setTitle(QString());
+    ui->menuOptions->setEnabled(false);
 
     // Not implemented action
     if (ui->actionExport_XmlGz_Custom)
