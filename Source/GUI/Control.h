@@ -28,6 +28,7 @@ class QLabel;
 class QToolButton;
 class QPushButton;
 class QTimer;
+class QTime;
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -85,7 +86,7 @@ protected:
 
     // Time
     QTimer* Timer;
-    qint64  DateTime;
+    QTime*  Time;
     bool    Time_MinusPlus;
     int     Timer_Duration;
 public:

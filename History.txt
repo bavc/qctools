@@ -6,6 +6,8 @@
 + File list info shows empty data instead of 0 when the video file is not present
 + Speed improvements
 + The graph marker is now on a frame value
++ RHEL/CentOS 6/7 binaries
++ Debian 6 binaries
 x Minimize/maximize button on video preview window (GitHub issue #24)
 x Position of cursor in graph not updated, when moving in preview window (GitHub issue #18)
 x YUVJ (full range) were shrinked to broadcast range, now using Ffmpeg update for better YUVJ handling (GitHub issue #36)

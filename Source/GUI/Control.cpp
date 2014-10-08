@@ -22,7 +22,7 @@
 #include <QTimer>
 #include <QGridLayout>
 #include <QLabel>
-#include <QDateTime>
+#include <QTime>
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -201,8 +201,7 @@ Control::Control(QWidget *parent, FileInformation* FileInformationData_, Plots* 
     // Info
     Frames_Pos=-1;
     ShouldUpate=false;
-    DateTime=-1;
-    Timer_Duration=0;
+    Time=NULL;
 
     Update();
 }
@@ -212,6 +211,7 @@ Control::~Control()
 {
     if (Timer)
         Timer->stop();
+    delete Time;
 }
 
 //***************************************************************************
@@ -739,7 +739,6 @@ void Control::on_P9_clicked(bool checked)
 //---------------------------------------------------------------------------
 void Control::TimeOut_Init()
 {
-    DateTime=QDateTime::currentMSecsSinceEpoch();
     if (!Timer)
     {
         Timer=new QTimer(this);
@@ -776,15 +775,13 @@ void Control::TimeOut ()
         on_Minus_clicked(true); // Minus->click();
     }
 
-    if (DateTime==-1)
-        DateTime=QDateTime::currentMSecsSinceEpoch();
-    qint64 DateTime_New=QDateTime::currentMSecsSinceEpoch();
-    qint64 Diff=DateTime-DateTime_New;
-    DateTime+=Timer_Duration;
-    if (Diff<0)
+    if (Time==NULL)
+        Time=new QTime();
+    qint64 Diff=Time->restart();
+    if (Diff<Timer_Duration)
+        Diff=Timer_Duration-Diff;
+    else
         Diff=0;
-    if (Diff<=Timer->interval()-3 || Diff>=Timer->interval()+3 || !Timer->isActive())
-    {
+    if (!Timer->isActive())
         Timer->start(Diff);
-    }
 }
