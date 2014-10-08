@@ -15,9 +15,13 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires:  gcc-c++
 BuildRequires:  pkgconfig
 BuildRequires:  zlib-devel
+%if %{undefined mandriva_version}
 BuildRequires:  libbz2-devel
+%endif
 BuildRequires:  cmake
+%if %{undefined rhel_version} && %{undefined centos_version}
 BuildRequires:  yasm
+%endif
 BuildRequires:  libqt4-devel
 %if 0%{?suse_version}
 BuildRequires:  update-desktop-files
