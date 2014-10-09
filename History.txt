@@ -9,6 +9,7 @@
 + RHEL/CentOS 6/7 binaries
 + Debian 6 binaries
 + Ctrl+G keyboard shortcut for "Go to frame at position" (GitHub issue #30)
++ F1 keyboard shortcut for help
 x Minimize/maximize button on video preview window (GitHub issue #24)
 x Position of cursor in graph not updated, when moving in preview window (GitHub issue #18)
 x YUVJ (full range) were shrinked to broadcast range, now using Ffmpeg update for better YUVJ handling (GitHub issue #36)
