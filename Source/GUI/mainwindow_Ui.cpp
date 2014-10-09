@@ -72,8 +72,6 @@ void MainWindow::Ui_Init()
     QObject::connect(shortcutSpace, SIGNAL(activated()), this, SLOT(on_PlayPause_triggered()));
     QShortcut *shortcutF = new QShortcut(QKeySequence(Qt::Key_F), this);
     QObject::connect(shortcutF, SIGNAL(activated()), this, SLOT(on_Full_triggered()));
-    QShortcut *shortcutG = new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_G), this);
-    QObject::connect(shortcutG, SIGNAL(activated()), this, SLOT(on_actionGoTo_triggered()));
 
     // Drag n drop
     setAcceptDrops(true);

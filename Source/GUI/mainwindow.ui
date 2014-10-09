@@ -265,6 +265,12 @@
    <property name="text">
     <string>Go to frame at position...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
   </action>
   <action name="actionToolbar">
    <property name="checkable">
