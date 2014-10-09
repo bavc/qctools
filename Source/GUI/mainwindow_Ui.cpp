@@ -162,7 +162,10 @@ void MainWindow::configureZoom()
         ui->horizontalScrollBar->setSingleStep(1);
         ui->horizontalScrollBar->setEnabled(false);
         ui->actionZoomOut->setEnabled(false);
-        ui->actionZoomIn->setEnabled(!Files.empty());
+        if (Files_CurrentPos<Files.size() && PlotsArea && PlotsArea->ZoomScale<Files[Files_CurrentPos]->Videos[0]->x_Current_Max/4)
+            ui->actionZoomIn->setEnabled(true);
+        else
+            ui->actionZoomIn->setEnabled(false);
         ui->actionGoTo->setEnabled(!Files.empty());
         ui->actionExport_XmlGz_Prompt->setEnabled(!Files.empty());
         ui->actionExport_XmlGz_Sidecar->setEnabled(!Files.empty());
@@ -178,7 +181,10 @@ void MainWindow::configureZoom()
     ui->horizontalScrollBar->setSingleStep(Increment);
     ui->horizontalScrollBar->setEnabled(true);
     ui->actionZoomOut->setEnabled(true);
-    ui->actionZoomIn->setEnabled(true);
+    if (PlotsArea->ZoomScale<Files[Files_CurrentPos]->Videos[0]->x_Current_Max/4)
+        ui->actionZoomIn->setEnabled(true);
+    else
+        ui->actionZoomIn->setEnabled(false);
     ui->actionGoTo->setEnabled(true);
     ui->actionExport_XmlGz_Prompt->setEnabled(true);
     ui->actionExport_XmlGz_Sidecar->setEnabled(true);
@@ -198,7 +204,8 @@ void MainWindow::Zoom_Move(size_t Begin)
 //---------------------------------------------------------------------------
 void MainWindow::Zoom_In()
 {
-    PlotsArea->ZoomScale*=2;
+    if (PlotsArea->ZoomScale<Files[Files_CurrentPos]->Videos[0]->x_Current_Max/4)
+        PlotsArea->ZoomScale*=2;
     configureZoom();
     size_t Position=Files[Files_CurrentPos]->Frames_Pos_Get();
     size_t Increment=Files[Files_CurrentPos]->Videos[0]->x_Current_Max/PlotsArea->ZoomScale;
