@@ -739,6 +739,8 @@ void Control::on_P9_clicked(bool checked)
 //---------------------------------------------------------------------------
 void Control::TimeOut_Init()
 {
+    delete Time;
+    Time=new QTime();
     if (!Timer)
     {
         Timer=new QTimer(this);
@@ -775,13 +777,11 @@ void Control::TimeOut ()
         on_Minus_clicked(true); // Minus->click();
     }
 
-    if (Time==NULL)
-        Time=new QTime();
     qint64 Diff=Time->restart();
     if (Diff<Timer_Duration)
         Diff=Timer_Duration-Diff;
     else
         Diff=0;
-    if (!Timer->isActive())
+    if (Diff<=Timer->interval()-3 || Diff>=Timer->interval()+3 || !Timer->isActive())
         Timer->start(Diff);
 }
