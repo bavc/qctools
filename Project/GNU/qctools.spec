@@ -30,8 +30,6 @@ BuildRequires:  update-desktop-files
 BuildRequires:  qt-devel
 BuildRequires:  desktop-file-utils
 %endif
-Requires:   libqt4
-Requires:   libqt4-x11
 
 %description
 QCTools (Quality Control Tools for Video Preservation)
