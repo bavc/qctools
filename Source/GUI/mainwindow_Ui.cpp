@@ -52,12 +52,8 @@ void MainWindow::Ui_Init()
     ui->setupUi(this);
 
     // Shortcuts
-    QShortcut *shortcutPlus = new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_Plus), this);
-    QObject::connect(shortcutPlus, SIGNAL(activated()), this, SLOT(on_actionZoomIn_triggered()));
     QShortcut *shortcutEqual = new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_Equal), this);
     QObject::connect(shortcutEqual, SIGNAL(activated()), this, SLOT(on_actionZoomIn_triggered()));
-    QShortcut *shortcutZoomOut = new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_Minus), this);
-    QObject::connect(shortcutZoomOut, SIGNAL(activated()), this, SLOT(on_actionZoomOut_triggered()));
     QShortcut *shortcutJ = new QShortcut(QKeySequence(Qt::Key_J), this);
     QObject::connect(shortcutJ, SIGNAL(activated()), this, SLOT(on_M1_triggered()));
     QShortcut *shortcutLeft = new QShortcut(QKeySequence(Qt::Key_Left), this);
