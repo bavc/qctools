@@ -1,3 +1,7 @@
+0.6.1, 2014-10-15
+-----
+x Crash with MP4 files on Mac OS X 10.7 (GitHub issue #40)
+
 0.6.0, 2014-10-09
 -----
 + Summarization statistics
