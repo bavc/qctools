@@ -17,14 +17,14 @@
 		</p>
 		
         <h2 style="color:blue">Histogram</h2>
-        <p>The histogram shows the frequency of occurrence of values per channel. Typically the histogram will show one graph per channel (one for each Y, U, and V or one for each red, green, and blue).Video with a lot of contrast and a well distributed range of luminance values will result in a histogram with an even spread. You may also select <b>'Field Split'</b> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).</p>
+        <p>The histogram shows the frequency of occurrence of values per channel. Typically the histogram will show one graph per channel (one for each Y, U, and V or one for each red, green, and blue).Video with a lot of contrast and a well distributed range of luminance values will result in a histogram with an even spread. You may also select <strong>'Field Split'</strong> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).</p>
 
         <h2 style="color:blue">Waveform</h2>
-        <p>The waveform plots the brightness of the image, each column of the waveform corresponds to a column of pixels in the source video. The pixels of each column are then plotted in a scale from 0 to 110 IRE. The range from 0 to 7.5 IRE is highlighted in blue and indicates a black value that is below traditional NTSC broadcast range. The range from 100 to 110 IRE is highlighted in red and indicates a white value that is above broadcast range. For most analog media the intended pixel luminsotiy values should exist between 7.5 and 100 IRE. You may also select <b>'Field Split'</b> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).</p>
+        <p>The waveform plots the brightness of the image, each column of the waveform corresponds to a column of pixels in the source video. The pixels of each column are then plotted in a scale from 0 to 110 IRE. The range from 0 to 7.5 IRE is highlighted in blue and indicates a black value that is below traditional NTSC broadcast range. The range from 100 to 110 IRE is highlighted in red and indicates a white value that is above broadcast range. For most analog media the intended pixel luminsotiy values should exist between 7.5 and 100 IRE. You may also select <strong>'Field Split'</strong> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).</p>
 
         <h2 style="color:blue">Vectorscope</h2>
         <p>
-		A vectorscope display. This display plots chroma values (U/V color placement) in two dimensional graph (which is called a vectorscope). It can be used to read of the hue and saturation of the current frame. The whiter a pixel in the vectorscope, the more pixels of the input frame correspond to that pixel (that is the more pixels have this chroma value). The V component is displayed on the vertical (Y) axis, with the bottom edge being V = 0 and the top being V = 255. The U component is displayed on the horizontal (Y) axis, with the left representing U = 0 and the right representing U = 255.<br/>Six blocks are highlighted to depict standardized color points for red (90, 16), green (54, 222), blue (240, 146), cyan (166, 240), magenta (202, 44), and yellow (16, 110). All valid chroma values fall within a circlular shape from the center to the outer edge of the plot.You may also select <b>'Field Split'</b> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).<br/><br/>
+		A vectorscope display. This display plots chroma values (U/V color placement) in two dimensional graph (which is called a vectorscope). It can be used to read of the hue and saturation of the current frame. The whiter a pixel in the vectorscope, the more pixels of the input frame correspond to that pixel (that is the more pixels have this chroma value). The V component is displayed on the vertical (Y) axis, with the bottom edge being V = 0 and the top being V = 255. The U component is displayed on the horizontal (Y) axis, with the left representing U = 0 and the right representing U = 255.<br/>Six blocks are highlighted to depict standardized color points for red (90, 16), green (54, 222), blue (240, 146), cyan (166, 240), magenta (202, 44), and yellow (16, 110). All valid chroma values fall within a circlular shape from the center to the outer edge of the plot.You may also select <strong>'Field Split'</strong> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).<br/><br/>
         <img src="vectorscope_illegal.jpg" alt="Vectorscope"/><br/><br/>
 		<br/><br/>
         <img src="playback_layout_two_windows.jpg" width="65%" height="65%" alt="Vectorscope Split Screen"/><br/><br/>
@@ -41,17 +41,17 @@
 		This filter selects the bit position of each plane for display. Selecting 'None' for a plane will replace all values with 0x80 (middle gray for Y and no color for U or V). Selecting 'All' will send the display plane as is. Selecting 'Bit [1-8]' will display only that specific bit position of each pixel of the plane. For the Y plane a pixel will display as black is that bit is '0' or white is that bit is '1'. For U a pixel will be yellow-green if '0' purple if '1'. For V a pixel will be green for '0' and red for '1'.<br/>
         Generally lossy video codecs will show blocky structured patterns at higher numbered bit positions. See the <a href="https://en.wikipedia.org/wiki/Bit_plane">bit plane article</a> in Wikipedia for more information about the application of bit plane filtering.<br/>
 		<img src="1A_seattle_parade_transfer_a_messedup-1.jpg" alt="Bit Plane"/><br/><br/>
-		video sample & permission to use provided by <a href="http://www.seattle.gov">seattle.gov</a>
+		(Video sample and permission to use provided by <a href="http://www.seattle.gov">seattle.gov</a>)
 		</p>
 		
 		<h2 style="color:blue">Vertical Line Repetitions</h2>
         <p>This filter displays repetitive lines of video data.</p>
 
         <h2 style="color:blue">Broadcast Range Pixels</h2>
-        <p>This is the same presentation as 'Normal' except that pixels that are outside of broadcast range are highlighted as white. Again here, you have the option of selecting <b>'Field Split'</b> to display field 1 (top) and field 2 (bottom) separately. </p>
+        <p>This is the same presentation as 'Normal' except that pixels that are outside of broadcast range are highlighted as white. Again here, you have the option of selecting <strong>'Field Split'</strong> to display field 1 (top) and field 2 (bottom) separately. </p>
 
         <h2 style="color:blue">Temporal Outlier Pixels</h2>
-        <p>This is the same presentation as 'Normal' except that pixels that are labelled as temporal outliers are highlighted as white. Temporal outliers are pixels that significantly differ from their neighbors and often correspond to tape damage or playback error. Select <b>'Field Split'</b> to see the fields displayed separately. </p>
+        <p>This is the same presentation as 'Normal' except that pixels that are labelled as temporal outliers are highlighted as white. Temporal outliers are pixels that significantly differ from their neighbors and often correspond to tape damage or playback error. Select <strong>'Field Split'</strong> to see the fields displayed separately. </p>
 
         <h2 style="color:blue">Chroma Adjust</h2>
         <p>This filter enables the hue and saturation levels to be adjusted. Hue adjustments may be expressed in degrees where 0 is no change and 180 would invert the color. For saturation a value of 1 needs the saturation unchanged, 0 removes all color, and the saturation may be increased up to a maximum of 10.</p>

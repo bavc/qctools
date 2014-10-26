@@ -9,10 +9,10 @@
         <p>The QCTools Document is designed to be a self-descriptive metadata document that stores analytical metadata about video and audio frames and may be quickly rendered in QCTools version 0.5 or later. The QCTools Document is an XML expression of FFprobe's XML expression as defined by the ffprobe schema at <a href="http://www.ffmpeg.org/schema/ffprobe.xsd">http://www.ffmpeg.org/schema/ffprobe.xsd</a>. For more information about FFprobe's XML expression please visit: <a href="http://ffmpeg.org/ffprobe.html#xml">http://www.ffmpeg.org/schema/ffprobe.xsd</a>; for additional information about FFprobe's XML expression: <a href="http://ffmpeg.org/ffprobe.html#xml">http://ffmpeg.org/ffprobe.html#xml</a>.</p>
         <p>In addition to frame metadata, the QCTools Document stores metadata values output from four evaluative filters: signalstats, cropdetect, psnr, and ebur128. </p>
         <ol>
-            <li><b>signal stats</b><br/>The signalstats filter is a project of the QCTools project. Signalstats outputs information about the range of values used in luminance and chrominance video planes as well as details of hue and saturation and pixel labeling tests such as vertical line repetition, temporal outliers, and broadcast range adherence. More info: <a href="http://ffmpeg.org/ffmpeg-filters.html#signalstats">http://ffmpeg.org/ffmpeg-filters.html#signalstats.</a> </li>
-            <li><b>cropdetect</b><br/>The cropdetect filter detects how a given frame may be cropped to remove black (or nearly black) borders from the edges of the video. It can detect if video has been letterboxed or pillarboxed or other bordering rows or columns of black pixels. More info: <a href="http://ffmpeg.org/ffmpeg-filters.html#cropdetect">http://ffmpeg.org/ffmpeg-filters.html#cropdetect.</a></li>
-            <li><b>psnr</b><br/>Within the QCTools Document the psnr filter is used specifically to visually compare field 1 and field 2. The filter accepts field 1 and field 2 as two separate inputs and provides quantification of the visual difference between those two images for each plane (Y, U, and V) as well as for the overall image. This data is presented in both Peak Signal to Noise Ratio (PSNR) and Mean Square Error (MSE). More info: <a href="ffmpeg.org/ffmpeg-filters.html#psnr">ffmpeg.org/ffmpeg-filters.html#psnr.</a></li>
-            <li><b>ebur128</b><br/>The ebur128 filter is a volume detection filter that measures perceived loudness according to the EBU standard. More info: <a href="http://ffmpeg.org/ffmpeg-filters.html#ebur128">http://ffmpeg.org/ffmpeg-filters.html#ebur128.</a></li>
+            <li><strong>signal stats</strong><br/>The signalstats filter is a project of the QCTools project. Signalstats outputs information about the range of values used in luminance and chrominance video planes as well as details of hue and saturation and pixel labeling tests such as vertical line repetition, temporal outliers, and broadcast range adherence. More info: <a href="http://ffmpeg.org/ffmpeg-filters.html#signalstats">http://ffmpeg.org/ffmpeg-filters.html#signalstats.</a> </li>
+            <li><strong>cropdetect</strong><br/>The cropdetect filter detects how a given frame may be cropped to remove black (or nearly black) borders from the edges of the video. It can detect if video has been letterboxed or pillarboxed or other bordering rows or columns of black pixels. More info: <a href="http://ffmpeg.org/ffmpeg-filters.html#cropdetect">http://ffmpeg.org/ffmpeg-filters.html#cropdetect.</a></li>
+            <li><strong>psnr</strong><br/>Within the QCTools Document the psnr filter is used specifically to visually compare field 1 and field 2. The filter accepts field 1 and field 2 as two separate inputs and provides quantification of the visual difference between those two images for each plane (Y, U, and V) as well as for the overall image. This data is presented in both Peak Signal to Noise Ratio (PSNR) and Mean Square Error (MSE). More info: <a href="ffmpeg.org/ffmpeg-filters.html#psnr">ffmpeg.org/ffmpeg-filters.html#psnr.</a></li>
+            <li><strong>ebur128</strong><br/>The ebur128 filter is a volume detection filter that measures perceived loudness according to the EBU standard. More info: <a href="http://ffmpeg.org/ffmpeg-filters.html#ebur128">http://ffmpeg.org/ffmpeg-filters.html#ebur128.</a></li>
         </ol>
         <p>The data format of a QCTools xml export contains two main sections:</p>
         <h3 style="color:blue">1. Library Versions</h3>
@@ -28,24 +28,24 @@
             <li>libpostproc</li>
         </ul>
         <h3 style="color:blue">2. Frames and Tags </h3>
-        <p>The document is further divided into Frames and Tags per <b>media type</b>.</p>
+        <p>The document is further divided into Frames and Tags per <strong>media type</strong>.</p>
         <p>A <a href="https://github.com/bavc/FFmpeg/blob/master/doc/ffprobe.xsd#L55-L88">frame</a> describes a particular point in the video or audio and has a set of attributes that describe and identify that point (or frame)--including media type, duration, size, position, etc.<br/>A <a href="https://github.com/bavc/FFmpeg/blob/master/doc/ffprobe.xsd#L207-L210">tag</a> contains a key--in this case a reference to the filter name-- and the value for that filter.</p>
         <h4>Media Type: Audio</h4>
         <p>The Audio frame element contains descriptive information that identifies a particular frame.
         The tag attributes include values for the following filters (based on EBU R 128):</p>
         <ul>
-            <li><b>lavfi.r128.M</b>: or 'Momentary loudness' reflects sudden changes in volume over brief intervals of time (up to 400ms)</li>
-            <li><b>lavri.r128.S</b>: 'Short term loudness', measured in intervals of up to 3s in duration</li>
-            <li><b>lavfi.r128.I</b>: 'Integrated loudness', or overall loudness occurring over the entire duration of the audiovisual asset, or from 'start to stop'</li>
-            <li><b>lavfi.r128.LRA</b>: 'Loudness Range' quantifies the variation across loudness; measured in units of LU (1 LU is equal to 1 dB)</li>
-            <li><b>lavfi.r128.LRA.low</b></li>
-            <li><b>lavfi.r128LRA.high</b></li>
+            <li><strong>lavfi.r128.M</strong>: or 'Momentary loudness' reflects sudden changes in volume over brief intervals of time (up to 400ms)</li>
+            <li><strong>lavri.r128.S</strong>: 'Short term loudness', measured in intervals of up to 3s in duration</li>
+            <li><strong>lavfi.r128.I</strong>: 'Integrated loudness', or overall loudness occurring over the entire duration of the audiovisual asset, or from 'start to stop'</li>
+            <li><strong>lavfi.r128.LRA</strong>: 'Loudness Range' quantifies the variation across loudness; measured in units of LU (1 LU is equal to 1 dB)</li>
+            <li><strong>lavfi.r128.LRA.low</strong></li>
+            <li><strong>lavfi.r128LRA.high</strong></li>
         </ul>
         <h4>Media Type: Video</h4>
         <p>Each frame element contains descritpive information that identifies a particular point in the video. The tag attributes present the various QCTools filters and their values for that frame. For example:<br/>
         &#60;tag = key "lavfi.signalstats.YMIN" value = "15"&#47;&#62; <br/>
         &#60;tag = key "lavfi.signalstats.YLOW" value = "18"&#47;&#62; <br/>
-        For more info, please see <b>Filter Descriptions.</b></p>
+        For more info, please see <strong>Filter Descriptions.</strong></p>
 
         <h3 style="color:blue">Creating a QCTools Document</h3>
         <p>The QCTools Document can be created in either of the following ways:</p>
@@ -60,10 +60,10 @@
 
         <h3 style="color:blue">Additional Resources</h3>
         <p>For further information about FFmpeg, EBU audio specifications, etc., please see: <br/>
-        <b>FFmpeg / </b> <a href= "https://ffmpeg.org"> ffmpeg.org </a> <br/>
-        <b>FFmpeg Documentation / </b> <a href= "http://ffmpeg.org/documentation.html"> http://ffmpeg.org/documentation.html </a><br/>
-        <b>EBU 3341, Loudness Metering: 'EBU Mode' metering to supplement loudness normalizqation in accordance with EBU R 128 / </b> <a href= "https://tech.ebu.ch/docs/tech/tech3341.pdf"> https://tech.ebu.ch/docs/tech/tech3341.pdf</a><br/>
-        <b>EBU R 128, Loudness Normalisation and permitted maximum level of audio signals / </b> <a href= "https://tech.ebu.ch/docs/r/r128-2014.pdf"> https://tech.ebu.ch/docs/r/r128-2014.pdf </a> <br/>
-        <b>GZIP / </b> <a href="http://www.gzip.org/">www.gzip.org</a></p>
+        <strong>FFmpeg / </strong> <a href= "https://ffmpeg.org"> ffmpeg.org </a> <br/>
+        <strong>FFmpeg Documentation / </strong> <a href= "http://ffmpeg.org/documentation.html"> http://ffmpeg.org/documentation.html </a><br/>
+        <strong>EBU 3341, Loudness Metering: 'EBU Mode' metering to supplement loudness normalizqation in accordance with EBU R 128 / </strong> <a href= "https://tech.ebu.ch/docs/tech/tech3341.pdf"> https://tech.ebu.ch/docs/tech/tech3341.pdf</a><br/>
+        <strong>EBU R 128, Loudness Normalisation and permitted maximum level of audio signals / </strong> <a href= "https://tech.ebu.ch/docs/r/r128-2014.pdf"> https://tech.ebu.ch/docs/r/r128-2014.pdf </a> <br/>
+        <strong>GZIP / </strong> <a href="http://www.gzip.org/">www.gzip.org</a></p>
     </body>
 </html>
