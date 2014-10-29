@@ -93,10 +93,6 @@ void MainWindow::Ui_Init()
     ui->verticalLayout->setStretch(0, 1);
     ui->verticalLayout->setContentsMargins(0,0,0,0);
 
-    QLabel* DragDrop=new QLabel();
-    DragDrop->setAlignment(Qt::AlignCenter);
-    DragDrop->setPixmap(QPixmap(":/icon/window-out.png"));
-
     // Window
     setWindowTitle("QCTools");
     setWindowIcon(QIcon(":/icon/logo.png"));

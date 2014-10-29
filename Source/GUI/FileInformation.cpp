@@ -189,7 +189,10 @@ FileInformation::~FileInformation ()
 {
     WantToStop=true;
     wait();
-    delete Glue; Glue=NULL;
+
+    for (size_t Pos=0; Pos<Videos.size(); Pos++)
+        delete Videos[Pos];
+    delete Glue;
 }
 
 //***************************************************************************

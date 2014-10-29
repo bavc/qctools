@@ -450,6 +450,11 @@ void ImageLabel::paintEvent(QPaintEvent *event)
                 case 2 : Image=(*Picture)->Image2; break;
                 default: return;
             }
+            if (!Image)
+            {
+                painter.drawPixmap(0, 0, QPixmap().scaled(event->rect().width(), event->rect().height()));
+                return;
+            }
         }
         #if QT_VERSION>0x040700
             Pixmap.convertFromImage(*Image);

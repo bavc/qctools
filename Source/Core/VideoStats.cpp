@@ -74,8 +74,6 @@ VideoStats::VideoStats (size_t FrameCount, double Duration, size_t FrameCount_Ma
     key_frames = new bool[FrameCount_Max];
     memset(key_frames, 0x00, FrameCount_Max*sizeof(bool));
 
-    Data_Reserve(0);
-
     // Data - Maximums
     x_Current=0;
     x_Current_Max=FrameCount;
@@ -97,6 +95,9 @@ VideoStats::~VideoStats()
     for (size_t j=0; j<PlotName_Max; ++j)
         delete[] y[j];
     delete[] y;
+
+    delete[] durations;
+    delete[] key_frames;
 }
 
 //***************************************************************************
