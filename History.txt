@@ -1,3 +1,8 @@
+<next>
+-----
++ Saturation Highlight playback filter
++ Zoom playback filter
+
 0.6.2, 2014-10-29
 -----
 x Memory leaks removed
