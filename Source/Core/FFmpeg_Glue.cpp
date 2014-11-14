@@ -753,6 +753,15 @@ int FFmpeg_Glue::StreamCount_Get()
 }
 
 //---------------------------------------------------------------------------
+int FFmpeg_Glue::BitRate_Get()
+{
+    if (FormatContext==NULL)
+        return 0;
+
+    return FormatContext->bit_rate;
+}
+
+//---------------------------------------------------------------------------
 string FFmpeg_Glue::VideoFormat_Get()
 {
     if (VideoStream==NULL || VideoStream->codec==NULL || VideoStream->codec->codec==NULL || VideoStream->codec->codec->long_name==NULL)
