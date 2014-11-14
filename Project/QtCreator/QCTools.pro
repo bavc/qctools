@@ -73,6 +73,7 @@ LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
              -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
              -L$${PWD}/../../../ffmpeg/libavutil -lavutil
 LIBS      += -L$${PWD}/../../../openjpeg/usr/lib -lopenjpeg
+LIBS      += -L$${PWD}/../../../freetype/usr/lib -lfreetype
 LIBS      += -lbz2
 !macx
 {
