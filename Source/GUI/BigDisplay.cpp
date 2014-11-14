@@ -360,7 +360,6 @@ const filter Filters[]=
         },
     },
     */
-    /*
     {
         "Zoom",
         {
@@ -374,7 +373,6 @@ const filter Filters[]=
             "crop=${3}:${3}/dar:${1}:${2},histeq=strength=${4}:intensity=${5}",
         },
     },
-    */
     {
         "(End)",
         {
