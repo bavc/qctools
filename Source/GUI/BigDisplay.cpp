@@ -365,12 +365,12 @@ const filter Filters[]=
         {
             { Args_Type_Slider,   0,   0,   0,   1, "x" },
             { Args_Type_Slider,   0,   0,   0,   1, "y" },
-            { Args_Type_Slider,  12,   0,   0,   1, "s" },
+            { Args_Type_Slider,  60,   0,   0,   1, "s" },
             { Args_Type_Slider,   0,   0,  10,  10, "Strength" },
             { Args_Type_Slider,   0,   0,  10,  10, "Intensity" },
         },
         {
-            "crop=${3}:${3}/dar:${1}:${2},histeq=strength=${4}:intensity=${5}",
+            "crop=${3}:${3}/dar:${1}:${2},scale=${width}:${height}:flags=neighbor,histeq=strength=${4}:intensity=${5}",
         },
     },
     {
