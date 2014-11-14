@@ -75,12 +75,10 @@ LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
 LIBS      += -L$${PWD}/../../../openjpeg/usr/lib -lopenjpeg
 LIBS      += -L$${PWD}/../../../freetype/usr/lib -lfreetype
 LIBS      += -lbz2
-!macx
-{
-LIBS      += -lrt
-}
 
 macx:
 {
-    ICON = ../../Source/Resource/Logo.icns 
+    ICON = ../../Source/Resource/Logo.icns
+	QMAKE_LFLAGS += -framework CoreFoundation -framework CoreVideo -framework VideoDecodeAcceleration
+	LIBS += -liconv
 }
