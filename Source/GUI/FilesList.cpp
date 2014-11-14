@@ -225,17 +225,7 @@ void FilesList::UpdateAll()
                 Duration.append(1, '0'+m3);
             }
 
-                 if (DAR>=(float)1.23 && DAR<(float)1.27) DAR_String="5:4";
-            else if (DAR>=(float)1.30 && DAR<(float)1.37) DAR_String="4:3";
-            else if (DAR>=(float)1.45 && DAR<(float)1.55) DAR_String="3:2";
-            else if (DAR>=(float)1.55 && DAR<(float)1.65) DAR_String="16:10";
-            else if (DAR>=(float)1.74 && DAR<(float)1.82) DAR_String="16:9";
-            else if (DAR>=(float)1.82 && DAR<(float)1.88) DAR_String="1.85:1";
-            else if (DAR>=(float)2.15 && DAR<(float)2.22) DAR_String="2.2:1";
-            else if (DAR>=(float)2.23 && DAR<(float)2.30) DAR_String="2.25:1";
-            else if (DAR>=(float)2.30 && DAR<(float)2.37) DAR_String="2.35:1";
-            else if (DAR>=(float)2.37 && DAR<(float)2.45) DAR_String="2.40:1";
-            else              DAR_String=QString::number(DAR, 'f', 3);
+            DAR_String=QString::number(DAR, 'f', 4);
             if (SamplingRate)
                 SamplingRate_String=QString::number(SamplingRate);
             if (BitDepth)
