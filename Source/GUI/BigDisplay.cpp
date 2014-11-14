@@ -117,7 +117,7 @@ const filter Filters[]=
         },
         {
             "",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1][b1]framepack=tab",
+            "il=l=d:c=d",
         },
     },
     {
@@ -245,7 +245,7 @@ const filter Filters[]=
         },
         {
             "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:intensity=${3}",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:strength=${3}[a2];[b1]format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:intensity=${3}[b2];[a2][b2]framepack=tab",
+            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:strength=${3}",
         },
     },
     {
@@ -259,7 +259,7 @@ const filter Filters[]=
         },
         {
             "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:intensity=${4}",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:strength=${4}[a2];[b1]format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:intensity=${4}[b2];[a2][b2]framepack=tab",
+            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:strength=${4}",
         },
     },
     {
@@ -286,7 +286,7 @@ const filter Filters[]=
         },
         {
             "extractplanes=${2},lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)",
-            "extractplanes=${2},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)[a2];[b1]lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)[b2];[a2][b2]framepack=tab",
+            "extractplanes=${2},il=l=d:c=d,lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)",
         },
     },
     {
@@ -316,7 +316,7 @@ const filter Filters[]=
         },
         {
             "hue=h=${2}:s=${3}",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]hue=h=${2}:s=${3}[a2];[b1]hue=h=${2}:s=${3}[b2];[a2][b2]framepack=tab",
+            "il=l=d:c=d,hue=h=${2}:s=${3}",
         },
     },
     {
@@ -330,7 +330,7 @@ const filter Filters[]=
         },
         {
             "signalstats=out=brng:c=${2},format=yuv444p|rgb24",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]signalstats=out=brng:c=${2},format=yuv444p|rgb24[a2];[b1]signalstats=out=brng:c=${2},format=yuv444p|rgb24[b2];[a2][b2]framepack=tab",
+            "il=l=d:c=d,signalstats=out=brng:c=${2},format=yuv444p|rgb24",
         },
     },
     {
@@ -344,7 +344,7 @@ const filter Filters[]=
         },
         {
             "signalstats=out=tout:c=${2}",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]signalstats=out=tout:c=${2}[a2];[b1]signalstats=out=tout:c=${2}[b2];[a2][b2]framepack=tab",
+            "il=l=d:c=d,signalstats=out=tout:c=${2}",
         },
     },
     {
@@ -358,7 +358,7 @@ const filter Filters[]=
         },
         {
             "signalstats=out=vrep:c=${2}",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]signalstats=out=vrep:c=${2}[a2];[b1]signalstats=out=vrep:c=${2}[b2];[a2][b2]framepack=tab",
+            "il=l=d:c=d,signalstats=out=vrep:c=${2}",
         },
     },
     /*
