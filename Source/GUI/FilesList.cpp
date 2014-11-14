@@ -96,7 +96,7 @@ percolumn PerColumn[Col_Max]=
     { StatsType_None,       PlotName_Max,           PlotName_Max,           "Frame rate",       NULL, },
     { StatsType_None,       PlotName_Max,           PlotName_Max,           "A. Format",        NULL, },
   //{ StatsType_None,       PlotName_Max,           PlotName_Max,           "Sample format",    NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Sampling rate",    NULL, },
+    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Sampling rate",    "measured in Hz", },
   //{ StatsType_None,       PlotName_Max,           PlotName_Max,           "Channel layout",   NULL, },
   //{ StatsType_None,       PlotName_Max,           PlotName_Max,           "Bit depth",        NULL, },
 };
@@ -236,20 +236,8 @@ void FilesList::UpdateAll()
             else if (DAR>=(float)2.30 && DAR<(float)2.37) DAR_String="2.35:1";
             else if (DAR>=(float)2.37 && DAR<(float)2.45) DAR_String="2.40:1";
             else              DAR_String=QString::number(DAR, 'f', 3);
-                 if (SamplingRate==96000)
-                SamplingRate_String="96 kHz";
-            else if (SamplingRate==88200)
-                SamplingRate_String="88.2 kHz";
-            else if (SamplingRate==48000)
-                SamplingRate_String="48 kHz";
-            else if (SamplingRate==44100)
-                SamplingRate_String="44.1 kHz";
-            else if (SamplingRate==24000)
-                SamplingRate_String="24 kHz";
-            else if (SamplingRate==22500)
-                SamplingRate_String="22.05 kHz";
-            else if (SamplingRate)
-                SamplingRate_String=QString::number(SamplingRate)+" Hz";
+            if (SamplingRate)
+                SamplingRate_String=QString::number(SamplingRate);
             if (BitDepth)
                 BitDepth_String=QString::number(BitDepth)+"-bit";
 
