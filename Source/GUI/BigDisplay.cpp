@@ -365,7 +365,7 @@ const filter Filters[]=
         {
             { Args_Type_Slider,   0,   0,   0,   1, "x" },
             { Args_Type_Slider,   0,   0,   0,   1, "y" },
-            { Args_Type_Slider,  60,   0,   0,   1, "s" },
+            { Args_Type_Slider,  60,  16,   0,   1, "s" },
             { Args_Type_Slider,   0,   0,  10,  10, "Strength" },
             { Args_Type_Slider,   0,   0,  10,  10, "Intensity" },
         },
