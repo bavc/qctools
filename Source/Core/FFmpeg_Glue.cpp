@@ -82,13 +82,13 @@ static void avlog_cb(void *, int level, const char * szFmt, va_list varg)
 
 //---------------------------------------------------------------------------
 FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<VideoStats*>* Videos_, int Scale_Width_, int Scale_Height_, outputmethod OutputMethod_, const string &Filter1_, const string &Filter2_, bool With1_, bool With2_, bool WithStats_) :
-    FileName(FileName_),
     Videos(Videos_),
+    FileName(FileName_),
+    Filter1(Filter1_),
+    Filter2(Filter2_),
     Scale_Width(Scale_Width_),
     Scale_Height(Scale_Height_),
     OutputMethod(OutputMethod_),
-    Filter1(Filter1_),
-    Filter2(Filter2_),
     WithStats(WithStats_),
     With1(With1_),
     With2(With2_)
@@ -698,7 +698,7 @@ bool FFmpeg_Glue::Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, 
                             if (!JpegOutput_CodecContext && !JpegOutput_Init())
                                 return true;
                                     
-                            int temp = avcodec_encode_video2(JpegOutput_CodecContext, JpegOutput_Packet, Scale_Frame, &got_packet);
+                            (void)avcodec_encode_video2(JpegOutput_CodecContext, JpegOutput_Packet, Scale_Frame, &got_packet);
 
                             if (got_packet)
                             {
