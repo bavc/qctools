@@ -7,6 +7,7 @@ mkdir _Automated
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\FilesList.h -o_Automated\moc_FilesList.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Help.h -o_Automated\moc_Help.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Info.h -o_Automated\moc_Info.cpp
+..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Plot.h -o_Automated\moc_Plot.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Plots.h -o_Automated\moc_Plots.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\TinyDisplay.h -o_Automated\moc_TinyDisplay.cpp
 ..\..\..\..\Qt\qtbase\bin\rcc ..\..\..\Source\Resource\Resources.qrc -o _Automated\qrc_Resources.cpp

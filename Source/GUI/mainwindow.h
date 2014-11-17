@@ -18,7 +18,6 @@ using namespace std;
 
 #include "Core/Core.h"
 #include "GUI/FileInformation.h"
-#include "GUI/Plots.h"
 #include "GUI/TinyDisplay.h"
 #include "GUI/Control.h"
 #include "GUI/Info.h"
@@ -28,6 +27,7 @@ namespace Ui {
 class MainWindow;
 }
 
+class Plots;
 class QPixmap;
 class QLabel;
 class QToolButton;
@@ -63,7 +63,6 @@ public:
     void                        Export_CSV                  ();
     void                        Export_PDF                  ();
     void                        refreshDisplay              ();
-    void                        refreshDisplay_Axis         ();
     void                        Options_Preferences         ();
     void                        Help_GettingStarted         ();
     void                        Help_HowToUse               ();
@@ -182,6 +181,7 @@ private Q_SLOTS:
     void on_Full_triggered();
 
 private:
+    void Zoom( bool );
     Ui::MainWindow *ui;
 };
 

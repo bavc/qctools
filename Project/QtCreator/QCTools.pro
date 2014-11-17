@@ -21,6 +21,7 @@ HEADERS = \
     ../../Source/GUI/Info.h \
     ../../Source/GUI/mainwindow.h \
     ../../Source/GUI/preferences.h \
+    ../../Source/GUI/Plot.h \
     ../../Source/GUI/Plots.h \
     ../../Source/GUI/TinyDisplay.h \
     ../../Source/ThirdParty/tinyxml2/tinyxml2.h
@@ -40,6 +41,7 @@ SOURCES = \
     ../../Source/GUI/mainwindow_Callbacks.cpp \
     ../../Source/GUI/mainwindow_More.cpp \
     ../../Source/GUI/mainwindow_Ui.cpp \
+    ../../Source/GUI/Plot.cpp \
     ../../Source/GUI/Plots.cpp \
     ../../Source/GUI/preferences.cpp \
     ../../Source/GUI/TinyDisplay.cpp \

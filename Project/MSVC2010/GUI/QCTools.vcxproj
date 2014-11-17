@@ -88,6 +88,7 @@
     <ClCompile Include="..\..\..\Source\GUI\mainwindow_More.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\mainwindow_Ui.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\BigDisplay.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Plot.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\preferences.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\TinyDisplay.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Plots.cpp" />
@@ -99,6 +100,7 @@
     <ClCompile Include="_Automated\moc_Info.cpp" />
     <ClCompile Include="_Automated\moc_mainwindow.cpp" />
     <ClCompile Include="_Automated\moc_BigDisplay.cpp" />
+    <ClCompile Include="_Automated\moc_Plot.cpp" />
     <ClCompile Include="_Automated\moc_Plots.cpp" />
     <ClCompile Include="_Automated\moc_preferences.cpp" />
     <ClCompile Include="_Automated\moc_TinyDisplay.cpp" />
@@ -115,6 +117,7 @@
     <ClInclude Include="..\..\..\Source\GUI\Info.h" />
     <ClInclude Include="..\..\..\Source\GUI\mainwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\BigDisplay.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Plot.h" />
     <ClInclude Include="..\..\..\Source\GUI\Plots.h" />
     <ClInclude Include="..\..\..\Source\GUI\preferences.h" />
     <ClInclude Include="..\..\..\Source\GUI\TinyDisplay.h" />

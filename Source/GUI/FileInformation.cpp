@@ -173,13 +173,11 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_) :
     {
         delete Glue;
         Glue=NULL;
-        Frames_Pos=(int)-1;
         if (!Videos.empty() && Videos[0])
             Videos[0]->VideoStatsFinish();
     }
-    else
-        Frames_Pos=0;
 
+    Frames_Pos=0;
     WantToStop=false;
     Parse();
 }

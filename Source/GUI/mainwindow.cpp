@@ -7,6 +7,7 @@
 //---------------------------------------------------------------------------
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "GUI/Plots.h"
 
 #include <QFileDialog>
 #include <QScrollBar>

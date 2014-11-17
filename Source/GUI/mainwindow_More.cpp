@@ -17,6 +17,7 @@
 #include <QMessageBox>
 
 #include "Core/Core.h"
+#include "GUI/Plots.h"
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -94,7 +95,6 @@ void MainWindow::processFile(const QString &FileName)
     ui->fileNamesBox->clear();
 
     // Layout
-    QLayout* Layout=layout();
     if (FilesListArea)
     {
         ui->verticalLayout->removeWidget(FilesListArea);
@@ -290,15 +290,11 @@ void MainWindow::createGraphsLayout()
     //InfoArea=new Info(this, Files[Files_CurrentPos], Info::Style_Grid);
     //ui->verticalLayout->addWidget(InfoArea);
 
-    PlotsArea->TinyDisplayArea=TinyDisplayArea;
-    PlotsArea->ControlArea=ControlArea;
-    PlotsArea->InfoArea=InfoArea;
     TinyDisplayArea->ControlArea=ControlArea;
     ControlArea->TinyDisplayArea=TinyDisplayArea;
     ControlArea->InfoArea=InfoArea;
 
     refreshDisplay();
-    PlotsArea->createData_Init();
 
     configureZoom();
     ui->verticalLayout->removeItem(ui->verticalSpacer);
