@@ -78,9 +78,8 @@ LIBS      += -L$${PWD}/../../../openjpeg/usr/lib -lopenjpeg
 LIBS      += -L$${PWD}/../../../freetype/usr/lib -lfreetype
 LIBS      += -lbz2
 
-macx:
-{
-    ICON = ../../Source/Resource/Logo.icns
-	QMAKE_LFLAGS += -framework CoreFoundation -framework CoreVideo -framework VideoDecodeAcceleration
-	LIBS += -liconv
-}
+!macx:LIBS      += -lrt
+
+macx:ICON = ../../Source/Resource/Logo.icns
+macx:QMAKE_LFLAGS += -framework CoreFoundation -framework CoreVideo -framework VideoDecodeAcceleration
+macx:LIBS += -liconv
