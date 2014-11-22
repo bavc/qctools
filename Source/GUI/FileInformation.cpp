@@ -168,7 +168,9 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_) :
         Videos.push_back(Video);
         Video->VideoStatsFromExternalData(StatsFromExternalData);
     }
-    Glue= new FFmpeg_Glue(FileName_string.c_str(), &Videos, 72, 72, FFmpeg_Glue::Output_Jpeg, Filter1, string(), true, false, !Filter1.empty());
+    Glue=new FFmpeg_Glue(FileName_string.c_str(), &Videos, true);
+    Glue->AddOutput(72, 72, FFmpeg_Glue::Output_Jpeg);
+    Glue->AddOutput(0, 0, FFmpeg_Glue::Output_Stats, Filter1);
     if (Glue->ContainerFormat_Get().empty())
     {
         delete Glue;
@@ -294,13 +296,13 @@ void FileInformation::Export_CSV (const QString &ExportFileName)
 //---------------------------------------------------------------------------
 QPixmap* FileInformation::Picture_Get (size_t Pos)
 {
-    if (!Glue || Pos>=Videos[0]->x_Current || Pos>=Glue->JpegList.size())
+    if (!Glue || Pos>=Videos[0]->x_Current || Pos>=Glue->Thumbnails_Size(0))
     {
         Pixmap.load(":/icon/logo.png");
         Pixmap=Pixmap.scaled(72, 72);
     }
     else
-        Pixmap.loadFromData(Glue->JpegList[Pos]->Data, Glue->JpegList[Pos]->Size);
+        Pixmap.loadFromData(Glue->Thumbnail_Get(0, Pos)->Data, Glue->Thumbnail_Get(0, Pos)->Size);
     return &Pixmap;
 }
 

@@ -442,8 +442,8 @@ void ImageLabel::paintEvent(QPaintEvent *event)
     QImage* Image;
     switch (Pos)
     {
-        case 1 : Image=(*Picture)->Image1; break;
-        case 2 : Image=(*Picture)->Image2; break;
+        case 1 : Image=(*Picture)->Image_Get(0); break;
+        case 2 : Image=(*Picture)->Image_Get(1); break;
         default: return;
     }
     if (!Image)
@@ -460,8 +460,8 @@ void ImageLabel::paintEvent(QPaintEvent *event)
             (*Picture)->Scale_Change(Size.width(), Size.height());
             switch (Pos)
             {
-                case 1 : Image=(*Picture)->Image1; break;
-                case 2 : Image=(*Picture)->Image2; break;
+                case 1 : Image=(*Picture)->Image_Get(0); break;
+                case 2 : Image=(*Picture)->Image_Get(1); break;
                 default: return;
             }
             if (!Image)
@@ -1296,7 +1296,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
 void BigDisplay::FiltersList1_currentOptionChanged(size_t Picture_Current)
 {
     string Modified_String=FiltersList_currentOptionChanged(0, Picture_Current);
-    Picture->Filter1_Change(Modified_String.c_str());
+    Picture->Filter_Change(0, Modified_String.c_str());
 
     Frames_Pos=(size_t)-1;
     ShowPicture ();
@@ -1306,7 +1306,7 @@ void BigDisplay::FiltersList1_currentOptionChanged(size_t Picture_Current)
 void BigDisplay::FiltersList2_currentOptionChanged(size_t Picture_Current)
 {
     string Modified_String=FiltersList_currentOptionChanged(1, Picture_Current);
-    Picture->Filter2_Change(Modified_String.c_str());
+    Picture->Filter_Change(1, Modified_String.c_str());
 
     Frames_Pos=(size_t)-1;
     ShowPicture ();
@@ -1341,15 +1341,17 @@ void BigDisplay::ShowPicture ()
         int height=QDesktopWidget().screenGeometry().height()*2/5;
         if (height%2)
             height--; //odd number is wanted for filters
-        Picture=new FFmpeg_Glue(FileName_string.c_str(), &FileInfoData->Videos, width, height, FFmpeg_Glue::Output_QImage, "", "", Picture_Current1<FiltersListDefault_Count, Picture_Current2<FiltersListDefault_Count); ///*Filters[Picture_Current1].Value[0], Filters[Picture_Current2].Value[0] removed else there is random crashs in libavfilters, maybe due to bad libavfilter config
+        Picture=new FFmpeg_Glue(FileName_string.c_str(), &FileInfoData->Videos);
+        Picture->AddOutput(width, height, FFmpeg_Glue::Output_QImage);
+        Picture->AddOutput(width, height, FFmpeg_Glue::Output_QImage);
         FiltersList1_currentIndexChanged(Picture_Current1);
         FiltersList2_currentIndexChanged(Picture_Current2);
     }
     Picture->FrameAtPosition(Frames_Pos);
-    if (Picture->Image1)
+    if (Picture->Image_Get(0))
     {
-        Image_Width=Picture->Image1->width();
-        Image_Height=Picture->Image1->height();
+        Image_Width=Picture->Image_Get(0)->width();
+        Image_Height=Picture->Image_Get(0)->height();
     }
 
     if (Slider->sliderPosition()!=Frames_Pos)
@@ -1537,7 +1539,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
     // None
     if (action->text()=="No display")
     {
-        Picture->With1_Change(false);
+        Picture->Disable(0);
         Image1->Remove();
         Layout->setColumnStretch(0, 0);
         //move(pos().x()+Image_Width, pos().y());
@@ -1566,7 +1568,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
             }
             Picture_Current1=Pos;
             //Picture->Filter1_Change(Filters[Pos].Formula[0]);
-            Picture->Filter1_Change(FiltersList_currentOptionChanged(Pos, 0));
+            Picture->Filter_Change(0, FiltersList_currentOptionChanged(Pos, 0));
 
             Frames_Pos=(size_t)-1;
             ShowPicture ();
@@ -1589,7 +1591,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
     // None
     if (Pos==1)
     {
-        Picture->With1_Change(false);
+        Picture->Disable(0);
         Image1->Remove();
         Layout->setColumnStretch(0, 0);
         //move(pos().x()+Image_Width, pos().y());
@@ -1628,7 +1630,7 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(int Pos)
     // None
     if (Pos==1)
     {
-        Picture->With2_Change(false);
+        Picture->Disable(1);
         Image2->Remove();
         Layout->setColumnStretch(2, 0);
         //adjustSize();
@@ -1652,7 +1654,7 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(QAction * action)
     // None
     if (action->text()=="No display")
     {
-        Picture->With2_Change(false);
+        Picture->Disable(1);
         Image2->Remove();
         Layout->setColumnStretch(2, 0);
         //adjustSize();
