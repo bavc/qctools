@@ -10,6 +10,7 @@
 
 //---------------------------------------------------------------------------
 #include "Core/VideoStats.h"
+#include "Core/AudioStats.h"
 #include <QImage>
 #include <QXmlStreamReader>
 
@@ -74,7 +75,7 @@ static void avlog_cb(void *, int level, const char * szFmt, va_list varg)
     vsnprintf(Temp, 1000, szFmt, varg);
     Errors+=Temp;
 }
-*/
+//*/
 
 //***************************************************************************
 // inputdata
@@ -142,7 +143,10 @@ FFmpeg_Glue::outputdata::outputdata()
     
     // Helpers
     Width(0),
-    Height(0)
+    Height(0),
+
+    // Status
+    FramePos(0)
 {
 }
 
@@ -185,8 +189,11 @@ void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
     ApplyFilter();
 
     // Stats
-    if (Stats)
-        Stats->VideoStatsFromFrame(FilteredFrame, Stream->codec->width, Stream->codec->height);
+    if (Stats && FilteredFrame)
+    {
+        Stats->TimeStampFromFrame(FilteredFrame, FramePos-1);
+        Stats->StatsFromFrame(FilteredFrame, Stream->codec->width, Stream->codec->height);
+    }
 
     // Scale
     ApplyScale();
@@ -212,30 +219,47 @@ void FFmpeg_Glue::outputdata::ApplyFilter()
     if (Filter.empty())
     {
         FilteredFrame=DecodedFrame;
+        FramePos++;
         return;
     }
 
     if (!FilterGraph && !FilterGraph_Init())
     {
         FilteredFrame=DecodedFrame;
+        FramePos++;
         return;
     }
             
     // Push the decoded Frame into the filtergraph 
-    if (av_buffersrc_add_frame_flags(FilterGraph_Source_Context, DecodedFrame, AV_BUFFERSRC_FLAG_KEEP_REF)<0)
+    //if (av_buffersrc_add_frame_flags(FilterGraph_Source_Context, DecodedFrame, AV_BUFFERSRC_FLAG_KEEP_REF)<0)
+    if (av_buffersrc_add_frame_flags(FilterGraph_Source_Context, DecodedFrame, 0)<0)
     {
         FilteredFrame=DecodedFrame;
+        FramePos++;
         return;
     }
 
     // Pull filtered frames from the filtergraph 
     FilteredFrame = av_frame_alloc();
     int GetAnswer = av_buffersink_get_frame(FilterGraph_Sink_Context, FilteredFrame); //TODO: handling of multiple output per input
-    if (GetAnswer<0 || GetAnswer==AVERROR(EAGAIN) || GetAnswer==AVERROR_EOF)
+    if (GetAnswer==AVERROR(EAGAIN) || GetAnswer==AVERROR_EOF)
+    {
+        av_frame_free(&FilteredFrame);
+        FilteredFrame=NULL;
+        return;
+    }
+    if (GetAnswer<0)
     {
         av_frame_free(&FilteredFrame);
         FilteredFrame=DecodedFrame;
+        return;
     }
+
+    FramePos++;
+
+    //TEMP
+    if (Type)
+        int a=0;
 }
 
 //---------------------------------------------------------------------------
@@ -303,6 +327,9 @@ void FFmpeg_Glue::outputdata::AddThumbnail()
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::outputdata::DiscardScaledFrame()
 {
+    if (!ScaledFrame)
+        return;
+
     if (ScaledFrame!=FilteredFrame)
         av_frame_free(&ScaledFrame);
     ScaledFrame=NULL;
@@ -311,6 +338,9 @@ void FFmpeg_Glue::outputdata::DiscardScaledFrame()
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::outputdata::DiscardFilteredFrame()
 {
+    if (!FilteredFrame)
+        return;
+
     if (FilteredFrame!=DecodedFrame)
     {
         av_frame_unref(FilteredFrame);
@@ -353,25 +383,49 @@ bool FFmpeg_Glue::outputdata::InitThumnails()
 bool FFmpeg_Glue::outputdata::FilterGraph_Init()
 {
     // Alloc
-    AVFilter*       Source                      = avfilter_get_by_name("buffer");
-    AVFilter*       Sink                        = avfilter_get_by_name("buffersink");
     AVFilterInOut*  Outputs                     = avfilter_inout_alloc();
     AVFilterInOut*  Inputs                      = avfilter_inout_alloc();
-                    FilterGraph      = avfilter_graph_alloc();
-
+                    FilterGraph                 = avfilter_graph_alloc();
 
     // Source
-    stringstream args; //"video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d"
-    args    << "video_size="  <<Stream->codec->width<<"x"<<Stream->codec->height
-            <<":pix_fmt="     <<(int)Stream->codec->pix_fmt
-            <<":time_base="   <<Stream->codec->time_base.num<<"/"<<Stream->codec->time_base.den
-            <<":pixel_aspect="<<Stream->codec->sample_aspect_ratio.num<<"/"<<Stream->codec->sample_aspect_ratio.den;
-    if (avfilter_graph_create_filter(&FilterGraph_Source_Context, Source, "in", args.str().c_str(), NULL, FilterGraph)<0)
+    stringstream    Args;
+    AVFilter*       Source;
+    AVFilter*       Sink;
+    if (Type==AVMEDIA_TYPE_VIDEO)
+    {
+        Source                                  = avfilter_get_by_name("buffer");
+        Sink                                    = avfilter_get_by_name("buffersink");
+        Args    << "video_size="                << Stream->codec->width
+                << "x"                          << Stream->codec->height
+                <<":pix_fmt="                   << (int)Stream->codec->pix_fmt
+                <<":time_base="                 << Stream->codec->time_base.num
+                << "/"                          << Stream->codec->time_base.den
+                <<":pixel_aspect="              << Stream->codec->sample_aspect_ratio.num
+                << "/"                          << Stream->codec->sample_aspect_ratio.den;
+    }
+    if (Type==AVMEDIA_TYPE_AUDIO)
+    {
+        Source                                  = avfilter_get_by_name("abuffer");
+        Sink                                    = avfilter_get_by_name("abuffersink");
+        Args    << "time_base="                 << Stream->codec->time_base.num
+                << "/"                          << Stream->codec->time_base.den
+                <<":sample_rate="               << Stream->codec->sample_rate
+                <<":sample_fmt="                << av_get_sample_fmt_name(Stream->codec->sample_fmt)
+                <<":channel_layout=0x"          << Stream->codec->channel_layout;
+            ;
+    }
+    if (avfilter_graph_create_filter(&FilterGraph_Source_Context, Source, "in", Args.str().c_str(), NULL, FilterGraph)<0)
+    {
+        FilterGraph_Free();
         return false;
+    }
 
     // Sink
     if (avfilter_graph_create_filter(&FilterGraph_Sink_Context, Sink, "out", NULL, NULL, FilterGraph)<0)
+    {
+        FilterGraph_Free();
         return false;
+    }
 
     // Endpoints for the filter graph. 
     Outputs->name       = av_strdup("in");
@@ -472,7 +526,7 @@ bool FFmpeg_Glue::outputdata::AdaptDAR()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<VideoStats*>* Stats_, bool WithStats_) :
+FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<CommonStats*>* Stats_, bool WithStats_) :
     Stats(Stats_),
     WithStats(WithStats_),
     FileName(FileName_)
@@ -546,12 +600,13 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<VideoStats*>* Sta
         {
             inputdata* InputData=InputDatas[Pos];
 
-            VideoStats* Stat=NULL;
+            CommonStats* Stat=NULL;
             if (InputData)
             {
                 switch (InputData->Type)
                 {
                     case AVMEDIA_TYPE_VIDEO: Stat=new VideoStats(InputData->FrameCount, InputData->Duration, InputData->FrameCount_Max, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0); break;
+                    case AVMEDIA_TYPE_AUDIO: Stat=new AudioStats(InputData->FrameCount, InputData->Duration, InputData->FrameCount_Max, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0); break;
                 }
             }
             
@@ -587,27 +642,36 @@ FFmpeg_Glue::~FFmpeg_Glue()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::AddOutput(int Scale_Width, int Scale_Height, outputmethod OutputMethod, const string &Filter)
+void FFmpeg_Glue::AddOutput(int Scale_Width, int Scale_Height, outputmethod OutputMethod, int FilterType, const string &Filter)
 {
     OutputDatas.push_back(NULL);
-    ModifyOutput(OutputDatas.size()-1, Scale_Width, Scale_Height, OutputMethod, Filter);
+    ModifyOutput(OutputDatas.size()-1, Scale_Width, Scale_Height, OutputMethod, FilterType, Filter);
 }
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::ModifyOutput(size_t Pos, int Scale_Width, int Scale_Height, outputmethod OutputMethod, const string &Filter)
+void FFmpeg_Glue::ModifyOutput(size_t Pos, int Scale_Width, int Scale_Height, outputmethod OutputMethod, int FilterType, const string &Filter)
 {
     if (Pos>=OutputDatas.size())
         return;
         
     outputdata* OutputData=new outputdata;
-    OutputData->Type=AVMEDIA_TYPE_VIDEO;
+    OutputData->Type=FilterType;
     OutputData->Width=Scale_Width;
     OutputData->Height=Scale_Height;
     OutputData->OutputMethod=OutputMethod;
     OutputData->Filter=Filter;
-    OutputData->Stream=InputDatas[0]->Stream;
-    if (OutputMethod==Output_Stats && Stats)
-        OutputData->Stats=(*Stats)[0];
+    for (size_t InputPos=0; InputPos<InputDatas.size(); InputPos++)
+    {
+        inputdata* InputData=InputDatas[InputPos];
+
+        if (InputDatas[InputPos] && InputDatas[InputPos]->Type==FilterType)
+        {
+            OutputData->Stream=InputDatas[InputPos]->Stream;
+            if (OutputMethod==Output_Stats && Stats)
+                OutputData->Stats=(*Stats)[InputPos];
+            break;
+        }
+    }
 
     delete OutputDatas[Pos];
     OutputDatas[Pos]=OutputData;
@@ -626,7 +690,7 @@ void FFmpeg_Glue::Seek(size_t FramePos)
 
             // Getting first time stamp
             if (InputData->FirstTimeStamp==DBL_MAX && Stats && !Stats->empty() && (*Stats)[0])
-                InputData->FirstTimeStamp=(*Stats)[0]->VideoFirstTimeStamp;
+                InputData->FirstTimeStamp=(*Stats)[0]->FirstTimeStamp;
 
             // Finding the right source and time stamp computing
             if (Stats && !Stats->empty() && (*Stats)[0] && FramePos<(*Stats)[0]->x_Current_Max)
@@ -710,7 +774,7 @@ bool FFmpeg_Glue::NextFrame()
     // Complete
     if (WithStats)
         for (size_t Pos=0; Pos<Stats->size(); Pos++)
-            (*Stats)[Pos]->VideoStatsFinish();
+            (*Stats)[Pos]->StatsFinish();
 
     return false;
 }
@@ -729,6 +793,7 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
         switch(InputDatas[TempPacket->stream_index]->Type)
         {
             case AVMEDIA_TYPE_VIDEO : Bytes=avcodec_decode_video2(InputData->Stream->codec, Frame, &got_frame, TempPacket); break;
+            case AVMEDIA_TYPE_AUDIO : Bytes=avcodec_decode_audio4(InputData->Stream->codec, Frame, &got_frame, TempPacket); break;
             default                 : Bytes=0;
         }
         
@@ -753,8 +818,6 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
         int64_t ts=(Frame->pkt_pts==AV_NOPTS_VALUE)?Frame->pkt_dts:Frame->pkt_pts;
         if (ts!=AV_NOPTS_VALUE && ts<InputData->FirstTimeStamp*InputData->Stream->time_base.den/InputData->Stream->time_base.num)
             InputData->FirstTimeStamp=((double)ts)*InputData->Stream->time_base.num/InputData->Stream->time_base.den;
-        if (InputData->FramePos>=(*Stats)[TempPacket->stream_index]->x_Current_Max || (*Stats)[TempPacket->stream_index]->x[1][InputData->FramePos]==0)
-            (*Stats)[TempPacket->stream_index]->TimeStampFromFrame(Frame, InputData->FramePos);
         
         for (size_t OutputPos=0; OutputPos<OutputDatas.size(); OutputPos++)
             if (OutputDatas[OutputPos] && OutputDatas[OutputPos]->Stream==InputData->Stream)
@@ -774,7 +837,7 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::Filter_Change(const size_t Pos, const string &Filter)
+void FFmpeg_Glue::Filter_Change(const size_t Pos, int FilterType, const string &Filter)
 {
     if (Pos>=OutputDatas.size())
         return;
@@ -783,7 +846,7 @@ void FFmpeg_Glue::Filter_Change(const size_t Pos, const string &Filter)
         return;
 
     OutputData->Enabled=true;
-    ModifyOutput(Pos, OutputData->Width, OutputData->Height, OutputData->OutputMethod, Filter);
+    ModifyOutput(Pos, OutputData->Width, OutputData->Height, OutputData->OutputMethod, FilterType, Filter);
 }
 
 //---------------------------------------------------------------------------

@@ -89,7 +89,7 @@ public:
 
     // Visual elements
     FilesList*                  FilesListArea;
-    Plots*                      PlotsArea;
+    std::vector<Plots*>         PlotsAreas;
     TinyDisplay*                TinyDisplayArea;
     Control*                    ControlArea;
     Info*                       InfoArea;
@@ -97,7 +97,7 @@ public:
     QLabel*                     DragDrop_Text;
 
     //CheckBoxes
-    QCheckBox*                  CheckBoxes[PlotType_Max];
+    std::vector<QCheckBox*>     CheckBoxes[2]; //0=Video, 1=Audio
 
     // Files
     std::vector<FileInformation*> Files;

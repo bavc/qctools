@@ -10,8 +10,12 @@ CONFIG += qt release
 CONFIG += no_keywords
 
 HEADERS = \
+    ../../Source/Core/AudioCore.h \
+    ../../Source/Core/AudioStats.h \
+    ../../Source/Core/CommonStats.h \
     ../../Source/Core/Core.h \
     ../../Source/Core/FFmpeg_Glue.h \
+    ../../Source/Core/VideoCore.h \
     ../../Source/Core/VideoStats.h \
     ../../Source/GUI/BigDisplay.h \
     ../../Source/GUI/Control.h \
@@ -27,8 +31,12 @@ HEADERS = \
     ../../Source/ThirdParty/tinyxml2/tinyxml2.h
 
 SOURCES = \
+    ../../Source/Core/AudioCore.cpp \
+    ../../Source/Core/AudioStats.cpp \
+    ../../Source/Core/CommonStats.cpp \
     ../../Source/Core/Core.cpp \
     ../../Source/Core/FFmpeg_Glue.cpp \
+    ../../Source/Core/VideoCore.cpp \
     ../../Source/Core/VideoStats.cpp \
     ../../Source/GUI/BigDisplay.cpp \
     ../../Source/GUI/Control.cpp \
@@ -75,7 +83,6 @@ LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
              -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
              -L$${PWD}/../../../ffmpeg/libavutil -lavutil
 LIBS      += -L$${PWD}/../../../openjpeg/usr/lib -lopenjpeg
-LIBS      += -L$${PWD}/../../../freetype/usr/lib -lfreetype
 LIBS      += -lbz2
 
 !macx:LIBS      += -lrt

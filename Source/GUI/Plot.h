@@ -24,7 +24,7 @@ class Plot : public QwtPlot
     Q_OBJECT
 
 public:
-    explicit Plot( PlotType Type, QWidget *parent );
+    explicit Plot( const struct stream_info* streamInfo, size_t group, QWidget *parent );
     virtual ~Plot();
 
     void setCursorPos( double x );
@@ -42,9 +42,10 @@ private Q_SLOTS:
 private:
     QColor curveColor( int index ) const;
 
-    const PlotType          m_type;
-    QVector<QwtPlotCurve*>  m_curves;
-    PlotCursor*             m_cursor;
+    const struct stream_info*   m_streamInfo; 
+    const size_t                m_group;
+    QVector<QwtPlotCurve*>      m_curves;
+    PlotCursor*                 m_cursor;
 };
 
 #endif // GUI_Plot_H

@@ -11,6 +11,9 @@
 //---------------------------------------------------------------------------
 #include "GUI/FileInformation.h"
 #include "GUI/mainwindow.h"
+#include "Core/CommonStats.h"
+#include "Core/VideoCore.h"
+#include "Core/AudioCore.h"
 #include <QFileInfo>
 #include <QHeaderView>
 #include <QMenu>
@@ -30,8 +33,8 @@ enum statstype
 struct percolumn
 {
     statstype       Stats_Type;
-    PlotName        Stats_PlotName;
-    PlotName        Stats_PlotName2;
+    size_t          Stats_Item;
+    size_t          Stats_Item2;
     const char*     HeaderName;
     const char*     ToolTip;
 };
@@ -72,35 +75,35 @@ enum col_names
 
 percolumn PerColumn[Col_Max]=
 {
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Processed",        NULL, },
-    { StatsType_Average,    PlotName_YAVG,          PlotName_Max,           "Yav",              "average of Y values", },
-    { StatsType_Average,    PlotName_YHIGH,         PlotName_YLOW,          "Yrang",            "average of ( YHIGH - YLOW ), indicative of contrast range", },
-    { StatsType_Average,    PlotName_UAVG,          PlotName_Max,           "Uav",              NULL, },
-    { StatsType_Average,    PlotName_VAVG,          PlotName_Max,           "Vav",              "average of V values", },
-    { StatsType_Average,    PlotName_TOUT,          PlotName_Max,           "TOUTav",           "average of TOUT values", },
-    { StatsType_Count,      PlotName_TOUT,          PlotName_Max,           "TOUTc",            "count of TOUT > 0.005", },
-    { StatsType_Count,      PlotName_SATMAX,        PlotName_Max,           "SATb",             "count of frames with MAXSAT > 88.7, outside of broadcast color levels", },
-    { StatsType_Count2,     PlotName_SATMAX,        PlotName_Max,           "SATi",             "count of frames with MAXSAT > 118.2, illegal YUV color", },
-    { StatsType_Average,    PlotName_BRNG,          PlotName_Max,           "BRNGav",           "average of BRNG", },
-    { StatsType_Count,      PlotName_BRNG,          PlotName_Max,           "BRNGc",            "count of frames with BRNG > 0.02", },
-    { StatsType_Count,      PlotName_MSE_y,         PlotName_Max,           "MSEfY",            "count of frames with MSEfY over 1000", },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Format",           NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Streams count",    NULL, },
-	{ StatsType_None,       PlotName_Max,           PlotName_Max,           "Bit Rate",         NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Duration",         NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "File size",        NULL, },
-  //{ StatsType_None,       PlotName_Max,           PlotName_Max,           "Encoder",          NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "V. Format",        NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Width",            NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Height",           NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "DAR",              NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Pix Format",       NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Frame rate",       NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "A. Format",        NULL, },
-  //{ StatsType_None,       PlotName_Max,           PlotName_Max,           "Sample format",    NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Sampling rate",    "measured in Hz", },
-  //{ StatsType_None,       PlotName_Max,           PlotName_Max,           "Channel layout",   NULL, },
-  //{ StatsType_None,       PlotName_Max,           PlotName_Max,           "Bit depth",        NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Processed",        NULL, },
+    { StatsType_Average,    Item_YAVG,              Item_VideoMax,          "Yav",              "average of Y values", },
+    { StatsType_Average,    Item_YHIGH,             Item_YLOW,              "Yrang",            "average of ( YHIGH - YLOW ), indicative of contrast range", },
+    { StatsType_Average,    Item_UAVG,              Item_VideoMax,          "Uav",              NULL, },
+    { StatsType_Average,    Item_VAVG,              Item_VideoMax,          "Vav",              "average of V values", },
+    { StatsType_Average,    Item_TOUT,              Item_VideoMax,          "TOUTav",           "average of TOUT values", },
+    { StatsType_Count,      Item_TOUT,              Item_VideoMax,          "TOUTc",            "count of TOUT > 0.005", },
+    { StatsType_Count,      Item_SATMAX,            Item_VideoMax,          "SATb",             "count of frames with MAXSAT > 88.7, outside of broadcast color levels", },
+    { StatsType_Count2,     Item_SATMAX,            Item_VideoMax,          "SATi",             "count of frames with MAXSAT > 118.2, illegal YUV color", },
+    { StatsType_Average,    Item_BRNG,              Item_VideoMax,          "BRNGav",           "average of BRNG", },
+    { StatsType_Count,      Item_BRNG,              Item_VideoMax,          "BRNGc",            "count of frames with BRNG > 0.02", },
+    { StatsType_Count,      Item_MSE_y,             Item_VideoMax,          "MSEfY",            "count of frames with MSEfY over 1000", },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Format",           NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Streams count",    NULL, },
+	{ StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Bit Rate",         NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Duration",         NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "File size",        NULL, },
+  //{ StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Encoder",          NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "V. Format",        NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Width",            NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Height",           NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "DAR",              NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Pix Format",       NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Frame rate",       NULL, },
+    { StatsType_None,       Item_AudioMax,          Item_AudioMax,          "A. Format",        NULL, },
+  //{ StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Sample format",    NULL, },
+    { StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Sampling rate",    "measured in Hz", },
+  //{ StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Channel layout",   NULL, },
+  //{ StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Bit depth",        NULL, },
 };
 
 
@@ -295,7 +298,7 @@ void FilesList::Update()
 void FilesList::Update(size_t Files_Pos)
 {
     stringstream Message;
-    Message<<(int)(Main->Files[Files_Pos]->Videos[0]->State_Get()*100)<<"%";
+    Message<<(int)(Main->Files[Files_Pos]->Stats[0]->State_Get()*100)<<"%";
     setItem((int)Files_Pos, Col_Processed, new QTableWidgetItem(QString::fromStdString(Message.str())));
     
     // Stats
@@ -306,19 +309,19 @@ void FilesList::Update(size_t Files_Pos)
             switch (PerColumn[Col].Stats_Type)
             {
                 case StatsType_Average : 
-                                            if (PerColumn[Col].Stats_PlotName2==PlotName_Max)
-                                                Item->setText(Main->Files[Files_Pos]->Videos[0]->Average_Get(PerColumn[Col].Stats_PlotName).c_str());
+                                            if (PerColumn[Col].Stats_Item2==Item_VideoMax)
+                                                Item->setText(Main->Files[Files_Pos]->Stats[0]->Average_Get(PerColumn[Col].Stats_Item).c_str());
                                             else
-                                                Item->setText(Main->Files[Files_Pos]->Videos[0]->Average_Get(PerColumn[Col].Stats_PlotName, PerColumn[Col].Stats_PlotName2).c_str());
+                                                Item->setText(Main->Files[Files_Pos]->Stats[0]->Average_Get(PerColumn[Col].Stats_Item, PerColumn[Col].Stats_Item2).c_str());
                                             break;
                 case StatsType_Count : 
-                                            Item->setText(Main->Files[Files_Pos]->Videos[0]->Count_Get(PerColumn[Col].Stats_PlotName).c_str());
+                                            Item->setText(Main->Files[Files_Pos]->Stats[0]->Count_Get(PerColumn[Col].Stats_Item).c_str());
                                             break;
                 case StatsType_Count2 :
-                                            Item->setText(Main->Files[Files_Pos]->Videos[0]->Count2_Get(PerColumn[Col].Stats_PlotName).c_str());
+                                            Item->setText(Main->Files[Files_Pos]->Stats[0]->Count2_Get(PerColumn[Col].Stats_Item).c_str());
                                             break;
                 case StatsType_Percent : 
-                                            Item->setText(Main->Files[Files_Pos]->Videos[0]->Percent_Get(PerColumn[Col].Stats_PlotName).c_str());
+                                            Item->setText(Main->Files[Files_Pos]->Stats[0]->Percent_Get(PerColumn[Col].Stats_Item).c_str());
                                             break;
                 default:    ;
             }

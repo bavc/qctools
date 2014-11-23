@@ -16,6 +16,7 @@
 
 class QwtPlot;
 class Plot;
+struct per_item;
 
 //***************************************************************************
 // Class
@@ -26,15 +27,15 @@ class Plots : public QWidget
     Q_OBJECT
 
 public:
-    explicit                    Plots( QWidget *parent, FileInformation* FileInfoData );
+    explicit                    Plots( QWidget *parent, const struct stream_info* streamInfo, FileInformation* FileInfoData, size_t StatsPos );
     virtual                     ~Plots();
 
     void                        updateAll();
     void                        Plots_Update();
     void                        Marker_Update();
-    void                        setPlotVisible( PlotType, bool on );
+    void                        setPlotVisible( size_t, bool on );
 
-    const QwtPlot*              plot( PlotType ) const;
+    const QwtPlot*              plot( size_t ) const;
 
     void                        Zoom_Move( size_t Begin );
 
@@ -56,17 +57,17 @@ private:
     void                        shiftXAxes( size_t Begin );
 
     void                        syncPlots();
-    void                        syncPlot( PlotType Type );
+    void                        syncPlot( size_t Type );
     void                        setCursorPos( double X );
 
     void                        alignYAxes();
     double                      axisStepSize( double s ) const;
-    const VideoStats*           videoStats() const { return m_fileInfoData->Videos[0]; }
-    VideoStats*                 videoStats() { return m_fileInfoData->Videos[0]; }
+    const CommonStats*          stats() const { return m_fileInfoData->Stats[m_statsPos]; }
+    CommonStats*                stats() { return m_fileInfoData->Stats[m_statsPos]; }
     int                         framePos() const { return m_fileInfoData->Frames_Pos_Get(); }
 
 private:
-    QwtPlot*                    m_plots[PlotType_Max];
+    QwtPlot**                   m_plots;
     size_t                      m_zoomLevel;
 
     // X axis info
@@ -74,6 +75,11 @@ private:
     size_t                      m_Data_FramePos_Max;
 
     FileInformation*            m_fileInfoData;
+
+    size_t                      m_statsPos;
+
+    // Arrays
+    const struct stream_info*   m_streamInfo; 
 };
 
 #endif // GUI_Plots_H

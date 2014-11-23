@@ -7,6 +7,7 @@
 //---------------------------------------------------------------------------
 
 #include "GUI/Plot.h"
+#include "Core/VideoCore.h" //Only for some specific colors
 #include <qwt_plot_grid.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_picker.h>
@@ -119,9 +120,10 @@ private:
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Plot::Plot( PlotType type, QWidget *parent ) :
+Plot::Plot( const struct stream_info* streamInfo, size_t group, QWidget *parent) :
     QwtPlot( parent ),
-    m_type( type )
+    m_streamInfo( streamInfo ),
+    m_group( group )
 {
     setAutoReplot( false );
 
@@ -146,9 +148,9 @@ Plot::Plot( PlotType type, QWidget *parent ) :
 
     // curves
 
-    for( unsigned j = 0; j < PerPlotGroup[type].Count; ++j )
+    for( unsigned j = 0; j < m_streamInfo->PerGroup[m_group].Count; ++j )
     {
-        QwtPlotCurve* curve = new QwtPlotCurve( PerPlotName[PerPlotGroup[type].Start + j].Name );
+        QwtPlotCurve* curve = new QwtPlotCurve( m_streamInfo->PerItem[m_streamInfo->PerGroup[m_group].Start + j].Name );
 
         curve->setPen( curveColor( j ) );
         curve->setRenderHint( QwtPlotItem::RenderAntialiased );
@@ -186,15 +188,15 @@ QColor Plot::curveColor( int index ) const
 {
     QColor c = Qt::black;
 
-    switch ( PerPlotGroup[m_type].Count )
+    switch ( m_streamInfo->PerGroup[m_group].Count )
     {
         case 1 :
         {
-            switch ( m_type )
+            switch ( m_group )
             {
-                case PlotType_YDiff: c = Qt::darkGreen; break;
-                case PlotType_UDiff: c = Qt::darkBlue; break;
-                case PlotType_VDiff: c = Qt::darkRed; break;
+                case Group_YDiff: c = Qt::darkGreen; break;
+                case Group_UDiff: c = Qt::darkBlue; break;
+                case Group_VDiff: c = Qt::darkRed; break;
                 default: c = Qt::black;
             }
             break;

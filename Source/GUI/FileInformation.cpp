@@ -11,6 +11,8 @@
 //---------------------------------------------------------------------------
 #include "GUI/mainwindow.h"
 #include "Core/FFmpeg_Glue.h"
+#include "Core/VideoStats.h"
+#include "Core/AudioStats.h"
 
 #include <QProcess>
 #include <QFileInfo>
@@ -159,24 +161,32 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_) :
     #ifdef _WIN32
         replace(FileName_string.begin(), FileName_string.end(), '/', '\\' );
     #endif
-    string Filter1;
+    string Filter1, Filter2;
     if (StatsFromExternalData.empty())
+    {
         Filter1="signalstats=stat=tout+vrep+brng,cropdetect=reset=1:round=1,split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr";
+        Filter2="ebur128=metadata=1"; //ebur128=metadata=1"; //TODO not working
+    }
     else
     {
         VideoStats* Video=new VideoStats();
-        Videos.push_back(Video);
-        Video->VideoStatsFromExternalData(StatsFromExternalData);
+        Stats.push_back(Video);
+        Video->StatsFromExternalData(StatsFromExternalData);
+
+        AudioStats* Audio=new AudioStats();
+        Stats.push_back(Audio);
+        Audio->StatsFromExternalData(StatsFromExternalData);
     }
-    Glue=new FFmpeg_Glue(FileName_string.c_str(), &Videos, true);
+    Glue=new FFmpeg_Glue(FileName_string.c_str(), &Stats, true);
     Glue->AddOutput(72, 72, FFmpeg_Glue::Output_Jpeg);
-    Glue->AddOutput(0, 0, FFmpeg_Glue::Output_Stats, Filter1);
+    Glue->AddOutput(0, 0, FFmpeg_Glue::Output_Stats, 0, Filter1);
+    Glue->AddOutput(0, 0, FFmpeg_Glue::Output_Stats, 1, Filter2);
     if (Glue->ContainerFormat_Get().empty())
     {
         delete Glue;
         Glue=NULL;
-        if (!Videos.empty() && Videos[0])
-            Videos[0]->VideoStatsFinish();
+        for (size_t Pos=0; Pos<Stats.size(); Pos++)
+            Stats[Pos]->StatsFinish();
     }
 
     Frames_Pos=0;
@@ -190,8 +200,8 @@ FileInformation::~FileInformation ()
     WantToStop=true;
     wait();
 
-    for (size_t Pos=0; Pos<Videos.size(); Pos++)
-        delete Videos[Pos];
+    for (size_t Pos=0; Pos<Stats.size(); Pos++)
+        delete Stats[Pos];
     delete Glue;
 }
 
@@ -239,7 +249,7 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
     Data<<"    <frames>\n";
 
     // From stats
-    Data<<Videos[0]->StatsToXML(Glue->Width_Get(), Glue->Height_Get());
+    Data<<Stats[0]->StatsToXML(Glue->Width_Get(), Glue->Height_Get());
 
     // Footer
     Data<<"    </frames>\n";
@@ -281,7 +291,7 @@ void FileInformation::Export_CSV (const QString &ExportFileName)
     if (ExportFileName.isEmpty())
         return;
 
-    string StatsToExternalData=Videos[0]->StatsToCSV();
+    string StatsToExternalData=Stats[0]->StatsToCSV();
 
     QFile F(ExportFileName);
     F.open(QIODevice::WriteOnly|QIODevice::Truncate);
@@ -296,7 +306,7 @@ void FileInformation::Export_CSV (const QString &ExportFileName)
 //---------------------------------------------------------------------------
 QPixmap* FileInformation::Picture_Get (size_t Pos)
 {
-    if (!Glue || Pos>=Videos[0]->x_Current || Pos>=Glue->Thumbnails_Size(0))
+    if (!Glue || Pos>=Stats[0]->x_Current || Pos>=Glue->Thumbnails_Size(0))
     {
         Pixmap.load(":/icon/logo.png");
         Pixmap=Pixmap.scaled(72, 72);
@@ -311,8 +321,8 @@ void FileInformation::Frames_Pos_Set (int Pos)
 {
     if (Pos<0)
         Pos=0;
-    if (Pos>=Videos[0]->x_Current_Max)
-        Pos=Videos[0]->x_Current_Max-1;
+    if (Pos>=Stats[0]->x_Current_Max)
+        Pos=Stats[0]->x_Current_Max-1;
 
     if (Frames_Pos==Pos)
         return;
@@ -337,7 +347,7 @@ void FileInformation::Frames_Pos_Minus ()
 //---------------------------------------------------------------------------
 void FileInformation::Frames_Pos_Plus ()
 {
-    if (Frames_Pos+1>=Videos[0]->x_Current_Max)
+    if (Frames_Pos+1>=Stats[0]->x_Current_Max)
         return;
 
     Frames_Pos++;

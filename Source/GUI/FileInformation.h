@@ -12,15 +12,14 @@
 //---------------------------------------------------------------------------
 #include "Core/Core.h"
 #include "Core/FFmpeg_Glue.h"
-#include "Core/VideoStats.h"
 
 #include <QThread>
 #include <QPixmap>
 
 class MainWindow;
+class CommonStats;
+
 //---------------------------------------------------------------------------
-
-
 class FileInformation : public QThread
 {
     //thread part
@@ -50,7 +49,7 @@ public:
 
     // FFmpeg glue
     FFmpeg_Glue*                Glue;
-    std::vector<VideoStats*>    Videos;
+    std::vector<CommonStats*>   Stats;
 
 private:
     // Info

@@ -16,6 +16,7 @@
 //---------------------------------------------------------------------------
 #include <QLabel>
 #include <QGridLayout>
+#include "Core/CommonStats.h"
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -23,10 +24,14 @@
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Info::Info(QWidget *parent, FileInformation* FileInformationData_, style Style):
+Info::Info(QWidget *parent, const struct per_group* plotGroup, const struct per_item* plotItem, size_t CountOfGroups_, size_t CountOfItems_, FileInformation* FileInformationData_, style Style):
     QWidget(parent),
     // File information
-    FileInfoData(FileInformationData_)
+    FileInfoData(FileInformationData_),
+    m_plotGroup( plotGroup ),
+    m_plotItem( plotItem ),
+    CountOfGroups( CountOfGroups_ ),
+    CountOfItems( CountOfItems_ )
 {
     // Info
     QGridLayout* Layout=new QGridLayout();
@@ -42,18 +47,18 @@ Info::Info(QWidget *parent, FileInformation* FileInformationData_, style Style):
     #endif //_WIN32
 
     // Values
-    Values=new QLabel*[PlotName_Max];
+    Values=new QLabel*[CountOfItems];
     size_t X=0;
     size_t Y=0;
-    for (size_t Pos=0; Pos<PlotName_Max; Pos++)
+    for (size_t Pos=0; Pos<CountOfItems; Pos++)
     {
         Values[Pos]=new QLabel(this);
-        Values[Pos]->setText(PerPlotName[Pos].Name+QString("= "));
+        Values[Pos]->setText(m_plotItem[Pos].Name+QString("= "));
         Values[Pos]->setFont(Font);
         Layout->addWidget(Values[Pos], X, Y);
 
         Y++;
-        if (Style==Style_Columns || PerPlotName[Y].NewLine)
+        if (Style==Style_Columns || m_plotItem[Y].NewLine)
         {
             X++;
             Y=0;
@@ -86,14 +91,14 @@ void Info::Update()
     Frames_Pos=FileInfoData->Frames_Pos_Get();
     ShouldUpate=false;
 
-    if (Frames_Pos<FileInfoData->Videos[0]->x_Current)
-        for (size_t Pos=0; Pos<PlotName_Max; Pos++)
+    if (Frames_Pos<FileInfoData->Stats[0]->x_Current)
+        for (size_t Pos=0; Pos<CountOfItems; Pos++)
         {
-            if (PerPlotName[Pos].DigitsAfterComma==0)
-                Values[Pos]->setText(PerPlotName[Pos].Name+QString("= ")+QString::number((int)FileInfoData->Videos[0]->y[Pos][Frames_Pos]));
+            if (m_plotItem[Pos].DigitsAfterComma==0)
+                Values[Pos]->setText(m_plotItem[Pos].Name+QString("= ")+QString::number((int)FileInfoData->Stats[0]->y[Pos][Frames_Pos]));
             else
             {
-                QString Value=QString::number(FileInfoData->Videos[0]->y[Pos][Frames_Pos], 'f', PerPlotName[Pos].DigitsAfterComma);
+                QString Value=QString::number(FileInfoData->Stats[0]->y[Pos][Frames_Pos], 'f', m_plotItem[Pos].DigitsAfterComma);
                 int Point=Value.indexOf('.');
                 if (Point==-1)
                 {
@@ -102,15 +107,15 @@ void Info::Update()
                 }
                 else
                     Point++;
-                while (Value.size()-Point<PerPlotName[Pos].DigitsAfterComma)
+                while (Value.size()-Point<m_plotItem[Pos].DigitsAfterComma)
                     Value+='0'; //Adding precision information
-                Values[Pos]->setText(PerPlotName[Pos].Name+QString("= ")+Value);
+                Values[Pos]->setText(m_plotItem[Pos].Name+QString("= ")+Value);
             }
         }
     else
     {
-        for (size_t Pos=0; Pos<PlotName_Max; Pos++)
-            Values[Pos]->setText(PerPlotName[Pos].Name+QString("= "));
+        for (size_t Pos=0; Pos<CountOfItems; Pos++)
+            Values[Pos]->setText(m_plotItem[Pos].Name+QString("= "));
         ShouldUpate=true;
     }
 }

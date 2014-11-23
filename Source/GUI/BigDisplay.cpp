@@ -390,6 +390,19 @@ const filter Filters[]=
         },
     },
     {
+        "Audio Spectrum",
+        {
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+        },
+        {
+            "showspectrum=slide=1:mode=separate:color=intensity",
+        },
+    },
+    {
         "(End)",
         {
             { Args_Type_None,   0, 0, 0, 0, },
@@ -1296,7 +1309,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
 void BigDisplay::FiltersList1_currentOptionChanged(size_t Picture_Current)
 {
     string Modified_String=FiltersList_currentOptionChanged(0, Picture_Current);
-    Picture->Filter_Change(0, Modified_String.c_str());
+    Picture->Filter_Change(0, 0, Modified_String.c_str());
 
     Frames_Pos=(size_t)-1;
     ShowPicture ();
@@ -1306,7 +1319,7 @@ void BigDisplay::FiltersList1_currentOptionChanged(size_t Picture_Current)
 void BigDisplay::FiltersList2_currentOptionChanged(size_t Picture_Current)
 {
     string Modified_String=FiltersList_currentOptionChanged(1, Picture_Current);
-    Picture->Filter_Change(1, Modified_String.c_str());
+    Picture->Filter_Change(1, 0, Modified_String.c_str());
 
     Frames_Pos=(size_t)-1;
     ShowPicture ();
@@ -1341,7 +1354,7 @@ void BigDisplay::ShowPicture ()
         int height=QDesktopWidget().screenGeometry().height()*2/5;
         if (height%2)
             height--; //odd number is wanted for filters
-        Picture=new FFmpeg_Glue(FileName_string.c_str(), &FileInfoData->Videos);
+        Picture=new FFmpeg_Glue(FileName_string.c_str(), &FileInfoData->Stats);
         Picture->AddOutput(width, height, FFmpeg_Glue::Output_QImage);
         Picture->AddOutput(width, height, FFmpeg_Glue::Output_QImage);
         FiltersList1_currentIndexChanged(Picture_Current1);
@@ -1568,7 +1581,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
             }
             Picture_Current1=Pos;
             //Picture->Filter1_Change(Filters[Pos].Formula[0]);
-            Picture->Filter_Change(0, FiltersList_currentOptionChanged(Pos, 0));
+            Picture->Filter_Change(0, 0, FiltersList_currentOptionChanged(Pos, 0));
 
             Frames_Pos=(size_t)-1;
             ShowPicture ();

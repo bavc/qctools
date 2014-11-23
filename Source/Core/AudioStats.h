@@ -5,8 +5,8 @@
  */
 
 //---------------------------------------------------------------------------
-#ifndef VideoStats_H
-#define VideoStats_H
+#ifndef AudioStats_H
+#define AudioStats_H
 
 #include "Core/Core.h"
 #include "Core/CommonStats.h"
@@ -18,12 +18,12 @@ using namespace std;
 
 struct AVFrame;
 
-class VideoStats : public CommonStats
+class AudioStats : public CommonStats
 {
 public:
     // Constructor / Destructor
-    VideoStats(size_t FrameCount=0, double Duration=0, size_t FrameCount_Max=(1<<18), double Frequency=0);
-    ~VideoStats();
+    AudioStats(size_t FrameCount=0, double Duration=0, size_t FrameCount_Max=(1<<18), double Frequency=0);
+    ~AudioStats();
 
     // External data
     void                        StatsFromExternalData(const string &Data);
@@ -31,8 +31,6 @@ public:
     void                        TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos);
     string                      StatsToCSV();
     string                      StatsToXML(int Width, int Height);
-
-private:
 };
 
 #endif // Stats_H

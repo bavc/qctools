@@ -30,7 +30,7 @@ struct AVFilterInOut;
 struct AVFilterInOut;
 
 class QImage;
-class VideoStats;
+class CommonStats;
 
 class FFmpeg_Glue
 {
@@ -43,7 +43,7 @@ public:
         Output_Jpeg,
         Output_Stats,
     };
-    FFmpeg_Glue(const string &FileName, std::vector<VideoStats*>* Stats, bool WithStats=false);
+    FFmpeg_Glue(const string &FileName, std::vector<CommonStats*>* Stats, bool WithStats=false);
     ~FFmpeg_Glue();
 
     // Images
@@ -72,7 +72,7 @@ public:
     size_t                      VideoFramePos_Get();
 
     // Data
-    std::vector<VideoStats*>*   Stats;
+    std::vector<CommonStats*>*  Stats;
 
     // Container information
     string                      ContainerFormat_Get();
@@ -104,13 +104,13 @@ public:
     string                      FFmpeg_LibsVersion();
  
     // Actions
-    void                        AddOutput(int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, const string &Filter=string());
-    void                        ModifyOutput(size_t Pos, int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, const string &Filter=string());
+    void                        AddOutput(int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, int FilterType=0, const string &Filter=string());
+    void                        ModifyOutput(size_t Pos, int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, int FilterType=0, const string &Filter=string());
     void                        Seek(size_t Pos);
     void                        FrameAtPosition(size_t Pos);
     bool                        NextFrame();
     bool                        OutputFrame(AVPacket* Packet, bool Decode=true);
-    void                        Filter_Change(const size_t Pos, const string &Filter);
+    void                        Filter_Change(const size_t Pos, int FilterType, const string &Filter);
     void                        Disable(const size_t Pos);
     void                        Scale_Change(int Scale_Width, int Scale_Height);
 
@@ -183,7 +183,10 @@ private:
         outputmethod            OutputMethod;
         QImage*                 Image;
         std::vector<bytes*>     Thumbnails;
-        VideoStats*             Stats;
+        CommonStats*            Stats;
+
+        // Status
+        size_t                  FramePos;               // Current position of playback
 
         // Helpers
         bool                    InitThumnails();

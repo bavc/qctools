@@ -11,6 +11,7 @@
 
 //---------------------------------------------------------------------------
 #include <QMainWindow>
+#include <vector>
 
 class FileInformation;
 class PerPicture;
@@ -45,7 +46,7 @@ public:
         Style_Cols,
         Style_Grid,
     };
-    explicit Control(QWidget *parent, FileInformation* FileInfoData, Plots* PlotsArea, style Style, bool IsSlave=false);
+    explicit Control(QWidget *parent, FileInformation* FileInfoData, std::vector<Plots*>* PlotsAreas, style Style, bool IsSlave=false);
     ~Control();
 
     // Commands
@@ -77,7 +78,7 @@ public:
 protected:
     // File information
     FileInformation*            FileInfoData;
-    Plots*                      PlotsArea;
+    std::vector<Plots*>*        PlotsAreas;
     int                         Frames_Pos;
     style                       Style;
 

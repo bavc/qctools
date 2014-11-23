@@ -8,6 +8,7 @@
 
 #include "GUI/Plots.h"
 #include "GUI/Plot.h"
+#include "Core/CommonStats.h"
 #include "Core/Core.h"
 
 #include "mainwindow.h"
@@ -63,23 +64,26 @@ public:
 };
 
 //---------------------------------------------------------------------------
-Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
+Plots::Plots( QWidget *parent, const struct stream_info* streamInfo, FileInformation* FileInformationData_, size_t StatsPos  ) :
     QWidget( parent ),
     m_fileInfoData( FileInformationData_ ),
     m_zoomLevel( 1 ),
     m_dataTypeIndex( 1 ),
-    m_Data_FramePos_Max( 0 )
+    m_Data_FramePos_Max( 0 ),
+    m_statsPos( StatsPos ),
+    m_streamInfo( streamInfo )
 {
 
     QGridLayout* layout = new QGridLayout( this );
     layout->setSpacing( 0 );
     layout->setContentsMargins( 0, 0, 0, 0 );
 
-    for ( int row = 0; row < PlotType_Max; row++ )
+    m_plots=new QwtPlot*[m_streamInfo->CountOfGroups];
+    for ( size_t row = 0; row < m_streamInfo->CountOfGroups; row++ )
     {
-        if ( row != PlotType_Axis )
+        if ( row != m_streamInfo->CountOfGroups-1 ) // Group_Axis
         {
-            Plot* plot = new Plot( ( PlotType )row, this );
+            Plot* plot = new Plot( m_streamInfo, row, this );
 			plot->setMinimumHeight( 1 );
 
             QwtLegend *legend = new PlotLegend( this );
@@ -89,7 +93,7 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
             connect( plot, SIGNAL( cursorMoved( double ) ), SLOT( onCursorMoved( double ) ) );
             plot->updateLegend();
 
-            if ( PerPlotGroup[row].Count > 3 )
+            if ( m_streamInfo->PerGroup[row].Count > 3 )
                 plot->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
 
             layout->addWidget( legend, row, 1 );
@@ -106,10 +110,10 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
             m_plots[row] = new DummyAxisPlot( this );;
         }
 
-        m_plots[row]->setAxisScale( QwtPlot::xBottom, 0, videoStats()->x_Max[m_dataTypeIndex] );
+        m_plots[row]->setAxisScale( QwtPlot::xBottom, 0, stats()->x_Max[m_dataTypeIndex] );
         layout->addWidget( m_plots[row], row, 0 );
 
-        setPlotVisible( ( PlotType )row, false );
+        setPlotVisible( row, false );
     }
 
     layout->setColumnStretch( 0, 10 );
@@ -122,7 +126,7 @@ Plots::~Plots()
 }
 
 //---------------------------------------------------------------------------
-const QwtPlot* Plots::plot( PlotType Type ) const
+const QwtPlot* Plots::plot( size_t Type ) const
 {
     return m_plots[Type];
 }
@@ -168,35 +172,35 @@ void Plots::Plots_Update()
     	replotAll();
     }
 
-    setCursorPos( videoStats()->x[m_dataTypeIndex][pos] );
+    setCursorPos( stats()->x[m_dataTypeIndex][pos] );
 }
 
 //---------------------------------------------------------------------------
 void Plots::Marker_Update()
 {
-	setCursorPos( videoStats()->x[m_dataTypeIndex][framePos()] );
+	setCursorPos( stats()->x[m_dataTypeIndex][framePos()] );
 }
 
 //---------------------------------------------------------------------------
 void Plots::setCursorPos( double x )
 {
-    for ( int row = 0; row < PlotType_Axis; ++row )
+    for ( int row = 0; row < m_streamInfo->CountOfGroups-1; ++row ) // Group_Axis
         plotAt( row )->setCursorPos( x );
 }
 
 //---------------------------------------------------------------------------
 void Plots::syncPlots()
 {
-    for ( int i = 0; i < PlotType_Axis; i++ )
+    for ( int i = 0; i < m_streamInfo->CountOfGroups-1; i++ ) // Group_Axis
     {
         if ( m_plots[i]->isVisibleTo( this ) )
-            syncPlot( ( PlotType )i );
+            syncPlot( i );
     }
 
-    if ( m_Data_FramePos_Max + 1 != videoStats()->x_Current_Max )
+    if ( m_Data_FramePos_Max + 1 != stats()->x_Current_Max )
     {
         //Update of zoom in case of total duration change
-        m_Data_FramePos_Max = videoStats()->x_Current_Max - 1;
+        m_Data_FramePos_Max = stats()->x_Current_Max - 1;
         shiftXAxes();
     }
 
@@ -217,30 +221,32 @@ double Plots::axisStepSize( double s ) const
 }
 
 //---------------------------------------------------------------------------
-void Plots::syncPlot( PlotType Type )
+void Plots::syncPlot( size_t group )
 {
-    Plot* plot = plotAt( Type );
+    Plot* plot = plotAt( group );
     if ( plot == NULL )
         return;
 
-    VideoStats* video = videoStats();
+    CommonStats* Stats = stats();
 
-    if ( PerPlotGroup[Type].Min != PerPlotGroup[Type].Max &&
-            video->y_Max[Type] >= PerPlotGroup[Type].Max / 2 )
+    if ( m_streamInfo->PerGroup[group].Min != m_streamInfo->PerGroup[group].Max &&
+         Stats->y_Max[group] >= m_streamInfo->PerGroup[group].Max / 2 )
     {
-        video->y_Max[Type] = PerPlotGroup[Type].Max;
+        Stats->y_Max[group] = m_streamInfo->PerGroup[group].Max;
     }
 
-    const double yMax = video->y_Max[Type];
-    if ( yMax )
+    const double yMax = Stats->y_Max[group];
+    const double yMin = Stats->y_Min[group];
+    if ( yMin != yMax )
     {
-        if ( yMax > plot->axisInterval( QwtPlot::yLeft ).maxValue() )
+        if ( yMin < plot->axisInterval( QwtPlot::yLeft ).minValue()
+          || yMax > plot->axisInterval( QwtPlot::yLeft ).maxValue() )
         {
-			const double stepCount = PerPlotGroup[Type].StepsCount;
-			const double stepSize = axisStepSize( yMax / stepCount );
+			const double stepCount = m_streamInfo->PerGroup[group].StepsCount;
+			const double stepSize = axisStepSize( ( yMax - yMin ) / stepCount );
 
             if ( stepSize )
-                plot->setAxisScale( QwtPlot::yLeft, 0, yMax, stepSize );
+                plot->setAxisScale( QwtPlot::yLeft, yMin, yMax, stepSize );
         }
     }
     else
@@ -249,10 +255,10 @@ void Plots::syncPlot( PlotType Type )
         plot->setAxisScale( QwtPlot::yLeft, 0, 1, 1 );
     }
 
-    for( unsigned j = 0; j < PerPlotGroup[Type].Count; ++j )
+    for( unsigned j = 0; j < m_streamInfo->PerGroup[group].Count; ++j )
     {
-        plot->setCurveSamples( j, video->x[m_dataTypeIndex],
-            video->y[PerPlotGroup[Type].Start + j], video->x_Current );
+        plot->setCurveSamples( j, Stats->x[m_dataTypeIndex],
+            Stats->y[m_streamInfo->PerGroup[group].Start + j], Stats->x_Current );
     }
 }
 
@@ -288,10 +294,10 @@ void Plots::shiftXAxes( size_t Begin )
     if ( Begin + increment > m_Data_FramePos_Max )
         Begin = m_Data_FramePos_Max - increment;
 
-    const double x = videoStats()->x[m_dataTypeIndex][Begin];
-    const double width = videoStats()->x_Max[m_dataTypeIndex] / m_zoomLevel;
+    const double x = stats()->x[m_dataTypeIndex][Begin];
+    const double width = stats()->x_Max[m_dataTypeIndex] / m_zoomLevel;
 
-    for ( int row = 0; row < PlotType_Max; row++ )
+    for ( int row = 0; row < m_streamInfo->CountOfGroups; row++ )
         m_plots[row]->setAxisScale( QwtPlot::xBottom, x, x + width );
 }
 
@@ -301,7 +307,7 @@ void Plots::alignYAxes()
 {
     double maxExtent = 0;
 
-    for ( int i = 0; i < PlotType_Max; i++ )
+    for ( int i = 0; i < m_streamInfo->CountOfGroups; i++ )
     {
         QwtScaleWidget *scaleWidget = m_plots[i]->axisWidget( QwtPlot::yLeft );
 
@@ -316,7 +322,7 @@ void Plots::alignYAxes()
     }
     maxExtent += 3; // margin
 
-    for ( int i = 0; i < PlotType_Max; i++ )
+    for ( int i = 0; i < m_streamInfo->CountOfGroups; i++ )
     {
         QwtScaleWidget *scaleWidget = m_plots[i]->axisWidget( QwtPlot::yLeft );
         scaleWidget->scaleDraw()->setMinimumExtent( maxExtent );
@@ -326,16 +332,16 @@ void Plots::alignYAxes()
 //---------------------------------------------------------------------------
 void Plots::onCursorMoved( double cursorX )
 {
-    const double* xData = videoStats()->x[m_dataTypeIndex];
+    const double* xData = stats()->x[m_dataTypeIndex];
 
     size_t pos = 0;
-    while ( pos < videoStats()->x_Current_Max && cursorX >= xData[pos] )
+    while ( pos < stats()->x_Current_Max && cursorX >= xData[pos] )
         pos++;
 
     if ( pos )
     {
-        if ( pos >= videoStats()->x_Current )
-            pos = videoStats()->x_Current - 1;
+        if ( pos >= stats()->x_Current )
+            pos = stats()->x_Current - 1;
 
         double Distance1 = cursorX - xData[pos - 1];
         double Distance2 = xData[pos] - cursorX;
@@ -344,7 +350,7 @@ void Plots::onCursorMoved( double cursorX )
     }
 
     m_fileInfoData->Frames_Pos_Set( pos );
-    setCursorPos( xData[pos] );
+    //setCursorPos( xData[pos] );
 }
 
 //---------------------------------------------------------------------------
@@ -358,7 +364,7 @@ void Plots::onDataTypeChanged( int index )
 }
 
 //---------------------------------------------------------------------------
-void Plots::setPlotVisible( PlotType Type, bool on )
+void Plots::setPlotVisible( size_t Type, bool on )
 {
     const int row = Type;
 
@@ -392,7 +398,7 @@ void Plots::zoom( bool up )
 //---------------------------------------------------------------------------
 void Plots::replotAll()
 {
-    for ( int i = 0; i < PlotType_Max; i++ )
+    for ( int i = 0; i < m_streamInfo->CountOfGroups; i++ )
     {
         if ( m_plots[i]->isVisibleTo( this ) )
             m_plots[i]->replot();
