@@ -297,7 +297,6 @@ void MainWindow::createGraphsLayout()
     refreshDisplay();
 
     configureZoom();
-    ui->verticalLayout->removeItem(ui->verticalSpacer);
 }
 
 //---------------------------------------------------------------------------
