@@ -182,6 +182,27 @@ public:
     PlotScaleDrawY()
     {
     }
+
+protected:
+    virtual void drawLabel( QPainter *painter, double val ) const
+    {
+        const int fh = painter->fontMetrics().height();
+
+        if ( length() < fh )
+        {
+            const QList<double> ticks = scaleDiv().ticks( QwtScaleDiv::MajorTick );
+            if ( val != ticks.last() )
+                return;
+        }
+        else if ( length() < 3 * painter->fontMetrics().height() )
+        {
+            const QList<double> ticks = scaleDiv().ticks( QwtScaleDiv::MajorTick );
+            if ( val != ticks.last() && val != ticks.first() )
+                return;
+        }
+
+        QwtScaleDraw::drawLabel( painter, val );
+    }
 };
 
 class PlotScaleDrawX: public QwtScaleDraw
