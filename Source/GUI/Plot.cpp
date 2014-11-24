@@ -205,15 +205,6 @@ protected:
     }
 };
 
-class PlotScaleDrawX: public QwtScaleDraw
-{
-public:
-    PlotScaleDrawX()
-    {
-    }
-};
-
-
 //***************************************************************************
 // Constructor / Destructor
 //***************************************************************************
@@ -236,7 +227,7 @@ Plot::Plot( PlotType type, QWidget *parent ) :
     setAxisMaxMinor( QwtPlot::yLeft, 0 );
     setAxisScaleDraw( QwtPlot::yLeft, new PlotScaleDrawY() );
 
-    setAxisScaleDraw( QwtPlot::xBottom, new PlotScaleDrawX() );
+    enableAxis( QwtPlot::xBottom, false );
 
     // something invalid
     setAxisScale( QwtPlot::xBottom, -1, 0 );
