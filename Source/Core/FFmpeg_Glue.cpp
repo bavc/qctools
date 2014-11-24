@@ -757,7 +757,8 @@ bool FFmpeg_Glue::NextFrame()
                 {
                     if (Packet->size==0)
                         av_free_packet(&TempPacket);
-                    return true;
+                    if (InputDatas[Packet->stream_index]->Type==AVMEDIA_TYPE_VIDEO)
+                        return true;
                 }
             }
             while (Packet->size > 0);
