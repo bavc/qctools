@@ -13,6 +13,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QScrollArea>
 #include <qwt_legend.h>
 #include <qwt_scale_widget.h>
 #include <cmath>
@@ -53,7 +54,15 @@ public:
         setMinimumHeight( 1 );
         setMaxColumns( 1 );
         setContentsMargins( 0, 0, 0, 0 );
+
         contentsWidget()->layout()->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+
+        QScrollArea *scrollArea = findChild<QScrollArea *>();
+        if ( scrollArea )
+        {
+            scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+            scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+        }
 
         QFont fnt = font();
         fnt.setPointSize( 8 );
@@ -80,7 +89,7 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
         if ( row != PlotType_Axis )
         {
             Plot* plot = new Plot( ( PlotType )row, this );
-			plot->setMinimumHeight( 1 );
+            plot->setMinimumHeight( 1 );
 
             QwtLegend *legend = new PlotLegend( this );
             connect( plot, SIGNAL( legendDataChanged( const QVariant &, const QList<QwtLegendData> & ) ),
@@ -165,7 +174,7 @@ void Plots::Plots_Update()
                 NewBegin = m_Data_FramePos_Max - increment;
         }
         shiftXAxes( NewBegin );
-    	replotAll();
+        replotAll();
     }
 
     setCursorPos( videoStats()->x[m_dataTypeIndex][pos] );
@@ -174,7 +183,7 @@ void Plots::Plots_Update()
 //---------------------------------------------------------------------------
 void Plots::Marker_Update()
 {
-	setCursorPos( videoStats()->x[m_dataTypeIndex][framePos()] );
+    setCursorPos( videoStats()->x[m_dataTypeIndex][framePos()] );
 }
 
 //---------------------------------------------------------------------------
@@ -206,14 +215,14 @@ void Plots::syncPlots()
 //---------------------------------------------------------------------------
 double Plots::axisStepSize( double s ) const
 {
-	for ( int d = 1; d <= 1000000; d *= 10 )
-	{
-		const double step = floor( s * d ) / d;
-		if ( step > 0.0 )
-			return step;
-	}
+    for ( int d = 1; d <= 1000000; d *= 10 )
+    {
+        const double step = floor( s * d ) / d;
+        if ( step > 0.0 )
+            return step;
+    }
 
-	return 0.0;
+    return 0.0;
 }
 
 //---------------------------------------------------------------------------
@@ -236,8 +245,8 @@ void Plots::syncPlot( PlotType Type )
     {
         if ( yMax > plot->axisInterval( QwtPlot::yLeft ).maxValue() )
         {
-			const double stepCount = PerPlotGroup[Type].StepsCount;
-			const double stepSize = axisStepSize( yMax / stepCount );
+            const double stepCount = PerPlotGroup[Type].StepsCount;
+            const double stepSize = axisStepSize( yMax / stepCount );
 
             if ( stepSize )
                 plot->setAxisScale( QwtPlot::yLeft, 0, yMax, stepSize );
