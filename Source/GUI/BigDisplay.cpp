@@ -73,6 +73,7 @@ struct args
 struct filter
 {
     const char*         Name;
+    const int           Type; // 0 = Video, 1 = Audio
     const args          Args[Args_Max];
     const char*         Formula[1<<Args_Max]; //Max 2^Args_Max toggles
 };
@@ -82,6 +83,7 @@ const filter Filters[]=
 {
     {
         "Help",
+        -1,
         {
             { Args_Type_None,   0, 0, 0, 0, },
             { Args_Type_None,   0, 0, 0, 0, },
@@ -95,6 +97,7 @@ const filter Filters[]=
     },
     {
         "No display",
+        -1,
         {
             { Args_Type_None,   0, 0, 0, 0, },
             { Args_Type_None,   0, 0, 0, 0, },
@@ -108,6 +111,7 @@ const filter Filters[]=
     },
     {
         "Normal",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_None,     0,   0,   0,   0, },
@@ -122,6 +126,7 @@ const filter Filters[]=
     },
     {
         "(Separator)",
+        -1,
         {
             { Args_Type_None,   0, 0, 0, 0, },
             { Args_Type_None,   0, 0, 0, 0, },
@@ -135,6 +140,7 @@ const filter Filters[]=
     },
     {
         "Field Difference",
+        0,
         {
             { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
             { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
@@ -152,6 +158,7 @@ const filter Filters[]=
     /*
     {
         "Frame Metadata Play",
+        0,
         {
             { Args_Type_None,   0, 0, 0, 0, },
             { Args_Type_None,   0, 0, 0, 0, },
@@ -166,6 +173,7 @@ const filter Filters[]=
     */
     {
         "Histogram",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_Toggle,   0,   0,   0,   0, "RGB" },
@@ -186,6 +194,7 @@ const filter Filters[]=
     },
     {
         "Waveform",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_Slider,  20,   1, 255,   1, "Brightness" },
@@ -206,6 +215,7 @@ const filter Filters[]=
     },
     {
         "Line Select",
+        0,
         {
             { Args_Type_Slider,   1,   1,   0,   1, "Line" },
             { Args_Type_Slider, 255,   1, 255,   1, "Brightness" },
@@ -222,6 +232,7 @@ const filter Filters[]=
     },
     {
         "Vectorscope",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_Slider,   5,   1,  10,   1, "Brightness" },
@@ -236,6 +247,7 @@ const filter Filters[]=
     },
     {
         "Extract Planes UV Equal.",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
@@ -250,6 +262,7 @@ const filter Filters[]=
     },
     {
         "Extract Planes Equalized",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_Yuv,      2,   0,   0,   0, "Plane"},
@@ -264,6 +277,7 @@ const filter Filters[]=
     },
     {
         "Bit Plane",
+        0,
         {
             { Args_Type_Slider,   1,  -1,   8,   1, "Y bit position" },
             { Args_Type_Slider,   -1, -1,   8,   1, "U bit position" },
@@ -277,6 +291,7 @@ const filter Filters[]=
     },
     {
         "Value Highlight",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_Yuv,      0,   0,   0,   0, "Plane" },
@@ -291,6 +306,7 @@ const filter Filters[]=
     },
     {
         "Saturation Highlight",
+        0,
         {
 			{ Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
 			{ Args_Type_Toggle,   0,   0,   0,   0, "Sat as Lum" },
@@ -307,6 +323,7 @@ const filter Filters[]=
     },
     {
         "Chroma Adjust",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_Slider,   0,   0, 360,   1, "Hue"},
@@ -321,6 +338,7 @@ const filter Filters[]=
     },
     {
         "Broadcast Range Pixels",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
@@ -335,6 +353,7 @@ const filter Filters[]=
     },
     {
         "Temporal Outlier Pixels",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
@@ -349,6 +368,7 @@ const filter Filters[]=
     },
     {
         "Vertical Repetition Pixels",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
@@ -364,6 +384,7 @@ const filter Filters[]=
     /*
     {
         "Tile",
+        0,
         {
             { Args_Type_Tile,     1,   0,   0,   0, "Frames" },
             { Args_Type_None,     0,   0,   0,   0, },
@@ -378,6 +399,7 @@ const filter Filters[]=
     */
     {
         "Zoom",
+        0,
         {
             { Args_Type_Slider,   0,   0,   0,   1, "x" },
             { Args_Type_Slider,   0,   0,   0,   1, "y" },
@@ -391,19 +413,63 @@ const filter Filters[]=
     },
     {
         "Audio Spectrum",
+        1,
         {
-            { Args_Type_None,   0, 0, 0, 0, },
-            { Args_Type_None,   0, 0, 0, 0, },
-            { Args_Type_None,   0, 0, 0, 0, },
-            { Args_Type_None,   0, 0, 0, 0, },
-            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
         },
         {
             "showspectrum=slide=1:mode=separate:color=intensity",
         },
     },
     {
+        "Audio Waveform",
+        1,
+        {
+            { Args_Type_Slider,   2,   0,  20,   1, "Samples per column"},
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "showwaves=mode=line:n=${1}",
+        },
+    },
+    {
+        "Show CQT",
+        1,
+        {
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "showcqt=fullhd=0",
+        },
+    },
+    {
+        "Audio Vectorscope",
+        1,
+        {
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "avectorscope=m=lissajous:s=512x512",
+        },
+    },
+    {
         "(End)",
+        -1,
         {
             { Args_Type_None,   0, 0, 0, 0, },
             { Args_Type_None,   0, 0, 0, 0, },
@@ -809,7 +875,7 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     // Picture
     Picture=NULL;
     Picture_Current1=2;
-    Picture_Current2=6;
+    Picture_Current2=6;//=19;
     Options[0].FiltersList->setCurrentIndex(Picture_Current1);
     Options[1].FiltersList->setCurrentIndex(Picture_Current2);
     connect(Options[0].FiltersList, SIGNAL(currentIndexChanged(int)), this, SLOT(on_FiltersList1_currentIndexChanged(int)));
@@ -1309,7 +1375,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
 void BigDisplay::FiltersList1_currentOptionChanged(size_t Picture_Current)
 {
     string Modified_String=FiltersList_currentOptionChanged(0, Picture_Current);
-    Picture->Filter_Change(0, 0, Modified_String.c_str());
+    Picture->Filter_Change(0, Filters[Picture_Current1].Type, Modified_String.c_str());
 
     Frames_Pos=(size_t)-1;
     ShowPicture ();
@@ -1319,7 +1385,7 @@ void BigDisplay::FiltersList1_currentOptionChanged(size_t Picture_Current)
 void BigDisplay::FiltersList2_currentOptionChanged(size_t Picture_Current)
 {
     string Modified_String=FiltersList_currentOptionChanged(1, Picture_Current);
-    Picture->Filter_Change(1, 0, Modified_String.c_str());
+    Picture->Filter_Change(1, Filters[Picture_Current2].Type, Modified_String.c_str());
 
     Frames_Pos=(size_t)-1;
     ShowPicture ();

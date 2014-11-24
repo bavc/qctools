@@ -165,7 +165,7 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_) :
     if (StatsFromExternalData.empty())
     {
         Filter1="signalstats=stat=tout+vrep+brng,cropdetect=reset=1:round=1,split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr";
-        Filter2="ebur128=metadata=1"; //ebur128=metadata=1"; //TODO not working
+        Filter2="ebur128=metadata=1";
     }
     else
     {

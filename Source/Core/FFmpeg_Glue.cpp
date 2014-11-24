@@ -256,15 +256,14 @@ void FFmpeg_Glue::outputdata::ApplyFilter()
     }
 
     FramePos++;
-
-    //TEMP
-    if (Type)
-        int a=0;
 }
 
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::outputdata::ApplyScale()
 {
+    if (!FilteredFrame)
+        return;
+
     switch (OutputMethod)
     {
         case Output_Jpeg:
@@ -292,6 +291,9 @@ void FFmpeg_Glue::outputdata::ApplyScale()
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::outputdata::ReplaceImage()
 {
+    if (!ScaledFrame)
+        return;    
+        
     // Convert the Frame to QImage
     if (Image==NULL)
         Image=new QImage(ScaledFrame->width, ScaledFrame->height, QImage::Format_RGB888);
@@ -406,7 +408,7 @@ bool FFmpeg_Glue::outputdata::FilterGraph_Init()
     if (Type==AVMEDIA_TYPE_AUDIO)
     {
         Source                                  = avfilter_get_by_name("abuffer");
-        Sink                                    = avfilter_get_by_name("abuffersink");
+        Sink                                    = avfilter_get_by_name(OutputMethod==Output_Stats?"abuffersink":"buffersink");
         Args    << "time_base="                 << Stream->codec->time_base.num
                 << "/"                          << Stream->codec->time_base.den
                 <<":sample_rate="               << Stream->codec->sample_rate
@@ -464,6 +466,9 @@ void FFmpeg_Glue::outputdata::FilterGraph_Free()
 //---------------------------------------------------------------------------
 bool FFmpeg_Glue::outputdata::Scale_Init()
 {
+    if (!FilteredFrame)
+        return false;    
+        
     if (!AdaptDAR())
         return false;
     
@@ -504,7 +509,9 @@ bool FFmpeg_Glue::outputdata::AdaptDAR()
 {
     // Display aspect ratio
     double DAR;
-    if (DecodedFrame->sample_aspect_ratio.num && DecodedFrame->sample_aspect_ratio.den)
+    if (!DecodedFrame)
+        DAR=4.0/3.0; // TODO: video frame DAR
+    else if (DecodedFrame->sample_aspect_ratio.num && DecodedFrame->sample_aspect_ratio.den)
         DAR=((double)DecodedFrame->width)/DecodedFrame->height*DecodedFrame->sample_aspect_ratio.num/DecodedFrame->sample_aspect_ratio.den;
     else
         DAR=((double)DecodedFrame->width)/DecodedFrame->height;
