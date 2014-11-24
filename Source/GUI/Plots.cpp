@@ -15,6 +15,7 @@
 
 #include <QScrollArea>
 #include <qwt_legend.h>
+#include <qwt_legend_label.h>
 #include <qwt_scale_widget.h>
 #include <cmath>
 //---------------------------------------------------------------------------
@@ -55,7 +56,9 @@ public:
         setMaxColumns( 1 );
         setContentsMargins( 0, 0, 0, 0 );
 
-        contentsWidget()->layout()->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+        QLayout* layout = contentsWidget()->layout();
+        layout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+        layout->setSpacing( 0 );
 
         QScrollArea *scrollArea = findChild<QScrollArea *>();
         if ( scrollArea )
@@ -64,10 +67,28 @@ public:
             scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
         }
 
+#if 1
         QFont fnt = font();
-        fnt.setPointSize( 8 );
+        if ( fnt.pointSize() > 8 )
+        {
+            fnt.setPointSize( 8 );
+            setFont( fnt );
+        }
+#endif
+    }
 
-        setFont( fnt );
+protected:
+    virtual QWidget *createWidget( const QwtLegendData &data ) const
+    {
+        QWidget *w = QwtLegend::createWidget( data );
+
+        QwtLegendLabel *label = dynamic_cast<QwtLegendLabel *>( w );
+        if ( label )
+        {
+            label->setMargin( 0 );
+        }
+
+        return w;
     }
 };
 
