@@ -13,6 +13,7 @@
 #include <qwt_picker_machine.h>
 #include <qwt_widget_overlay.h>
 #include <qwt_scale_widget.h>
+#include <qwt_plot_canvas.h>
 #include <QResizeEvent>
 
 class PlotPicker: public QwtPlotPicker
@@ -168,6 +169,24 @@ Plot::Plot( PlotType type, QWidget *parent ) :
 //---------------------------------------------------------------------------
 Plot::~Plot()
 {
+}
+
+QSize Plot::sizeHint() const
+{
+    const QSize hint = QwtPlot::minimumSizeHint();
+
+    const int fh = axisWidget( QwtPlot::yLeft )->fontMetrics().height();
+    const int spacing = 2;
+    const int fw = dynamic_cast<const QwtPlotCanvas*>( canvas() )->frameWidth();
+
+    // 4 tick labels 
+    return QSize( hint.width(), 4 * fh + 3 * spacing + 2 * fw );
+}
+
+QSize Plot::minimumSizeHint() const
+{
+    const QSize hint = QwtPlot::minimumSizeHint();
+    return QSize( hint.width(), -1 );
 }
 
 void Plot::setCurveSamples( int index,
