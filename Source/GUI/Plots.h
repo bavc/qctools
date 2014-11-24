@@ -64,7 +64,7 @@ private:
     double                      axisStepSize( double s ) const;
     const CommonStats*          stats() const { return m_fileInfoData->Stats[m_statsPos]; }
     CommonStats*                stats() { return m_fileInfoData->Stats[m_statsPos]; }
-    int                         framePos() const { return m_fileInfoData->Frames_Pos_Get(); }
+    int                         framePos() const { return m_fileInfoData->Frames_Pos_Get(m_statsPos); }
 
 private:
     QwtPlot**                   m_plots;

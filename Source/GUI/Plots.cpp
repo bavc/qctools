@@ -349,7 +349,7 @@ void Plots::onCursorMoved( double cursorX )
             pos--;
     }
 
-    m_fileInfoData->Frames_Pos_Set( pos );
+    m_fileInfoData->Frames_Pos_Set( pos, m_statsPos );
     //setCursorPos( xData[pos] );
 }
 

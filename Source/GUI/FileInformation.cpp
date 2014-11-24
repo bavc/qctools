@@ -317,8 +317,48 @@ QPixmap* FileInformation::Picture_Get (size_t Pos)
 }
 
 //---------------------------------------------------------------------------
-void FileInformation::Frames_Pos_Set (int Pos)
+int FileInformation::Frames_Pos_Get (size_t Stats_Pos)
 {
+    int Pos;
+
+    if (Stats_Pos)
+    {
+        // Computing frame pos based on the first stream
+        double TimeStamp=Stats[0]->x[1][Frames_Pos];
+        Pos=0;
+        for (; Pos<Stats[Stats_Pos]->x_Current_Max; Pos++)
+        {
+            if (Stats[Stats_Pos]->x[1][Pos]>=TimeStamp)
+            {
+                if (Pos && Stats[Stats_Pos]->x[1][Pos]!=TimeStamp)
+                    Pos--;
+                break;
+            }
+        }
+    }
+    else
+        Pos=Frames_Pos;
+    
+    return Pos;
+}
+
+//---------------------------------------------------------------------------
+void FileInformation::Frames_Pos_Set (int Pos, size_t Stats_Pos)
+{
+    if (Stats_Pos)
+    {
+        // Computing frame pos based on the first stream
+        double TimeStamp=Stats[Stats_Pos]->x[1][Pos];
+        Pos=0;
+        for (; Pos<Stats[0]->x_Current_Max; Pos++)
+            if (Stats[0]->x[1][Pos]>=TimeStamp)
+            {
+                if (Pos && Stats[0]->x[1][Pos]!=TimeStamp)
+                    Pos--;
+                break;
+            }
+    }
+    
     if (Pos<0)
         Pos=0;
     if (Pos>=Stats[0]->x_Current_Max)
