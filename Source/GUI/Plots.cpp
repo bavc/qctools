@@ -84,7 +84,7 @@ Plots::Plots( QWidget *parent, const struct stream_info* streamInfo, FileInforma
         if ( row != m_streamInfo->CountOfGroups-1 ) // Group_Axis
         {
             Plot* plot = new Plot( m_streamInfo, row, this );
-			plot->setMinimumHeight( 1 );
+			plot->setMinimumHeight( 50 );
 
             QwtLegend *legend = new PlotLegend( this );
             connect( plot, SIGNAL( legendDataChanged( const QVariant &, const QList<QwtLegendData> & ) ),
