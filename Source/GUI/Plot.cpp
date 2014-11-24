@@ -14,7 +14,16 @@
 #include <qwt_widget_overlay.h>
 #include <qwt_scale_widget.h>
 #include <qwt_plot_canvas.h>
+#include <qwt_series_data.h>
 #include <QResizeEvent>
+
+struct compareX
+{
+    inline bool operator()( const double x, const QPointF &pos ) const
+    {
+        return ( x < pos.x() );
+    }
+};
 
 class PlotPicker: public QwtPlotPicker
 {
@@ -27,7 +36,7 @@ public:
         setRubberBandPen( QColor( Qt::green ) );
 
         setTrackerMode( QwtPicker::AlwaysOn );
-        setTrackerPen( QColor( Qt::white ) );
+        setTrackerPen( QColor( Qt::black ) );
 
         setStateMachine( new QwtPickerDragPointMachine () );
     }
@@ -37,11 +46,63 @@ public:
         // the white text is hard to see over a light canvas background
 
         QColor bg( Qt::darkGray );
-        bg.setAlpha( 100 );
+        bg.setAlpha( 160 );
 
-        QwtText text = QwtPlotPicker::trackerTextF( pos );
+        const QLineF line = curveLineAt( pos.x() );
+
+        QwtText text = infoText( line );
         text.setBackgroundBrush( QBrush( bg ) );
+
         return text;
+    }
+
+protected:
+    virtual QString infoText( const QLineF &line ) const
+    {
+        QString info( "(%1, %2) -> (%3, %4)" );
+        return info.arg( line.x1() ).arg( line.y1() ).arg( line.x2() ).arg( line.y2() );
+    }
+
+private:
+    const QwtPlotCurve* curve0() const
+    {
+        const QwtPlotItemList curves = plot()->itemList( QwtPlotItem::Rtti_PlotCurve );
+        if ( curves.isEmpty() )
+            return NULL;
+
+        return dynamic_cast<const QwtPlotCurve*>( curves.first() );
+    }
+
+    QLineF curveLineAt( double x ) const
+    {
+        QLineF line;
+
+        const QwtPlotCurve* curve = curve0();
+
+        if ( curve->dataSize() >= 2 )
+        {
+            const QRectF br = curve->boundingRect();
+            if ( br.isValid() && x >= br.left() && x <= br.right() )
+            {
+                int index = qwtUpperSampleIndex<QPointF>(
+                    *curve->data(), x, compareX() );
+
+                if ( index == -1 &&
+                    x == curve->sample( curve->dataSize() - 1 ).x() )
+                {
+                    // the last sample is excluded from qwtUpperSampleIndex
+                    index = curve->dataSize() - 1;
+                }
+
+                if ( index > 0 )
+                {
+                    line.setP1( curve->sample( index - 1 ) );
+                    line.setP2( curve->sample( index ) );
+                }
+            }
+        }
+
+        return line;
     }
 };
 
@@ -115,6 +176,23 @@ private:
     int m_widgetPos;
 };
 
+class PlotScaleDrawY: public QwtScaleDraw
+{
+public:
+    PlotScaleDrawY()
+    {
+    }
+};
+
+class PlotScaleDrawX: public QwtScaleDraw
+{
+public:
+    PlotScaleDrawX()
+    {
+    }
+};
+
+
 //***************************************************************************
 // Constructor / Destructor
 //***************************************************************************
@@ -135,7 +213,9 @@ Plot::Plot( PlotType type, QWidget *parent ) :
 
     setAxisMaxMajor( QwtPlot::yLeft, 0 );
     setAxisMaxMinor( QwtPlot::yLeft, 0 );
-    enableAxis( QwtPlot::xBottom, false );
+    setAxisScaleDraw( QwtPlot::yLeft, new PlotScaleDrawY() );
+
+    setAxisScaleDraw( QwtPlot::xBottom, new PlotScaleDrawX() );
 
     // something invalid
     setAxisScale( QwtPlot::xBottom, -1, 0 );
