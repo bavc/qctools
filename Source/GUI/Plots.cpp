@@ -42,6 +42,7 @@ public:
         QwtPlot( parent )
     {
         setMaximumHeight( axisWidget( QwtPlot::xBottom )->height() );
+        dynamic_cast<QFrame *>( canvas() )->setFrameStyle( QFrame::NoFrame );
         enableAxis( QwtPlot::xBottom, true );
     }
 };
@@ -102,7 +103,7 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
 {
 
     QGridLayout* layout = new QGridLayout( this );
-    layout->setSpacing( 0 );
+    layout->setSpacing( 1 );
     layout->setContentsMargins( 0, 0, 0, 0 );
 
     for ( int row = 0; row < PlotType_Max; row++ )
@@ -110,7 +111,6 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
         if ( row != PlotType_Axis )
         {
             Plot* plot = new Plot( ( PlotType )row, this );
-            plot->setMinimumHeight( 1 );
 
             QwtLegend *legend = new PlotLegend( this );
             connect( plot, SIGNAL( legendDataChanged( const QVariant &, const QList<QwtLegendData> & ) ),
@@ -119,8 +119,10 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
             connect( plot, SIGNAL( cursorMoved( double ) ), SLOT( onCursorMoved( double ) ) );
             plot->updateLegend();
 
-            if ( PerPlotGroup[row].Count > 3 )
-                plot->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+#if 1
+            // we allow tp shrink the plot below height of the size hint
+            plot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
+#endif
 
             layout->addWidget( legend, row, 1 );
             m_plots[row] = plot;

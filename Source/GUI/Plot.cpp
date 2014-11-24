@@ -126,6 +126,13 @@ Plot::Plot( PlotType type, QWidget *parent ) :
 {
     setAutoReplot( false );
 
+    QwtPlotCanvas* canvas = dynamic_cast<QwtPlotCanvas*>( this->canvas() );
+    if ( canvas )
+    {
+        canvas->setFrameStyle( QFrame::Plain | QFrame::Panel );
+        canvas->setLineWidth( 1 );
+    }
+
     setAxisMaxMajor( QwtPlot::yLeft, 0 );
     setAxisMaxMinor( QwtPlot::yLeft, 0 );
     enableAxis( QwtPlot::xBottom, false );
@@ -142,7 +149,7 @@ Plot::Plot( PlotType type, QWidget *parent ) :
     grid->setMinorPen( Qt::gray, 0 , Qt::DotLine );
     grid->attach( this );
 
-    m_cursor = new PlotCursor( canvas() );
+    m_cursor = new PlotCursor( canvas );
     m_cursor->setPosition( 0 );
 
     // curves
@@ -159,7 +166,7 @@ Plot::Plot( PlotType type, QWidget *parent ) :
         m_curves += curve;
     }
 
-    PlotPicker* picker = new PlotPicker( canvas() );
+    PlotPicker* picker = new PlotPicker( canvas );
     connect( picker, SIGNAL( moved( const QPointF& ) ), SLOT( onPickerMoved( const QPointF& ) ) );
     connect( picker, SIGNAL( selected( const QPointF& ) ), SLOT( onPickerMoved( const QPointF& ) ) );
 
@@ -176,7 +183,7 @@ QSize Plot::sizeHint() const
     const QSize hint = QwtPlot::minimumSizeHint();
 
     const int fh = axisWidget( QwtPlot::yLeft )->fontMetrics().height();
-    const int spacing = 2;
+    const int spacing = 0;
     const int fw = dynamic_cast<const QwtPlotCanvas*>( canvas() )->frameWidth();
 
     // 4 tick labels 
