@@ -27,6 +27,9 @@ public:
     explicit Plot( const struct stream_info* streamInfo, size_t group, QWidget *parent );
     virtual ~Plot();
 
+    virtual QSize sizeHint() const;
+    virtual QSize minimumSizeHint() const;
+
     void setCursorPos( double x );
 
     void setCurveSamples( int index,

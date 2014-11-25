@@ -14,7 +14,17 @@
 #include <qwt_picker_machine.h>
 #include <qwt_widget_overlay.h>
 #include <qwt_scale_widget.h>
+#include <qwt_plot_canvas.h>
+#include <qwt_series_data.h>
 #include <QResizeEvent>
+
+struct compareX
+{
+    inline bool operator()( const double x, const QPointF &pos ) const
+    {
+        return ( x < pos.x() );
+    }
+};
 
 class PlotPicker: public QwtPlotPicker
 {
@@ -27,7 +37,7 @@ public:
         setRubberBandPen( QColor( Qt::green ) );
 
         setTrackerMode( QwtPicker::AlwaysOn );
-        setTrackerPen( QColor( Qt::white ) );
+        setTrackerPen( QColor( Qt::black ) );
 
         setStateMachine( new QwtPickerDragPointMachine () );
     }
@@ -37,11 +47,63 @@ public:
         // the white text is hard to see over a light canvas background
 
         QColor bg( Qt::darkGray );
-        bg.setAlpha( 100 );
+        bg.setAlpha( 160 );
 
-        QwtText text = QwtPlotPicker::trackerTextF( pos );
+        const QLineF line = curveLineAt( pos.x() );
+
+        QwtText text = infoText( line );
         text.setBackgroundBrush( QBrush( bg ) );
+
         return text;
+    }
+
+protected:
+    virtual QString infoText( const QLineF &line ) const
+    {
+        QString info( "(%1, %2) -> (%3, %4)" );
+        return info.arg( line.x1() ).arg( line.y1() ).arg( line.x2() ).arg( line.y2() );
+    }
+
+private:
+    const QwtPlotCurve* curve0() const
+    {
+        const QwtPlotItemList curves = plot()->itemList( QwtPlotItem::Rtti_PlotCurve );
+        if ( curves.isEmpty() )
+            return NULL;
+
+        return dynamic_cast<const QwtPlotCurve*>( curves.first() );
+    }
+
+    QLineF curveLineAt( double x ) const
+    {
+        QLineF line;
+
+        const QwtPlotCurve* curve = curve0();
+
+        if ( curve->dataSize() >= 2 )
+        {
+            const QRectF br = curve->boundingRect();
+            if ( br.isValid() && x >= br.left() && x <= br.right() )
+            {
+                int index = qwtUpperSampleIndex<QPointF>(
+                    *curve->data(), x, compareX() );
+
+                if ( index == -1 &&
+                    x == curve->sample( curve->dataSize() - 1 ).x() )
+                {
+                    // the last sample is excluded from qwtUpperSampleIndex
+                    index = curve->dataSize() - 1;
+                }
+
+                if ( index > 0 )
+                {
+                    line.setP1( curve->sample( index - 1 ) );
+                    line.setP2( curve->sample( index ) );
+                }
+            }
+        }
+
+        return line;
     }
 };
 
@@ -115,6 +177,35 @@ private:
     int m_widgetPos;
 };
 
+class PlotScaleDrawY: public QwtScaleDraw
+{
+public:
+    PlotScaleDrawY()
+    {
+    }
+
+protected:
+    virtual void drawLabel( QPainter *painter, double val ) const
+    {
+        const int fh = painter->fontMetrics().height();
+
+        if ( length() < fh )
+        {
+            const QList<double> ticks = scaleDiv().ticks( QwtScaleDiv::MajorTick );
+            if ( val != ticks.last() )
+                return;
+        }
+        else if ( length() < 3 * painter->fontMetrics().height() )
+        {
+            const QList<double> ticks = scaleDiv().ticks( QwtScaleDiv::MajorTick );
+            if ( val != ticks.last() && val != ticks.first() )
+                return;
+        }
+
+        QwtScaleDraw::drawLabel( painter, val );
+    }
+};
+
 //***************************************************************************
 // Constructor / Destructor
 //***************************************************************************
@@ -127,8 +218,17 @@ Plot::Plot( const struct stream_info* streamInfo, size_t group, QWidget *parent)
 {
     setAutoReplot( false );
 
+    QwtPlotCanvas* canvas = dynamic_cast<QwtPlotCanvas*>( this->canvas() );
+    if ( canvas )
+    {
+        canvas->setFrameStyle( QFrame::Plain | QFrame::Panel );
+        canvas->setLineWidth( 1 );
+    }
+
     setAxisMaxMajor( QwtPlot::yLeft, 0 );
     setAxisMaxMinor( QwtPlot::yLeft, 0 );
+    setAxisScaleDraw( QwtPlot::yLeft, new PlotScaleDrawY() );
+
     enableAxis( QwtPlot::xBottom, false );
 
     // something invalid
@@ -143,7 +243,7 @@ Plot::Plot( const struct stream_info* streamInfo, size_t group, QWidget *parent)
     grid->setMinorPen( Qt::gray, 0 , Qt::DotLine );
     grid->attach( this );
 
-    m_cursor = new PlotCursor( canvas() );
+    m_cursor = new PlotCursor( canvas );
     m_cursor->setPosition( 0 );
 
     // curves
@@ -160,7 +260,7 @@ Plot::Plot( const struct stream_info* streamInfo, size_t group, QWidget *parent)
         m_curves += curve;
     }
 
-    PlotPicker* picker = new PlotPicker( canvas() );
+    PlotPicker* picker = new PlotPicker( canvas );
     connect( picker, SIGNAL( moved( const QPointF& ) ), SLOT( onPickerMoved( const QPointF& ) ) );
     connect( picker, SIGNAL( selected( const QPointF& ) ), SLOT( onPickerMoved( const QPointF& ) ) );
 
@@ -170,6 +270,24 @@ Plot::Plot( const struct stream_info* streamInfo, size_t group, QWidget *parent)
 //---------------------------------------------------------------------------
 Plot::~Plot()
 {
+}
+
+QSize Plot::sizeHint() const
+{
+    const QSize hint = QwtPlot::minimumSizeHint();
+
+    const int fh = axisWidget( QwtPlot::yLeft )->fontMetrics().height();
+    const int spacing = 0;
+    const int fw = dynamic_cast<const QwtPlotCanvas*>( canvas() )->frameWidth();
+
+    // 4 tick labels 
+    return QSize( hint.width(), 4 * fh + 3 * spacing + 2 * fw );
+}
+
+QSize Plot::minimumSizeHint() const
+{
+    const QSize hint = QwtPlot::minimumSizeHint();
+    return QSize( hint.width(), -1 );
 }
 
 void Plot::setCurveSamples( int index,

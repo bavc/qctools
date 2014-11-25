@@ -14,7 +14,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QScrollArea>
 #include <qwt_legend.h>
+#include <qwt_legend_label.h>
 #include <qwt_scale_widget.h>
 #include <cmath>
 //---------------------------------------------------------------------------
@@ -41,6 +43,7 @@ public:
         QwtPlot( parent )
     {
         setMaximumHeight( axisWidget( QwtPlot::xBottom )->height() );
+        dynamic_cast<QFrame *>( canvas() )->setFrameStyle( QFrame::NoFrame );
         enableAxis( QwtPlot::xBottom, true );
     }
 };
@@ -54,12 +57,40 @@ public:
         setMinimumHeight( 1 );
         setMaxColumns( 1 );
         setContentsMargins( 0, 0, 0, 0 );
-        contentsWidget()->layout()->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
+        QLayout* layout = contentsWidget()->layout();
+        layout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+        layout->setSpacing( 0 );
+
+        QScrollArea *scrollArea = findChild<QScrollArea *>();
+        if ( scrollArea )
+        {
+            scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+            scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+        }
+
+#if 1
         QFont fnt = font();
-        fnt.setPointSize( 8 );
+        if ( fnt.pointSize() > 8 )
+        {
+            fnt.setPointSize( 8 );
+            setFont( fnt );
+        }
+#endif
+    }
 
-        setFont( fnt );
+protected:
+    virtual QWidget *createWidget( const QwtLegendData &data ) const
+    {
+        QWidget *w = QwtLegend::createWidget( data );
+
+        QwtLegendLabel *label = dynamic_cast<QwtLegendLabel *>( w );
+        if ( label )
+        {
+            label->setMargin( 0 );
+        }
+
+        return w;
     }
 };
 
@@ -75,7 +106,7 @@ Plots::Plots( QWidget *parent, const struct stream_info* streamInfo, FileInforma
 {
 
     QGridLayout* layout = new QGridLayout( this );
-    layout->setSpacing( 0 );
+    layout->setSpacing( 1 );
     layout->setContentsMargins( 0, 0, 0, 0 );
 
     m_plots=new QwtPlot*[m_streamInfo->CountOfGroups];
@@ -84,7 +115,7 @@ Plots::Plots( QWidget *parent, const struct stream_info* streamInfo, FileInforma
         if ( row != m_streamInfo->CountOfGroups-1 ) // Group_Axis
         {
             Plot* plot = new Plot( m_streamInfo, row, this );
-			plot->setMinimumHeight( 50 );
+			plot->setMinimumHeight( 1 );
 
             QwtLegend *legend = new PlotLegend( this );
             connect( plot, SIGNAL( legendDataChanged( const QVariant &, const QList<QwtLegendData> & ) ),
@@ -95,6 +126,11 @@ Plots::Plots( QWidget *parent, const struct stream_info* streamInfo, FileInforma
 
             if ( m_streamInfo->PerGroup[row].Count > 3 )
                 plot->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+
+#if 1
+            // we allow tp shrink the plot below height of the size hint
+            plot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
+#endif
 
             layout->addWidget( legend, row, 1 );
             m_plots[row] = plot;
@@ -169,7 +205,7 @@ void Plots::Plots_Update()
                 NewBegin = m_Data_FramePos_Max - increment;
         }
         shiftXAxes( NewBegin );
-    	replotAll();
+        replotAll();
     }
 
     setCursorPos( stats()->x[m_dataTypeIndex][pos] );
@@ -210,14 +246,14 @@ void Plots::syncPlots()
 //---------------------------------------------------------------------------
 double Plots::axisStepSize( double s ) const
 {
-	for ( int d = 1; d <= 1000000; d *= 10 )
-	{
-		const double step = floor( s * d ) / d;
-		if ( step > 0.0 )
-			return step;
-	}
+    for ( int d = 1; d <= 1000000; d *= 10 )
+    {
+        const double step = floor( s * d ) / d;
+        if ( step > 0.0 )
+            return step;
+    }
 
-	return 0.0;
+    return 0.0;
 }
 
 //---------------------------------------------------------------------------
