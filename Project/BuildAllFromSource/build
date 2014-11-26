@@ -43,12 +43,20 @@ make
 make install
 cd ..
 
+# decklink
+if [ ! -d decklinksdk ] ; then
+	wget http://software.blackmagicdesign.com/SDK/Blackmagic_DeckLink_SDK_10.1.4.zip
+	unzip Blackmagic_DeckLink_SDK_10.1.4.zip 
+	mv Blackmagic_DeckLink_SDK_10.1.4 decklinksdk
+fi
+
 cd ffmpeg
 chmod u+x configure
 chmod u+x version.sh
 if yasm --version >/dev/null 2>&1
 then
-    ./configure --enable-gpl --enable-version3 --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --enable-libopenjpeg --disable-decoder=jpeg2000 --extra-cflags="-I../openjpeg/usr/include" --extra-ldflags="-L../openjpeg/usr/lib" --enable-libfreetype --extra-cflags="-I../freetype/usr/include" --extra-ldflags="-L../freetype/usr/lib"
+	# need to conditionally use ../decklink/{Mac|Win|Linux}/include for build
+    ./configure --enable-gpl --enable-version3 --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --enable-libopenjpeg --disable-decoder=jpeg2000 --extra-cflags="-I../openjpeg/usr/include" --extra-ldflags="-L../openjpeg/usr/lib" --enable-libfreetype --extra-cflags="-I../freetype/usr/include" --extra-ldflags="-L../freetype/usr/lib" --enable-decklink --extra-cflags="-I../decklink/Mac/include"
 else
     cd ../yasm/
     ./configure --prefix=`pwd`/usr
@@ -56,7 +64,8 @@ else
     make install
 
     cd ../ffmpeg
-    ./configure --enable-gpl --enable-version3 --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --enable-libopenjpeg --disable-decoder=jpeg2000 --extra-cflags="-I../openjpeg/usr/include" --extra-ldflags="-L../openjpeg/usr/lib" --enable-libfreetype --extra-cflags="-I../freetype/usr/include" --extra-ldflags="-L../freetype/usr/lib" --yasmexe=../yasm/usr/bin/yasm
+	# need to conditionally use ../decklink/{Mac|Win|Linux}/include for build
+    ./configure --enable-gpl --enable-version3 --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --enable-libopenjpeg --disable-decoder=jpeg2000 --extra-cflags="-I../openjpeg/usr/include" --extra-ldflags="-L../openjpeg/usr/lib" --enable-libfreetype --extra-cflags="-I../freetype/usr/include" --extra-ldflags="-L../freetype/usr/lib" --enable-decklink --extra-cflags="-I../decklink/Mac/include" --yasmexe=../yasm/usr/bin/yasm
 fi
 
 make
