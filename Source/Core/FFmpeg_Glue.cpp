@@ -700,7 +700,7 @@ void FFmpeg_Glue::Seek(size_t FramePos)
                 InputData->FirstTimeStamp=(*Stats)[0]->FirstTimeStamp;
 
             // Finding the right source and time stamp computing
-            if (Stats && !Stats->empty() && (*Stats)[0] && FramePos<(*Stats)[0]->x_Current_Max)
+            if (Stats && !Stats->empty() && (*Stats)[0] && FramePos<(*Stats)[0]->x_Current)
             {
                 double TimeStamp=(*Stats)[0]->x[1][FramePos];
                 if (InputData->FirstTimeStamp!=DBL_MAX)
