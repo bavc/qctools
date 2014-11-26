@@ -20,6 +20,11 @@ else
 	exit
 fi
 
+if cmake >/dev/null 2>&1
+    echo cmake not found
+	exit
+fi
+
 cd openjpeg
 cmake -DBUILD_SHARED_LIBS:BOOL=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=usr .
 make
