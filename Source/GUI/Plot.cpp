@@ -29,7 +29,10 @@ struct compareX
 class PlotPicker: public QwtPlotPicker
 {
 public:
-    PlotPicker( QWidget *canvas ):
+    PlotPicker( QWidget *canvas , const struct stream_info* streamInfo, const size_t group, const QVector<QwtPlotCurve*>* curves):
+        m_streamInfo( streamInfo ),
+        m_group( group ),
+        m_curves( curves ),
         QwtPlotPicker( canvas )
     {
         setAxis( QwtPlot::xBottom, QwtPlot::yLeft );
@@ -58,7 +61,18 @@ public:
 protected:
     virtual QString infoText( int index ) const
     {
-        QString info( "Frame: %1" );
+        QString info( "Frame " );
+        info += QString::number(index);
+        for( unsigned i = 0; i < m_streamInfo->PerGroup[m_group].Count; ++i )
+        {
+            const per_item &itemInfo = m_streamInfo->PerItem[m_streamInfo->PerGroup[m_group].Start + i];
+        
+            info += i?", ":": ";
+            info += itemInfo.Name;
+            info += "=";
+            info += QString::number( (*m_curves)[i]->sample(index).ry(), 'f',  itemInfo.DigitsAfterComma);
+        }
+
         return info.arg( index + 1 );
     }
 
@@ -86,6 +100,10 @@ private:
 
         return index - 1;
     }
+
+    const struct stream_info*       m_streamInfo; 
+    const size_t                    m_group;
+    const QVector<QwtPlotCurve*>*   m_curves;
 };
 
 class PlotCursor: public QwtWidgetOverlay
@@ -244,7 +262,7 @@ Plot::Plot( const struct stream_info* streamInfo, size_t group, QWidget *parent)
         m_curves += curve;
     }
 
-    PlotPicker* picker = new PlotPicker( canvas );
+    PlotPicker* picker = new PlotPicker( canvas,  m_streamInfo, m_group, &m_curves );
     connect( picker, SIGNAL( moved( const QPointF& ) ), SLOT( onPickerMoved( const QPointF& ) ) );
     connect( picker, SIGNAL( selected( const QPointF& ) ), SLOT( onPickerMoved( const QPointF& ) ) );
 
