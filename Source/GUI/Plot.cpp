@@ -49,19 +49,17 @@ public:
         QColor bg( Qt::darkGray );
         bg.setAlpha( 160 );
 
-        const QLineF line = curveLineAt( pos.x() );
-
-        QwtText text = infoText( line );
+        QwtText text = infoText( indexLower( pos.x() ) );
         text.setBackgroundBrush( QBrush( bg ) );
 
         return text;
     }
 
 protected:
-    virtual QString infoText( const QLineF &line ) const
+    virtual QString infoText( int index ) const
     {
-        QString info( "(%1, %2) -> (%3, %4)" );
-        return info.arg( line.x1() ).arg( line.y1() ).arg( line.x2() ).arg( line.y2() );
+        QString info( "Frame: %1" );
+        return info.arg( index + 1 );
     }
 
 private:
@@ -74,36 +72,19 @@ private:
         return dynamic_cast<const QwtPlotCurve*>( curves.first() );
     }
 
-    QLineF curveLineAt( double x ) const
+    int indexLower( double x ) const
     {
-        QLineF line;
-
         const QwtPlotCurve* curve = curve0();
+        if ( curve == NULL )
+            return -1;
 
-        if ( curve->dataSize() >= 2 )
-        {
-            const QRectF br = curve->boundingRect();
-            if ( br.isValid() && x >= br.left() && x <= br.right() )
-            {
-                int index = qwtUpperSampleIndex<QPointF>(
-                    *curve->data(), x, compareX() );
+        int index = qwtUpperSampleIndex<QPointF>(
+            *curve->data(), x, compareX() );
 
-                if ( index == -1 &&
-                    x == curve->sample( curve->dataSize() - 1 ).x() )
-                {
-                    // the last sample is excluded from qwtUpperSampleIndex
-                    index = curve->dataSize() - 1;
-                }
+        if ( index == -1 )
+            index = curve->dataSize();
 
-                if ( index > 0 )
-                {
-                    line.setP1( curve->sample( index - 1 ) );
-                    line.setP2( curve->sample( index ) );
-                }
-            }
-        }
-
-        return line;
+        return index - 1;
     }
 };
 
@@ -223,6 +204,9 @@ Plot::Plot( const struct stream_info* streamInfo, size_t group, QWidget *parent)
     {
         canvas->setFrameStyle( QFrame::Plain | QFrame::Panel );
         canvas->setLineWidth( 1 );
+#if 1
+        canvas->setPalette( QColor("Cornsilk") );
+#endif
     }
 
     setAxisMaxMajor( QwtPlot::yLeft, 0 );
