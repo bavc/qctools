@@ -8,7 +8,7 @@
 #ifndef Core_H
 #define Core_H
 
-#include <new>
+#include <cstddef>
 
 #ifndef UNICODE
     #define UNICODE

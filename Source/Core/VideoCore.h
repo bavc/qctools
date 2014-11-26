@@ -10,7 +10,7 @@
 
 #include <Core/Core.h>
 
-const std::size_t VideoItem_Begin=21;
+const size_t VideoItem_Begin=21;
 
 enum VideoItem
 {

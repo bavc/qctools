@@ -10,7 +10,7 @@
 
 #include <Core/Core.h>
 
-const std::size_t AudioItem_Begin=21;
+const size_t AudioItem_Begin=21;
 
 enum AudioItem
 {
