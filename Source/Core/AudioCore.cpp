@@ -36,5 +36,5 @@ const struct per_item AudioPerItem [Item_AudioMax]=
     //U
     { Group_LRA,    Group_AudioMax,       "LRAL",           "lavfi.r128.LRA.low",       0,   false,  DBL_MAX, DBL_MAX },
     { Group_LRA,    Group_AudioMax,       "LRA",            "lavfi.r128.LRA",           0,   false,  DBL_MAX, DBL_MAX },
-    { Group_LRA,    Group_AudioMax,       "LRAM",           "lavfi.r128.LRA.high",      0,   true,   DBL_MAX, DBL_MAX },
+    { Group_LRA,    Group_AudioMax,       "LRAH",           "lavfi.r128.LRA.high",      0,   true,   DBL_MAX, DBL_MAX },
 };
