@@ -333,7 +333,10 @@ void FFmpeg_Glue::outputdata::DiscardScaledFrame()
         return;
 
     if (ScaledFrame!=FilteredFrame)
+    {
+        avpicture_free((AVPicture*)ScaledFrame);
         av_frame_free(&ScaledFrame);
+    }
     ScaledFrame=NULL;
 }
 
@@ -834,6 +837,7 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
         InputData->FramePos++;
         if (InputData->FramePos>InputData->FrameCount)
             InputData->FrameCount=InputData->FramePos;
+
         return true;
     }
 
