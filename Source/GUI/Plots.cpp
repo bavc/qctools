@@ -32,6 +32,7 @@ public:
         addItem( "Seconds" );
         addItem( "Minutes" );
         addItem( "Hours" );
+        addItem( "Time" );
     }
 };
 
@@ -44,7 +45,62 @@ public:
         setMaximumHeight( axisWidget( QwtPlot::xBottom )->height() );
         dynamic_cast<QFrame *>( canvas() )->setFrameStyle( QFrame::NoFrame );
         enableAxis( QwtPlot::xBottom, true );
+
+        ScaleDraw* sd = new ScaleDraw();
+        sd->setFormat( Plots::AxisTime );
+        setAxisScaleDraw( QwtPlot::xBottom, new ScaleDraw() );
     }
+
+    void setFormat( int format )
+    {
+        ScaleDraw* sd = dynamic_cast<ScaleDraw*>( axisScaleDraw( QwtPlot::xBottom ) );
+        if ( sd )
+            sd->setFormat( format );
+    }
+
+private:
+    class ScaleDraw: public QwtScaleDraw
+    {
+    public:
+        void setFormat( int format )
+        {
+            if ( format != m_format )
+            {
+                m_format = format;
+                invalidateCache();
+            }
+        }
+
+        virtual QwtText label( double value ) const
+        {
+            if ( m_format == Plots::AxisTime )
+            {
+                const int h = static_cast<int>( value / 3600 );
+                const int m = static_cast<int>( value / 60 );
+                const int s = static_cast<int>( value );
+
+                QString label;
+
+                if ( scaleDiv().interval().width() > 10.0 )
+                {
+                    label.sprintf( "%02d:%02d:%02d", 
+                        h, m - h * 60, s - m * 60 );
+                }
+                else
+                {
+                    label.sprintf( "%02d:%02d:%02d.%03d", 
+                        h, m - h * 60, s - m * 60, qRound( value - s ) );
+                }
+
+                return label;
+            }
+
+            return QwtScaleDraw::label( value );
+        }
+
+    private:
+        int m_format;
+    };
 };
 
 class PlotLegend: public QwtLegend
@@ -98,7 +154,7 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
     QWidget( parent ),
     m_fileInfoData( FileInformationData_ ),
     m_zoomLevel( 1 ),
-    m_dataTypeIndex( 1 ),
+    m_dataTypeIndex( Plots::AxisSeconds ),
     m_Data_FramePos_Max( 0 )
 {
     QGridLayout* layout = new QGridLayout( this );
@@ -129,12 +185,16 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
         else
         {
             XAxisFormatBox* xAxisBox = new XAxisFormatBox( this );
-            xAxisBox->setCurrentIndex( m_dataTypeIndex );
+            xAxisBox->setCurrentIndex( Plots::AxisTime );
             connect( xAxisBox, SIGNAL( currentIndexChanged( int ) ),
                      this, SLOT( onXAxisFormatChanged( int ) ) );
 
             layout->addWidget( xAxisBox, row, 1 );
-            m_plots[row] = new DummyAxisPlot( this );
+
+            DummyAxisPlot* axisPlot = new DummyAxisPlot( this );
+            axisPlot->setFormat( xAxisBox->currentIndex() );
+
+            m_plots[row] = axisPlot;
         }
 
         m_plots[row]->setAxisScale( QwtPlot::xBottom, 0, videoStats()->x_Max[m_dataTypeIndex] );
@@ -379,9 +439,16 @@ void Plots::onCursorMoved( double cursorX )
 }
 
 //---------------------------------------------------------------------------
-void Plots::onXAxisFormatChanged( int index )
+void Plots::onXAxisFormatChanged( int format )
 {
-    m_dataTypeIndex = index;
+    DummyAxisPlot* plot = dynamic_cast<DummyAxisPlot *>( m_plots[PlotType_Axis] );
+    if ( plot )
+        plot->setFormat( format );
+
+    if ( format == AxisTime )
+        m_dataTypeIndex = AxisSeconds;
+    else
+        m_dataTypeIndex = format;
 
     syncPlots();
     Marker_Update();

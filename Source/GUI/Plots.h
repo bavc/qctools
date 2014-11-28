@@ -26,6 +26,15 @@ class Plots : public QWidget
     Q_OBJECT
 
 public:
+    enum XAxisFormat
+    {
+        AxisFrames,
+        AxisSeconds,
+        AxisMinutes,
+        AxisHours,
+        AxisTime
+    };
+
     explicit                    Plots( QWidget *parent, FileInformation* FileInfoData );
     virtual                     ~Plots();
 
