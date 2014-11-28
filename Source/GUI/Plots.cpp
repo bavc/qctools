@@ -20,10 +20,10 @@
 #include <cmath>
 //---------------------------------------------------------------------------
 
-class KindComboBox: public QComboBox
+class XAxisFormatBox: public QComboBox
 {
 public:
-    KindComboBox( QWidget* parent ):
+    XAxisFormatBox( QWidget* parent ):
         QComboBox( parent )
     {
         setContentsMargins( 0, 0, 0, 0 );
@@ -101,7 +101,6 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
     m_dataTypeIndex( 1 ),
     m_Data_FramePos_Max( 0 )
 {
-
     QGridLayout* layout = new QGridLayout( this );
     layout->setSpacing( 1 );
     layout->setContentsMargins( 0, 0, 0, 0 );
@@ -129,13 +128,13 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
         }
         else
         {
-            KindComboBox* comboBox = new KindComboBox( this );
-            comboBox->setCurrentIndex( m_dataTypeIndex );
-            connect( comboBox, SIGNAL( currentIndexChanged( int ) ),
-                     this, SLOT( onDataTypeChanged( int ) ) );
+            XAxisFormatBox* xAxisBox = new XAxisFormatBox( this );
+            xAxisBox->setCurrentIndex( m_dataTypeIndex );
+            connect( xAxisBox, SIGNAL( currentIndexChanged( int ) ),
+                     this, SLOT( onXAxisFormatChanged( int ) ) );
 
-            layout->addWidget( comboBox, row, 1 );
-            m_plots[row] = new DummyAxisPlot( this );;
+            layout->addWidget( xAxisBox, row, 1 );
+            m_plots[row] = new DummyAxisPlot( this );
         }
 
         m_plots[row]->setAxisScale( QwtPlot::xBottom, 0, videoStats()->x_Max[m_dataTypeIndex] );
@@ -380,7 +379,7 @@ void Plots::onCursorMoved( double cursorX )
 }
 
 //---------------------------------------------------------------------------
-void Plots::onDataTypeChanged( int index )
+void Plots::onXAxisFormatChanged( int index )
 {
     m_dataTypeIndex = index;
 

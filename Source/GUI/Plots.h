@@ -41,10 +41,9 @@ public:
     void                        zoom( bool up );
     int                         zoomLevel() const { return m_zoomLevel; }
 
-
 private Q_SLOTS:
     void                        onCursorMoved( double x );
-    void                        onDataTypeChanged( int index );
+    void                        onXAxisFormatChanged( int index );
 
 private:
     Plot*                       plotAt( int row );
