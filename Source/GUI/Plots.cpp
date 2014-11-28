@@ -88,8 +88,9 @@ private:
                 }
                 else
                 {
+                    const int ms = qRound( ( value - s ) * 1000.0 );
                     label.sprintf( "%02d:%02d:%02d.%03d", 
-                        h, m - h * 60, s - m * 60, qRound( value - s ) );
+                        h, m - h * 60, s - m * 60, ms);
                 }
 
                 return label;
