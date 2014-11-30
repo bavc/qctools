@@ -27,6 +27,15 @@ class Plots : public QWidget
     Q_OBJECT
 
 public:
+    enum XAxisFormat
+    {
+        AxisFrames,
+        AxisSeconds,
+        AxisMinutes,
+        AxisHours,
+        AxisTime
+    };
+
     explicit                    Plots( QWidget *parent, const struct stream_info* streamInfo, FileInformation* FileInfoData, size_t StatsPos );
     virtual                     ~Plots();
 
@@ -42,10 +51,9 @@ public:
     void                        zoom( bool up );
     int                         zoomLevel() const { return m_zoomLevel; }
 
-
 private Q_SLOTS:
     void                        onCursorMoved( double x );
-    void                        onDataTypeChanged( int index );
+    void                        onXAxisFormatChanged( int index );
 
 private:
     Plot*                       plotAt( int row );

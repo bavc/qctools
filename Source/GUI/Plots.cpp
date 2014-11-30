@@ -21,10 +21,10 @@
 #include <cmath>
 //---------------------------------------------------------------------------
 
-class KindComboBox: public QComboBox
+class XAxisFormatBox: public QComboBox
 {
 public:
-    KindComboBox( QWidget* parent ):
+    XAxisFormatBox( QWidget* parent ):
         QComboBox( parent )
     {
         setContentsMargins( 0, 0, 0, 0 );
@@ -33,6 +33,7 @@ public:
         addItem( "Seconds" );
         addItem( "Minutes" );
         addItem( "Hours" );
+        addItem( "Time" );
     }
 };
 
@@ -45,7 +46,63 @@ public:
         setMaximumHeight( axisWidget( QwtPlot::xBottom )->height() );
         dynamic_cast<QFrame *>( canvas() )->setFrameStyle( QFrame::NoFrame );
         enableAxis( QwtPlot::xBottom, true );
+
+        ScaleDraw* sd = new ScaleDraw();
+        sd->setFormat( Plots::AxisTime );
+        setAxisScaleDraw( QwtPlot::xBottom, new ScaleDraw() );
     }
+
+    void setFormat( int format )
+    {
+        ScaleDraw* sd = dynamic_cast<ScaleDraw*>( axisScaleDraw( QwtPlot::xBottom ) );
+        if ( sd )
+            sd->setFormat( format );
+    }
+
+private:
+    class ScaleDraw: public QwtScaleDraw
+    {
+    public:
+        void setFormat( int format )
+        {
+            if ( format != m_format )
+            {
+                m_format = format;
+                invalidateCache();
+            }
+        }
+
+        virtual QwtText label( double value ) const
+        {
+            if ( m_format == Plots::AxisTime )
+            {
+                const int h = static_cast<int>( value / 3600 );
+                const int m = static_cast<int>( value / 60 );
+                const int s = static_cast<int>( value );
+
+                QString label;
+
+                if ( scaleDiv().interval().width() > 10.0 )
+                {
+                    label.sprintf( "%02d:%02d:%02d", 
+                        h, m - h * 60, s - m * 60 );
+                }
+                else
+                {
+                    const int ms = qRound( ( value - s ) * 1000.0 );
+                    label.sprintf( "%02d:%02d:%02d.%03d", 
+                        h, m - h * 60, s - m * 60, ms);
+                }
+
+                return label;
+            }
+
+            return QwtScaleDraw::label( value );
+        }
+
+    private:
+        int m_format;
+    };
 };
 
 class PlotLegend: public QwtLegend
@@ -99,12 +156,11 @@ Plots::Plots( QWidget *parent, const struct stream_info* streamInfo, FileInforma
     QWidget( parent ),
     m_fileInfoData( FileInformationData_ ),
     m_zoomLevel( 1 ),
-    m_dataTypeIndex( 1 ),
+    m_dataTypeIndex( Plots::AxisSeconds ),
     m_Data_FramePos_Max( 0 ),
     m_statsPos( StatsPos ),
     m_streamInfo( streamInfo )
 {
-
     QGridLayout* layout = new QGridLayout( this );
     layout->setSpacing( 1 );
     layout->setContentsMargins( 0, 0, 0, 0 );
@@ -137,13 +193,17 @@ Plots::Plots( QWidget *parent, const struct stream_info* streamInfo, FileInforma
         }
         else
         {
-            KindComboBox* comboBox = new KindComboBox( this );
-            comboBox->setCurrentIndex( m_dataTypeIndex );
-            connect( comboBox, SIGNAL( currentIndexChanged( int ) ),
-                     this, SLOT( onDataTypeChanged( int ) ) );
+            XAxisFormatBox* xAxisBox = new XAxisFormatBox( this );
+            xAxisBox->setCurrentIndex( Plots::AxisTime );
+            connect( xAxisBox, SIGNAL( currentIndexChanged( int ) ),
+                     this, SLOT( onXAxisFormatChanged( int ) ) );
 
-            layout->addWidget( comboBox, row, 1 );
-            m_plots[row] = new DummyAxisPlot( this );;
+            layout->addWidget( xAxisBox, row, 1 );
+
+            DummyAxisPlot* axisPlot = new DummyAxisPlot( this );
+            axisPlot->setFormat( xAxisBox->currentIndex() );
+
+            m_plots[row] = axisPlot;
         }
 
         m_plots[row]->setAxisScale( QwtPlot::xBottom, 0, stats()->x_Max[m_dataTypeIndex] );
@@ -390,9 +450,16 @@ void Plots::onCursorMoved( double cursorX )
 }
 
 //---------------------------------------------------------------------------
-void Plots::onDataTypeChanged( int index )
+void Plots::onXAxisFormatChanged( int format )
 {
-    m_dataTypeIndex = index;
+    DummyAxisPlot* plot = dynamic_cast<DummyAxisPlot *>( m_plots[m_streamInfo->CountOfGroups-1] ); // Axis display
+    if ( plot )
+        plot->setFormat( format );
+
+    if ( format == AxisTime )
+        m_dataTypeIndex = AxisSeconds;
+    else
+        m_dataTypeIndex = format;
 
     syncPlots();
     Marker_Update();
