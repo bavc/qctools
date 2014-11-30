@@ -82,7 +82,9 @@ private:
 
                 QString label;
 
-                if ( scaleDiv().interval().width() > 10.0 )
+                if ( value == 0 )
+                    label = "0"; // Workaround because 00:00:00 puts the axis too much on the right. There is still a problem with other values
+                else if ( scaleDiv().interval().width() > 10.0 )
                 {
                     label.sprintf( "%02d:%02d:%02d", 
                         h, m - h * 60, s - m * 60 );
