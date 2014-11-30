@@ -48,7 +48,6 @@ public:
         enableAxis( QwtPlot::xBottom, true );
 
         ScaleDraw* sd = new ScaleDraw();
-        sd->setFormat( Plots::AxisTime );
         setAxisScaleDraw( QwtPlot::xBottom, new ScaleDraw() );
     }
 
@@ -196,7 +195,7 @@ Plots::Plots( QWidget *parent, const struct stream_info* streamInfo, FileInforma
         else
         {
             XAxisFormatBox* xAxisBox = new XAxisFormatBox( this );
-            xAxisBox->setCurrentIndex( Plots::AxisTime );
+            xAxisBox->setCurrentIndex( Plots::AxisSeconds );
             connect( xAxisBox, SIGNAL( currentIndexChanged( int ) ),
                      this, SLOT( onXAxisFormatChanged( int ) ) );
 
