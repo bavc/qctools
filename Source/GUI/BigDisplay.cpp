@@ -429,14 +429,15 @@ const filter Filters[]=
         "Audio Waveform",
         1,
         {
-            { Args_Type_Slider,   2,   1,  20,   1, "Samples per column"},
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Split Channels" },
+			{ Args_Type_Slider,   2,   1,  20,   1, "Samples per column"},
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "showwaves=mode=line:n=${1}",
+            "showwaves=mode=line:n=${2}:s=${width}x${height}:split_channels=0",
+			"showwaves=mode=line:n=${2}:s=${width}x${height}:split_channels=1",
         },
     },
     {
