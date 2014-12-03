@@ -415,14 +415,14 @@ const filter Filters[]=
         "Audio Spectrum",
         1,
         {
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Slider,   1, -10,  10,   1, "Saturation" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "showspectrum=slide=1:mode=separate:color=intensity",
+            "showspectrum=slide=scroll:mode=separate:color=intensity:saturation=${1}",
         },
     },
     {
