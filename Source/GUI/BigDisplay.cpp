@@ -458,14 +458,14 @@ const filter Filters[]=
         "Audio Vectorscope",
         1,
         {
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Slider,   1,   1,  10,   1, "Zoom" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "avectorscope=m=lissajous:s=512x512",
+            "avectorscope=m=lissajous:s=512x512:zoom=${1}",
         },
     },
     {
