@@ -20,7 +20,7 @@ else
 	exit
 fi
 
-if cmake >/dev/null 2>&1
+if [ ! $(which cmake) ] ; then
     echo cmake not found
 	exit
 fi
