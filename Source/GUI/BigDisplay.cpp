@@ -468,6 +468,22 @@ const filter Filters[]=
             "avectorscope=m=lissajous:s=512x512:zoom=${1}",
         },
     },
+    /*
+    {
+        "EBU r128 Loudness Meter",
+        1,
+        {
+            { Args_Type_Slider,   1,   1,  10,   1, "Zoom" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "ebur128=video=1[out0],anullsink",
+        },
+    },
+	*/
     {
         "(End)",
         -1,
