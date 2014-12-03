@@ -429,7 +429,7 @@ const filter Filters[]=
         "Audio Waveform",
         1,
         {
-            { Args_Type_Slider,   2,   0,  20,   1, "Samples per column"},
+            { Args_Type_Slider,   2,   1,  20,   1, "Samples per column"},
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
