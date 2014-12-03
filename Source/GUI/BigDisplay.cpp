@@ -155,22 +155,20 @@ const filter Filters[]=
             "transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3},transpose=2",
         },
     },
-    /*
     {
         "Frame Metadata Play",
         0,
         {
-            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
             { Args_Type_None,   0, 0, 0, 0, },
             { Args_Type_None,   0, 0, 0, 0, },
             { Args_Type_None,   0, 0, 0, 0, },
             { Args_Type_None,   0, 0, 0, 0, },
         },
         {
-            "cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,drawtext=fontfile=Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=yellow:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=drawtext.txt",
+            "cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,drawtext=fontfile=/Users/rice/Downloads/Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=${1}:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=/Users/rice/Downloads/drawtext.txt",
         },
     },
-    */
     {
         "Histogram",
         0,
