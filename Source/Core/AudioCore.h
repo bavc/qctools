@@ -16,12 +16,12 @@ enum AudioItem
 {
     //R128
     Item_R128M,
-    Item_R128S,
-    Item_R128I,
+    //Item_R128S,
+    //Item_R128I,
     //LRA (R128)
-    Item_LRAL,
-    Item_LRA,
-    Item_LRAH,
+    //Item_LRAL,
+    //Item_LRA,
+    //Item_LRAH,
     //Internal
     Item_AudioMax
 };
@@ -29,7 +29,7 @@ enum AudioItem
 enum AudioGroup
 {
     Group_R128,
-    Group_LRA,
+    //Group_LRA,
     Group_AudioAxis,
     Group_AudioMax
 };
