@@ -158,6 +158,19 @@ const filter Filters[]=
         },
     },
     {
+        "Pixel Offset Subtraction",
+        0,
+        {
+			{ Args_Type_Slider,   1, -20,  20,   1, "Y H" },
+			{ Args_Type_Slider,   0, -20,  20,   1, "Y V" },
+            { Args_Type_Slider,   0, -20,  20,   1, "UV H" },
+            { Args_Type_Slider,   0, -20,  20,   1, "UV V" },
+            { Args_Type_Slider,   0,   0,  10,  10, "Strength" },
+        },
+        {
+            "geq=lum=lum(X\\,Y)-lum(X-${1}\\,Y-${2})+128:cb=cb(X\\,Y)-cb(X-${3}\\,Y-${4})+128:cr=cr(X\\,Y)-cr(X-${3}\\,Y-${4})+128,histeq=strength=${5}",
+        },
+    },
         "Frame Metadata Play",
         0,
         {
