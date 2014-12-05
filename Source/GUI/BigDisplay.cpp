@@ -395,22 +395,20 @@ const filter Filters[]=
             "il=l=d:c=d,signalstats=out=vrep:c=${2}",
         },
     },
-    /*
     {
-        "Tile",
+        "Frame Tiles",
         0,
         {
-            { Args_Type_Tile,     1,   0,   0,   0, "Frames" },
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Slider,   2,   1,   12,   1, "Width"},
+            { Args_Type_Slider,   2,   1,   12,   1, "Height"},
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "scale=iw/${1}:ih/${1}"
+            "scale=iw/${1}:ih/${2},tile=${1}x${2}"
         },
     },
-    */
     {
         "Zoom",
         0,
