@@ -58,7 +58,6 @@ enum args_type
 	Args_Type_Wave_Mode,
     Args_Type_Yuv,  // Y, U , V
     Args_Type_YuvA, // Y, U, V, All
-    Args_Type_Tile, // 4x4, 6x6, 8x8, 10x10
     Args_Type_ClrPck, // Color picker
 };
 
@@ -1066,22 +1065,11 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
 						            break;
 			case Args_Type_Yuv:
             case Args_Type_YuvA:
-            case Args_Type_Tile:
                                     Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
                                     for (size_t OptionPos2=0; OptionPos2<(Filters[FilterPos].Args[OptionPos].Type==Args_Type_Yuv?3:4); OptionPos2++)
                                     {
                                         Options[Pos].Radios[OptionPos][OptionPos2]=new QRadioButton();
                                         Options[Pos].Radios[OptionPos][OptionPos2]->setFont(Font);
-                                        if (Filters[FilterPos].Args[OptionPos].Type==Args_Type_Tile)
-                                            switch (OptionPos2)
-                                            {
-                                                case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("4x4"); break;
-                                                case 1: Options[Pos].Radios[OptionPos][OptionPos2]->setText("6x6"); break;
-                                                case 2: Options[Pos].Radios[OptionPos][OptionPos2]->setText("8x8"); break;
-                                                case 3: Options[Pos].Radios[OptionPos][OptionPos2]->setText("10x10"); break;
-                                                default:;
-                                            }
-                                        else
                                             switch (OptionPos2)
                                             {
                                                 case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("Y"); break;
@@ -1267,20 +1255,12 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                     Value_Pos|=Options[Pos].Radios[OptionPos][3]->isChecked()?1:0; // 3 = pos of "all"
                                     //No break
             case Args_Type_Yuv:
-            case Args_Type_Tile:
                                     Modified=true;
                                     for (size_t OptionPos2=0; OptionPos2<(Filters[Picture_Current].Args[OptionPos].Type?4:3); OptionPos2++)
                                     {
                                         if (Options[Pos].Radios[OptionPos][OptionPos2] && Options[Pos].Radios[OptionPos][OptionPos2]->isChecked())
                                         {
-                                            if (Filters[Picture_Current].Args[OptionPos].Type==Args_Type_Tile)
-                                            {
-                                                WithRadios[OptionPos]=Options[Pos].Radios[OptionPos][OptionPos2]->text().toUtf8().data();
-                                                size_t X_Pos=WithRadios[OptionPos].find('x');
-                                                if (X_Pos!=string::npos)
-                                                    WithRadios[OptionPos].resize(X_Pos);
-                                            }
-                                            else if (string(Filters[Picture_Current].Name)=="Waveform")
+                                            if (string(Filters[Picture_Current].Name)=="Waveform")
                                                 switch (OptionPos2)
                                                 {
                                                     case 0: WithRadios[OptionPos]="0"; break;
@@ -1360,7 +1340,6 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
 				case Args_Type_Wave_Mode:
                 case Args_Type_Yuv:
                 case Args_Type_YuvA:
-                case Args_Type_Tile:
                 case Args_Type_ClrPck:
                                         {
                                         char ToFind1[3];
