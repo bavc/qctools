@@ -171,19 +171,6 @@ const filter Filters[]=
             "geq=lum=lum(X\\,Y)-lum(X-${1}\\,Y-${2})+128:cb=cb(X\\,Y)-cb(X-${3}\\,Y-${4})+128:cr=cr(X\\,Y)-cr(X-${3}\\,Y-${4})+128,histeq=strength=${5}",
         },
     },
-        "Frame Metadata Play",
-        0,
-        {
-            { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
-            { Args_Type_None,   0, 0, 0, 0, },
-            { Args_Type_None,   0, 0, 0, 0, },
-            { Args_Type_None,   0, 0, 0, 0, },
-            { Args_Type_None,   0, 0, 0, 0, },
-        },
-        {
-            "cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,drawtext=fontfile=/Users/rice/Downloads/Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=${1}:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=/Users/rice/Downloads/drawtext.txt",
-        },
-    },
     {
         "Histogram",
         0,
@@ -300,6 +287,20 @@ const filter Filters[]=
         },
         {
             "lutyuv=y=if(eq(${1}\\,-1)\\,128\\,if(eq(${1}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${1}))*pow(2\\,${1}))):u=if(eq(${2}\\,-1)\\,128\\,if(eq(${2}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${2}))*pow(2\\,${2}))):v=if(eq(${3}\\,-1)\\,128\\,if(eq(${3}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${3}))*pow(2\\,${3}))),format=yuv444p|rgb24",
+        },
+    },
+    {
+        "Frame Metadata Play",
+        0,
+        {
+            { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+        },
+        {
+            "cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,drawtext=fontfile=/Users/rice/Downloads/Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=${1}:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=/Users/rice/Downloads/drawtext.txt",
         },
     },
     {
