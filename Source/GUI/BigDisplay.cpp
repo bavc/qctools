@@ -54,6 +54,7 @@ enum args_type
     Args_Type_None,
     Args_Type_Toggle,
     Args_Type_Slider,
+	Args_Type_Win_Func,
     Args_Type_Yuv,  // Y, U , V
     Args_Type_YuvA, // Y, U, V, All
     Args_Type_Tile, // 4x4, 6x6, 8x8, 10x10
@@ -414,13 +415,13 @@ const filter Filters[]=
         1,
         {
             { Args_Type_Slider,   1, -10,  10,   1, "Saturation" },
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Win_Func, 0,   0,   0,   0, "Win Func" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "showspectrum=slide=scroll:mode=separate:color=intensity:saturation=${1}",
+            "showspectrum=slide=scroll:mode=separate:color=intensity:saturation=${1}:win_func=${2}",
         },
     },
     {
@@ -1006,7 +1007,29 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                     Widget_XPox+=2;
                                     }
                                     break;
-            case Args_Type_Yuv:
+            case Args_Type_Win_Func:
+						            Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
+						            for (size_t OptionPos2=0; OptionPos2<4; OptionPos2++)
+						            {
+						                Options[Pos].Radios[OptionPos][OptionPos2]=new QRadioButton();
+						                Options[Pos].Radios[OptionPos][OptionPos2]->setFont(Font);
+					                    switch (OptionPos2)
+					                    {
+					                        case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("none"); break;
+					                        case 1: Options[Pos].Radios[OptionPos][OptionPos2]->setText("hann"); break;
+					                        case 2: Options[Pos].Radios[OptionPos][OptionPos2]->setText("hamming"); break;
+					                        case 3: Options[Pos].Radios[OptionPos][OptionPos2]->setText("blackman"); break;
+					                        default:;
+					                    }
+						                if (OptionPos2==PreviousValues[Pos][FilterPos].Values[OptionPos])
+						                    Options[Pos].Radios[OptionPos][OptionPos2]->setChecked(true);
+						                connect(Options[Pos].Radios[OptionPos][OptionPos2], SIGNAL(toggled(bool)), this, Pos==0?(SLOT(on_FiltersOptions1_toggle(bool))):SLOT(on_FiltersOptions2_toggle(bool)));
+						                Layout0->addWidget(Options[Pos].Radios[OptionPos][OptionPos2], 0, Widget_XPox+OptionPos2);
+						                Options[Pos].Radios_Group[OptionPos]->addButton(Options[Pos].Radios[OptionPos][OptionPos2]);
+						            }
+						            Widget_XPox+=4;
+						            break;
+			case Args_Type_Yuv:
             case Args_Type_YuvA:
             case Args_Type_Tile:
                                     Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
@@ -1188,7 +1211,22 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                     WithSliders[OptionPos]=Options[Pos].Sliders_SpinBox[OptionPos]->value();
                                     PreviousValues[Pos][Picture_Current].Values[OptionPos]=Options[Pos].Sliders_SpinBox[OptionPos]->value();
                                     break;
-            case Args_Type_YuvA:
+			case Args_Type_Win_Func:
+                Modified=true;
+                for (size_t OptionPos2=0; OptionPos2<4; OptionPos2++)
+                {
+                    if (Options[Pos].Radios[OptionPos][OptionPos2] && Options[Pos].Radios[OptionPos][OptionPos2]->isChecked())
+                    {
+                        WithRadios[OptionPos]=Options[Pos].Radios[OptionPos][OptionPos2]->text().toUtf8().data();
+                        size_t X_Pos=WithRadios[OptionPos].find('x');
+                        if (X_Pos!=string::npos)
+                            WithRadios[OptionPos].resize(X_Pos);
+                        PreviousValues[Pos][Picture_Current].Values[OptionPos]=OptionPos2;
+                        break;
+                    }
+                }
+                break;
+			case Args_Type_YuvA:
                                     Value_Pos<<=1;
                                     Value_Pos|=Options[Pos].Radios[OptionPos][3]->isChecked()?1:0; // 3 = pos of "all"
                                     //No break
@@ -1282,6 +1320,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                         }
                                         }
                                         break;
+				case Args_Type_Win_Func:
                 case Args_Type_Yuv:
                 case Args_Type_YuvA:
                 case Args_Type_Tile:
