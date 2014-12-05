@@ -55,6 +55,7 @@ enum args_type
     Args_Type_Toggle,
     Args_Type_Slider,
 	Args_Type_Win_Func,
+	Args_Type_Wave_Mode,
     Args_Type_Yuv,  // Y, U , V
     Args_Type_YuvA, // Y, U, V, All
     Args_Type_Tile, // 4x4, 6x6, 8x8, 10x10
@@ -430,13 +431,13 @@ const filter Filters[]=
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Split Channels" },
 			{ Args_Type_Slider,   2,   1,  20,   1, "Samples per column"},
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Wave_Mode,2,   0,   0,   0, "Mode" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "showwaves=mode=line:n=${2}:s=${width}x${height}:split_channels=0",
-			"showwaves=mode=line:n=${2}:s=${width}x${height}:split_channels=1",
+            "showwaves=mode=${3}:n=${2}:s=${width}x${height}:split_channels=0,negate",
+			"showwaves=mode=${3}:n=${2}:s=${width}x${height}:split_channels=1,negate",
         },
     },
     {
@@ -1029,6 +1030,28 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
 						            }
 						            Widget_XPox+=4;
 						            break;
+            case Args_Type_Wave_Mode:
+						            Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
+						            for (size_t OptionPos2=0; OptionPos2<4; OptionPos2++)
+						            {
+						                Options[Pos].Radios[OptionPos][OptionPos2]=new QRadioButton();
+						                Options[Pos].Radios[OptionPos][OptionPos2]->setFont(Font);
+					                    switch (OptionPos2)
+					                    {
+					                        case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("point"); break;
+					                        case 1: Options[Pos].Radios[OptionPos][OptionPos2]->setText("line"); break;
+					                        case 2: Options[Pos].Radios[OptionPos][OptionPos2]->setText("p2p"); break;
+					                        case 3: Options[Pos].Radios[OptionPos][OptionPos2]->setText("cline"); break;
+					                        default:;
+					                    }
+						                if (OptionPos2==PreviousValues[Pos][FilterPos].Values[OptionPos])
+						                    Options[Pos].Radios[OptionPos][OptionPos2]->setChecked(true);
+						                connect(Options[Pos].Radios[OptionPos][OptionPos2], SIGNAL(toggled(bool)), this, Pos==0?(SLOT(on_FiltersOptions1_toggle(bool))):SLOT(on_FiltersOptions2_toggle(bool)));
+						                Layout0->addWidget(Options[Pos].Radios[OptionPos][OptionPos2], 0, Widget_XPox+OptionPos2);
+						                Options[Pos].Radios_Group[OptionPos]->addButton(Options[Pos].Radios[OptionPos][OptionPos2]);
+						            }
+						            Widget_XPox+=4;
+						            break;
 			case Args_Type_Yuv:
             case Args_Type_YuvA:
             case Args_Type_Tile:
@@ -1212,6 +1235,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                     PreviousValues[Pos][Picture_Current].Values[OptionPos]=Options[Pos].Sliders_SpinBox[OptionPos]->value();
                                     break;
 			case Args_Type_Win_Func:
+			case Args_Type_Wave_Mode:
                 Modified=true;
                 for (size_t OptionPos2=0; OptionPos2<4; OptionPos2++)
                 {
@@ -1321,6 +1345,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                         }
                                         break;
 				case Args_Type_Win_Func:
+				case Args_Type_Wave_Mode:
                 case Args_Type_Yuv:
                 case Args_Type_YuvA:
                 case Args_Type_Tile:
