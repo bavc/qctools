@@ -16,7 +16,6 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QCoreApplication>
-#include <QShortcut>
 #include <QDropEvent>
 #include <QDragEnterEvent>
 #include <QMimeData>
@@ -460,14 +459,6 @@ void MainWindow::dropEvent(QDropEvent *Event)
     }
 
     clearDragDrop();
-    if (FilesListArea)
-    {
-        FilesListArea->UpdateAll();
-        FilesListArea->show();
-    }
-    if (Files.size()>1)
-        ui->actionFilesList->trigger();
-    else
-        ui->actionGraphsLayout->trigger();
+    addFile_finish();
 }
 

@@ -108,8 +108,8 @@ Download_Packages $1 x  x   x x ""           openSUSE_Tumbleweed x86_64 .x86_64
 }
 
 
-qctoolsv="0.5.0"
+qctoolsv="0.6.0"
 destversion="1"
 
-Download_Global 40.1
+Download_Global 25.1
 

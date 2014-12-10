@@ -31,8 +31,6 @@
 //---------------------------------------------------------------------------
 void MainWindow::openFile()
 {
-    //processFile(QFileDialog::getOpenFileName(this, "Open file", "", "Video files (*.avi *.mkv *.mov *.mxf *.mp4);;Statistic files (*.csv);;All (*.*)"));
-
     QStringList List=QFileDialog::getOpenFileNames(this, "Open file", "", "Video files (*.avi *.mkv *.mov *.mxf *.mp4);;Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
     if (List.empty())
         return;
@@ -42,6 +40,8 @@ void MainWindow::openFile()
     {
         addFile(List[Pos]);
     }
+
+    addFile_finish();
 }
 
 //---------------------------------------------------------------------------
@@ -315,6 +315,20 @@ void MainWindow::addFile(const QString &FileName)
 
     Files.push_back(Temp);
     ui->fileNamesBox->addItem(Temp->FileName);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::addFile_finish()
+{
+    if (FilesListArea)
+    {
+        FilesListArea->UpdateAll();
+        FilesListArea->show();
+    }
+    if (Files.size()>1)
+        ui->actionFilesList->trigger();
+    else
+        ui->actionGraphsLayout->trigger();
 
     TimeOut();
 }

@@ -1,4 +1,4 @@
-%define qctools_version           0.5.0
+%define qctools_version           0.6.0
 
 Name:           qctools
 Version:        %{qctools_version}
@@ -15,9 +15,13 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires:  gcc-c++
 BuildRequires:  pkgconfig
 BuildRequires:  zlib-devel
+%if %{undefined mandriva_version}
 BuildRequires:  libbz2-devel
+%endif
 BuildRequires:  cmake
+%if %{undefined rhel_version} && %{undefined centos_version}
 BuildRequires:  yasm
+%endif
 BuildRequires:  libqt4-devel
 %if 0%{?suse_version}
 BuildRequires:  update-desktop-files
@@ -26,8 +30,6 @@ BuildRequires:  update-desktop-files
 BuildRequires:  qt-devel
 BuildRequires:  desktop-file-utils
 %endif
-Requires:   libqt4
-Requires:   libqt4-x11
 
 %description
 QCTools (Quality Control Tools for Video Preservation)

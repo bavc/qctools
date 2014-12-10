@@ -20,33 +20,40 @@
            </ul>
 	   </ul>
 
+<<<<<<< HEAD
     <h2 <a id="Install">Install</a></h2>
     <p>Go to http://bavc.org/qctools and download QCTools for your operating system (currently Windows or Mac OS X are supported). Initiate the install by double-clicking the icon, and follow the steps. New releases of QCTools will be periodically available at the <a href="http://www.bavc.org/qctools">QCTools project website. </a></p>
     <h2><a id="Load">Load Video Files</a></h2>
+=======
+    <h2>Install</h2>
+    <p>Go to http://bavc.org/qctools and download QCTools for your operating system (currently Windows or Mac OS X are supported). Initiate the install by double-clicking the icon, and follow the steps. New releases of QCTools will be periodically available at the <a href="http://www.bavc.org/qctools">QCTools project website.</a></p>
+    <h2>Load Video Files</h2>
+>>>>>>> FETCH_HEAD
     <p>QCTools can currently accomodate several video file types including .mov, .mp4
     Once the QCTools application is open you may identify selected video files for QC Tools analysis in three ways:</p>
     <ol>
         <li>Simply drag a video file (or files) into the QCTools window.(Note that you may import multiple files at once into the tool, though depending on the number and size of the files, processing speed may be affected)</li>
-        <li>Double click the folder icon on the upper left. This launches a window from which you can browse and select video files. </li>
+        <li>Double click the folder icon on the upper left. This launches a window from which you can browse and select video files.</li>
         <li>Navigating to File --&gt; Open.</li>
     </ol>
     <h2><a id="Select">Select Graph Filters</a></h2>
     <p>By clicking the filter checkboxes you can select those that you wish to analyze and display. You may make these selections before uploading your video or at any time after the QC Tools analysis has been done and the graph display will update dynamically.
     As a default, 'Y values', 'U values', 'V values', and 'Diffs' are selected.
-    To begin, you may want to select the <b>Temporal Outliers</b> Graph Filter. This will detect any large discrepancies between pixels and can provide an initial, high-level overview of potential errors.</p>
+    To begin, you may want to select the <strong>Temporal Outliers</strong> Graph Filter. This will detect any large discrepancies between pixels and can provide an initial, high-level overview of potential errors.</p>
     <p>For descriptions of each Filter and how to read graph values, please see the Help Section, denoted by the '?' icon in the toolbox portion of the application.</p>
 
     <h2><a id="View">View and Navigate Graphs</a></h2>
     <p>Graphs display on the top portion of the screen, corresponding video frames show below. The video frames may be navigated via the next, previous, or playback buttons; the frame and time for the particular selection will be displayed. Clicking and dragging your cursor over a portion of the graph will cause the thumbnails below to update accordingly. You may also double click a specific frame and a window will appear displaying the image and all of the various filter values, with 'chroma' or 'normal' view options.</p>
     <p>Pointing your keyboard cursor to a particular point on a graph will result in the display of two values: the frame, and the timecode of the particular place in the video you have navigated to.</p>
     <p>You may also use the '+' and '-' icons in the tool box section of the application to zoom in/out, giving you a more or less detailed view of the graph displays, over a specific timespan of the uploaded video.</p>
-    <p>Some helpful <b>keyboard shortcuts</b> you may want to use are:</p>
+    <p>Some helpful <strong>keyboard shortcuts</strong> you may want to use are:</p>
     <ul>
         <li>'J' - To rewind </li>
         <li>'K' - To pause</li>
         <li>'L' - To Fast Forward</li>
         <li>'F' - To enlarge the window to full screen</li>
     </ul>
+<<<<<<< HEAD
     <h2><a id="Play">Playback and Visual Analysis</a></h2>
     <p>By clicking on a thumbail, you can open the preview window. The preview window serves as a playback environment that allows spot checking and manual video alaysis. The preview window contains two playback windows that can be set to various selections; the filters allow the video to be processed in one of many ways which may help make particular issues more discernable. See the <b>Filter Description</b> page for more details on these playback filters.</p>
 
@@ -54,13 +61,22 @@
     <p>Once you've analyzed a video you may wish to export the analysis as a text-based document. QCTools may express analytical metadata per frame in a <a href="http://en.wikipedia.org/wiki/Comma-separated_values">CSV</a> or <a href="http://en.wikipedia.org/wiki/XML"> XML</a> file format (Please see 'Data Format' tab for more information on the XML file compression and resulting file).<br/>
     When an analysis (which may be time consuming, depending on the length of the file) is complete, a text document may be generated and exported. At a later point, the video may be reviewed simply by opening the file--using the <b>Import</b> menu, or dragging and dropping an existing file--in QCTools instead of having to reload/ reanalyze the video file itself; this process will take considerably less time. Additionally, this file may be opened in other environments such as standard spreadsheet or database applications.<br/>
     To <b>Export</b>:
+=======
+    <h2>Playback and Visual Analysis</h2>
+    <p>By clicking on a thumbail, you can open the preview window. The preview window serves as a playback environment that allows spot checking and manual video alaysis. The preview window contains two playback windows that can be set to various selections; the filters allow the video to be processed in one of many ways which may help make particular issues more discernable. See the <strong>Filter Description</strong> page for more details on these playback filters.</p>
+
+    <h2>Create/Export a Report</h2>
+    <p>Once you've analyzed a video you may wish to export the analysis as a text-based document. QCTools may express analytical metadata per frame in a <a href="http://en.wikipedia.org/wiki/Comma-separated_values">CSV</a> or <a href="http://en.wikipedia.org/wiki/XML">XML</a> file format (Please see 'Data Format' tab for more information on the XML file compression and resulting file).<br/>
+    When an analysis (which may be time consuming, depending on the length of the file) is complete, a text document may be generated and exported. At a later point, the video may be reviewed simply by opening the file--using the <strong>Import</strong> menu, or dragging and dropping an existing file--in QCTools instead of having to reload/ reanalyze the video file itself; this process will take considerably less time. Additionally, this file may be opened in other environments such as standard spreadsheet or database applications.<br/>
+    To <strong>Export</strong>:
+>>>>>>> FETCH_HEAD
 	</p>
     <ul>
         <li>Navigate to: Export --&gt; To .qctools.xml.gz.../CSV, etc. </li>
         <li>Click the 'CSV' icon in the toolbox section of the application. </li>
     </ul>
     <p>Both options will prompt you to name your file and select a select a location.<br/>
-    To <b>Import</b>:
+    To <strong>Import</strong>:
 	</p>
     <ul>
         <li>Navigate to: Import --&gt; From .qctools.xml.gz...</li>

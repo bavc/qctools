@@ -188,10 +188,16 @@
    <property name="text">
     <string>Open</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="actionClose">
    <property name="text">
     <string>Close</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
    </property>
   </action>
   <action name="actionQuit">
@@ -206,6 +212,9 @@
    <property name="text">
     <string>Zoom in</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl++</string>
+   </property>
   </action>
   <action name="actionZoomOut">
    <property name="enabled">
@@ -213,6 +222,9 @@
    </property>
    <property name="text">
     <string>Zoom out</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+-</string>
    </property>
   </action>
   <action name="actionPrint">
@@ -226,6 +238,9 @@
   <action name="actionGettingStarted">
    <property name="text">
     <string>Getting started</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
    </property>
   </action>
   <action name="actionHowToUseThisTool">
@@ -264,6 +279,12 @@
   <action name="actionGoTo">
    <property name="text">
     <string>Go to frame at position...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionToolbar">
@@ -341,6 +362,9 @@
    </property>
    <property name="text">
     <string>To sidecar .qctools.xml.gz</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actionExport_XmlGz_Custom">

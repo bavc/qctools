@@ -173,6 +173,7 @@ void TinyDisplay::on_Labels_Middle_clicked(bool checked)
             BigDisplayArea->connect(BigDisplayArea->ControlArea->P9         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_P9_clicked        (bool)));
         }
     }
+    BigDisplayArea->hide();
     BigDisplayArea->show();
     BigDisplayArea->ShowPicture();
 }

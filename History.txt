@@ -1,4 +1,12 @@
-0.6.0
+0.6.2, 2014-10-29
+-----
+x Memory leaks removed
+
+0.6.1, 2014-10-15
+-----
+x Crash with MP4 files on Mac OS X 10.7 (GitHub issue #40)
+
+0.6.0, 2014-10-09
 -----
 + Summarization statistics
 + pkt_duration_time is added to tha sidecar stats file in order to get the real end timestamp of the stream
@@ -6,6 +14,10 @@
 + File list info shows empty data instead of 0 when the video file is not present
 + Speed improvements
 + The graph marker is now on a frame value
++ RHEL/CentOS 6/7 binaries
++ Debian 6 binaries
++ Ctrl+G keyboard shortcut for "Go to frame at position" (GitHub issue #30)
++ F1 keyboard shortcut for help
 x Minimize/maximize button on video preview window (GitHub issue #24)
 x Position of cursor in graph not updated, when moving in preview window (GitHub issue #18)
 x YUVJ (full range) were shrinked to broadcast range, now using Ffmpeg update for better YUVJ handling (GitHub issue #36)
@@ -15,6 +27,11 @@ x The sidecar stats file was not correctly detected if the media file is open in
 x Linux only: The sidecar stats file was not correctly loaded
 x Fix corrupted Broadcast Range display in some inputs (GitHub issue #10)
 x Line select now plots one line in a waveform, previous the next line and next line were plotted
+x MSEf, PSNR: Y and V were inverted
+x UI was not showing graphs if the file is open via the menu
+x Windows: icon was not always displayed in Windows menu
+x Mac: Playback window was not pushed to the forefront of the screen when a user clicks on a thumbnail but the first time
+x When clicking the "zoom in" button an insane number of times, QCTools was crashing (GitHub issue #39)
 
 0.5.0, 2014-09-12
 -----

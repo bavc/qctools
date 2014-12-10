@@ -52,12 +52,8 @@ void MainWindow::Ui_Init()
     ui->setupUi(this);
 
     // Shortcuts
-    QShortcut *shortcutPlus = new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_Plus), this);
-    QObject::connect(shortcutPlus, SIGNAL(activated()), this, SLOT(on_actionZoomIn_triggered()));
     QShortcut *shortcutEqual = new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_Equal), this);
     QObject::connect(shortcutEqual, SIGNAL(activated()), this, SLOT(on_actionZoomIn_triggered()));
-    QShortcut *shortcutZoomOut = new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_Minus), this);
-    QObject::connect(shortcutZoomOut, SIGNAL(activated()), this, SLOT(on_actionZoomOut_triggered()));
     QShortcut *shortcutJ = new QShortcut(QKeySequence(Qt::Key_J), this);
     QObject::connect(shortcutJ, SIGNAL(activated()), this, SLOT(on_M1_triggered()));
     QShortcut *shortcutLeft = new QShortcut(QKeySequence(Qt::Key_Left), this);
@@ -96,10 +92,6 @@ void MainWindow::Ui_Init()
     ui->verticalLayout->setMargin(0);
     ui->verticalLayout->setStretch(0, 1);
     ui->verticalLayout->setContentsMargins(0,0,0,0);
-
-    QLabel* DragDrop=new QLabel();
-    DragDrop->setAlignment(Qt::AlignCenter);
-    DragDrop->setPixmap(QPixmap(":/icon/window-out.png"));
 
     // Window
     setWindowTitle("QCTools");
@@ -141,6 +133,10 @@ void MainWindow::Ui_Init()
     ui->actionFiltersLayout->setVisible(false);
     ui->actionWindowOut->setVisible(false);
     ui->actionPrint->setVisible(false);
+    ui->actionPreferences->setVisible(false);
+    ui->menuOptions->setVisible(false);
+    ui->menuOptions->setTitle(QString());
+    ui->menuOptions->setEnabled(false);
 
     // Not implemented action
     if (ui->actionExport_XmlGz_Custom)
@@ -158,7 +154,10 @@ void MainWindow::configureZoom()
         ui->horizontalScrollBar->setSingleStep(1);
         ui->horizontalScrollBar->setEnabled(false);
         ui->actionZoomOut->setEnabled(false);
-        ui->actionZoomIn->setEnabled(!Files.empty());
+        if (Files_CurrentPos<Files.size() && PlotsArea && PlotsArea->ZoomScale<Files[Files_CurrentPos]->Videos[0]->x_Current_Max/4)
+            ui->actionZoomIn->setEnabled(true);
+        else
+            ui->actionZoomIn->setEnabled(false);
         ui->actionGoTo->setEnabled(!Files.empty());
         ui->actionExport_XmlGz_Prompt->setEnabled(!Files.empty());
         ui->actionExport_XmlGz_Sidecar->setEnabled(!Files.empty());
@@ -174,7 +173,10 @@ void MainWindow::configureZoom()
     ui->horizontalScrollBar->setSingleStep(Increment);
     ui->horizontalScrollBar->setEnabled(true);
     ui->actionZoomOut->setEnabled(true);
-    ui->actionZoomIn->setEnabled(true);
+    if (PlotsArea->ZoomScale<Files[Files_CurrentPos]->Videos[0]->x_Current_Max/4)
+        ui->actionZoomIn->setEnabled(true);
+    else
+        ui->actionZoomIn->setEnabled(false);
     ui->actionGoTo->setEnabled(true);
     ui->actionExport_XmlGz_Prompt->setEnabled(true);
     ui->actionExport_XmlGz_Sidecar->setEnabled(true);
@@ -194,7 +196,8 @@ void MainWindow::Zoom_Move(size_t Begin)
 //---------------------------------------------------------------------------
 void MainWindow::Zoom_In()
 {
-    PlotsArea->ZoomScale*=2;
+    if (PlotsArea->ZoomScale<Files[Files_CurrentPos]->Videos[0]->x_Current_Max/4)
+        PlotsArea->ZoomScale*=2;
     configureZoom();
     size_t Position=Files[Files_CurrentPos]->Frames_Pos_Get();
     size_t Increment=Files[Files_CurrentPos]->Videos[0]->x_Current_Max/PlotsArea->ZoomScale;

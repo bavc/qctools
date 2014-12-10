@@ -5,7 +5,7 @@ RequestExecutionLevel admin
 ; Some defines
 !define PRODUCT_NAME "QCTools"
 !define PRODUCT_PUBLISHER "MediaArea.net"
-!define PRODUCT_VERSION "0.5.0"
+!define PRODUCT_VERSION "0.6.0"
 !define PRODUCT_VERSION4 "${PRODUCT_VERSION}.0"
 !define PRODUCT_WEB_SITE "http://www.bavc.org/qctools"
 !define COMPANY_REGISTRY "Software\MediaArea.net"
@@ -77,7 +77,7 @@ FunctionEnd
 Section "SectionPrincipale" SEC01
   SetOverwrite on
   SetOutPath "$SMPROGRAMS"
-  CreateShortCut "$SMPROGRAMS\QCTools.lnk" "$INSTDIR\QCTools.exe" "" "" "" "" "" ""
+  CreateShortCut "$SMPROGRAMS\QCTools.lnk" "$INSTDIR\QCTools.exe" "" "$INSTDIR\QCTools.exe" 0 "" "" "QCTools"
   SetOutPath "$INSTDIR"
   File "..\..\Project\MSVC2010\Release\QCTools.exe"
   File "..\..\Project\MSVC2010\Release\avcodec-55.dll"

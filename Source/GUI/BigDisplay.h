@@ -194,12 +194,6 @@ public Q_SLOTS:
     void on_Color1_click(bool checked);
     void on_Color2_click(bool checked);
 
-    void on_M1_triggered();
-    void on_Minus_triggered();
-    void on_PlayPause_triggered();
-    void on_Pause_triggered();
-    void on_Plus_triggered();
-    void on_P1_triggered();
     void on_Full_triggered();
 };
 
