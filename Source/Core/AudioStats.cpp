@@ -5,8 +5,8 @@
  */
 
 //---------------------------------------------------------------------------
-#include "Core/VideoStats.h"
-#include "Core/VideoCore.h"
+#include "Core/AudioStats.h"
+#include "Core/AudioCore.h"
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -33,14 +33,14 @@ using namespace tinyxml2;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-VideoStats::VideoStats (size_t FrameCount, double Duration, size_t FrameCount_Max, double Frequency_)
+AudioStats::AudioStats (size_t FrameCount, double Duration, size_t FrameCount_Max, double Frequency_)
     :
-    CommonStats(VideoPerItem, 0, Group_VideoMax, Item_VideoMax, FrameCount, Duration, FrameCount_Max, Frequency_)
+    CommonStats(AudioPerItem, 1, Group_AudioMax, Item_AudioMax, FrameCount, Duration, FrameCount_Max, Frequency_)
 {
 }
 
 //---------------------------------------------------------------------------
-VideoStats::~VideoStats()
+AudioStats::~AudioStats()
 {
 }
 
@@ -49,9 +49,9 @@ VideoStats::~VideoStats()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void VideoStats::StatsFromExternalData (const string &Data)
+void AudioStats::StatsFromExternalData (const string &Data)
 {
-    // VideoStats from external data
+    // AudioStats from external data
     // XML input
     XMLDocument Document;
     if (Document.Parse(Data.c_str()))
@@ -69,7 +69,7 @@ void VideoStats::StatsFromExternalData (const string &Data)
                 if (!strcmp(Frame->Value(), "frame"))
                 {
                     const char* media_type=Frame->Attribute("media_type");
-                    if (media_type && !strcmp(media_type, "video"))
+                    if (media_type && !strcmp(media_type, "audio"))
                     {
                         const char* Attribute;
                             
@@ -106,36 +106,22 @@ void VideoStats::StatsFromExternalData (const string &Data)
                             x[3][x_Current]=x[2][x_Current]/60;
                         }
 
-                        int Width;
-                        Attribute=Frame->Attribute("width");
-                        if (Attribute)
-                            Width=std::atoi(Attribute);
-                        else
-                            Width=0;
-
-                        int Height;
-                        Attribute=Frame->Attribute("width");
-                        if (Attribute)
-                            Height=std::atoi(Attribute);
-                        else
-                            Height=0;
-
                         XMLElement* Tag=Frame->FirstChildElement();
                         while (Tag)
                         {
                             if (!strcmp(Tag->Value(), "tag"))
                             {
-                                size_t j=Item_VideoMax;
+                                size_t j=Item_AudioMax;
                                 const char* key=Tag->Attribute("key");
                                 if (key)
-                                    for (size_t Plot_Pos=0; Plot_Pos<Item_VideoMax; Plot_Pos++)
+                                    for (size_t Plot_Pos=0; Plot_Pos<Item_AudioMax; Plot_Pos++)
                                         if (!strcmp(key, PerItem[Plot_Pos].FFmpeg_Name))
                                         {
                                             j=Plot_Pos;
                                             break;
                                         }
 
-                                if (j!=Item_VideoMax)
+                                if (j!=Item_AudioMax)
                                 {
                                     double value;
                                     Attribute=Tag->Attribute("value");
@@ -143,29 +129,18 @@ void VideoStats::StatsFromExternalData (const string &Data)
                                         value=std::atof(Attribute);
                                     else
                                         value=0;
-                                            
-                                    // Special cases: crop: x2, y2
-                                    if (Width && !strcmp(key, "lavfi.cropdetect.x2"))
-                                        y[j][x_Current]=Width-value;
-                                    else if (Height && !strcmp(key, "lavfi.cropdetect.y2"))
-                                        y[j][x_Current]=Height-value;
-                                    else if (Width && !strcmp(key, "lavfi.cropdetect.w"))
-                                        y[j][x_Current]=Width-value;
-                                    else if (Height && !strcmp(key, "lavfi.cropdetect.h"))
-                                        y[j][x_Current]=Height-value;
-                                    else
-                                        y[j][x_Current]=value;
+                                    y[j][x_Current]=value;
 
-                                    if (PerItem[j].Group1!=Group_VideoMax && y_Max[PerItem[j].Group1]<y[j][x_Current])
+                                    if (PerItem[j].Group1!=Group_AudioMax && y_Max[PerItem[j].Group1]<y[j][x_Current])
                                         y_Max[PerItem[j].Group1]=y[j][x_Current];
-                                    if (PerItem[j].Group2!=Group_VideoMax && y_Max[PerItem[j].Group2]<y[j][x_Current])
+                                    if (PerItem[j].Group2!=Group_AudioMax && y_Max[PerItem[j].Group2]<y[j][x_Current])
                                         y_Max[PerItem[j].Group2]=y[j][x_Current];
-                                    if (PerItem[j].Group1!=Group_VideoMax && y_Min[PerItem[j].Group1]>y[j][x_Current])
+                                    if (PerItem[j].Group1!=Group_AudioMax && y_Min[PerItem[j].Group1]>y[j][x_Current])
                                         y_Min[PerItem[j].Group1]=y[j][x_Current];
-                                    if (PerItem[j].Group2!=Group_VideoMax && y_Min[PerItem[j].Group2]>y[j][x_Current])
+                                    if (PerItem[j].Group2!=Group_AudioMax && y_Min[PerItem[j].Group2]>y[j][x_Current])
                                         y_Min[PerItem[j].Group2]=y[j][x_Current];
 
-                                    //VideoStats
+                                    //AudioStats
                                     Stats_Totals[j]+=y[j][x_Current];
                                     if (PerItem[j].DefaultLimit!=DBL_MAX)
                                     {
@@ -210,7 +185,7 @@ void VideoStats::StatsFromExternalData (const string &Data)
 }
 
 //---------------------------------------------------------------------------
-void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
+void AudioStats::StatsFromFrame (struct AVFrame* Frame, int, int)
 {
     AVDictionary * m=av_frame_get_metadata (Frame);
     AVDictionaryEntry* e=NULL;
@@ -221,35 +196,23 @@ void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
         if (!e)
             break;
         size_t j=0;
-        for (; j<Item_VideoMax; j++)
+        for (; j<Item_AudioMax; j++)
         {
             if (strcmp(e->key, PerItem[j].FFmpeg_Name)==0)
                 break;
         }
 
-        if (j<Item_VideoMax)
+        if (j<Item_AudioMax)
         {
-            double value=std::atof(e->value);
+            y[j][x_Current]=std::atof(e->value);
                                             
-            // Special cases: crop: x2, y2
-            if (string(e->key)=="lavfi.cropdetect.x2")
-                y[j][x_Current]=Width-value;
-            else if (string(e->key)=="lavfi.cropdetect.y2")
-                y[j][x_Current]=Height-value;
-            else if (string(e->key)=="lavfi.cropdetect.w")
-                y[j][x_Current]=Width-value;
-            else if (string(e->key)=="lavfi.cropdetect.h")
-                y[j][x_Current]=Height-value;
-            else
-                y[j][x_Current]=value;
-
-            if (PerItem[j].Group1!=Group_VideoMax && y_Max[PerItem[j].Group1]<y[j][x_Current])
+            if (PerItem[j].Group1!=Group_AudioMax && y_Max[PerItem[j].Group1]<y[j][x_Current])
                 y_Max[PerItem[j].Group1]=y[j][x_Current];
-            if (PerItem[j].Group2!=Group_VideoMax && y_Max[PerItem[j].Group2]<y[j][x_Current])
+            if (PerItem[j].Group2!=Group_AudioMax && y_Max[PerItem[j].Group2]<y[j][x_Current])
                 y_Max[PerItem[j].Group2]=y[j][x_Current];
-            if (PerItem[j].Group1!=Group_VideoMax && y_Min[PerItem[j].Group1]>y[j][x_Current])
+            if (PerItem[j].Group1!=Group_AudioMax && y_Min[PerItem[j].Group1]>y[j][x_Current])
                 y_Min[PerItem[j].Group1]=y[j][x_Current];
-            if (PerItem[j].Group2!=Group_VideoMax && y_Min[PerItem[j].Group2]>y[j][x_Current])
+            if (PerItem[j].Group2!=Group_AudioMax && y_Min[PerItem[j].Group2]>y[j][x_Current])
                 y_Min[PerItem[j].Group2]=y[j][x_Current];
 
             //Stats
@@ -263,12 +226,10 @@ void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
             }
         }
 
-        /*
         A+=e->key;
         A+=',';
         A+=e->value;
         A+="\r\n";
-        */
     }
 
     key_frames[x_Current]=Frame->key_frame?true:false;
@@ -286,7 +247,7 @@ void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
 }
 
 //---------------------------------------------------------------------------
-void VideoStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
+void AudioStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
 {
     if (Frequency==0)
         return; // Not supported
@@ -327,7 +288,7 @@ void VideoStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
 }
 
 //---------------------------------------------------------------------------
-string VideoStats::StatsToCSV()
+string AudioStats::StatsToCSV()
 {
     stringstream Value;
     Value<<",,,,,,pts,,,,,,,,,,,,,,,YMIN,YLOW,YAVG,YHIGH,YMAX,UMIN,ULOW,UAVG,UHIGH,UMAX,VMIN,VLOW,VAVG,VHIGH,VMAX,YDIF,UDIF,VDIF,SATMIN,SATLOW,SATAVG,SATHIGH,SATMAX,HUEMED,HUEAVG,TOUT,VREP,BRNG,CROPx1,CROPx2,CROPy1,CROPy2,CROPw,CROPh,MSEy,MSEu,MSEv,PSNRy,PSNRu,PSNRv";
@@ -345,7 +306,7 @@ string VideoStats::StatsToCSV()
         Value<<",,,,,,";
         Value<<fixed<<setprecision(6)<<x[1][Pos];
         Value<<",,,,,,,,,,,,,,";
-        for (size_t Pos2=0; Pos2<Item_VideoMax; Pos2++)
+        for (size_t Pos2=0; Pos2<Item_AudioMax; Pos2++)
         {
             Value<<','<<fixed<<setprecision(PerItem[Pos2].DigitsAfterComma)<<y[Pos2][Pos];
         }
@@ -364,7 +325,7 @@ string VideoStats::StatsToCSV()
 }
 
 //---------------------------------------------------------------------------
-string VideoStats::StatsToXML (int Width, int Height)
+string AudioStats::StatsToXML (int Width, int Height)
 {
     stringstream Data;
 
@@ -381,26 +342,16 @@ string VideoStats::StatsToXML (int Width, int Height)
             Data<<" pkt_duration_time=\"" << pkt_duration_time.str() << "\"";
         Data<<" width=\"" << width.str() << "\" height=\"" << height.str() <<"\">\n";
 
-        for (size_t Plot_Pos=0; Plot_Pos<Item_VideoMax; Plot_Pos++)
+        for (size_t Plot_Pos=0; Plot_Pos<Item_AudioMax; Plot_Pos++)
         {
             string key=PerItem[Plot_Pos].FFmpeg_Name;
 
             stringstream value;
-            switch (Plot_Pos)
-            {
-                case Item_Crop_x2 :
-                case Item_Crop_w :
-                                        // Special case, values are from width
-                                        value<<Width-y[Plot_Pos][x_Pos];
-                                        break;
-                case Item_Crop_y2 :
-                case Item_Crop_h :
-                                        // Special case, values are from height
-                                        value<<Height-y[Plot_Pos][x_Pos];
-                                        break;
-                default:
+            //switch (Plot_Pos)
+            //{
+            //    default:
                                         value<<y[Plot_Pos][x_Pos];
-            }
+            //}
 
             Data<<"            <tag key=\""+key+"\" value=\""+value.str()+"\"/>\n";
         }

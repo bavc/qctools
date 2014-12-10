@@ -132,6 +132,24 @@
     <ClCompile Include="..\..\..\Source\ThirdParty\tinyxml2\tinyxml2.cpp">
       <Filter>Source Files\ThirdParty\tinyxml2</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Plot.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_Plot.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Core\VideoCore.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Core\AudioCore.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Core\AudioStats.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Core\CommonStats.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="_Automated\ui_mainwindow.h">
@@ -181,6 +199,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\ThirdParty\tinyxml2\tinyxml2.h">
       <Filter>Header Files\ThirdParty\tinyxml2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Plot.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Core\AudioCore.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Core\AudioStats.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Core\CommonStats.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Core\VideoCore.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

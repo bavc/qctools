@@ -9,35 +9,14 @@
 #define GUI_Plots_H
 //---------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------
 #include "Core/Core.h"
 #include "GUI/FileInformation.h"
-//---------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------
 #include <QWidget>
-//---------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------
 class QwtPlot;
-class QwtLegend;
-class QwtPlotZoomer;
-class QwtPlotCurve;
-class QwtPlotPicker;
-class QwtPlotMarker;
-
-class QLabel;
-class QToolButton;
-class QPushButton;
-class QComboBox;
-class QVBoxLayout;
-class QHBoxLayout;
-
-class PerPicture;
-class TinyDisplay;
-class Control;
-class Info;
-//---------------------------------------------------------------------------
+class Plot;
+struct per_item;
 
 //***************************************************************************
 // Class
@@ -48,70 +27,67 @@ class Plots : public QWidget
     Q_OBJECT
 
 public:
-    explicit Plots(QWidget *parent, FileInformation* FileInfoData);
-    ~Plots();
+    enum XAxisFormat
+    {
+        AxisFrames,
+        AxisSeconds,
+        AxisMinutes,
+        AxisHours,
+        AxisTime
+    };
 
-    // File information
-    FileInformation*            FileInfoData;
+    explicit                    Plots( QWidget *parent, const struct stream_info* streamInfo, FileInformation* FileInfoData, size_t StatsPos );
+    virtual                     ~Plots();
 
-    // To update
-    TinyDisplay*                TinyDisplayArea;
-    Control*                    ControlArea;
-    Info*                       InfoArea;
+    void                        updateAll();
+    void                        Plots_Update();
+    void                        Marker_Update();
+    void                        setPlotVisible( size_t, bool on );
 
-    // Positioning info
-    size_t                      ZoomScale;
+    const QwtPlot*              plot( size_t ) const;
 
-    // Plots
-    void                        Plots_Create                ();
-    void                        Plots_Create                (PlotType Type);
-    void                        Plots_Update                ();
-    void                        Marker_Update               ();
-    void                        Marker_Update               (double X);
-    void                        createData_Init             ();
-    void                        createData_Update           ();
-    void                        createData_Update           (PlotType Type);
+    void                        Zoom_Move( size_t Begin );
 
-    // UI
-    bool                        Status[PlotType_Max];
-    void                        refreshDisplay              ();
-    void                        refreshDisplay_Axis         ();
-
-    // Zoom
-    void                        Zoom_Update                 ();
-    void                        Zoom_Move                   (size_t Begin);
-    void                        Zoom_In                     ();
-    void                        Zoom_Out                    ();
-
-    // Widgets
-    QVBoxLayout*                Layout;
-    QHBoxLayout*                Layouts[PlotType_Max];
-    QWidget*                    paddings[PlotType_Max];
-    QwtPlot*                    plots[PlotType_Max];
-    QwtLegend*                  legends[PlotType_Max];
-
-    // Widgets addons
-    QwtPlotCurve*               plotsCurves[PlotType_Max][5];
-    QwtPlotZoomer*              plotsZoomers[PlotType_Max];
-    QwtPlotPicker*              plotsPickers[PlotType_Max];
-    QwtPlotMarker*              plotsMarkers[PlotType_Max];
-
-    // X axis info
-    QComboBox*                  XAxis_Kind;
-    int                         XAxis_Kind_index;
-    qreal                       Zoom_Left;
-    qreal                       Zoom_Width;
-    QPointF                     Marker_RealPoint;
-    size_t                      Marker_FramePos;
-    size_t                      Data_FramePos_Max;
-    size_t                      Data_FramePos_Current;
-
-    // Y axis info
-    double                      plots_YMax[PlotType_Max];
+    void                        zoom( bool up );
+    int                         zoomLevel() const { return m_zoomLevel; }
 
 private Q_SLOTS:
-    void plot_moved( const QPointF & );
-    void on_XAxis_Kind_currentIndexChanged(int index);
+    void                        onCursorMoved( double x );
+    void                        onXAxisFormatChanged( int index );
+
+private:
+    Plot*                       plotAt( int row );
+    const Plot*                 plotAt( int row ) const;
+
+    void                        replotAll();
+
+    void                        shiftXAxes();
+    void                        shiftXAxes( size_t Begin );
+
+    void                        syncPlots();
+    void                        syncPlot( size_t Type );
+    void                        setCursorPos( double X );
+
+    void                        alignYAxes();
+    double                      axisStepSize( double s ) const;
+    const CommonStats*          stats() const { return m_fileInfoData->Stats[m_statsPos]; }
+    CommonStats*                stats() { return m_fileInfoData->Stats[m_statsPos]; }
+    int                         framePos() const { return m_fileInfoData->Frames_Pos_Get(m_statsPos); }
+
+private:
+    QwtPlot**                   m_plots;
+    size_t                      m_zoomLevel;
+
+    // X axis info
+    int                         m_dataTypeIndex;
+    size_t                      m_Data_FramePos_Max;
+
+    FileInformation*            m_fileInfoData;
+
+    size_t                      m_statsPos;
+
+    // Arrays
+    const struct stream_info*   m_streamInfo; 
 };
 
 #endif // GUI_Plots_H

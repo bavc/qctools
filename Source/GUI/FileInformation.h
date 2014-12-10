@@ -12,15 +12,14 @@
 //---------------------------------------------------------------------------
 #include "Core/Core.h"
 #include "Core/FFmpeg_Glue.h"
-#include "Core/VideoStats.h"
 
 #include <QThread>
 #include <QPixmap>
 
 class MainWindow;
+class CommonStats;
+
 //---------------------------------------------------------------------------
-
-
 class FileInformation : public QThread
 {
     //thread part
@@ -42,15 +41,15 @@ public:
     // Infos
     QPixmap*                    Picture_Get                 (size_t Pos);
     QString                     FileName;
-    int                         Frames_Pos_Get              ()                                      {return Frames_Pos;}
-    void                        Frames_Pos_Set              (int Frames_Pos);
+    int                         Frames_Pos_Get              (size_t Stats_Pos=0);
+    void                        Frames_Pos_Set              (int Frames_Pos, size_t Stats_Pos=0);
     void                        Frames_Pos_Minus            ();
     void                        Frames_Pos_Plus             ();
     bool                        PlayBackFilters_Available   ();
 
     // FFmpeg glue
     FFmpeg_Glue*                Glue;
-    std::vector<VideoStats*>    Videos;
+    std::vector<CommonStats*>   Stats;
 
 private:
     // Info

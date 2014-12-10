@@ -10,8 +10,12 @@ CONFIG += qt release
 CONFIG += no_keywords
 
 HEADERS = \
+    ../../Source/Core/AudioCore.h \
+    ../../Source/Core/AudioStats.h \
+    ../../Source/Core/CommonStats.h \
     ../../Source/Core/Core.h \
     ../../Source/Core/FFmpeg_Glue.h \
+    ../../Source/Core/VideoCore.h \
     ../../Source/Core/VideoStats.h \
     ../../Source/GUI/BigDisplay.h \
     ../../Source/GUI/Control.h \
@@ -21,13 +25,18 @@ HEADERS = \
     ../../Source/GUI/Info.h \
     ../../Source/GUI/mainwindow.h \
     ../../Source/GUI/preferences.h \
+    ../../Source/GUI/Plot.h \
     ../../Source/GUI/Plots.h \
     ../../Source/GUI/TinyDisplay.h \
     ../../Source/ThirdParty/tinyxml2/tinyxml2.h
 
 SOURCES = \
+    ../../Source/Core/AudioCore.cpp \
+    ../../Source/Core/AudioStats.cpp \
+    ../../Source/Core/CommonStats.cpp \
     ../../Source/Core/Core.cpp \
     ../../Source/Core/FFmpeg_Glue.cpp \
+    ../../Source/Core/VideoCore.cpp \
     ../../Source/Core/VideoStats.cpp \
     ../../Source/GUI/BigDisplay.cpp \
     ../../Source/GUI/Control.cpp \
@@ -40,6 +49,7 @@ SOURCES = \
     ../../Source/GUI/mainwindow_Callbacks.cpp \
     ../../Source/GUI/mainwindow_More.cpp \
     ../../Source/GUI/mainwindow_Ui.cpp \
+    ../../Source/GUI/Plot.cpp \
     ../../Source/GUI/Plots.cpp \
     ../../Source/GUI/preferences.cpp \
     ../../Source/GUI/TinyDisplay.cpp \
@@ -72,14 +82,12 @@ LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
              -L$${PWD}/../../../ffmpeg/libswscale -lswscale \
              -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
              -L$${PWD}/../../../ffmpeg/libavutil -lavutil
-LIBS      += -L$${PWD}/../../../openjpeg/usr/lib -lopenjpeg
+LIBS      += -L$${PWD}/../../../openjpeg/usr/lib -lopenjpeg \
+             -L$${PWD}/../../../freetype/usr/lib -lfreetype
 LIBS      += -lbz2
-!macx
-{
-LIBS      += -lrt
-}
 
-macx:
-{
-    ICON = ../../Source/Resource/Logo.icns 
-}
+!macx:LIBS      += -lrt
+
+macx:ICON = ../../Source/Resource/Logo.icns
+macx:QMAKE_LFLAGS += -framework CoreFoundation -framework CoreVideo -framework VideoDecodeAcceleration
+macx:LIBS += -liconv

@@ -7,6 +7,7 @@
 //---------------------------------------------------------------------------
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "Core/CommonStats.h"
 #include "Core/Core.h"
 
 #include <QFileDialog>
@@ -40,7 +41,7 @@ void MainWindow::TimeOut ()
     // Configuring plots
     if (ui->actionFilesList->isChecked() && FilesListArea==NULL)
         createFilesList();
-    if (ui->actionGraphsLayout->isChecked() && PlotsArea==NULL)
+    if (ui->actionGraphsLayout->isChecked() && PlotsAreas.empty())
         createGraphsLayout();
     refreshDisplay();
     Update();
@@ -48,7 +49,7 @@ void MainWindow::TimeOut ()
     // Simultaneous parsing
     for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
     {
-        if (Files[Files_Pos]->Videos[0]->State_Get()<1)
+        if (Files[Files_Pos]->Stats[0]->State_Get()<1)
             Files[Files_Pos]->Parse();
     }
 
@@ -62,8 +63,8 @@ void MainWindow::TimeOut ()
         int VideoFramePos_Total=0;
         for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
         {
-            VideoFramePos_Total+=Files[Files_Pos]->Videos[0]->x_Current;
-            VideoFrameCount_Total+=Files[Files_Pos]->Videos[0]->x_Current_Max;
+            VideoFramePos_Total+=Files[Files_Pos]->Stats[0]->x_Current;
+            VideoFrameCount_Total+=Files[Files_Pos]->Stats[0]->x_Current_Max;
         }
         if (Files_Completed!=Files.size())
         {
@@ -74,17 +75,17 @@ void MainWindow::TimeOut ()
         }
     }
     for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
-        if (Files[Files_Pos]->Videos[0]->State_Get()>=1)
+        if (Files[Files_Pos]->Stats[0]->State_Get()>=1)
             Files_Completed++;
 
     if (Files_CurrentPos!=(size_t)-1)
     {
-        if (Files[Files_CurrentPos]->Videos[0]->State_Get()<1)
+        if (Files[Files_CurrentPos]->Stats[0]->State_Get()<1)
         {
             stringstream Message;
-            Message<<"Parsing frame "<<Files[Files_CurrentPos]->Videos[0]->x_Current;
-            if (Files[Files_CurrentPos]->Videos[0]->x_Current_Max)
-                Message<<"/"<<Files[Files_CurrentPos]->Videos[0]->x_Current_Max<<" ("<<(int)((double)Files[Files_CurrentPos]->Videos[0]->x_Current)*100/Files[Files_CurrentPos]->Videos[0]->x_Current_Max<<"%)";
+            Message<<"Parsing frame "<<Files[Files_CurrentPos]->Stats[0]->x_Current;
+            if (Files[Files_CurrentPos]->Stats[0]->x_Current_Max)
+                Message<<"/"<<Files[Files_CurrentPos]->Stats[0]->x_Current_Max<<" ("<<(int)((double)Files[Files_CurrentPos]->Stats[0]->x_Current)*100/Files[Files_CurrentPos]->Stats[0]->x_Current_Max<<"%)";
             QStatusBar* StatusBar=statusBar();
             if (StatusBar)
                 StatusBar->showMessage((Message.str()+Message_Total.str()).c_str());

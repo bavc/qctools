@@ -18,7 +18,6 @@ using namespace std;
 
 #include "Core/Core.h"
 #include "GUI/FileInformation.h"
-#include "GUI/Plots.h"
 #include "GUI/TinyDisplay.h"
 #include "GUI/Control.h"
 #include "GUI/Info.h"
@@ -28,6 +27,7 @@ namespace Ui {
 class MainWindow;
 }
 
+class Plots;
 class QPixmap;
 class QLabel;
 class QToolButton;
@@ -63,7 +63,6 @@ public:
     void                        Export_CSV                  ();
     void                        Export_PDF                  ();
     void                        refreshDisplay              ();
-    void                        refreshDisplay_Axis         ();
     void                        Options_Preferences         ();
     void                        Help_GettingStarted         ();
     void                        Help_HowToUse               ();
@@ -90,7 +89,7 @@ public:
 
     // Visual elements
     FilesList*                  FilesListArea;
-    Plots*                      PlotsArea;
+    std::vector<Plots*>         PlotsAreas;
     TinyDisplay*                TinyDisplayArea;
     Control*                    ControlArea;
     Info*                       InfoArea;
@@ -98,7 +97,7 @@ public:
     QLabel*                     DragDrop_Text;
 
     //CheckBoxes
-    QCheckBox*                  CheckBoxes[PlotType_Max];
+    std::vector<QCheckBox*>     CheckBoxes[2]; //0=Video, 1=Audio
 
     // Files
     std::vector<FileInformation*> Files;
@@ -182,6 +181,7 @@ private Q_SLOTS:
     void on_Full_triggered();
 
 private:
+    void Zoom( bool );
     Ui::MainWindow *ui;
 };
 

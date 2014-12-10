@@ -14,6 +14,7 @@
 #include "GUI/Info.h"
 #include "GUI/FileInformation.h"
 #include "GUI/Plots.h"
+#include "Core/CommonStats.h"
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -30,10 +31,10 @@
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Control::Control(QWidget *parent, FileInformation* FileInformationData_, Plots* PlotsArea_, style Style_, bool IsSlave_):
+Control::Control(QWidget *parent, FileInformation* FileInformationData_, std::vector<Plots*>* PlotsAreas_, style Style_, bool IsSlave_):
     QWidget(parent),
     FileInfoData(FileInformationData_),
-    PlotsArea(PlotsArea_),
+    PlotsAreas(PlotsAreas_),
     Style(Style_),
     IsSlave(IsSlave_)
 {
@@ -228,8 +229,10 @@ void Control::Update()
     ShouldUpate=false;
 
     int Milliseconds=(int)-1;
-    if (FileInfoData && Frames_Pos<FileInfoData->Videos[0]->x_Current || (Frames_Pos<FileInfoData->Videos[0]->x_Current_Max && FileInfoData->Videos[0]->x[1][Frames_Pos])) //Also includes when stats are not ready but timestamp is available
-        Milliseconds=(int)(FileInfoData->Videos[0]->x[1][Frames_Pos]*1000);
+    if (FileInfoData && !FileInfoData->Stats.empty()
+     && ( Frames_Pos<FileInfoData->Stats[0]->x_Current
+      || (Frames_Pos<FileInfoData->Stats[0]->x_Current_Max && FileInfoData->Stats[0]->x[1][Frames_Pos]))) //Also includes when stats are not ready but timestamp is available
+        Milliseconds=(int)(FileInfoData->Stats[0]->x[1][Frames_Pos]*1000);
 
     if (Frames_Pos!=(int)-1)
         Info_Frames->setText("Frame "+QString::number(Frames_Pos));
@@ -298,7 +301,7 @@ void Control::Update()
             TinyDisplayArea->BigDisplayArea->ControlArea->P2->setEnabled(P2->isEnabled());
         }
     }
-    else if (Frames_Pos+1==FileInfoData->Videos[0]->x_Current_Max)
+    else if (Frames_Pos+1==FileInfoData->Stats[0]->x_Current_Max)
     {
         if (Timer)
             Timer->stop();
@@ -360,7 +363,7 @@ void Control::Update()
                 TinyDisplayArea->BigDisplayArea->ControlArea->P2->setEnabled(P2->isEnabled());
             }
         }
-        if (SelectedSpeed==Speed_O && Frames_Pos+1!=FileInfoData->Videos[0]->x_Current_Max)
+        if (SelectedSpeed==Speed_O && Frames_Pos+1!=FileInfoData->Stats[0]->x_Current_Max)
         {
             PlayPause->setText(">");
             PlayPause->setIcon(QIcon(":/icon/play.png"));
@@ -389,8 +392,11 @@ void Control::Update()
         }
     }
 
-    if (PlotsArea)
-        PlotsArea->Marker_Update();
+    if (PlotsAreas)
+    {
+        for (size_t Pos=0; Pos<PlotsAreas->size(); Pos++)
+            (*PlotsAreas)[Pos]->Marker_Update();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -400,7 +406,8 @@ void Control::on_Minus_clicked(bool checked)
         return;
 
     FileInfoData->Frames_Pos_Minus();
-    PlotsArea->Plots_Update();
+    for (size_t Pos=0; Pos<PlotsAreas->size(); Pos++)
+        (*PlotsAreas)[Pos]->Plots_Update();
 }
 
 //---------------------------------------------------------------------------
@@ -410,7 +417,8 @@ void Control::on_Plus_clicked(bool checked)
         return;
 
     FileInfoData->Frames_Pos_Plus();
-    PlotsArea->Plots_Update();
+    for (size_t Pos=0; Pos<PlotsAreas->size(); Pos++)
+        (*PlotsAreas)[Pos]->Plots_Update();
 }
 
 //---------------------------------------------------------------------------
@@ -420,7 +428,8 @@ void Control::on_M9_clicked(bool checked)
         return;
 
     FileInfoData->Frames_Pos_Set(0);
-    PlotsArea->Plots_Update();
+    for (size_t Pos=0; Pos<PlotsAreas->size(); Pos++)
+        (*PlotsAreas)[Pos]->Plots_Update();
 }
 
 //---------------------------------------------------------------------------
@@ -563,16 +572,16 @@ void Control::on_Pause_clicked(bool checked)
 
     SelectedSpeed=Speed_O;
     Minus->setEnabled(Frames_Pos);
-    Plus->setEnabled(Frames_Pos+1!=FileInfoData->Videos[0]->x_Current_Max);
+    Plus->setEnabled(Frames_Pos+1!=FileInfoData->Stats[0]->x_Current_Max);
     M2->setEnabled(Frames_Pos);
     M1->setEnabled(Frames_Pos);
     M0->setEnabled(Frames_Pos);
     PlayPause->setText(">");
     PlayPause->setIcon(QIcon(":/icon/play.png"));
-    PlayPause->setEnabled(Frames_Pos+1!=FileInfoData->Videos[0]->x_Current_Max);
-    P0->setEnabled(Frames_Pos+1!=FileInfoData->Videos[0]->x_Current_Max);
-    P1->setEnabled(Frames_Pos+1!=FileInfoData->Videos[0]->x_Current_Max);
-    P2->setEnabled(Frames_Pos+1!=FileInfoData->Videos[0]->x_Current_Max);
+    PlayPause->setEnabled(Frames_Pos+1!=FileInfoData->Stats[0]->x_Current_Max);
+    P0->setEnabled(Frames_Pos+1!=FileInfoData->Stats[0]->x_Current_Max);
+    P1->setEnabled(Frames_Pos+1!=FileInfoData->Stats[0]->x_Current_Max);
+    P2->setEnabled(Frames_Pos+1!=FileInfoData->Stats[0]->x_Current_Max);
 
     if (TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
     {
@@ -725,10 +734,11 @@ void Control::on_P9_clicked(bool checked)
     if (IsSlave)
         return;
 
-    if (FileInfoData->Videos[0]->x_Current_Max)
+    if (FileInfoData->Stats[0]->x_Current_Max)
     {
-        FileInfoData->Frames_Pos_Set(FileInfoData->Videos[0]->x_Current_Max-1);
-        PlotsArea->Plots_Update();
+        FileInfoData->Frames_Pos_Set(FileInfoData->Stats[0]->x_Current_Max-1);
+        for (size_t Pos=0; Pos<PlotsAreas->size(); Pos++)
+            (*PlotsAreas)[Pos]->Plots_Update();
     }
 }
 
@@ -754,7 +764,7 @@ void Control::TimeOut ()
 {
     if (Time_MinusPlus)
     {
-        if (Frames_Pos+1==FileInfoData->Videos[0]->x_Current_Max)
+        if (Frames_Pos+1==FileInfoData->Stats[0]->x_Current_Max)
         {
             Timer->stop();
             SelectedSpeed=Speed_O;
