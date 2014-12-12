@@ -66,6 +66,11 @@ public:
 		return scaleDraw()->scaleDiv();
 	}
 
+	QwtInterval inverval() const
+	{
+		return scaleDraw()->scaleDiv().interval();
+	}
+
 private:
     class ScaleDraw: public QwtScaleDraw
     {
@@ -242,8 +247,9 @@ const Plot* Plots::plotAt( int row ) const
 }
 
 //---------------------------------------------------------------------------
-void Plots::Plots_Update()
+void Plots::syncXAxis()
 {
+	// position of the current frame has changed 
     const size_t pos = framePos();
 
     // Put the current frame in center
@@ -262,11 +268,11 @@ void Plots::Plots_Update()
         replotAll();
     }
 
-    setCursorPos( videoStats()->x[m_dataTypeIndex][pos] );
+	syncMarker();
 }
 
 //---------------------------------------------------------------------------
-void Plots::Marker_Update()
+void Plots::syncMarker()
 {
     setCursorPos( videoStats()->x[m_dataTypeIndex][framePos()] );
 }
@@ -369,13 +375,6 @@ void Plots::shiftXAxes()
 }
 
 //---------------------------------------------------------------------------
-void Plots::Zoom_Move( size_t Begin )
-{
-    shiftXAxes( Begin );
-    replotAll();
-}
-
-//---------------------------------------------------------------------------
 void Plots::shiftXAxes( size_t Begin )
 {
     size_t increment = m_Data_FramePos_Max / m_zoomLevel;
@@ -386,6 +385,14 @@ void Plots::shiftXAxes( size_t Begin )
     const double width = videoStats()->x_Max[m_dataTypeIndex] / m_zoomLevel;
 
 	m_scaleWidget->setScale( x, x + width );
+}
+
+
+//---------------------------------------------------------------------------
+void Plots::Zoom_Move( size_t Begin )
+{
+    shiftXAxes( Begin );
+    replotAll();
 }
 
 
@@ -451,7 +458,7 @@ void Plots::onXAxisFormatChanged( int format )
         m_dataTypeIndex = format;
 
     syncPlots();
-    Marker_Update();
+    syncMarker();
     shiftXAxes();
 }
 
@@ -479,7 +486,7 @@ void Plots::setPlotVisible( PlotType Type, bool on )
 }
 
 //---------------------------------------------------------------------------
-void Plots::zoom( bool up )
+void Plots::zoomXAxis( bool up )
 {
     if ( up )
     {
@@ -490,6 +497,19 @@ void Plots::zoom( bool up )
         if ( m_zoomLevel > 1 )
             m_zoomLevel /= 2;
     }
+
+    size_t Position = framePos();
+    size_t Increment = videoStats()->x_Current_Max/ m_zoomLevel;
+
+    if ( Position + Increment / 2> videoStats()->x_Current_Max )
+        Position = videoStats()->x_Current_Max-Increment/2;
+
+    if ( Position > Increment / 2 )
+        Position -= Increment/2;
+    else
+        Position=0;
+
+    Zoom_Move( Position );
 }
 
 //---------------------------------------------------------------------------
@@ -501,4 +521,19 @@ void Plots::replotAll()
         if ( m_plots[i]->isVisibleTo( this ) )
             m_plots[i]->replot();
     }
+}
+
+bool Plots::isZoomed() const
+{
+	return m_zoomLevel > 1;
+}
+
+bool Plots::isZoomable() const
+{
+    return  m_zoomLevel < videoStats()->x_Current_Max / 4;
+}
+
+size_t Plots::zoomIncrement() const
+{
+	videoStats()->x_Current_Max / m_zoomLevel;
 }

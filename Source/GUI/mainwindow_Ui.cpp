@@ -147,7 +147,7 @@ void MainWindow::Ui_Init()
 //---------------------------------------------------------------------------
 void MainWindow::configureZoom()
 {
-    if (Files.empty() || PlotsArea==NULL || PlotsArea->zoomLevel()==1)
+    if (Files.empty() || PlotsArea==NULL || !PlotsArea->isZoomed() )
     {
         ui->horizontalScrollBar->setRange(0, 0);
         ui->horizontalScrollBar->setMaximum(0);
@@ -155,7 +155,7 @@ void MainWindow::configureZoom()
         ui->horizontalScrollBar->setSingleStep(1);
         ui->horizontalScrollBar->setEnabled(false);
         ui->actionZoomOut->setEnabled(false);
-        if (Files_CurrentPos<Files.size() && PlotsArea && PlotsArea->zoomLevel() < Files[Files_CurrentPos]->Videos[0]->x_Current_Max/4)
+        if (Files_CurrentPos<Files.size() && PlotsArea && PlotsArea->isZoomable())
             ui->actionZoomIn->setEnabled(true);
         else
             ui->actionZoomIn->setEnabled(false);
@@ -168,16 +168,13 @@ void MainWindow::configureZoom()
         return;
     }
 
-    size_t Increment=Files[Files_CurrentPos]->Videos[0]->x_Current_Max/PlotsArea->zoomLevel();
+    size_t Increment=PlotsArea->zoomIncrement();
     ui->horizontalScrollBar->setMaximum(Files[Files_CurrentPos]->Videos[0]->x_Current_Max-Increment);
     ui->horizontalScrollBar->setPageStep(Increment);
     ui->horizontalScrollBar->setSingleStep(Increment);
     ui->horizontalScrollBar->setEnabled(true);
     ui->actionZoomOut->setEnabled(true);
-    if (PlotsArea->zoomLevel() < Files[Files_CurrentPos]->Videos[0]->x_Current_Max/4)
-        ui->actionZoomIn->setEnabled(true);
-    else
-        ui->actionZoomIn->setEnabled(false);
+    ui->actionZoomIn->setEnabled( PlotsArea->isZoomable() );
     ui->actionGoTo->setEnabled(true);
     ui->actionExport_XmlGz_Prompt->setEnabled(true);
     ui->actionExport_XmlGz_Sidecar->setEnabled(true);
@@ -210,28 +207,15 @@ void MainWindow::Zoom( bool on )
 {
 	if ( on )
 	{
-    	if (PlotsArea->zoomLevel() < Files[Files_CurrentPos]->Videos[0]->x_Current_Max/4)
-        	PlotsArea->zoom( true );
+    	if ( PlotsArea->isZoomable() )
+        	PlotsArea->zoomXAxis( true );
 	}
 	else
 	{
-    	PlotsArea->zoom( false );
+    	PlotsArea->zoomXAxis( false );
 	}
 
     configureZoom();
-
-    size_t Position = Files[Files_CurrentPos]->Frames_Pos_Get();
-    size_t Increment=Files[Files_CurrentPos]->Videos[0]->x_Current_Max/PlotsArea->zoomLevel();
-
-	if (Position+Increment/2>Files[Files_CurrentPos]->Videos[0]->x_Current_Max)
-		Position=Files[Files_CurrentPos]->Videos[0]->x_Current_Max-Increment/2;
-
-   	if (Position>Increment/2)
-       	Position-=Increment/2;
-   	else
-       	Position=0;
-
-    Zoom_Move(Position);
 }
 
 //---------------------------------------------------------------------------

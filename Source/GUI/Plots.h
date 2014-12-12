@@ -39,16 +39,18 @@ public:
     explicit                    Plots( QWidget *parent, FileInformation* FileInfoData );
     virtual                     ~Plots();
 
-    void                        Plots_Update();
-    void                        Marker_Update();
+    void                        syncXAxis();
+    void                        syncMarker();
     void                        setPlotVisible( PlotType, bool on );
 
     const QwtPlot*              plot( PlotType ) const;
 
     void                        Zoom_Move( size_t Begin );
 
-    void                        zoom( bool up );
-    int                         zoomLevel() const { return m_zoomLevel; }
+    void                        zoomXAxis( bool up );
+	bool                        isZoomed() const;
+	bool                        isZoomable() const;
+	size_t                      zoomIncrement() const;
 
 private Q_SLOTS:
     void                        onCursorMoved( double x );
