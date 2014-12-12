@@ -50,7 +50,7 @@ public:
     void                        zoomXAxis( bool up );
 	bool                        isZoomed() const;
 	bool                        isZoomable() const;
-	size_t                      zoomIncrement() const;
+	size_t                      visibleFrameCount() const;
 
 private Q_SLOTS:
     void                        onCursorMoved( double x );
@@ -74,6 +74,10 @@ private:
     const VideoStats*           videoStats() const { return m_fileInfoData->Videos[0]; }
     VideoStats*                 videoStats() { return m_fileInfoData->Videos[0]; }
     int                         framePos() const { return m_fileInfoData->Frames_Pos_Get(); }
+
+	int                         zoomLevel() const;
+	size_t                      zoomIncrement2() const;
+	size_t                      zoomIncrement3() const;
 
 private:
 	ScaleWidget*                m_scaleWidget;

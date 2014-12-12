@@ -168,7 +168,7 @@ void MainWindow::configureZoom()
         return;
     }
 
-    size_t Increment=PlotsArea->zoomIncrement();
+    size_t Increment=PlotsArea->visibleFrameCount();
     ui->horizontalScrollBar->setMaximum(Files[Files_CurrentPos]->Videos[0]->x_Current_Max-Increment);
     ui->horizontalScrollBar->setPageStep(Increment);
     ui->horizontalScrollBar->setSingleStep(Increment);
