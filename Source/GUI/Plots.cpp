@@ -61,6 +61,11 @@ public:
             sd->setFormat( format );
     }
 
+	QwtScaleDiv scaleDiv() const
+	{
+		return scaleDraw()->scaleDiv();
+	}
+
 private:
     class ScaleDraw: public QwtScaleDraw
     {
@@ -186,7 +191,6 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
 		layout->addWidget( legend, row, 1 );
 
 		m_plots[row] = plot;
-        setPlotVisible( ( PlotType )row, false );
     }
 
 	// bottom scale
@@ -235,14 +239,6 @@ Plot* Plots::plotAt( int row )
 const Plot* Plots::plotAt( int row ) const
 {
     return dynamic_cast<Plot*>( m_plots[row] );
-}
-
-//---------------------------------------------------------------------------
-void Plots::updateAll()
-{
-    syncPlots();
-    alignYAxes();
-    replotAll();
 }
 
 //---------------------------------------------------------------------------
@@ -389,8 +385,7 @@ void Plots::shiftXAxes( size_t Begin )
     const double x = videoStats()->x[m_dataTypeIndex][Begin];
     const double width = videoStats()->x_Max[m_dataTypeIndex] / m_zoomLevel;
 
-    for ( int row = 0; row < PlotType_Max; row++ )
-        m_plots[row]->setAxisScale( QwtPlot::xBottom, x, x + width );
+	m_scaleWidget->setScale( x, x + width );
 }
 
 
@@ -463,6 +458,9 @@ void Plots::onXAxisFormatChanged( int format )
 //---------------------------------------------------------------------------
 void Plots::setPlotVisible( PlotType Type, bool on )
 {
+	if ( on == m_plots[Type]->isVisibleTo( this ) )
+		return;
+
     const int row = Type;
 
     QGridLayout* l = dynamic_cast<QGridLayout*>( layout() );
@@ -476,6 +474,8 @@ void Plots::setPlotVisible( PlotType Type, bool on )
                 item->widget()->setVisible( on );
         }
     }
+
+	alignYAxes();
 }
 
 //---------------------------------------------------------------------------
@@ -497,6 +497,7 @@ void Plots::replotAll()
 {
     for ( int i = 0; i < PlotType_Max; i++ )
     {
+		m_plots[i]->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
         if ( m_plots[i]->isVisibleTo( this ) )
             m_plots[i]->replot();
     }

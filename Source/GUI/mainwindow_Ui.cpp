@@ -273,8 +273,6 @@ void MainWindow::refreshDisplay()
     {
         for (size_t j=0; j<PlotType_Max; j++)
             PlotsArea->setPlotVisible( (PlotType)j, CheckBoxes[j]->checkState()==Qt::Checked );
-
-        PlotsArea->updateAll();
     }
 }
 

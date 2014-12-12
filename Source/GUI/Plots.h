@@ -39,7 +39,6 @@ public:
     explicit                    Plots( QWidget *parent, FileInformation* FileInfoData );
     virtual                     ~Plots();
 
-    void                        updateAll();
     void                        Plots_Update();
     void                        Marker_Update();
     void                        setPlotVisible( PlotType, bool on );
