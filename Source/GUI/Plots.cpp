@@ -17,13 +17,14 @@
 #include <qwt_legend.h>
 #include <qwt_legend_label.h>
 #include <qwt_scale_widget.h>
+#include <qwt_scale_engine.h>
 #include <cmath>
 //---------------------------------------------------------------------------
 
 class XAxisFormatBox: public QComboBox
 {
 public:
-    XAxisFormatBox( QWidget* parent ):
+    XAxisFormatBox( QWidget* parent = NULL ):
         QComboBox( parent )
     {
         setContentsMargins( 0, 0, 0, 0 );
@@ -36,24 +37,26 @@ public:
     }
 };
 
-class DummyAxisPlot: public QwtPlot
+class ScaleWidget: public QwtScaleWidget
 {
 public:
-    DummyAxisPlot( QWidget* parent ):
-        QwtPlot( parent )
+    ScaleWidget( QWidget* parent = NULL ):
+        QwtScaleWidget( QwtScaleDraw::BottomScale, parent )
     {
-        setMaximumHeight( axisWidget( QwtPlot::xBottom )->height() );
-        dynamic_cast<QFrame *>( canvas() )->setFrameStyle( QFrame::NoFrame );
-        enableAxis( QwtPlot::xBottom, true );
-
         ScaleDraw* sd = new ScaleDraw();
         sd->setFormat( Plots::AxisTime );
-        setAxisScaleDraw( QwtPlot::xBottom, new ScaleDraw() );
+        setScaleDraw( new ScaleDraw() );
     }
+
+	void setScale( double from, double to )
+	{
+		QwtLinearScaleEngine se;
+		setScaleDiv( se.divideScale( from, to, 5, 8 ) );
+	}
 
     void setFormat( int format )
     {
-        ScaleDraw* sd = dynamic_cast<ScaleDraw*>( axisScaleDraw( QwtPlot::xBottom ) );
+        ScaleDraw* sd = dynamic_cast<ScaleDraw*>( scaleDraw() );
         if ( sd )
             sd->setFormat( format );
     }
@@ -158,10 +161,6 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
     m_dataTypeIndex( Plots::AxisSeconds ),
     m_Data_FramePos_Max( 0 )
 {
-    XAxisFormatBox* xAxisBox = new XAxisFormatBox( this );
-    xAxisBox->setCurrentIndex( Plots::AxisTime );
-    connect( xAxisBox, SIGNAL( currentIndexChanged( int ) ),
-        this, SLOT( onXAxisFormatChanged( int ) ) );
 
     QGridLayout* layout = new QGridLayout( this );
     layout->setSpacing( 1 );
@@ -169,47 +168,50 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
 
     for ( int row = 0; row < PlotType_Max; row++ )
     {
-        if ( row != PlotType_Axis )
-        {
-            Plot* plot = new Plot( ( PlotType )row, this );
+		Plot* plot = new Plot( ( PlotType )row, this );
 
-            QwtLegend *legend = new PlotLegend( this );
-            connect( plot, SIGNAL( legendDataChanged( const QVariant &, const QList<QwtLegendData> & ) ),
-                     legend, SLOT( updateLegend( const QVariant &, const QList<QwtLegendData> & ) ) );
+		// we allow to shrink the plot below height of the size hint
+		plot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
+        plot->setAxisScale( QwtPlot::xBottom, 0, videoStats()->x_Max[m_dataTypeIndex] );
 
-            connect( plot, SIGNAL( cursorMoved( double ) ), SLOT( onCursorMoved( double ) ) );
-            plot->updateLegend();
+		QwtLegend *legend = new PlotLegend( this );
+		connect( plot, SIGNAL( legendDataChanged( const QVariant &, const QList<QwtLegendData> & ) ),
+				 legend, SLOT( updateLegend( const QVariant &, const QList<QwtLegendData> & ) ) );
 
-#if 1
-            // we allow tp shrink the plot below height of the size hint
-            plot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
-#endif
+		connect( plot, SIGNAL( cursorMoved( double ) ), SLOT( onCursorMoved( double ) ) );
+		plot->updateLegend();
 
-            layout->addWidget( legend, row, 1 );
-            m_plots[row] = plot;
-        }
-        else
-        {
-            m_plots[row] = new DummyAxisPlot( this );
-        }
 
-        m_plots[row]->setAxisScale( QwtPlot::xBottom, 0, videoStats()->x_Max[m_dataTypeIndex] );
-        layout->addWidget( m_plots[row], row, 0 );
+        layout->addWidget( plot, row, 0 );
+		layout->addWidget( legend, row, 1 );
 
+		m_plots[row] = plot;
         setPlotVisible( ( PlotType )row, false );
     }
+
+	// bottom scale
+	m_scaleWidget = new ScaleWidget();
+	m_scaleWidget->setScale( 0, videoStats()->x_Max[m_dataTypeIndex] );
+	layout->addWidget( m_scaleWidget, PlotType_Max, 0, 1, 2 );
+
+    // combo box for the axis format
+    XAxisFormatBox* xAxisBox = new XAxisFormatBox();
+    xAxisBox->setCurrentIndex( Plots::AxisTime );
+    connect( xAxisBox, SIGNAL( currentIndexChanged( int ) ),
+        this, SLOT( onXAxisFormatChanged( int ) ) );
 
 	int axisBoxRow = layout->rowCount() - 1;
 #if 1
     // one row below to have space enough for bottom scale tick labels
-	axisBoxRow++;
+    layout->addWidget( xAxisBox, PlotType_Max + 1, 1 );
+#else
+    layout->addWidget( xAxisBox, PlotType_Max, 1 );
 #endif
-    layout->addWidget( xAxisBox, axisBoxRow++, 1 );
-
-	onXAxisFormatChanged( xAxisBox->currentIndex() );
 
     layout->setColumnStretch( 0, 10 );
     layout->setColumnStretch( 1, 0 );
+
+	onXAxisFormatChanged( xAxisBox->currentIndex() );
 }
 
 //---------------------------------------------------------------------------
@@ -276,14 +278,14 @@ void Plots::Marker_Update()
 //---------------------------------------------------------------------------
 void Plots::setCursorPos( double x )
 {
-    for ( int row = 0; row < PlotType_Axis; ++row )
+    for ( int row = 0; row < PlotType_Max; ++row )
         plotAt( row )->setCursorPos( x );
 }
 
 //---------------------------------------------------------------------------
 void Plots::syncPlots()
 {
-    for ( int i = 0; i < PlotType_Axis; i++ )
+    for ( int i = 0; i < PlotType_Max; i++ )
     {
         if ( m_plots[i]->isVisibleTo( this ) )
             syncPlot( ( PlotType )i );
@@ -446,9 +448,7 @@ void Plots::onCursorMoved( double cursorX )
 //---------------------------------------------------------------------------
 void Plots::onXAxisFormatChanged( int format )
 {
-    DummyAxisPlot* plot = dynamic_cast<DummyAxisPlot *>( m_plots[PlotType_Axis] );
-    if ( plot )
-        plot->setFormat( format );
+    m_scaleWidget->setFormat( format );
 
     if ( format == AxisTime )
         m_dataTypeIndex = AxisSeconds;

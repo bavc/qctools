@@ -99,7 +99,6 @@ enum PlotType
     PlotType_CropF,
     PlotType_MSE,
     PlotType_PSNR,
-    PlotType_Axis,
     PlotType_Max
 };
 

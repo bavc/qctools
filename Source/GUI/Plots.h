@@ -16,6 +16,7 @@
 
 class QwtPlot;
 class Plot;
+class ScaleWidget;
 
 //***************************************************************************
 // Class
@@ -74,6 +75,7 @@ private:
     int                         framePos() const { return m_fileInfoData->Frames_Pos_Get(); }
 
 private:
+	ScaleWidget*                m_scaleWidget;
     QwtPlot*                    m_plots[PlotType_Max];
     size_t                      m_zoomLevel;
 

@@ -140,12 +140,7 @@ const struct per_plot_group PerPlotGroup [PlotType_Max]=
         "Peak Signal to Noise Ratio for each plane (Y, U, and V). Lower values may\n"
         "be indicative of differences between the images of field 1 and field 2 as\n"
         "may be caused by a head clog or playback error.",
-    },
-    //Internal
-    {
-        PlotName_Max,       0,    0,    0,  0,  "",
-        "",
-    },
+    }
 };
 
 const struct per_plot_item PerPlotName [PlotName_Max]=

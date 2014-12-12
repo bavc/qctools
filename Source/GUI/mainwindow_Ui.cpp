@@ -107,7 +107,7 @@ void MainWindow::Ui_Init()
     //ToolTip
     if (ui->fileNamesBox)
         ui->fileNamesBox->hide();
-    for (size_t j=0; j<PlotType_Axis; j++)
+    for (size_t j=0; j<PlotType_Max; j++)
     {
         CheckBoxes[j]=new QCheckBox(PerPlotGroup[j].Name);
         CheckBoxes[j]->setToolTip(PerPlotGroup[j].Description);
@@ -271,10 +271,9 @@ void MainWindow::refreshDisplay()
 {
     if (PlotsArea)
     {
-        for (size_t j=0; j<PlotType_Axis; j++)
+        for (size_t j=0; j<PlotType_Max; j++)
             PlotsArea->setPlotVisible( (PlotType)j, CheckBoxes[j]->checkState()==Qt::Checked );
 
-        PlotsArea->setPlotVisible(PlotType_Axis, true);
         PlotsArea->updateAll();
     }
 }
