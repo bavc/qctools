@@ -40,6 +40,7 @@ public:
     virtual                     ~Plots();
 
     void                        syncXAxis();
+    void                        scrollXAxis();
     void                        syncMarker();
     void                        setPlotVisible( PlotType, bool on );
 

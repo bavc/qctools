@@ -246,6 +246,38 @@ const Plot* Plots::plotAt( int row ) const
     return dynamic_cast<Plot*>( m_plots[row] );
 }
 
+void Plots::scrollXAxis()
+{
+    // position of the current frame has changed 
+
+    if ( isZoomed() )
+    {
+    	// Put the current frame in center
+    	const size_t pos = framePos();
+        const size_t numFrames = visibleFrameCount();
+
+        size_t Begin = 0;
+        if ( pos > numFrames / 2 )
+        {
+            Begin = pos - numFrames / 2;
+            if ( Begin + numFrames > m_Data_FramePos_Max )
+                Begin = m_Data_FramePos_Max - numFrames;
+        }
+
+    	if ( Begin + numFrames > m_Data_FramePos_Max )
+        	Begin = m_Data_FramePos_Max - numFrames;
+
+    	const double x = videoStats()->x[m_dataTypeIndex][Begin];
+		const double w = m_scaleWidget->interval().width();
+
+    	m_scaleWidget->setScale( x, x + w );
+
+        replotAll();
+    }
+
+    syncMarker();
+}
+
 //---------------------------------------------------------------------------
 void Plots::syncXAxis()
 {
@@ -394,7 +426,6 @@ void Plots::Zoom_Move( size_t Begin )
     shiftXAxes( Begin );
     replotAll();
 }
-
 
 //---------------------------------------------------------------------------
 void Plots::alignYAxes()
