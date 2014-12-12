@@ -255,7 +255,7 @@ void Plots::syncXAxis()
     // Put the current frame in center
     if ( isZoomed() )
     {
-        const size_t increment = zoomIncrement2();
+        const size_t increment = zoomIncrement();
 
         size_t NewBegin = 0;
         if ( pos > increment / 2 )
@@ -359,7 +359,7 @@ void Plots::syncPlot( PlotType Type )
 //---------------------------------------------------------------------------
 void Plots::shiftXAxes()
 {
-    const size_t increment = zoomIncrement2();
+    const size_t increment = zoomIncrement();
 
     int pos = framePos();
     if ( pos == -1 )
@@ -377,7 +377,7 @@ void Plots::shiftXAxes()
 //---------------------------------------------------------------------------
 void Plots::shiftXAxes( size_t Begin )
 {
-    size_t increment = zoomIncrement2();
+    size_t increment = zoomIncrement();
     if ( Begin + increment > m_Data_FramePos_Max )
         Begin = m_Data_FramePos_Max - increment;
 
@@ -499,7 +499,7 @@ void Plots::zoomXAxis( bool up )
     }
 
     size_t Position = framePos();
-    size_t Increment = zoomIncrement3();
+    size_t Increment = zoomIncrement();
 
     if ( Position + Increment / 2> videoStats()->x_Current_Max )
         Position = videoStats()->x_Current_Max - Increment / 2;
@@ -540,16 +540,9 @@ size_t Plots::visibleFrameCount() const
 	return qRound( w * videoStats()->x_Current_Max / videoStats()->x_Max[m_dataTypeIndex] );
 }
 
-size_t Plots::zoomIncrement3() const
+size_t Plots::zoomIncrement() const
 {
-//qDebug() << "zoomIncrement3: " << m_zoomLevel << zoomLevel();
 	return videoStats()->x_Current_Max / m_zoomLevel;
-}
-
-size_t Plots::zoomIncrement2() const
-{
-//qDebug() << "zoomIncrement2: " << m_zoomLevel << zoomLevel();
-	return m_Data_FramePos_Max / m_zoomLevel;
 }
 
 int Plots::zoomLevel() const

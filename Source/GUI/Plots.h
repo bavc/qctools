@@ -76,8 +76,7 @@ private:
     int                         framePos() const { return m_fileInfoData->Frames_Pos_Get(); }
 
 	int                         zoomLevel() const;
-	size_t                      zoomIncrement2() const;
-	size_t                      zoomIncrement3() const;
+	size_t                      zoomIncrement() const;
 
 private:
 	ScaleWidget*                m_scaleWidget;
