@@ -158,6 +158,11 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
     m_dataTypeIndex( Plots::AxisSeconds ),
     m_Data_FramePos_Max( 0 )
 {
+    XAxisFormatBox* xAxisBox = new XAxisFormatBox( this );
+    xAxisBox->setCurrentIndex( Plots::AxisTime );
+    connect( xAxisBox, SIGNAL( currentIndexChanged( int ) ),
+        this, SLOT( onXAxisFormatChanged( int ) ) );
+
     QGridLayout* layout = new QGridLayout( this );
     layout->setSpacing( 1 );
     layout->setContentsMargins( 0, 0, 0, 0 );
@@ -185,17 +190,7 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
         }
         else
         {
-            XAxisFormatBox* xAxisBox = new XAxisFormatBox( this );
-            xAxisBox->setCurrentIndex( Plots::AxisTime );
-            connect( xAxisBox, SIGNAL( currentIndexChanged( int ) ),
-                     this, SLOT( onXAxisFormatChanged( int ) ) );
-
-            layout->addWidget( xAxisBox, row, 1 );
-
-            DummyAxisPlot* axisPlot = new DummyAxisPlot( this );
-            axisPlot->setFormat( xAxisBox->currentIndex() );
-
-            m_plots[row] = axisPlot;
+            m_plots[row] = new DummyAxisPlot( this );
         }
 
         m_plots[row]->setAxisScale( QwtPlot::xBottom, 0, videoStats()->x_Max[m_dataTypeIndex] );
@@ -203,6 +198,15 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
 
         setPlotVisible( ( PlotType )row, false );
     }
+
+	int axisBoxRow = layout->rowCount() - 1;
+#if 1
+    // one row below to have space enough for bottom scale tick labels
+	axisBoxRow++;
+#endif
+    layout->addWidget( xAxisBox, axisBoxRow++, 1 );
+
+	onXAxisFormatChanged( xAxisBox->currentIndex() );
 
     layout->setColumnStretch( 0, 10 );
     layout->setColumnStretch( 1, 0 );
