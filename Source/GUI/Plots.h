@@ -56,18 +56,15 @@ private Q_SLOTS:
     void                        onXAxisFormatChanged( int index );
 
 private:
-    Plot*                       plotAt( int row );
-    const Plot*                 plotAt( int row ) const;
-
     void                        replotAll();
 
     void                        initAxisFormat( int index );
 	int                         visibleFramesBegin() const;
-    void                        syncMarker();
 
     void                        shiftXAxes();
 
-    void                        syncPlot( PlotType Type );
+    void                        initYAxis( Plot* );
+    void                        updateSamples( Plot* );
     void                        setCursorPos( double X );
 
     void                        alignYAxes();
@@ -81,7 +78,7 @@ private:
 
 private:
 	ScaleWidget*                m_scaleWidget;
-    QwtPlot*                    m_plots[PlotType_Max];
+    Plot*                       m_plots[PlotType_Max];
     size_t                      m_zoomLevel;
 
     // X axis info

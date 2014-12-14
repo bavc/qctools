@@ -35,6 +35,8 @@ public:
     void setCurveSamples( int index,
         const double *xData, const double *yData, int size );
 
+	PlotType type() const { return m_type; }
+
 Q_SIGNALS:
     void cursorMoved( double x );
 

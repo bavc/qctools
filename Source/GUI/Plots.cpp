@@ -185,13 +185,21 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
     layout->setSpacing( 1 );
     layout->setContentsMargins( 0, 0, 0, 0 );
 
+	// bottom scale
+	m_scaleWidget = new ScaleWidget();
+    m_scaleWidget->setFormat( Plots::AxisTime );
+	m_scaleWidget->setScale( 0, videoStats()->x_Max[m_dataTypeIndex] );
+
+	// plots and legends
+
     for ( int row = 0; row < PlotType_Max; row++ )
     {
 		Plot* plot = new Plot( ( PlotType )row, this );
 
 		// we allow to shrink the plot below height of the size hint
 		plot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
-        plot->setAxisScale( QwtPlot::xBottom, 0, videoStats()->x_Max[m_dataTypeIndex] );
+        plot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
+		initYAxis( plot );
 
 		QwtLegend *legend = new PlotLegend( this );
 		connect( plot, SIGNAL( legendDataChanged( const QVariant &, const QList<QwtLegendData> & ) ),
@@ -200,17 +208,13 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
 		connect( plot, SIGNAL( cursorMoved( double ) ), SLOT( onCursorMoved( double ) ) );
 		plot->updateLegend();
 
-
         layout->addWidget( plot, row, 0 );
 		layout->addWidget( legend, row, 1 );
 
+		updateSamples( plot );
 		m_plots[row] = plot;
     }
 
-	// bottom scale
-	m_scaleWidget = new ScaleWidget();
-    m_scaleWidget->setFormat( Plots::AxisTime );
-	m_scaleWidget->setScale( 0, videoStats()->x_Max[m_dataTypeIndex] );
 	layout->addWidget( m_scaleWidget, PlotType_Max, 0, 1, 2 );
 
     // combo box for the axis format
@@ -230,12 +234,6 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
     layout->setColumnStretch( 0, 10 );
     layout->setColumnStretch( 1, 0 );
 
-    for ( int i = 0; i < PlotType_Max; i++ )
-    {
-        if ( m_plots[i]->isVisibleTo( this ) )
-            syncPlot( ( PlotType )i );
-    }
-
     setCursorPos( videoStats()->x[m_dataTypeIndex][framePos()] );
 }
 
@@ -250,17 +248,6 @@ const QwtPlot* Plots::plot( PlotType Type ) const
     return m_plots[Type];
 }
 
-//---------------------------------------------------------------------------
-Plot* Plots::plotAt( int row )
-{
-    return dynamic_cast<Plot*>( m_plots[row] );
-}
-
-//---------------------------------------------------------------------------
-const Plot* Plots::plotAt( int row ) const
-{
-    return dynamic_cast<Plot*>( m_plots[row] );
-}
 
 void Plots::scrollXAxis()
 {
@@ -291,20 +278,14 @@ void Plots::scrollXAxis()
         replotAll();
     }
 
-    syncMarker();
-}
-
-//---------------------------------------------------------------------------
-void Plots::syncMarker()
-{
     setCursorPos( videoStats()->x[m_dataTypeIndex][framePos()] );
 }
 
 //---------------------------------------------------------------------------
 void Plots::setCursorPos( double x )
 {
-    for ( int row = 0; row < PlotType_Max; ++row )
-        plotAt( row )->setCursorPos( x );
+    for ( int i = 0; i < PlotType_Max; ++i )
+        m_plots[i]->setCursorPos( x );
 }
 
 //---------------------------------------------------------------------------
@@ -321,26 +302,24 @@ double Plots::axisStepSize( double s ) const
 }
 
 //---------------------------------------------------------------------------
-void Plots::syncPlot( PlotType Type )
+void Plots::initYAxis( Plot* plot )
 {
-    Plot* plot = plotAt( Type );
-    if ( plot == NULL )
-        return;
+	const PlotType plotType = plot->type();
 
     VideoStats* video = videoStats();
 
-    if ( PerPlotGroup[Type].Min != PerPlotGroup[Type].Max &&
-            video->y_Max[Type] >= PerPlotGroup[Type].Max / 2 )
+    if ( PerPlotGroup[plotType].Min != PerPlotGroup[plotType].Max &&
+            video->y_Max[plotType] >= PerPlotGroup[plotType].Max / 2 )
     {
-        video->y_Max[Type] = PerPlotGroup[Type].Max;
+        video->y_Max[plotType] = PerPlotGroup[plotType].Max;
     }
 
-    const double yMax = video->y_Max[Type];
+    const double yMax = video->y_Max[plotType];
     if ( yMax )
     {
         if ( yMax > plot->axisInterval( QwtPlot::yLeft ).maxValue() )
         {
-            const double stepCount = PerPlotGroup[Type].StepsCount;
+            const double stepCount = PerPlotGroup[plotType].StepsCount;
             const double stepSize = axisStepSize( yMax / stepCount );
 
             if ( stepSize )
@@ -352,11 +331,17 @@ void Plots::syncPlot( PlotType Type )
         //Special case, in order to force a scale of 0 to 1
         plot->setAxisScale( QwtPlot::yLeft, 0, 1, 1 );
     }
+}
 
-    for( unsigned j = 0; j < PerPlotGroup[Type].Count; ++j )
+void Plots::updateSamples( Plot* plot )
+{
+    const PlotType plotType = plot->type();
+	const VideoStats* video = videoStats();
+
+    for( unsigned j = 0; j < PerPlotGroup[plotType].Count; ++j )
     {
         plot->setCurveSamples( j, video->x[m_dataTypeIndex],
-            video->y[PerPlotGroup[Type].Start + j], video->x_Current );
+            video->y[PerPlotGroup[plotType].Start + j], video->x_Current );
     }
 }
 
@@ -456,31 +441,29 @@ void Plots::onXAxisFormatChanged( int format )
 	if ( format == m_scaleWidget->format() )
 		return;
 
-	const int dataTypeIndex = m_dataTypeIndex;
-	const int frame0 = visibleFramesBegin();
-	const int numFrames = visibleFramesCount();
-	
-    m_scaleWidget->setFormat( format );
-
+	int dataTypeIndex = format;
     if ( format == AxisTime )
-        m_dataTypeIndex = AxisSeconds;
-    else
-        m_dataTypeIndex = format;
-
-    for ( int i = 0; i < PlotType_Max; i++ )
-    {
-        if ( m_plots[i]->isVisibleTo( this ) )
-            syncPlot( ( PlotType )i );
-    }
+        dataTypeIndex = AxisSeconds;
 
 	if ( m_dataTypeIndex != dataTypeIndex )
 	{
+		const int frame0 = visibleFramesBegin();
+		const int numFrames = visibleFramesCount();
+
+		m_dataTypeIndex = dataTypeIndex;
+
+    	for ( int i = 0; i < PlotType_Max; i++ )
+           	updateSamples( m_plots[i] );
+
 		const double* x = videoStats()->x[m_dataTypeIndex];
     	m_scaleWidget->setScale( x[frame0], x[frame0 + numFrames - 1] );
 
 		setCursorPos( x[framePos()] );
 	}
+
+    m_scaleWidget->setFormat( format );
 	m_scaleWidget->update();
+
     replotAll();
 }
 
