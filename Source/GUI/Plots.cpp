@@ -37,7 +37,6 @@ public:
 Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
     QWidget( parent ),
     m_fileInfoData( FileInformationData_ ),
-    m_zoomLevel( 1 ),
     m_dataTypeIndex( Plots::AxisSeconds )
 {
     QGridLayout* layout = new QGridLayout( this );
@@ -47,7 +46,7 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
 	// bottom scale
 	m_scaleWidget = new PlotScaleWidget();
     m_scaleWidget->setFormat( Plots::AxisTime );
-	m_scaleWidget->setScale( 0, videoStats()->x_Max[m_dataTypeIndex] );
+	setFrameRange( 0, numFrames() - 1 );
 
 	// plots and legends
 
@@ -102,34 +101,34 @@ const QwtPlot* Plots::plot( PlotType Type ) const
     return m_plots[Type];
 }
 
+void Plots::setFrameRange( int from, int to )
+{
+	m_visibleFrame[0] = from;
+	m_visibleFrame[1] = to;
+
+	const double* x = videoStats()->x[m_dataTypeIndex];
+	m_scaleWidget->setScale( x[from], x[to] );
+}
 
 void Plots::scrollXAxis()
 {
     // position of the current frame has changed 
 
-    if ( isZoomed() )
+    if ( m_visibleFrame[1] < numFrames() - 1 )
     {
-    	// Put the current frame in center
-    	const size_t pos = framePos();
-        const size_t numFrames = visibleFramesCount();
+    	const int pos = framePos();
+        const int numVisibleFrames = visibleFramesCount();
 
-        size_t Begin = 0;
-        if ( pos > numFrames / 2 )
-        {
-            Begin = pos - numFrames / 2;
-            if ( Begin + numFrames > ( videoStats()->x_Current_Max - 1 ) )
-                Begin = ( videoStats()->x_Current_Max - 1 ) - numFrames;
-        }
+        if ( pos > m_visibleFrame[0] + numVisibleFrames / 2 )
+		{
+    		// Put the current frame in center
+            const int from = pos - numVisibleFrames / 2;
+			const int to = qMin( from + numVisibleFrames, numFrames() ) - 1;
 
-    	if ( Begin + numFrames > ( videoStats()->x_Current_Max - 1 ) )
-        	Begin = ( videoStats()->x_Current_Max - 1 ) - numFrames;
+			setFrameRange( to - numVisibleFrames, to );
 
-    	const double x = videoStats()->x[m_dataTypeIndex][Begin];
-		const double w = m_scaleWidget->interval().width();
-
-    	m_scaleWidget->setScale( x, x + w );
-
-        replotAll();
+        	replotAll();
+		}
     }
 
     setCursorPos( videoStats()->x[m_dataTypeIndex][framePos()] );
@@ -200,16 +199,12 @@ void Plots::updateSamples( Plot* plot )
 }
 
 //---------------------------------------------------------------------------
-void Plots::Zoom_Move( size_t Begin )
+void Plots::Zoom_Move( int Begin )
 {
-    const double x0 = videoStats()->x[m_dataTypeIndex][Begin];
-    const double width = m_scaleWidget->interval().width();
+	const int numVisibleFrames = visibleFramesCount();
+	const int to = qMin( Begin + numVisibleFrames, numFrames() ) - 1;
 
-	double x = x0 + width; 
-	if ( x > videoStats()->x_Current_Max )
-		x = videoStats()->x_Current_Max;
-
-	m_scaleWidget->setScale( x - width, x );
+	setFrameRange( to - numVisibleFrames, to );
 
     replotAll();
 }
@@ -247,13 +242,19 @@ void Plots::onCursorMoved( double cursorX )
     const double* xData = videoStats()->x[m_dataTypeIndex];
 
     size_t pos = 0;
-    while ( pos < videoStats()->x_Current_Max && cursorX >= xData[pos] )
+    while ( pos < numFrames() && cursorX >= xData[pos] )
         pos++;
 
     if ( pos )
     {
+#if 0
+        // numFrames() ???
         if ( pos >= videoStats()->x_Current )
             pos = videoStats()->x_Current - 1;
+#else
+        if ( pos >= numFrames() )
+            pos = numFrames() - 1;
+#endif
 
         double Distance1 = cursorX - xData[pos - 1];
         double Distance2 = xData[pos] - cursorX;
@@ -277,17 +278,14 @@ void Plots::onXAxisFormatChanged( int format )
 
 	if ( m_dataTypeIndex != dataTypeIndex )
 	{
-		const int frame0 = visibleFramesBegin();
-		const int numFrames = visibleFramesCount();
-
 		m_dataTypeIndex = dataTypeIndex;
 
     	for ( int i = 0; i < PlotType_Max; i++ )
            	updateSamples( m_plots[i] );
 
-		const double* x = videoStats()->x[m_dataTypeIndex];
-    	m_scaleWidget->setScale( x[frame0], x[frame0 + numFrames - 1] );
+    	setFrameRange( m_visibleFrame[0], m_visibleFrame[1] );
 
+		const double* x = videoStats()->x[m_dataTypeIndex];
 		setCursorPos( x[framePos()] );
 	}
 
@@ -312,38 +310,16 @@ void Plots::setPlotVisible( PlotType Type, bool on )
 //---------------------------------------------------------------------------
 void Plots::zoomXAxis( bool up )
 {
+	int numVisibleFrames = visibleFramesCount();
     if ( up )
-    {
-        m_zoomLevel *= 2;
-    }
+		numVisibleFrames /= 2;
     else
-    {
-        if ( m_zoomLevel <= 1 )
-			return;
+		numVisibleFrames *= 2;
 
-        m_zoomLevel /= 2;
-    }
+	const int to = qMin( m_visibleFrame[0] + numVisibleFrames, numFrames() ) - 1;
+	const int from = qMax( 0, to - numVisibleFrames );
 
-	const double xMax = videoStats()->x_Current_Max;
-
-    size_t pos = framePos();
-    size_t Increment = xMax / m_zoomLevel;
-
-    if ( pos + Increment / 2 > xMax )
-        pos = xMax - Increment / 2;
-
-    if ( pos > Increment / 2 )
-        pos -= Increment / 2;
-    else
-        pos=0;
-
-    if ( pos + Increment > ( videoStats()->x_Current_Max - 1 ) )
-        pos = ( videoStats()->x_Current_Max - 1 ) - Increment;
-
-    const double x = videoStats()->x[m_dataTypeIndex][pos];
-    const double width = videoStats()->x_Max[m_dataTypeIndex] / m_zoomLevel;
-
-    m_scaleWidget->setScale( x, x + width );
+    setFrameRange( from, to );
 
     replotAll();
 }
@@ -361,7 +337,7 @@ void Plots::replotAll()
 
 bool Plots::isZoomed() const
 {
-	return m_zoomLevel > 1;
+	return visibleFramesCount() < numFrames();
 }
 
 bool Plots::isZoomable() const
@@ -371,23 +347,5 @@ bool Plots::isZoomable() const
 
 size_t Plots::visibleFramesCount() const
 {
-	// current scale width translated into frames
-	const double w = m_scaleWidget->interval().width();
-	return qRound( w * videoStats()->x_Current_Max / videoStats()->x_Max[m_dataTypeIndex] );
-}
-
-int Plots::visibleFramesBegin() const
-{
-	const double* x = videoStats()->x[m_dataTypeIndex];
-	const double value = m_scaleWidget->interval().minValue();
-#if 1
-	// TODO
-	int i;
-	for ( i = 0; i < videoStats()->x_Current; i++ )
-	{
-		if ( x[i] > value )
-			break;
-	}
-	return i - 1;
-#endif
+	return m_visibleFrame[1] - m_visibleFrame[0] + 1;
 }

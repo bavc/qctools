@@ -44,7 +44,7 @@ public:
 
     const QwtPlot*              plot( PlotType ) const;
 
-    void                        Zoom_Move( size_t Begin );
+    void                        Zoom_Move( int Begin );
 
     void                        zoomXAxis( bool up );
 	bool                        isZoomed() const;
@@ -59,7 +59,6 @@ private:
     void                        replotAll();
 
     void                        initAxisFormat( int index );
-	int                         visibleFramesBegin() const;
 
     void                        initYAxis( Plot* );
     void                        updateSamples( Plot* );
@@ -70,16 +69,17 @@ private:
     const VideoStats*           videoStats() const { return m_fileInfoData->Videos[0]; }
     VideoStats*                 videoStats() { return m_fileInfoData->Videos[0]; }
     int                         framePos() const { return m_fileInfoData->Frames_Pos_Get(); }
+    int                         numFrames() const { return videoStats()->x_Current_Max; }
+
+	void                        setFrameRange( int from, int to );
 
 private:
 	PlotScaleWidget*            m_scaleWidget;
     Plot*                       m_plots[PlotType_Max];
-    size_t                      m_zoomLevel;
 
+	int                         m_visibleFrame[2];
     // X axis info
     int                         m_dataTypeIndex;
-    size_t                      m_Data_FramePos_Max;
-
     FileInformation*            m_fileInfoData;
 };
 
