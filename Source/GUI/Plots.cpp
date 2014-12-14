@@ -202,9 +202,9 @@ void Plots::updateSamples( Plot* plot )
 void Plots::Zoom_Move( int Begin )
 {
 	const int numVisibleFrames = visibleFramesCount();
-	const int to = qMin( Begin + numVisibleFrames, numFrames() ) - 1;
+	const int to = qMin( Begin + numVisibleFrames, numFrames() - 1 );
 
-	setFrameRange( to - numVisibleFrames, to );
+	setFrameRange( to - numVisibleFrames + 1, to );
 
     replotAll();
 }
