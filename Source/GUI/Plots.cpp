@@ -8,14 +8,13 @@
 
 #include "GUI/Plots.h"
 #include "GUI/Plot.h"
+#include "GUI/PlotLegend.h"
+#include "GUI/PlotScaleWidget.h"
 #include "Core/Core.h"
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QScrollArea>
-#include <qwt_legend.h>
-#include <qwt_legend_label.h>
 #include <qwt_scale_widget.h>
 #include <qwt_scale_engine.h>
 #include <cmath>
@@ -37,143 +36,6 @@ public:
     }
 };
 
-class ScaleWidget: public QwtScaleWidget
-{
-public:
-    ScaleWidget( QWidget* parent = NULL ):
-        QwtScaleWidget( QwtScaleDraw::BottomScale, parent )
-    {
-        ScaleDraw* sd = new ScaleDraw();
-        sd->setFormat( Plots::AxisTime );
-        setScaleDraw( new ScaleDraw() );
-    }
-
-	void setScale( double from, double to )
-	{
-		QwtLinearScaleEngine se;
-		setScaleDiv( se.divideScale( from, to, 5, 8 ) );
-	}
-
-    void setFormat( int format )
-    {
-        ScaleDraw* sd = dynamic_cast<ScaleDraw*>( scaleDraw() );
-        if ( sd )
-            sd->setFormat( format );
-    }
-
-    int format() const
-	{
-        const ScaleDraw* sd = dynamic_cast<const ScaleDraw*>( scaleDraw() );
-		return sd ? sd->format() : 0;
-	}
-
-	QwtScaleDiv scaleDiv() const
-	{
-		return scaleDraw()->scaleDiv();
-	}
-
-	QwtInterval interval() const
-	{
-		return scaleDraw()->scaleDiv().interval();
-	}
-
-private:
-    class ScaleDraw: public QwtScaleDraw
-    {
-    public:
-        void setFormat( int format )
-        {
-            if ( format != m_format )
-            {
-                m_format = format;
-                invalidateCache();
-            }
-        }
-
-		int format() const
-		{
-			return m_format;
-		}
-
-        virtual QwtText label( double value ) const
-        {
-            if ( m_format == Plots::AxisTime )
-            {
-                const int h = static_cast<int>( value / 3600 );
-                const int m = static_cast<int>( value / 60 );
-                const int s = static_cast<int>( value );
-
-                QString label;
-
-                if ( scaleDiv().interval().width() > 10.0 )
-                {
-                    label.sprintf( "%02d:%02d:%02d", 
-                        h, m - h * 60, s - m * 60 );
-                }
-                else
-                {
-                    const int ms = qRound( ( value - s ) * 1000.0 );
-                    label.sprintf( "%02d:%02d:%02d.%03d", 
-                        h, m - h * 60, s - m * 60, ms);
-                }
-
-                return label;
-            }
-
-            return QwtScaleDraw::label( value );
-        }
-
-    private:
-        int m_format;
-    };
-};
-
-class PlotLegend: public QwtLegend
-{
-public:
-    PlotLegend( QWidget *parent ):
-        QwtLegend( parent )
-    {
-        setMinimumHeight( 1 );
-        setMaxColumns( 1 );
-        setContentsMargins( 0, 0, 0, 0 );
-
-        QLayout* layout = contentsWidget()->layout();
-        layout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
-        layout->setSpacing( 0 );
-
-        QScrollArea *scrollArea = findChild<QScrollArea *>();
-        if ( scrollArea )
-        {
-            scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-            scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-        }
-
-#if 1
-        QFont fnt = font();
-        if ( fnt.pointSize() > 8 )
-        {
-            fnt.setPointSize( 8 );
-            setFont( fnt );
-        }
-#endif
-    }
-
-protected:
-    virtual QWidget *createWidget( const QwtLegendData &data ) const
-    {
-        QWidget *w = QwtLegend::createWidget( data );
-
-        QwtLegendLabel *label = dynamic_cast<QwtLegendLabel *>( w );
-        if ( label )
-        {
-            label->setMargin( 0 );
-        }
-
-        return w;
-    }
-};
-
 //---------------------------------------------------------------------------
 Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
     QWidget( parent ),
@@ -186,7 +48,7 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
     layout->setContentsMargins( 0, 0, 0, 0 );
 
 	// bottom scale
-	m_scaleWidget = new ScaleWidget();
+	m_scaleWidget = new PlotScaleWidget();
     m_scaleWidget->setFormat( Plots::AxisTime );
 	m_scaleWidget->setScale( 0, videoStats()->x_Max[m_dataTypeIndex] );
 
@@ -343,30 +205,6 @@ void Plots::updateSamples( Plot* plot )
         plot->setCurveSamples( j, video->x[m_dataTypeIndex],
             video->y[PerPlotGroup[plotType].Start + j], video->x_Current );
     }
-}
-
-//---------------------------------------------------------------------------
-void Plots::shiftXAxes()
-{
-    const size_t increment = zoomIncrement();
-
-    int pos = framePos();
-    if ( pos == -1 )
-        return;
-
-    if ( pos > increment / 2 )
-        pos -= increment / 2;
-    else
-        pos = 0;
-
-    if ( pos + increment > ( videoStats()->x_Current_Max - 1 ) )
-        pos = ( videoStats()->x_Current_Max - 1 ) - increment;
-
-    const double x = videoStats()->x[m_dataTypeIndex][pos];
-    const double width = videoStats()->x_Max[m_dataTypeIndex] / m_zoomLevel;
-
-	m_scaleWidget->setScale( x, x + width );
-    replotAll();
 }
 
 //---------------------------------------------------------------------------
@@ -542,7 +380,7 @@ void Plots::replotAll()
 
 bool Plots::isZoomed() const
 {
-	return zoomLevel() > 1;
+	return m_zoomLevel > 1;
 }
 
 bool Plots::isZoomable() const
@@ -571,14 +409,4 @@ int Plots::visibleFramesBegin() const
 	}
 	return i - 1;
 #endif
-}
-
-size_t Plots::zoomIncrement() const
-{
-	return videoStats()->x_Current_Max / m_zoomLevel;
-}
-
-int Plots::zoomLevel() const
-{
-	return qRound( videoStats()->x_Max[m_dataTypeIndex] / m_scaleWidget->interval().width() );
 }

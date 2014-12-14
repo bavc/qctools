@@ -16,7 +16,7 @@
 
 class QwtPlot;
 class Plot;
-class ScaleWidget;
+class PlotScaleWidget;
 
 //***************************************************************************
 // Class
@@ -61,8 +61,6 @@ private:
     void                        initAxisFormat( int index );
 	int                         visibleFramesBegin() const;
 
-    void                        shiftXAxes();
-
     void                        initYAxis( Plot* );
     void                        updateSamples( Plot* );
     void                        setCursorPos( double X );
@@ -73,11 +71,8 @@ private:
     VideoStats*                 videoStats() { return m_fileInfoData->Videos[0]; }
     int                         framePos() const { return m_fileInfoData->Frames_Pos_Get(); }
 
-	int                         zoomLevel() const;
-	size_t                      zoomIncrement() const;
-
 private:
-	ScaleWidget*                m_scaleWidget;
+	PlotScaleWidget*            m_scaleWidget;
     Plot*                       m_plots[PlotType_Max];
     size_t                      m_zoomLevel;
 

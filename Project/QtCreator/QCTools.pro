@@ -22,6 +22,8 @@ HEADERS = \
     ../../Source/GUI/mainwindow.h \
     ../../Source/GUI/preferences.h \
     ../../Source/GUI/Plot.h \
+    ../../Source/GUI/PlotLegend.h \
+    ../../Source/GUI/PlotScaleWidget.h \
     ../../Source/GUI/Plots.h \
     ../../Source/GUI/TinyDisplay.h \
     ../../Source/ThirdParty/tinyxml2/tinyxml2.h
@@ -42,6 +44,8 @@ SOURCES = \
     ../../Source/GUI/mainwindow_More.cpp \
     ../../Source/GUI/mainwindow_Ui.cpp \
     ../../Source/GUI/Plot.cpp \
+    ../../Source/GUI/PlotLegend.cpp \
+    ../../Source/GUI/PlotScaleWidget.cpp \
     ../../Source/GUI/Plots.cpp \
     ../../Source/GUI/preferences.cpp \
     ../../Source/GUI/TinyDisplay.cpp \
