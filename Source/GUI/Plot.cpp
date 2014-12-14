@@ -7,6 +7,7 @@
 //---------------------------------------------------------------------------
 
 #include "GUI/Plot.h"
+#include "GUI/PlotLegend.h"
 #include <qwt_plot_grid.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_picker.h>
@@ -247,11 +248,20 @@ Plot::Plot( PlotType type, QWidget *parent ) :
     connect( picker, SIGNAL( selected( const QPointF& ) ), SLOT( onPickerMoved( const QPointF& ) ) );
 
     connect( axisWidget( QwtPlot::xBottom ), SIGNAL( scaleDivChanged() ), SLOT( onXScaleChanged() ) );
+
+	// legend
+	m_legend = new PlotLegend();
+	
+    connect( this, SIGNAL( legendDataChanged( const QVariant &, const QList<QwtLegendData> & ) ),
+         m_legend, SLOT( updateLegend( const QVariant &, const QList<QwtLegendData> & ) ) );
+
+	updateLegend();
 }
 
 //---------------------------------------------------------------------------
 Plot::~Plot()
 {
+	delete m_legend;
 }
 
 QSize Plot::sizeHint() const

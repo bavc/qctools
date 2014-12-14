@@ -59,18 +59,13 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
 		plot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
         plot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
 		initYAxis( plot );
-
-		QwtLegend *legend = new PlotLegend( this );
-		connect( plot, SIGNAL( legendDataChanged( const QVariant &, const QList<QwtLegendData> & ) ),
-				 legend, SLOT( updateLegend( const QVariant &, const QList<QwtLegendData> & ) ) );
+		updateSamples( plot );
 
 		connect( plot, SIGNAL( cursorMoved( double ) ), SLOT( onCursorMoved( double ) ) );
-		plot->updateLegend();
 
         layout->addWidget( plot, row, 0 );
-		layout->addWidget( legend, row, 1 );
+		layout->addWidget( plot->legend(), row, 1 );
 
-		updateSamples( plot );
 		m_plots[row] = plot;
     }
 
@@ -305,24 +300,13 @@ void Plots::onXAxisFormatChanged( int format )
 //---------------------------------------------------------------------------
 void Plots::setPlotVisible( PlotType Type, bool on )
 {
-	if ( on == m_plots[Type]->isVisibleTo( this ) )
-		return;
+	if ( on != m_plots[Type]->isVisibleTo( this ) )
+	{
+		m_plots[Type]->setVisible( on );
+		m_plots[Type]->legend()->setVisible( on );
 
-    const int row = Type;
-
-    QGridLayout* l = dynamic_cast<QGridLayout*>( layout() );
-
-    if ( row < l->rowCount() )
-    {
-        for ( int col = 0; col < l->columnCount(); col++ )
-        {
-            QLayoutItem *item = l->itemAtPosition( row, col );
-            if ( item && item->widget() )
-                item->widget()->setVisible( on );
-        }
+		alignYAxes();
     }
-
-	alignYAxes();
 }
 
 //---------------------------------------------------------------------------

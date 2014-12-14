@@ -14,6 +14,7 @@
 
 class QwtPlotCurve;
 class PlotCursor;
+class PlotLegend;
 
 //***************************************************************************
 // Class
@@ -37,6 +38,8 @@ public:
 
 	PlotType type() const { return m_type; }
 
+	PlotLegend *legend() { return m_legend; }
+
 Q_SIGNALS:
     void cursorMoved( double x );
 
@@ -50,6 +53,8 @@ private:
     const PlotType          m_type;
     QVector<QwtPlotCurve*>  m_curves;
     PlotCursor*             m_cursor;
+
+	PlotLegend*             m_legend;
 };
 
 #endif // GUI_Plot_H
