@@ -61,12 +61,12 @@ private:
 
     void                        replotAll();
 
+    void                        initAxisFormat( int index );
 	int                         visibleFramesBegin() const;
     void                        syncMarker();
 
     void                        shiftXAxes();
 
-    void                        syncPlots();
     void                        syncPlot( PlotType Type );
     void                        setCursorPos( double X );
 

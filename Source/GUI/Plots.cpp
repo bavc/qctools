@@ -179,8 +179,7 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
     QWidget( parent ),
     m_fileInfoData( FileInformationData_ ),
     m_zoomLevel( 1 ),
-    m_dataTypeIndex( Plots::AxisSeconds ),
-    m_Data_FramePos_Max( 0 )
+    m_dataTypeIndex( Plots::AxisSeconds )
 {
     QGridLayout* layout = new QGridLayout( this );
     layout->setSpacing( 1 );
@@ -210,6 +209,7 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
 
 	// bottom scale
 	m_scaleWidget = new ScaleWidget();
+    m_scaleWidget->setFormat( Plots::AxisTime );
 	m_scaleWidget->setScale( 0, videoStats()->x_Max[m_dataTypeIndex] );
 	layout->addWidget( m_scaleWidget, PlotType_Max, 0, 1, 2 );
 
@@ -230,7 +230,13 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
     layout->setColumnStretch( 0, 10 );
     layout->setColumnStretch( 1, 0 );
 
-	onXAxisFormatChanged( xAxisBox->currentIndex() );
+    for ( int i = 0; i < PlotType_Max; i++ )
+    {
+        if ( m_plots[i]->isVisibleTo( this ) )
+            syncPlot( ( PlotType )i );
+    }
+
+    setCursorPos( videoStats()->x[m_dataTypeIndex][framePos()] );
 }
 
 //---------------------------------------------------------------------------
@@ -270,12 +276,12 @@ void Plots::scrollXAxis()
         if ( pos > numFrames / 2 )
         {
             Begin = pos - numFrames / 2;
-            if ( Begin + numFrames > m_Data_FramePos_Max )
-                Begin = m_Data_FramePos_Max - numFrames;
+            if ( Begin + numFrames > ( videoStats()->x_Current_Max - 1 ) )
+                Begin = ( videoStats()->x_Current_Max - 1 ) - numFrames;
         }
 
-    	if ( Begin + numFrames > m_Data_FramePos_Max )
-        	Begin = m_Data_FramePos_Max - numFrames;
+    	if ( Begin + numFrames > ( videoStats()->x_Current_Max - 1 ) )
+        	Begin = ( videoStats()->x_Current_Max - 1 ) - numFrames;
 
     	const double x = videoStats()->x[m_dataTypeIndex][Begin];
 		const double w = m_scaleWidget->interval().width();
@@ -299,25 +305,6 @@ void Plots::setCursorPos( double x )
 {
     for ( int row = 0; row < PlotType_Max; ++row )
         plotAt( row )->setCursorPos( x );
-}
-
-//---------------------------------------------------------------------------
-void Plots::syncPlots()
-{
-    for ( int i = 0; i < PlotType_Max; i++ )
-    {
-        if ( m_plots[i]->isVisibleTo( this ) )
-            syncPlot( ( PlotType )i );
-    }
-
-    if ( m_Data_FramePos_Max + 1 != videoStats()->x_Current_Max )
-    {
-        //Update of zoom in case of total duration change
-        m_Data_FramePos_Max = videoStats()->x_Current_Max - 1;
-        shiftXAxes();
-    }
-
-    replotAll();
 }
 
 //---------------------------------------------------------------------------
@@ -387,8 +374,8 @@ void Plots::shiftXAxes()
     else
         pos = 0;
 
-    if ( pos + increment > m_Data_FramePos_Max )
-        pos = m_Data_FramePos_Max - increment;
+    if ( pos + increment > ( videoStats()->x_Current_Max - 1 ) )
+        pos = ( videoStats()->x_Current_Max - 1 ) - increment;
 
     const double x = videoStats()->x[m_dataTypeIndex][pos];
     const double width = videoStats()->x_Max[m_dataTypeIndex] / m_zoomLevel;
@@ -480,7 +467,11 @@ void Plots::onXAxisFormatChanged( int format )
     else
         m_dataTypeIndex = format;
 
-    syncPlots();
+    for ( int i = 0; i < PlotType_Max; i++ )
+    {
+        if ( m_plots[i]->isVisibleTo( this ) )
+            syncPlot( ( PlotType )i );
+    }
 
 	if ( m_dataTypeIndex != dataTypeIndex )
 	{
