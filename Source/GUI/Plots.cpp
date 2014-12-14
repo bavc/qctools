@@ -11,13 +11,10 @@
 #include "GUI/PlotLegend.h"
 #include "GUI/PlotScaleWidget.h"
 #include "Core/Core.h"
-
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
-
-#include <qwt_scale_widget.h>
-#include <qwt_scale_engine.h>
+#include <QComboBox>
+#include <QGridLayout>
 #include <cmath>
+
 //---------------------------------------------------------------------------
 
 class XAxisFormatBox: public QComboBox
