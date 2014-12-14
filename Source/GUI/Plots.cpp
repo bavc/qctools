@@ -61,6 +61,12 @@ public:
             sd->setFormat( format );
     }
 
+    int format() const
+	{
+        const ScaleDraw* sd = dynamic_cast<const ScaleDraw*>( scaleDraw() );
+		return sd ? sd->format() : 0;
+	}
+
 	QwtScaleDiv scaleDiv() const
 	{
 		return scaleDraw()->scaleDiv();
@@ -83,6 +89,11 @@ private:
                 invalidateCache();
             }
         }
+
+		int format() const
+		{
+			return m_format;
+		}
 
         virtual QwtText label( double value ) const
         {
@@ -171,7 +182,6 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
     m_dataTypeIndex( Plots::AxisSeconds ),
     m_Data_FramePos_Max( 0 )
 {
-
     QGridLayout* layout = new QGridLayout( this );
     layout->setSpacing( 1 );
     layout->setContentsMargins( 0, 0, 0, 0 );
@@ -254,7 +264,7 @@ void Plots::scrollXAxis()
     {
     	// Put the current frame in center
     	const size_t pos = framePos();
-        const size_t numFrames = visibleFrameCount();
+        const size_t numFrames = visibleFramesCount();
 
         size_t Begin = 0;
         if ( pos > numFrames / 2 )
@@ -276,31 +286,6 @@ void Plots::scrollXAxis()
     }
 
     syncMarker();
-}
-
-//---------------------------------------------------------------------------
-void Plots::syncXAxis()
-{
-	// position of the current frame has changed 
-    const size_t pos = framePos();
-
-    // Put the current frame in center
-    if ( isZoomed() )
-    {
-        const size_t increment = zoomIncrement();
-
-        size_t NewBegin = 0;
-        if ( pos > increment / 2 )
-        {
-            NewBegin = pos - increment / 2;
-            if ( NewBegin + increment > m_Data_FramePos_Max )
-                NewBegin = m_Data_FramePos_Max - increment;
-        }
-        shiftXAxes( NewBegin );
-        replotAll();
-    }
-
-	syncMarker();
 }
 
 //---------------------------------------------------------------------------
@@ -402,28 +387,28 @@ void Plots::shiftXAxes()
     else
         pos = 0;
 
-    shiftXAxes( pos );
+    if ( pos + increment > m_Data_FramePos_Max )
+        pos = m_Data_FramePos_Max - increment;
+
+    const double x = videoStats()->x[m_dataTypeIndex][pos];
+    const double width = videoStats()->x_Max[m_dataTypeIndex] / m_zoomLevel;
+
+	m_scaleWidget->setScale( x, x + width );
     replotAll();
 }
 
 //---------------------------------------------------------------------------
-void Plots::shiftXAxes( size_t Begin )
-{
-    size_t increment = zoomIncrement();
-    if ( Begin + increment > m_Data_FramePos_Max )
-        Begin = m_Data_FramePos_Max - increment;
-
-    const double x = videoStats()->x[m_dataTypeIndex][Begin];
-    const double width = videoStats()->x_Max[m_dataTypeIndex] / m_zoomLevel;
-
-	m_scaleWidget->setScale( x, x + width );
-}
-
-
-//---------------------------------------------------------------------------
 void Plots::Zoom_Move( size_t Begin )
 {
-    shiftXAxes( Begin );
+    const double x0 = videoStats()->x[m_dataTypeIndex][Begin];
+    const double width = m_scaleWidget->interval().width();
+
+	double x = x0 + width; 
+	if ( x > videoStats()->x_Current_Max )
+		x = videoStats()->x_Current_Max;
+
+	m_scaleWidget->setScale( x - width, x );
+
     replotAll();
 }
 
@@ -481,6 +466,13 @@ void Plots::onCursorMoved( double cursorX )
 //---------------------------------------------------------------------------
 void Plots::onXAxisFormatChanged( int format )
 {
+	if ( format == m_scaleWidget->format() )
+		return;
+
+	const int dataTypeIndex = m_dataTypeIndex;
+	const int frame0 = visibleFramesBegin();
+	const int numFrames = visibleFramesCount();
+	
     m_scaleWidget->setFormat( format );
 
     if ( format == AxisTime )
@@ -489,8 +481,16 @@ void Plots::onXAxisFormatChanged( int format )
         m_dataTypeIndex = format;
 
     syncPlots();
-    syncMarker();
-    shiftXAxes();
+
+	if ( m_dataTypeIndex != dataTypeIndex )
+	{
+		const double* x = videoStats()->x[m_dataTypeIndex];
+    	m_scaleWidget->setScale( x[frame0], x[frame0 + numFrames - 1] );
+
+		setCursorPos( x[framePos()] );
+	}
+	m_scaleWidget->update();
+    replotAll();
 }
 
 //---------------------------------------------------------------------------
@@ -525,22 +525,34 @@ void Plots::zoomXAxis( bool up )
     }
     else
     {
-        if ( m_zoomLevel > 1 )
-            m_zoomLevel /= 2;
+        if ( m_zoomLevel <= 1 )
+			return;
+
+        m_zoomLevel /= 2;
     }
 
-    size_t Position = framePos();
-    size_t Increment = zoomIncrement();
+	const double xMax = videoStats()->x_Current_Max;
 
-    if ( Position + Increment / 2> videoStats()->x_Current_Max )
-        Position = videoStats()->x_Current_Max - Increment / 2;
+    size_t pos = framePos();
+    size_t Increment = xMax / m_zoomLevel;
 
-    if ( Position > Increment / 2 )
-        Position -= Increment/2;
+    if ( pos + Increment / 2 > xMax )
+        pos = xMax - Increment / 2;
+
+    if ( pos > Increment / 2 )
+        pos -= Increment / 2;
     else
-        Position=0;
+        pos=0;
 
-    Zoom_Move( Position );
+    if ( pos + Increment > ( videoStats()->x_Current_Max - 1 ) )
+        pos = ( videoStats()->x_Current_Max - 1 ) - Increment;
+
+    const double x = videoStats()->x[m_dataTypeIndex][pos];
+    const double width = videoStats()->x_Max[m_dataTypeIndex] / m_zoomLevel;
+
+    m_scaleWidget->setScale( x, x + width );
+
+    replotAll();
 }
 
 //---------------------------------------------------------------------------
@@ -561,14 +573,30 @@ bool Plots::isZoomed() const
 
 bool Plots::isZoomable() const
 {
-	return visibleFrameCount() > 4;
+	return visibleFramesCount() > 4;
 }
 
-size_t Plots::visibleFrameCount() const
+size_t Plots::visibleFramesCount() const
 {
-	// current scale width tanslated into frames
+	// current scale width translated into frames
 	const double w = m_scaleWidget->interval().width();
 	return qRound( w * videoStats()->x_Current_Max / videoStats()->x_Max[m_dataTypeIndex] );
+}
+
+int Plots::visibleFramesBegin() const
+{
+	const double* x = videoStats()->x[m_dataTypeIndex];
+	const double value = m_scaleWidget->interval().minValue();
+#if 1
+	// TODO
+	int i;
+	for ( i = 0; i < videoStats()->x_Current; i++ )
+	{
+		if ( x[i] > value )
+			break;
+	}
+	return i - 1;
+#endif
 }
 
 size_t Plots::zoomIncrement() const

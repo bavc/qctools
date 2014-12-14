@@ -39,9 +39,7 @@ public:
     explicit                    Plots( QWidget *parent, FileInformation* FileInfoData );
     virtual                     ~Plots();
 
-    void                        syncXAxis();
     void                        scrollXAxis();
-    void                        syncMarker();
     void                        setPlotVisible( PlotType, bool on );
 
     const QwtPlot*              plot( PlotType ) const;
@@ -51,7 +49,7 @@ public:
     void                        zoomXAxis( bool up );
 	bool                        isZoomed() const;
 	bool                        isZoomable() const;
-	size_t                      visibleFrameCount() const;
+	size_t                      visibleFramesCount() const;
 
 private Q_SLOTS:
     void                        onCursorMoved( double x );
@@ -63,8 +61,10 @@ private:
 
     void                        replotAll();
 
+	int                         visibleFramesBegin() const;
+    void                        syncMarker();
+
     void                        shiftXAxes();
-    void                        shiftXAxes( size_t Begin );
 
     void                        syncPlots();
     void                        syncPlot( PlotType Type );
