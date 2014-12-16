@@ -51,6 +51,8 @@ public:
 	bool                        isZoomable() const;
 	size_t                      visibleFramesCount() const;
 
+	virtual bool                eventFilter( QObject *, QEvent * );
+
 private Q_SLOTS:
     void                        onCursorMoved( double x );
     void                        onXAxisFormatChanged( int index );
@@ -64,6 +66,7 @@ private:
     void                        updateSamples( Plot* );
     void                        setCursorPos( double X );
 
+    void                        alignXAxis( const Plot* );
     void                        alignYAxes();
     double                      axisStepSize( double s ) const;
     const VideoStats*           videoStats() const { return m_fileInfoData->Videos[0]; }

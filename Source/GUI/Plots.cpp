@@ -13,6 +13,9 @@
 #include "Core/Core.h"
 #include <QComboBox>
 #include <QGridLayout>
+#include <QEvent>
+#include <qwt_plot_layout.h>
+#include <qwt_plot_canvas.h>
 #include <cmath>
 
 //---------------------------------------------------------------------------
@@ -61,6 +64,8 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
 		updateSamples( plot );
 
 		connect( plot, SIGNAL( cursorMoved( double ) ), SLOT( onCursorMoved( double ) ) );
+
+		plot->canvas()->installEventFilter( this );
 
         layout->addWidget( plot, row, 0 );
 		layout->addWidget( plot->legend(), row, 1 );
@@ -234,6 +239,41 @@ void Plots::alignYAxes()
         QwtScaleWidget *scaleWidget = m_plots[i]->axisWidget( QwtPlot::yLeft );
         scaleWidget->scaleDraw()->setMinimumExtent( maxExtent );
     }
+}
+
+bool Plots::eventFilter( QObject *object, QEvent *event )
+{
+	if ( event->type() == QEvent::Move || event->type() == QEvent::Resize )
+	{
+		for ( int i = 0; i < PlotType_Max; i++ )
+		{
+			if ( m_plots[i]->isVisibleTo( this ) )
+			{
+				if ( object == m_plots[i]->canvas() )
+					alignXAxis( m_plots[i] );
+
+				break;
+			}
+		}
+	}
+
+	return QWidget::eventFilter( object, event );
+}
+
+void Plots::alignXAxis( const Plot* plot )
+{
+	const QWidget* canvas = plot->canvas();
+
+	QRect r = canvas->geometry(); 
+	r.moveTopLeft( mapFromGlobal( plot->mapToGlobal( r.topLeft() ) ) );
+
+	int left = r.left();
+	left += plot->plotLayout()->canvasMargin( QwtPlot::yLeft );
+
+	int right = width() - ( r.right() - 1 );
+	right += plot->plotLayout()->canvasMargin( QwtPlot::yRight );
+
+	m_scaleWidget->setBorderDist( left, right );
 }
 
 //---------------------------------------------------------------------------
