@@ -41,8 +41,10 @@ public:
 
     PlotLegend *legend() { return m_legend; }
 
+    const QwtPlotCurve* curve( int index ) const;
+
 Q_SIGNALS:
-    void cursorMoved( double x );
+    void cursorMoved( int index );
 
 private Q_SLOTS:
     void onPickerMoved( const QPointF& );

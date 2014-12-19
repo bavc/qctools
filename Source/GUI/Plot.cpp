@@ -39,6 +39,15 @@ struct compareX
     }
 };
 
+static int indexLower( double x, const QwtSeriesData<QPointF> &data ) 
+{
+    int index = qwtUpperSampleIndex<QPointF>( data, x, compareX() );
+    if ( index == -1 )
+        index = data.size();
+
+    return index - 1;
+}
+
 class PlotPicker: public QwtPlotPicker
 {
 public:
@@ -62,8 +71,14 @@ public:
         QColor bg( Qt::darkGray );
         bg.setAlpha( 160 );
 
-        QwtText text = infoText( indexLower( pos.x() ) );
-        text.setBackgroundBrush( QBrush( bg ) );
+        QwtText text;
+
+        const QwtPlotCurve* curve = dynamic_cast<const Plot*>( plot() )->curve(0);
+        if ( curve )
+        {
+            text = infoText( ::indexLower( pos.x(), *curve->data() ) );
+            text.setBackgroundBrush( QBrush( bg ) );
+        }
 
         return text;
     }
@@ -73,31 +88,6 @@ protected:
     {
         QString info( "Frame: %1" );
         return info.arg( index + 1 );
-    }
-
-private:
-    const QwtPlotCurve* curve0() const
-    {
-        const QwtPlotItemList curves = plot()->itemList( QwtPlotItem::Rtti_PlotCurve );
-        if ( curves.isEmpty() )
-            return NULL;
-
-        return dynamic_cast<const QwtPlotCurve*>( curves.first() );
-    }
-
-    int indexLower( double x ) const
-    {
-        const QwtPlotCurve* curve = curve0();
-        if ( curve == NULL )
-            return -1;
-
-        int index = qwtUpperSampleIndex<QPointF>(
-            *curve->data(), x, compareX() );
-
-        if ( index == -1 )
-            index = curve->dataSize();
-
-        return index - 1;
     }
 };
 
@@ -295,6 +285,15 @@ QSize Plot::minimumSizeHint() const
     return QSize( hint.width(), -1 );
 }
 
+const QwtPlotCurve* Plot::curve( int index ) const
+{
+    const QwtPlotItemList curves = itemList( QwtPlotItem::Rtti_PlotCurve );
+    if ( index >= 0 && index < curves.size() )
+        return dynamic_cast<const QwtPlotCurve*>( curves[index] );
+
+    return NULL;
+}   
+
 void Plot::setCurveSamples( int index,
     const double *xData, const double *yData, int size )
 {
@@ -374,7 +373,27 @@ QColor Plot::curveColor( int index ) const
 
 void Plot::onPickerMoved( const QPointF& pos )
 {
-    Q_EMIT cursorMoved( qMax( pos.x(), 0.0 ) );
+    const QwtPlotCurve* curve = this->curve(0);
+    if ( curve == NULL )
+        return;
+
+    const QwtSeriesData<QPointF> &data = *curve->data();
+
+    int idx = ::indexLower( pos.x(), data );
+    if ( idx < 0 )
+    {
+        idx = 0;
+    }
+    else if ( idx < data.size() - 1 )
+    {
+        // index, where x is closer
+        const double x1 = data.sample( idx ).x();
+        const double x2 = data.sample( idx + 1 ).x();
+        if ( qAbs( pos.x() - x2 ) < qAbs( pos.x() - x1 ) ) 
+            idx++;
+    }
+
+    Q_EMIT cursorMoved( idx );
 }
 
 void Plot::onXScaleChanged()

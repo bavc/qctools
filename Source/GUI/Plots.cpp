@@ -63,7 +63,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
         initYAxis( plot );
         updateSamples( plot );
 
-        connect( plot, SIGNAL( cursorMoved( double ) ), SLOT( onCursorMoved( double ) ) );
+        connect( plot, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
 
         plot->canvas()->installEventFilter( this );
 
@@ -92,7 +92,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     layout->setColumnStretch( 0, 10 );
     layout->setColumnStretch( 1, 0 );
 
-    setCursorPos( videoStats()->x[m_dataTypeIndex][framePos()] );
+    setCursorPos( framePos() );
 }
 
 //---------------------------------------------------------------------------
@@ -136,12 +136,13 @@ void Plots::scrollXAxis()
         }
     }
 
-    setCursorPos( videoStats()->x[m_dataTypeIndex][framePos()] );
+    setCursorPos( framePos() );
 }
 
 //---------------------------------------------------------------------------
-void Plots::setCursorPos( double x )
+void Plots::setCursorPos( int framePos )
 {
+    const double x = videoStats()->x[m_dataTypeIndex][framePos];
     for ( int i = 0; i < PlotType_Max; ++i )
         m_plots[i]->setCursorPos( x );
 }
@@ -256,33 +257,10 @@ void Plots::alignXAxis( const Plot* plot )
 }
 
 //---------------------------------------------------------------------------
-void Plots::onCursorMoved( double cursorX )
+void Plots::onCursorMoved( int framePos )
 {
-    const double* xData = videoStats()->x[m_dataTypeIndex];
-
-    size_t pos = 0;
-    while ( pos < numFrames() && cursorX >= xData[pos] )
-        pos++;
-
-    if ( pos )
-    {
-#if 0
-        // numFrames() ???
-        if ( pos >= videoStats()->x_Current )
-            pos = videoStats()->x_Current - 1;
-#else
-        if ( pos >= numFrames() )
-            pos = numFrames() - 1;
-#endif
-
-        double Distance1 = cursorX - xData[pos - 1];
-        double Distance2 = xData[pos] - cursorX;
-        if ( Distance1 < Distance2 )
-            pos--;
-    }
-
-    m_fileInfoData->Frames_Pos_Set( pos );
-    setCursorPos( xData[pos] );
+    m_fileInfoData->Frames_Pos_Set( framePos );
+    setCursorPos( framePos );
 }
 
 //---------------------------------------------------------------------------
@@ -303,9 +281,7 @@ void Plots::onXAxisFormatChanged( int format )
             updateSamples( m_plots[i] );
 
         setFrameRange( m_visibleFrame[0], m_visibleFrame[1] );
-
-        const double* x = videoStats()->x[m_dataTypeIndex];
-        setCursorPos( x[framePos()] );
+        setCursorPos( framePos() );
     }
 
     m_scaleWidget->setFormat( format );

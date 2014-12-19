@@ -54,7 +54,7 @@ public:
     virtual bool                eventFilter( QObject *, QEvent * );
 
 private Q_SLOTS:
-    void                        onCursorMoved( double x );
+    void                        onCursorMoved( int index );
     void                        onXAxisFormatChanged( int index );
 
 private:
@@ -64,7 +64,7 @@ private:
 
     void                        initYAxis( Plot* );
     void                        updateSamples( Plot* );
-    void                        setCursorPos( double X );
+    void                        setCursorPos( int framePos );
 
     void                        alignXAxis( const Plot* );
     void                        alignYAxes();
