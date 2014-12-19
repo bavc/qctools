@@ -181,6 +181,7 @@ private Q_SLOTS:
     void on_Full_triggered();
 
 private:
+    bool isPlotZoomable() const;
     void Zoom( bool );
     Ui::MainWindow *ui;
 };

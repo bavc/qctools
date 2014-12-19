@@ -18,6 +18,24 @@ class QwtPlot;
 class Plot;
 class PlotScaleWidget;
 
+class FrameInterval
+{
+public:
+    FrameInterval():
+        from( 0 ),
+        to( 0 )
+    {
+    }
+
+    int count() const
+    {
+        return to - from + 1;
+    }
+
+    int from;
+    int to;
+};
+
 //***************************************************************************
 // Class
 //***************************************************************************
@@ -48,8 +66,7 @@ public:
 
     void                        zoomXAxis( bool up );
     bool                        isZoomed() const;
-    bool                        isZoomable() const;
-    size_t                      visibleFramesCount() const;
+    FrameInterval               visibleFrames() const;
 
     virtual bool                eventFilter( QObject *, QEvent * );
 
@@ -79,7 +96,7 @@ private:
     PlotScaleWidget*            m_scaleWidget;
     Plot*                       m_plots[PlotType_Max];
 
-    int                         m_visibleFrame[2];
+    FrameInterval               m_frameInterval;
     // X axis info
     int                         m_dataTypeIndex;
     FileInformation*            m_fileInfoData;

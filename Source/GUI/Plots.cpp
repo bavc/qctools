@@ -108,8 +108,8 @@ const QwtPlot* Plots::plot( PlotType Type ) const
 
 void Plots::setFrameRange( int from, int to )
 {
-    m_visibleFrame[0] = from;
-    m_visibleFrame[1] = to;
+    m_frameInterval.from = from;
+    m_frameInterval.to = to;
 
     const double* x = videoStats()->x[m_dataTypeIndex];
     m_scaleWidget->setScale( x[from], x[to] );
@@ -121,12 +121,12 @@ void Plots::scrollXAxis()
 
     if ( isZoomed() )
     {
-        const int n = visibleFramesCount();
+        const int n = m_frameInterval.count();
 
         const int from = qBound( 0, framePos() - n / 2, numFrames() - n - 1 );
         const int to = from + n - 1;
 
-        if ( from != m_visibleFrame[0] )
+        if ( from != m_frameInterval.from )
         {
             setFrameRange( from, to );
             replotAll();
@@ -183,10 +183,9 @@ void Plots::updateSamples( Plot* plot )
 //---------------------------------------------------------------------------
 void Plots::Zoom_Move( int Begin )
 {
-    const int numVisibleFrames = visibleFramesCount();
-    const int to = qMin( Begin + numVisibleFrames, numFrames() - 1 );
+    const int to = qMin( Begin + m_frameInterval.count(), numFrames() - 1 );
 
-    setFrameRange( to - numVisibleFrames + 1, to );
+    setFrameRange( to - m_frameInterval.count() + 1, to );
 
     replotAll();
 }
@@ -277,7 +276,7 @@ void Plots::onXAxisFormatChanged( int format )
         for ( int i = 0; i < PlotType_Max; i++ )
             updateSamples( m_plots[i] );
 
-        setFrameRange( m_visibleFrame[0], m_visibleFrame[1] );
+        setFrameRange( m_frameInterval.from, m_frameInterval.to );
         setCursorPos( framePos() );
     }
 
@@ -302,13 +301,13 @@ void Plots::setPlotVisible( PlotType Type, bool on )
 //---------------------------------------------------------------------------
 void Plots::zoomXAxis( bool up )
 {
-    int numVisibleFrames = visibleFramesCount();
+    int numVisibleFrames = m_frameInterval.count();
     if ( up )
         numVisibleFrames /= 2;
     else
         numVisibleFrames *= 2;
 
-    const int to = qMin( m_visibleFrame[0] + numVisibleFrames, numFrames() ) - 1;
+    const int to = qMin( m_frameInterval.from + numVisibleFrames, numFrames() ) - 1;
     const int from = qMax( 0, to - numVisibleFrames );
 
     setFrameRange( from, to );
@@ -329,15 +328,10 @@ void Plots::replotAll()
 
 bool Plots::isZoomed() const
 {
-    return visibleFramesCount() < numFrames();
+    return m_frameInterval.count() < numFrames();
 }
 
-bool Plots::isZoomable() const
+FrameInterval Plots::visibleFrames() const
 {
-    return visibleFramesCount() > 4;
-}
-
-size_t Plots::visibleFramesCount() const
-{
-    return m_visibleFrame[1] - m_visibleFrame[0] + 1;
+    return m_frameInterval;
 }

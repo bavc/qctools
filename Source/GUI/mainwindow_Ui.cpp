@@ -145,6 +145,12 @@ void MainWindow::Ui_Init()
 }
 
 //---------------------------------------------------------------------------
+bool MainWindow::isPlotZoomable() const
+{
+    return PlotsArea && PlotsArea->visibleFrames().count() > 4;
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::configureZoom()
 {
     if (Files.empty() || PlotsArea==NULL || !PlotsArea->isZoomed() )
@@ -159,7 +165,7 @@ void MainWindow::configureZoom()
         ui->horizontalScrollBar->hide();
 #endif
         ui->actionZoomOut->setEnabled(false);
-        if (Files_CurrentPos<Files.size() && PlotsArea && PlotsArea->isZoomable())
+        if (Files_CurrentPos<Files.size() && isPlotZoomable())
             ui->actionZoomIn->setEnabled(true);
         else
             ui->actionZoomIn->setEnabled(false);
@@ -172,7 +178,7 @@ void MainWindow::configureZoom()
         return;
     }
 
-    size_t Increment=PlotsArea->visibleFramesCount();
+    size_t Increment=PlotsArea->visibleFrames().count();
     ui->horizontalScrollBar->setMaximum(Files[Files_CurrentPos]->Videos[0]->x_Current_Max-Increment);
     ui->horizontalScrollBar->setPageStep(Increment);
     ui->horizontalScrollBar->setSingleStep(Increment);
@@ -182,7 +188,7 @@ void MainWindow::configureZoom()
     ui->horizontalScrollBar->show();
 #endif
     ui->actionZoomOut->setEnabled(true);
-    ui->actionZoomIn->setEnabled( PlotsArea->isZoomable() );
+    ui->actionZoomIn->setEnabled( isPlotZoomable() );
     ui->actionGoTo->setEnabled(true);
     ui->actionExport_XmlGz_Prompt->setEnabled(true);
     ui->actionExport_XmlGz_Sidecar->setEnabled(true);
@@ -200,27 +206,18 @@ void MainWindow::Zoom_Move(size_t Begin)
 //---------------------------------------------------------------------------
 void MainWindow::Zoom_In()
 {
-	Zoom( true );
+    Zoom( true );
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::Zoom_Out()
 {
-	Zoom( false );
+    Zoom( false );
 }
 
 void MainWindow::Zoom( bool on )
 {
-	if ( on )
-	{
-    	if ( PlotsArea->isZoomable() )
-        	PlotsArea->zoomXAxis( true );
-	}
-	else
-	{
-    	PlotsArea->zoomXAxis( false );
-	}
-
+    PlotsArea->zoomXAxis( on );
     configureZoom();
 }
 
@@ -252,7 +249,7 @@ void MainWindow::Export_PDF()
 
     QwtPlotRenderer PlotRenderer;
     PlotRenderer.renderDocument(const_cast<QwtPlot*>( PlotsArea->plot(PlotType_Y) ), 
-		SaveFileName, "PDF", QSizeF(210, 297), 150);
+        SaveFileName, "PDF", QSizeF(210, 297), 150);
     QDesktopServices::openUrl(QUrl("file:///"+SaveFileName, QUrl::TolerantMode));
 }
 
