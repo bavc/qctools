@@ -49,7 +49,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     // bottom scale
     m_scaleWidget = new PlotScaleWidget();
     m_scaleWidget->setFormat( Plots::AxisTime );
-    setFrameRange( 0, numFrames() - 1 );
+    setVisibleFrames( 0, numFrames() - 1 );
 
     // plots and legends
 
@@ -106,15 +106,26 @@ const QwtPlot* Plots::plot( PlotType Type ) const
     return m_plots[Type];
 }
 
-void Plots::setFrameRange( int from, int to )
+//---------------------------------------------------------------------------
+void Plots::setVisibleFrames( int from, int to )
 {
-    m_frameInterval.from = from;
-    m_frameInterval.to = to;
+	if ( from != m_frameInterval.from || to != m_frameInterval.to )
+	{
+    	m_frameInterval.from = from;
+    	m_frameInterval.to = to;
 
-    const double* x = videoStats()->x[m_dataTypeIndex];
-    m_scaleWidget->setScale( x[from], x[to] );
+    	const double* x = videoStats()->x[m_dataTypeIndex];
+    	m_scaleWidget->setScale( x[from], x[to] );
+	}
 }
 
+//---------------------------------------------------------------------------
+FrameInterval Plots::visibleFrames() const
+{
+    return m_frameInterval;
+}
+
+//---------------------------------------------------------------------------
 void Plots::scrollXAxis()
 {
     // position of the current frame has changed 
@@ -123,12 +134,12 @@ void Plots::scrollXAxis()
     {
         const int n = m_frameInterval.count();
 
-        const int from = qBound( 0, framePos() - n / 2, numFrames() - n - 1 );
+        const int from = qBound( 0, framePos() - n / 2, numFrames() - n );
         const int to = from + n - 1;
 
         if ( from != m_frameInterval.from )
         {
-            setFrameRange( from, to );
+            setVisibleFrames( from, to );
             replotAll();
         }
     }
@@ -168,6 +179,7 @@ void Plots::initYAxis( Plot* plot )
 
 }
 
+//---------------------------------------------------------------------------
 void Plots::updateSamples( Plot* plot )
 {
     const PlotType plotType = plot->type();
@@ -183,9 +195,13 @@ void Plots::updateSamples( Plot* plot )
 //---------------------------------------------------------------------------
 void Plots::Zoom_Move( int Begin )
 {
-    const int to = qMin( Begin + m_frameInterval.count(), numFrames() - 1 );
+qDebug() << "Zoom_Move" << Begin;
+	const int n = m_frameInterval.count();
 
-    setFrameRange( to - m_frameInterval.count() + 1, to );
+	const int from = qMax( Begin, 0 );
+	const int to = qMin( numFrames(), from + n ) - 1;
+
+    setVisibleFrames( from, to );
 
     replotAll();
 }
@@ -276,7 +292,7 @@ void Plots::onXAxisFormatChanged( int format )
         for ( int i = 0; i < PlotType_Max; i++ )
             updateSamples( m_plots[i] );
 
-        setFrameRange( m_frameInterval.from, m_frameInterval.to );
+        setVisibleFrames( m_frameInterval.from, m_frameInterval.to );
         setCursorPos( framePos() );
     }
 
@@ -310,9 +326,14 @@ void Plots::zoomXAxis( bool up )
     const int to = qMin( m_frameInterval.from + numVisibleFrames, numFrames() ) - 1;
     const int from = qMax( 0, to - numVisibleFrames );
 
-    setFrameRange( from, to );
+    setVisibleFrames( from, to );
 
     replotAll();
+}
+
+bool Plots::isZoomed() const
+{
+    return m_frameInterval.count() < numFrames();
 }
 
 //---------------------------------------------------------------------------
@@ -324,14 +345,4 @@ void Plots::replotAll()
         if ( m_plots[i]->isVisibleTo( this ) )
             m_plots[i]->replot();
     }
-}
-
-bool Plots::isZoomed() const
-{
-    return m_frameInterval.count() < numFrames();
-}
-
-FrameInterval Plots::visibleFrames() const
-{
-    return m_frameInterval;
 }

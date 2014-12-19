@@ -153,22 +153,16 @@ bool MainWindow::isPlotZoomable() const
 //---------------------------------------------------------------------------
 void MainWindow::configureZoom()
 {
+	updateScrollBar();
+
     if (Files.empty() || PlotsArea==NULL || !PlotsArea->isZoomed() )
     {
-#if 0
-        ui->horizontalScrollBar->setRange(0, 0);
-        ui->horizontalScrollBar->setMaximum(0);
-        ui->horizontalScrollBar->setPageStep(1);
-        ui->horizontalScrollBar->setSingleStep(1);
-        ui->horizontalScrollBar->setEnabled(false);
-#else
-        ui->horizontalScrollBar->hide();
-#endif
         ui->actionZoomOut->setEnabled(false);
         if (Files_CurrentPos<Files.size() && isPlotZoomable())
             ui->actionZoomIn->setEnabled(true);
         else
             ui->actionZoomIn->setEnabled(false);
+
         ui->actionGoTo->setEnabled(!Files.empty());
         ui->actionExport_XmlGz_Prompt->setEnabled(!Files.empty());
         ui->actionExport_XmlGz_Sidecar->setEnabled(!Files.empty());
@@ -178,15 +172,6 @@ void MainWindow::configureZoom()
         return;
     }
 
-    size_t Increment=PlotsArea->visibleFrames().count();
-    ui->horizontalScrollBar->setMaximum(Files[Files_CurrentPos]->Videos[0]->x_Current_Max-Increment);
-    ui->horizontalScrollBar->setPageStep(Increment);
-    ui->horizontalScrollBar->setSingleStep(Increment);
-#if 0
-    ui->horizontalScrollBar->setEnabled(true);
-#else
-    ui->horizontalScrollBar->show();
-#endif
     ui->actionZoomOut->setEnabled(true);
     ui->actionZoomIn->setEnabled( isPlotZoomable() );
     ui->actionGoTo->setEnabled(true);
@@ -207,18 +192,40 @@ void MainWindow::Zoom_Move(size_t Begin)
 void MainWindow::Zoom_In()
 {
     Zoom( true );
+	updateScrollBar();
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::Zoom_Out()
 {
     Zoom( false );
+	updateScrollBar();
 }
 
 void MainWindow::Zoom( bool on )
 {
     PlotsArea->zoomXAxis( on );
     configureZoom();
+}
+
+void MainWindow::updateScrollBar()
+{
+	QScrollBar* sb = ui->horizontalScrollBar;
+
+	if ( PlotsArea==NULL || !PlotsArea->isZoomed() )
+	{
+        sb->hide();
+	}
+	else
+	{
+		const FrameInterval intv = PlotsArea->visibleFrames();
+
+		sb->setRange( 0, PlotsArea->numFrames() - intv.count() + 1 );
+    	sb->setValue( intv.from );
+    	sb->setPageStep( intv.count() );
+    	sb->setSingleStep( intv.count() );
+    	sb->show();
+	}
 }
 
 //---------------------------------------------------------------------------

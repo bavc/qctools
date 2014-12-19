@@ -67,6 +67,7 @@ public:
     void                        zoomXAxis( bool up );
     bool                        isZoomed() const;
     FrameInterval               visibleFrames() const;
+    int                         numFrames() const { return videoStats()->x_Current_Max; }
 
     virtual bool                eventFilter( QObject *, QEvent * );
 
@@ -85,12 +86,12 @@ private:
 
     void                        alignXAxis( const Plot* );
     void                        alignYAxes();
+
+    void                        setVisibleFrames( int from, int to );
+
     const VideoStats*           videoStats() const { return m_fileInfoData->Videos[0]; }
     VideoStats*                 videoStats() { return m_fileInfoData->Videos[0]; }
     int                         framePos() const { return m_fileInfoData->Frames_Pos_Get(); }
-    int                         numFrames() const { return videoStats()->x_Current_Max; }
-
-    void                        setFrameRange( int from, int to );
 
 private:
     PlotScaleWidget*            m_scaleWidget;

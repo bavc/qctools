@@ -180,9 +180,12 @@ private Q_SLOTS:
 
     void on_Full_triggered();
 
+	void updateScrollBar();
+
 private:
     bool isPlotZoomable() const;
     void Zoom( bool );
+
     Ui::MainWindow *ui;
 };
 
