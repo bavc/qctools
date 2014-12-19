@@ -37,43 +37,43 @@ public:
 };
 
 //---------------------------------------------------------------------------
-Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
+Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     QWidget( parent ),
-    m_fileInfoData( FileInformationData_ ),
+    m_fileInfoData( fileInformation ),
     m_dataTypeIndex( Plots::AxisSeconds )
 {
     QGridLayout* layout = new QGridLayout( this );
     layout->setSpacing( 1 );
     layout->setContentsMargins( 0, 0, 0, 0 );
 
-	// bottom scale
-	m_scaleWidget = new PlotScaleWidget();
+    // bottom scale
+    m_scaleWidget = new PlotScaleWidget();
     m_scaleWidget->setFormat( Plots::AxisTime );
-	setFrameRange( 0, numFrames() - 1 );
+    setFrameRange( 0, numFrames() - 1 );
 
-	// plots and legends
+    // plots and legends
 
     for ( int row = 0; row < PlotType_Max; row++ )
     {
-		Plot* plot = new Plot( ( PlotType )row, this );
+        Plot* plot = new Plot( ( PlotType )row, this );
 
-		// we allow to shrink the plot below height of the size hint
-		plot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
+        // we allow to shrink the plot below height of the size hint
+        plot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
         plot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
-		initYAxis( plot );
-		updateSamples( plot );
+        initYAxis( plot );
+        updateSamples( plot );
 
-		connect( plot, SIGNAL( cursorMoved( double ) ), SLOT( onCursorMoved( double ) ) );
+        connect( plot, SIGNAL( cursorMoved( double ) ), SLOT( onCursorMoved( double ) ) );
 
-		plot->canvas()->installEventFilter( this );
+        plot->canvas()->installEventFilter( this );
 
         layout->addWidget( plot, row, 0 );
-		layout->addWidget( plot->legend(), row, 1 );
+        layout->addWidget( plot->legend(), row, 1 );
 
-		m_plots[row] = plot;
+        m_plots[row] = plot;
     }
 
-	layout->addWidget( m_scaleWidget, PlotType_Max, 0, 1, 2 );
+    layout->addWidget( m_scaleWidget, PlotType_Max, 0, 1, 2 );
 
     // combo box for the axis format
     XAxisFormatBox* xAxisBox = new XAxisFormatBox();
@@ -81,7 +81,7 @@ Plots::Plots( QWidget *parent, FileInformation* FileInformationData_ ) :
     connect( xAxisBox, SIGNAL( currentIndexChanged( int ) ),
         this, SLOT( onXAxisFormatChanged( int ) ) );
 
-	int axisBoxRow = layout->rowCount() - 1;
+    int axisBoxRow = layout->rowCount() - 1;
 #if 1
     // one row below to have space enough for bottom scale tick labels
     layout->addWidget( xAxisBox, PlotType_Max + 1, 1 );
@@ -108,11 +108,11 @@ const QwtPlot* Plots::plot( PlotType Type ) const
 
 void Plots::setFrameRange( int from, int to )
 {
-	m_visibleFrame[0] = from;
-	m_visibleFrame[1] = to;
+    m_visibleFrame[0] = from;
+    m_visibleFrame[1] = to;
 
-	const double* x = videoStats()->x[m_dataTypeIndex];
-	m_scaleWidget->setScale( x[from], x[to] );
+    const double* x = videoStats()->x[m_dataTypeIndex];
+    m_scaleWidget->setScale( x[from], x[to] );
 }
 
 void Plots::scrollXAxis()
@@ -121,19 +121,19 @@ void Plots::scrollXAxis()
 
     if ( m_visibleFrame[1] < numFrames() - 1 )
     {
-    	const int pos = framePos();
+        const int pos = framePos();
         const int numVisibleFrames = visibleFramesCount();
 
         if ( pos > m_visibleFrame[0] + numVisibleFrames / 2 )
-		{
-    		// Put the current frame in center
+        {
+            // Put the current frame in center
             const int from = pos - numVisibleFrames / 2;
-			const int to = qMin( from + numVisibleFrames, numFrames() ) - 1;
+            const int to = qMin( from + numVisibleFrames, numFrames() ) - 1;
 
-			setFrameRange( to - numVisibleFrames, to );
+            setFrameRange( to - numVisibleFrames, to );
 
-        	replotAll();
-		}
+            replotAll();
+        }
     }
 
     setCursorPos( videoStats()->x[m_dataTypeIndex][framePos()] );
@@ -147,52 +147,33 @@ void Plots::setCursorPos( double x )
 }
 
 //---------------------------------------------------------------------------
-double Plots::axisStepSize( double s ) const
-{
-    for ( int d = 1; d <= 1000000; d *= 10 )
-    {
-        const double step = floor( s * d ) / d;
-        if ( step > 0.0 )
-            return step;
-    }
-
-    return 0.0;
-}
-
-//---------------------------------------------------------------------------
 void Plots::initYAxis( Plot* plot )
 {
-	const PlotType plotType = plot->type();
+    const PlotType plotType = plot->type();
 
     VideoStats* video = videoStats();
-	const struct per_plot_group& group = PerPlotGroup[plotType];
+    const struct per_plot_group& group = PerPlotGroup[plotType];
 
-	double yMax = video->y_Max[plotType];
+    double yMax = video->y_Max[plotType];
     if ( ( group.Min != group.Max ) && ( yMax >= group.Max / 2 ) )
-		yMax = group.Max;
+        yMax = group.Max;
 
     if ( yMax )
     {
-        if ( yMax > plot->axisInterval( QwtPlot::yLeft ).maxValue() )
-        {
-            const double stepCount = group.StepsCount;
-            const double stepSize = axisStepSize( yMax / stepCount );
-
-            if ( stepSize )
-                plot->setAxisScale( QwtPlot::yLeft, 0, yMax, stepSize );
-        }
+        plot->setYAxis( yMax, group.StepsCount );
     }
     else
     {
         //Special case, in order to force a scale of 0 to 1
-        plot->setAxisScale( QwtPlot::yLeft, 0, 1, 1 );
+        plot->setYAxis( 1.0, 1 );
     }
+
 }
 
 void Plots::updateSamples( Plot* plot )
 {
     const PlotType plotType = plot->type();
-	const VideoStats* video = videoStats();
+    const VideoStats* video = videoStats();
 
     for( unsigned j = 0; j < PerPlotGroup[plotType].Count; ++j )
     {
@@ -204,10 +185,10 @@ void Plots::updateSamples( Plot* plot )
 //---------------------------------------------------------------------------
 void Plots::Zoom_Move( int Begin )
 {
-	const int numVisibleFrames = visibleFramesCount();
-	const int to = qMin( Begin + numVisibleFrames, numFrames() - 1 );
+    const int numVisibleFrames = visibleFramesCount();
+    const int to = qMin( Begin + numVisibleFrames, numFrames() - 1 );
 
-	setFrameRange( to - numVisibleFrames + 1, to );
+    setFrameRange( to - numVisibleFrames + 1, to );
 
     replotAll();
 }
@@ -241,37 +222,37 @@ void Plots::alignYAxes()
 
 bool Plots::eventFilter( QObject *object, QEvent *event )
 {
-	if ( event->type() == QEvent::Move || event->type() == QEvent::Resize )
-	{
-		for ( int i = 0; i < PlotType_Max; i++ )
-		{
-			if ( m_plots[i]->isVisibleTo( this ) )
-			{
-				if ( object == m_plots[i]->canvas() )
-					alignXAxis( m_plots[i] );
+    if ( event->type() == QEvent::Move || event->type() == QEvent::Resize )
+    {
+        for ( int i = 0; i < PlotType_Max; i++ )
+        {
+            if ( m_plots[i]->isVisibleTo( this ) )
+            {
+                if ( object == m_plots[i]->canvas() )
+                    alignXAxis( m_plots[i] );
 
-				break;
-			}
-		}
-	}
+                break;
+            }
+        }
+    }
 
-	return QWidget::eventFilter( object, event );
+    return QWidget::eventFilter( object, event );
 }
 
 void Plots::alignXAxis( const Plot* plot )
 {
-	const QWidget* canvas = plot->canvas();
+    const QWidget* canvas = plot->canvas();
 
-	QRect r = canvas->geometry(); 
-	r.moveTopLeft( mapFromGlobal( plot->mapToGlobal( r.topLeft() ) ) );
+    QRect r = canvas->geometry(); 
+    r.moveTopLeft( mapFromGlobal( plot->mapToGlobal( r.topLeft() ) ) );
 
-	int left = r.left();
-	left += plot->plotLayout()->canvasMargin( QwtPlot::yLeft );
+    int left = r.left();
+    left += plot->plotLayout()->canvasMargin( QwtPlot::yLeft );
 
-	int right = width() - ( r.right() - 1 );
-	right += plot->plotLayout()->canvasMargin( QwtPlot::yRight );
+    int right = width() - ( r.right() - 1 );
+    right += plot->plotLayout()->canvasMargin( QwtPlot::yRight );
 
-	m_scaleWidget->setBorderDist( left, right );
+    m_scaleWidget->setBorderDist( left, right );
 }
 
 //---------------------------------------------------------------------------
@@ -307,28 +288,28 @@ void Plots::onCursorMoved( double cursorX )
 //---------------------------------------------------------------------------
 void Plots::onXAxisFormatChanged( int format )
 {
-	if ( format == m_scaleWidget->format() )
-		return;
+    if ( format == m_scaleWidget->format() )
+        return;
 
-	int dataTypeIndex = format;
+    int dataTypeIndex = format;
     if ( format == AxisTime )
         dataTypeIndex = AxisSeconds;
 
-	if ( m_dataTypeIndex != dataTypeIndex )
-	{
-		m_dataTypeIndex = dataTypeIndex;
+    if ( m_dataTypeIndex != dataTypeIndex )
+    {
+        m_dataTypeIndex = dataTypeIndex;
 
-    	for ( int i = 0; i < PlotType_Max; i++ )
-           	updateSamples( m_plots[i] );
+        for ( int i = 0; i < PlotType_Max; i++ )
+            updateSamples( m_plots[i] );
 
-    	setFrameRange( m_visibleFrame[0], m_visibleFrame[1] );
+        setFrameRange( m_visibleFrame[0], m_visibleFrame[1] );
 
-		const double* x = videoStats()->x[m_dataTypeIndex];
-		setCursorPos( x[framePos()] );
-	}
+        const double* x = videoStats()->x[m_dataTypeIndex];
+        setCursorPos( x[framePos()] );
+    }
 
     m_scaleWidget->setFormat( format );
-	m_scaleWidget->update();
+    m_scaleWidget->update();
 
     replotAll();
 }
@@ -336,26 +317,26 @@ void Plots::onXAxisFormatChanged( int format )
 //---------------------------------------------------------------------------
 void Plots::setPlotVisible( PlotType Type, bool on )
 {
-	if ( on != m_plots[Type]->isVisibleTo( this ) )
-	{
-		m_plots[Type]->setVisible( on );
-		m_plots[Type]->legend()->setVisible( on );
+    if ( on != m_plots[Type]->isVisibleTo( this ) )
+    {
+        m_plots[Type]->setVisible( on );
+        m_plots[Type]->legend()->setVisible( on );
 
-		alignYAxes();
+        alignYAxes();
     }
 }
 
 //---------------------------------------------------------------------------
 void Plots::zoomXAxis( bool up )
 {
-	int numVisibleFrames = visibleFramesCount();
+    int numVisibleFrames = visibleFramesCount();
     if ( up )
-		numVisibleFrames /= 2;
+        numVisibleFrames /= 2;
     else
-		numVisibleFrames *= 2;
+        numVisibleFrames *= 2;
 
-	const int to = qMin( m_visibleFrame[0] + numVisibleFrames, numFrames() ) - 1;
-	const int from = qMax( 0, to - numVisibleFrames );
+    const int to = qMin( m_visibleFrame[0] + numVisibleFrames, numFrames() ) - 1;
+    const int from = qMax( 0, to - numVisibleFrames );
 
     setFrameRange( from, to );
 
@@ -367,7 +348,7 @@ void Plots::replotAll()
 {
     for ( int i = 0; i < PlotType_Max; i++ )
     {
-		m_plots[i]->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
+        m_plots[i]->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
         if ( m_plots[i]->isVisibleTo( this ) )
             m_plots[i]->replot();
     }
@@ -375,15 +356,15 @@ void Plots::replotAll()
 
 bool Plots::isZoomed() const
 {
-	return visibleFramesCount() < numFrames();
+    return visibleFramesCount() < numFrames();
 }
 
 bool Plots::isZoomable() const
 {
-	return visibleFramesCount() > 4;
+    return visibleFramesCount() > 4;
 }
 
 size_t Plots::visibleFramesCount() const
 {
-	return m_visibleFrame[1] - m_visibleFrame[0] + 1;
+    return m_visibleFrame[1] - m_visibleFrame[0] + 1;
 }

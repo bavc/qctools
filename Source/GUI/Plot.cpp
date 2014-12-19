@@ -18,6 +18,19 @@
 #include <qwt_series_data.h>
 #include <QResizeEvent>
 
+static double stepSize( double max, int numSteps )
+{
+    const double s = max / numSteps;
+    for ( int d = 1; d <= 1000000; d *= 10 )
+    {
+        const double step = floor( s * d ) / d;
+        if ( step > 0.0 )
+            return step;
+    }
+
+    return 0.0;
+}
+
 struct compareX
 {
     inline bool operator()( const double x, const QPointF &pos ) const
@@ -249,19 +262,19 @@ Plot::Plot( PlotType type, QWidget *parent ) :
 
     connect( axisWidget( QwtPlot::xBottom ), SIGNAL( scaleDivChanged() ), SLOT( onXScaleChanged() ) );
 
-	// legend
-	m_legend = new PlotLegend();
-	
+    // legend
+    m_legend = new PlotLegend();
+    
     connect( this, SIGNAL( legendDataChanged( const QVariant &, const QList<QwtLegendData> & ) ),
          m_legend, SLOT( updateLegend( const QVariant &, const QList<QwtLegendData> & ) ) );
 
-	updateLegend();
+    updateLegend();
 }
 
 //---------------------------------------------------------------------------
 Plot::~Plot()
 {
-	delete m_legend;
+    delete m_legend;
 }
 
 QSize Plot::sizeHint() const
@@ -287,6 +300,11 @@ void Plot::setCurveSamples( int index,
 {
     if ( index >= 0 && index < m_curves.size() )
         m_curves[index]->setRawSamples( xData, yData, size );
+}
+
+void Plot::setYAxis( double max, int numSteps )
+{
+    setAxisScale( QwtPlot::yLeft, 0.0, max, ::stepSize( max, numSteps ) );
 }
 
 void Plot::setCursorPos( double x )

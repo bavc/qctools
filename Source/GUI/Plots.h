@@ -36,7 +36,7 @@ public:
         AxisTime
     };
 
-    explicit                    Plots( QWidget *parent, FileInformation* FileInfoData );
+    explicit                    Plots( QWidget *parent, FileInformation* );
     virtual                     ~Plots();
 
     void                        scrollXAxis();
@@ -47,11 +47,11 @@ public:
     void                        Zoom_Move( int Begin );
 
     void                        zoomXAxis( bool up );
-	bool                        isZoomed() const;
-	bool                        isZoomable() const;
-	size_t                      visibleFramesCount() const;
+    bool                        isZoomed() const;
+    bool                        isZoomable() const;
+    size_t                      visibleFramesCount() const;
 
-	virtual bool                eventFilter( QObject *, QEvent * );
+    virtual bool                eventFilter( QObject *, QEvent * );
 
 private Q_SLOTS:
     void                        onCursorMoved( double x );
@@ -68,19 +68,18 @@ private:
 
     void                        alignXAxis( const Plot* );
     void                        alignYAxes();
-    double                      axisStepSize( double s ) const;
     const VideoStats*           videoStats() const { return m_fileInfoData->Videos[0]; }
     VideoStats*                 videoStats() { return m_fileInfoData->Videos[0]; }
     int                         framePos() const { return m_fileInfoData->Frames_Pos_Get(); }
     int                         numFrames() const { return videoStats()->x_Current_Max; }
 
-	void                        setFrameRange( int from, int to );
+    void                        setFrameRange( int from, int to );
 
 private:
-	PlotScaleWidget*            m_scaleWidget;
+    PlotScaleWidget*            m_scaleWidget;
     Plot*                       m_plots[PlotType_Max];
 
-	int                         m_visibleFrame[2];
+    int                         m_visibleFrame[2];
     // X axis info
     int                         m_dataTypeIndex;
     FileInformation*            m_fileInfoData;

@@ -31,14 +31,15 @@ public:
     virtual QSize sizeHint() const;
     virtual QSize minimumSizeHint() const;
 
+    void setYAxis( double max, int numSteps );
     void setCursorPos( double x );
 
     void setCurveSamples( int index,
         const double *xData, const double *yData, int size );
 
-	PlotType type() const { return m_type; }
+    PlotType type() const { return m_type; }
 
-	PlotLegend *legend() { return m_legend; }
+    PlotLegend *legend() { return m_legend; }
 
 Q_SIGNALS:
     void cursorMoved( double x );
@@ -54,7 +55,7 @@ private:
     QVector<QwtPlotCurve*>  m_curves;
     PlotCursor*             m_cursor;
 
-	PlotLegend*             m_legend;
+    PlotLegend*             m_legend;
 };
 
 #endif // GUI_Plot_H
