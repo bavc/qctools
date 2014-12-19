@@ -41,7 +41,7 @@ public:
 
     PlotLegend *legend() { return m_legend; }
 
-    const QwtPlotCurve* curve( int index ) const;
+	int frameAt( double x ) const;
 
 Q_SIGNALS:
     void cursorMoved( int index );
@@ -51,6 +51,7 @@ private Q_SLOTS:
     void onXScaleChanged();
 
 private:
+    const QwtPlotCurve* curve( int index ) const;
     QColor curveColor( int index ) const;
 
     const PlotType          m_type;

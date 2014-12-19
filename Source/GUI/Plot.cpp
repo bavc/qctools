@@ -73,10 +73,10 @@ public:
 
         QwtText text;
 
-        const QwtPlotCurve* curve = dynamic_cast<const Plot*>( plot() )->curve(0);
-        if ( curve )
+		const int idx = dynamic_cast<const Plot*>( plot() )->frameAt( pos.x() );
+		if ( idx >= 0 )
         {
-            text = infoText( ::indexLower( pos.x(), *curve->data() ) );
+            text = infoText( idx );
             text.setBackgroundBrush( QBrush( bg ) );
         }
 
@@ -373,13 +373,20 @@ QColor Plot::curveColor( int index ) const
 
 void Plot::onPickerMoved( const QPointF& pos )
 {
+    const int idx = frameAt( pos.x() );
+	if ( idx >= 0 )
+    	Q_EMIT cursorMoved( idx );
+}
+
+int Plot::frameAt( double x ) const
+{
     const QwtPlotCurve* curve = this->curve(0);
     if ( curve == NULL )
-        return;
+        return -1;
 
     const QwtSeriesData<QPointF> &data = *curve->data();
 
-    int idx = ::indexLower( pos.x(), data );
+    int idx = ::indexLower( x, data );
     if ( idx < 0 )
     {
         idx = 0;
@@ -389,11 +396,12 @@ void Plot::onPickerMoved( const QPointF& pos )
         // index, where x is closer
         const double x1 = data.sample( idx ).x();
         const double x2 = data.sample( idx + 1 ).x();
-        if ( qAbs( pos.x() - x2 ) < qAbs( pos.x() - x1 ) ) 
+
+        if ( qAbs( x - x2 ) < qAbs( x - x1 ) )
             idx++;
     }
 
-    Q_EMIT cursorMoved( idx );
+	return idx;
 }
 
 void Plot::onXScaleChanged()
