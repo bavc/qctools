@@ -119,19 +119,16 @@ void Plots::scrollXAxis()
 {
     // position of the current frame has changed 
 
-    if ( m_visibleFrame[1] < numFrames() - 1 )
+    if ( isZoomed() )
     {
-        const int pos = framePos();
-        const int numVisibleFrames = visibleFramesCount();
+        const int n = visibleFramesCount();
 
-        if ( pos > m_visibleFrame[0] + numVisibleFrames / 2 )
+        const int from = qBound( 0, framePos() - n / 2, numFrames() - n - 1 );
+        const int to = from + n - 1;
+
+        if ( from != m_visibleFrame[0] )
         {
-            // Put the current frame in center
-            const int from = pos - numVisibleFrames / 2;
-            const int to = qMin( from + numVisibleFrames, numFrames() ) - 1;
-
-            setFrameRange( to - numVisibleFrames + 1, to );
-
+            setFrameRange( from, to );
             replotAll();
         }
     }
