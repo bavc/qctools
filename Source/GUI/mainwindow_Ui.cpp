@@ -149,11 +149,15 @@ void MainWindow::configureZoom()
 {
     if (Files.empty() || PlotsArea==NULL || !PlotsArea->isZoomed() )
     {
+#if 0
         ui->horizontalScrollBar->setRange(0, 0);
         ui->horizontalScrollBar->setMaximum(0);
         ui->horizontalScrollBar->setPageStep(1);
         ui->horizontalScrollBar->setSingleStep(1);
         ui->horizontalScrollBar->setEnabled(false);
+#else
+        ui->horizontalScrollBar->hide();
+#endif
         ui->actionZoomOut->setEnabled(false);
         if (Files_CurrentPos<Files.size() && PlotsArea && PlotsArea->isZoomable())
             ui->actionZoomIn->setEnabled(true);
@@ -172,7 +176,11 @@ void MainWindow::configureZoom()
     ui->horizontalScrollBar->setMaximum(Files[Files_CurrentPos]->Videos[0]->x_Current_Max-Increment);
     ui->horizontalScrollBar->setPageStep(Increment);
     ui->horizontalScrollBar->setSingleStep(Increment);
+#if 0
     ui->horizontalScrollBar->setEnabled(true);
+#else
+    ui->horizontalScrollBar->show();
+#endif
     ui->actionZoomOut->setEnabled(true);
     ui->actionZoomIn->setEnabled( PlotsArea->isZoomable() );
     ui->actionGoTo->setEnabled(true);
