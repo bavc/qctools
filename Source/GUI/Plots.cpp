@@ -165,19 +165,17 @@ void Plots::initYAxis( Plot* plot )
 	const PlotType plotType = plot->type();
 
     VideoStats* video = videoStats();
+	const struct per_plot_group& group = PerPlotGroup[plotType];
 
-    if ( PerPlotGroup[plotType].Min != PerPlotGroup[plotType].Max &&
-            video->y_Max[plotType] >= PerPlotGroup[plotType].Max / 2 )
-    {
-        video->y_Max[plotType] = PerPlotGroup[plotType].Max;
-    }
+	double yMax = video->y_Max[plotType];
+    if ( ( group.Min != group.Max ) && ( yMax >= group.Max / 2 ) )
+		yMax = group.Max;
 
-    const double yMax = video->y_Max[plotType];
     if ( yMax )
     {
         if ( yMax > plot->axisInterval( QwtPlot::yLeft ).maxValue() )
         {
-            const double stepCount = PerPlotGroup[plotType].StepsCount;
+            const double stepCount = group.StepsCount;
             const double stepSize = axisStepSize( yMax / stepCount );
 
             if ( stepSize )
