@@ -184,7 +184,7 @@ private Q_SLOTS:
 
 
 private:
-	void updateScrollBar();
+	void updateScrollBar( bool blockSignals = false );
     bool isPlotZoomable() const;
     void Zoom( bool );
 

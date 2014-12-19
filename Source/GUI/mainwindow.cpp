@@ -442,7 +442,7 @@ void MainWindow::on_Full_triggered()
 void MainWindow::on_CurrentFrameChanged()
 {
 	PlotsArea->onCurrentFrameChanged();
-	updateScrollBar();
+	updateScrollBar( true );
 }
 
 //---------------------------------------------------------------------------

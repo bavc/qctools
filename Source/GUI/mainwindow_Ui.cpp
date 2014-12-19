@@ -208,7 +208,7 @@ void MainWindow::Zoom( bool on )
     configureZoom();
 }
 
-void MainWindow::updateScrollBar()
+void MainWindow::updateScrollBar( bool blockSignals )
 {
 	QScrollBar* sb = ui->horizontalScrollBar;
 
@@ -220,10 +220,15 @@ void MainWindow::updateScrollBar()
 	{
 		const FrameInterval intv = PlotsArea->visibleFrames();
 
+		sb->blockSignals( blockSignals );
+
 		sb->setRange( 0, PlotsArea->numFrames() - intv.count() + 1 );
     	sb->setValue( intv.from );
     	sb->setPageStep( intv.count() );
     	sb->setSingleStep( intv.count() );
+
+		sb->blockSignals( false );
+
     	sb->show();
 	}
 }
