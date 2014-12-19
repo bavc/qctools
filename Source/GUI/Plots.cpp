@@ -195,7 +195,6 @@ void Plots::updateSamples( Plot* plot )
 //---------------------------------------------------------------------------
 void Plots::Zoom_Move( int Begin )
 {
-qDebug() << "Zoom_Move" << Begin;
 	const int n = m_frameInterval.count();
 
 	const int from = qMax( Begin, 0 );

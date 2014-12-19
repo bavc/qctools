@@ -16,7 +16,6 @@ class FileInformation;
 class PerPicture;
 class TinyDisplay;
 class Info;
-class Plots;
 
 class QLabel;
 class QToolButton;
@@ -40,12 +39,15 @@ public:
         Style_Grid,
     };
     explicit Control(QWidget *parent, FileInformation* FileInfoData, 
-        Plots* PlotsArea, style Style, bool IsSlave=false);
+        style Style, bool IsSlave=false);
 
     virtual ~Control();
 
     // Commands
     void                        Update                      ();
+
+Q_SIGNALS:
+	void currentFrameChanged();
 
 public Q_SLOTS:
     void TimeOut();
@@ -85,7 +87,6 @@ public:
 
 private:
     void TimeOut_Init();
-	void onCurrentFrameChanged();
 
     enum selectedspeed
     {
@@ -103,7 +104,6 @@ private:
 
     // File information
     FileInformation*            FileInfoData;
-    Plots*                      PlotsArea;
     int                         Frames_Pos;
     style                       Style;
 
