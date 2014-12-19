@@ -130,7 +130,7 @@ void Plots::scrollXAxis()
             const int from = pos - numVisibleFrames / 2;
             const int to = qMin( from + numVisibleFrames, numFrames() ) - 1;
 
-            setFrameRange( to - numVisibleFrames, to );
+            setFrameRange( to - numVisibleFrames + 1, to );
 
             replotAll();
         }
