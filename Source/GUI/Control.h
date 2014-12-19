@@ -39,15 +39,30 @@ public:
         Style_Cols,
         Style_Grid,
     };
-    explicit Control(QWidget *parent, FileInformation* FileInfoData, Plots* PlotsArea, style Style, bool IsSlave=false);
-    ~Control();
+    explicit Control(QWidget *parent, FileInformation* FileInfoData, 
+        Plots* PlotsArea, style Style, bool IsSlave=false);
+
+    virtual ~Control();
 
     // Commands
     void                        Update                      ();
 
-    // Info
-    bool                        ShouldUpate;
+public Q_SLOTS:
+    void TimeOut();
+    void on_M9_clicked(bool checked);
+    void on_M2_clicked(bool checked);
+    void on_M1_clicked(bool checked);
+    void on_M0_clicked(bool checked);
+    void on_Minus_clicked(bool checked=false);
+    void on_PlayPause_clicked(bool checked);
+    void on_Pause_clicked(bool checked);
+    void on_Plus_clicked(bool checked=false);
+    void on_P0_clicked(bool checked);
+    void on_P1_clicked(bool checked);
+    void on_P2_clicked(bool checked);
+    void on_P9_clicked(bool checked);
 
+public:
     // To update
     TinyDisplay*                TinyDisplayArea;
     Info*                       InfoArea;
@@ -68,7 +83,24 @@ public:
     QToolButton*                P2;
     QToolButton*                P9;
 
-protected:
+private:
+    void TimeOut_Init();
+	void onCurrentFrameChanged();
+
+    enum selectedspeed
+    {
+        Speed_M2,
+        Speed_M1,
+        Speed_M0,
+        Speed_O,
+        Speed_P0,
+        Speed_P1,
+        Speed_P2,
+    };
+    selectedspeed               SelectedSpeed;
+    bool                        ShouldUpate;
+    bool                        IsSlave;
+
     // File information
     FileInformation*            FileInfoData;
     Plots*                      PlotsArea;
@@ -83,40 +115,6 @@ protected:
     QTime*  Time;
     bool    Time_MinusPlus;
     int     Timer_Duration;
-public:
-    enum selectedspeed
-    {
-        Speed_M2,
-        Speed_M1,
-        Speed_M0,
-        Speed_O,
-        Speed_P0,
-        Speed_P1,
-        Speed_P2,
-    };
-    selectedspeed SelectedSpeed;
-protected:
-    bool    IsSlave;
-
-    void TimeOut_Init();
-
-public Q_SLOTS:
-    void TimeOut();
-    void on_M9_clicked(bool checked);
-    void on_M2_clicked(bool checked);
-    void on_M1_clicked(bool checked);
-    void on_M0_clicked(bool checked);
-    void on_Minus_clicked(bool checked=false);
-    void on_PlayPause_clicked(bool checked);
-    void on_Pause_clicked(bool checked);
-    void on_Plus_clicked(bool checked=false);
-    void on_P0_clicked(bool checked);
-    void on_P1_clicked(bool checked);
-    void on_P2_clicked(bool checked);
-    void on_P9_clicked(bool checked);
-
-private:
-	void onCurrentFrameChanged();
 };
 
 #endif // GUI_Control_H
