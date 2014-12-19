@@ -126,7 +126,7 @@ FrameInterval Plots::visibleFrames() const
 }
 
 //---------------------------------------------------------------------------
-void Plots::scrollXAxis()
+void Plots::onCurrentFrameChanged()
 {
     // position of the current frame has changed 
 

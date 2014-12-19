@@ -57,7 +57,6 @@ public:
     explicit                    Plots( QWidget *parent, FileInformation* );
     virtual                     ~Plots();
 
-    void                        scrollXAxis();
     void                        setPlotVisible( PlotType, bool on );
 
     const QwtPlot*              plot( PlotType ) const;
@@ -70,6 +69,9 @@ public:
     int                         numFrames() const { return videoStats()->x_Current_Max; }
 
     virtual bool                eventFilter( QObject *, QEvent * );
+
+public Q_SLOTS:
+    void                        onCurrentFrameChanged();
 
 private Q_SLOTS:
     void                        onCursorMoved( int index );

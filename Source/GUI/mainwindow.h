@@ -180,9 +180,11 @@ private Q_SLOTS:
 
     void on_Full_triggered();
 
-	void updateScrollBar();
+    void on_CurrentFrameChanged();
+
 
 private:
+	void updateScrollBar();
     bool isPlotZoomable() const;
     void Zoom( bool );
 

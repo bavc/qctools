@@ -397,7 +397,7 @@ void Control::on_Minus_clicked(bool checked)
         return;
 
     FileInfoData->Frames_Pos_Minus();
-    PlotsArea->scrollXAxis();
+    onCurrentFrameChanged();
 }
 
 //---------------------------------------------------------------------------
@@ -407,7 +407,7 @@ void Control::on_Plus_clicked(bool checked)
         return;
 
     FileInfoData->Frames_Pos_Plus();
-    PlotsArea->scrollXAxis();
+    onCurrentFrameChanged();
 }
 
 //---------------------------------------------------------------------------
@@ -417,7 +417,7 @@ void Control::on_M9_clicked(bool checked)
         return;
 
     FileInfoData->Frames_Pos_Set(0);
-    PlotsArea->scrollXAxis();
+    onCurrentFrameChanged();
 }
 
 //---------------------------------------------------------------------------
@@ -725,8 +725,14 @@ void Control::on_P9_clicked(bool checked)
     if (FileInfoData->Videos[0]->x_Current_Max)
     {
         FileInfoData->Frames_Pos_Set(FileInfoData->Videos[0]->x_Current_Max-1);
-        PlotsArea->scrollXAxis();
+        onCurrentFrameChanged();
     }
+}
+
+//---------------------------------------------------------------------------
+void Control::onCurrentFrameChanged()
+{
+    PlotsArea->onCurrentFrameChanged();
 }
 
 //***************************************************************************

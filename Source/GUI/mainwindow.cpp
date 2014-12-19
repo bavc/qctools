@@ -439,6 +439,13 @@ void MainWindow::on_Full_triggered()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_CurrentFrameChanged()
+{
+	PlotsArea->onCurrentFrameChanged();
+	updateScrollBar();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
     event->acceptProposedAction();

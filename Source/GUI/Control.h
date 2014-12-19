@@ -10,19 +10,13 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include <QMainWindow>
+#include <QWidget>
 
 class FileInformation;
 class PerPicture;
 class TinyDisplay;
 class Info;
 class Plots;
-
-class QwtPlot;
-class QwtLegend;
-class QwtPlotZoomer;
-class QwtPlotCurve;
-class QwtPlotPicker;
 
 class QLabel;
 class QToolButton;
@@ -120,6 +114,9 @@ public Q_SLOTS:
     void on_P1_clicked(bool checked);
     void on_P2_clicked(bool checked);
     void on_P9_clicked(bool checked);
+
+private:
+	void onCurrentFrameChanged();
 };
 
 #endif // GUI_Control_H
