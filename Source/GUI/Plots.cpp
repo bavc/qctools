@@ -291,7 +291,9 @@ void Plots::onXAxisFormatChanged( int format )
         for ( int i = 0; i < PlotType_Max; i++ )
             updateSamples( m_plots[i] );
 
-        setVisibleFrames( m_frameInterval.from, m_frameInterval.to );
+        const double* x = videoStats()->x[m_dataTypeIndex];
+        m_scaleWidget->setScale( x[m_frameInterval.from], x[m_frameInterval.to] );
+
         setCursorPos( framePos() );
     }
 
