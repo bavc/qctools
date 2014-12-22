@@ -200,7 +200,7 @@ void Plots::Zoom_Move( int Begin )
 	const int from = qMax( Begin, 0 );
 	const int to = qMin( numFrames(), from + n ) - 1;
 
-    setVisibleFrames( from, to );
+    setVisibleFrames( to - n + 1, to );
 
     replotAll();
 }
