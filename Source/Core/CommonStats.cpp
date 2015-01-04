@@ -33,7 +33,7 @@ using namespace tinyxml2;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t CountOfGroups_, size_t CountOfItems_, size_t FrameCount, double Duration, size_t FrameCount_Max, double Frequency_)
+CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t CountOfGroups_, size_t CountOfItems_, size_t FrameCount, double Duration, double Frequency_)
     :
     Frequency(Frequency_),
     PerItem(PerItem_),
@@ -44,15 +44,17 @@ CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t Cou
     // Adaptation for having a graph even with 1 frame
     if (FrameCount<2)
         FrameCount=2;
-    if (FrameCount_Max<2)
-        FrameCount_Max=2;
 
     // Status
     IsComplete=false;
     FirstTimeStamp=DBL_MAX;
 
     // Memory management
-    Data_Reserved=FrameCount_Max;
+    Data_Reserved=1;
+    while (Data_Reserved<FrameCount)
+        Data_Reserved<<=1;
+    if (Data_Reserved+128>=FrameCount)
+        Data_Reserved<<=1;
 
     // Data - Counts
     Stats_Totals = new double[CountOfItems];
@@ -66,21 +68,21 @@ CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t Cou
     x = new double*[4];
     for (size_t j=0; j<4; ++j)
     {
-        x[j]=new double[FrameCount_Max];
-        memset(x[j], 0x00, FrameCount_Max*sizeof(double));
+        x[j]=new double[Data_Reserved];
+        memset(x[j], 0x00, Data_Reserved*sizeof(double));
     }
     y = new double*[CountOfItems];
     for (size_t j=0; j<CountOfItems; ++j)
     {
-        y[j]=new double[FrameCount_Max];
-        memset(y[j], 0x00, FrameCount_Max*sizeof(double));
+        y[j]=new double[Data_Reserved];
+        memset(y[j], 0x00, Data_Reserved*sizeof(double));
     }
 
     // Data - Extra
-    durations=new double[FrameCount_Max];
-    memset(durations, 0x00, FrameCount_Max*sizeof(double));
-    key_frames=new bool[FrameCount_Max];
-    memset(key_frames, 0x00, FrameCount_Max*sizeof(bool));
+    durations=new double[Data_Reserved];
+    memset(durations, 0x00, Data_Reserved*sizeof(double));
+    key_frames=new bool[Data_Reserved];
+    memset(key_frames, 0x00, Data_Reserved*sizeof(bool));
 
     // Data - Maximums
     x_Current=0;

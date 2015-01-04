@@ -20,7 +20,7 @@ class CommonStats
 {
 public:
     // Constructor / Destructor
-    CommonStats(const struct per_item* PerItem, int Type, size_t CountOfGroups, size_t CountOfItems, size_t FrameCount=0, double Duration=0, size_t FrameCount_Max=(1<<18), double Frequency=0);
+    CommonStats(const struct per_item* PerItem, int Type, size_t CountOfGroups, size_t CountOfItems, size_t FrameCount=0, double Duration=0, double Frequency=0);
     virtual ~CommonStats();
 
     // Data

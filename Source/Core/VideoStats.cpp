@@ -33,9 +33,9 @@ using namespace tinyxml2;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-VideoStats::VideoStats (size_t FrameCount, double Duration, size_t FrameCount_Max, double Frequency_)
+VideoStats::VideoStats (size_t FrameCount, double Duration, double Frequency_)
     :
-    CommonStats(VideoPerItem, 0, Group_VideoMax, Item_VideoMax, FrameCount, Duration, FrameCount_Max, Frequency_)
+    CommonStats(VideoPerItem, 0, Group_VideoMax, Item_VideoMax, FrameCount, Duration, Frequency_)
 {
 }
 

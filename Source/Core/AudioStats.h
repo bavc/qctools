@@ -22,7 +22,7 @@ class AudioStats : public CommonStats
 {
 public:
     // Constructor / Destructor
-    AudioStats(size_t FrameCount=0, double Duration=0, size_t FrameCount_Max=(1<<18), double Frequency=0);
+    AudioStats(size_t FrameCount=0, double Duration=0, double Frequency=0);
     ~AudioStats();
 
     // External data

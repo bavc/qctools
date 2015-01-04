@@ -96,7 +96,6 @@ FFmpeg_Glue::inputdata::inputdata()
 
     // General information
     FrameCount(0),
-    FrameCount_Max(0),
     FirstTimeStamp(DBL_MAX),
     Duration(0)
 {
@@ -566,7 +565,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<CommonStats*>* St
                                                     if (Codec)
                                                         avcodec_open2(InputData->Stream->codec, Codec, NULL);
 
-                                                    InputData->FrameCount_Max=InputData->FrameCount=InputData->Stream->nb_frames;
+                                                    InputData->FrameCount=InputData->Stream->nb_frames;
                                                     if (InputData->Stream->duration!=AV_NOPTS_VALUE)
                                                         InputData->Duration=((double)InputData->Stream->duration)*InputData->Stream->time_base.num/InputData->Stream->time_base.den;
 
@@ -615,8 +614,8 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<CommonStats*>* St
             {
                 switch (InputData->Type)
                 {
-                    case AVMEDIA_TYPE_VIDEO: Stat=new VideoStats(InputData->FrameCount, InputData->Duration, InputData->FrameCount_Max, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0); break;
-                    case AVMEDIA_TYPE_AUDIO: Stat=new AudioStats(InputData->FrameCount, InputData->Duration, InputData->FrameCount_Max, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0); break;
+                    case AVMEDIA_TYPE_VIDEO: Stat=new VideoStats(InputData->FrameCount, InputData->Duration, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0); break;
+                    case AVMEDIA_TYPE_AUDIO: Stat=new AudioStats(InputData->FrameCount, InputData->Duration, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0); break;
                 }
             }
             

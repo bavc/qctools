@@ -33,9 +33,9 @@ using namespace tinyxml2;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-AudioStats::AudioStats (size_t FrameCount, double Duration, size_t FrameCount_Max, double Frequency_)
+AudioStats::AudioStats (size_t FrameCount, double Duration, double Frequency_)
     :
-    CommonStats(AudioPerItem, 1, Group_AudioMax, Item_AudioMax, FrameCount, Duration, FrameCount_Max, Frequency_)
+    CommonStats(AudioPerItem, 1, Group_AudioMax, Item_AudioMax, FrameCount, Duration, Frequency_)
 {
 }
 

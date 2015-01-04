@@ -137,7 +137,6 @@ private:
         
         // General information
         size_t                  FrameCount;             // Total count of frames (may be estimated)
-        size_t                  FrameCount_Max;         // Temporary usage for array max size
         double                  FirstTimeStamp;         // First PTS met in seconds
         double                  Duration;               // Duration in seconds
     };
