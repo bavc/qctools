@@ -77,7 +77,7 @@ public:
     // Container information
     string                      ContainerFormat_Get();
     int                         StreamCount_Get();
-	int                         BitRate_Get();
+    int                         BitRate_Get();
 
     // Video information
     string                      VideoFormat_Get();

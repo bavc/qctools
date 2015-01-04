@@ -54,8 +54,8 @@ enum args_type
     Args_Type_None,
     Args_Type_Toggle,
     Args_Type_Slider,
-	Args_Type_Win_Func,
-	Args_Type_Wave_Mode,
+    Args_Type_Win_Func,
+    Args_Type_Wave_Mode,
     Args_Type_Yuv,  // Y, U , V
     Args_Type_YuvA, // Y, U, V, All
     Args_Type_ClrPck, // Color picker
@@ -160,8 +160,8 @@ const filter Filters[]=
         "Pixel Offset Subtraction",
         0,
         {
-			{ Args_Type_Slider,   1, -20,  20,   1, "Y H" },
-			{ Args_Type_Slider,   0, -20,  20,   1, "Y V" },
+            { Args_Type_Slider,   1, -20,  20,   1, "Y H" },
+            { Args_Type_Slider,   0, -20,  20,   1, "Y V" },
             { Args_Type_Slider,   0, -20,  20,   1, "UV H" },
             { Args_Type_Slider,   0, -20,  20,   1, "UV V" },
             { Args_Type_Slider,   0,   0,  10,  10, "Strength" },
@@ -321,17 +321,17 @@ const filter Filters[]=
         "Saturation Highlight",
         0,
         {
-			{ Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
-			{ Args_Type_Toggle,   0,   0,   0,   0, "Sat as Lum" },
-			{ Args_Type_Slider,  89,   0, 182,   1, "Min"},
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Sat as Lum" },
+            { Args_Type_Slider,  89,   0, 182,   1, "Min"},
             { Args_Type_Slider, 182,   0, 182,   1, "Max"},
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-			"format=yuv444p,geq=lum=lum(X\\,Y):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)",
-			"format=yuv444p,geq=lum=hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)*(256/189):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)",
-			"il=l=d:c=d,format=yuv444p,geq=lum=lum(X\\,Y):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)",
-			"il=l=d:c=d,format=yuv444p,geq=lum=hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)*(256/189):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)"
+            "format=yuv444p,geq=lum=lum(X\\,Y):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)",
+            "format=yuv444p,geq=lum=hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)*(256/189):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)",
+            "il=l=d:c=d,format=yuv444p,geq=lum=lum(X\\,Y):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)",
+            "il=l=d:c=d,format=yuv444p,geq=lum=hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)*(256/189):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)"
         },
     },
     {
@@ -441,14 +441,14 @@ const filter Filters[]=
         1,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Split Channels" },
-			{ Args_Type_Slider,   2,   1,  20,   1, "Samples per column"},
+            { Args_Type_Slider,   2,   1,  20,   1, "Samples per column"},
             { Args_Type_Wave_Mode,2,   0,   0,   0, "Mode" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
             "showwaves=mode=${3}:n=${2}:s=${width}x${height}:split_channels=0,negate",
-			"showwaves=mode=${3}:n=${2}:s=${width}x${height}:split_channels=1,negate",
+            "showwaves=mode=${3}:n=${2}:s=${width}x${height}:split_channels=1,negate",
         },
     },
     {
@@ -494,7 +494,7 @@ const filter Filters[]=
             "ebur128=video=1[out0],anullsink",
         },
     },
-	*/
+    */
     {
         "(End)",
         -1,
@@ -895,7 +895,7 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     Layout->addWidget(Slider, 2, 0, 1, 3);
 
     // Control
-    ControlArea=new Control(this, FileInfoData, NULL, Control::Style_Cols, true);
+    ControlArea=new Control(this, FileInfoData, Control::Style_Cols, true);
     Layout->addWidget(ControlArea, 3, 0, 1, 3, Qt::AlignBottom);
 
     setLayout(Layout);
@@ -1020,50 +1020,50 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                     }
                                     break;
             case Args_Type_Win_Func:
-						            Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
-						            for (size_t OptionPos2=0; OptionPos2<4; OptionPos2++)
-						            {
-						                Options[Pos].Radios[OptionPos][OptionPos2]=new QRadioButton();
-						                Options[Pos].Radios[OptionPos][OptionPos2]->setFont(Font);
-					                    switch (OptionPos2)
-					                    {
-					                        case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("none"); break;
-					                        case 1: Options[Pos].Radios[OptionPos][OptionPos2]->setText("hann"); break;
-					                        case 2: Options[Pos].Radios[OptionPos][OptionPos2]->setText("hamming"); break;
-					                        case 3: Options[Pos].Radios[OptionPos][OptionPos2]->setText("blackman"); break;
-					                        default:;
-					                    }
-						                if (OptionPos2==PreviousValues[Pos][FilterPos].Values[OptionPos])
-						                    Options[Pos].Radios[OptionPos][OptionPos2]->setChecked(true);
-						                connect(Options[Pos].Radios[OptionPos][OptionPos2], SIGNAL(toggled(bool)), this, Pos==0?(SLOT(on_FiltersOptions1_toggle(bool))):SLOT(on_FiltersOptions2_toggle(bool)));
-						                Layout0->addWidget(Options[Pos].Radios[OptionPos][OptionPos2], 0, Widget_XPox+OptionPos2);
-						                Options[Pos].Radios_Group[OptionPos]->addButton(Options[Pos].Radios[OptionPos][OptionPos2]);
-						            }
-						            Widget_XPox+=4;
-						            break;
+                                    Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
+                                    for (size_t OptionPos2=0; OptionPos2<4; OptionPos2++)
+                                    {
+                                        Options[Pos].Radios[OptionPos][OptionPos2]=new QRadioButton();
+                                        Options[Pos].Radios[OptionPos][OptionPos2]->setFont(Font);
+                                        switch (OptionPos2)
+                                        {
+                                            case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("none"); break;
+                                            case 1: Options[Pos].Radios[OptionPos][OptionPos2]->setText("hann"); break;
+                                            case 2: Options[Pos].Radios[OptionPos][OptionPos2]->setText("hamming"); break;
+                                            case 3: Options[Pos].Radios[OptionPos][OptionPos2]->setText("blackman"); break;
+                                            default:;
+                                        }
+                                        if (OptionPos2==PreviousValues[Pos][FilterPos].Values[OptionPos])
+                                            Options[Pos].Radios[OptionPos][OptionPos2]->setChecked(true);
+                                        connect(Options[Pos].Radios[OptionPos][OptionPos2], SIGNAL(toggled(bool)), this, Pos==0?(SLOT(on_FiltersOptions1_toggle(bool))):SLOT(on_FiltersOptions2_toggle(bool)));
+                                        Layout0->addWidget(Options[Pos].Radios[OptionPos][OptionPos2], 0, Widget_XPox+OptionPos2);
+                                        Options[Pos].Radios_Group[OptionPos]->addButton(Options[Pos].Radios[OptionPos][OptionPos2]);
+                                    }
+                                    Widget_XPox+=4;
+                                    break;
             case Args_Type_Wave_Mode:
-						            Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
-						            for (size_t OptionPos2=0; OptionPos2<4; OptionPos2++)
-						            {
-						                Options[Pos].Radios[OptionPos][OptionPos2]=new QRadioButton();
-						                Options[Pos].Radios[OptionPos][OptionPos2]->setFont(Font);
-					                    switch (OptionPos2)
-					                    {
-					                        case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("point"); break;
-					                        case 1: Options[Pos].Radios[OptionPos][OptionPos2]->setText("line"); break;
-					                        case 2: Options[Pos].Radios[OptionPos][OptionPos2]->setText("p2p"); break;
-					                        case 3: Options[Pos].Radios[OptionPos][OptionPos2]->setText("cline"); break;
-					                        default:;
-					                    }
-						                if (OptionPos2==PreviousValues[Pos][FilterPos].Values[OptionPos])
-						                    Options[Pos].Radios[OptionPos][OptionPos2]->setChecked(true);
-						                connect(Options[Pos].Radios[OptionPos][OptionPos2], SIGNAL(toggled(bool)), this, Pos==0?(SLOT(on_FiltersOptions1_toggle(bool))):SLOT(on_FiltersOptions2_toggle(bool)));
-						                Layout0->addWidget(Options[Pos].Radios[OptionPos][OptionPos2], 0, Widget_XPox+OptionPos2);
-						                Options[Pos].Radios_Group[OptionPos]->addButton(Options[Pos].Radios[OptionPos][OptionPos2]);
-						            }
-						            Widget_XPox+=4;
-						            break;
-			case Args_Type_Yuv:
+                                    Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
+                                    for (size_t OptionPos2=0; OptionPos2<4; OptionPos2++)
+                                    {
+                                        Options[Pos].Radios[OptionPos][OptionPos2]=new QRadioButton();
+                                        Options[Pos].Radios[OptionPos][OptionPos2]->setFont(Font);
+                                        switch (OptionPos2)
+                                        {
+                                            case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("point"); break;
+                                            case 1: Options[Pos].Radios[OptionPos][OptionPos2]->setText("line"); break;
+                                            case 2: Options[Pos].Radios[OptionPos][OptionPos2]->setText("p2p"); break;
+                                            case 3: Options[Pos].Radios[OptionPos][OptionPos2]->setText("cline"); break;
+                                            default:;
+                                        }
+                                        if (OptionPos2==PreviousValues[Pos][FilterPos].Values[OptionPos])
+                                            Options[Pos].Radios[OptionPos][OptionPos2]->setChecked(true);
+                                        connect(Options[Pos].Radios[OptionPos][OptionPos2], SIGNAL(toggled(bool)), this, Pos==0?(SLOT(on_FiltersOptions1_toggle(bool))):SLOT(on_FiltersOptions2_toggle(bool)));
+                                        Layout0->addWidget(Options[Pos].Radios[OptionPos][OptionPos2], 0, Widget_XPox+OptionPos2);
+                                        Options[Pos].Radios_Group[OptionPos]->addButton(Options[Pos].Radios[OptionPos][OptionPos2]);
+                                    }
+                                    Widget_XPox+=4;
+                                    break;
+            case Args_Type_Yuv:
             case Args_Type_YuvA:
                                     Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
                                     for (size_t OptionPos2=0; OptionPos2<(Filters[FilterPos].Args[OptionPos].Type==Args_Type_Yuv?3:4); OptionPos2++)
@@ -1234,8 +1234,8 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                     WithSliders[OptionPos]=Options[Pos].Sliders_SpinBox[OptionPos]->value();
                                     PreviousValues[Pos][Picture_Current].Values[OptionPos]=Options[Pos].Sliders_SpinBox[OptionPos]->value();
                                     break;
-			case Args_Type_Win_Func:
-			case Args_Type_Wave_Mode:
+            case Args_Type_Win_Func:
+            case Args_Type_Wave_Mode:
                 Modified=true;
                 for (size_t OptionPos2=0; OptionPos2<4; OptionPos2++)
                 {
@@ -1250,7 +1250,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                     }
                 }
                 break;
-			case Args_Type_YuvA:
+            case Args_Type_YuvA:
                                     Value_Pos<<=1;
                                     Value_Pos|=Options[Pos].Radios[OptionPos][3]->isChecked()?1:0; // 3 = pos of "all"
                                     //No break
@@ -1336,8 +1336,8 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                         }
                                         }
                                         break;
-				case Args_Type_Win_Func:
-				case Args_Type_Wave_Mode:
+                case Args_Type_Win_Func:
+                case Args_Type_Wave_Mode:
                 case Args_Type_Yuv:
                 case Args_Type_YuvA:
                 case Args_Type_ClrPck:

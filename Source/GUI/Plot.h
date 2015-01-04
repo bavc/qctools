@@ -14,6 +14,7 @@
 
 class QwtPlotCurve;
 class PlotCursor;
+class PlotLegend;
 
 //***************************************************************************
 // Class
@@ -24,31 +25,44 @@ class Plot : public QwtPlot
     Q_OBJECT
 
 public:
-    explicit Plot( const struct stream_info* streamInfo, size_t group, QWidget *parent );
+    explicit Plot( size_t streamPos, size_t Type, size_t Group, QWidget *parent );
     virtual ~Plot();
 
     virtual QSize sizeHint() const;
     virtual QSize minimumSizeHint() const;
 
+    void setYAxis( double min, double max, int numSteps );
     void setCursorPos( double x );
 
     void setCurveSamples( int index,
         const double *xData, const double *yData, int size );
 
+    size_t streamPos() const { return m_streamPos; }
+    size_t type() const { return m_type; }
+    size_t group() const { return m_group; }
+
+    PlotLegend *legend() { return m_legend; }
+
+    int frameAt( double x ) const;
+
 Q_SIGNALS:
-    void cursorMoved( double x );
+    void cursorMoved( int index );
 
 private Q_SLOTS:
     void onPickerMoved( const QPointF& );
     void onXScaleChanged();
 
 private:
+    const QwtPlotCurve* curve( int index ) const;
     QColor curveColor( int index ) const;
 
-    const struct stream_info*   m_streamInfo; 
-    const size_t                m_group;
-    QVector<QwtPlotCurve*>      m_curves;
-    PlotCursor*                 m_cursor;
+    const size_t            m_streamPos;
+    const size_t            m_type;
+    const size_t            m_group;
+    QVector<QwtPlotCurve*>  m_curves;
+    PlotCursor*             m_cursor;
+
+    PlotLegend*             m_legend;
 };
 
 #endif // GUI_Plot_H

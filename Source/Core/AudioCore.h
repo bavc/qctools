@@ -30,7 +30,6 @@ enum AudioGroup
 {
     Group_R128,
     //Group_LRA,
-    Group_AudioAxis,
     Group_AudioMax
 };
 

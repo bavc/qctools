@@ -55,7 +55,7 @@ enum col_names
     Col_MSEfY,
     Col_Format,
     Col_StreamCount,
-	Col_BitRate,
+    Col_BitRate,
     Col_Duration,
     Col_FileSize,
   //Col_Encoder,
@@ -89,7 +89,7 @@ percolumn PerColumn[Col_Max]=
     { StatsType_Count,      Item_MSE_y,             Item_VideoMax,          "MSEfY",            "count of frames with MSEfY over 1000", },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Format",           NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Streams count",    NULL, },
-	{ StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Bit Rate",         NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Bit Rate",         NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Duration",         NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "File size",        NULL, },
   //{ StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Encoder",          NULL, },
@@ -167,7 +167,7 @@ void FilesList::UpdateAll()
     {
         QString     Format;
         QString     StreamCount;
-		QString     BitRate;
+        QString     BitRate;
         QString     FrameRate;
         string      Duration;
         QString     ShortFileName;
@@ -190,7 +190,7 @@ void FilesList::UpdateAll()
             // Data from FFmpeg
             Format=                             Main->Files[Files_Pos]->Glue->ContainerFormat_Get().c_str();
             StreamCount=QString::number(        Main->Files[Files_Pos]->Glue->StreamCount_Get());
-			BitRate=QString::number(            Main->Files[Files_Pos]->Glue->BitRate_Get());
+            BitRate=QString::number(            Main->Files[Files_Pos]->Glue->BitRate_Get());
             int Milliseconds=(int)(             Main->Files[Files_Pos]->Glue->VideoDuration_Get()*1000);
             VideoFormat=                        Main->Files[Files_Pos]->Glue->VideoFormat_Get().c_str();
             Width=QString::number(              Main->Files[Files_Pos]->Glue->Width_Get());
@@ -248,7 +248,7 @@ void FilesList::UpdateAll()
 
         setItem((int)Files_Pos, Col_Format,         new QTableWidgetItem(Format));
         setItem((int)Files_Pos, Col_StreamCount,    new QTableWidgetItem(StreamCount));
-		setItem((int)Files_Pos, Col_BitRate,        new QTableWidgetItem(BitRate));
+        setItem((int)Files_Pos, Col_BitRate,        new QTableWidgetItem(BitRate));
         setItem((int)Files_Pos, Col_Duration,       new QTableWidgetItem(Duration.c_str()));
         setItem((int)Files_Pos, Col_FileSize,       new QTableWidgetItem(FileSize));
       //setItem((int)Files_Pos, Col_Encoder,        new QTableWidgetItem("(TODO)"));

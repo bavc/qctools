@@ -8,8 +8,9 @@ mkdir _Automated
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Help.h -o_Automated\moc_Help.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Info.h -o_Automated\moc_Info.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Plot.h -o_Automated\moc_Plot.cpp
+..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\PlotLegend.h -o_Automated\moc_PlotLegend.cpp
+..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\PlotScaleWidget.h -o_Automated\moc_PlotScaleWidget.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Plots.h -o_Automated\moc_Plots.cpp
-..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\PlotsArea.h -o_Automated\moc_PlotsArea.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\TinyDisplay.h -o_Automated\moc_TinyDisplay.cpp
 ..\..\..\..\Qt\qtbase\bin\rcc ..\..\..\Source\Resource\Resources.qrc -o _Automated\qrc_Resources.cpp
 ..\..\..\..\Qt\qtbase\bin\uic ..\..\..\Source\GUI\mainwindow.ui -o _Automated\ui_mainwindow.h

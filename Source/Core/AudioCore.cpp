@@ -19,12 +19,7 @@ const struct per_group AudioPerGroup [Group_AudioMax]=
     //{
     //    Item_LRAL,       3,    0,    0,  3,  "LRA",  true,
     //    "(TODO)\n",
-	//},
-    //Internal
-    {
-        Item_AudioMax,  0,    0,    0,  0,  "",
-        "",
-    },
+    //},
 };
 
 const struct per_item AudioPerItem [Item_AudioMax]=

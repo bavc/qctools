@@ -10,20 +10,12 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include <QMainWindow>
-#include <vector>
+#include <QWidget>
 
 class FileInformation;
 class PerPicture;
 class TinyDisplay;
 class Info;
-class Plots;
-
-class QwtPlot;
-class QwtLegend;
-class QwtPlotZoomer;
-class QwtPlotCurve;
-class QwtPlotPicker;
 
 class QLabel;
 class QToolButton;
@@ -46,15 +38,33 @@ public:
         Style_Cols,
         Style_Grid,
     };
-    explicit Control(QWidget *parent, FileInformation* FileInfoData, std::vector<Plots*>* PlotsAreas, style Style, bool IsSlave=false);
-    ~Control();
+    explicit Control(QWidget *parent, FileInformation* FileInfoData, 
+        style Style, bool IsSlave=false);
+
+    virtual ~Control();
 
     // Commands
     void                        Update                      ();
 
-    // Info
-    bool                        ShouldUpate;
+Q_SIGNALS:
+    void currentFrameChanged();
 
+public Q_SLOTS:
+    void TimeOut();
+    void on_M9_clicked(bool checked);
+    void on_M2_clicked(bool checked);
+    void on_M1_clicked(bool checked);
+    void on_M0_clicked(bool checked);
+    void on_Minus_clicked(bool checked=false);
+    void on_PlayPause_clicked(bool checked);
+    void on_Pause_clicked(bool checked);
+    void on_Plus_clicked(bool checked=false);
+    void on_P0_clicked(bool checked);
+    void on_P1_clicked(bool checked);
+    void on_P2_clicked(bool checked);
+    void on_P9_clicked(bool checked);
+
+public:
     // To update
     TinyDisplay*                TinyDisplayArea;
     Info*                       InfoArea;
@@ -75,10 +85,25 @@ public:
     QToolButton*                P2;
     QToolButton*                P9;
 
-protected:
+private:
+    void TimeOut_Init();
+
+    enum selectedspeed
+    {
+        Speed_M2,
+        Speed_M1,
+        Speed_M0,
+        Speed_O,
+        Speed_P0,
+        Speed_P1,
+        Speed_P2,
+    };
+    selectedspeed               SelectedSpeed;
+    bool                        ShouldUpate;
+    bool                        IsSlave;
+
     // File information
     FileInformation*            FileInfoData;
-    std::vector<Plots*>*        PlotsAreas;
     int                         Frames_Pos;
     style                       Style;
 
@@ -90,37 +115,6 @@ protected:
     QTime*  Time;
     bool    Time_MinusPlus;
     int     Timer_Duration;
-public:
-    enum selectedspeed
-    {
-        Speed_M2,
-        Speed_M1,
-        Speed_M0,
-        Speed_O,
-        Speed_P0,
-        Speed_P1,
-        Speed_P2,
-    };
-    selectedspeed SelectedSpeed;
-protected:
-    bool    IsSlave;
-
-    void TimeOut_Init();
-
-public Q_SLOTS:
-    void TimeOut();
-    void on_M9_clicked(bool checked);
-    void on_M2_clicked(bool checked);
-    void on_M1_clicked(bool checked);
-    void on_M0_clicked(bool checked);
-    void on_Minus_clicked(bool checked=false);
-    void on_PlayPause_clicked(bool checked);
-    void on_Pause_clicked(bool checked);
-    void on_Plus_clicked(bool checked=false);
-    void on_P0_clicked(bool checked);
-    void on_P1_clicked(bool checked);
-    void on_P2_clicked(bool checked);
-    void on_P9_clicked(bool checked);
 };
 
 #endif // GUI_Control_H

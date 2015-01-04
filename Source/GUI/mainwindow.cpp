@@ -8,7 +8,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "GUI/Plots.h"
-#include "Core/CommonStats.h"
 
 #include <QFileDialog>
 #include <QScrollBar>
@@ -40,6 +39,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // FilesList
     FilesListArea=NULL;
 
+    // Plots
+    PlotsArea=NULL;
+
     // Pictures
     TinyDisplayArea=NULL;
 
@@ -68,8 +70,7 @@ MainWindow::~MainWindow()
         delete Files[Pos];
 
     // Plots
-    for (size_t Pos=0; Pos<PlotsAreas.size(); Pos++)
-        delete PlotsAreas[Pos];
+    delete PlotsArea;
 
     // Pictures
     delete TinyDisplayArea;
@@ -259,13 +260,13 @@ void MainWindow::on_actionFilesList_triggered()
         ui->actionZoomOut->setVisible(false);
     if (ui->actionWindowOut)
         ui->actionWindowOut->setVisible(false);
-    for (size_t i=0; i<CountOfStreamTypes; i++)
-        for (size_t Pos=0; Pos<CheckBoxes[i].size(); Pos++)
-            CheckBoxes[i][Pos]->hide();
+    for (size_t type = 0; type < CountOfStreamTypes; type++)
+        for (size_t group=0; group<CheckBoxes[type].size(); group++)
+            CheckBoxes[type][group]->hide();
     if (ui->fileNamesBox)
         ui->fileNamesBox->hide();
-    for (size_t Pos=0; Pos<PlotsAreas.size(); Pos++)
-        PlotsAreas[Pos]->hide();
+    if (PlotsArea)
+        PlotsArea->hide();
     if (TinyDisplayArea)
         TinyDisplayArea->hide();
     if (ControlArea)
@@ -297,13 +298,13 @@ void MainWindow::on_actionGraphsLayout_triggered()
         ui->actionZoomOut->setVisible(true);
     if (ui->actionWindowOut)
         ui->actionWindowOut->setVisible(false);
-    for (size_t i=0; i<CountOfStreamTypes; i++)
-        for (size_t Pos=0; Pos<CheckBoxes[i].size(); Pos++)
-            CheckBoxes[i][Pos]->show();
+    for (size_t type = 0; type < CountOfStreamTypes; type++)
+        for (size_t group=0; group<CheckBoxes[group].size(); group++)
+            CheckBoxes[type][group]->show();
     if (ui->fileNamesBox)
         ui->fileNamesBox->show();
-    for (size_t Pos=0; Pos<PlotsAreas.size(); Pos++)
-        PlotsAreas[Pos]->show();
+    if (PlotsArea)
+        PlotsArea->show();
     if (TinyDisplayArea)
         TinyDisplayArea->show();
     if (ControlArea)
@@ -431,6 +432,13 @@ void MainWindow::on_Full_triggered()
      setWindowState(Qt::WindowActive);
   else
      setWindowState(Qt::WindowFullScreen);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_CurrentFrameChanged()
+{
+    PlotsArea->onCurrentFrameChanged();
+    updateScrollBar( true );
 }
 
 //---------------------------------------------------------------------------

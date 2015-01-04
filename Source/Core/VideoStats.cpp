@@ -217,7 +217,7 @@ void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
     string A;
     for (;;)
     {
-        e=av_dict_get 	(m, "", e, AV_DICT_IGNORE_SUFFIX);
+        e=av_dict_get     (m, "", e, AV_DICT_IGNORE_SUFFIX);
         if (!e)
             break;
         size_t j=0;

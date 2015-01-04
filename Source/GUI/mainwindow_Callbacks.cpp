@@ -7,8 +7,9 @@
 //---------------------------------------------------------------------------
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "Core/CommonStats.h"
 #include "Core/Core.h"
+#include "Core/CommonStats.h"
+#include "GUI/Plots.h"
 
 #include <QFileDialog>
 #include <QScrollBar>
@@ -41,7 +42,7 @@ void MainWindow::TimeOut ()
     // Configuring plots
     if (ui->actionFilesList->isChecked() && FilesListArea==NULL)
         createFilesList();
-    if (ui->actionGraphsLayout->isChecked() && PlotsAreas.empty())
+    if (ui->actionGraphsLayout->isChecked() && PlotsArea==NULL)
         createGraphsLayout();
     refreshDisplay();
     Update();
@@ -104,6 +105,9 @@ void MainWindow::TimeOut ()
         if (FilesListArea)
             FilesListArea->Update();
     }
+
+    if (PlotsArea)
+        PlotsArea->refresh();
 }
 
 //---------------------------------------------------------------------------

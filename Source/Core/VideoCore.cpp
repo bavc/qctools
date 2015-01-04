@@ -139,11 +139,6 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "be indicative of differences between the images of field 1 and field 2 as\n"
         "may be caused by a head clog or playback error.",
     },
-    //Internal
-    {
-        Item_VideoMax, 0,    0,    0,  0,  "",
-        "",
-    },
 };
 
 const struct per_item VideoPerItem [Item_VideoMax]=

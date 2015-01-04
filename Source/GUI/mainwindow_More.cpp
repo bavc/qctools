@@ -17,7 +17,6 @@
 #include <QMessageBox>
 
 #include "Core/Core.h"
-#include "Core/CommonStats.h"
 #include "GUI/Plots.h"
 //---------------------------------------------------------------------------
 
@@ -101,12 +100,11 @@ void MainWindow::processFile(const QString &FileName)
         ui->verticalLayout->removeWidget(FilesListArea);
         delete FilesListArea; FilesListArea=NULL;
     }
-    for (size_t Pos=0; Pos<PlotsAreas.size(); Pos++)
+    if (PlotsArea)
     {
-        ui->verticalLayout->removeWidget(PlotsAreas[Pos]);
-        delete PlotsAreas[Pos];
+        ui->verticalLayout->removeWidget(PlotsArea);
+        delete PlotsArea; PlotsArea=NULL;
     }
-    PlotsAreas.clear();
     if (TinyDisplayArea)
     {
         ui->verticalLayout->removeWidget(TinyDisplayArea);
@@ -228,12 +226,11 @@ void MainWindow::createFilesList()
 //---------------------------------------------------------------------------
 void MainWindow::clearGraphsLayout()
 {
-    for (size_t Pos=0; Pos<PlotsAreas.size(); Pos++)
+    if (PlotsArea)
     {
-        ui->verticalLayout->removeWidget(PlotsAreas[Pos]);
-        delete PlotsAreas[Pos];
+        ui->verticalLayout->removeWidget(PlotsArea);
+        delete PlotsArea; PlotsArea=NULL;
     }
-    PlotsAreas.clear();
     if (TinyDisplayArea)
     {
         ui->verticalLayout->removeWidget(TinyDisplayArea);
@@ -258,10 +255,10 @@ void MainWindow::createGraphsLayout()
 
     if (Files_CurrentPos==(size_t)-1)
     {
-        for (size_t i=0; i<CountOfStreamTypes; i++)
-            for (size_t Pos=0; Pos<CheckBoxes[i].size(); Pos++)
-                if (CheckBoxes[i][Pos])
-                    CheckBoxes[i][Pos]->hide();
+        for (size_t type = 0; type < CountOfStreamTypes; type++)
+            for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
+                if (CheckBoxes[type][group])
+                    CheckBoxes[type][group]->hide();
         if (ui->fileNamesBox)
             ui->fileNamesBox->hide();
 
@@ -270,28 +267,27 @@ void MainWindow::createGraphsLayout()
     }
     clearDragDrop();
 
-    for (size_t i=0; i<CountOfStreamTypes; i++)
-        for (size_t Pos=0; Pos<CheckBoxes[i].size(); Pos++)
-            if (CheckBoxes[i][Pos])
-                CheckBoxes[i][Pos]->show();
+    for (size_t type = 0; type < CountOfStreamTypes; type++)
+        for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
+            if (CheckBoxes[type][group])
+                CheckBoxes[type][group]->show();
     if (ui->fileNamesBox)
         ui->fileNamesBox->show();
 
-    for (size_t i=0; i<Files[Files_CurrentPos]->Stats.size(); i++)
-    {
-        Plots* PlotsArea=new Plots(this, &PerStreamType[Files[Files_CurrentPos]->Stats[i]->Type_Get()], Files[Files_CurrentPos], i);
-        if (!ui->actionGraphsLayout->isChecked())
-            PlotsArea->hide();
-        ui->verticalLayout->addWidget(PlotsArea);
-        PlotsAreas.push_back(PlotsArea);
-    }
+    PlotsArea=new Plots(this, Files[Files_CurrentPos]);
+    if (!ui->actionGraphsLayout->isChecked())
+        PlotsArea->hide();
+    ui->verticalLayout->addWidget(PlotsArea);
 
     TinyDisplayArea=new TinyDisplay(this, Files[Files_CurrentPos]);
     if (!ui->actionGraphsLayout->isChecked())
         TinyDisplayArea->hide();
     ui->verticalLayout->addWidget(TinyDisplayArea);
 
-    ControlArea=new Control(this, Files[Files_CurrentPos], &PlotsAreas, Control::Style_Cols);
+    ControlArea=new Control(this, Files[Files_CurrentPos], Control::Style_Cols);
+    connect( ControlArea, SIGNAL( currentFrameChanged() ), 
+        this, SLOT( on_CurrentFrameChanged() ) );
+
     if (!ui->actionGraphsLayout->isChecked())
         ControlArea->hide();
     ui->verticalLayout->addWidget(ControlArea);

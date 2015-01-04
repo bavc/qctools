@@ -89,7 +89,7 @@ public:
 
     // Visual elements
     FilesList*                  FilesListArea;
-    std::vector<Plots*>         PlotsAreas;
+    Plots*                      PlotsArea;
     TinyDisplay*                TinyDisplayArea;
     Control*                    ControlArea;
     Info*                       InfoArea;
@@ -97,7 +97,7 @@ public:
     QLabel*                     DragDrop_Text;
 
     //CheckBoxes
-    std::vector<QCheckBox*>     CheckBoxes[2]; //0=Video, 1=Audio
+    std::vector<QCheckBox*>     CheckBoxes[CountOfStreamTypes];
 
     // Files
     std::vector<FileInformation*> Files;
@@ -180,8 +180,14 @@ private Q_SLOTS:
 
     void on_Full_triggered();
 
+    void on_CurrentFrameChanged();
+
+
 private:
+    void updateScrollBar( bool blockSignals = false );
+    bool isPlotZoomable() const;
     void Zoom( bool );
+
     Ui::MainWindow *ui;
 };
 

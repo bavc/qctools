@@ -11,8 +11,8 @@
 #include "GUI/preferences.h"
 #include "GUI/Help.h"
 #include "GUI/Plots.h"
-#include "Core/CommonStats.h"
 #include "Core/Core.h"
+#include "Core/VideoCore.h"
 
 #include <QFileDialog>
 #include <QScrollBar>
@@ -108,18 +108,18 @@ void MainWindow::Ui_Init()
     //ToolTip
     if (ui->fileNamesBox)
         ui->fileNamesBox->hide();
-    for (size_t i=0; i<CountOfStreamTypes; i++)
-        for (size_t j=0; j<PerStreamType[i].CountOfGroups-1; j++) // Group_Axis
+    for (size_t type = 0; type < CountOfStreamTypes; type++)
+        for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ ) // Group_Axis
         {
-            QCheckBox* CheckBox=new QCheckBox(PerStreamType[i].PerGroup[j].Name);
-            CheckBox->setToolTip(PerStreamType[i].PerGroup[j].Description);
+            QCheckBox* CheckBox=new QCheckBox(PerStreamType[type].PerGroup[group].Name);
+            CheckBox->setToolTip(PerStreamType[type].PerGroup[group].Description);
             CheckBox->setCheckable(true);
-            CheckBox->setChecked(PerStreamType[i].PerGroup[j].CheckedByDefault);
+            CheckBox->setChecked(PerStreamType[type].PerGroup[group].CheckedByDefault);
             CheckBox->setVisible(false);
             QObject::connect(CheckBox, SIGNAL(toggled(bool)), this, SLOT(on_check_toggled(bool)));
             ui->horizontalLayout->addWidget(CheckBox);
 
-            CheckBoxes[i].push_back(CheckBox);
+            CheckBoxes[type].push_back(CheckBox);
         }
 
     configureZoom();
@@ -149,20 +149,24 @@ void MainWindow::Ui_Init()
 }
 
 //---------------------------------------------------------------------------
+bool MainWindow::isPlotZoomable() const
+{
+    return PlotsArea && PlotsArea->visibleFrames().count() > 4;
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::configureZoom()
 {
-    if (Files.empty() || PlotsAreas.empty() || PlotsAreas[0]->zoomLevel()==1)
+    updateScrollBar();
+
+    if (Files.empty() || PlotsArea==NULL || !PlotsArea->isZoomed() )
     {
-        ui->horizontalScrollBar->setRange(0, 0);
-        ui->horizontalScrollBar->setMaximum(0);
-        ui->horizontalScrollBar->setPageStep(1);
-        ui->horizontalScrollBar->setSingleStep(1);
-        ui->horizontalScrollBar->setEnabled(false);
         ui->actionZoomOut->setEnabled(false);
-        if (Files_CurrentPos<Files.size() && !PlotsAreas.empty() && PlotsAreas[0]->zoomLevel() < Files[Files_CurrentPos]->Stats[0]->x_Current_Max/4)
+        if (Files_CurrentPos<Files.size() && isPlotZoomable())
             ui->actionZoomIn->setEnabled(true);
         else
             ui->actionZoomIn->setEnabled(false);
+
         ui->actionGoTo->setEnabled(!Files.empty());
         ui->actionExport_XmlGz_Prompt->setEnabled(!Files.empty());
         ui->actionExport_XmlGz_Sidecar->setEnabled(!Files.empty());
@@ -172,16 +176,8 @@ void MainWindow::configureZoom()
         return;
     }
 
-    size_t Increment=Files[Files_CurrentPos]->Stats[0]->x_Current_Max/PlotsAreas[0]->zoomLevel();
-    ui->horizontalScrollBar->setMaximum(Files[Files_CurrentPos]->Stats[0]->x_Current_Max-Increment);
-    ui->horizontalScrollBar->setPageStep(Increment);
-    ui->horizontalScrollBar->setSingleStep(Increment);
-    ui->horizontalScrollBar->setEnabled(true);
     ui->actionZoomOut->setEnabled(true);
-    if (PlotsAreas[0]->zoomLevel() < Files[Files_CurrentPos]->Stats[0]->x_Current_Max/4)
-        ui->actionZoomIn->setEnabled(true);
-    else
-        ui->actionZoomIn->setEnabled(false);
+    ui->actionZoomIn->setEnabled( isPlotZoomable() );
     ui->actionGoTo->setEnabled(true);
     ui->actionExport_XmlGz_Prompt->setEnabled(true);
     ui->actionExport_XmlGz_Sidecar->setEnabled(true);
@@ -193,53 +189,52 @@ void MainWindow::configureZoom()
 //---------------------------------------------------------------------------
 void MainWindow::Zoom_Move(size_t Begin)
 {
-    for (size_t Pos=0; Pos<PlotsAreas.size(); Pos++)
-        PlotsAreas[Pos]->Zoom_Move(Begin); //TODO: frame number is not good because frame duration is different (video/audio), must use time stamps
-
-    ui->horizontalScrollBar->setValue(Begin);
+    PlotsArea->Zoom_Move(Begin);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::Zoom_In()
 {
-	Zoom( true );
+    Zoom( true );
+    updateScrollBar();
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::Zoom_Out()
 {
-	Zoom( false );
+    Zoom( false );
+    updateScrollBar();
 }
 
 void MainWindow::Zoom( bool on )
 {
-    for (size_t Pos=0; Pos<PlotsAreas.size(); Pos++)
-    {
-        if ( on )
-	    {
-    	    if (PlotsAreas[Pos]->zoomLevel() < Files[Files_CurrentPos]->Stats[0]->x_Current_Max/4)
-        	    PlotsAreas[Pos]->zoom( true );
-	    }
-	    else
-	    {
-    	    PlotsAreas[Pos]->zoom( false );
-	    }
-    }
-
+    PlotsArea->zoomXAxis( on );
     configureZoom();
+}
 
-    size_t Position = Files[Files_CurrentPos]->Frames_Pos_Get();
-    size_t Increment=Files[Files_CurrentPos]->Stats[0]->x_Current_Max/PlotsAreas[0]->zoomLevel();
+void MainWindow::updateScrollBar( bool blockSignals )
+{
+    QScrollBar* sb = ui->horizontalScrollBar;
 
-	if (Position+Increment/2>Files[Files_CurrentPos]->Stats[0]->x_Current_Max)
-		Position=Files[Files_CurrentPos]->Stats[0]->x_Current_Max-Increment/2;
+    if ( PlotsArea==NULL || !PlotsArea->isZoomed() )
+    {
+        sb->hide();
+    }
+    else
+    {
+        const FrameInterval intv = PlotsArea->visibleFrames();
 
-   	if (Position>Increment/2)
-       	Position-=Increment/2;
-   	else
-       	Position=0;
+        sb->blockSignals( blockSignals );
 
-    Zoom_Move(Position);
+        sb->setRange( 0, PlotsArea->numFrames() - intv.count() + 1 );
+        sb->setValue( intv.from );
+        sb->setPageStep( intv.count() );
+        sb->setSingleStep( intv.count() );
+
+        sb->blockSignals( false );
+
+        sb->show();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -270,8 +265,8 @@ void MainWindow::Export_PDF()
 
     /*
     QwtPlotRenderer PlotRenderer;
-    PlotRenderer.renderDocument(const_cast<QwtPlot*>( PlotsAreas[0]->plot(Group_Y) ), 
-		SaveFileName, "PDF", QSizeF(210, 297), 150);
+    PlotRenderer.renderDocument(const_cast<QwtPlot*>( PlotsArea->plot(TempType, Group_Y) ), 
+        SaveFileName, "PDF", QSizeF(210, 297), 150);
     QDesktopServices::openUrl(QUrl("file:///"+SaveFileName, QUrl::TolerantMode));
     */
 }
@@ -279,13 +274,11 @@ void MainWindow::Export_PDF()
 //---------------------------------------------------------------------------
 void MainWindow::refreshDisplay()
 {
-    for (size_t Pos=0; Pos<PlotsAreas.size(); Pos++)
+    if (PlotsArea)
     {
-        for (size_t j=0; j<CheckBoxes[Pos?1:0].size(); j++)
-            PlotsAreas[Pos]->setPlotVisible( j, CheckBoxes[Pos?1:0][j]->checkState()==Qt::Checked );
-
-        PlotsAreas[Pos]->setPlotVisible(CheckBoxes[Pos?1:0].size(), true); //Group_Axis
-        PlotsAreas[Pos]->updateAll();
+        for (size_t type = 0; type<CountOfStreamTypes; type++)
+            for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
+                PlotsArea->setPlotVisible( type, group, CheckBoxes[type][group]->checkState()==Qt::Checked );
     }
 }
 

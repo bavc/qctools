@@ -7,7 +7,7 @@
 //---------------------------------------------------------------------------
 
 #include "GUI/Plot.h"
-#include "Core/VideoCore.h" //Only for some specific colors
+#include "GUI/PlotLegend.h"
 #include <qwt_plot_grid.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_picker.h>
@@ -18,6 +18,21 @@
 #include <qwt_series_data.h>
 #include <QResizeEvent>
 
+#include "Core/VideoCore.h"
+
+static double stepSize( double distance, int numSteps )
+{
+    const double s = distance / numSteps;
+    for ( int d = 1; d <= 1000000; d *= 10 )
+    {
+        const double step = floor( s * d ) / d;
+        if ( step > 0.0 )
+            return step;
+    }
+
+    return 0.0;
+}
+
 struct compareX
 {
     inline bool operator()( const double x, const QPointF &pos ) const
@@ -25,6 +40,15 @@ struct compareX
         return ( x < pos.x() );
     }
 };
+
+static int indexLower( double x, const QwtSeriesData<QPointF> &data ) 
+{
+    int index = qwtUpperSampleIndex<QPointF>( data, x, compareX() );
+    if ( index == -1 )
+        index = data.size();
+
+    return index - 1;
+}
 
 class PlotPicker: public QwtPlotPicker
 {
@@ -52,8 +76,14 @@ public:
         QColor bg( Qt::darkGray );
         bg.setAlpha( 160 );
 
-        QwtText text = infoText( indexLower( pos.x() ) );
-        text.setBackgroundBrush( QBrush( bg ) );
+        QwtText text;
+
+        const int idx = dynamic_cast<const Plot*>( plot() )->frameAt( pos.x() );
+        if ( idx >= 0 )
+        {
+            text = infoText( idx );
+            text.setBackgroundBrush( QBrush( bg ) );
+        }
 
         return text;
     }
@@ -64,7 +94,7 @@ protected:
         QString info( "Frame " );
         info += QString::number(index);
         for( unsigned i = 0; i < m_streamInfo->PerGroup[m_group].Count; ++i )
-        {
+       {
             const per_item &itemInfo = m_streamInfo->PerItem[m_streamInfo->PerGroup[m_group].Start + i];
         
             info += i?", ":": ";
@@ -74,31 +104,6 @@ protected:
         }
 
         return info.arg( index + 1 );
-    }
-
-private:
-    const QwtPlotCurve* curve0() const
-    {
-        const QwtPlotItemList curves = plot()->itemList( QwtPlotItem::Rtti_PlotCurve );
-        if ( curves.isEmpty() )
-            return NULL;
-
-        return dynamic_cast<const QwtPlotCurve*>( curves.first() );
-    }
-
-    int indexLower( double x ) const
-    {
-        const QwtPlotCurve* curve = curve0();
-        if ( curve == NULL )
-            return -1;
-
-        int index = qwtUpperSampleIndex<QPointF>(
-            *curve->data(), x, compareX() );
-
-        if ( index == -1 )
-            index = curve->dataSize();
-
-        return index - 1;
     }
 
     const struct stream_info*       m_streamInfo; 
@@ -210,10 +215,11 @@ protected:
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Plot::Plot( const struct stream_info* streamInfo, size_t group, QWidget *parent) :
+Plot::Plot( size_t streamPos, size_t Type, size_t Group, QWidget *parent ) :
     QwtPlot( parent ),
-    m_streamInfo( streamInfo ),
-    m_group( group )
+    m_streamPos( streamPos ),
+    m_type( Type ),
+    m_group( Group )
 {
     setAutoReplot( false );
 
@@ -250,9 +256,9 @@ Plot::Plot( const struct stream_info* streamInfo, size_t group, QWidget *parent)
 
     // curves
 
-    for( unsigned j = 0; j < m_streamInfo->PerGroup[m_group].Count; ++j )
+    for( unsigned j = 0; j < PerStreamType[m_type].PerGroup[m_group].Count; ++j )
     {
-        QwtPlotCurve* curve = new QwtPlotCurve( m_streamInfo->PerItem[m_streamInfo->PerGroup[m_group].Start + j].Name );
+        QwtPlotCurve* curve = new QwtPlotCurve( PerStreamType[m_type].PerItem[PerStreamType[m_type].PerGroup[m_group].Start + j].Name );
 
         curve->setPen( curveColor( j ) );
         curve->setRenderHint( QwtPlotItem::RenderAntialiased );
@@ -262,16 +268,25 @@ Plot::Plot( const struct stream_info* streamInfo, size_t group, QWidget *parent)
         m_curves += curve;
     }
 
-    PlotPicker* picker = new PlotPicker( canvas,  m_streamInfo, m_group, &m_curves );
+    PlotPicker* picker = new PlotPicker( canvas, &PerStreamType[m_type], m_group, &m_curves );
     connect( picker, SIGNAL( moved( const QPointF& ) ), SLOT( onPickerMoved( const QPointF& ) ) );
     connect( picker, SIGNAL( selected( const QPointF& ) ), SLOT( onPickerMoved( const QPointF& ) ) );
 
     connect( axisWidget( QwtPlot::xBottom ), SIGNAL( scaleDivChanged() ), SLOT( onXScaleChanged() ) );
+
+    // legend
+    m_legend = new PlotLegend();
+    
+    connect( this, SIGNAL( legendDataChanged( const QVariant &, const QList<QwtLegendData> & ) ),
+         m_legend, SLOT( updateLegend( const QVariant &, const QList<QwtLegendData> & ) ) );
+
+    updateLegend();
 }
 
 //---------------------------------------------------------------------------
 Plot::~Plot()
 {
+    delete m_legend;
 }
 
 QSize Plot::sizeHint() const
@@ -292,11 +307,25 @@ QSize Plot::minimumSizeHint() const
     return QSize( hint.width(), -1 );
 }
 
+const QwtPlotCurve* Plot::curve( int index ) const
+{
+    const QwtPlotItemList curves = itemList( QwtPlotItem::Rtti_PlotCurve );
+    if ( index >= 0 && index < curves.size() )
+        return dynamic_cast<const QwtPlotCurve*>( curves[index] );
+
+    return NULL;
+}   
+
 void Plot::setCurveSamples( int index,
     const double *xData, const double *yData, int size )
 {
     if ( index >= 0 && index < m_curves.size() )
         m_curves[index]->setRawSamples( xData, yData, size );
+}
+
+void Plot::setYAxis( double min, double max, int numSteps )
+{
+    setAxisScale( QwtPlot::yLeft, min, max, ::stepSize( max - min, numSteps ) );
 }
 
 void Plot::setCursorPos( double x )
@@ -308,7 +337,7 @@ QColor Plot::curveColor( int index ) const
 {
     QColor c = Qt::black;
 
-    switch ( m_streamInfo->PerGroup[m_group].Count )
+    switch ( PerStreamType[m_type].PerGroup[m_group].Count )
     {
         case 1 :
         {
@@ -366,7 +395,35 @@ QColor Plot::curveColor( int index ) const
 
 void Plot::onPickerMoved( const QPointF& pos )
 {
-    Q_EMIT cursorMoved( qMax( pos.x(), 0.0 ) );
+    const int idx = frameAt( pos.x() );
+    if ( idx >= 0 )
+        Q_EMIT cursorMoved( idx );
+}
+
+int Plot::frameAt( double x ) const
+{
+    const QwtPlotCurve* curve = this->curve(0);
+    if ( curve == NULL )
+        return -1;
+
+    const QwtSeriesData<QPointF> &data = *curve->data();
+
+    int idx = ::indexLower( x, data );
+    if ( idx < 0 )
+    {
+        idx = 0;
+    }
+    else if ( idx < data.size() - 1 )
+    {
+        // index, where x is closer
+        const double x1 = data.sample( idx ).x();
+        const double x2 = data.sample( idx + 1 ).x();
+
+        if ( qAbs( x - x2 ) < qAbs( x - x1 ) )
+            idx++;
+    }
+
+    return idx;
 }
 
 void Plot::onXScaleChanged()

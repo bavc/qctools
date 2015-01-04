@@ -93,7 +93,6 @@ enum VideoGroup
     Group_CropF,
     Group_MSE,
     Group_PSNR,
-    Group_VideoAxis,
     Group_VideoMax
 };
 
