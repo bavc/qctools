@@ -161,11 +161,11 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_) :
     #ifdef _WIN32
         replace(FileName_string.begin(), FileName_string.end(), '/', '\\' );
     #endif
-    string Filter1, Filter2;
+    string Filters[CountOfStreamTypes];
     if (StatsFromExternalData.empty())
     {
-        Filter1="signalstats=stat=tout+vrep+brng,cropdetect=reset=1:round=1,split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr";
-        Filter2="ebur128=metadata=1";
+        Filters[0]="signalstats=stat=tout+vrep+brng,cropdetect=reset=1:round=1,split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr";
+        Filters[1]="ebur128=metadata=1";
     }
     else
     {
@@ -178,9 +178,9 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_) :
         Audio->StatsFromExternalData(StatsFromExternalData);
     }
     Glue=new FFmpeg_Glue(FileName_string.c_str(), &Stats, true);
-    Glue->AddOutput(72, 72, FFmpeg_Glue::Output_Jpeg);
-    Glue->AddOutput(0, 0, FFmpeg_Glue::Output_Stats, 0, Filter1);
-    Glue->AddOutput(0, 0, FFmpeg_Glue::Output_Stats, 1, Filter2);
+    Glue->AddOutput(0, 72, 72, FFmpeg_Glue::Output_Jpeg);
+    Glue->AddOutput(1, 0, 0, FFmpeg_Glue::Output_Stats, 0, Filters[0]);
+    Glue->AddOutput(0, 0, 0, FFmpeg_Glue::Output_Stats, 1, Filters[1]);
     if (Glue->ContainerFormat_Get().empty())
     {
         delete Glue;

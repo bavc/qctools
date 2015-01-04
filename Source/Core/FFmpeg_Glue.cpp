@@ -116,6 +116,7 @@ FFmpeg_Glue::outputdata::outputdata()
     :
     // In
     Enabled(true),
+    FilterPos(false),
 
     // FFmpeg pointers - Input
     Stream(NULL),
@@ -651,39 +652,39 @@ FFmpeg_Glue::~FFmpeg_Glue()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::AddOutput(int Scale_Width, int Scale_Height, outputmethod OutputMethod, int FilterType, const string &Filter)
+void FFmpeg_Glue::AddOutput(size_t FilterPos, int Scale_Width, int Scale_Height, outputmethod OutputMethod, int FilterType, const string &Filter)
 {
-    OutputDatas.push_back(NULL);
-    ModifyOutput(OutputDatas.size()-1, Scale_Width, Scale_Height, OutputMethod, FilterType, Filter);
+    for (size_t InputPos=0; InputPos<InputDatas.size(); InputPos++)
+    {
+        inputdata* InputData=InputDatas[InputPos];
+
+        if (InputData && InputData->Type==FilterType)
+        {
+            OutputDatas.push_back(NULL);
+            ModifyOutput(InputPos, OutputDatas.size()-1, FilterPos, Scale_Width, Scale_Height, OutputMethod, FilterType, Filter);
+        }
+    }
 }
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::ModifyOutput(size_t Pos, int Scale_Width, int Scale_Height, outputmethod OutputMethod, int FilterType, const string &Filter)
+void FFmpeg_Glue::ModifyOutput(size_t InputPos, size_t OutputPos, size_t FilterPos, int Scale_Width, int Scale_Height, outputmethod OutputMethod, int FilterType, const string &Filter)
 {
-    if (Pos>=OutputDatas.size())
-        return;
-        
+    inputdata* InputData=InputDatas[InputPos];
+
     outputdata* OutputData=new outputdata;
     OutputData->Type=FilterType;
     OutputData->Width=Scale_Width;
     OutputData->Height=Scale_Height;
     OutputData->OutputMethod=OutputMethod;
     OutputData->Filter=Filter;
-    for (size_t InputPos=0; InputPos<InputDatas.size(); InputPos++)
-    {
-        inputdata* InputData=InputDatas[InputPos];
+    OutputData->FilterPos=FilterPos;
 
-        if (InputDatas[InputPos] && InputDatas[InputPos]->Type==FilterType)
-        {
-            OutputData->Stream=InputDatas[InputPos]->Stream;
-            if (OutputMethod==Output_Stats && Stats)
-                OutputData->Stats=(*Stats)[InputPos];
-            break;
-        }
-    }
+    OutputData->Stream=InputData->Stream;
+    if (OutputMethod==Output_Stats && Stats)
+        OutputData->Stats=(*Stats)[InputPos];
 
-    delete OutputDatas[Pos];
-    OutputDatas[Pos]=OutputData;
+    delete OutputDatas[OutputPos];
+    OutputDatas[OutputPos]=OutputData;
 }
 
 //---------------------------------------------------------------------------
@@ -848,16 +849,23 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::Filter_Change(const size_t Pos, int FilterType, const string &Filter)
+void FFmpeg_Glue::Filter_Change(size_t FilterPos, int FilterType, const string &Filter)
 {
-    if (Pos>=OutputDatas.size())
-        return;
-    outputdata* OutputData=OutputDatas[Pos];
-    if (!OutputData)
-        return;
+    for (size_t InputPos=0; InputPos<InputDatas.size(); InputPos++)
+    {
+        inputdata* InputData=InputDatas[InputPos];
 
-    OutputData->Enabled=true;
-    ModifyOutput(Pos, OutputData->Width, OutputData->Height, OutputData->OutputMethod, FilterType, Filter);
+        if (InputData && InputData->Type==FilterType)
+        {
+            for (size_t OutputPos=0; OutputPos<OutputDatas.size(); OutputPos++)
+            {
+                outputdata* OutputData=OutputDatas[OutputPos];
+
+                if (OutputData->Type==FilterType && OutputData->FilterPos==FilterPos)
+                    ModifyOutput(InputPos, OutputPos, FilterPos, OutputData->Width, OutputData->Height, OutputData->OutputMethod, FilterType, Filter);
+            }
+        }
+    }
 }
 
 //---------------------------------------------------------------------------

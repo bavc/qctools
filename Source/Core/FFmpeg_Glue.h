@@ -104,13 +104,13 @@ public:
     string                      FFmpeg_LibsVersion();
  
     // Actions
-    void                        AddOutput(int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, int FilterType=0, const string &Filter=string());
-    void                        ModifyOutput(size_t Pos, int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, int FilterType=0, const string &Filter=string());
+    void                        AddOutput(size_t FilterPos, int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, int FilterType=0, const string &Filter=string());
+    void                        ModifyOutput(size_t InputPos, size_t OutputPos, size_t FilterPos, int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, int FilterType=0, const string &Filter=string());
     void                        Seek(size_t Pos);
     void                        FrameAtPosition(size_t Pos);
     bool                        NextFrame();
     bool                        OutputFrame(AVPacket* Packet, bool Decode=true);
-    void                        Filter_Change(const size_t Pos, int FilterType, const string &Filter);
+    void                        Filter_Change(size_t FilterPos, int FilterType, const string &Filter);
     void                        Disable(const size_t Pos);
     void                        Scale_Change(int Scale_Width, int Scale_Height);
 
@@ -158,6 +158,7 @@ private:
         // In
         bool                    Enabled;
         string                  Filter;
+        size_t                  FilterPos;
 
         // FFmpeg pointers - Input
         int                     Type;
