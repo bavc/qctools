@@ -195,6 +195,11 @@ void Plots::setCursorPos( int framePos )
         for ( int i = 0; i < PerStreamType[type].CountOfGroups; ++i )
             m_plots[streamPos][i]->setCursorPos( x );
     }
+
+    m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
+    m_scaleWidget->update();
+
+    replotAll();
 }
 
 //---------------------------------------------------------------------------
@@ -247,6 +252,20 @@ void Plots::Zoom_Move( int Begin )
     const int to = qMin( numFrames(), from + n ) - 1;
 
     setVisibleFrames( to - n + 1, to );
+
+    for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
+    {
+		size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+
+        for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
+            m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
+    }
+
+    m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
+
+    refresh();
+
+    m_scaleWidget->update();
 
     replotAll();
 }
@@ -401,6 +420,20 @@ void Plots::zoomXAxis( bool up )
         to = numFrames() - 1;
 
     setVisibleFrames( from, to );
+
+    for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
+    {
+		size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+
+        for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
+            m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
+    }
+
+    m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
+
+    refresh();
+
+    m_scaleWidget->update();
 
     replotAll();
 }
