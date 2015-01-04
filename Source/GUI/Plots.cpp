@@ -394,8 +394,11 @@ void Plots::zoomXAxis( bool up )
     else
         numVisibleFrames *= 2;
 
-    const int to = qMin( m_frameInterval.from + numVisibleFrames, numFrames() ) - 1;
-    const int from = qMax( 0, to - numVisibleFrames );
+    int to = qMin( m_frameInterval.from + numVisibleFrames, numFrames() ) - 1;
+    int from = qMax( 0, to - numVisibleFrames );
+
+    if ( from == 0 && to + 2 == numFrames() )
+        to = numFrames() - 1;
 
     setVisibleFrames( from, to );
 
