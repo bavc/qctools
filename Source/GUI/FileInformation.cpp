@@ -189,6 +189,14 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_) :
             Stats[Pos]->StatsFinish();
     }
 
+    // Looking for the first video stream
+    ReferenceStream_Pos=0;
+    for (; ReferenceStream_Pos<Stats.size(); ReferenceStream_Pos++)
+        if (Stats[ReferenceStream_Pos]->Type_Get()==0)
+            break;
+    if (ReferenceStream_Pos>=Stats.size())
+        ReferenceStream_Pos=0;
+
     Frames_Pos=0;
     WantToStop=false;
     Parse();
@@ -249,7 +257,7 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
     Data<<"    <frames>\n";
 
     // From stats
-    Data<<Stats[0]->StatsToXML(Glue->Width_Get(), Glue->Height_Get());
+    Data<<ReferenceStat()->StatsToXML(Glue->Width_Get(), Glue->Height_Get());
 
     // Footer
     Data<<"    </frames>\n";
@@ -291,7 +299,7 @@ void FileInformation::Export_CSV (const QString &ExportFileName)
     if (ExportFileName.isEmpty())
         return;
 
-    string StatsToExternalData=Stats[0]->StatsToCSV();
+    string StatsToExternalData=ReferenceStat()->StatsToCSV();
 
     QFile F(ExportFileName);
     F.open(QIODevice::WriteOnly|QIODevice::Truncate);
@@ -306,7 +314,7 @@ void FileInformation::Export_CSV (const QString &ExportFileName)
 //---------------------------------------------------------------------------
 QPixmap* FileInformation::Picture_Get (size_t Pos)
 {
-    if (!Glue || Pos>=Stats[0]->x_Current || Pos>=Glue->Thumbnails_Size(0))
+    if (!Glue || Pos>=ReferenceStat()->x_Current || Pos>=Glue->Thumbnails_Size(0))
     {
         Pixmap.load(":/icon/logo.png");
         Pixmap=Pixmap.scaled(72, 72);
@@ -319,18 +327,29 @@ QPixmap* FileInformation::Picture_Get (size_t Pos)
 //---------------------------------------------------------------------------
 int FileInformation::Frames_Count_Get (size_t Stats_Pos)
 {
+    if (Stats_Pos==(size_t)-1)
+        Stats_Pos=ReferenceStream_Pos_Get();
+    
+    if (Stats_Pos>=Stats.size())
+        return -1;
     return Stats[Stats_Pos]->x_Max[0];
 }
 
 //---------------------------------------------------------------------------
 int FileInformation::Frames_Pos_Get (size_t Stats_Pos)
 {
+    // Looking for the first video stream
+    if (Stats_Pos==(size_t)-1)
+        Stats_Pos=ReferenceStream_Pos_Get();
+    if (Stats_Pos>=Stats.size())
+        return -1;
+
     int Pos;
 
-    if (Stats_Pos)
+    if (Stats_Pos!=ReferenceStream_Pos_Get())
     {
         // Computing frame pos based on the first stream
-        double TimeStamp=Stats[0]->x[1][Frames_Pos];
+        double TimeStamp=ReferenceStat()->x[1][Frames_Pos];
         Pos=0;
         for (; Pos<Stats[Stats_Pos]->x_Current_Max; Pos++)
         {
@@ -351,15 +370,21 @@ int FileInformation::Frames_Pos_Get (size_t Stats_Pos)
 //---------------------------------------------------------------------------
 void FileInformation::Frames_Pos_Set (int Pos, size_t Stats_Pos)
 {
-    if (Stats_Pos)
+    // Looking for the first video stream
+    if (Stats_Pos==(size_t)-1)
+        Stats_Pos=ReferenceStream_Pos_Get();
+    if (Stats_Pos>=Stats.size())
+        return;
+
+    if (Stats_Pos!=ReferenceStream_Pos_Get())
     {
         // Computing frame pos based on the first stream
         double TimeStamp=Stats[Stats_Pos]->x[1][Pos];
         Pos=0;
-        for (; Pos<Stats[0]->x_Current_Max; Pos++)
-            if (Stats[0]->x[1][Pos]>=TimeStamp)
+        for (; Pos<ReferenceStat()->x_Current_Max; Pos++)
+            if (ReferenceStat()->x[1][Pos]>=TimeStamp)
             {
-                if (Pos && Stats[0]->x[1][Pos]!=TimeStamp)
+                if (Pos && ReferenceStat()->x[1][Pos]!=TimeStamp)
                     Pos--;
                 break;
             }
@@ -367,8 +392,8 @@ void FileInformation::Frames_Pos_Set (int Pos, size_t Stats_Pos)
     
     if (Pos<0)
         Pos=0;
-    if (Pos>=Stats[0]->x_Current_Max)
-        Pos=Stats[0]->x_Current_Max-1;
+    if (Pos>=ReferenceStat()->x_Current_Max)
+        Pos=ReferenceStat()->x_Current_Max-1;
 
     if (Frames_Pos==Pos)
         return;
@@ -393,7 +418,7 @@ void FileInformation::Frames_Pos_Minus ()
 //---------------------------------------------------------------------------
 void FileInformation::Frames_Pos_Plus ()
 {
-    if (Frames_Pos+1>=Stats[0]->x_Current_Max)
+    if (Frames_Pos+1>=ReferenceStat()->x_Current_Max)
         return;
 
     Frames_Pos++;

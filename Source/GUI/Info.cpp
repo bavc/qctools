@@ -91,14 +91,14 @@ void Info::Update()
     Frames_Pos=FileInfoData->Frames_Pos_Get();
     ShouldUpate=false;
 
-    if (Frames_Pos<FileInfoData->Stats[0]->x_Current)
+    if (Frames_Pos<FileInfoData->ReferenceStat()->x_Current)
         for (size_t Pos=0; Pos<CountOfItems; Pos++)
         {
             if (m_plotItem[Pos].DigitsAfterComma==0)
-                Values[Pos]->setText(m_plotItem[Pos].Name+QString("= ")+QString::number((int)FileInfoData->Stats[0]->y[Pos][Frames_Pos]));
+                Values[Pos]->setText(m_plotItem[Pos].Name+QString("= ")+QString::number((int)FileInfoData->ReferenceStat()->y[Pos][Frames_Pos]));
             else
             {
-                QString Value=QString::number(FileInfoData->Stats[0]->y[Pos][Frames_Pos], 'f', m_plotItem[Pos].DigitsAfterComma);
+                QString Value=QString::number(FileInfoData->ReferenceStat()->y[Pos][Frames_Pos], 'f', m_plotItem[Pos].DigitsAfterComma);
                 int Point=Value.indexOf('.');
                 if (Point==-1)
                 {

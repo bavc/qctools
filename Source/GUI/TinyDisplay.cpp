@@ -90,7 +90,7 @@ void TinyDisplay::Update()
 {
     for (; Labels_MustUpdateFrom<Labels_MustUpdateTo; Labels_MustUpdateFrom++)
     {
-        if (Frames_Pos-4+Labels_MustUpdateFrom>=FileInfoData->Stats[0]->x_Current)
+        if (Frames_Pos-4+Labels_MustUpdateFrom>=FileInfoData->ReferenceStat()->x_Current)
             break;
         Labels[Labels_MustUpdateFrom]->setIcon(FileInfoData->Picture_Get(Frames_Pos-4+Labels_MustUpdateFrom)->copy(0, 0, 72, 72));
     }
@@ -99,16 +99,16 @@ void TinyDisplay::Update()
     {
         Frames_Pos=FileInfoData->Frames_Pos_Get();
 
-        if (Frames_Pos>=FileInfoData->Stats[0]->x_Current_Max)
-            Frames_Pos=FileInfoData->Stats[0]->x_Current_Max-1;
+        if (Frames_Pos>=FileInfoData->ReferenceStat()->x_Current_Max)
+            Frames_Pos=FileInfoData->ReferenceStat()->x_Current_Max-1;
 
         Labels_MustUpdateFrom=(int)-1;
         Labels_MustUpdateTo=(int)-1;
         for (size_t Pos=0; Pos<9; Pos++)
         {
-            if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->Stats[0]->x_Current)
+            if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->ReferenceStat()->x_Current)
                 Labels[Pos]->setIcon(FileInfoData->Picture_Get(Frames_Pos-4+Pos)->copy(0, 0, 72, 72));
-            else if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->Stats[0]->x_Current_Max)
+            else if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->ReferenceStat()->x_Current_Max)
             {
                 Labels[Pos]->setIcon(QPixmap());
                 if (Labels_MustUpdateFrom==(int)-1)

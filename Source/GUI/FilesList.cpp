@@ -298,7 +298,7 @@ void FilesList::Update()
 void FilesList::Update(size_t Files_Pos)
 {
     stringstream Message;
-    Message<<(int)(Main->Files[Files_Pos]->Stats[0]->State_Get()*100)<<"%";
+    Message<<(int)(Main->Files[Files_Pos]->ReferenceStat()->State_Get()*100)<<"%";
     setItem((int)Files_Pos, Col_Processed, new QTableWidgetItem(QString::fromStdString(Message.str())));
     
     // Stats
@@ -310,18 +310,18 @@ void FilesList::Update(size_t Files_Pos)
             {
                 case StatsType_Average : 
                                             if (PerColumn[Col].Stats_Item2==Item_VideoMax)
-                                                Item->setText(Main->Files[Files_Pos]->Stats[0]->Average_Get(PerColumn[Col].Stats_Item).c_str());
+                                                Item->setText(Main->Files[Files_Pos]->ReferenceStat()->Average_Get(PerColumn[Col].Stats_Item).c_str());
                                             else
-                                                Item->setText(Main->Files[Files_Pos]->Stats[0]->Average_Get(PerColumn[Col].Stats_Item, PerColumn[Col].Stats_Item2).c_str());
+                                                Item->setText(Main->Files[Files_Pos]->ReferenceStat()->Average_Get(PerColumn[Col].Stats_Item, PerColumn[Col].Stats_Item2).c_str());
                                             break;
                 case StatsType_Count : 
-                                            Item->setText(Main->Files[Files_Pos]->Stats[0]->Count_Get(PerColumn[Col].Stats_Item).c_str());
+                                            Item->setText(Main->Files[Files_Pos]->ReferenceStat()->Count_Get(PerColumn[Col].Stats_Item).c_str());
                                             break;
                 case StatsType_Count2 :
-                                            Item->setText(Main->Files[Files_Pos]->Stats[0]->Count2_Get(PerColumn[Col].Stats_Item).c_str());
+                                            Item->setText(Main->Files[Files_Pos]->ReferenceStat()->Count2_Get(PerColumn[Col].Stats_Item).c_str());
                                             break;
                 case StatsType_Percent : 
-                                            Item->setText(Main->Files[Files_Pos]->Stats[0]->Percent_Get(PerColumn[Col].Stats_Item).c_str());
+                                            Item->setText(Main->Files[Files_Pos]->ReferenceStat()->Percent_Get(PerColumn[Col].Stats_Item).c_str());
                                             break;
                 default:    ;
             }

@@ -41,9 +41,10 @@ public:
     // Infos
     QPixmap*                    Picture_Get                 (size_t Pos);
     QString                     FileName;
-    int                         Frames_Count_Get            (size_t Stats_Pos=0);
-    int                         Frames_Pos_Get              (size_t Stats_Pos=0);
-    void                        Frames_Pos_Set              (int Frames_Pos, size_t Stats_Pos=0);
+    size_t                      ReferenceStream_Pos_Get     () {return ReferenceStream_Pos;}
+    int                         Frames_Count_Get            (size_t Stats_Pos=(size_t)-1);
+    int                         Frames_Pos_Get              (size_t Stats_Pos=(size_t)-1);
+    void                        Frames_Pos_Set              (int Frames_Pos, size_t Stats_Pos=(size_t)-1);
     void                        Frames_Pos_Minus            ();
     void                        Frames_Pos_Plus             ();
     bool                        PlayBackFilters_Available   ();
@@ -51,10 +52,12 @@ public:
     // FFmpeg glue
     FFmpeg_Glue*                Glue;
     std::vector<CommonStats*>   Stats;
+    CommonStats*                ReferenceStat               () {return Stats[ReferenceStream_Pos];}
 
 private:
     // Info
     QPixmap                     Pixmap;
+    size_t                      ReferenceStream_Pos;
     int                         Frames_Pos;
     MainWindow*                 Main;
 
