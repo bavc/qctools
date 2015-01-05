@@ -317,6 +317,12 @@ QPixmap* FileInformation::Picture_Get (size_t Pos)
 }
 
 //---------------------------------------------------------------------------
+int FileInformation::Frames_Count_Get (size_t Stats_Pos)
+{
+    return Stats[Stats_Pos]->x_Max[0];
+}
+
+//---------------------------------------------------------------------------
 int FileInformation::Frames_Pos_Get (size_t Stats_Pos)
 {
     int Pos;

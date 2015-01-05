@@ -39,6 +39,7 @@ public:
 //---------------------------------------------------------------------------
 Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     QWidget( parent ),
+    m_zoomFactor ( 1 ),
     m_fileInfoData( fileInformation ),
     m_dataTypeIndex( Plots::AxisSeconds )
 {
@@ -411,17 +412,15 @@ void Plots::setPlotVisible( size_t type, size_t group, bool on )
 //---------------------------------------------------------------------------
 void Plots::zoomXAxis( bool up )
 {
-    int numVisibleFrames = m_frameInterval.count();
     if ( up )
-        numVisibleFrames /= 2;
-    else
-        numVisibleFrames *= 2;
+        m_zoomFactor++;
+    else if ( m_zoomFactor > 1)
+        m_zoomFactor--;
+        
+    int numVisibleFrames = m_fileInfoData->Frames_Count_Get() / (1 << m_zoomFactor);
 
     int to = qMin( m_frameInterval.from + numVisibleFrames, numFrames() ) - 1;
     int from = qMax( 0, to - numVisibleFrames );
-
-    if ( from == 0 && to + 2 == numFrames() )
-        to = numFrames() - 1;
 
     setVisibleFrames( from, to );
 

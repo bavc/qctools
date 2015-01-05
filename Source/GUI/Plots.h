@@ -122,6 +122,7 @@ private:
 
     FrameInterval               m_frameInterval;
     TimeInterval                m_timeInterval;
+    int                         m_zoomFactor;
 
     // X axis info
     int                         m_dataTypeIndex;

@@ -41,6 +41,7 @@ public:
     // Infos
     QPixmap*                    Picture_Get                 (size_t Pos);
     QString                     FileName;
+    int                         Frames_Count_Get            (size_t Stats_Pos=0);
     int                         Frames_Pos_Get              (size_t Stats_Pos=0);
     void                        Frames_Pos_Set              (int Frames_Pos, size_t Stats_Pos=0);
     void                        Frames_Pos_Minus            ();
