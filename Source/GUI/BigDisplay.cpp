@@ -45,6 +45,15 @@
 
 
 //***************************************************************************
+// Config
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+// Default filters (check Filters order)
+const size_t Filters_Default1 = 2; // 2 = Normal
+const size_t Filters_Default2 = 7; // 7 = Waveform
+
+//***************************************************************************
 // Info
 //***************************************************************************
 
@@ -902,8 +911,8 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
 
     // Picture
     Picture=NULL;
-    Picture_Current1=2;
-    Picture_Current2=6;//=19;
+    Picture_Current1=Filters_Default1;
+    Picture_Current2=Filters_Default2;
     Options[0].FiltersList->setCurrentIndex(Picture_Current1);
     Options[1].FiltersList->setCurrentIndex(Picture_Current2);
     connect(Options[0].FiltersList, SIGNAL(currentIndexChanged(int)), this, SLOT(on_FiltersList1_currentIndexChanged(int)));
