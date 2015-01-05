@@ -419,7 +419,7 @@ void Plots::zoomXAxis( bool up )
         
     int numVisibleFrames = m_fileInfoData->Frames_Count_Get() / (1 << m_zoomFactor);
 
-    int to = qMin( m_frameInterval.from + numVisibleFrames, numFrames() ) - 1;
+    int to = qMin( framePos() + numVisibleFrames / 2, numFrames() );
     int from = qMax( 0, to - numVisibleFrames );
 
     setVisibleFrames( from, to );
