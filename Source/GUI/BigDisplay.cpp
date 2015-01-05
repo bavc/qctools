@@ -432,6 +432,20 @@ const filter Filters[]=
         },
     },
     {
+        "(Separator)",
+        -1,
+        {
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+        },
+        {
+            "",
+        },
+    },
+    {
         "Audio Spectrum",
         1,
         {
