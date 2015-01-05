@@ -861,7 +861,7 @@ void FFmpeg_Glue::Filter_Change(size_t FilterPos, int FilterType, const string &
             {
                 outputdata* OutputData=OutputDatas[OutputPos];
 
-                if (OutputData->Type==FilterType && OutputData->FilterPos==FilterPos)
+                if (OutputData->FilterPos==FilterPos)
                     ModifyOutput(InputPos, OutputPos, FilterPos, OutputData->Width, OutputData->Height, OutputData->OutputMethod, FilterType, Filter);
             }
         }
