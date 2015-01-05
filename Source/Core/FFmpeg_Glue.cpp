@@ -694,7 +694,7 @@ void FFmpeg_Glue::Seek(size_t FramePos)
     {
         inputdata* InputData=InputDatas[Pos];
 
-        if (InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        if (InputData && InputData->Type==AVMEDIA_TYPE_VIDEO)
         {
             InputData->FramePos=FramePos;
 
@@ -944,7 +944,7 @@ string FFmpeg_Glue::VideoFormat_Get()
 {
     inputdata* InputData=NULL;
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
-        if (InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
         {
             InputData=InputDatas[Pos];
             break;
@@ -961,7 +961,7 @@ double FFmpeg_Glue::VideoDuration_Get()
 {
     inputdata* InputData=NULL;
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
-        if (InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
         {
             InputData=InputDatas[Pos];
             break;
@@ -978,7 +978,7 @@ double FFmpeg_Glue::VideoFrameRate_Get()
 {
     inputdata* InputData=NULL;
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
-        if (InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
         {
             InputData=InputDatas[Pos];
             break;
@@ -1001,7 +1001,7 @@ size_t FFmpeg_Glue::VideoFramePos_Get()
 {
     inputdata* InputData=NULL;
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
-        if (InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
         {
             InputData=InputDatas[Pos];
             break;
@@ -1018,7 +1018,7 @@ size_t FFmpeg_Glue::VideoFrameCount_Get()
 {
     inputdata* InputData=NULL;
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
-        if (InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
         {
             InputData=InputDatas[Pos];
             break;
@@ -1035,7 +1035,7 @@ int FFmpeg_Glue::Width_Get()
 {
     inputdata* InputData=NULL;
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
-        if (InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
         {
             InputData=InputDatas[Pos];
             break;
@@ -1052,7 +1052,7 @@ int FFmpeg_Glue::Height_Get()
 {
     inputdata* InputData=NULL;
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
-        if (InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
         {
             InputData=InputDatas[Pos];
             break;
@@ -1069,7 +1069,7 @@ double FFmpeg_Glue::DAR_Get()
 {
     inputdata* InputData=NULL;
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
-        if (InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
         {
             InputData=InputDatas[Pos];
             break;
@@ -1095,7 +1095,7 @@ string FFmpeg_Glue::PixFormat_Get()
 {
     inputdata* InputData=NULL;
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
-        if (InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
         {
             InputData=InputDatas[Pos];
             break;
@@ -1294,7 +1294,7 @@ string FFmpeg_Glue::AudioFormat_Get()
 {
     inputdata* InputData=NULL;
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
-        if (InputDatas[Pos]->Type==AVMEDIA_TYPE_AUDIO)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_AUDIO)
         {
             InputData=InputDatas[Pos];
             break;
@@ -1311,7 +1311,7 @@ string FFmpeg_Glue::SampleFormat_Get()
 {
     inputdata* InputData=NULL;
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
-        if (InputDatas[Pos]->Type==AVMEDIA_TYPE_AUDIO)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_AUDIO)
         {
             InputData=InputDatas[Pos];
             break;
@@ -1328,7 +1328,7 @@ int FFmpeg_Glue::SamplingRate_Get()
 {
     inputdata* InputData=NULL;
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
-        if (InputDatas[Pos]->Type==AVMEDIA_TYPE_AUDIO)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_AUDIO)
         {
             InputData=InputDatas[Pos];
             break;
@@ -1345,7 +1345,7 @@ string FFmpeg_Glue::ChannelLayout_Get()
 {
     inputdata* InputData=NULL;
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
-        if (InputDatas[Pos]->Type==AVMEDIA_TYPE_AUDIO)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_AUDIO)
         {
             InputData=InputDatas[Pos];
             break;
@@ -1362,7 +1362,7 @@ int FFmpeg_Glue::BitDepth_Get()
 {
     inputdata* InputData=NULL;
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
-        if (InputDatas[Pos]->Type==AVMEDIA_TYPE_AUDIO)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_AUDIO)
         {
             InputData=InputDatas[Pos];
             break;
