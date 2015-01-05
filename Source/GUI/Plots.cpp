@@ -186,12 +186,16 @@ void Plots::onCurrentFrameChanged()
 }
 
 //---------------------------------------------------------------------------
-void Plots::setCursorPos( int framePos )
+void Plots::setCursorPos( int newFramePos )
 {
+    setFramePos( newFramePos );
+
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
     {
+        const double x = m_fileInfoData->Stats[streamPos]->x[m_dataTypeIndex][framePos(streamPos)];
+
         size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
-        const double x = m_fileInfoData->Stats[streamPos]->x[m_dataTypeIndex][framePos];
+
         for ( int i = 0; i < PerStreamType[type].CountOfGroups; ++i )
             m_plots[streamPos][i]->setCursorPos( x );
     }

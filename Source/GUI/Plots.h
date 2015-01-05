@@ -113,7 +113,8 @@ private:
 
     const CommonStats*          stats( size_t statsPos ) const { return m_fileInfoData->Stats[statsPos]; }
     CommonStats*                stats( size_t statsPos ) { return m_fileInfoData->Stats[statsPos]; }
-    int                         framePos() const { return m_fileInfoData->Frames_Pos_Get(); }
+    int                         framePos( size_t statsPos = 0 ) const { return m_fileInfoData->Frames_Pos_Get(statsPos); }
+    void                        setFramePos( size_t framePos, size_t statsPos = 0 ) const { m_fileInfoData->Frames_Pos_Set(framePos, statsPos); }
 
 private:
     PlotScaleWidget*            m_scaleWidget;
