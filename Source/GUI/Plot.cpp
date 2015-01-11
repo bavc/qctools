@@ -103,7 +103,7 @@ protected:
             info += QString::number( (*m_curves)[i]->sample(index).ry(), 'f',  itemInfo.DigitsAfterComma);
         }
 
-        return info.arg( index + 1 );
+        return info;
     }
 
     const struct stream_info*       m_streamInfo; 
