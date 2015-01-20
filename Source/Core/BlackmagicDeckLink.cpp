@@ -121,13 +121,20 @@ IDeckLink *getDeckLinkCard(size_t Pos=0)
     
     // get the first decklink card
     IDeckLink* deckLink=NULL;
-    for (; Pos--; Pos)
+    for (;;)
     {
-        if (deckLinkIter->Next(&deckLink) != S_OK)
+        HRESULT Result=deckLinkIter->Next(&deckLink);
+        if (Result == E_FAIL)
         {
             cout << "Could not detect a DeckLink card" << endl;
             break;
         }
+        if (Result == S_FALSE)
+            break; // Finished
+
+        if (!Pos)
+            break;
+        Pos--;
     }
         
     deckLinkIter->Release();
@@ -156,7 +163,7 @@ std::vector<std::string> DeckLinkCardsList()
         if (Result == S_FALSE)
             break; // Finished
 
-        List.push_back("Card");
+        List.push_back("DeckLink");
     }
         
     deckLinkIter->Release();
@@ -461,7 +468,7 @@ HRESULT CaptureHelper::DeckControlEventReceived (BMDDeckControlEvent bmdDeckCont
         case bmdDeckControlCaptureCompleteEvent:
                                                     *Status=BlackmagicDeckLink_Glue::captured;
                                                     break;
-        case bmdDeckControlAbortedEvent:
+        default:
                                                     *Status=BlackmagicDeckLink_Glue::aborted;
                                                     break;
     }

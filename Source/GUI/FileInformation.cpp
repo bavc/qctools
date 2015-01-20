@@ -47,6 +47,7 @@ void FileInformation::run()
                                                         blackmagicDeckLink_Glue->Start();
                                                         break;
                 case BlackmagicDeckLink_Glue::captured: 
+                case BlackmagicDeckLink_Glue::aborted: 
                                                         WantToStop=true;
                                                         break;
                 default : ;
