@@ -108,12 +108,12 @@ void BlackmagicDeckLink_Glue::Pause()
 }
 
 //---------------------------------------------------------------------------
-void BlackmagicDeckLink_Glue::Stop()
+bool BlackmagicDeckLink_Glue::Stop()
 {
     if (Handle)
     {
         #if defined(BLACKMAGICDECKLINK_GLUE_MAC)
-            ((CaptureHelper*)Handle)->stopCapture();
+            return ((CaptureHelper*)Handle)->stopCapture();
         #endif
     }
 }

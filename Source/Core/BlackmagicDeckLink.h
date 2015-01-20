@@ -46,9 +46,9 @@ private:
     bool                        setupDeckLinkInput();
     bool                        setupDeckControl();
     
-    void                        cleanupDeckControl();
-    void                        cleanupDeckLinkInput();
-    void                        cleanupDeck();
+    bool                        cleanupDeckControl();
+    bool                        cleanupDeckLinkInput();
+    bool                        cleanupDeck();
     
 public:
                                 CaptureHelper(bool dropframe);
@@ -57,7 +57,7 @@ public:
     // start the capture operation. returns when the operation has completed
     void                        startCapture();
     void                        pauseCapture();
-    void                        stopCapture();
+    bool                        stopCapture(bool force=false);
     
     // IDeckLinkDeckControlStatusCallback
     virtual HRESULT             TimecodeUpdate (BMDTimecodeBCD currentTimecode);

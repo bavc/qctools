@@ -54,8 +54,8 @@ void FileInformation::run()
                 
             if (WantToStop)
             {
-                blackmagicDeckLink_Glue->Stop();
-                break;
+                if (blackmagicDeckLink_Glue->Stop())
+                    break;
             }
             sleep(1);
             yieldCurrentThread();

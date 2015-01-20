@@ -18,7 +18,7 @@ public:
 
     void                        Start();
     void                        Pause();
-    void                        Stop();
+    bool                        Stop();
     
     int                         Width_Get();
     int                         Height_Get();
@@ -31,6 +31,7 @@ public:
         capturing,
         captured,
         aborting,
+        aborted,
     };
     status                      Status;
 

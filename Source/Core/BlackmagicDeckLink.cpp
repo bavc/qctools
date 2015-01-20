@@ -168,7 +168,7 @@ CaptureHelper::CaptureHelper(bool dropframe)
 //---------------------------------------------------------------------------
 CaptureHelper::~CaptureHelper()
 {
-    stopCapture();
+    stopCapture(true);
 }
 
 //---------------------------------------------------------------------------
@@ -290,10 +290,10 @@ bool CaptureHelper::setupDeckControl()
 }
 
 //---------------------------------------------------------------------------
-void CaptureHelper::cleanupDeckControl()
+bool CaptureHelper::cleanupDeckControl()
 {
     if (!m_deckControl)
-        return;
+        return true;
 
     cout << "*** Cleanup of DeckControl ***" << endl;
 
@@ -308,11 +308,7 @@ void CaptureHelper::cleanupDeckControl()
                                                     cout << "Could not abort capture" << endl;
                                                 else
                                                     cout << "Aborting capture" << endl;
-                                                sleep(3); // TODO: must wait or Abort event then stop
-                                                if (m_deckControl->Stop(&bmdDeckControlError) != S_OK)
-                                                    cout << "Could not stop (" << BMDDeckControlError2String(bmdDeckControlError) << ")" << endl;
-                                                else
-                                                    cout << "Playback stopped" << endl;
+                                                return false;
     }
 
     // Close
@@ -323,13 +319,15 @@ void CaptureHelper::cleanupDeckControl()
     m_deckControl = NULL;
 
     cout << "OK" << endl;
+
+    return true;
 }
 
 //---------------------------------------------------------------------------
-void CaptureHelper::cleanupDeckLinkInput()
+bool CaptureHelper::cleanupDeckLinkInput()
 {
     if (!m_deckLinkInput)
-        return;
+        return true;
 
     cout << "*** Cleanup of DeckLinkInput ***" << endl;
 
@@ -340,20 +338,25 @@ void CaptureHelper::cleanupDeckLinkInput()
     m_deckLinkInput = NULL;
 
     cout << "OK" << endl;
+
+    return true;
 }
 
 //---------------------------------------------------------------------------
-void CaptureHelper::cleanupDeck()
+bool CaptureHelper::cleanupDeck()
 {
     if (!m_deckLink)
-        return;
+        return true;
 
     cout << "*** Cleanup of Deck ***" << endl;
     
     // Decrement reference count of the object
     m_deckLink->Release();
+    m_deckLink=NULL;
 
     cout << "OK" << endl;
+
+    return true;
 }
 
 //---------------------------------------------------------------------------
@@ -392,13 +395,17 @@ void CaptureHelper::pauseCapture()
 }
 
 //---------------------------------------------------------------------------
-void CaptureHelper::stopCapture()
+bool CaptureHelper::stopCapture(bool force)
 {
-    cleanupDeckControl();
-    cleanupDeckLinkInput();
-    cleanupDeck();
+    if (!cleanupDeckControl() && !force)
+        return false;
+    if (!cleanupDeckLinkInput() && !force)
+        return false;
+    if (!cleanupDeck() && !force)
+        return false;
 
     Glue->CloseOutput();
+    return true;
 }
 
 //---------------------------------------------------------------------------
@@ -422,8 +429,10 @@ HRESULT CaptureHelper::DeckControlEventReceived (BMDDeckControlEvent bmdDeckCont
                                                     cout << "OK" << endl;
                                                     break;
         case bmdDeckControlCaptureCompleteEvent:
-        case bmdDeckControlAbortedEvent:
                                                     *Status=BlackmagicDeckLink_Glue::captured;
+                                                    break;
+        case bmdDeckControlAbortedEvent:
+                                                    *Status=BlackmagicDeckLink_Glue::aborted;
                                                     break;
     }
     
