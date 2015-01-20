@@ -55,6 +55,7 @@ public:
     void                        Ui_Init                     ();
     void                        configureZoom               ();
     void                        openFile                    ();
+    void                        openCapture                 ();
     void                        closeFile                   ();
     void                        closeAllFiles               ();
     void                        Zoom_Move                   (size_t Begin);
@@ -82,6 +83,7 @@ public:
     void                        clearGraphsLayout           ();
     void                        createGraphsLayout          ();
     void                        addFile                     (const QString &FileName);
+    void                        addFile                     (int TC_in, int TC_out, const string &Encoding_FileName=string());
     void                        addFile_finish              ();
     void                        selectFile                  (int newFilePos);
     void                        selectDisplayFile           (int newFilePos);
@@ -111,6 +113,8 @@ private Q_SLOTS:
     void on_actionQuit_triggered();
 
     void on_actionOpen_triggered();
+
+    void on_actionBlackmagicDeckLinkCapture_triggered();
 
     void on_actionClose_triggered();
 

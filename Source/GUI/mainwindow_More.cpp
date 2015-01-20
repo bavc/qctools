@@ -18,6 +18,7 @@
 
 #include "Core/Core.h"
 #include "GUI/Plots.h"
+#include "GUI/blackmagicdecklink_userinput.h"
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -32,6 +33,11 @@
 //---------------------------------------------------------------------------
 void MainWindow::openFile()
 {
+    clearFiles();
+    addFile("");
+    addFile_finish();
+    return;
+    
     QStringList List=QFileDialog::getOpenFileNames(this, "Open file", "", "Video files (*.avi *.mkv *.mov *.mxf *.mp4);;Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
     if (List.empty())
         return;
@@ -43,6 +49,20 @@ void MainWindow::openFile()
     }
 
     addFile_finish();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::openCapture()
+{
+    BlackmagicDeckLink_UserInput* blackmagicDeckLink_UserInput=new BlackmagicDeckLink_UserInput();
+    if (!blackmagicDeckLink_UserInput->exec())
+        return;
+    
+    clearFiles();
+    addFile(blackmagicDeckLink_UserInput->TC_in, blackmagicDeckLink_UserInput->TC_out, blackmagicDeckLink_UserInput->Encoding_FileName.toUtf8().data());
+    addFile_finish();
+
+    delete blackmagicDeckLink_UserInput;
 }
 
 //---------------------------------------------------------------------------
@@ -312,6 +332,16 @@ void MainWindow::addFile(const QString &FileName)
 
     // Launch analysis
     FileInformation* Temp=new FileInformation(this, FileName);
+
+    Files.push_back(Temp);
+    ui->fileNamesBox->addItem(Temp->FileName);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::addFile(int TC_in, int TC_out, const string &Encoding_FileName)
+{
+    // Launch analysis
+    FileInformation* Temp=new FileInformation(this, QString(), TC_in, TC_out, Encoding_FileName);
 
     Files.push_back(Temp);
     ui->fileNamesBox->addItem(Temp->FileName);

@@ -120,7 +120,14 @@
     </property>
     <addaction name="actionPreferences"/>
    </widget>
+   <widget class="QMenu" name="menuBlackmagicDeckLink">
+    <property name="title">
+     <string>Blackmagic DeckLink</string>
+    </property>
+    <addaction name="actionBlackmagicDeckLinkCapture"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuBlackmagicDeckLink"/>
    <addaction name="menuView"/>
    <addaction name="menuImport"/>
    <addaction name="menuExport"/>
@@ -365,6 +372,11 @@
   <action name="actionExport_XmlGz_SidecarAll">
    <property name="text">
     <string>To sidecar .qctools.xml.gz (All files)</string>
+   </property>
+  </action>
+  <action name="actionBlackmagicDeckLinkCapture">
+   <property name="text">
+    <string>Capture from deck</string>
    </property>
   </action>
  </widget>

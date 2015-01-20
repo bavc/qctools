@@ -28,7 +28,7 @@ class FileInformation : public QThread
 
 public:
     // Constructor/Destructor
-                                FileInformation             (MainWindow* Main, const QString &FileName);
+                                FileInformation             (MainWindow* Main, const QString &FileName, int TC_in=(int)-1, int TC_out=(int)-1, const string &Encoding_FileName=string());
                                 ~FileInformation            ();
 
     // Parsing
@@ -48,6 +48,10 @@ public:
     void                        Frames_Pos_Minus            ();
     void                        Frames_Pos_Plus             ();
     bool                        PlayBackFilters_Available   ();
+
+    // Deck control information
+    int                         TC_in;
+    int                         TC_out;
 
     // FFmpeg glue
     FFmpeg_Glue*                Glue;

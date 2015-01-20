@@ -50,7 +50,7 @@ void MainWindow::TimeOut ()
     // Simultaneous parsing
     for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
     {
-        if (Files[Files_Pos]->ReferenceStat()->State_Get()<1)
+        if (Files[Files_Pos]->ReferenceStat()->State_Get()==0)
             Files[Files_Pos]->Parse();
     }
 

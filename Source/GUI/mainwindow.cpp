@@ -102,6 +102,12 @@ void MainWindow::on_actionOpen_triggered()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_actionBlackmagicDeckLinkCapture_triggered()
+{
+    openCapture();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::on_actionClose_triggered()
 {
     closeFile();

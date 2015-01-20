@@ -1514,6 +1514,8 @@ void BigDisplay::ShowPicture ()
         if (height%2)
             height--; //odd number is wanted for filters
         Picture=new FFmpeg_Glue(FileName_string.c_str(), &FileInfoData->Stats);
+        if (FileName_string.empty())
+            Picture->InputData_Set(FileInfoData->Glue->InputData_Get()); // Using data from the analyzed file
         Picture->AddOutput(0, width, height, FFmpeg_Glue::Output_QImage);
         Picture->AddOutput(1, width, height, FFmpeg_Glue::Output_QImage);
         FiltersList1_currentIndexChanged(Picture_Current1);

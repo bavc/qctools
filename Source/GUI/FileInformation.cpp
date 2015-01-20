@@ -11,6 +11,7 @@
 //---------------------------------------------------------------------------
 #include "GUI/mainwindow.h"
 #include "Core/FFmpeg_Glue.h"
+#include "Core/BlackmagicDeckLink_Glue.h"
 #include "Core/VideoStats.h"
 #include "Core/AudioStats.h"
 
@@ -26,7 +27,6 @@
 #ifdef _WIN32
     #include <algorithm>
 #endif
-//---------------------------------------------------------------------------
 
 //***************************************************************************
 // Simultaneous parsing
@@ -35,16 +35,47 @@ static int ActiveParsing_Count=0;
 
 void FileInformation::run()
 {
-    for (;;)
+    if (FileName.isEmpty())
     {
-        if (Glue)
+        BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue=new BlackmagicDeckLink_Glue(Glue, TC_in, TC_out);
+
+        for (;;)
         {
-            if (!Glue->NextFrame())
+            switch (blackmagicDeckLink_Glue->Status)
+            {
+                case BlackmagicDeckLink_Glue::connected:
+                                                        blackmagicDeckLink_Glue->Start();
+                                                        break;
+                case BlackmagicDeckLink_Glue::captured: 
+                                                        WantToStop=true;
+                                                        break;
+                default : ;
+            }
+                
+            if (WantToStop)
+            {
+                blackmagicDeckLink_Glue->Stop();
                 break;
+            }
+            sleep(1);
+            yieldCurrentThread();
         }
-        if (WantToStop)
-            break;
-        yieldCurrentThread();
+
+        delete blackmagicDeckLink_Glue;
+    }
+    else
+    {
+        for (;;)
+        {
+            if (Glue)
+            {
+                if (!Glue->NextFrame())
+                    break;
+            }
+            if (WantToStop)
+                break;
+            yieldCurrentThread();
+        }
     }
 
     ActiveParsing_Count--;
@@ -57,9 +88,11 @@ void FileInformation::run()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_) :
+FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, int TC_in_, int TC_out_, const string &Encoding_FileName) :
     FileName(FileName_),
-    Main(Main_)
+    Main(Main_),
+    TC_in(TC_in_),
+    TC_out(TC_out_)
 {
     QString StatsFromExternalData_FileName;
     bool StatsFromExternalData_FileName_IsCompressed=false;
@@ -178,15 +211,29 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_) :
         Audio->StatsFromExternalData(StatsFromExternalData);
     }
     Glue=new FFmpeg_Glue(FileName_string.c_str(), &Stats, true);
-    Glue->AddOutput(0, 72, 72, FFmpeg_Glue::Output_Jpeg);
-    Glue->AddOutput(1, 0, 0, FFmpeg_Glue::Output_Stats, 0, Filters[0]);
-    Glue->AddOutput(0, 0, 0, FFmpeg_Glue::Output_Stats, 1, Filters[1]);
-    if (Glue->ContainerFormat_Get().empty())
+    if (FileName_string.empty())
+    {
+        int FrameCount_In, FrameCount_Out;
+        GET_FRAME_COUNT(FrameCount_In, TC_in, 30, 1);
+        GET_FRAME_COUNT(FrameCount_Out, TC_out, 30, 1);
+        int FrameCount=FrameCount_Out-FrameCount_In;
+        Glue->AddInput(0, FrameCount, FrameCount/30, 720, 486);
+    }
+    else if (Glue->ContainerFormat_Get().empty())
     {
         delete Glue;
         Glue=NULL;
         for (size_t Pos=0; Pos<Stats.size(); Pos++)
             Stats[Pos]->StatsFinish();
+    }
+
+    if (Glue)
+    {
+        Glue->AddOutput(0, 72, 72, FFmpeg_Glue::Output_Jpeg);
+        if (!Encoding_FileName.empty())
+            Glue->AddOutput(Encoding_FileName);
+        Glue->AddOutput(1, 0, 0, FFmpeg_Glue::Output_Stats, 0, Filters[0]);
+        Glue->AddOutput(0, 0, 0, FFmpeg_Glue::Output_Stats, 1, Filters[1]);
     }
 
     // Looking for the first video stream
