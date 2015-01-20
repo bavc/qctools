@@ -98,29 +98,69 @@ const char* BMDDeckControlVTRControlState2String(BMDDeckControlVTRControlState b
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-IDeckLink *getFirstDeckLinkCard()
+IDeckLinkIterator* getDeckLinkIterator()
 {
-    IDeckLink *deckLink = NULL;
-
     #if defined(_WIN32) || defined(_WIN64)
         IDeckLinkIterator* deckLinkIter = NULL;
         CoCreateInstance(CLSID_CDeckLinkIterator, NULL, CLSCTX_ALL, IID_IDeckLinkIterator, (void**)&deckLinkIter);
+        return deckLinkIter;
     #else
-        IDeckLinkIterator* deckLinkIter = CreateDeckLinkIteratorInstance();
+        return CreateDeckLinkIteratorInstance();
     #endif
-    
-    if (deckLinkIter)
+}
+
+//---------------------------------------------------------------------------
+IDeckLink *getDeckLinkCard(size_t Pos=0)
+{
+    IDeckLinkIterator* deckLinkIter = getDeckLinkIterator();
+    if (!deckLinkIter)
     {
-        // get the first decklink card
-        if (deckLinkIter->Next(&deckLink) != S_OK)
-            cout << "Could not detect a DeckLink card" << endl;
-        
-        deckLinkIter->Release();
-    }
-    else
         cout << "Could not enumerate DeckLink cards" << endl;
+        return NULL;
+    }
     
+    // get the first decklink card
+    IDeckLink* deckLink=NULL;
+    for (; Pos--; Pos)
+    {
+        if (deckLinkIter->Next(&deckLink) != S_OK)
+        {
+            cout << "Could not detect a DeckLink card" << endl;
+            break;
+        }
+    }
+        
+    deckLinkIter->Release();
     return deckLink;
+}
+
+//---------------------------------------------------------------------------
+std::vector<std::string> DeckLinkCardsList()
+{
+    std::vector<std::string> List;
+
+    IDeckLinkIterator* deckLinkIter = getDeckLinkIterator();
+    if (!deckLinkIter)
+        return List; // No card
+    
+    // get the first decklink card
+    IDeckLink* deckLink=NULL;
+    for (;;)
+    {
+        HRESULT Result=deckLinkIter->Next(&deckLink);
+        if (Result == E_FAIL)
+        {
+            cout << "Could not detect a DeckLink card" << endl;
+            break;
+        }
+        if (Result == S_FALSE)
+            break; // Finished
+
+        List.push_back("Card");
+    }
+        
+    deckLinkIter->Release();
+    return List;
 }
 
 //***************************************************************************
@@ -128,7 +168,7 @@ IDeckLink *getFirstDeckLinkCard()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-CaptureHelper::CaptureHelper(bool dropframe)
+CaptureHelper::CaptureHelper(size_t CardPos, bool dropframe)
     : m_deckLink(NULL)
     , m_deckLinkInput(NULL)
     , m_deckControl(NULL)
@@ -147,7 +187,7 @@ CaptureHelper::CaptureHelper(bool dropframe)
     cout << endl;
 
     // Setup DeckLink Input interface
-    if (!setupDeck())
+    if (!setupDeck(CardPos))
         return;
 
     // Setup DeckLink Input interface
@@ -173,12 +213,12 @@ CaptureHelper::~CaptureHelper()
 }
 
 //---------------------------------------------------------------------------
-bool CaptureHelper::setupDeck()
+bool CaptureHelper::setupDeck(size_t CardPos)
 {
     cout << "*** Setup of Deck ***" << endl;
 
     // Find the card
-    m_deckLink = getFirstDeckLinkCard();
+    m_deckLink = getDeckLinkCard(CardPos);
     if (!m_deckLink)
         return false;
 

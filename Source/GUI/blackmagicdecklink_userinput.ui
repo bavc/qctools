@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>518</width>
-    <height>342</height>
+    <width>639</width>
+    <height>594</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>300</y>
+     <x>290</x>
+     <y>550</y>
      <width>341</width>
      <height>32</height>
     </rect>
@@ -33,8 +33,8 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>110</y>
-     <width>481</width>
+     <y>240</y>
+     <width>611</width>
      <height>161</height>
     </rect>
    </property>
@@ -52,7 +52,7 @@
      <rect>
       <x>110</x>
       <y>20</y>
-      <width>361</width>
+      <width>491</width>
       <height>20</height>
      </rect>
     </property>
@@ -159,29 +159,19 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>10</y>
+     <y>50</y>
      <width>481</width>
      <height>91</height>
     </rect>
    </property>
    <property name="title">
-    <string>Time codes</string>
+    <string>In</string>
    </property>
-   <widget class="QSpinBox" name="Out_1">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>50</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QSpinBox" name="In_3">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>20</y>
+      <x>220</x>
+      <y>60</y>
       <width>42</width>
       <height>22</height>
      </rect>
@@ -190,28 +180,8 @@
    <widget class="QSpinBox" name="In_4">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>20</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="Out_3">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>50</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="Out_4">
-    <property name="geometry">
-     <rect>
-      <x>230</x>
-      <y>50</y>
+      <x>270</x>
+      <y>60</y>
       <width>42</width>
       <height>22</height>
      </rect>
@@ -221,30 +191,20 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>20</y>
-      <width>46</width>
-      <height>13</height>
+      <y>60</y>
+      <width>91</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>In:</string>
+     <string>Timecode:</string>
     </property>
    </widget>
    <widget class="QSpinBox" name="In_1">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>20</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="Out_2">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>50</y>
+      <x>120</x>
+      <y>60</y>
       <width>42</width>
       <height>22</height>
      </rect>
@@ -253,8 +213,74 @@
    <widget class="QSpinBox" name="In_2">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>20</y>
+      <x>170</x>
+      <y>60</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <zorder>In_3</zorder>
+   <zorder>In_4</zorder>
+   <zorder>InLabel</zorder>
+   <zorder>In_1</zorder>
+   <zorder>In_2</zorder>
+   <zorder>Out_2</zorder>
+   <zorder>Out_1</zorder>
+   <zorder>Out_4</zorder>
+   <zorder>Out_3</zorder>
+   <zorder>Out_2</zorder>
+   <zorder>Out_1</zorder>
+   <zorder>Out_4</zorder>
+   <zorder>Out_3</zorder>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>140</y>
+     <width>481</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Out</string>
+   </property>
+   <widget class="QSpinBox" name="Out_2">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>50</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="Out_3">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>50</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="Out_4">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>50</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="Out_1">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>50</y>
       <width>42</width>
       <height>22</height>
      </rect>
@@ -265,14 +291,24 @@
      <rect>
       <x>10</x>
       <y>50</y>
-      <width>46</width>
-      <height>13</height>
+      <width>91</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>Out:</string>
+     <string>Timecode:</string>
     </property>
    </widget>
+  </widget>
+  <widget class="QComboBox" name="CardsList">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>621</width>
+     <height>22</height>
+    </rect>
+   </property>
   </widget>
  </widget>
  <resources/>

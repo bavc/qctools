@@ -37,7 +37,7 @@ void FileInformation::run()
 {
     if (FileName.isEmpty())
     {
-        BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue=new BlackmagicDeckLink_Glue(Glue, TC_in, TC_out);
+        BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue=new BlackmagicDeckLink_Glue(Glue, CardPos, TC_in, TC_out);
 
         for (;;)
         {
@@ -87,9 +87,10 @@ void FileInformation::run()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, int TC_in_, int TC_out_, const string &Encoding_FileName) :
+FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, size_t CardPos_, int TC_in_, int TC_out_, const string &Encoding_FileName) :
     FileName(FileName_),
     Main(Main_),
+    CardPos(CardPos_),
     TC_in(TC_in_),
     TC_out(TC_out_)
 {

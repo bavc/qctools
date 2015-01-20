@@ -10,10 +10,7 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-//
-#if !defined(BLACKMAGICDECKLINK_YES) && !defined(BLACKMAGICDECKLINK_NO)
-    #define BLACKMAGICDECKLINK_YES //Default compilation is YES
-#endif
+#include "Core/BlackmagicDeckLink_Glue.h"
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -21,7 +18,6 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "Core/BlackmagicDeckLink_Glue.h"
 #include "Core/FFmpeg_Glue.h"
 #if defined(_WIN32) || defined(_WIN64)
     #include "DeckLinkAPI_h.h"
@@ -33,6 +29,8 @@
     #include "Linux/include/DeckLinkAPI.h"
     typedef uint32_t bmdl_uint32_t;
 #endif
+#include <string>
+#include <vector>
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -51,7 +49,7 @@ private:
     BMDTimeValue                m_frameDuration;
     bool                        m_dropframe;
     
-    bool                        setupDeck();
+    bool                        setupDeck(size_t CardPos);
     bool                        setupDeckLinkInput();
     bool                        setupDeckControl();
     
@@ -60,7 +58,7 @@ private:
     bool                        cleanupDeck();
     
 public:
-                                CaptureHelper(bool dropframe);
+                                CaptureHelper(size_t CardPos, bool dropframe);
     virtual                    ~CaptureHelper();
     
     // start the capture operation. returns when the operation has completed
@@ -90,6 +88,13 @@ public:
     int                         TC_current;
     int                         TC_out;
 };
+
+//***************************************************************************
+// Helpers
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+std::vector<std::string> DeckLinkCardsList();
 
 #endif // BLACKMAGICDECKLINK_YES
 

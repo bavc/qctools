@@ -13,6 +13,7 @@
 #include "GUI/Plots.h"
 #include "Core/Core.h"
 #include "Core/VideoCore.h"
+#include "Core/BlackmagicDeckLink_Glue.h"
 
 #include <QFileDialog>
 #include <QScrollBar>
@@ -146,6 +147,15 @@ void MainWindow::Ui_Init()
     // Not implemented action
     if (ui->actionExport_XmlGz_Custom)
         ui->actionExport_XmlGz_Custom->setVisible(false);
+
+    #if defined(BLACKMAGICDECKLINK_YES)
+        // Deck menu
+        if (BlackmagicDeckLink_Glue::CardsList().empty())
+        {
+            ui->actionBlackmagicDeckLinkCapture->setVisible(false);
+            ui->menuBlackmagicDeckLink->menuAction()->setVisible(false);
+        }
+    #endif
 }
 
 //---------------------------------------------------------------------------

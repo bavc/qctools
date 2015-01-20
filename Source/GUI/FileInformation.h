@@ -28,7 +28,7 @@ class FileInformation : public QThread
 
 public:
     // Constructor/Destructor
-                                FileInformation             (MainWindow* Main, const QString &FileName, int TC_in=(int)-1, int TC_out=(int)-1, const string &Encoding_FileName=string());
+                                FileInformation             (MainWindow* Main, const QString &FileName, size_t CardPos=(size_t)-1, int TC_in=(int)-1, int TC_out=(int)-1, const string &Encoding_FileName=string());
                                 ~FileInformation            ();
 
     // Parsing
@@ -50,6 +50,7 @@ public:
     bool                        PlayBackFilters_Available   ();
 
     // Deck control information
+    size_t                      CardPos;
     int                         TC_in;
     int                         TC_out;
 

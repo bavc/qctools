@@ -17,6 +17,7 @@ public:
 
     int                         TC_in;
     int                         TC_out;
+    size_t                      CardPos;
     QString                     Encoding_FileName;
 
 private:
@@ -26,6 +27,7 @@ private Q_SLOTS:
 
     void on_accepted();
     void on_Record_GroupBox_toggled(bool on);
+    void on_CardsList_currentIndexChanged(int Pos);
 };
 
 #endif // BLACKMAGIC_DECKLINK_USERINPUT_H

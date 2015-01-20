@@ -26,12 +26,12 @@ struct Debug_Simulation
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-BlackmagicDeckLink_Glue::BlackmagicDeckLink_Glue(FFmpeg_Glue* Glue, int TC_in, int TC_out)
+BlackmagicDeckLink_Glue::BlackmagicDeckLink_Glue(FFmpeg_Glue* Glue, size_t CardPos, int TC_in, int TC_out)
     : Handle(NULL)
     , Status(connecting)
 {
     #if defined(BLACKMAGICDECKLINK_YES)
-        CaptureHelper* helper=new CaptureHelper(true);
+        CaptureHelper* helper=new CaptureHelper(CardPos, true);
         helper->Status=&Status;
         helper->Glue=Glue;
         helper->TC_in=TC_in;
@@ -119,3 +119,10 @@ bool BlackmagicDeckLink_Glue::Stop()
 
     return false;
 }
+
+//---------------------------------------------------------------------------
+std::vector<std::string> BlackmagicDeckLink_Glue::CardsList()
+{
+    return DeckLinkCardsList();
+}
+

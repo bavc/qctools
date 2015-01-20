@@ -1,11 +1,13 @@
 #include "blackmagicdecklink_userinput.h"
 #include "ui_blackmagicdecklink_userinput.h"
+#include "Core/BlackmagicDeckLink_Glue.h"
 
 #include <QStandardPaths>
 
 BlackmagicDeckLink_UserInput::BlackmagicDeckLink_UserInput(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::BlackmagicDeckLink_UserInput)
+    ui(new Ui::BlackmagicDeckLink_UserInput),
+    CardPos(0)
 {
     ui->setupUi(this);
 
@@ -17,6 +19,12 @@ BlackmagicDeckLink_UserInput::BlackmagicDeckLink_UserInput(QWidget *parent) :
 
     connect( this, SIGNAL( accepted() ), this, SLOT( on_accepted() ) );
     connect( ui->Record_GroupBox, SIGNAL( toggled(bool) ), this, SLOT( on_Record_GroupBox_toggled(bool) ) );
+    connect( ui->CardsList, SIGNAL(currentIndexChanged(int)), this, SLOT(on_CardsList_currentIndexChanged(int)));
+
+    // Deck menu
+    std::vector<std::string> List=BlackmagicDeckLink_Glue::CardsList();
+    for (size_t Pos = 0; Pos<List.size(); Pos++)
+        ui->CardsList->addItem(List[Pos].c_str());
 }
 
 BlackmagicDeckLink_UserInput::~BlackmagicDeckLink_UserInput()
@@ -53,4 +61,10 @@ void BlackmagicDeckLink_UserInput::on_Record_GroupBox_toggled(bool on)
 {
     if (on && ui->Encoding_FileName_Line->text().isEmpty())
         ui->Encoding_FileName_Line->setText(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation)+"/QCTools_Capture.mov");
+}
+
+//---------------------------------------------------------------------------
+void BlackmagicDeckLink_UserInput::on_CardsList_currentIndexChanged(int Pos)
+{
+    CardPos=Pos;
 }

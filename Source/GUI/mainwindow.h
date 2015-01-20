@@ -83,7 +83,7 @@ public:
     void                        clearGraphsLayout           ();
     void                        createGraphsLayout          ();
     void                        addFile                     (const QString &FileName);
-    void                        addFile                     (int TC_in, int TC_out, const string &Encoding_FileName=string());
+    void                        addFile                     (size_t CardPos, int TC_in, int TC_out, const string &Encoding_FileName=string());
     void                        addFile_finish              ();
     void                        selectFile                  (int newFilePos);
     void                        selectDisplayFile           (int newFilePos);

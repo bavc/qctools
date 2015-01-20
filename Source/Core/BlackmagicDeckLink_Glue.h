@@ -8,12 +8,21 @@
 #ifndef BlackmagicDeckLink_Glue_H
 #define BlackmagicDeckLink_Glue_H
 
+//---------------------------------------------------------------------------
+#if !defined(BLACKMAGICDECKLINK_YES) && !defined(BLACKMAGICDECKLINK_NO)
+    #define BLACKMAGICDECKLINK_YES //Default compilation is YES
+#endif
+//---------------------------------------------------------------------------
+
+#include <string>
+#include <vector>
+
 class FFmpeg_Glue;
 
 class BlackmagicDeckLink_Glue
 {
 public:
-    BlackmagicDeckLink_Glue(FFmpeg_Glue* Glue, int TC_in, int TC_out);
+    BlackmagicDeckLink_Glue(FFmpeg_Glue* Glue, size_t CardPos, int TC_in, int TC_out);
     ~BlackmagicDeckLink_Glue();
 
     void                        Start();
@@ -34,6 +43,8 @@ public:
         aborted,
     };
     status                      Status;
+
+    static std::vector<std::string> CardsList();
 
 private:
     void*                       Handle;
