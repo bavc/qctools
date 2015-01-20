@@ -57,7 +57,6 @@ void FileInformation::run()
                 if (blackmagicDeckLink_Glue->Stop())
                     break;
             }
-            sleep(1);
             yieldCurrentThread();
         }
 
