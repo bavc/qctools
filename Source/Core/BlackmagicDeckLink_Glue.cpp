@@ -7,13 +7,13 @@
 //---------------------------------------------------------------------------
 #include "Core/BlackmagicDeckLink_Glue.h"
 #include "Core/BlackmagicDeckLink.h"
-#if !defined (BLACKMAGICDECKLINK_GLUE_MAC) && defined(_DEBUG)
+#if !defined (BLACKMAGICDECKLINK) && defined(_DEBUG)
     #include "Core/FFmpeg_Glue.h"
 #endif
 //---------------------------------------------------------------------------
 
 
-#if !defined (BLACKMAGICDECKLINK_GLUE_MAC) && defined(_DEBUG) // Simulation
+#if !defined (BLACKMAGICDECKLINK) && defined(_DEBUG) // Simulation
 struct Debug_Simulation
 {
     FFmpeg_Glue* Glue;
@@ -30,7 +30,7 @@ BlackmagicDeckLink_Glue::BlackmagicDeckLink_Glue(FFmpeg_Glue* Glue, int TC_in, i
     : Handle(NULL)
     , Status(connecting)
 {
-    #if defined(BLACKMAGICDECKLINK_GLUE_MAC)
+    #if defined(BLACKMAGICDECKLINK_YES)
         CaptureHelper* helper=new CaptureHelper(true);
         helper->Status=&Status;
         helper->Glue=Glue;
@@ -58,7 +58,7 @@ BlackmagicDeckLink_Glue::~BlackmagicDeckLink_Glue()
 {
     if (Handle)
     {
-        #if defined(BLACKMAGICDECKLINK_GLUE_MAC)
+        #if defined(BLACKMAGICDECKLINK_YES)
             delete (CaptureHelper*)Handle;
         #elif defined(_DEBUG) // Simulation
             delete (Debug_Simulation*)Handle;
@@ -75,7 +75,7 @@ void BlackmagicDeckLink_Glue::Start()
 {
     if (Handle)
     {
-        #if defined(BLACKMAGICDECKLINK_GLUE_MAC)
+        #if defined(BLACKMAGICDECKLINK_YES)
             ((CaptureHelper*)Handle)->startCapture();
         #elif defined(_DEBUG) // Simulation
             unsigned char FillingValue=0;
@@ -101,7 +101,7 @@ void BlackmagicDeckLink_Glue::Pause()
 {
     if (Handle)
     {
-        #if defined(BLACKMAGICDECKLINK_GLUE_MAC)
+        #if defined(BLACKMAGICDECKLINK_YES)
             ((CaptureHelper*)Handle)->pauseCapture();
         #endif
     }
@@ -112,8 +112,10 @@ bool BlackmagicDeckLink_Glue::Stop()
 {
     if (Handle)
     {
-        #if defined(BLACKMAGICDECKLINK_GLUE_MAC)
+        #if defined(BLACKMAGICDECKLINK_YES)
             return ((CaptureHelper*)Handle)->stopCapture();
         #endif
     }
+
+    return false;
 }

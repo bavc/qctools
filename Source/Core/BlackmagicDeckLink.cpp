@@ -14,7 +14,7 @@
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-#if defined(BLACKMAGICDECKLINK_GLUE_MAC)
+#if defined(BLACKMAGICDECKLINK_YES)
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -101,7 +101,13 @@ const char* BMDDeckControlVTRControlState2String(BMDDeckControlVTRControlState b
 IDeckLink *getFirstDeckLinkCard()
 {
     IDeckLink *deckLink = NULL;
-    IDeckLinkIterator *deckLinkIter = CreateDeckLinkIteratorInstance();
+
+    #if defined(_WIN32) || defined(_WIN64)
+        IDeckLinkIterator* deckLinkIter = NULL;
+        CoCreateInstance(CLSID_CDeckLinkIterator, NULL, CLSCTX_ALL, IID_IDeckLinkIterator, (void**)&deckLinkIter);
+    #else
+        IDeckLinkIterator* deckLinkIter = CreateDeckLinkIteratorInstance();
+    #endif
     
     if (deckLinkIter)
     {
@@ -177,19 +183,9 @@ bool CaptureHelper::setupDeck()
     cout << "*** Setup of Deck ***" << endl;
 
     // Find the card
-    IDeckLinkIterator *deckLinkIter = CreateDeckLinkIteratorInstance();
-    if (!deckLinkIter)
-    {
-        printf("Could not enumerate DeckLink cards\n");
+    m_deckLink = getFirstDeckLinkCard();
+    if (!m_deckLink)
         return false;
-    }
-    if (deckLinkIter->Next(&m_deckLink) != S_OK)
-    {
-        printf("Could not detect a DeckLink card\n");
-        deckLinkIter->Release();
-        return false;
-    }
-    deckLinkIter->Release();
 
     // Increment reference count of the object
     m_deckLink->AddRef();
@@ -446,7 +442,7 @@ HRESULT CaptureHelper::VTRControlStateChanged (BMDDeckControlVTRControlState new
 }
 
 //---------------------------------------------------------------------------
-HRESULT CaptureHelper::DeckControlStatusChanged (BMDDeckControlStatusFlags bmdDeckControlStatusFlags, uint32_t mask)
+HRESULT CaptureHelper::DeckControlStatusChanged (BMDDeckControlStatusFlags bmdDeckControlStatusFlags, bmdl_uint32_t mask)
 {
     cout <<"Deck control status change: " << BMDDeckControlStatusFlags2String(bmdDeckControlStatusFlags) << endl;
     
@@ -497,5 +493,5 @@ HRESULT CaptureHelper::VideoInputFrameArrived (IDeckLinkVideoInputFrame* arrived
     return S_OK;
 }
 
-#endif // defined(BLACKMAGICDECKLINK_GLUE_MAC)
+#endif // defined(BLACKMAGICDECKLINK_YES)
 

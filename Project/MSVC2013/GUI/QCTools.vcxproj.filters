@@ -43,6 +43,12 @@
     <Filter Include="Source Files\ThirdParty\tinyxml2">
       <UniqueIdentifier>{128f4702-bb86-46b3-a112-735dbaee62a1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Blackmagic DeckLink">
+      <UniqueIdentifier>{b2cb54be-a745-4318-979f-502f9197d241}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Blackmagic DeckLink">
+      <UniqueIdentifier>{ff91d0b0-aa2a-4854-b369-46ad3a34ec48}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\GUI\main.cpp">
@@ -171,6 +177,12 @@
     <ClCompile Include="..\..\..\Source\Core\BlackmagicDeckLink_Glue.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="DeckLinkAPI_i.c">
+      <Filter>Source Files\Blackmagic DeckLink</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Core\BlackmagicDeckLink.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="_Automated\ui_mainwindow.h">
@@ -251,10 +263,21 @@
     <ClInclude Include="..\..\..\Source\GUI\blackmagicdecklink_userinput.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Core\BlackmagicDeckLink.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DeckLinkAPI_h.h">
+      <Filter>Header Files\Blackmagic DeckLink</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="QCTools.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="..\..\..\..\Blackmagic DeckLink SDK\Win\include\DeckLinkAPI.idl">
+      <Filter>Source Files\Blackmagic DeckLink</Filter>
+    </Midl>
   </ItemGroup>
 </Project>

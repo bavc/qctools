@@ -78,6 +78,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Core\AudioCore.cpp" />
     <ClCompile Include="..\..\..\Source\Core\AudioStats.cpp" />
+    <ClCompile Include="..\..\..\Source\Core\BlackmagicDeckLink.cpp" />
     <ClCompile Include="..\..\..\Source\Core\BlackmagicDeckLink_Glue.cpp" />
     <ClCompile Include="..\..\..\Source\Core\CommonStats.cpp" />
     <ClCompile Include="..\..\..\Source\Core\Core.cpp" />
@@ -103,6 +104,7 @@
     <ClCompile Include="..\..\..\Source\GUI\TinyDisplay.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Plots.cpp" />
     <ClCompile Include="..\..\..\Source\ThirdParty\tinyxml2\tinyxml2.cpp" />
+    <ClCompile Include="DeckLinkAPI_i.c" />
     <ClCompile Include="_Automated\moc_Control.cpp" />
     <ClCompile Include="_Automated\moc_blackmagicdecklink_userinput.cpp" />
     <ClCompile Include="_Automated\moc_FileInformation.cpp" />
@@ -122,6 +124,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Core\AudioCore.h" />
     <ClInclude Include="..\..\..\Source\Core\AudioStats.h" />
+    <ClInclude Include="..\..\..\Source\Core\BlackmagicDeckLink.h" />
     <ClInclude Include="..\..\..\Source\Core\BlackmagicDeckLink_Glue.h" />
     <ClInclude Include="..\..\..\Source\Core\CommonStats.h" />
     <ClInclude Include="..\..\..\Source\Core\Core.h" />
@@ -143,12 +146,16 @@
     <ClInclude Include="..\..\..\Source\GUI\preferences.h" />
     <ClInclude Include="..\..\..\Source\GUI\TinyDisplay.h" />
     <ClInclude Include="..\..\..\Source\ThirdParty\tinyxml2\tinyxml2.h" />
+    <ClInclude Include="DeckLinkAPI_h.h" />
     <ClInclude Include="_Automated\ui_blackmagicdecklink_userinput.h" />
     <ClInclude Include="_Automated\ui_mainwindow.h" />
     <ClInclude Include="_Automated\ui_preferences.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="QCTools.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="..\..\..\..\Blackmagic DeckLink SDK\Win\include\DeckLinkAPI.idl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -11,19 +11,28 @@
 
 //---------------------------------------------------------------------------
 //
-#if defined(__APPLE__) && defined(__MACH__)
-    #define BLACKMAGICDECKLINK_GLUE_MAC
+#if !defined(BLACKMAGICDECKLINK_YES) && !defined(BLACKMAGICDECKLINK_NO)
+    #define BLACKMAGICDECKLINK_YES //Default compilation is YES
 #endif
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#if defined(BLACKMAGICDECKLINK_GLUE_MAC)
+#if defined(BLACKMAGICDECKLINK_YES)
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 #include "Core/BlackmagicDeckLink_Glue.h"
 #include "Core/FFmpeg_Glue.h"
-#include "Mac/include/DeckLinkAPI.h"
+#if defined(_WIN32) || defined(_WIN64)
+    #include "DeckLinkAPI_h.h"
+    typedef unsigned long bmdl_uint32_t;
+#elif defined(__APPLE__) && defined(__MACH__)
+    #include "Mac/include/DeckLinkAPI.h"
+    typedef uint32_t bmdl_uint32_t;
+#else
+    #include "Linux/include/DeckLinkAPI.h"
+    typedef uint32_t bmdl_uint32_t;
+#endif
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -60,19 +69,19 @@ public:
     bool                        stopCapture(bool force=false);
     
     // IDeckLinkDeckControlStatusCallback
-    virtual HRESULT             TimecodeUpdate (BMDTimecodeBCD currentTimecode);
-    virtual HRESULT             VTRControlStateChanged (BMDDeckControlVTRControlState newState, BMDDeckControlError error);
-    virtual HRESULT             DeckControlEventReceived (BMDDeckControlEvent event, BMDDeckControlError error);
-    virtual HRESULT             DeckControlStatusChanged (BMDDeckControlStatusFlags flags, uint32_t mask);
+    virtual HRESULT STDMETHODCALLTYPE TimecodeUpdate (BMDTimecodeBCD currentTimecode);
+    virtual HRESULT STDMETHODCALLTYPE VTRControlStateChanged (BMDDeckControlVTRControlState newState, BMDDeckControlError error);
+    virtual HRESULT STDMETHODCALLTYPE DeckControlEventReceived (BMDDeckControlEvent event, BMDDeckControlError error);
+    virtual HRESULT STDMETHODCALLTYPE DeckControlStatusChanged (BMDDeckControlStatusFlags flags, bmdl_uint32_t mask);
     
     // IDeckLinkInputCallback
-    virtual HRESULT             VideoInputFormatChanged (BMDVideoInputFormatChangedEvents notificationEvents, IDeckLinkDisplayMode* newDisplayMode, BMDDetectedVideoInputFormatFlags detectedSignalFlags) {return S_OK;};
-    virtual HRESULT             VideoInputFrameArrived (IDeckLinkVideoInputFrame* arrivedFrame, IDeckLinkAudioInputPacket*);
+    virtual HRESULT STDMETHODCALLTYPE VideoInputFormatChanged (BMDVideoInputFormatChangedEvents notificationEvents, IDeckLinkDisplayMode* newDisplayMode, BMDDetectedVideoInputFormatFlags detectedSignalFlags) {return S_OK;};
+    virtual HRESULT STDMETHODCALLTYPE VideoInputFrameArrived (IDeckLinkVideoInputFrame* arrivedFrame, IDeckLinkAudioInputPacket*);
     
     // IUnknown
-    HRESULT                     QueryInterface (REFIID iid, LPVOID *ppv)        {return E_NOINTERFACE;}
-    ULONG                       AddRef ()                                       {return 1;}
-    ULONG                       Release ()                                      {return 1;}
+    HRESULT STDMETHODCALLTYPE   QueryInterface (REFIID iid, LPVOID *ppv)        {return E_NOINTERFACE;}
+    ULONG STDMETHODCALLTYPE     AddRef ()                                       {return 1;}
+    ULONG STDMETHODCALLTYPE     Release ()                                      {return 1;}
 
     BlackmagicDeckLink_Glue::status* Status;
     FFmpeg_Glue*                Glue;
@@ -82,6 +91,6 @@ public:
     int                         TC_out;
 };
 
-#endif // BLACKMAGICDECKLINK_GLUE_MAC
+#endif // BLACKMAGICDECKLINK_YES
 
 #endif // BlackmagicDeckLink_H

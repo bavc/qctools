@@ -3,7 +3,7 @@
 + Saturation Highlight playback filter
 + Zoom playback filter
 + Graph tracker text with semi transparent gray background
-+ Basic support of Blackmagic DeckLink (Mac only)
++ Basic support of Blackmagic DeckLink (tested on Mac, looking for a tester on Windows and Linux)
 x Zooming in with more than the default graphs, shifts display offset (GitHub issue #41)
 x Left-align graph labels, instead of centering them (GitHub issue #45)
 x Y-scale label values disappear when zooming (GitHub issue #46)
