@@ -113,17 +113,12 @@ IDeckLink *getFirstDeckLinkCard()
     {
         // get the first decklink card
         if (deckLinkIter->Next(&deckLink) != S_OK)
-        {
-            printf("Could not detect a DeckLink card\n");
-        }
-        
+            cout << "Could not detect a DeckLink card" << endl;
         
         deckLinkIter->Release();
     }
     else
-    {
-        printf("Could not enumerate DeckLink cards\n");
-    }
+        cout << "Could not enumerate DeckLink cards" << endl;
     
     return deckLink;
 }
@@ -193,12 +188,12 @@ bool CaptureHelper::setupDeck()
     // Get interfaces
     if (m_deckLink->QueryInterface(IID_IDeckLinkInput, (void **)&m_deckLinkInput) != S_OK)
     {
-        printf("Could not obtain the DeckLink Input interface\n");
+        cout << "Could not obtain the DeckLink Input interface" << endl;
         return false;
     }
     if (m_deckLink->QueryInterface(IID_IDeckLinkDeckControl, (void **)&m_deckControl) != S_OK)
     {
-        printf("Could not obtain the DeckControl interface\n");
+        cout << "Could not obtain the DeckControl interface" << endl;
         return false;
     }
 
@@ -294,7 +289,6 @@ bool CaptureHelper::cleanupDeckControl()
     cout << "*** Cleanup of DeckControl ***" << endl;
 
     // Stop
-    BMDDeckControlError bmdDeckControlError;
     switch (*Status)
     {
         case BlackmagicDeckLink_Glue::seeking :
