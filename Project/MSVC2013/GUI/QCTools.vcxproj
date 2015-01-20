@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -20,12 +20,14 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120_xp</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -42,7 +44,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../../Source;../../../Source/ThirdParty/tinyxml2;../../../../ffmpeg;../../../../Qt/qtbase/include/QtGui;../../../../Qt/qtbase/include/QtWidgets;../../../../Qt/qtbase/include/QtCore;../../../../Qt/qtbase/include;./;../../../../qwt/src;./_Automated;../../../../Qt/qtbase/include/QtPrintSupport;../../../../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Source;../../../Source/ThirdParty/tinyxml2;../../../../ffmpeg;../../../../Qt/qtbase/include/QtGui;../../../../Qt/qtbase/include/QtWidgets;../../../../Qt/qtbase/include/QtCore;../../../../Qt/qtbase/include;./;../../../../qwt/src;./_Automated;../../../../Qt/qtbase/include/QtPrintSupport;../../../../zlib;../../../../Blackmagic DeckLink SDK\Win\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4018</DisableSpecificWarnings>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
@@ -50,8 +52,8 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\..\..\MediaInfoLib\Project\MSVC2010\Library\$(Platform)\$(Configuration);../../../../Qt\qtbase\lib\MSVC2010\Win32;../../../../Qt\qtbase\plugins\imageformats;../../../../qwt/lib;Lib;D:\Programmation\zlib\projects\MSVC2010\Win32\Debug</AdditionalLibraryDirectories>
-      <AdditionalDependencies>qwtd.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;qwindowsd.lib;qminimald.lib;qtmaind.lib;avformat.lib;avcodec.lib;avfilter.lib;swscale.lib;avutil.lib;winmm.lib;ws2_32.lib;imm32.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../../../Qt\qtbase\lib;../../../../Qt\qtbase\plugins\imageformats;../../../../qwt/lib;../../../../zlib\projects\MSVC2013\Win32\Debug;Lib;../../../../Qt\qtbase\plugins\platforms</AdditionalLibraryDirectories>
+      <AdditionalDependencies>qwtd.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;qwindowsd.lib;qminimald.lib;qtharfbuzzng.lib;qtmaind.lib;avformat.lib;avcodec.lib;avfilter.lib;swscale.lib;avutil.lib;winmm.lib;ws2_32.lib;imm32.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -76,12 +78,14 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Core\AudioCore.cpp" />
     <ClCompile Include="..\..\..\Source\Core\AudioStats.cpp" />
+    <ClCompile Include="..\..\..\Source\Core\BlackmagicDeckLink_Glue.cpp" />
     <ClCompile Include="..\..\..\Source\Core\CommonStats.cpp" />
     <ClCompile Include="..\..\..\Source\Core\Core.cpp" />
     <ClCompile Include="..\..\..\Source\Core\FFmpeg_Glue.cpp" />
     <ClCompile Include="..\..\..\Source\Core\VideoCore.cpp" />
     <ClCompile Include="..\..\..\Source\Core\VideoStats.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Control.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\blackmagicdecklink_userinput.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\FileInformation.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\FilesList.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Help.cpp" />
@@ -100,6 +104,7 @@
     <ClCompile Include="..\..\..\Source\GUI\Plots.cpp" />
     <ClCompile Include="..\..\..\Source\ThirdParty\tinyxml2\tinyxml2.cpp" />
     <ClCompile Include="_Automated\moc_Control.cpp" />
+    <ClCompile Include="_Automated\moc_blackmagicdecklink_userinput.cpp" />
     <ClCompile Include="_Automated\moc_FileInformation.cpp" />
     <ClCompile Include="_Automated\moc_FilesList.cpp" />
     <ClCompile Include="_Automated\moc_Help.cpp" />
@@ -117,12 +122,14 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Core\AudioCore.h" />
     <ClInclude Include="..\..\..\Source\Core\AudioStats.h" />
+    <ClInclude Include="..\..\..\Source\Core\BlackmagicDeckLink_Glue.h" />
     <ClInclude Include="..\..\..\Source\Core\CommonStats.h" />
     <ClInclude Include="..\..\..\Source\Core\Core.h" />
     <ClInclude Include="..\..\..\Source\Core\FFmpeg_Glue.h" />
     <ClInclude Include="..\..\..\Source\Core\VideoCore.h" />
     <ClInclude Include="..\..\..\Source\Core\VideoStats.h" />
     <ClInclude Include="..\..\..\Source\GUI\Control.h" />
+    <ClInclude Include="..\..\..\Source\GUI\blackmagicdecklink_userinput.h" />
     <ClInclude Include="..\..\..\Source\GUI\FileInformation.h" />
     <ClInclude Include="..\..\..\Source\GUI\FilesList.h" />
     <ClInclude Include="..\..\..\Source\GUI\Help.h" />
@@ -136,6 +143,7 @@
     <ClInclude Include="..\..\..\Source\GUI\preferences.h" />
     <ClInclude Include="..\..\..\Source\GUI\TinyDisplay.h" />
     <ClInclude Include="..\..\..\Source\ThirdParty\tinyxml2\tinyxml2.h" />
+    <ClInclude Include="_Automated\ui_blackmagicdecklink_userinput.h" />
     <ClInclude Include="_Automated\ui_mainwindow.h" />
     <ClInclude Include="_Automated\ui_preferences.h" />
   </ItemGroup>
