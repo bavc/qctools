@@ -2,26 +2,30 @@ Qt
 --
 You can download directly the binaries or compile yourself.
 http://qt-project.org/downloads
-My config (Qt 5.3.1):
+My config (Qt 5.4.0):
 Mac:
-Download and install qt-opensource-mac-x64-clang-5.3.1.dmg or
+Download and install qt-opensource-mac-x64-clang-5.4.0.dmg or
 ./configure -release -opensource -confirm-license -static -no-sql-sqlite -no-sql-odbc -no-qml-debug -no-gif -no-nis -no-dbus -no-audio-backend -no-framework -nomake examples
 Windows:
-Edit qtbase\mkspecs\win32-msvc* and replace -MD by -MT in order to have  static build of the C library then 
+Edit qtbase\mkspecs\win32-msvc2013 and replace -MD by -MT in order to have  static build of the C++ library
+Launch VS Tools Command Prompt 
 configure -opensource -confirm-license -static -ltcg -no-sql-sqlite -no-sql-odbc -no-qml-debug -no-gif -no-dbus -no-opengl -no-audio-backend -nomake examples -mp
+nmake
 
 Qwt
 ---
 Linux:
-Edit qwtconfig.pri, comment QwtDll and QwtSvg lines
+Launch VS Tools Command Prompt 
+Add QT bin folder to your PATH e.g. set "PATH=%PATH%;C:\Qt\qtbase\bin"
+Edit qwtconfig.pri, comment QwtDll, QwtSvg and QwtOpenGL lines
 qmake
 
 YASM
 ----
 For Ffmpeg speed optimization, you need to install YASM
 http://yasm.tortall.net/Download.html
-My config (YASM 1.2.0):
-Windows: I put the binary from website in /FFmpeg_for_QCTools directory, FFmpeg automaticly detects it
+My config (YASM 1.3.0):
+Windows: I put the binary from website in /FFmpeg_for_QCTools directory, rename it to yasm.exe, FFmpeg automaticly detects it
 
 Cmake
 -----
@@ -34,8 +38,10 @@ OpenJPEG
 Download OpenJPEG 1.x (2.x is not supported by Ffmpeg)
 My config (openjpeg 1.5.2):
 Windows:
-cmake .
-Launch the sln, replace -MD by -MT in order to have static build of the C library then build
+Launch VS Tools Command Prompt 
+cmake Visual Studio 12 .
+Edit libopenjpeg/openjpeg.vcxproj and replace MultiThreadedDLL by MultiThreaded in order to have  static build of the C++ library
+Launch the sln, build release
 Linux (static build):
 cmake -DBUILD_SHARED_LIBS:BOOL=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=usr .
 make
@@ -45,22 +51,34 @@ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=usr .
 make
 make install
 
+MSYS
+----
+Windows:
+Install MSYS
+
 FFmpeg
 ------
 My config:
 Windows:
 Look at http://ffmpeg.org/platform.html#Windows
+Launch VS Tools Command Prompt 
+msys.bat
+cd ffmpeg
 ./configure --enable-gpl --enable-version3 --enable-shared --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --enable-libopenjpeg --disable-decoder=jpeg2000 --extra-cflags="-I../openjpeg/libopenjpeg" --extra-ldflags="-L../openjpeg/bin/Release" --toolchain=msvc
 Note: not working with openjpeg for the moment, using
 ./configure --enable-gpl --enable-version3 --enable-shared --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --toolchain=msvc
+make
+Copy *.lib in Project\MSVC2013\GUI\Lib
 Mac:
 ./configure --enable-gpl --enable-version3 --enable-shared --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --enable-libopenjpeg --disable-decoder=jpeg2000 --yasmexe=../yasm/yasm --extra-cflags="-I../openjpeg/usr/include" --extra-ldflags="-L../openjpeg/usr/lib -mmacosx-version-min=10.5"
+make
 Linux (static build):
 ./configure --enable-gpl --enable-version3 --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --enable-libopenjpeg --disable-decoder=jpeg2000 --extra-cflags="-I../openjpeg/usr/include" --extra-ldflags="-L../openjpeg/usr/lib"
+make
 
 QCTools:
 Windows:
-(todo)
+Project\MSVC2013\GUI\qt_update
 Mac:
 cd Project/Qt/QtCreator && qmake && make
 cp ../../../ffmpeg/libavcodec/libavcodec.*.dylib QCTools.app/Contents/Resources/
