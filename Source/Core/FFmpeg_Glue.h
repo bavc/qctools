@@ -104,15 +104,23 @@ public:
     string                      FFmpeg_LibsVersion();
  
     // Actions
+    void                        AddInput(int CodecType, size_t FrameCount, double Duration, int Width, int Height);
     void                        AddOutput(size_t FilterPos, int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, int FilterType=0, const string &Filter=string());
+    void                        AddOutput(const string &FileName);
+    void                        CloseOutput();
     void                        ModifyOutput(size_t InputPos, size_t OutputPos, size_t FilterPos, int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, int FilterType=0, const string &Filter=string());
     void                        Seek(size_t Pos);
     void                        FrameAtPosition(size_t Pos);
     bool                        NextFrame();
     bool                        OutputFrame(AVPacket* Packet, bool Decode=true);
+    bool                        OutputFrame(unsigned char* Data, size_t Size, int FramePos);
     void                        Filter_Change(size_t FilterPos, int FilterType, const string &Filter);
     void                        Disable(const size_t Pos);
     void                        Scale_Change(int Scale_Width, int Scale_Height);
+
+    // Between different FFmpeg_Glue instances
+    void*                       InputData_Get() { return InputDatas[0]; }
+    void                        InputData_Set(void* InputData) {InputDatas.push_back((inputdata*)InputData); InputDatas_Copy=true;}
 
 private:
     // Stream information
@@ -139,6 +147,10 @@ private:
         size_t                  FrameCount;             // Total count of frames (may be estimated)
         double                  FirstTimeStamp;         // First PTS met in seconds
         double                  Duration;               // Duration in seconds
+
+        // Cache
+        std::vector<AVFrame*>*  FramesCache;
+        AVFrame*                FramesCache_Default;
     };
     struct outputdata
     {
@@ -152,6 +164,8 @@ private:
         void                    ApplyScale();
         void                    ReplaceImage();
         void                    AddThumbnail();
+        void                    Encode();
+        void                    CloseEncode();
         void                    DiscardScaledFrame();
         void                    DiscardFilteredFrame();
 
@@ -185,11 +199,19 @@ private:
         std::vector<bytes*>     Thumbnails;
         CommonStats*            Stats;
 
+        // Encode
+        string                  Encode_FileName;
+        AVFormatContext*        Encode_FormatContext;
+        AVCodecContext*         Encode_CodecContext;
+        AVStream*               Encode_Stream;
+        AVPacket*               Encode_Packet;
+
         // Status
         size_t                  FramePos;               // Current position of playback
 
         // Helpers
         bool                    InitThumnails();
+        bool                    InitEncode();
         bool                    FilterGraph_Init();
         void                    FilterGraph_Free();
         bool                    Scale_Init();
@@ -200,6 +222,7 @@ private:
     };
     std::vector<inputdata*>     InputDatas;
     std::vector<outputdata*>    OutputDatas;
+    bool                        InputDatas_Copy;
 
     // FFmpeg pointers - Input
     AVFormatContext*            FormatContext;
