@@ -334,7 +334,7 @@ string VideoStats::StatsToCSV()
     #ifdef _WIN32
         Value<<"\r\n";
     #else
-        #ifdef __APPLE__
+        #if defined(__APPLE__) && defined(__MACH__)
             Value<<"\r";
         #else
             Value<<"\n";
@@ -352,7 +352,7 @@ string VideoStats::StatsToCSV()
         #ifdef _WIN32
             Value<<"\r\n";
         #else
-            #ifdef __APPLE__
+            #if defined(__APPLE__) && defined(__MACH__)
                 Value<<"\r";
             #else
                 Value<<"\n";

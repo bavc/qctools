@@ -163,6 +163,7 @@ std::vector<std::string> DeckLinkCardsList()
         if (Result == S_FALSE)
             break; // Finished
 
+        #if defined(__APPLE__) && defined(__MACH__)
         CFStringRef deviceNameCFString = NULL;
         if (deckLink->GetModelName(&deviceNameCFString) == S_OK)
         {
@@ -171,6 +172,7 @@ std::vector<std::string> DeckLinkCardsList()
             List.push_back(deviceName);
         }
         else
+        #endif
             List.push_back("DeckLink");
     }
        
