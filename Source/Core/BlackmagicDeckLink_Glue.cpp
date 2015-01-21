@@ -129,3 +129,13 @@ std::vector<std::string> BlackmagicDeckLink_Glue::CardsList()
     return DeckLinkCardsList();
 }
 
+//---------------------------------------------------------------------------
+int BlackmagicDeckLink_Glue::CurrentTimecode()
+{
+    #if defined(BLACKMAGICDECKLINK_YES)
+        return ((CaptureHelper*)Handle)->getTimeCode();
+    #endif
+
+    return 0;
+}
+

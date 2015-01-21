@@ -32,6 +32,8 @@ public:
     int                         Width_Get();
     int                         Height_Get();
 
+    int                         CurrentTimecode();
+
     FFmpeg_Glue*                Glue;
     int                         TC_in;
     int                         TC_out;

@@ -400,6 +400,31 @@ bool CaptureHelper::cleanupDeck()
 }
 
 //---------------------------------------------------------------------------
+int CaptureHelper::getTimeCode()
+{
+    int TC;
+    
+    //cout << "*** Timecode ***" << endl;
+
+    BMDDeckControlError bmdDeckControlError;
+    IDeckLinkTimecode *currentTimecode=NULL;
+    if (m_deckControl->GetTimecode(&currentTimecode, &bmdDeckControlError) != S_OK)
+    {
+        //cout << "Error: " << BMDDeckControlError2String(bmdDeckControlError) << endl;
+        TC=(int)-1;
+    }
+    else
+    {
+        TC=currentTimecode->GetBCD();
+        //cout << "OK " << hex << TC << endl;
+    }
+    
+    if (currentTimecode)
+        currentTimecode->Release();
+    return TC;
+}
+
+//---------------------------------------------------------------------------
 void CaptureHelper::startCapture()
 {
     cout << "*** Start capture ***" << endl;

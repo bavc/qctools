@@ -61,10 +61,11 @@ public:
                                 CaptureHelper(size_t CardPos, bool dropframe);
     virtual                    ~CaptureHelper();
     
-    // start the capture operation. returns when the operation has completed
     void                        startCapture();
     void                        pauseCapture();
     bool                        stopCapture(bool force=false);
+
+    int                         getTimeCode();
     
     // IDeckLinkDeckControlStatusCallback
     virtual HRESULT STDMETHODCALLTYPE TimecodeUpdate (BMDTimecodeBCD currentTimecode);
