@@ -11,13 +11,15 @@
 
 //---------------------------------------------------------------------------
 #include "Core/Core.h"
-#include "Core/FFmpeg_Glue.h"
+#include <string>
 
 #include <QThread>
 #include <QPixmap>
 
 class MainWindow;
 class CommonStats;
+class FFmpeg_Glue;
+class BlackmagicDeckLink_Glue;
 
 //---------------------------------------------------------------------------
 class FileInformation : public QThread
@@ -28,7 +30,7 @@ class FileInformation : public QThread
 
 public:
     // Constructor/Destructor
-                                FileInformation             (MainWindow* Main, const QString &FileName, size_t CardPos=(size_t)-1, int TC_in=(int)-1, int TC_out=(int)-1, const string &Encoding_FileName=string());
+                                FileInformation             (MainWindow* Main, const QString &FileName, BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue=NULL, int FrameCount=0, const std::string &Encoding_FileName=std::string());
                                 ~FileInformation            ();
 
     // Parsing
@@ -50,9 +52,7 @@ public:
     bool                        PlayBackFilters_Available   ();
 
     // Deck control information
-    size_t                      CardPos;
-    int                         TC_in;
-    int                         TC_out;
+    BlackmagicDeckLink_Glue*    blackmagicDeckLink_Glue;
 
     // FFmpeg glue
     FFmpeg_Glue*                Glue;

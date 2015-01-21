@@ -14,6 +14,7 @@
 #include "Core/CommonStats.h"
 #include "Core/VideoCore.h"
 #include "Core/AudioCore.h"
+#include "Core/FFmpeg_Glue.h"
 #include <QFileInfo>
 #include <QHeaderView>
 #include <QMenu>

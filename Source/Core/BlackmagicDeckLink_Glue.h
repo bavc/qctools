@@ -22,7 +22,7 @@ class FFmpeg_Glue;
 class BlackmagicDeckLink_Glue
 {
 public:
-    BlackmagicDeckLink_Glue(FFmpeg_Glue* Glue, size_t CardPos, int TC_in, int TC_out);
+    BlackmagicDeckLink_Glue(size_t CardPos, int TC_in, int TC_out);
     ~BlackmagicDeckLink_Glue();
 
     void                        Start();
@@ -31,6 +31,8 @@ public:
     
     int                         Width_Get();
     int                         Height_Get();
+
+    FFmpeg_Glue*                Glue;
 
     enum status
     {
@@ -57,14 +59,14 @@ private:
 #include <cmath>
 
 // convert a BCD timecode to a frame count (does not take into account drop frame timecodes...)
-#define GET_FRAME_COUNT(result, tc_bcd, timeScale, frameDuration)    do{\
+#define GET_FRAME_COUNT(result, tc_bcd, timeScale, frameDuration)    {\
                         (result) = 0;\
-                        (result) += (((uint32_t)((tc_bcd) >> 28) & 0x0F)*10 + ((uint32_t)((tc_bcd) >> 24) & 0x0F))*60;\
-                        (result) += ((uint32_t)((tc_bcd) >> 20) & 0x0F)*10 + ((uint32_t)((tc_bcd) >> 16) & 0x0F);\
+                        (result) += (((int)((tc_bcd) >> 28) & 0x0F)*10 + ((int)((tc_bcd) >> 24) & 0x0F))*60;\
+                        (result) += ((int)((tc_bcd) >> 20) & 0x0F)*10 + ((int)((tc_bcd) >> 16) & 0x0F);\
                         (result) *= 60;\
-                        (result) += ((uint32_t)((tc_bcd) >> 12) & 0x0F)*10 + ((uint32_t)((tc_bcd) >> 8) & 0x0F);\
+                        (result) += ((int)((tc_bcd) >> 12) & 0x0F)*10 + ((int)((tc_bcd) >> 8) & 0x0F);\
                         (result) *= std::ceil(double((timeScale))/(frameDuration));\
-                        (result) += ((uint32_t)((tc_bcd) >> 4) & 0x0F)*10 + ((uint32_t)((tc_bcd) & 0x0F));\
-                        } while(0)
+                        (result) += ((int)((tc_bcd) >> 4) & 0x0F)*10 + ((int)((tc_bcd) & 0x0F));\
+                        }
 
 #endif // BlackmagicDeckLink_Glue_H

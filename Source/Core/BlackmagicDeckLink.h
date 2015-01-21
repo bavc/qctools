@@ -82,7 +82,7 @@ public:
     ULONG STDMETHODCALLTYPE     Release ()                                      {return 1;}
 
     BlackmagicDeckLink_Glue::status* Status;
-    FFmpeg_Glue*                Glue;
+    FFmpeg_Glue**               Glue;
     int                         m_FramePos;
     int                         TC_in;
     int                         TC_current;

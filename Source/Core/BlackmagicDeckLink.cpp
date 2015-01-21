@@ -185,6 +185,7 @@ CaptureHelper::CaptureHelper(size_t CardPos, bool dropframe)
     , m_frameDuration(0)
     , m_dropframe(dropframe)
     , m_FramePos(0)
+    , Glue(NULL)
     , TC_current(-1)
 {
     cout << endl;
@@ -441,7 +442,8 @@ bool CaptureHelper::stopCapture(bool force)
     if (!cleanupDeck() && !force)
         return false;
 
-    Glue->CloseOutput();
+    if (Glue && *Glue)
+        (*Glue)->CloseOutput();
     return true;
 }
 
@@ -523,7 +525,8 @@ HRESULT CaptureHelper::VideoInputFrameArrived (IDeckLinkVideoInputFrame* arrived
 
         void *buffer;
         arrivedFrame->GetBytes(&buffer);
-        Glue->OutputFrame((unsigned char*)buffer, 720*486*2, m_FramePos);
+        if (Glue && *Glue)
+            (*Glue)->OutputFrame((unsigned char*)buffer, 720*486*2, m_FramePos);
 
         TC_current = tcBCD;
         m_FramePos++;

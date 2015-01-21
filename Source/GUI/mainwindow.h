@@ -39,6 +39,8 @@ class QCheckBox;
 
 class PerPicture;
 
+class BlackmagicDeckLink_Glue;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -83,7 +85,7 @@ public:
     void                        clearGraphsLayout           ();
     void                        createGraphsLayout          ();
     void                        addFile                     (const QString &FileName);
-    void                        addFile                     (size_t CardPos, int TC_in, int TC_out, const string &Encoding_FileName=string());
+    void                        addFile                     (BlackmagicDeckLink_Glue* BlackmagicDeckLink_Glue, int FrameCount, const std::string &Encoding_FileName=std::string());
     void                        addFile_finish              ();
     void                        selectFile                  (int newFilePos);
     void                        selectDisplayFile           (int newFilePos);

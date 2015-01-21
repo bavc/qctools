@@ -1,6 +1,8 @@
 #ifndef BLACKMAGIC_DECKLINK_USERINPUT_H
 #define BLACKMAGIC_DECKLINK_USERINPUT_H
 
+#include "Core/BlackmagicDeckLink_Glue.h"
+
 #include <QDialog>
 
 namespace Ui {
@@ -15,13 +17,13 @@ public:
     explicit BlackmagicDeckLink_UserInput(QWidget *parent = 0);
     ~BlackmagicDeckLink_UserInput();
 
-    int                         TC_in;
-    int                         TC_out;
-    size_t                      CardPos;
+    BlackmagicDeckLink_Glue*    Card;
+    int                         FrameCount;
     QString                     Encoding_FileName;
 
 private:
     Ui::BlackmagicDeckLink_UserInput *ui;
+    int                         CardPos;
 
 private Q_SLOTS:
 

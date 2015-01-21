@@ -35,10 +35,10 @@ static int ActiveParsing_Count=0;
 
 void FileInformation::run()
 {
-    if (FileName.isEmpty())
+    if (blackmagicDeckLink_Glue)
     {
-        BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue=new BlackmagicDeckLink_Glue(Glue, CardPos, TC_in, TC_out);
-
+        blackmagicDeckLink_Glue->Glue=Glue;
+            
         for (;;)
         {
             switch (blackmagicDeckLink_Glue->Status)
@@ -88,12 +88,10 @@ void FileInformation::run()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, size_t CardPos_, int TC_in_, int TC_out_, const string &Encoding_FileName) :
+FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue_, int FrameCount, const string &Encoding_FileName) :
     FileName(FileName_),
     Main(Main_),
-    CardPos(CardPos_),
-    TC_in(TC_in_),
-    TC_out(TC_out_)
+    blackmagicDeckLink_Glue(blackmagicDeckLink_Glue_)
 {
     QString StatsFromExternalData_FileName;
     bool StatsFromExternalData_FileName_IsCompressed=false;
@@ -214,10 +212,6 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, s
     Glue=new FFmpeg_Glue(FileName_string.c_str(), &Stats, true);
     if (FileName_string.empty())
     {
-        int FrameCount_In, FrameCount_Out;
-        GET_FRAME_COUNT(FrameCount_In, TC_in, 30, 1);
-        GET_FRAME_COUNT(FrameCount_Out, TC_out, 30, 1);
-        int FrameCount=FrameCount_Out-FrameCount_In;
         Glue->AddInput(0, FrameCount, FrameCount/30, 720, 486);
     }
     else if (Glue->ContainerFormat_Get().empty())

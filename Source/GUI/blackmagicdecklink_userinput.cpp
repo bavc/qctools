@@ -1,12 +1,13 @@
 #include "blackmagicdecklink_userinput.h"
 #include "ui_blackmagicdecklink_userinput.h"
-#include "Core/BlackmagicDeckLink_Glue.h"
 
 #include <QStandardPaths>
 
 BlackmagicDeckLink_UserInput::BlackmagicDeckLink_UserInput(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::BlackmagicDeckLink_UserInput),
+    FrameCount(0),
+    Card(NULL),
     CardPos(0)
 {
     ui->setupUi(this);
@@ -34,7 +35,7 @@ BlackmagicDeckLink_UserInput::~BlackmagicDeckLink_UserInput()
 
 void BlackmagicDeckLink_UserInput::on_accepted()
 {
-    TC_in=0;
+    int TC_in=0;
     TC_in+=(ui->In_1->value()/10)<<28;
     TC_in+=(ui->In_1->value()%10)<<24;
     TC_in+=(ui->In_2->value()/10)<<20;
@@ -43,7 +44,7 @@ void BlackmagicDeckLink_UserInput::on_accepted()
     TC_in+=(ui->In_3->value()%10)<< 8;
     TC_in+=(ui->In_4->value()/10)<< 4;
     TC_in+=(ui->In_4->value()%10)<< 0;
-    TC_out=0;
+    int TC_out=0;
     TC_out+=(ui->Out_1->value()/10)<<28;
     TC_out+=(ui->Out_1->value()%10)<<24;
     TC_out+=(ui->Out_2->value()/10)<<20;
@@ -55,6 +56,13 @@ void BlackmagicDeckLink_UserInput::on_accepted()
 
     if (ui->Record_GroupBox->isChecked())
         Encoding_FileName=ui->Encoding_FileName_Line->text();
+
+    int FrameCount_In, FrameCount_Out;
+    GET_FRAME_COUNT(FrameCount_In, TC_in, 30, 1);
+    GET_FRAME_COUNT(FrameCount_Out, TC_out, 30, 1);
+    FrameCount=FrameCount_Out-FrameCount_In;
+
+    Card=new BlackmagicDeckLink_Glue(CardPos, TC_in, TC_out);
 }
 
 void BlackmagicDeckLink_UserInput::on_Record_GroupBox_toggled(bool on)
