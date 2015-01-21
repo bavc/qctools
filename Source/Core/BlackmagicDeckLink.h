@@ -84,9 +84,9 @@ public:
     BlackmagicDeckLink_Glue::status* Status;
     FFmpeg_Glue**               Glue;
     int                         m_FramePos;
-    int                         TC_in;
+    int*                        TC_in;
     int                         TC_current;
-    int                         TC_out;
+    int*                        TC_out;
 };
 
 //***************************************************************************

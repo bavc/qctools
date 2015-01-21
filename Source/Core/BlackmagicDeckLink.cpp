@@ -186,7 +186,9 @@ CaptureHelper::CaptureHelper(size_t CardPos, bool dropframe)
     , m_dropframe(dropframe)
     , m_FramePos(0)
     , Glue(NULL)
+    , TC_in(NULL)
     , TC_current(-1)
+    , TC_out(NULL)
 {
     cout << endl;
     cout << "***************************" << endl;
@@ -404,13 +406,13 @@ void CaptureHelper::startCapture()
 
     cout.setf (ios::hex, ios::basefield);
     cout.fill ('0');
-    cout << "Starting capure from " << setw(2) << ((TC_in>>24)&0xFF) << ":" << setw(2) << ((TC_in>>16)&0xFF) << ":" << setw(2) << ((TC_in>>8)&0xFF) << ":" << setw(2) << ((TC_in)&0xFF)
-         << " to " << setw(2) << ((TC_out>>24)&0xFF) << ":" << setw(2) << ((TC_out>>16)&0xFF) << ":" << setw(2) << ((TC_out>>8)&0xFF) << ":" << setw(2) << ((TC_out)&0xFF) << endl ;
+    cout << "Starting capure from " << setw(2) << (((*TC_in)>>24)&0xFF) << ":" << setw(2) << (((*TC_in)>>16)&0xFF) << ":" << setw(2) << (((*TC_in)>>8)&0xFF) << ":" << setw(2) << (((*TC_in))&0xFF)
+         << " to " << setw(2) << (((*TC_out)>>24)&0xFF) << ":" << setw(2) << (((*TC_out)>>16)&0xFF) << ":" << setw(2) << (((*TC_out)>>8)&0xFF) << ":" << setw(2) << (((*TC_out))&0xFF) << endl ;
 
     // Start capture
     *Status=BlackmagicDeckLink_Glue::seeking;
     BMDDeckControlError bmdDeckControlError;
-    if (m_deckControl->StartCapture(true, TC_in, TC_out, &bmdDeckControlError) != S_OK)
+    if (m_deckControl->StartCapture(true, (*TC_in), (*TC_out), &bmdDeckControlError) != S_OK)
         cout << "Could not start capture (" << BMDDeckControlError2String(bmdDeckControlError) << ")" << endl;
 
     cout << "Waiting for deck answer" << endl ;
@@ -514,8 +516,8 @@ HRESULT CaptureHelper::VideoInputFrameArrived (IDeckLinkVideoInputFrame* arrived
     // Handle the frame if time code is in [TC_in, TC_out[
     BMDTimecodeBCD tcBCD = timecode->GetBCD();
     if ( (TC_current == -1 || tcBCD != TC_current) //Ignore frames with same time code (TODO: check if it is relevant)
-      && tcBCD >= TC_in 
-      && tcBCD < TC_out )
+      && tcBCD >= *TC_in 
+      && tcBCD < *TC_out )
     {
         // this frame is within the in-and out-points, do something useful with it
         uint8_t hours, minutes, seconds, frames;

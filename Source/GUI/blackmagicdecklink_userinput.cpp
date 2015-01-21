@@ -7,8 +7,7 @@ BlackmagicDeckLink_UserInput::BlackmagicDeckLink_UserInput(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::BlackmagicDeckLink_UserInput),
     FrameCount(0),
-    Card(NULL),
-    CardPos(0)
+    Card(NULL)
 {
     ui->setupUi(this);
 
@@ -26,6 +25,7 @@ BlackmagicDeckLink_UserInput::BlackmagicDeckLink_UserInput(QWidget *parent) :
     std::vector<std::string> List=BlackmagicDeckLink_Glue::CardsList();
     for (size_t Pos = 0; Pos<List.size(); Pos++)
         ui->CardsList->addItem(List[Pos].c_str());
+    on_CardsList_currentIndexChanged(0);
 }
 
 BlackmagicDeckLink_UserInput::~BlackmagicDeckLink_UserInput()
@@ -35,34 +35,35 @@ BlackmagicDeckLink_UserInput::~BlackmagicDeckLink_UserInput()
 
 void BlackmagicDeckLink_UserInput::on_accepted()
 {
-    int TC_in=0;
-    TC_in+=(ui->In_1->value()/10)<<28;
-    TC_in+=(ui->In_1->value()%10)<<24;
-    TC_in+=(ui->In_2->value()/10)<<20;
-    TC_in+=(ui->In_2->value()%10)<<16;
-    TC_in+=(ui->In_3->value()/10)<<12;
-    TC_in+=(ui->In_3->value()%10)<< 8;
-    TC_in+=(ui->In_4->value()/10)<< 4;
-    TC_in+=(ui->In_4->value()%10)<< 0;
-    int TC_out=0;
-    TC_out+=(ui->Out_1->value()/10)<<28;
-    TC_out+=(ui->Out_1->value()%10)<<24;
-    TC_out+=(ui->Out_2->value()/10)<<20;
-    TC_out+=(ui->Out_2->value()%10)<<16;
-    TC_out+=(ui->Out_3->value()/10)<<12;
-    TC_out+=(ui->Out_3->value()%10)<< 8;
-    TC_out+=(ui->Out_4->value()/10)<< 4;
-    TC_out+=(ui->Out_4->value()%10)<< 0;
+    if (!Card)
+        return;
+
+    Card->TC_in=0;
+    Card->TC_in+=(ui->In_1->value()/10)<<28;
+    Card->TC_in+=(ui->In_1->value()%10)<<24;
+    Card->TC_in+=(ui->In_2->value()/10)<<20;
+    Card->TC_in+=(ui->In_2->value()%10)<<16;
+    Card->TC_in+=(ui->In_3->value()/10)<<12;
+    Card->TC_in+=(ui->In_3->value()%10)<< 8;
+    Card->TC_in+=(ui->In_4->value()/10)<< 4;
+    Card->TC_in+=(ui->In_4->value()%10)<< 0;
+    Card->TC_out=0;
+    Card->TC_out+=(ui->Out_1->value()/10)<<28;
+    Card->TC_out+=(ui->Out_1->value()%10)<<24;
+    Card->TC_out+=(ui->Out_2->value()/10)<<20;
+    Card->TC_out+=(ui->Out_2->value()%10)<<16;
+    Card->TC_out+=(ui->Out_3->value()/10)<<12;
+    Card->TC_out+=(ui->Out_3->value()%10)<< 8;
+    Card->TC_out+=(ui->Out_4->value()/10)<< 4;
+    Card->TC_out+=(ui->Out_4->value()%10)<< 0;
 
     if (ui->Record_GroupBox->isChecked())
         Encoding_FileName=ui->Encoding_FileName_Line->text();
 
     int FrameCount_In, FrameCount_Out;
-    GET_FRAME_COUNT(FrameCount_In, TC_in, 30, 1);
-    GET_FRAME_COUNT(FrameCount_Out, TC_out, 30, 1);
+    GET_FRAME_COUNT(FrameCount_In, Card->TC_in, 30, 1);
+    GET_FRAME_COUNT(FrameCount_Out, Card->TC_out, 30, 1);
     FrameCount=FrameCount_Out-FrameCount_In;
-
-    Card=new BlackmagicDeckLink_Glue(CardPos, TC_in, TC_out);
 }
 
 void BlackmagicDeckLink_UserInput::on_Record_GroupBox_toggled(bool on)
@@ -74,5 +75,6 @@ void BlackmagicDeckLink_UserInput::on_Record_GroupBox_toggled(bool on)
 //---------------------------------------------------------------------------
 void BlackmagicDeckLink_UserInput::on_CardsList_currentIndexChanged(int Pos)
 {
-    CardPos=Pos;
+    delete Card;
+    Card=new BlackmagicDeckLink_Glue(Pos);
 }

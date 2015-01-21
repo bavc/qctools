@@ -23,7 +23,6 @@ public:
 
 private:
     Ui::BlackmagicDeckLink_UserInput *ui;
-    int                         CardPos;
 
 private Q_SLOTS:
 

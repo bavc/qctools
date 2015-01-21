@@ -22,7 +22,7 @@ class FFmpeg_Glue;
 class BlackmagicDeckLink_Glue
 {
 public:
-    BlackmagicDeckLink_Glue(size_t CardPos, int TC_in, int TC_out);
+    BlackmagicDeckLink_Glue(size_t CardPos);
     ~BlackmagicDeckLink_Glue();
 
     void                        Start();
@@ -33,6 +33,8 @@ public:
     int                         Height_Get();
 
     FFmpeg_Glue*                Glue;
+    int                         TC_in;
+    int                         TC_out;
 
     enum status
     {

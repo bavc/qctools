@@ -26,17 +26,19 @@ struct Debug_Simulation
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-BlackmagicDeckLink_Glue::BlackmagicDeckLink_Glue(size_t CardPos, int TC_in, int TC_out) :
+BlackmagicDeckLink_Glue::BlackmagicDeckLink_Glue(size_t CardPos) :
     Handle(NULL),
     Glue(NULL),
+    TC_in(NULL),
+    TC_out(NULL),
     Status(connecting)
 {
     #if defined(BLACKMAGICDECKLINK_YES)
         CaptureHelper* helper=new CaptureHelper(CardPos, true);
         helper->Status=&Status;
         helper->Glue=&Glue;
-        helper->TC_in=TC_in;
-        helper->TC_out=TC_out;
+        helper->TC_in=&TC_in;
+        helper->TC_out=&TC_out;
 
         Handle=helper;
     #elif defined(_DEBUG) // Simulation
