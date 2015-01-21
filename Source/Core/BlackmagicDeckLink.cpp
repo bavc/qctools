@@ -163,9 +163,17 @@ std::vector<std::string> DeckLinkCardsList()
         if (Result == S_FALSE)
             break; // Finished
 
-        List.push_back("DeckLink");
+        CFStringRef deviceNameCFString = NULL;
+        if (deckLink->GetModelName(&deviceNameCFString) == S_OK)
+        {
+            char            deviceName[64];
+            CFStringGetCString(deviceNameCFString, deviceName, sizeof(deviceName), kCFStringEncodingMacRoman);
+            List.push_back(deviceName);
+        }
+        else
+            List.push_back("DeckLink");
     }
-        
+       
     deckLinkIter->Release();
     return List;
 }
