@@ -470,6 +470,7 @@ bool FFmpeg_Glue::outputdata::InitEncode()
     Encode_CodecContext->codec_tag     = 0x32767579; // 2vuy
     Encode_CodecContext->time_base.num = Stream->codec->time_base.num;
     Encode_CodecContext->time_base.den = Stream->codec->time_base.den;
+    Encode_CodecContext->field_order   = AV_FIELD_BT;
     if (avcodec_open2(Encode_CodecContext, Encode_Codec, NULL) < 0)
         return false;
 
