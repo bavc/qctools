@@ -66,6 +66,7 @@ enum col_names
     Col_DAR,
     Col_PixFormat,
     Col_ColorSpace,
+    Col_ColorRange,
     Col_FrameRate,
     Col_AudioFormat,
   //Col_SampleFormat,
@@ -101,6 +102,7 @@ percolumn PerColumn[Col_Max]=
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "DAR",              NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Pix Format",       NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Color Space",      NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Color Range",      NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Frame rate",       NULL, },
     { StatsType_None,       Item_AudioMax,          Item_AudioMax,          "A. Format",        NULL, },
   //{ StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Sample format",    NULL, },
@@ -181,6 +183,7 @@ void FilesList::UpdateAll()
         QString     DAR_String;
         QString     PixFormat;
         QString     ColorSpace;
+        QString     ColorRange;
         QString     AudioFormat;
         QString     SampleFormat;
         QString     SamplingRate_String;
@@ -203,6 +206,7 @@ void FilesList::UpdateAll()
             double FrameRated=                  Main->Files[Files_Pos]->Glue->VideoFrameRate_Get();
             PixFormat=                          Main->Files[Files_Pos]->Glue->PixFormat_Get().c_str();
             ColorSpace=                         Main->Files[Files_Pos]->Glue->ColorSpace_Get().c_str();
+            ColorRange=                         Main->Files[Files_Pos]->Glue->ColorRange_Get().c_str();
             AudioFormat=                        Main->Files[Files_Pos]->Glue->AudioFormat_Get().c_str();
             SampleFormat=                       Main->Files[Files_Pos]->Glue->SampleFormat_Get().c_str();
             double SamplingRate=                Main->Files[Files_Pos]->Glue->SamplingRate_Get();
@@ -263,6 +267,7 @@ void FilesList::UpdateAll()
         setItem((int)Files_Pos, Col_DAR,            new QTableWidgetItem(DAR_String));
         setItem((int)Files_Pos, Col_PixFormat,      new QTableWidgetItem(PixFormat));
         setItem((int)Files_Pos, Col_ColorSpace,     new QTableWidgetItem(ColorSpace));
+        setItem((int)Files_Pos, Col_ColorRange,     new QTableWidgetItem(ColorRange));
         setItem((int)Files_Pos, Col_FrameRate,      new QTableWidgetItem(FrameRate));
         setItem((int)Files_Pos, Col_AudioFormat,    new QTableWidgetItem(AudioFormat));
       //setItem((int)Files_Pos, Col_SampleFormat,   new QTableWidgetItem(SampleFormat));

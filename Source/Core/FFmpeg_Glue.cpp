@@ -1581,6 +1581,30 @@ string FFmpeg_Glue::ColorSpace_Get()
 }
 
 //---------------------------------------------------------------------------
+string FFmpeg_Glue::ColorRange_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
+        return 0;
+
+    switch (InputData->Stream->codec->color_range)
+    {
+        case AVCOL_RANGE_UNSPECIFIED: return "Unspecified";
+        case AVCOL_RANGE_MPEG: return "Broadcast Range (219*2^n-1)";
+        case AVCOL_RANGE_JPEG: return "Full Range (2^n-1)";
+        case AVCOL_RANGE_NB: return "Not part of ABI";
+        default: return string();
+    }
+}
+
+//---------------------------------------------------------------------------
 string FFmpeg_Glue::AudioFormat_Get()
 {
     inputdata* InputData=NULL;

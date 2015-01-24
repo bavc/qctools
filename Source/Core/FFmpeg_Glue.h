@@ -89,6 +89,7 @@ public:
     double                      DAR_Get();
     string                      PixFormat_Get();
     string                      ColorSpace_Get();
+    string                      ColorRange_Get();
     
     // Audio information
     string                      AudioFormat_Get();
