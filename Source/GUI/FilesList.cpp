@@ -64,6 +64,7 @@ enum col_names
     Col_Width,
     Col_Height,
     Col_DAR,
+    Col_SAR,
     Col_PixFormat,
     Col_ColorSpace,
     Col_ColorRange,
@@ -100,6 +101,7 @@ percolumn PerColumn[Col_Max]=
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Width",            NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Height",           NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "DAR",              NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "SAR",              NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Pix Format",       NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Color Space",      NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Color Range",      NULL, },
@@ -181,6 +183,7 @@ void FilesList::UpdateAll()
         QString     Width;
         QString     Height;
         QString     DAR_String;
+        QString     SAR;
         QString     PixFormat;
         QString     ColorSpace;
         QString     ColorRange;
@@ -203,6 +206,7 @@ void FilesList::UpdateAll()
             Width=QString::number(              Main->Files[Files_Pos]->Glue->Width_Get());
             Height=QString::number(             Main->Files[Files_Pos]->Glue->Height_Get());
             double DAR=                         Main->Files[Files_Pos]->Glue->DAR_Get();
+            SAR=                                Main->Files[Files_Pos]->Glue->SAR_Get().c_str();
             double FrameRated=                  Main->Files[Files_Pos]->Glue->VideoFrameRate_Get();
             PixFormat=                          Main->Files[Files_Pos]->Glue->PixFormat_Get().c_str();
             ColorSpace=                         Main->Files[Files_Pos]->Glue->ColorSpace_Get().c_str();
@@ -265,6 +269,7 @@ void FilesList::UpdateAll()
         setItem((int)Files_Pos, Col_Width,          new QTableWidgetItem(Width));
         setItem((int)Files_Pos, Col_Height,         new QTableWidgetItem(Height));
         setItem((int)Files_Pos, Col_DAR,            new QTableWidgetItem(DAR_String));
+        setItem((int)Files_Pos, Col_SAR,            new QTableWidgetItem(SAR));
         setItem((int)Files_Pos, Col_PixFormat,      new QTableWidgetItem(PixFormat));
         setItem((int)Files_Pos, Col_ColorSpace,     new QTableWidgetItem(ColorSpace));
         setItem((int)Files_Pos, Col_ColorRange,     new QTableWidgetItem(ColorRange));

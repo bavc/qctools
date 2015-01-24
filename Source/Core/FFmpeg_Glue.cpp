@@ -1343,6 +1343,29 @@ double FFmpeg_Glue::DAR_Get()
         DAR=((double)InputData->Stream->codec->width)/InputData->Stream->codec->height;
     return DAR;
 }
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::SAR_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
+        return 0;
+
+    ostringstream convert;
+    if (InputData->Stream->codec->sample_aspect_ratio.num==0)
+        return "Und";
+    else
+    {
+        convert << InputData->Stream->codec->sample_aspect_ratio.num << "/" << InputData->Stream->codec->sample_aspect_ratio.den;
+        return convert.str();
+    }
+}
 
 //---------------------------------------------------------------------------
 string FFmpeg_Glue::PixFormat_Get()

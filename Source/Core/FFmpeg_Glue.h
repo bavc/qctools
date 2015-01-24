@@ -87,6 +87,7 @@ public:
     int                         Width_Get();
     int                         Height_Get();
     double                      DAR_Get();
+    string                      SAR_Get();
     string                      PixFormat_Get();
     string                      ColorSpace_Get();
     string                      ColorRange_Get();
