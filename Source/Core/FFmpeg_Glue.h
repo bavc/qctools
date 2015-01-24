@@ -88,6 +88,7 @@ public:
     int                         Height_Get();
     double                      DAR_Get();
     string                      PixFormat_Get();
+    string                      ColorSpace_Get();
     
     // Audio information
     string                      AudioFormat_Get();

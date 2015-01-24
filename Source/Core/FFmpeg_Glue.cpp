@@ -1548,6 +1548,39 @@ string FFmpeg_Glue::PixFormat_Get()
 }
 
 //---------------------------------------------------------------------------
+string FFmpeg_Glue::ColorSpace_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
+        return 0;
+
+    switch (InputData->Stream->codec->colorspace)
+    {
+        case AVCOL_SPC_RGB: return "order of coefficients is actually GBR, also IEC 61966-2-1 (sRGB)";
+        case AVCOL_SPC_BT709: return "BT.709 / ITU-R BT1361 / IEC 61966-2-4 xvYCC709 / SMPTE RP177 Annex B";
+        case AVCOL_SPC_UNSPECIFIED: return "Unspecified";
+        case AVCOL_SPC_RESERVED: return "Reserved";
+        case AVCOL_SPC_FCC: return "FCC Title 47 Code of Federal Regulations 73.682 (a)(20)";
+        case AVCOL_SPC_BT470BG: return "BT.470bg / ITU-R BT601-6 625 / ITU-R BT1358 625 / ITU-R BT1700 625 PAL & SECAM / IEC 61966-2-4 xvYCC601";
+        case AVCOL_SPC_SMPTE170M: return "SMPTE 170m / ITU-R BT601-6 525 / ITU-R BT1358 525 / ITU-R BT1700 NTSC";
+        case AVCOL_SPC_SMPTE240M: return "SMPTE 240m";
+        case AVCOL_SPC_YCOCG: return "YCOCG: Used by Dirac / VC-2 and H.264 FRext, see ITU-T SG16";
+        case AVCOL_SPC_BT2020_NCL: return "ITU-R BT2020 non-constant luminance system";
+        case AVCOL_SPC_BT2020_CL: return "ITU-R BT2020 constant luminance system";
+        case AVCOL_SPC_NB: return "Not part of ABI.";
+        default: return string();
+    }
+    
+}
+
+//---------------------------------------------------------------------------
 string FFmpeg_Glue::AudioFormat_Get()
 {
     inputdata* InputData=NULL;
