@@ -1255,6 +1255,53 @@ double FFmpeg_Glue::VideoFrameRate_Get()
 }
 
 //---------------------------------------------------------------------------
+string FFmpeg_Glue::RVideoFrameRate_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
+        return 0;
+    
+    ostringstream convert;
+    if (InputData->Stream->r_frame_rate.num==0)
+        return "Und";
+    else
+    {
+        convert << InputData->Stream->r_frame_rate.num << "/" << InputData->Stream->r_frame_rate.den;
+        return convert.str();
+    }
+}
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::AvgVideoFrameRate_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
+        return 0;
+    
+    ostringstream convert;
+    if (InputData->Stream->avg_frame_rate.num==0)
+        return "Und";
+    else
+    {
+        convert << InputData->Stream->avg_frame_rate.num << "/" << InputData->Stream->avg_frame_rate.den;
+        return convert.str();
+    }
+}
+
+//---------------------------------------------------------------------------
 size_t FFmpeg_Glue::VideoFramePos_Get()
 {
     inputdata* InputData=NULL;

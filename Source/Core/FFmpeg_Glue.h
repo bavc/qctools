@@ -83,6 +83,8 @@ public:
     string                      VideoFormat_Get();
     double                      VideoDuration_Get();
     double                      VideoFrameRate_Get();
+    string                      RVideoFrameRate_Get();
+    string                      AvgVideoFrameRate_Get();
     size_t                      VideoFrameCount_Get();
     int                         Width_Get();
     int                         Height_Get();
