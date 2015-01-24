@@ -1563,7 +1563,7 @@ string FFmpeg_Glue::ColorSpace_Get()
 
     switch (InputData->Stream->codec->colorspace)
     {
-        case AVCOL_SPC_RGB: return "order of coefficients is actually GBR, also IEC 61966-2-1 (sRGB)";
+        case AVCOL_SPC_RGB: return "RGB: order of coefficients is actually GBR, also IEC 61966-2-1 (sRGB)";
         case AVCOL_SPC_BT709: return "BT.709 / ITU-R BT1361 / IEC 61966-2-4 xvYCC709 / SMPTE RP177 Annex B";
         case AVCOL_SPC_UNSPECIFIED: return "Unspecified";
         case AVCOL_SPC_RESERVED: return "Reserved";
@@ -1577,7 +1577,6 @@ string FFmpeg_Glue::ColorSpace_Get()
         case AVCOL_SPC_NB: return "Not part of ABI.";
         default: return string();
     }
-    
 }
 
 //---------------------------------------------------------------------------
