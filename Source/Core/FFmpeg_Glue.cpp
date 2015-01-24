@@ -1339,10 +1339,6 @@ double FFmpeg_Glue::DAR_Get()
     double DAR;
     if (InputData->Stream->codec->sample_aspect_ratio.num && InputData->Stream->codec->sample_aspect_ratio.den)
         DAR=((double)InputData->Stream->codec->width)/InputData->Stream->codec->height*InputData->Stream->codec->sample_aspect_ratio.num/InputData->Stream->codec->sample_aspect_ratio.den;
-    else if ((InputData->Stream->codec->width>=704 && InputData->Stream->codec->width<=720) //NTSC / PAL
-          && ((InputData->Stream->codec->height>=480 && InputData->Stream->codec->height<=486)
-           || InputData->Stream->codec->height==576))
-        DAR=((double)4)/3;
     else
         DAR=((double)InputData->Stream->codec->width)/InputData->Stream->codec->height;
     return DAR;
