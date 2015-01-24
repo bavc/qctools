@@ -68,7 +68,7 @@ enum col_names
     Col_PixFormat,
     Col_ColorSpace,
     Col_ColorRange,
-    Col_FrameRate,
+    Col_FramesDivDuration,
     Col_RFrameRate,
     Col_AvgFrameRate,
     Col_AudioFormat,
@@ -107,7 +107,7 @@ percolumn PerColumn[Col_Max]=
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Pix Format",       NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Color Space",      NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Color Range",      NULL, },
-    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Frame rate",       NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Frames/Dur",       NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "R Frame rate",     NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Avg Frame rate",   NULL, },
     { StatsType_None,       Item_AudioMax,          Item_AudioMax,          "A. Format",        NULL, },
@@ -179,7 +179,7 @@ void FilesList::UpdateAll()
         QString     Format;
         QString     StreamCount;
         QString     BitRate;
-        QString     FrameRate;
+        QString     FramesDivDuration;
         QString     RFrameRate;
         QString     AvgFrameRate;
         string      Duration;
@@ -213,7 +213,7 @@ void FilesList::UpdateAll()
             Height=QString::number(             Main->Files[Files_Pos]->Glue->Height_Get());
             double DAR=                         Main->Files[Files_Pos]->Glue->DAR_Get();
             SAR=                                Main->Files[Files_Pos]->Glue->SAR_Get().c_str();
-            double FrameRated=                  Main->Files[Files_Pos]->Glue->VideoFrameRate_Get();
+            double FramesDivDurationd=          Main->Files[Files_Pos]->Glue->FramesDivDuration_Get();
             RFrameRate=                         Main->Files[Files_Pos]->Glue->RVideoFrameRate_Get().c_str();
             AvgFrameRate=                       Main->Files[Files_Pos]->Glue->AvgVideoFrameRate_Get().c_str();
             PixFormat=                          Main->Files[Files_Pos]->Glue->PixFormat_Get().c_str();
@@ -226,7 +226,7 @@ void FilesList::UpdateAll()
             double BitDepth=                    Main->Files[Files_Pos]->Glue->BitDepth_Get();
 
             // Parsing
-            FrameRate=QString::number(FrameRated, 'f', 3);
+            FramesDivDuration=QString::number(FramesDivDurationd, 'f', 3);
 
             if (Milliseconds)
             {
@@ -281,7 +281,7 @@ void FilesList::UpdateAll()
         setItem((int)Files_Pos, Col_PixFormat,      new QTableWidgetItem(PixFormat));
         setItem((int)Files_Pos, Col_ColorSpace,     new QTableWidgetItem(ColorSpace));
         setItem((int)Files_Pos, Col_ColorRange,     new QTableWidgetItem(ColorRange));
-        setItem((int)Files_Pos, Col_FrameRate,      new QTableWidgetItem(FrameRate));
+        setItem((int)Files_Pos, Col_FramesDivDuration, new QTableWidgetItem(FramesDivDuration));
         setItem((int)Files_Pos, Col_RFrameRate,     new QTableWidgetItem(RFrameRate));
         setItem((int)Files_Pos, Col_AvgFrameRate,   new QTableWidgetItem(AvgFrameRate));
         setItem((int)Files_Pos, Col_AudioFormat,    new QTableWidgetItem(AudioFormat));

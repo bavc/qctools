@@ -1232,7 +1232,7 @@ double FFmpeg_Glue::VideoDuration_Get()
 }
 
 //---------------------------------------------------------------------------
-double FFmpeg_Glue::VideoFrameRate_Get()
+double FFmpeg_Glue::FramesDivDuration_Get()
 {
     inputdata* InputData=NULL;
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
@@ -1245,9 +1245,6 @@ double FFmpeg_Glue::VideoFrameRate_Get()
     if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
         return 0;
 
-    if (InputData->Stream->avg_frame_rate.num && InputData->Stream->avg_frame_rate.den)
-        return ((double)InputData->Stream->avg_frame_rate.num)/InputData->Stream->avg_frame_rate.den;
-    
     if (InputData->FrameCount && InputData->Duration)
         return InputData->FrameCount/InputData->Duration;
 

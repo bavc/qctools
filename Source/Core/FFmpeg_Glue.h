@@ -82,7 +82,7 @@ public:
     // Video information
     string                      VideoFormat_Get();
     double                      VideoDuration_Get();
-    double                      VideoFrameRate_Get();
+    double                      FramesDivDuration_Get();
     string                      RVideoFrameRate_Get();
     string                      AvgVideoFrameRate_Get();
     size_t                      VideoFrameCount_Get();
