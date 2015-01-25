@@ -42,6 +42,9 @@
             <li>
                 <a href="#Resources">Are there additional resources that may be useful to me?</a>
             </li>
+            <li>
+                <a href="#Feedback">How can I provide feedback?</a>
+            </li>
         </ul>
         <h2 style="color:blue">
             <a id="QCTools" name="QCTools">What is QCTools</a>
@@ -119,73 +122,73 @@
             <a id="Graphs" name="Graphs">What do the Graphs measure?</a>
         </h2>
         <p>
-            The following provides an overview of QCTools graph functionality. For more detailed descriptions, please see the <a href="FilterDescriptions.html">Filter Descriptions</a> tab.
+            The following provides an overview of QCTools graph functionality. For more detailed descriptions, please see the help documentation on Filter Descriptions or the documentation on FFmpeg's <a href="http://ffmpeg.org/ffmpeg-filters.html#signalstats">signalstats</a> filter.
         </p>
         <h3>
-            Y Channel Filters (Y, YDiff, YDiffX)
+            Y Channel Filters (Y, YDiff)
         </h3>
         <p>
-            The Y Channel carries brightness information (also called luma). Black and white moving image files will contain only Y data whereas a colorized video with have both Y, and U/V. If you are analyzing a black and white video, then, you should see no U/V data. If you do, this may indicate that your video has color noise. These filters are ideal for determining if your video is overly bright, or dark. The Diff filters simply measure the �difference� in value between the Y values of two consecutive pixels. Large differences would likely indicate a dramatic change in the brightness of your video which may indicate the presence of a problem.
+            The Y Channel carries brightness information (also called luma). Black and white moving image files will contain only Y data whereas a colorized video with have both Y, and U/V. If you are analyzing a black and white video, then, you should see no U/V data. If you do, this may indicate that your video has color noise. These filters are ideal for determining if your video is overly bright, or dark. The Diff filters simply measure the visual difference in value between the Y values of two consecutive pixels.
         </p>
         <h3>
             U/V Channel Filters (U, V, UDiff, VDiff)
         </h3>
         <p>
-            These 2 channels together carry color information (or chroma); dramatic activity in these graphs could indicate that your video has color abnormalities. A normal reading indicating consistent color values would show graph values on or around 128. This might manifest as a rainbow effect in your video.
+            These 2 channels together carry color information (or chroma); dramatic activity in these graphs could indicate that your video has color abnormalities. A normal reading indicating consistent color values would show graph values the around the central value of 128.
         </p>
         <h3>
             Saturation
         </h3>
         <p>
-            This graph detects the measure of vibrancy or brightness of color. Overly saturated (too bright) or under-saturated (too washed-out) are not ideal.
+            This graph detects the measure of vibrancy or brightness of color. Overly saturated (too bright) or under-saturated (too washed-out) are not ideal. Saturation levels that are too high may exceed broadcast range, extremely high levels are mathematically illegal as they can not be converted back to RGB without creating an invalid value, such values are generally indicative of tape damage.
         </p>
         <h3>
             Hue
         </h3>
         <p>
-            Hue is the degree to which a color is accurate (does skin tone look normal? Do the blues, reds, etc., of your video look as you expect they should?). This graph filter will help you detect areas of your video which may have strange color representation.
+            The Hue graphs plot the average color value for the frame. Do the blues, reds, etc., of your video look as you expect they should? This graph filter will help you detect areas of your video which may have strange color representation.
         </p>
         <h3>
             Temporal Outliers
         </h3>
         <p>
-            This filter looks at a collection of pixels that reside near to one another; in video with no errors, you would expect for these pixels to have roughly a similar value. If there are large differences between a pixel and it�s neighbors, this may be an indication of an error. This graph filter is especially good at detecting white speckling artifacts.
+            This filter looks at a collection of pixels that reside near to one another; in video with no errors, you would expect for these pixels to have roughly a similar value. If there are large differences between a pixel and it's neighbors, this may be an indication of a dropout or other error. This graph filter is especially good at detecting white speckling artifacts such as tape creases, tape tracking issues, or skew problems.
         </p>
         <h3>
             Vertical Repetitions (VREP)
         </h3>
         <p>
-            This graph filter works by looking for rows of similar or duplicate pixels. Often, if there is signal interruption or loss, your deck or Time Base Corrector, in an effort to fill in the gaps, will duplicate existing data. The VREP filter will alert you to this repetitive data, which often manifests as vertical lines across your picture. This filter is useful with analog source content only.
+            This graph filter works by looking for rows of similar or duplicate pixels. Often, if there is signal interruption or loss, your deck or Time Base Corrector, in an effort to fill in the gaps, will duplicate existing rows of pixel data. The VREP filter will alert you to this repetitive data, which often manifests as vertical lines across your picture. This filter is useful with analog source content only.
         </p>
         <h3>
             Broadcast Range (BRNG)
         </h3>
         <p>
-            This filter detects pixels which lie outside of 'broadcast range' or those deemed to have unacceptable values as per established broadcasting standards. Also see <a href="http://en.wikipedia.org/wiki/Broadcast_television_systems">Broadcast Standards</a>
+            This filter detects pixels which lie outside of <a href="http://en.wikipedia.org/wiki/Broadcast-safe">broadcast range</a> or those deemed to have unacceptable values as per established broadcasting standards. Also see <a href="http://en.wikipedia.org/wiki/Broadcast_television_systems">Broadcast Standards</a>.
         </p>
         <h3>
             Mean Square Error per Field (MSeF)
         </h3>
         <p>
-            This detects the image difference between the two fields of video. The bigger the difference, the more it indicates a potential problem (head clogs, deck issues).
+            This detects the visual difference between the two fields of video. The bigger the difference, the more it indicates a potential problem (head clogs, deck issues). See FFmpeg's documentation on the<a href="http://ffmpeg.org/ffmpeg-filters.html#psnr">PSNR filter</a> for more information.
         </p>
         <h3>
-            Peak Signal to Noise per Field (PSNRf)
+            Peak Signal to Noise Ratio per Field (PSNRf)
         </h3>
         <p>
-            This filter is helpful for detecting the <q>lossiness</q>of a video. Lossiness is a term often associated with the compression process and it refers to data or information that is <a href="http://en.wikipedia.org/wiki/Lossy_compression">lost</a> when the video undergoes this process.
+            This filter is similar to Mean Square Error per Field but uses the Peak Signal to Noise Ratio (PSNR) algorithm. See FFmpeg's documentation on the<a href="http://ffmpeg.org/ffmpeg-filters.html#psnr">PSNR filter</a> for more information.
         </p>
         <h2 style="color:blue">
             <a id="Choose" name="Choose">What Graphs should I chose?</a>
         </h2>
         <p>
-            The graphs dectect a wide array of errors and as you become more familiar with the tool and your video collection, you will likely opt for different graph filters depending on the errors you suspect or anticipate. There are some multipurpose options, however, that may be especially helpful to start with in order to get a high-level sense of where, and what type of errors are present. The YUV and Diffs (Y values, U values, V values, YDiff, YDiffX) are beneficial for detecting light/dark and color issues. The TOUT (Temporal Outliers) filter is targeted to detecting white noise such as white speckle pattern you may find in damaged VHS tape. The HEAD (Head Switching) filter is meant to quantify visible playback issues at the bottom of analog frames of video caused by <a href="http://preservation.bavc.org/artifactatlas/index.php/Head_Switching_Noise">head switching</a>. These graph filters are ideal to start with as a new user.
+            The graphs dectect a wide array of errors and as you become more familiar with the tool and your video collection, you will likely opt for different graph filters depending on the errors you suspect or anticipate. There are some multipurpose options, however, that may be especially helpful to start with in order to get a high-level sense of where, and what type of errors are present. The YUV and Diffs (Y values, U values, V values, YDiff, YDiffX) are beneficial for detecting light/dark and color issues. The TOUT (Temporal Outliers) filter is targeted to detecting white noise such as white speckle pattern you may find in damaged VHS tape. These graph filters are ideal to start with as a new user.
         </p>
         <h2 style="color:blue">
             <a id="FFmpeg" name="FFmpeg">What is FFmpeg?</a>
         </h2>
         <p>
-            FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. QCTools utilizes FFmpeg to decode video for analysis. The playback filters use FFmpeg's libavfilter in order to process the decoded audiovisual data for different types of displays. More at <a href="ffmpeg.org">FFmpeg</a>
+            FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. QCTools utilizes FFmpeg to decode video for analysis. The playback filters use FFmpeg's libavfilter in order to process the decoded audiovisual data for different types of displays. More at <a href="ffmpeg.org">FFmpeg.org</a>.
         </p>
         <h2 style="color:blue">
             <a id="Workflow" name="Workflow">How can I integrate the QCTools export feature into my workflow?</a>
@@ -193,11 +196,14 @@
         <p>
             QCTools currently supports a frame-by-frame analysis/export in XML format (based on the FFprobe metadata standard. Please also see the 'Data Format' tab). These files can be integrated into your preservation metadata.
         </p>
+        <p>
+            Since the QCTool's analysis filter, <a href="http://ffmpeg.org/ffmpeg-filters.html#signalstats">signalstats</a>, is now part of FFmpeg and QCTool's reporting format is based on FFmpeg's ffprobe metadata schema, QCTools data reports may be fully generated using a recent version of FFmpeg. This may be preferrable for handling the analysis of large amounts of audiovisual files, so that FFmpeg creates many QCTools reports through FFmpeg which can then later be assessed more closely within the QCTools application. See the Data Format section of the help documentation for more information.
+        </p>
         <h2 style="color:blue">
             <a id="Audio" name="Audio">What about my audio?</a>
         </h2>
         <p>
-            QCTools does not support audio at this time, but will in future releases.
+            Starting in QCTools version 0.7, QCTools has some audio support. This includes plotting EBU R128 loudness measurements over time and providing several audio visualization playback tools (audio vectorscope, audio waveforms, etc) in the player window.
         </p>
         <h2 style="color:blue">
             <a id="Error" name="Error">What is [this error] called?</a>
@@ -213,6 +219,12 @@
         </p>
         <p>
             The <a href="http://preservation.bavc.org/artifactatlas/index.php/A/V_Artifact_Atlas">AV Artifact Atlas</a> is an especially good resource to find examples of video errors, with accompanying descriptions and visual references.
+        </p>
+        <h2 style="color:blue">
+            <a id="Feedback" name="Feedback">How can I provide feedback?</a>
+        </h2>
+        <p>
+            Feedback such as requests for clarifications, suggestions for enhancements, or reports of bugs is important for the project. If you find an issue with QCTools, find something unclear, or have an idea please visit the issue tracker at <a href="http://github.com/bavc/qctools/issues">QCTool's github account</a> and click <a href="http://github.com/bavc/qctools/issues/new">New issue</a>. Once here please name your issue and fill out a description. Once submitted the issue will be in the public issue tracker and the development team can respond to it or associate improvements to it.
         </p>
     </body>
 </html>
