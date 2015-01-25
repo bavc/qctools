@@ -8,6 +8,9 @@
         </title>
     </head>
     <body>
+        <h1>
+            How to Use
+        </h1>
         <ul style="list-style-type:none">
             <li>
                 <a href="#Install">Install</a>
@@ -44,27 +47,30 @@
             Install
         </h2>
         <p>
-            Go to http://bavc.org/qctools and download QCTools for your operating system (currently Windows or Mac OS X are supported). Initiate the install by double-clicking the icon, and follow the steps. New releases of QCTools will be periodically available at the <a href="http://www.bavc.org/qctools">QCTools project website.</a>
+            Go to <a href="http://bavc.org/qctools">http://bavc.org/qctools</a> and download QCTools for your operating system (currently Windows, Mac OS X, and many Linux-based operating systems are supported). Initiate the install by double-clicking the icon, and follow the steps. New releases of QCTools will be periodically available at BAVC's <a href="http://www.bavc.org/qctools">QCTools project website</a> as well as the releases tab on the <a href="http://github.com/bavc/qctools/releases">QCTools github page</a>.
         </p>
         <h2 id="Load">
             Load Video Files
         </h2>
         <p>
-            QCTools can currently accomodate several video file types including .mov, .mp4 Once the QCTools application is open you may identify selected video files for QC Tools analysis in three ways:
+            QCTools can currently accomodate several video file types including QuickTime, MXF, AVI, Matroska, MP4, and many other audiovisual file formats. Once the QCTools application is open you may identify selected video files for QCTools analysis in three ways:
         </p>
         <ol>
-            <li>Simply drag a video file (or files) into the QCTools window.(Note that you may import multiple files at once into the tool, though depending on the number and size of the files, processing speed may be affected)
+            <li>Simply drag a video file (or files) into the QCTools window. Note that you may import multiple files at once into the tool, though depending on the number and size of the files, processing speed may be affected.
             </li>
             <li>Double click the folder icon on the upper left. This launches a window from which you can browse and select video files.
             </li>
-            <li>Navigating to File --&gt; Open.
+            <li>Navigating to File--&gt;Open.
             </li>
         </ol>
+        <p>
+            As files are opened QCTools will begin immediately processing them. This involves creating thumbnails, decoding audiovisual data, and analyzing that data through FFmpeg's signalstats filter.
+        </p>
         <h2 id="Select">
             Select Graph Filters
         </h2>
         <p>
-            By clicking the filter checkboxes you can select those that you wish to analyze and display. You may make these selections before uploading your video or at any time after the QC Tools analysis has been done and the graph display will update dynamically. As a default, 'Y values', 'U values', 'V values', and 'Diffs' are selected. To begin, you may want to select the <strong>Temporal Outliers</strong> Graph Filter. This will detect any large discrepancies between pixels and can provide an initial, high-level overview of potential errors.
+            By clicking the graph checkboxes you can select particular audiovisual metrics that you wish to analyze and display. You may make these selections before uploading your video or at any time after the QCTools analysis has been done and the graph display will update dynamically. As a default, 'Y values', 'U values', 'V values', 'Diffs', and 'Sat' (saturation) are selected. To begin, you may also want to select the <b>Temporal Outliers</b> (tout) Graph Filter. This will detect any large discrepancies between pixels and can provide an initial, high-level overview of potential errors.
         </p>
         <p>
             For descriptions of each Filter and how to read graph values, please see the Help Section, denoted by the '?' icon in the toolbox portion of the application.
@@ -73,43 +79,52 @@
             <a id="View" name="View">View and Navigate Graphs</a>
         </h2>
         <p>
-            Graphs display on the top portion of the screen, corresponding video frames show below. The video frames may be navigated via the next, previous, or playback buttons; the frame and time for the particular selection will be displayed. Clicking and dragging your cursor over a portion of the graph will cause the thumbnails below to update accordingly. You may also double click a specific frame and a window will appear displaying the image and all of the various filter values, with 'chroma' or 'normal' view options.
+            Graphs display on the top portion of the screen, corresponding video thumbnails show below. The video frames may be navigated via the next, previous, or playback buttons; the frame and time for the particular selection will be displayed. Clicking and dragging your cursor over a portion of the graph will cause the thumbnails below to update accordingly. You may also double click a specific thumbnail and the playback window will appear displaying the image and with a variety of analytical playback filters.
         </p>
         <p>
-            Pointing your keyboard cursor to a particular point on a graph will result in the display of two values: the frame, and the timecode of the particular place in the video you have navigated to.
+            Scrubbing your cursor over a particular point on a graph will reveal the corresponding thumbnails in the thumbnail bar along with the frame number and the timestamp of the particular place in the video you have navigated to.
         </p>
         <p>
             You may also use the '+' and '-' icons in the tool box section of the application to zoom in/out, giving you a more or less detailed view of the graph displays, over a specific timespan of the uploaded video.
         </p>
         <p>
+            You can also 'play' the window within the graph view. When playing the graph's cursor which shows the currently selected frame will scroll to the right while the corresponding thumbnails update in the thumbnail bar below.
+        </p>
+        <p>
             Some helpful <strong>keyboard shortcuts</strong> you may want to use are:
         </p>
         <ul>
-            <li>'J' - To rewind
+            <li>'j' - To rewind
             </li>
-            <li>'K' - To pause
+            <li>'k' - To pause
             </li>
-            <li>'L' - To Fast Forward
+            <li>'l' - To Fast Forward
             </li>
-            <li>'F' - To enlarge the window to full screen
+            <li>'f' - To enlarge the window to full screen
+            </li>
+            <li>space bar - Toggle between play and pause
+            </li>
+            <li>left - Select the previous frame
+            </li>
+            <li>right - Select the next frame
             </li>
         </ul>
         <h2 id="Play">
             Playback and Visual Analysis
         </h2>
         <p>
-            By clicking on a thumbail, you can open the preview window. The preview window serves as a playback environment that allows spot checking and manual video alaysis. The preview window contains two playback windows that can be set to various selections; the filters allow the video to be processed in one of many ways which may help make particular issues more discernable. See the <b>Filter Description</b> page for more details on these playback filters.
+            By clicking on a thumbail, you can open the preview window. The preview window serves as a playback environment that allows spot checking and manual video alaysis. The preview window contains two playback windows that can be set to various selections; the filters allow the video to be processed in one of many ways which may help make particular issues more discernable. See the <b>Playback Filters</b> page for more details on these playback filters.
         </p>
         <h2 id="Report">
             Create/Export a Report
         </h2>
         <p>
-            Once you've analyzed a video you may wish to export the analysis as a text-based document. QCTools may express analytical metadata per frame in a <a href="http://en.wikipedia.org/wiki/Comma-separated_values">CSV</a> or <a href="http://en.wikipedia.org/wiki/XML">XML</a> file format (Please see 'Data Format' tab for more information on the XML file compression and resulting file).<br />
-            When an analysis (which may be time consuming, depending on the length of the file) is complete, a text document may be generated and exported. At a later point, the video may be reviewed simply by opening the file--using the <b>Import</b> menu, or dragging and dropping an existing file--in QCTools instead of having to reload/ reanalyze the video file itself; this process will take considerably less time. Additionally, this file may be opened in other environments such as standard spreadsheet or database applications.<br />
+            When an analysis (which may be time consuming, depending on the length of the file) is complete the analysis data may then be exported to a compressed XML file for future use. At a later point, the video may be reviewed again simply by opening the XML file--using the <b>Import</b> menu, or dragging and dropping the XML into QCTools--instead of having to reload/ reanalyze the video file itself; this process will take considerably less time. Additionally, this file may be opened in other environments such as standard spreadsheet or database applications.<br />
+            QCTools also can export analytical metadata per frame in a <a href="http://en.wikipedia.org/wiki/Comma-separated_values">CSV</a> document but the compressed <a href="http://en.wikipedia.org/wiki/XML">XML</a> report is recommended since it can be reloaded into QCTools. Please see 'Data Format' tab for more information on the XML file compression and resulting file.<br />
             To <b>Export</b>:
         </p>
         <ul>
-            <li>Navigate to: Export --&gt; To .qctools.xml.gz.../CSV, etc.
+            <li>Navigate to: Export--&gt;To .qctools.xml.gz.../CSV, etc.
             </li>
             <li>Click the 'CSV' icon in the toolbox section of the application.
             </li>
@@ -128,23 +143,23 @@
             Parts of the Tool
         </h2>
         <h3 style="color:blue" id="Data">
-            Data Analysis Window:
+            Graph Window:
         </h3>
         <p>
-            This view displays the filename, filter selections, X-Axis value selector, and the frame navigator buttons.<br />
+            This view displays the filename, graph selections, X-Axis value selector, and the frame navigator buttons.<br />
             <br />
             <img src="Slide1.jpg" alt="Data Analysis Window" /><br />
             <br />
-            Descriptions of a particular filter display as you use your mouse to hover:<br />
+            Descriptions of a graphs are reveals as tooltips when hovering your cursor over the graph checkboxes:<br />
             <br />
             <img src="Slide4.jpg" alt="filter description" /><br />
             <br />
         </p>
         <h3 style="color:blue" id="List">
-            List View:
+            Table View:
         </h3>
         <p>
-            The List View enables you to view the progress of your file download, plus associated metadata:<br />
+            The Table View enables you to view the progress of your file download, plus associated metadata:<br />
             <br />
             <img src="metadatascreen.jpg" alt="List View" /><br />
             <br />
@@ -164,82 +179,82 @@
                 </tr>
                 <tr>
                     <td>
-                        &nbsp;Yav&nbsp;
+                        Yav
                     </td>
                     <td>
-                        &nbsp;The average of the Y values&nbsp;
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        &nbsp;Yrang&nbsp;
-                    </td>
-                    <td>
-                        &nbsp;The average of the YHIGH and YLOW values, which indicates the overall range of contrast&nbsp;
+                        The average of the Y values
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        &nbsp;Uav&nbsp;
+                        Yrang
                     </td>
                     <td>
-                        &nbsp;The average of the U values&nbsp;
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        &nbsp;Vav&nbsp;
-                    </td>
-                    <td>
-                        &nbsp;The average of the V values&nbsp;
+                        The average of the YHIGH and YLOW values, which indicates the overall range of contrast
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        &nbsp;TOUTav&nbsp;
+                        Uav
                     </td>
                     <td>
-                        &nbsp;The average of the TOUT values&nbsp;
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        &nbsp;SATb&nbsp;
-                    </td>
-                    <td>
-                        &nbsp;The number of frames where the maximum saturation is over 88.7, which would indicate levels outside of the broadcast range&nbsp;
+                        The average of the U values
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        &nbsp;SATi&nbsp;
+                        Vav
                     </td>
                     <td>
-                        &nbsp;The number of frames where the maximum saturation is over 118.2, which would indicate levels outside the legal YUV values&nbsp;
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        &nbsp;BRNGav&nbsp;
-                    </td>
-                    <td>
-                        &nbsp;The percentage of frames with a BRNG value of more than zero&nbsp;
+                        The average of the V values
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        &nbsp;BRNGc&nbsp;
+                        TOUTav
                     </td>
                     <td>
-                        &nbsp;The number of frames with a BRNG value greater than zero&nbsp;
+                        The average of the TOUT values
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        &nbsp;MSEfY&nbsp;
+                        SATb
                     </td>
                     <td>
-                        &nbsp;The number of frames with an MSEfY value over 1000&nbsp;
+                        The number of frames where the maximum saturation is over 88.7, which would indicate levels outside of the broadcast range
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        SATi
+                    </td>
+                    <td>
+                        The number of frames where the maximum saturation is over 118.2, which would indicate levels outside the legal YUV values
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        BRNGav
+                    </td>
+                    <td>
+                        The percentage of frames with a BRNG value of more than zero
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        BRNGc
+                    </td>
+                    <td>
+                        The number of frames with a BRNG value greater than zero
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        MSEfY
+                    </td>
+                    <td>
+                        The number of frames with an MSEfY value over 1000
                     </td>
                 </tr>
             </tbody>
@@ -254,6 +269,7 @@
             <br />
             <img src="Slide3.jpg" alt="Views" /><br />
             <br />
+            Many playback filters will use contextual options to tweak them, please review the Playback Filters section of the help documentation for more details.
         </p>
     </body>
 </html>
