@@ -351,8 +351,8 @@ const filter Filters[]=
         0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
-            { Args_Type_Slider,   0,   0, 360,   1, "Hue"},
-            { Args_Type_Slider,   1, -10,  10,   1, "Saturation"},
+            { Args_Type_Slider,   0,-180, 180,   1, "Hue"},
+            { Args_Type_Slider,  10,   0,  30,  10, "Saturation"},
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
