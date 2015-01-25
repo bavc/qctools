@@ -67,6 +67,7 @@ enum args_type
     Args_Type_Wave_Mode,
     Args_Type_Yuv,  // Y, U , V
     Args_Type_YuvA, // Y, U, V, All
+    Args_Type_Ranges, // above whites, below black
     Args_Type_ClrPck, // Color picker
 };
 
@@ -373,6 +374,23 @@ const filter Filters[]=
         {
             "signalstats=out=brng:c=${2},format=yuv444p|rgb24",
             "il=l=d:c=d,signalstats=out=brng:c=${2},format=yuv444p|rgb24",
+        },
+    },
+    {
+        "Broadcast Illegal Focus",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
+            { Args_Type_Ranges,   1,   0,   0,   0, "Outer Range"},
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+                       "geq=lum=if(gt(lum(X\\,Y)\\,235)\\,(lum(X\\,Y)-235)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
+                       "geq=lum=if(lt(lum(X\\,Y)\\,16)\\,(lum(X\\,Y)+1)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
+            "il=l=d:c=d,geq=lum=if(gt(lum(X\\,Y)\\,235)\\,(lum(X\\,Y)-235)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
+            "il=l=d:c=d,geq=lum=if(lt(lum(X\\,Y)\\,16)\\,(lum(X\\,Y)+1)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
         },
     },
     {
@@ -1111,6 +1129,26 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                     }
                                     Widget_XPox+=Filters[FilterPos].Args[OptionPos].Type==Args_Type_Yuv?3:4;
                                     break;
+            case Args_Type_Ranges:
+                                    Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
+                                    for (size_t OptionPos2=0; OptionPos2<2; OptionPos2++)
+                                    {
+                                        Options[Pos].Radios[OptionPos][OptionPos2]=new QRadioButton();
+                                        Options[Pos].Radios[OptionPos][OptionPos2]->setFont(Font);
+                                        switch (OptionPos2)
+                                        {
+                                            case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("above white"); break;
+                                            case 1: Options[Pos].Radios[OptionPos][OptionPos2]->setText("below black"); break;
+                                            default:;
+                                        }
+                                        if (OptionPos2==PreviousValues[Pos][FilterPos].Values[OptionPos])
+                                            Options[Pos].Radios[OptionPos][OptionPos2]->setChecked(true);
+                                        connect(Options[Pos].Radios[OptionPos][OptionPos2], SIGNAL(toggled(bool)), this, Pos==0?(SLOT(on_FiltersOptions1_toggle(bool))):SLOT(on_FiltersOptions2_toggle(bool)));
+                                        Layout0->addWidget(Options[Pos].Radios[OptionPos][OptionPos2], 0, Widget_XPox+OptionPos2);
+                                        Options[Pos].Radios_Group[OptionPos]->addButton(Options[Pos].Radios[OptionPos][OptionPos2]);
+                                    }
+                                    Widget_XPox+=2;
+                                    break;
             case Args_Type_ClrPck:
                                     {
                                     Options[Pos].ColorValue[OptionPos]=PreviousValues[Pos][FilterPos].Values[OptionPos];
@@ -1317,6 +1355,10 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                         }
                                     }
                                     break;
+            case Args_Type_Ranges:
+                                    Value_Pos<<=1;
+                                    Value_Pos|=Options[Pos].Radios[OptionPos][1]->isChecked()?1:0;
+                                    //No break
             case Args_Type_ClrPck:
                                     Modified=true;
                                     WithSliders[OptionPos]=Options[Pos].ColorValue[OptionPos];

@@ -50,6 +50,9 @@
         <h2 style="color:blue">Broadcast Range Pixels</h2>
         <p>This is the same presentation as 'Normal' except that pixels that are outside of broadcast range are highlighted as white. Again here, you have the option of selecting <strong>'Field Split'</strong> to display field 1 (top) and field 2 (bottom) separately. </p>
 
+        <h2 style="color:blue">Broadcast Illegal Focus</h2>
+        <p>For video that uses the YUV colorspace and decode in a broadcast range. Values from 0-16 (on an 8 bit scale) will all decode to black on a computer monitor, while values from 235-255 will decode as white. This filter allows the users to select to feature pixel data that is outside of broadcast range. Select "above whites" to set pixels with luma values from 236-255 to a range of grays (while all other pixels are set to black). Select "below black" to set pixels with luma values from 0-15 to a range of grays (while all other pixels are set to black). If a video frame only contains pixels that have luma values within broadcast range, then this filter will play black only black pixels. This filter portrays broadcast range compliance in somewhat the opposite way as the "Broadcast Range Pixels" filter since it focuses on values that may be crushed to black or white because they fall outside of broadcast range. Note that some videos may intentionally be encoded in 'full range' where this filter is less relevant.</p>
+
         <h2 style="color:blue">Temporal Outlier Pixels</h2>
         <p>This is the same presentation as 'Normal' except that pixels that are labelled as temporal outliers are highlighted as white. Temporal outliers are pixels that significantly differ from their neighbors and often correspond to tape damage or playback error. Select <strong>'Field Split'</strong> to see the fields displayed separately. </p>
 
