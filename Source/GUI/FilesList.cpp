@@ -75,7 +75,7 @@ enum col_names
   //Col_SampleFormat,
     Col_SamplingRate,
     Col_ChannelLayout,
-  //Col_BitDepth,
+    Col_ABitDepth,
     Col_Max
 };
 
@@ -114,7 +114,7 @@ percolumn PerColumn[Col_Max]=
   //{ StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Sample format",    NULL, },
     { StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Sampling rate",    "measured in Hz", },
     { StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Channel layout",   NULL, },
-  //{ StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Bit depth",        NULL, },
+    { StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Audio Bit depth",  NULL, },
 };
 
 
@@ -197,7 +197,7 @@ void FilesList::UpdateAll()
         QString     SampleFormat;
         QString     SamplingRate_String;
         QString     ChannelLayout;
-        QString     BitDepth_String;
+        QString     ABitDepth_String;
 
         QFileInfo   FileInfo(Main->Files[Files_Pos]->FileName);
 
@@ -223,7 +223,7 @@ void FilesList::UpdateAll()
             SampleFormat=                       Main->Files[Files_Pos]->Glue->SampleFormat_Get().c_str();
             double SamplingRate=                Main->Files[Files_Pos]->Glue->SamplingRate_Get();
             ChannelLayout=                      Main->Files[Files_Pos]->Glue->ChannelLayout_Get().c_str();
-            double BitDepth=                    Main->Files[Files_Pos]->Glue->BitDepth_Get();
+            double ABitDepth=                    Main->Files[Files_Pos]->Glue->ABitDepth_Get();
 
             // Parsing
             FramesDivDuration=QString::number(FramesDivDurationd, 'f', 3);
@@ -256,8 +256,8 @@ void FilesList::UpdateAll()
             DAR_String=QString::number(DAR, 'f', 4);
             if (SamplingRate)
                 SamplingRate_String=QString::number(SamplingRate);
-            if (BitDepth)
-                BitDepth_String=QString::number(BitDepth)+"-bit";
+            if (ABitDepth)
+                ABitDepth_String=QString::number(ABitDepth);
 
             FileSize=QString::number(FileInfo.size());
         }
@@ -288,7 +288,7 @@ void FilesList::UpdateAll()
       //setItem((int)Files_Pos, Col_SampleFormat,   new QTableWidgetItem(SampleFormat));
         setItem((int)Files_Pos, Col_SamplingRate,   new QTableWidgetItem(SamplingRate_String));
         setItem((int)Files_Pos, Col_ChannelLayout,  new QTableWidgetItem(ChannelLayout));
-      //setItem((int)Files_Pos, Col_BitDepth,       new QTableWidgetItem(BitDepth_String));
+        setItem((int)Files_Pos, Col_ABitDepth,       new QTableWidgetItem(ABitDepth_String));
 
         for (int Pos=0; Pos<Col_Max; Pos++)
         {

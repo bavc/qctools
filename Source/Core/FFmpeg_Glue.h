@@ -99,7 +99,7 @@ public:
     string                      SampleFormat_Get();
     int                         SamplingRate_Get();
     string                      ChannelLayout_Get();
-    int                         BitDepth_Get();
+    int                         ABitDepth_Get();
     
     // FFmpeg information
     string                      FFmpeg_Version();

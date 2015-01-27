@@ -1779,7 +1779,7 @@ string FFmpeg_Glue::ChannelLayout_Get()
 }
 
 //---------------------------------------------------------------------------
-int FFmpeg_Glue::BitDepth_Get()
+int FFmpeg_Glue::ABitDepth_Get()
 {
     inputdata* InputData=NULL;
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
@@ -1792,7 +1792,7 @@ int FFmpeg_Glue::BitDepth_Get()
     if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
         return 0;
 
-    return 0; //TODO
+    return InputData->Stream->codec->bits_per_coded_sample;
 }
 
 //---------------------------------------------------------------------------
