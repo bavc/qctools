@@ -74,7 +74,7 @@ enum col_names
     Col_AudioFormat,
   //Col_SampleFormat,
     Col_SamplingRate,
-  //Col_ChannelLayout,
+    Col_ChannelLayout,
   //Col_BitDepth,
     Col_Max
 };
@@ -113,7 +113,7 @@ percolumn PerColumn[Col_Max]=
     { StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Audio Format",     NULL, },
   //{ StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Sample format",    NULL, },
     { StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Sampling rate",    "measured in Hz", },
-  //{ StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Channel layout",   NULL, },
+    { StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Channel layout",   NULL, },
   //{ StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Bit depth",        NULL, },
 };
 
@@ -287,7 +287,7 @@ void FilesList::UpdateAll()
         setItem((int)Files_Pos, Col_AudioFormat,    new QTableWidgetItem(AudioFormat));
       //setItem((int)Files_Pos, Col_SampleFormat,   new QTableWidgetItem(SampleFormat));
         setItem((int)Files_Pos, Col_SamplingRate,   new QTableWidgetItem(SamplingRate_String));
-      //setItem((int)Files_Pos, Col_ChannelLayout,  new QTableWidgetItem(ChannelLayout));
+        setItem((int)Files_Pos, Col_ChannelLayout,  new QTableWidgetItem(ChannelLayout));
       //setItem((int)Files_Pos, Col_BitDepth,       new QTableWidgetItem(BitDepth_String));
 
         for (int Pos=0; Pos<Col_Max; Pos++)

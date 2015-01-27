@@ -1728,10 +1728,40 @@ string FFmpeg_Glue::ChannelLayout_Get()
             break;
         }
 
-    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
-        return string();
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL)
+        return "";
 
-    return string(); //TODO
+    switch (InputData->Stream->codec->channel_layout)
+    {
+        case AV_CH_LAYOUT_MONO: return "mono";
+        case AV_CH_LAYOUT_STEREO: return "stereo"; 
+        case AV_CH_LAYOUT_2POINT1: return "2.1"; 
+        case AV_CH_LAYOUT_SURROUND: return "3.0"; 
+        case AV_CH_LAYOUT_2_1: return "3.0(back)";
+        case AV_CH_LAYOUT_4POINT0: return "4.0";
+        case AV_CH_LAYOUT_QUAD: return "quad";
+        case AV_CH_LAYOUT_2_2: return "quad(side)";
+        case AV_CH_LAYOUT_3POINT1: return "3.1";
+        case AV_CH_LAYOUT_5POINT0_BACK: return "5.0";
+        case AV_CH_LAYOUT_5POINT0: return "5.0(side)";
+        case AV_CH_LAYOUT_4POINT1: return "4.1";
+        case AV_CH_LAYOUT_5POINT1_BACK: 
+        case AV_CH_LAYOUT_5POINT1: return "5.1(side)";
+        case AV_CH_LAYOUT_6POINT0: return "6.0";
+        case AV_CH_LAYOUT_6POINT0_FRONT: return "6.0(front)";
+        case AV_CH_LAYOUT_HEXAGONAL: return "hexagonal";
+        case AV_CH_LAYOUT_6POINT1: return "6.1";
+        case AV_CH_LAYOUT_6POINT1_BACK: return "6.1";
+        case AV_CH_LAYOUT_6POINT1_FRONT: return "6.1(front)";
+        case AV_CH_LAYOUT_7POINT0: return "7.0";
+        case AV_CH_LAYOUT_7POINT0_FRONT: return "7.0(front)";
+        case AV_CH_LAYOUT_7POINT1: return "7.1";
+        case AV_CH_LAYOUT_7POINT1_WIDE_BACK: return "7.1(wide)";
+        case AV_CH_LAYOUT_7POINT1_WIDE: return "7.1(wide-side)";
+        case AV_CH_LAYOUT_OCTAGONAL: return "octagonal";
+        case AV_CH_LAYOUT_STEREO_DOWNMIX: return "downmix";
+        default: return string();
+    }
 }
 
 //---------------------------------------------------------------------------
