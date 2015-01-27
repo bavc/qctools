@@ -64,8 +64,13 @@ enum col_names
     Col_Width,
     Col_Height,
     Col_DAR,
+    Col_SAR,
     Col_PixFormat,
-    Col_FrameRate,
+    Col_ColorSpace,
+    Col_ColorRange,
+    Col_FramesDivDuration,
+    Col_RFrameRate,
+    Col_AvgFrameRate,
     Col_AudioFormat,
   //Col_SampleFormat,
     Col_SamplingRate,
@@ -94,13 +99,18 @@ percolumn PerColumn[Col_Max]=
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Duration",         NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "File size",        NULL, },
   //{ StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Encoder",          NULL, },
-    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "V. Format",        NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Video Format",     NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Width",            NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Height",           NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "DAR",              NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "SAR",              NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Pix Format",       NULL, },
-    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Frame rate",       NULL, },
-    { StatsType_None,       Item_AudioMax,          Item_AudioMax,          "A. Format",        NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Color Space",      NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Color Range",      NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Frames/Dur",       NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "R Frame rate",     NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Avg Frame rate",   NULL, },
+    { StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Audio Format",     NULL, },
   //{ StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Sample format",    NULL, },
     { StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Sampling rate",    "measured in Hz", },
   //{ StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Channel layout",   NULL, },
@@ -169,7 +179,9 @@ void FilesList::UpdateAll()
         QString     Format;
         QString     StreamCount;
         QString     BitRate;
-        QString     FrameRate;
+        QString     FramesDivDuration;
+        QString     RFrameRate;
+        QString     AvgFrameRate;
         string      Duration;
         QString     ShortFileName;
         QString     FileSize;
@@ -177,7 +189,10 @@ void FilesList::UpdateAll()
         QString     Width;
         QString     Height;
         QString     DAR_String;
+        QString     SAR;
         QString     PixFormat;
+        QString     ColorSpace;
+        QString     ColorRange;
         QString     AudioFormat;
         QString     SampleFormat;
         QString     SamplingRate_String;
@@ -197,8 +212,13 @@ void FilesList::UpdateAll()
             Width=QString::number(              Main->Files[Files_Pos]->Glue->Width_Get());
             Height=QString::number(             Main->Files[Files_Pos]->Glue->Height_Get());
             double DAR=                         Main->Files[Files_Pos]->Glue->DAR_Get();
-            double FrameRated=                  Main->Files[Files_Pos]->Glue->VideoFrameRate_Get();
+            SAR=                                Main->Files[Files_Pos]->Glue->SAR_Get().c_str();
+            double FramesDivDurationd=          Main->Files[Files_Pos]->Glue->FramesDivDuration_Get();
+            RFrameRate=                         Main->Files[Files_Pos]->Glue->RVideoFrameRate_Get().c_str();
+            AvgFrameRate=                       Main->Files[Files_Pos]->Glue->AvgVideoFrameRate_Get().c_str();
             PixFormat=                          Main->Files[Files_Pos]->Glue->PixFormat_Get().c_str();
+            ColorSpace=                         Main->Files[Files_Pos]->Glue->ColorSpace_Get().c_str();
+            ColorRange=                         Main->Files[Files_Pos]->Glue->ColorRange_Get().c_str();
             AudioFormat=                        Main->Files[Files_Pos]->Glue->AudioFormat_Get().c_str();
             SampleFormat=                       Main->Files[Files_Pos]->Glue->SampleFormat_Get().c_str();
             double SamplingRate=                Main->Files[Files_Pos]->Glue->SamplingRate_Get();
@@ -206,7 +226,7 @@ void FilesList::UpdateAll()
             double BitDepth=                    Main->Files[Files_Pos]->Glue->BitDepth_Get();
 
             // Parsing
-            FrameRate=QString::number(FrameRated, 'f', 3);
+            FramesDivDuration=QString::number(FramesDivDurationd, 'f', 3);
 
             if (Milliseconds)
             {
@@ -257,8 +277,13 @@ void FilesList::UpdateAll()
         setItem((int)Files_Pos, Col_Width,          new QTableWidgetItem(Width));
         setItem((int)Files_Pos, Col_Height,         new QTableWidgetItem(Height));
         setItem((int)Files_Pos, Col_DAR,            new QTableWidgetItem(DAR_String));
+        setItem((int)Files_Pos, Col_SAR,            new QTableWidgetItem(SAR));
         setItem((int)Files_Pos, Col_PixFormat,      new QTableWidgetItem(PixFormat));
-        setItem((int)Files_Pos, Col_FrameRate,      new QTableWidgetItem(FrameRate));
+        setItem((int)Files_Pos, Col_ColorSpace,     new QTableWidgetItem(ColorSpace));
+        setItem((int)Files_Pos, Col_ColorRange,     new QTableWidgetItem(ColorRange));
+        setItem((int)Files_Pos, Col_FramesDivDuration, new QTableWidgetItem(FramesDivDuration));
+        setItem((int)Files_Pos, Col_RFrameRate,     new QTableWidgetItem(RFrameRate));
+        setItem((int)Files_Pos, Col_AvgFrameRate,   new QTableWidgetItem(AvgFrameRate));
         setItem((int)Files_Pos, Col_AudioFormat,    new QTableWidgetItem(AudioFormat));
       //setItem((int)Files_Pos, Col_SampleFormat,   new QTableWidgetItem(SampleFormat));
         setItem((int)Files_Pos, Col_SamplingRate,   new QTableWidgetItem(SamplingRate_String));

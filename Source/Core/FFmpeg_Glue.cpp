@@ -470,6 +470,9 @@ bool FFmpeg_Glue::outputdata::InitEncode()
     Encode_CodecContext->codec_tag     = 0x32767579; // 2vuy
     Encode_CodecContext->time_base.num = Stream->codec->time_base.num;
     Encode_CodecContext->time_base.den = Stream->codec->time_base.den;
+    Encode_CodecContext->sample_aspect_ratio.num = 9;
+    Encode_CodecContext->sample_aspect_ratio.den = 10;
+    Encode_CodecContext->field_order   = AV_FIELD_BT;
     if (avcodec_open2(Encode_CodecContext, Encode_Codec, NULL) < 0)
         return false;
 
@@ -1229,7 +1232,7 @@ double FFmpeg_Glue::VideoDuration_Get()
 }
 
 //---------------------------------------------------------------------------
-double FFmpeg_Glue::VideoFrameRate_Get()
+double FFmpeg_Glue::FramesDivDuration_Get()
 {
     inputdata* InputData=NULL;
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
@@ -1242,13 +1245,57 @@ double FFmpeg_Glue::VideoFrameRate_Get()
     if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
         return 0;
 
-    if (InputData->Stream->avg_frame_rate.num && InputData->Stream->avg_frame_rate.den)
-        return ((double)InputData->Stream->avg_frame_rate.num)/InputData->Stream->avg_frame_rate.den;
-    
     if (InputData->FrameCount && InputData->Duration)
         return InputData->FrameCount/InputData->Duration;
 
     return 0; // Unknown
+}
+
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::RVideoFrameRate_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
+        return 0;
+    
+    ostringstream convert;
+    if (InputData->Stream->r_frame_rate.num==0)
+        return "Und";
+    else
+    {
+        convert << InputData->Stream->r_frame_rate.num << "/" << InputData->Stream->r_frame_rate.den;
+        return convert.str();
+    }
+}
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::AvgVideoFrameRate_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
+        return 0;
+    
+    ostringstream convert;
+    if (InputData->Stream->avg_frame_rate.num==0)
+        return "Und";
+    else
+    {
+        convert << InputData->Stream->avg_frame_rate.num << "/" << InputData->Stream->avg_frame_rate.den;
+        return convert.str();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -1336,13 +1383,32 @@ double FFmpeg_Glue::DAR_Get()
     double DAR;
     if (InputData->Stream->codec->sample_aspect_ratio.num && InputData->Stream->codec->sample_aspect_ratio.den)
         DAR=((double)InputData->Stream->codec->width)/InputData->Stream->codec->height*InputData->Stream->codec->sample_aspect_ratio.num/InputData->Stream->codec->sample_aspect_ratio.den;
-    else if ((InputData->Stream->codec->width>=704 && InputData->Stream->codec->width<=720) //NTSC / PAL
-          && ((InputData->Stream->codec->height>=480 && InputData->Stream->codec->height<=486)
-           || InputData->Stream->codec->height==576))
-        DAR=((double)4)/3;
     else
         DAR=((double)InputData->Stream->codec->width)/InputData->Stream->codec->height;
     return DAR;
+}
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::SAR_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
+        return 0;
+
+    ostringstream convert;
+    if (InputData->Stream->codec->sample_aspect_ratio.num==0)
+        return "Und";
+    else
+    {
+        convert << InputData->Stream->codec->sample_aspect_ratio.num << "/" << InputData->Stream->codec->sample_aspect_ratio.den;
+        return convert.str();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -1540,6 +1606,62 @@ string FFmpeg_Glue::PixFormat_Get()
         case AV_PIX_FMT_BAYER_GBRG16BE: return "bayer, GBGB..(odd line), RGRG..(even line), 16-bit samples, big-endian";
         case AV_PIX_FMT_BAYER_GRBG16LE: return "bayer, GRGR..(odd line), BGBG..(even line), 16-bit samples, little-endian";
         case AV_PIX_FMT_BAYER_GRBG16BE: return "bayer, GRGR..(odd line), BGBG..(even line), 16-bit samples, big-endian";
+        default: return string();
+    }
+}
+
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::ColorSpace_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
+        return 0;
+
+    switch (InputData->Stream->codec->colorspace)
+    {
+        case AVCOL_SPC_RGB: return "RGB: order of coefficients is actually GBR, also IEC 61966-2-1 (sRGB)";
+        case AVCOL_SPC_BT709: return "BT.709 / ITU-R BT1361 / IEC 61966-2-4 xvYCC709 / SMPTE RP177 Annex B";
+        case AVCOL_SPC_UNSPECIFIED: return "Unspecified";
+        case AVCOL_SPC_RESERVED: return "Reserved";
+        case AVCOL_SPC_FCC: return "FCC Title 47 Code of Federal Regulations 73.682 (a)(20)";
+        case AVCOL_SPC_BT470BG: return "BT.470bg / ITU-R BT601-6 625 / ITU-R BT1358 625 / ITU-R BT1700 625 PAL & SECAM / IEC 61966-2-4 xvYCC601";
+        case AVCOL_SPC_SMPTE170M: return "SMPTE 170m / ITU-R BT601-6 525 / ITU-R BT1358 525 / ITU-R BT1700 NTSC";
+        case AVCOL_SPC_SMPTE240M: return "SMPTE 240m";
+        case AVCOL_SPC_YCOCG: return "YCOCG: Used by Dirac / VC-2 and H.264 FRext, see ITU-T SG16";
+        case AVCOL_SPC_BT2020_NCL: return "ITU-R BT2020 non-constant luminance system";
+        case AVCOL_SPC_BT2020_CL: return "ITU-R BT2020 constant luminance system";
+        case AVCOL_SPC_NB: return "Not part of ABI.";
+        default: return string();
+    }
+}
+
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::ColorRange_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
+        return 0;
+
+    switch (InputData->Stream->codec->color_range)
+    {
+        case AVCOL_RANGE_UNSPECIFIED: return "Unspecified";
+        case AVCOL_RANGE_MPEG: return "Broadcast Range (219*2^n-1)";
+        case AVCOL_RANGE_JPEG: return "Full Range (2^n-1)";
+        case AVCOL_RANGE_NB: return "Not part of ABI";
         default: return string();
     }
 }

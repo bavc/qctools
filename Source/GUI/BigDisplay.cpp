@@ -67,6 +67,7 @@ enum args_type
     Args_Type_Wave_Mode,
     Args_Type_Yuv,  // Y, U , V
     Args_Type_YuvA, // Y, U, V, All
+    Args_Type_Ranges, // above whites, below black
     Args_Type_ClrPck, // Color picker
 };
 
@@ -297,6 +298,7 @@ const filter Filters[]=
             "lutyuv=y=if(eq(${1}\\,-1)\\,128\\,if(eq(${1}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${1}))*pow(2\\,${1}))):u=if(eq(${2}\\,-1)\\,128\\,if(eq(${2}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${2}))*pow(2\\,${2}))):v=if(eq(${3}\\,-1)\\,128\\,if(eq(${3}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${3}))*pow(2\\,${3}))),format=yuv444p|rgb24",
         },
     },
+    /*
     {
         "Frame Metadata Play",
         0,
@@ -311,6 +313,7 @@ const filter Filters[]=
             "cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,drawtext=fontfile=/Users/rice/Downloads/Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=${1}:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=/Users/rice/Downloads/drawtext.txt",
         },
     },
+    */
     {
         "Value Highlight",
         0,
@@ -348,14 +351,16 @@ const filter Filters[]=
         0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
-            { Args_Type_Slider,   0,   0, 360,   1, "Hue"},
-            { Args_Type_Slider,   1, -10,  10,   1, "Saturation"},
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Vectorscope" },
+            { Args_Type_Slider,   0,-180, 180,   1, "Hue"},
+            { Args_Type_Slider,  10,   0,  30,  10, "Saturation"},
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "hue=h=${2}:s=${3}",
-            "il=l=d:c=d,hue=h=${2}:s=${3}",
+            "hue=h=${3}:s=${4}",
+            "hue=h=${3}:s=${4},split[a][b];[a]histogram=mode=color2,transpose=dir=2,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height},setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
+            "il=l=d:c=d,hue=h=${3}:s=${4}",
+            "hue=h=${3}:s=${4},split[a][b];[a]histogram=mode=color2,transpose=dir=2,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height},setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
         },
     },
     {
@@ -371,6 +376,23 @@ const filter Filters[]=
         {
             "signalstats=out=brng:c=${2},format=yuv444p|rgb24",
             "il=l=d:c=d,signalstats=out=brng:c=${2},format=yuv444p|rgb24",
+        },
+    },
+    {
+        "Broadcast Illegal Focus",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
+            { Args_Type_Ranges,   1,   0,   0,   0, "Outer Range"},
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+                       "geq=lum=if(gt(lum(X\\,Y)\\,235)\\,(lum(X\\,Y)-235)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
+                       "geq=lum=if(lt(lum(X\\,Y)\\,16)\\,(lum(X\\,Y)+1)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
+            "il=l=d:c=d,geq=lum=if(gt(lum(X\\,Y)\\,235)\\,(lum(X\\,Y)-235)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
+            "il=l=d:c=d,geq=lum=if(lt(lum(X\\,Y)\\,16)\\,(lum(X\\,Y)+1)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
         },
     },
     {
@@ -1109,6 +1131,26 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                     }
                                     Widget_XPox+=Filters[FilterPos].Args[OptionPos].Type==Args_Type_Yuv?3:4;
                                     break;
+            case Args_Type_Ranges:
+                                    Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
+                                    for (size_t OptionPos2=0; OptionPos2<2; OptionPos2++)
+                                    {
+                                        Options[Pos].Radios[OptionPos][OptionPos2]=new QRadioButton();
+                                        Options[Pos].Radios[OptionPos][OptionPos2]->setFont(Font);
+                                        switch (OptionPos2)
+                                        {
+                                            case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("above white"); break;
+                                            case 1: Options[Pos].Radios[OptionPos][OptionPos2]->setText("below black"); break;
+                                            default:;
+                                        }
+                                        if (OptionPos2==PreviousValues[Pos][FilterPos].Values[OptionPos])
+                                            Options[Pos].Radios[OptionPos][OptionPos2]->setChecked(true);
+                                        connect(Options[Pos].Radios[OptionPos][OptionPos2], SIGNAL(toggled(bool)), this, Pos==0?(SLOT(on_FiltersOptions1_toggle(bool))):SLOT(on_FiltersOptions2_toggle(bool)));
+                                        Layout0->addWidget(Options[Pos].Radios[OptionPos][OptionPos2], 0, Widget_XPox+OptionPos2);
+                                        Options[Pos].Radios_Group[OptionPos]->addButton(Options[Pos].Radios[OptionPos][OptionPos2]);
+                                    }
+                                    Widget_XPox+=2;
+                                    break;
             case Args_Type_ClrPck:
                                     {
                                     Options[Pos].ColorValue[OptionPos]=PreviousValues[Pos][FilterPos].Values[OptionPos];
@@ -1315,6 +1357,10 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                         }
                                     }
                                     break;
+            case Args_Type_Ranges:
+                                    Value_Pos<<=1;
+                                    Value_Pos|=Options[Pos].Radios[OptionPos][1]->isChecked()?1:0;
+                                    //No break
             case Args_Type_ClrPck:
                                     Modified=true;
                                     WithSliders[OptionPos]=Options[Pos].ColorValue[OptionPos];
