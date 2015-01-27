@@ -294,7 +294,7 @@ void MainWindow::createGraphsLayout()
     if (ui->fileNamesBox)
         ui->fileNamesBox->show();
 
-    PlotsArea=new Plots(this, Files[Files_CurrentPos]);
+    PlotsArea=Files[Files_CurrentPos]->Stats.empty()?NULL:new Plots(this, Files[Files_CurrentPos]);
     if (!ui->actionGraphsLayout->isChecked())
         PlotsArea->hide();
     ui->verticalLayout->addWidget(PlotsArea);

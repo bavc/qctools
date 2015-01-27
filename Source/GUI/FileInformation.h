@@ -57,7 +57,7 @@ public:
     // FFmpeg glue
     FFmpeg_Glue*                Glue;
     std::vector<CommonStats*>   Stats;
-    CommonStats*                ReferenceStat               () {return Stats[ReferenceStream_Pos];}
+    CommonStats*                ReferenceStat               () {if (ReferenceStream_Pos<Stats.size()) return Stats[ReferenceStream_Pos]; else return NULL;}
 
 private:
     // Info
