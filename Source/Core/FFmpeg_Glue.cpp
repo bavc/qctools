@@ -1693,12 +1693,26 @@ string FFmpeg_Glue::SampleFormat_Get()
             InputData=InputDatas[Pos];
             break;
         }
+        if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
+            return "";
 
-    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
-        return string();
-
-    return string(); //TODO
-}
+        switch (InputData->Stream->codec->sample_fmt)
+        {
+            case AV_SAMPLE_FMT_NONE: return "none";
+            case AV_SAMPLE_FMT_U8: return "unsigned 8 bits";
+            case AV_SAMPLE_FMT_S16: return "signed 16 bits";
+            case AV_SAMPLE_FMT_S32: return "signed 32 bits";
+            case AV_SAMPLE_FMT_FLT: return "float";
+            case AV_SAMPLE_FMT_DBL: return "double";
+            case AV_SAMPLE_FMT_U8P: return "unsigned 8 bits, planar";
+            case AV_SAMPLE_FMT_S16P: return "signed 16 bits, planar";
+            case AV_SAMPLE_FMT_S32P: return "signed 32 bits, planar";
+            case AV_SAMPLE_FMT_FLTP: return "float, planar";
+            case AV_SAMPLE_FMT_DBLP: return "double, planar";
+            case AV_SAMPLE_FMT_NB: return "number of sample formats";
+            default: return string();
+        }
+    }
 
 //---------------------------------------------------------------------------
 int FFmpeg_Glue::SamplingRate_Get()
