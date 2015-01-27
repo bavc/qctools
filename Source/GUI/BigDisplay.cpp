@@ -168,6 +168,21 @@ const filter Filters[]=
         },
     },
     {
+        "Temporal Difference",
+        0,
+        {
+            { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
+            { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
+            { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "extractplanes=${1},tblend=all_mode=difference128,histeq=strength=${2}:intensity=${3}",
+            "tblend=all_mode=difference128,histeq=strength=${2}:intensity=${3}",
+        },
+    },
+    {
         "Pixel Offset Subtraction",
         0,
         {
