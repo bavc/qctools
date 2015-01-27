@@ -223,7 +223,7 @@ void FilesList::UpdateAll()
             SampleFormat=                       Main->Files[Files_Pos]->Glue->SampleFormat_Get().c_str();
             double SamplingRate=                Main->Files[Files_Pos]->Glue->SamplingRate_Get();
             ChannelLayout=                      Main->Files[Files_Pos]->Glue->ChannelLayout_Get().c_str();
-            double ABitDepth=                    Main->Files[Files_Pos]->Glue->ABitDepth_Get();
+            double ABitDepth=                   Main->Files[Files_Pos]->Glue->ABitDepth_Get();
 
             // Parsing
             FramesDivDuration=QString::number(FramesDivDurationd, 'f', 3);
@@ -288,7 +288,7 @@ void FilesList::UpdateAll()
       //setItem((int)Files_Pos, Col_SampleFormat,   new QTableWidgetItem(SampleFormat));
         setItem((int)Files_Pos, Col_SamplingRate,   new QTableWidgetItem(SamplingRate_String));
         setItem((int)Files_Pos, Col_ChannelLayout,  new QTableWidgetItem(ChannelLayout));
-        setItem((int)Files_Pos, Col_ABitDepth,       new QTableWidgetItem(ABitDepth_String));
+        setItem((int)Files_Pos, Col_ABitDepth,      new QTableWidgetItem(ABitDepth_String));
 
         for (int Pos=0; Pos<Col_Max; Pos++)
         {
