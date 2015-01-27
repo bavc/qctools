@@ -370,12 +370,12 @@ const filter Filters[]=
         {
             { Args_Type_ColorMatrix,   0,   0,   0,   0, },
             { Args_Type_ColorMatrix,   1,   0,   0,   0, },
-            { Args_Type_None,          0,   0,   0,   0, },
+            { Args_Type_Slider,        0,   0,   0,   1, "reveal" },
             { Args_Type_None,          0,   0,   0,   0, },
             { Args_Type_None,          0,   0,   0,   0, },
         },
         {
-            "colormatrix=${1}:${2}",
+            "split[a][b];[a]crop=${3}:${height}:0:0[a1];[b]colormatrix=${1}:${2}[b1];[a1][b1]overlay",
         },
     },
     {
@@ -1058,7 +1058,7 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                                 SelectWidth=Filters[FilterPos].Args[OptionPos2].Default?true:false;
                                         Max=SelectWidth?FileInfoData->Glue->Width_Get():FileInfoData->Glue->Height_Get();
                                     }
-                                    else if (MaxTemp=="x" || MaxTemp=="s")
+                                    else if (MaxTemp=="x" || MaxTemp=="s" || MaxTemp=="reveal" )
                                         Max=FileInfoData->Glue->Width_Get();
                                     else if (MaxTemp=="y")
                                         Max=FileInfoData->Glue->Height_Get();
