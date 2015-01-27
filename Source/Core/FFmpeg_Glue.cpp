@@ -1263,7 +1263,7 @@ string FFmpeg_Glue::RVideoFrameRate_Get()
         }
 
     if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
-        return 0;
+        return string();
     
     ostringstream convert;
     if (InputData->Stream->r_frame_rate.num==0)
@@ -1286,7 +1286,7 @@ string FFmpeg_Glue::AvgVideoFrameRate_Get()
         }
 
     if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
-        return 0;
+        return string();
     
     ostringstream convert;
     if (InputData->Stream->avg_frame_rate.num==0)
@@ -1399,7 +1399,7 @@ string FFmpeg_Glue::SAR_Get()
         }
 
     if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
-        return 0;
+        return string();
 
     ostringstream convert;
     if (InputData->Stream->codec->sample_aspect_ratio.num==0)
@@ -1423,7 +1423,7 @@ string FFmpeg_Glue::PixFormat_Get()
         }
 
     if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
-        return "";
+        return string();
 
     switch (InputData->Stream->codec->pix_fmt)
     {
@@ -1622,7 +1622,7 @@ string FFmpeg_Glue::ColorSpace_Get()
         }
 
     if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
-        return 0;
+        return string();
 
     switch (InputData->Stream->codec->colorspace)
     {
@@ -1654,7 +1654,7 @@ string FFmpeg_Glue::ColorRange_Get()
         }
 
     if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
-        return 0;
+        return string();
 
     switch (InputData->Stream->codec->color_range)
     {
@@ -1678,7 +1678,7 @@ string FFmpeg_Glue::AudioFormat_Get()
         }
 
     if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
-        return "";
+        return string();
 
     return InputData->Stream->codec->codec->long_name;
 }
@@ -1695,9 +1695,9 @@ string FFmpeg_Glue::SampleFormat_Get()
         }
 
     if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
-        return "";
+        return string();
 
-    return "";
+    return string(); //TODO
 }
 
 //---------------------------------------------------------------------------
@@ -1729,9 +1729,9 @@ string FFmpeg_Glue::ChannelLayout_Get()
         }
 
     if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
-        return "";
+        return string();
 
-    return "";
+    return string(); //TODO
 }
 
 //---------------------------------------------------------------------------
@@ -1748,7 +1748,7 @@ int FFmpeg_Glue::BitDepth_Get()
     if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
         return 0;
 
-    return 0;
+    return 0; //TODO
 }
 
 //---------------------------------------------------------------------------
