@@ -170,10 +170,10 @@ const filter Filters[]=
         "Pixel Offset Subtraction",
         0,
         {
-            { Args_Type_Slider,   1, -20,  20,   1, "Y H" },
-            { Args_Type_Slider,   0, -20,  20,   1, "Y V" },
-            { Args_Type_Slider,   0, -20,  20,   1, "UV H" },
-            { Args_Type_Slider,   0, -20,  20,   1, "UV V" },
+            { Args_Type_Slider,   1,-120, 120,   1, "Y H" },
+            { Args_Type_Slider,   0,-120, 120,   1, "Y V" },
+            { Args_Type_Slider,   0,-120, 120,   1, "UV H" },
+            { Args_Type_Slider,   0,-120, 120,   1, "UV V" },
             { Args_Type_Slider,   0,   0,  10,  10, "Strength" },
         },
         {
