@@ -68,6 +68,7 @@ enum args_type
     Args_Type_Yuv,  // Y, U , V
     Args_Type_YuvA, // Y, U, V, All
     Args_Type_Ranges, // above whites, below black
+    Args_Type_ColorMatrix, // bt601, bt709, smpte240m, fcc
     Args_Type_ClrPck, // Color picker
 };
 
@@ -361,6 +362,20 @@ const filter Filters[]=
             "hue=h=${3}:s=${4},split[a][b];[a]histogram=mode=color2,transpose=dir=2,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height},setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
             "il=l=d:c=d,hue=h=${3}:s=${4}",
             "hue=h=${3}:s=${4},split[a][b];[a]histogram=mode=color2,transpose=dir=2,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height},setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
+        },
+    },
+    {
+        "Color Matrix",
+        0,
+        {
+            { Args_Type_ColorMatrix,   0,   0,   0,   0, },
+            { Args_Type_ColorMatrix,   1,   0,   0,   0, },
+            { Args_Type_None,          0,   0,   0,   0, },
+            { Args_Type_None,          0,   0,   0,   0, },
+            { Args_Type_None,          0,   0,   0,   0, },
+        },
+        {
+            "colormatrix=${1}:${2}",
         },
     },
     {
@@ -1150,6 +1165,28 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                         Options[Pos].Radios_Group[OptionPos]->addButton(Options[Pos].Radios[OptionPos][OptionPos2]);
                                     }
                                     Widget_XPox+=2;
+                                    break;
+            case Args_Type_ColorMatrix:
+                                    Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
+                                    for (size_t OptionPos2=0; OptionPos2<4; OptionPos2++)
+                                    {
+                                        Options[Pos].Radios[OptionPos][OptionPos2]=new QRadioButton();
+                                        Options[Pos].Radios[OptionPos][OptionPos2]->setFont(Font);
+                                        switch (OptionPos2)
+                                        {
+                                            case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("bt601"); break;
+                                            case 1: Options[Pos].Radios[OptionPos][OptionPos2]->setText("bt709"); break;
+                                            case 2: Options[Pos].Radios[OptionPos][OptionPos2]->setText("smpte240m"); break;
+                                            case 3: Options[Pos].Radios[OptionPos][OptionPos2]->setText("fcc"); break;
+                                            default:;
+                                        }
+                                        if (OptionPos2==PreviousValues[Pos][FilterPos].Values[OptionPos])
+                                            Options[Pos].Radios[OptionPos][OptionPos2]->setChecked(true);
+                                        connect(Options[Pos].Radios[OptionPos][OptionPos2], SIGNAL(toggled(bool)), this, Pos==0?(SLOT(on_FiltersOptions1_toggle(bool))):SLOT(on_FiltersOptions2_toggle(bool)));
+                                        Layout0->addWidget(Options[Pos].Radios[OptionPos][OptionPos2], 0, Widget_XPox+OptionPos2);
+                                        Options[Pos].Radios_Group[OptionPos]->addButton(Options[Pos].Radios[OptionPos][OptionPos2]);
+                                    }
+                                    Widget_XPox+=4;
                                     break;
             case Args_Type_ClrPck:
                                     {
