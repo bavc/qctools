@@ -71,6 +71,9 @@ void VideoStats::StatsFromExternalData (const string &Data)
                     const char* media_type=Frame->Attribute("media_type");
                     if (media_type && !strcmp(media_type, "video"))
                     {
+                        if (x_Current>=Data_Reserved)
+                            Data_Reserve(x_Current);
+
                         const char* Attribute;
                             
                         x[0][x_Current]=x_Current;
@@ -192,11 +195,7 @@ void VideoStats::StatsFromExternalData (const string &Data)
                         }
                         x_Current++;
                         if (x_Current_Max<=x_Current)
-                        {
                             x_Current_Max=x_Current;
-                            if (x_Current_Max>Data_Reserved)
-                                Data_Reserve(x_Current_Max);
-                        }
                     }
                 }
 
