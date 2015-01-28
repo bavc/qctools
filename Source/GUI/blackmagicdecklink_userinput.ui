@@ -205,8 +205,8 @@
      <rect>
       <x>120</x>
       <y>60</y>
-      <width>42</width>
-      <height>22</height>
+      <width>37</width>
+      <height>20</height>
      </rect>
     </property>
    </widget>
@@ -220,19 +220,11 @@
      </rect>
     </property>
    </widget>
-   <zorder>In_3</zorder>
-   <zorder>In_4</zorder>
    <zorder>InLabel</zorder>
-   <zorder>In_1</zorder>
    <zorder>In_2</zorder>
-   <zorder>Out_2</zorder>
-   <zorder>Out_1</zorder>
-   <zorder>Out_4</zorder>
-   <zorder>Out_3</zorder>
-   <zorder>Out_2</zorder>
-   <zorder>Out_1</zorder>
-   <zorder>Out_4</zorder>
-   <zorder>Out_3</zorder>
+   <zorder>In_4</zorder>
+   <zorder>In_1</zorder>
+   <zorder>In_3</zorder>
   </widget>
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
@@ -299,6 +291,11 @@
      <string>Timecode:</string>
     </property>
    </widget>
+   <zorder>OutLabel</zorder>
+   <zorder>Out_1</zorder>
+   <zorder>Out_4</zorder>
+   <zorder>Out_3</zorder>
+   <zorder>Out_2</zorder>
   </widget>
   <widget class="QComboBox" name="CardsList">
    <property name="geometry">
