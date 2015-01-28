@@ -1265,11 +1265,11 @@ string FFmpeg_Glue::RVideoFrameRate_Get()
     if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
         return string();
     
-    ostringstream convert;
     if (InputData->Stream->r_frame_rate.num==0)
         return "Und";
     else
     {
+        ostringstream convert;
         convert << InputData->Stream->r_frame_rate.num << "/" << InputData->Stream->r_frame_rate.den;
         return convert.str();
     }
