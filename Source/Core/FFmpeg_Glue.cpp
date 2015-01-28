@@ -202,7 +202,7 @@ void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
     ApplyFilter();
 
     // Stats
-    if (Stats && FilteredFrame)
+    if (Stats && FilteredFrame && !Filter.empty())
     {
         Stats->TimeStampFromFrame(FilteredFrame, FramePos-1);
         Stats->StatsFromFrame(FilteredFrame, Stream->codec->width, Stream->codec->height);
