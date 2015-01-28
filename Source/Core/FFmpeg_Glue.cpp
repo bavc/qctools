@@ -1398,14 +1398,14 @@ string FFmpeg_Glue::SAR_Get()
             break;
         }
 
-    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
         return string();
 
-    ostringstream convert;
     if (InputData->Stream->codec->sample_aspect_ratio.num==0)
         return "Und";
     else
     {
+        ostringstream convert;
         convert << InputData->Stream->codec->sample_aspect_ratio.num << "/" << InputData->Stream->codec->sample_aspect_ratio.den;
         return convert.str();
     }
