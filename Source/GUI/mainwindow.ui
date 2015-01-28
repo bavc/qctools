@@ -162,7 +162,7 @@
    <addaction name="actionOpen"/>
    <addaction name="actionBlackmagicDeckLinkCapture"/>
    <addaction name="separator"/>
-   <addaction name="actionCSV"/>
+   <addaction name="actionExport_XmlGz_Prompt"/>
    <addaction name="actionPrint"/>
    <addaction name="separator"/>
    <addaction name="actionZoomIn"/>
