@@ -61,7 +61,7 @@ chmod u+x configure
 chmod u+x version.sh
 if yasm --version >/dev/null 2>&1
 then
-    ./configure --enable-gpl --enable-version3 --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --enable-libopenjpeg --disable-decoder=jpeg2000 --extra-cflags="-I../openjpeg/usr/include" --extra-ldflags="-L../openjpeg/usr/lib" --enable-libfreetype --extra-cflags="-I../freetype/usr/include" --extra-ldflags="-L../freetype/usr/lib"
+    ./configure --enable-gpl --enable-version3 --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --enable-libopenjpeg --disable-decoder=jpeg2000 --extra-cflags="-I../openjpeg/usr/include" --extra-ldflags="-L../openjpeg/usr/lib" --enable-libfreetype --extra-cflags="-I../freetype/usr/include" --extra-ldflags="-L../freetype/usr/lib" --extra-cflags="-mmacosx-version-min=10.5" --extra-ldflags="-mmacosx-version-min=10.5"
 else
     cd ../yasm/
     ./configure --prefix=`pwd`/usr
@@ -69,7 +69,7 @@ else
     make install
 
     cd ../ffmpeg
-    ./configure --enable-gpl --enable-version3 --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --enable-libopenjpeg --disable-decoder=jpeg2000 --extra-cflags="-I../openjpeg/usr/include" --extra-ldflags="-L../openjpeg/usr/lib" --enable-libfreetype --extra-cflags="-I../freetype/usr/include" --extra-ldflags="-L../freetype/usr/lib" --yasmexe=../yasm/usr/bin/yasm
+    ./configure --enable-gpl --enable-version3 --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --enable-libopenjpeg --disable-decoder=jpeg2000 --extra-cflags="-I../openjpeg/usr/include" --extra-ldflags="-L../openjpeg/usr/lib" --enable-libfreetype --extra-cflags="-I../freetype/usr/include" --extra-ldflags="-L../freetype/usr/lib" --yasmexe=../yasm/usr/bin/yasm --extra-cflags="-mmacosx-version-min=10.5" --extra-ldflags="-mmacosx-version-min=10.5"
 fi
 
 make

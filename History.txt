@@ -11,6 +11,7 @@ x Left-align graph labels, instead of centering them (GitHub issue #45)
 x Y-scale label values disappear when zooming (GitHub issue #46)
 x Seek was not possible in the playback window during the analysis
 x Some colors change, marker text contains data values (GitHub issue #23)
+x Support of Mac OS X 10.6 (GitHub issue #63)
 
 0.6.2, 2014-10-29
 -----
