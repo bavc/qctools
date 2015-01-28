@@ -329,17 +329,14 @@ string AudioStats::StatsToXML (int Width, int Height)
     stringstream Data;
 
     // Per frame (note: the XML header and footer are not created here)
-    stringstream width; width<<Width; // Note: we use the same value for all frame, we should later use the right value per frame
-    stringstream height; height<<Height; // Note: we use the same value for all frame, we should later use the right value per frame
     for (size_t x_Pos=0; x_Pos<x_Current; ++x_Pos)
     {
         stringstream pkt_pts_time; pkt_pts_time<<fixed<<setprecision(7)<<(x[1][x_Pos]+FirstTimeStamp);
         stringstream pkt_duration_time; pkt_duration_time<<fixed<<setprecision(7)<<durations[x_Pos];
         stringstream key_frame; key_frame<<key_frames[x_Pos]?'1':'0';
-        Data<<"        <frame media_type=\"video\" key_frame=\"" << key_frame.str() << "\" pkt_pts_time=\"" << pkt_pts_time.str() << "\"";
+        Data<<"        <frame media_type=\"audio\" key_frame=\"" << key_frame.str() << "\" pkt_pts_time=\"" << pkt_pts_time.str() << "\"";
         if (pkt_duration_time)
             Data<<" pkt_duration_time=\"" << pkt_duration_time.str() << "\"";
-        Data<<" width=\"" << width.str() << "\" height=\"" << height.str() <<"\">\n";
 
         for (size_t Plot_Pos=0; Plot_Pos<Item_AudioMax; Plot_Pos++)
         {
