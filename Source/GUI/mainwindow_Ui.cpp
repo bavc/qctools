@@ -77,7 +77,7 @@ void MainWindow::Ui_Init()
 
     // Icons
     ui->actionOpen->setIcon(QIcon(":/icon/document-open.png"));
-    ui->actionCSV->setIcon(QIcon(":/icon/export.png"));
+    ui->actionCSV->setIcon(QIcon(":/icon/export_csv.png"));
     ui->actionPrint->setIcon(QIcon(":/icon/document-print.png"));
     ui->actionZoomIn->setIcon(QIcon(":/icon/zoom-in.png"));
     ui->actionZoomOut->setIcon(QIcon(":/icon/zoom-out.png"));

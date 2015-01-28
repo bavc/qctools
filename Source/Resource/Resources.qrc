@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/icon">
         <file alias="document-open.png">document-open.png</file>
-        <file alias="export.png">export.png</file>
+        <file alias="export_csv.png">export_csv.png</file>
         <file alias="document-print.png">document-print.png</file>
         <file alias="help.png">help.png</file>
         <file alias="zoom-in.png">zoom-in.png</file>
