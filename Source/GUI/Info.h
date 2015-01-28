@@ -33,7 +33,7 @@ public:
         Style_Columns,
         Style_Grid,
     };
-    explicit Info(QWidget *parent, FileInformation* FileInfoData, style Style);
+    explicit Info(QWidget *parent, const struct per_group* plotGroup, const struct per_item* plotItem, size_t CountOfGroups, size_t CountOfItems, FileInformation* FileInfoData, style Style);
     ~Info();
 
     // Commands
@@ -47,6 +47,12 @@ protected:
 
     // Widgets
     QLabel**                    Values;
+
+    // Arrays
+    const struct per_group*    m_plotGroup; 
+    const struct per_item*     m_plotItem; 
+    size_t                          CountOfGroups;
+    size_t                          CountOfItems;
 };
 
 #endif // GUI_Info_H

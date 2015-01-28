@@ -10,6 +10,7 @@
 
 //---------------------------------------------------------------------------
 #include "Core/VideoStats.h"
+#include "Core/AudioStats.h"
 #include <QImage>
 #include <QXmlStreamReader>
 
@@ -74,324 +75,464 @@ static void avlog_cb(void *, int level, const char * szFmt, va_list varg)
     vsnprintf(Temp, 1000, szFmt, varg);
     Errors+=Temp;
 }
-*/
+//*/
 
 //***************************************************************************
-// Constructor / Destructor
+// inputdata
 //***************************************************************************
 
-//---------------------------------------------------------------------------
-FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<VideoStats*>* Videos_, int Scale_Width_, int Scale_Height_, outputmethod OutputMethod_, const string &Filter1_, const string &Filter2_, bool With1_, bool With2_, bool WithStats_) :
-    FileName(FileName_),
-    Videos(Videos_),
-    Scale_Width(Scale_Width_),
-    Scale_Height(Scale_Height_),
-    OutputMethod(OutputMethod_),
-    Filter1(Filter1_),
-    Filter2(Filter2_),
-    WithStats(WithStats_),
-    With1(With1_),
-    With2(With2_)
-{
+FFmpeg_Glue::inputdata::inputdata()
+    :
     // In
-    Scale_Adapted=false;
+    Enabled(true),
 
-    // Out
-    Image1=NULL;
-    Image2=NULL;
-    VideoFrameCount=0;
-    VideoDuration=0;
-    VideoFirstTimeStamp=DBL_MAX;
-    
-    // FFmpeg pointers
-    FormatContext=NULL;
-    JpegOutput_CodecContext=NULL;
-    FilterGraph1=NULL;
-    FilterGraph2=NULL;
-    Filtered1_Frame=NULL;
-    Filtered2_Frame=NULL;
-    Scale1_Context=NULL;
-    Scale2_Context=NULL;
-    Scale1_Frame=NULL;
-    Scale2_Frame=NULL;
+    // FFmpeg pointers - Input
+    Type(-1),
+    Stream(NULL),
+    DecodedFrame(NULL),
 
-    // FFmpeg init
-    av_register_all();
-    avfilter_register_all();
-    //av_log_set_callback(avlog_cb);
+    // Status
+    FramePos(0),
 
-    // Container part
-    VideoStream=NULL;
-    AudioStream=NULL;
-    if (avformat_open_input(&FormatContext, FileName.c_str(), NULL, NULL)>=0)
-    {
-        if (avformat_find_stream_info(FormatContext, NULL)>=0)
-        {
-            // Video stream
-            VideoStream_Index=av_find_best_stream(FormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
-            if (VideoStream_Index>=0)
-            {
-                VideoStream=FormatContext->streams[VideoStream_Index];
+    // General information
+    FrameCount(0),
+    FirstTimeStamp(DBL_MAX),
+    Duration(0),
 
-                // Video codec
-                if (VideoStream)
-                {
-                    AVCodec* VideoStream_Codec=avcodec_find_decoder(VideoStream->codec->codec_id);
-                    if (VideoStream_Codec)
-                        avcodec_open2(VideoStream->codec, VideoStream_Codec, NULL);
-                }
-            }
-
-            // Audio stream
-            int AudioStream_Index=av_find_best_stream(FormatContext, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
-            if (AudioStream_Index>=0)
-            {
-                AudioStream=FormatContext->streams[AudioStream_Index];
-
-                if (AudioStream)
-                {
-                    AVCodec* AudioStream_Codec=avcodec_find_decoder(AudioStream->codec->codec_id);
-                    if (AudioStream_Codec)
-                        avcodec_open2(AudioStream->codec, AudioStream_Codec, NULL);
-                }
-            }
-        }
-    }
-
-    // Frame
-    Frame = av_frame_alloc();
-    if (!Frame)
-        return;
-
-    // Packet
-    Packet = new AVPacket;
-    av_init_packet(Packet);
-    Packet->data = NULL;
-    Packet->size = 0;
-
-    // Output
-    size_t VideoFrameCount_Max=0;
-    if (VideoStream)
-    {
-        VideoFrameCount_Max=VideoFrameCount=VideoStream->nb_frames;
-        if (VideoStream->duration!=AV_NOPTS_VALUE)
-            VideoDuration=((double)VideoStream->duration)*VideoStream->time_base.num/VideoStream->time_base.den;
-
-        // If video duration is not known, estimating it
-        if (VideoDuration==0 && FormatContext->duration!=AV_NOPTS_VALUE)
-            VideoDuration=((double)FormatContext->duration)/AV_TIME_BASE;
-
-        // If frame count is not known, estimating it
-        if (VideoFrameCount==0 && VideoStream->avg_frame_rate.num && VideoStream->avg_frame_rate.den && VideoDuration)
-            VideoFrameCount=VideoDuration*VideoStream->avg_frame_rate.num/VideoStream->avg_frame_rate.den;
-        if (VideoFrameCount==0
-         && ((VideoStream->time_base.num==1 && VideoStream->time_base.den>=24 && VideoStream->time_base.den<=60)
-          || (VideoStream->time_base.num==1001 && VideoStream->time_base.den>=24000 && VideoStream->time_base.den<=60000)))
-            VideoFrameCount=VideoStream->duration;
-    }
-    if (OutputMethod==Output_Jpeg)
-    {
-        JpegList.reserve(VideoFrameCount_Max);
-    }
-    if (OutputMethod==Output_Jpeg)
-    {
-        JpegOutput_CodecContext=NULL;
-    }
-
-    //Demux
-    JpegOutput_Packet=new AVPacket;
-    av_init_packet (JpegOutput_Packet);
-    JpegOutput_Packet->data=NULL;
-    JpegOutput_Packet->size=0;
-
-    // Frame info
-    if (WithStats)
-    {
-        VideoStats* Video=new VideoStats(VideoFrameCount, VideoDuration, VideoFrameCount_Max, VideoStream?(((double)VideoStream->time_base.den)/VideoStream->time_base.num):0);
-        Videos->push_back(Video);
-    }
-    VideoFramePos=0;
-
-    // Temp
-    Seek_TimeStamp=AV_NOPTS_VALUE;
+    // Cache
+    FramesCache(NULL),
+    FramesCache_Default(NULL)
+{
 }
 
-//---------------------------------------------------------------------------
-FFmpeg_Glue::~FFmpeg_Glue()
+FFmpeg_Glue::inputdata::~inputdata()
 {
-    // Clear
-    if (Packet)
-    {
-        av_free_packet(Packet);
-        delete Packet;
-    }
+    // FFmpeg pointers - Input
+    if (Stream)
+        avcodec_close(Stream->codec);
+}
+
+//***************************************************************************
+// outputdata
+//***************************************************************************
+
+FFmpeg_Glue::outputdata::outputdata()
+    :
+    // In
+    Enabled(true),
+    FilterPos(false),
+
+    // FFmpeg pointers - Input
+    Stream(NULL),
+    DecodedFrame(NULL),
+
+    // FFmpeg pointers - Filter
+    FilterGraph(NULL),
+    FilterGraph_Source_Context(NULL),
+    FilterGraph_Sink_Context(NULL),
+    FilteredFrame(NULL),
+
+    // FFmpeg pointers - Scale
+    ScaleContext(NULL),
+    ScaledFrame(NULL),
+
+    // FFmpeg pointers - Output
+    JpegOutput_CodecContext(NULL),
+    JpegOutput_Packet(NULL),
+
+    // Out
+    OutputMethod(Output_None),
+    Image(NULL),
+    Stats(NULL),
+    
+    // Helpers
+    Width(0),
+    Height(0),
+
+    // Encode
+    Encode_FormatContext(NULL),
+    Encode_CodecContext(NULL),
+    Encode_Stream(NULL),
+    Encode_Packet(NULL),
+
+    // Status
+    FramePos(0)
+{
+}
+
+FFmpeg_Glue::outputdata::~outputdata()
+{
+    // Images
+    delete Image;
+    for (size_t Pos=0; Pos<Thumbnails.size(); Pos++)
+        delete Thumbnails[Pos];
+
+    // FFmpeg pointers - Output
     if (JpegOutput_Packet)
     {
         av_free_packet(JpegOutput_Packet);
         delete JpegOutput_Packet;
     }
-    if (Scale1_Frame)
-        avpicture_free((AVPicture*)Scale1_Frame);
-    if (Scale1_Context)
-        sws_freeContext(Scale1_Context);
+    if (JpegOutput_CodecContext)
+        avcodec_free_context(&JpegOutput_CodecContext);
+
+    // FFmpeg pointers - Scale
+    if (ScaledFrame)
+    {
+        avpicture_free((AVPicture*)ScaledFrame);
+        av_frame_free(&ScaledFrame);
+    }
+    if (ScaleContext)
+        sws_freeContext(ScaleContext);
+
+    // FFmpeg pointers - Filter
+    if (FilterGraph)
+        avfilter_graph_free(&FilterGraph);
+
+    // Encode
+    CloseEncode();
 }
 
-//***************************************************************************
-// Actions
-//***************************************************************************
-
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::Seek(size_t FramePos)
+void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
 {
-    VideoFramePos=FramePos;
-
-    // Getting first time stamp
-    if (VideoFirstTimeStamp==DBL_MAX && Videos && !Videos->empty() && (*Videos)[0])
-        VideoFirstTimeStamp=(*Videos)[0]->VideoFirstTimeStamp;
-
-    // Finding the right source and time stamp computing
-    if (Videos && !Videos->empty() && (*Videos)[0] && FramePos<(*Videos)[0]->x_Current_Max)
-    {
-        double TimeStamp=(*Videos)[0]->x[1][FramePos];
-        if (VideoFirstTimeStamp!=DBL_MAX)
-            TimeStamp+=VideoFirstTimeStamp;
-        Seek_TimeStamp=(int64_t)(TimeStamp*VideoStream->time_base.den/VideoStream->time_base.num);
-    }
-    else
-    {
-        Seek_TimeStamp=FramePos;
-        Seek_TimeStamp*=VideoStream->duration;
-        Seek_TimeStamp/=VideoFrameCount;  // TODO: seek based on time stamp
-    }
+    DecodedFrame=DecodedFrame_;
     
-    // Seek
-    if (Seek_TimeStamp)
-        avformat_seek_file(FormatContext, VideoStream_Index, 0, Seek_TimeStamp, Seek_TimeStamp, 0);
-    else
-        avformat_seek_file(FormatContext, VideoStream_Index, 0, 1, 1, 0); //Found some cases such seek fails
+    //Filtering
+    ApplyFilter();
 
-    // Flushing
-    avcodec_flush_buffers(VideoStream->codec);
+    // Stats
+    if (Stats && FilteredFrame)
+    {
+        Stats->TimeStampFromFrame(FilteredFrame, FramePos-1);
+        Stats->StatsFromFrame(FilteredFrame, Stream->codec->width, Stream->codec->height);
+    }
+
+    // Scale
+    ApplyScale();
+
+    // Output
+    switch (OutputMethod)
+    {
+        case Output_QImage  :   ReplaceImage(); break;
+        case Output_Jpeg    :   AddThumbnail();  break;
+        default             :   ;
+    }
+
+    // Encode
+    if (OutputMethod==Output_Jpeg && !Encode_FileName.empty())
+        Encode();
+
+    // Clean up
+    DiscardScaledFrame();
+
+    // Clean up
+    DiscardFilteredFrame();
 }
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::FrameAtPosition(size_t Pos)
+void FFmpeg_Glue::outputdata::ApplyFilter()
 {
-    if (VideoFramePos!=Pos)
-        Seek(Pos);
-    NextFrame();
+    if (Filter.empty())
+    {
+        FilteredFrame=DecodedFrame;
+        FramePos++;
+        return;
+    }
+
+    if (!FilterGraph && !FilterGraph_Init())
+    {
+        FilteredFrame=DecodedFrame;
+        FramePos++;
+        return;
+    }
+            
+    // Push the decoded Frame into the filtergraph 
+    //if (av_buffersrc_add_frame_flags(FilterGraph_Source_Context, DecodedFrame, AV_BUFFERSRC_FLAG_KEEP_REF)<0)
+    if (av_buffersrc_add_frame_flags(FilterGraph_Source_Context, DecodedFrame, 0)<0)
+    {
+        FilteredFrame=DecodedFrame;
+        FramePos++;
+        return;
+    }
+
+    // Pull filtered frames from the filtergraph 
+    FilteredFrame = av_frame_alloc();
+    int GetAnswer = av_buffersink_get_frame(FilterGraph_Sink_Context, FilteredFrame); //TODO: handling of multiple output per input
+    if (GetAnswer==AVERROR(EAGAIN) || GetAnswer==AVERROR_EOF)
+    {
+        av_frame_free(&FilteredFrame);
+        FilteredFrame=NULL;
+        return;
+    }
+    if (GetAnswer<0)
+    {
+        av_frame_free(&FilteredFrame);
+        FilteredFrame=DecodedFrame;
+        return;
+    }
+
+    FramePos++;
 }
 
 //---------------------------------------------------------------------------
-bool FFmpeg_Glue::NextFrame()
+void FFmpeg_Glue::outputdata::ApplyScale()
 {
-    if (!FormatContext)
+    if (!FilteredFrame)
+        return;
+
+    switch (OutputMethod)
+    {
+        case Output_Jpeg:
+        case Output_QImage:
+                            break;
+        default: 
+                            return;
+    }
+
+    if (!ScaleContext && !Scale_Init())
+        return;
+
+    ScaledFrame = av_frame_alloc();
+    ScaledFrame->width=Width;
+    ScaledFrame->height=Height;
+    avpicture_alloc((AVPicture*)ScaledFrame, OutputMethod==Output_QImage?PIX_FMT_RGB24:PIX_FMT_YUVJ420P, Width, Height);
+    if (sws_scale(ScaleContext, FilteredFrame->data, FilteredFrame->linesize, 0, FilteredFrame->height, ScaledFrame->data, ScaledFrame->linesize)<0)
+    {
+        avpicture_free((AVPicture*)ScaledFrame);
+        av_frame_free(&ScaledFrame);
+        ScaledFrame=FilteredFrame;
+    }
+}
+
+//---------------------------------------------------------------------------
+void FFmpeg_Glue::outputdata::ReplaceImage()
+{
+    if (!ScaledFrame)
+        return;    
+        
+    // Convert the Frame to QImage
+    if (Image==NULL)
+        Image=new QImage(ScaledFrame->width, ScaledFrame->height, QImage::Format_RGB888);
+    for(int y=0;y<ScaledFrame->height;y++)
+        memcpy(Image->scanLine(y), ScaledFrame->data[0]+y*ScaledFrame->linesize[0], ScaledFrame->width*3);
+}
+
+//---------------------------------------------------------------------------
+void FFmpeg_Glue::outputdata::AddThumbnail()
+{
+    int got_packet=0;
+    if (!JpegOutput_CodecContext && !InitThumnails())
+    {
+        Thumbnails.push_back(new bytes());
+        return;
+    }
+                                    
+    JpegOutput_Packet->data=NULL;
+    JpegOutput_Packet->size=0;
+    if (avcodec_encode_video2(JpegOutput_CodecContext, JpegOutput_Packet, ScaledFrame, &got_packet) < 0 || !got_packet)
+    {
+        Thumbnails.push_back(new bytes());
+        return;
+    }
+
+    bytes* JpegItem=new bytes;
+    JpegItem->Data=new unsigned char[JpegOutput_Packet->size];
+    memcpy(JpegItem->Data, JpegOutput_Packet->data, JpegOutput_Packet->size);
+    JpegItem->Size=JpegOutput_Packet->size;
+    Thumbnails.push_back(JpegItem);
+}
+
+//---------------------------------------------------------------------------
+void FFmpeg_Glue::outputdata::Encode()
+{
+    int got_packet=0;
+    if (!Encode_CodecContext && !InitEncode())
+    {
+        return;
+    }
+                                    
+    Encode_Packet->data=NULL;
+    Encode_Packet->size=0;
+    Encode_Packet->stream_index=0;
+    Encode_Packet->pts=Encode_Packet->dts=FramePos;
+    if (avcodec_encode_video2(Encode_CodecContext, Encode_Packet, FilteredFrame, &got_packet) < 0 || !got_packet)
+    {
+        return;
+    }
+
+    av_interleaved_write_frame(Encode_FormatContext, Encode_Packet);
+}
+
+//---------------------------------------------------------------------------
+void FFmpeg_Glue::outputdata::CloseEncode()
+{
+    if (!Encode_FormatContext)
+        return;
+
+    av_write_trailer(Encode_FormatContext);
+
+    avcodec_close(Encode_CodecContext);
+
+    avio_close(Encode_FormatContext->pb);
+
+    avformat_free_context(Encode_FormatContext);
+
+    Encode_FormatContext=NULL;
+}
+
+//---------------------------------------------------------------------------
+void FFmpeg_Glue::outputdata::DiscardScaledFrame()
+{
+    if (!ScaledFrame)
+        return;
+
+    if (ScaledFrame!=FilteredFrame)
+    {
+        avpicture_free((AVPicture*)ScaledFrame);
+        av_frame_free(&ScaledFrame);
+    }
+    ScaledFrame=NULL;
+}
+
+//---------------------------------------------------------------------------
+void FFmpeg_Glue::outputdata::DiscardFilteredFrame()
+{
+    if (!FilteredFrame)
+        return;
+
+    if (FilteredFrame!=DecodedFrame)
+    {
+        av_frame_unref(FilteredFrame);
+        av_frame_free(&FilteredFrame);
+    }
+    FilteredFrame=NULL;
+}
+
+//---------------------------------------------------------------------------
+bool FFmpeg_Glue::outputdata::InitThumnails()
+{
+    //
+    //Thumbnails.reserve(FrameCount_Max);
+
+    //
+    JpegOutput_Packet=new AVPacket;
+    av_init_packet (JpegOutput_Packet);
+   
+    //
+    AVCodec *JpegOutput_Codec=avcodec_find_encoder(CODEC_ID_MJPEG);
+    if (!JpegOutput_Codec)
+        return false;
+    JpegOutput_CodecContext=avcodec_alloc_context3 (JpegOutput_Codec);
+    if (!JpegOutput_CodecContext)
+        return false;
+    JpegOutput_CodecContext->qmax          = 12;
+    JpegOutput_CodecContext->width         = Width;
+    JpegOutput_CodecContext->height        = Height;
+    JpegOutput_CodecContext->pix_fmt       = PIX_FMT_YUVJ420P;
+    JpegOutput_CodecContext->time_base.num = Stream->codec->time_base.num;
+    JpegOutput_CodecContext->time_base.den = Stream->codec->time_base.den;
+    if (avcodec_open2(JpegOutput_CodecContext, JpegOutput_Codec, NULL) < 0)
         return false;
 
-    // Next frame
-    while (Packet->size || av_read_frame(FormatContext, Packet) >= 0)
-    {
-        AVPacket TempPacket=*Packet;
-        if (Packet->stream_index == VideoStream_Index)
-        {
-            do
-            {
-                if (OutputFrame(Packet))
-                    return true;
-            }
-            while (Packet->size > 0);
-        }
-        else
-            Packet->size=0;
-        av_free_packet(&TempPacket);
-    }
-    
-    // Flushing
-    Packet->data=NULL;
-    Packet->size=0;
-    while (OutputFrame(Packet));
-    
-    // Complete
-    if (WithStats)
-        (*Videos)[0]->VideoStatsFinish();
-
-    return false;
+    // All is OK
+    return true;
 }
 
 //---------------------------------------------------------------------------
-bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
+bool FFmpeg_Glue::outputdata::InitEncode()
 {
-    // Decoding
-    int got_frame;
-    if (Decode)
-    {
-        got_frame=0;
-        int Bytes=avcodec_decode_video2(VideoStream->codec, Frame, &got_frame, TempPacket);
-        if (Bytes<=0 && !got_frame)
-        {
-            // Should not happen, NULL image
-            Image1=NULL;
-            Image2=NULL;
-            TempPacket->data+=TempPacket->size;
-            TempPacket->size=0;
-            return false;
-        }
-        TempPacket->data+=Bytes;
-        TempPacket->size-=Bytes;
-    }
-    else
-        got_frame=1;
+    //
+    if (avformat_alloc_output_context2(&Encode_FormatContext, NULL, NULL, Encode_FileName.c_str())<0)
+        return false;
+    AVOutputFormat* fmt = Encode_FormatContext->oformat;
 
-    // Analyzing frame
-    if (got_frame && (Seek_TimeStamp==AV_NOPTS_VALUE || Frame->pkt_pts>=(Seek_TimeStamp?(Seek_TimeStamp-1):Seek_TimeStamp)))
-    {
-        Seek_TimeStamp=AV_NOPTS_VALUE;
-        int64_t ts=(Frame->pkt_pts==AV_NOPTS_VALUE)?Frame->pkt_dts:Frame->pkt_pts;
-        if (ts!=AV_NOPTS_VALUE && ts<VideoFirstTimeStamp*VideoStream->time_base.den/VideoStream->time_base.num)
-            VideoFirstTimeStamp=((double)ts)*VideoStream->time_base.num/VideoStream->time_base.den;
-        
-        if (With1)
-            Process(Filtered1_Frame, FilterGraph1, FilterGraph1_Source_Context, FilterGraph1_Sink_Context, Filter1, Scale1_Context, Scale1_Frame, Image1);
+    //
+    Encode_Packet=new AVPacket;
+    av_init_packet (Encode_Packet);
+   
+    //
+    AVCodec *Encode_Codec=avcodec_find_encoder(CODEC_ID_RAWVIDEO);
+    if (!Encode_Codec)
+        return false;
 
-        if (With2)
-            Process(Filtered1_Frame, FilterGraph2, FilterGraph2_Source_Context, FilterGraph2_Sink_Context, Filter2, Scale2_Context, Scale2_Frame, Image2);
+    Encode_Stream=avformat_new_stream(Encode_FormatContext, Encode_Codec);
+    Encode_Stream->start_time=0;
+    Encode_Stream->time_base.num = Stream->codec->time_base.num;
+    Encode_Stream->time_base.den = Stream->codec->time_base.den;
 
-        VideoFramePos++;
-        if (VideoFramePos>VideoFrameCount)
-            VideoFrameCount=VideoFramePos;
-        return true;
-    }
+    Encode_CodecContext=Encode_Stream->codec;
+    if (!Encode_CodecContext)
+        return false;
+    Encode_CodecContext->width         = FilteredFrame->width;
+    Encode_CodecContext->height        = FilteredFrame->height;
+    Encode_CodecContext->pix_fmt       = AV_PIX_FMT_UYVY422;
+    Encode_CodecContext->codec_tag     = 0x32767579; // 2vuy
+    Encode_CodecContext->time_base.num = Stream->codec->time_base.num;
+    Encode_CodecContext->time_base.den = Stream->codec->time_base.den;
+    Encode_CodecContext->sample_aspect_ratio.num = 9;
+    Encode_CodecContext->sample_aspect_ratio.den = 10;
+    Encode_CodecContext->field_order   = AV_FIELD_BT;
+    if (avcodec_open2(Encode_CodecContext, Encode_Codec, NULL) < 0)
+        return false;
 
-    return false;
+    //
+    if (avio_open(&Encode_FormatContext->pb, Encode_FileName.c_str(), AVIO_FLAG_WRITE)<0)
+        return false;
+    if (avformat_write_header(Encode_FormatContext, NULL))
+        return false;
+
+    // All is OK
+    return true;
 }
 
-//***************************************************************************
-// FFmpeg actions
-//***************************************************************************
-
 //---------------------------------------------------------------------------
-bool FFmpeg_Glue::FilterGraph_Init(AVFilterGraph* &FilterGraph, AVFilterContext* &FilterGraph_Source_Context, AVFilterContext* &FilterGraph_Sink_Context, const string &Filter)
+bool FFmpeg_Glue::outputdata::FilterGraph_Init()
 {
     // Alloc
-    AVFilter*       Source      = avfilter_get_by_name("buffer");
-    AVFilter*       Sink        = avfilter_get_by_name("buffersink");
-    AVFilterInOut*  Outputs     = avfilter_inout_alloc();
-    AVFilterInOut*  Inputs      = avfilter_inout_alloc();
-                    FilterGraph = avfilter_graph_alloc();
-
+    AVFilterInOut*  Outputs                     = avfilter_inout_alloc();
+    AVFilterInOut*  Inputs                      = avfilter_inout_alloc();
+                    FilterGraph                 = avfilter_graph_alloc();
 
     // Source
-    stringstream args; //"video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d"
-    args    << "video_size="  <<VideoStream->codec->width<<"x"<<VideoStream->codec->height
-            <<":pix_fmt="     <<(int)VideoStream->codec->pix_fmt
-            <<":time_base="   <<VideoStream->codec->time_base.num<<"/"<<VideoStream->codec->time_base.den
-            <<":pixel_aspect="<<VideoStream->codec->sample_aspect_ratio.num<<"/"<<VideoStream->codec->sample_aspect_ratio.den;
-    if (avfilter_graph_create_filter(&FilterGraph_Source_Context, Source, "in", args.str().c_str(), NULL, FilterGraph)<0)
+    stringstream    Args;
+    AVFilter*       Source;
+    AVFilter*       Sink;
+    if (Type==AVMEDIA_TYPE_VIDEO)
+    {
+        Source                                  = avfilter_get_by_name("buffer");
+        Sink                                    = avfilter_get_by_name("buffersink");
+        Args    << "video_size="                << Stream->codec->width
+                << "x"                          << Stream->codec->height
+                <<":pix_fmt="                   << (int)Stream->codec->pix_fmt
+                <<":time_base="                 << Stream->codec->time_base.num
+                << "/"                          << Stream->codec->time_base.den
+                <<":pixel_aspect="              << Stream->codec->sample_aspect_ratio.num
+                << "/"                          << Stream->codec->sample_aspect_ratio.den;
+    }
+    if (Type==AVMEDIA_TYPE_AUDIO)
+    {
+        Source                                  = avfilter_get_by_name("abuffer");
+        Sink                                    = avfilter_get_by_name(OutputMethod==Output_Stats?"abuffersink":"buffersink");
+        Args    << "time_base="                 << Stream->codec->time_base.num
+                << "/"                          << Stream->codec->time_base.den
+                <<":sample_rate="               << Stream->codec->sample_rate
+                <<":sample_fmt="                << av_get_sample_fmt_name(Stream->codec->sample_fmt)
+                <<":channel_layout=0x"          << std::hex << Stream->codec->channel_layout;
+            ;
+    }
+    if (avfilter_graph_create_filter(&FilterGraph_Source_Context, Source, "in", Args.str().c_str(), NULL, FilterGraph)<0)
+    {
+        FilterGraph_Free();
         return false;
+    }
 
     // Sink
     if (avfilter_graph_create_filter(&FilterGraph_Sink_Context, Sink, "out", NULL, NULL, FilterGraph)<0)
+    {
+        FilterGraph_Free();
         return false;
+    }
 
     // Endpoints for the filter graph. 
     Outputs->name       = av_strdup("in");
@@ -403,16 +544,22 @@ bool FFmpeg_Glue::FilterGraph_Init(AVFilterGraph* &FilterGraph, AVFilterContext*
     Inputs->pad_idx     = 0;
     Inputs->next        = NULL;
     if (avfilter_graph_parse_ptr(FilterGraph, Filter.c_str(), &Inputs, &Outputs, NULL)<0)
+    {
+        FilterGraph_Free();
         return false;
+    }
     if (avfilter_graph_config(FilterGraph, NULL)<0)
+    {
+        FilterGraph_Free();
         return false;
+    }
 
     // All is OK
     return true;
 }
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::FilterGraph_Free(AVFilterGraph* &FilterGraph)
+void FFmpeg_Glue::outputdata::FilterGraph_Free()
 {
     if (FilterGraph)
     {
@@ -422,264 +569,601 @@ void FFmpeg_Glue::FilterGraph_Free(AVFilterGraph* &FilterGraph)
 }
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::Filter1_Change(const string &Filter)
+bool FFmpeg_Glue::outputdata::Scale_Init()
 {
-    With1_Change(true);
+    if (!FilteredFrame)
+        return false;    
+        
+    if (!AdaptDAR())
+        return false;
     
-    Scale_Free(Scale1_Frame, Scale1_Context, Scale1_Frame);
-    FilterGraph_Free(FilterGraph1);
-    if (!FilterGraph_Init(FilterGraph1, FilterGraph1_Source_Context, FilterGraph1_Sink_Context, Filter))
-    {
-        FilterGraph_Free(FilterGraph1);
-        Filter1.clear();
-        return;
-    }
-    Filter1=Filter;
+    // Init
+    ScaleContext = sws_getContext(FilteredFrame->width, FilteredFrame->height,
+                                    (AVPixelFormat)FilteredFrame->format,
+                                    Width, Height,
+                                    OutputMethod==Output_QImage?PIX_FMT_RGB24:PIX_FMT_YUVJ420P,
+                                    Output_QImage?SWS_BICUBIC:SWS_FAST_BILINEAR, NULL, NULL, NULL);
+    ScaledFrame=av_frame_alloc();
+    ScaledFrame->width=Width;
+    ScaledFrame->height=Height;
+    avpicture_alloc((AVPicture*)ScaledFrame, OutputMethod==Output_QImage?PIX_FMT_RGB24:PIX_FMT_YUVJ420P, Width, Height);
+
+    // All is OK
+    return true;
 }
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::Filter2_Change(const string &Filter)
+void FFmpeg_Glue::outputdata::Scale_Free()
 {
-    With2_Change(true);
+    if (ScaleContext)
+    {
+        sws_freeContext(ScaleContext);
+        ScaleContext=NULL;
+    }
+
+    if (ScaledFrame)
+    {
+        avpicture_free((AVPicture*)ScaledFrame);
+        av_frame_free(&ScaledFrame);
+        ScaledFrame=NULL;
+    }
+}
+
+//---------------------------------------------------------------------------
+bool FFmpeg_Glue::outputdata::AdaptDAR()
+{
+    // Display aspect ratio
+    double DAR;
+    if (!DecodedFrame)
+        DAR=4.0/3.0; // TODO: video frame DAR
+    else if (DecodedFrame->sample_aspect_ratio.num && DecodedFrame->sample_aspect_ratio.den)
+        DAR=((double)DecodedFrame->width)/DecodedFrame->height*DecodedFrame->sample_aspect_ratio.num/DecodedFrame->sample_aspect_ratio.den;
+    else
+        DAR=((double)DecodedFrame->width)/DecodedFrame->height;
+    if (DAR)
+    {
+        int Target_Width=Height*DAR;
+        int Target_Height=Width/DAR;
+        if (Target_Width>Width)
+            Height=Target_Height;
+        if (Target_Height>Height)
+            Width=Target_Width;
+    }
+
+    return true;
+}
+
+//***************************************************************************
+// Constructor / Destructor
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<CommonStats*>* Stats_, bool WithStats_) :
+    Stats(Stats_),
+    WithStats(WithStats_),
+    FileName(FileName_),
+    InputDatas_Copy(false)
+{
+    // FFmpeg init
+    av_register_all();
+    avfilter_register_all();
+    //av_log_set_callback(avlog_cb);
+    av_log_set_level(AV_LOG_QUIET);
+
+    // Open file
+    FormatContext=NULL;
+    if (!FileName.empty())
+    {
+        if (avformat_open_input(&FormatContext, FileName.c_str(), NULL, NULL)>=0)
+        {
+            if (avformat_find_stream_info(FormatContext, NULL)>=0)
+            {
+                for (int Pos=0; Pos<FormatContext->nb_streams; Pos++)
+                {
+                    switch (FormatContext->streams[Pos]->codec->codec_type)
+                    {
+                        case AVMEDIA_TYPE_VIDEO:
+                        case AVMEDIA_TYPE_AUDIO:
+                                                    {
+                                                        inputdata* InputData=new inputdata;
+                                                        InputData->Type=FormatContext->streams[Pos]->codec->codec_type;
+                                                        InputData->Stream=FormatContext->streams[Pos];
+                                                        AVCodec* Codec=avcodec_find_decoder(InputData->Stream->codec->codec_id);
+                                                        if (Codec)
+                                                            avcodec_open2(InputData->Stream->codec, Codec, NULL);
+
+                                                        InputData->FrameCount=InputData->Stream->nb_frames;
+                                                        if (InputData->Stream->duration!=AV_NOPTS_VALUE)
+                                                            InputData->Duration=((double)InputData->Stream->duration)*InputData->Stream->time_base.num/InputData->Stream->time_base.den;
+
+                                                        // If duration is not known, estimating it
+                                                        if (InputData->Duration==0 && FormatContext->duration!=AV_NOPTS_VALUE)
+                                                            InputData->Duration=((double)FormatContext->duration)/AV_TIME_BASE;
+
+                                                        // If frame count is not known, estimating it
+                                                        if (InputData->FrameCount==0 && InputData->Stream->avg_frame_rate.num && InputData->Stream->avg_frame_rate.den && InputData->Duration)
+                                                            InputData->FrameCount=InputData->Duration*InputData->Stream->avg_frame_rate.num/InputData->Stream->avg_frame_rate.den;
+                                                        if (InputData->FrameCount==0
+                                                         && ((InputData->Stream->time_base.num==1 && InputData->Stream->time_base.den>=24 && InputData->Stream->time_base.den<=60)
+                                                          || (InputData->Stream->time_base.num==1001 && InputData->Stream->time_base.den>=24000 && InputData->Stream->time_base.den<=60000)))
+                                                            InputData->FrameCount=InputData->Stream->duration;
+
+                                                        //
+                                                        InputDatas.push_back(InputData);
+                                                    }
+                                                    break;
+                        default: InputDatas.push_back(NULL);
+                    }
+                }
+            }
+        }
+    }
+
+    // Packet
+    Packet = new AVPacket;
+    av_init_packet(Packet);
+    Packet->data = NULL;
+    Packet->size = 0;
+
+    // Frame
+    Frame = av_frame_alloc();
+    if (!Frame)
+        return;
+
+    // Stats
+    if (WithStats)
+    {
+        for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        {
+            inputdata* InputData=InputDatas[Pos];
+
+            CommonStats* Stat=NULL;
+            if (InputData)
+            {
+                switch (InputData->Type)
+                {
+                    case AVMEDIA_TYPE_VIDEO: Stat=new VideoStats(InputData->FrameCount, InputData->Duration, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0); break;
+                    case AVMEDIA_TYPE_AUDIO: Stat=new AudioStats(InputData->FrameCount, InputData->Duration, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0); break;
+                }
+            }
+            
+            if (Stat)
+            {
+                Stats->push_back(Stat);
+            }
+        }
+    }
+
+    // Temp
+    Seek_TimeStamp=AV_NOPTS_VALUE;
+}
+
+//---------------------------------------------------------------------------
+FFmpeg_Glue::~FFmpeg_Glue()
+{
+    if (Packet)
+    {
+        //av_free_packet(Packet);
+        delete Packet;
+    }
+
+    if (Frame)
+        av_frame_free(&Frame);
+
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        delete InputDatas[Pos];
+    for (size_t Pos=0; Pos<OutputDatas.size(); Pos++)
+        delete OutputDatas[Pos];
+    avformat_close_input(&FormatContext);
+}
+
+//***************************************************************************
+// Actions
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void FFmpeg_Glue::AddInput(int CodecType, size_t FrameCount, double Duration, int Width, int Height)
+{
+    if (avformat_alloc_output_context2(&FormatContext, NULL, "mpeg", NULL)<0)
+        return;
+
+    inputdata* InputData=new inputdata;
+    InputData->Type=0;
+    InputData->Stream=avformat_new_stream(FormatContext, NULL);
+    InputData->Stream->time_base.num=1;
+    InputData->Stream->time_base.den=30;
+    InputData->Stream->start_time=0;
+    InputData->Stream->duration=FrameCount;
+    AVCodec* Codec=avcodec_find_decoder(AV_CODEC_ID_RAWVIDEO);
+    AVCodecContext* CodecContext=avcodec_alloc_context3(Codec);
+    CodecContext->pix_fmt=AV_PIX_FMT_UYVY422;
+    CodecContext->width=Width;
+    CodecContext->height=Height;
+    CodecContext->time_base.num=1;
+    CodecContext->time_base.den=30;
+    if (avcodec_open2(CodecContext, Codec, NULL)<0)
+        return;
+    InputData->Stream->codec=CodecContext;
+
+    InputData->FrameCount=FrameCount;
+    InputData->Duration=Duration;
+
+    // Stats
+    if (WithStats)
+    {
+        CommonStats* Stat=NULL;
+        if (InputData)
+        {
+            switch (InputData->Type)
+            {
+                case AVMEDIA_TYPE_VIDEO: Stat=new VideoStats(InputData->FrameCount, InputData->Duration, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0); break;
+                case AVMEDIA_TYPE_AUDIO: Stat=new AudioStats(InputData->FrameCount, InputData->Duration, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0); break;
+            }
+        }
+            
+        if (Stat)
+        {
+            Stats->push_back(Stat);
+        }
+    }
+
+    //
+    InputDatas.push_back(InputData);
+}
+
+//---------------------------------------------------------------------------
+void FFmpeg_Glue::AddOutput(size_t FilterPos, int Scale_Width, int Scale_Height, outputmethod OutputMethod, int FilterType, const string &Filter)
+{
+    for (size_t InputPos=0; InputPos<InputDatas.size(); InputPos++)
+    {
+        inputdata* InputData=InputDatas[InputPos];
+
+        if (InputData && InputData->Type==FilterType)
+        {
+            OutputDatas.push_back(NULL);
+            ModifyOutput(InputPos, OutputDatas.size()-1, FilterPos, Scale_Width, Scale_Height, OutputMethod, FilterType, Filter);
+        }
+    }
+}
+
+//---------------------------------------------------------------------------
+void FFmpeg_Glue::AddOutput(const string &FileName)
+{
+    for (size_t OutputPos=0; OutputPos<OutputDatas.size(); OutputPos++)
+    {
+        outputdata* OutputData=OutputDatas[OutputPos];
+
+        if (OutputData && OutputData->OutputMethod==Output_Jpeg)
+        {
+            OutputData->Encode_FileName=FileName;
+        }
+    }
+}
+
+//---------------------------------------------------------------------------
+void FFmpeg_Glue::CloseOutput()
+{
+    for (size_t OutputPos=0; OutputPos<OutputDatas.size(); OutputPos++)
+    {
+        outputdata* OutputData=OutputDatas[OutputPos];
+
+        if (OutputData && OutputData->OutputMethod==Output_Jpeg)
+        {
+            OutputData->CloseEncode();
+        }
+    }
+}
+
+//---------------------------------------------------------------------------
+void FFmpeg_Glue::ModifyOutput(size_t InputPos, size_t OutputPos, size_t FilterPos, int Scale_Width, int Scale_Height, outputmethod OutputMethod, int FilterType, const string &Filter)
+{
+    inputdata* InputData=InputDatas[InputPos];
+
+    outputdata* OutputData=new outputdata;
+    OutputData->Type=FilterType;
+    OutputData->Width=Scale_Width;
+    OutputData->Height=Scale_Height;
+    OutputData->OutputMethod=OutputMethod;
+    OutputData->Filter=Filter;
+    OutputData->FilterPos=FilterPos;
+
+    OutputData->Stream=InputData->Stream;
+    if (OutputMethod==Output_Stats && Stats)
+        OutputData->Stats=(*Stats)[InputPos];
+
+    delete OutputDatas[OutputPos];
+    OutputDatas[OutputPos]=OutputData;
+}
+
+//---------------------------------------------------------------------------
+void FFmpeg_Glue::Seek(size_t FramePos)
+{
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+    {
+        inputdata* InputData=InputDatas[Pos];
+
+        if (InputData && InputData->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData->FramePos=FramePos;
+
+            // Getting first time stamp
+            if (InputData->FirstTimeStamp==DBL_MAX && Stats && !Stats->empty() && (*Stats)[0])
+                InputData->FirstTimeStamp=(*Stats)[0]->FirstTimeStamp;
+
+            // Finding the right source and time stamp computing
+            if (Stats && !Stats->empty() && (*Stats)[0] && FramePos<(*Stats)[0]->x_Current)
+            {
+                double TimeStamp=(*Stats)[0]->x[1][FramePos];
+                if (InputData->FirstTimeStamp!=DBL_MAX)
+                    TimeStamp+=InputData->FirstTimeStamp;
+                Seek_TimeStamp=(int64_t)(TimeStamp*InputData->Stream->time_base.den/InputData->Stream->time_base.num);
+            }
+            else
+            {
+                Seek_TimeStamp=FramePos;
+                Seek_TimeStamp*=InputData->Stream->duration;
+                Seek_TimeStamp/=InputData->FrameCount;  // TODO: seek based on time stamp
+            }
     
-    Scale_Free(Scale2_Frame, Scale2_Context, Scale2_Frame);
-    FilterGraph_Free(FilterGraph2);
-    if (!FilterGraph_Init(FilterGraph2, FilterGraph2_Source_Context, FilterGraph2_Sink_Context, Filter))
+            // Seek
+            if (FormatContext)
+            {
+                if (Seek_TimeStamp)
+                    avformat_seek_file(FormatContext, Pos, 0, Seek_TimeStamp, Seek_TimeStamp, 0);
+                else
+                    avformat_seek_file(FormatContext, Pos, 0, 1, 1, 0); //Found some cases such seek fails
+            }
+
+            // Flushing
+            avcodec_flush_buffers(InputData->Stream->codec);
+
+            break;
+        }
+    }
+}
+
+//---------------------------------------------------------------------------
+void FFmpeg_Glue::FrameAtPosition(size_t FramePos)
+{
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
     {
-        FilterGraph_Free(FilterGraph2);
-        Filter2.clear();
+        inputdata* InputData=InputDatas[Pos];
+
+        if (InputData->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            if (InputData->FramePos!=FramePos)
+                Seek(FramePos);
+            NextFrame();
+
+            break;
+        }
+    }
+}
+
+//---------------------------------------------------------------------------
+bool FFmpeg_Glue::NextFrame()
+{
+    if (FileName.empty())
+    {
+        if (Seek_TimeStamp!=AV_NOPTS_VALUE)
+            InputDatas[0]->FramePos=Seek_TimeStamp;
+            
+        AVPacket Packet;
+        av_init_packet(&Packet);
+        av_packet_from_data(&Packet, NULL, 0);
+        Packet.stream_index=0;
+        Packet.pts=InputDatas[0]->FramePos;
+        if (InputDatas[0]->FramesCache && !(*InputDatas[0]->FramesCache).empty())
+        {
+            if (InputDatas[0]->FramePos>=(*InputDatas[0]->FramesCache).size())
+            {
+                if (!InputDatas[0]->FramesCache_Default)
+                {
+                    InputDatas[0]->FramesCache_Default = av_frame_alloc();
+                    InputDatas[0]->FramesCache_Default->width = (*InputDatas[0]->FramesCache)[0]->width;
+                    InputDatas[0]->FramesCache_Default->height = (*InputDatas[0]->FramesCache)[0]->height;
+                    InputDatas[0]->FramesCache_Default->format = (*InputDatas[0]->FramesCache)[0]->format;
+                    InputDatas[0]->FramesCache_Default->pkt_pts = (*InputDatas[0]->FramesCache)[0]->pkt_pts;
+                    int size = avpicture_get_size((AVPixelFormat)InputDatas[0]->FramesCache_Default->format, InputDatas[0]->FramesCache_Default->width, InputDatas[0]->FramesCache_Default->height);
+                    uint8_t* buffer = (uint8_t*)av_malloc(size);
+                    avpicture_fill((AVPicture*)InputDatas[0]->FramesCache_Default, buffer, (AVPixelFormat)InputDatas[0]->FramesCache_Default->format, InputDatas[0]->FramesCache_Default->width, InputDatas[0]->FramesCache_Default->height);
+                    memset(InputDatas[0]->FramesCache_Default->data[0], 0xFF, InputDatas[0]->FramesCache_Default->linesize[0] * InputDatas[0]->FramesCache_Default->height);
+                    memset(InputDatas[0]->FramesCache_Default->data[1], 0x80, InputDatas[0]->FramesCache_Default->linesize[1] * InputDatas[0]->FramesCache_Default->height / 2);
+                    memset(InputDatas[0]->FramesCache_Default->data[2], 0x80, InputDatas[0]->FramesCache_Default->linesize[2] * InputDatas[0]->FramesCache_Default->height / 2);
+                }
+                Frame=InputDatas[0]->FramesCache_Default;
+                Frame->pkt_pts=InputDatas[0]->FramePos;
+            }
+            else
+                Frame=(*InputDatas[0]->FramesCache)[InputDatas[0]->FramePos];
+            OutputFrame(&Packet, false);
+        }
+        return true;
+    }
+    
+    if (!FormatContext)
+        return false;
+
+    // Next frame
+    while (Packet->size || av_read_frame(FormatContext, Packet) >= 0)
+    {
+        AVPacket TempPacket=*Packet;
+        if (InputDatas[Packet->stream_index] && InputDatas[Packet->stream_index]->Enabled)
+        {
+            do
+            {
+                if (OutputFrame(Packet))
+                {
+                    if (Packet->size==0)
+                        av_free_packet(&TempPacket);
+                    if (InputDatas[Packet->stream_index]->Type==AVMEDIA_TYPE_VIDEO)
+                        return true;
+                }
+            }
+            while (Packet->size > 0);
+        }
+        av_free_packet(&TempPacket);
+        Packet->size=0;
+    }
+    
+    // Flushing
+    Packet->data=NULL;
+    Packet->size=0;
+    while (OutputFrame(Packet));
+    
+    // Complete
+    if (WithStats)
+        for (size_t Pos=0; Pos<Stats->size(); Pos++)
+            (*Stats)[Pos]->StatsFinish();
+
+    return false;
+}
+
+//---------------------------------------------------------------------------
+bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
+{
+    inputdata* InputData=InputDatas[TempPacket->stream_index];
+    
+    // Decoding
+    int got_frame;
+    if (Decode)
+    {
+        got_frame=0;
+        int Bytes;
+        switch(InputDatas[TempPacket->stream_index]->Type)
+        {
+            case AVMEDIA_TYPE_VIDEO : Bytes=avcodec_decode_video2(InputData->Stream->codec, Frame, &got_frame, TempPacket); break;
+            case AVMEDIA_TYPE_AUDIO : Bytes=avcodec_decode_audio4(InputData->Stream->codec, Frame, &got_frame, TempPacket); break;
+            default                 : Bytes=0;
+        }
+        
+        if (Bytes<=0 && !got_frame)
+        {
+            TempPacket->data+=TempPacket->size;
+            TempPacket->size=0;
+            return false;
+        }
+        TempPacket->data+=Bytes;
+        TempPacket->size-=Bytes;
+    }
+    else if (Frame && Frame->format!=-1)
+        got_frame=1;
+    else
+        got_frame=0;
+
+    // Analyzing frame
+    if (got_frame && (Seek_TimeStamp==AV_NOPTS_VALUE || Frame->pkt_pts>=(Seek_TimeStamp?(Seek_TimeStamp-1):Seek_TimeStamp)))
+    {
+        Seek_TimeStamp=AV_NOPTS_VALUE;
+        int64_t ts=(Frame->pkt_pts==AV_NOPTS_VALUE)?Frame->pkt_dts:Frame->pkt_pts;
+        if (ts!=AV_NOPTS_VALUE && ts<InputData->FirstTimeStamp*InputData->Stream->time_base.den/InputData->Stream->time_base.num)
+            InputData->FirstTimeStamp=((double)ts)*InputData->Stream->time_base.num/InputData->Stream->time_base.den;
+        
+        for (size_t OutputPos=0; OutputPos<OutputDatas.size(); OutputPos++)
+            if (OutputDatas[OutputPos] && OutputDatas[OutputPos]->Stream==InputData->Stream)
+                OutputDatas[OutputPos]->Process(Frame);
+
+        InputData->FramePos++;
+        if (InputData->FramePos>InputData->FrameCount)
+            InputData->FrameCount=InputData->FramePos;
+        if (!InputDatas_Copy && FileName.empty())
+        {
+            AVFrame* NewFrame = av_frame_alloc();
+            NewFrame->width = Frame->width;
+            NewFrame->height = Frame->height;
+            NewFrame->format = Frame->format;
+            NewFrame->pkt_pts = Frame->pkt_pts;
+            int size = avpicture_get_size((AVPixelFormat)NewFrame->format, NewFrame->width, NewFrame->height);
+            uint8_t* buffer = (uint8_t*)av_malloc(size);
+            avpicture_fill((AVPicture*)NewFrame, buffer, (AVPixelFormat)NewFrame->format, NewFrame->width, NewFrame->height);
+            memcpy(NewFrame->data[0], Frame->data[0], NewFrame->linesize[0] * NewFrame->height);
+            memcpy(NewFrame->data[1], Frame->data[1], NewFrame->linesize[1] * NewFrame->height / 2);
+            memcpy(NewFrame->data[2], Frame->data[2], NewFrame->linesize[2] * NewFrame->height / 2);
+
+            if (!InputData->FramesCache)
+                InputData->FramesCache=new std::vector<AVFrame*>;
+            InputData->FramesCache->push_back(NewFrame);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+//---------------------------------------------------------------------------
+bool FFmpeg_Glue::OutputFrame(unsigned char* Data, size_t Size, int FramePos)
+{
+    AVPacket Packet;
+    av_init_packet(&Packet);
+    av_packet_from_data(&Packet, Data, Size);
+    Packet.stream_index=0;
+    Packet.pts=FramePos;
+    return OutputFrame(&Packet);
+}
+
+//***************************************************************************
+// FFmpeg actions
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void FFmpeg_Glue::Filter_Change(size_t FilterPos, int FilterType, const string &Filter)
+{
+    for (size_t InputPos=0; InputPos<InputDatas.size(); InputPos++)
+    {
+        inputdata* InputData=InputDatas[InputPos];
+
+        if (InputData && InputData->Type==FilterType)
+        {
+            for (size_t OutputPos=0; OutputPos<OutputDatas.size(); OutputPos++)
+            {
+                outputdata* OutputData=OutputDatas[OutputPos];
+
+                if (OutputData->FilterPos==FilterPos)
+                    ModifyOutput(InputPos, OutputPos, FilterPos, OutputData->Width, OutputData->Height, OutputData->OutputMethod, FilterType, Filter);
+            }
+        }
+    }
+}
+
+//---------------------------------------------------------------------------
+void FFmpeg_Glue::Disable(const size_t Pos)
+{
+    if (Pos>=OutputDatas.size())
         return;
-    }
-    Filter2=Filter;
-}
+    outputdata* OutputData=OutputDatas[Pos];
+    if (!OutputData)
+        return;
 
-//---------------------------------------------------------------------------
-void FFmpeg_Glue::With1_Change(bool With)
-{
-    With1=With;
-    if (!With)
-    {
-        delete Image1; Image1=NULL;
-    }
-}
-
-//---------------------------------------------------------------------------
-void FFmpeg_Glue::With2_Change(bool With)
-{
-    With2=With;
-    if (!With)
-    {
-        delete Image2; Image2=NULL;
-    }
+    OutputData->Enabled=false;
 }
 
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::Scale_Change(int Scale_Width_, int Scale_Height_)
 {
-    if (Scale_Width_ && Scale_Height_)
+    bool MustOutput=false;
+    for (size_t Pos=0; Pos<OutputDatas.size(); Pos++)
     {
-        int ScaleSave_Width=Scale_Width;
-        int ScaleSave_Height=Scale_Height;
-        Scale_Width=Scale_Width_;
-        Scale_Height=Scale_Height_;
-        Scale_Adapted=false;
-        if (Frame)
-            Scale_Adapt(Frame);
-        if (ScaleSave_Width!=Scale_Width || ScaleSave_Height!=Scale_Height)
+        outputdata* OutputData=OutputDatas[Pos];
+
+        if (OutputData)
         {
-            Scale_Free(Scale1_Frame, Scale1_Context, Scale1_Frame);
-            Scale_Free(Scale2_Frame, Scale2_Context, Scale2_Frame);
-            delete Image1; Image1=NULL;
-            delete Image2; Image2=NULL;
-            OutputFrame(Packet, false);
-        }
-    }
-    else
-    {
-        With1_Change(false);
-        With2_Change(false);
-    }
-}
-
-//---------------------------------------------------------------------------
-bool FFmpeg_Glue::Scale_Adapt(AVFrame* FilteredFrame)
-{
-    // Display aspect ratio
-    double DAR;
-    if (FilteredFrame->sample_aspect_ratio.num && FilteredFrame->sample_aspect_ratio.den)
-        DAR=((double)FilteredFrame->width)/FilteredFrame->height*FilteredFrame->sample_aspect_ratio.num/FilteredFrame->sample_aspect_ratio.den;
-    else
-        DAR=((double)FilteredFrame->width)/FilteredFrame->height;
-    if (DAR)
-    {
-        int Target_Width=Scale_Height*DAR;
-        int Target_Height=Scale_Width/DAR;
-        if (Target_Width>Scale_Width)
-            Scale_Height=Target_Height;
-        if (Target_Height>Scale_Height)
-            Scale_Width=Target_Width;
-
-        Scale_Adapted=true;
-    }
-
-    return true;
-}
-
-//---------------------------------------------------------------------------
-bool FFmpeg_Glue::Scale_Init(AVFrame* FilteredFrame, SwsContext* &Scale_Context, AVFrame* &Scale_Frame)
-{
-    if (!Scale_Adapted && !Scale_Adapt(FilteredFrame))
-        return false;
-    
-    // Init
-    Scale_Context = sws_getContext(FilteredFrame->width, FilteredFrame->height,
-                                    (AVPixelFormat)FilteredFrame->format,
-                                    Scale_Width, Scale_Height,
-                                    OutputMethod==Output_QImage?PIX_FMT_RGB24:PIX_FMT_YUVJ420P,
-                                    Output_QImage?SWS_BICUBIC:SWS_FAST_BILINEAR, NULL, NULL, NULL);
-    Scale_Frame=av_frame_alloc();
-    Scale_Frame->width=Scale_Width;
-    Scale_Frame->height=Scale_Height;
-    avpicture_alloc((AVPicture*)Scale_Frame, OutputMethod==Output_QImage?PIX_FMT_RGB24:PIX_FMT_YUVJ420P, Scale_Width, Scale_Height);
-
-    // All is OK
-    return true;
-}
-
-//---------------------------------------------------------------------------
-void FFmpeg_Glue::Scale_Free(AVFrame* FilteredFrame, SwsContext* &Scale_Context, AVFrame* &Scale_Frame)
-{
-    if (FilteredFrame)
-    {
-        sws_freeContext(Scale_Context);
-        Scale_Context=NULL;
-    }
-
-    if (Scale_Frame)
-    {
-        av_frame_free(&Scale_Frame);
-        Scale_Frame=NULL;
-    }
-}
-
-//---------------------------------------------------------------------------
-bool FFmpeg_Glue::JpegOutput_Init()
-{
-    AVCodec *JpegOutput_Codec=avcodec_find_encoder(CODEC_ID_MJPEG);
-    if (!JpegOutput_Codec)
-        return false;
-    JpegOutput_CodecContext=avcodec_alloc_context3 (JpegOutput_Codec);
-    if (!JpegOutput_CodecContext)
-        return false;
-    JpegOutput_CodecContext->qmax          = 12;
-    JpegOutput_CodecContext->width         = Scale_Width;
-    JpegOutput_CodecContext->height        = Scale_Height;
-    JpegOutput_CodecContext->pix_fmt       = PIX_FMT_YUVJ420P;
-    JpegOutput_CodecContext->time_base.num = VideoStream->codec->time_base.num;
-    JpegOutput_CodecContext->time_base.den = VideoStream->codec->time_base.den;
-    if (avcodec_open2(JpegOutput_CodecContext, JpegOutput_Codec, NULL) < 0)
-        return false;
-
-    // All is OK
-    return true;
-}
-
-//---------------------------------------------------------------------------
-bool FFmpeg_Glue::Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, AVFilterContext* &FilterGraph_Source_Context, AVFilterContext* &FilterGraph_Sink_Context, const string &Filter, SwsContext* &Scale_Context, AVFrame* &Scale_Frame, QImage* &Image)
-{
-    //Filtering
-    if (Filter.empty())
-        FilteredFrame=Frame; // The filtered frame is the decoded frame
-    else
-    {
-        if (!FilterGraph && !FilterGraph_Init(FilterGraph, FilterGraph_Source_Context, FilterGraph_Sink_Context, Filter))
-            return true;
-            
-        // Push the decoded Frame into the filtergraph 
-        if (av_buffersrc_add_frame_flags(FilterGraph_Source_Context, Frame, AV_BUFFERSRC_FLAG_KEEP_REF)<0)
-            return true;
-
-        // Pull filtered frames from the filtergraph 
-        FilteredFrame = av_frame_alloc();
-        int GetAnswer = av_buffersink_get_frame(FilterGraph_Sink_Context, FilteredFrame); //TODO: handling of multiple output per input
-            
-        // Stats
-        if (Videos && (VideoFramePos>=(*Videos)[0]->x_Current_Max || (*Videos)[0]->x[1][VideoFramePos]==0))
-            (*Videos)[0]->TimeStampFromFrame(Frame, VideoFramePos);
-        if (WithStats)
-            (*Videos)[0]->VideoStatsFromFrame(FilteredFrame, VideoStream->codec->width, VideoStream->codec->height);
-
-        if (GetAnswer==AVERROR(EAGAIN) || GetAnswer==AVERROR_EOF)
-            return true; // TODO: handle such cases
-        if (GetAnswer<0)
-            return true; // Error
-
-        //TODO: add a real flag for skipping filter
-        if (OutputMethod!=Output_QImage) //Awful hack: we detect it is not the BigBisplay
-        {
-            av_frame_unref(FilteredFrame);
-            FilteredFrame=Frame; // The filtered frame is the decoded frame
+            int ScaleSave_Width=OutputData->Width;
+            int ScaleSave_Height=OutputData->Height;
+            OutputData->Width=Scale_Width_;
+            OutputData->Height=Scale_Height_;
+            OutputData->AdaptDAR();
+            if (ScaleSave_Width!=OutputData->Width || ScaleSave_Height!=OutputData->Height)
+            {
+                OutputData->Scale_Free();
+                delete OutputData->Image; OutputData->Image=NULL;
+                MustOutput=true;
+            }
         }
     }
 
-    //Scale
-    if (true)
-    {
-        if (!Scale_Context && !Scale_Init(FilteredFrame, Scale_Context, Scale_Frame))
-            return true;
-
-        sws_scale(Scale_Context, FilteredFrame->data, FilteredFrame->linesize, 0, FilteredFrame->height, Scale_Frame->data, Scale_Frame->linesize);
-    }
-    else
-    {
-        Scale_Frame=FilteredFrame;
-    }
-
-    //Encode
-    switch (OutputMethod)
-    {
-        case Output_QImage :
-                            // Convert the Frame to QImage
-                            if (Image==NULL)
-                                Image=new QImage(Scale_Frame->width, Scale_Frame->height, QImage::Format_RGB888);
-                            for(int y=0;y<Scale_Frame->height;y++)
-                                memcpy(Image->scanLine(y), Scale_Frame->data[0]+y*Scale_Frame->linesize[0], Scale_Frame->width*3);
-                            break;
-        case Output_Jpeg :
-                            {
-                            int got_packet=0;
-                            JpegOutput_Packet->data=NULL;
-                            JpegOutput_Packet->size=0;
-                            if (!JpegOutput_CodecContext && !JpegOutput_Init())
-                                return true;
-                                    
-                            int temp = avcodec_encode_video2(JpegOutput_CodecContext, JpegOutput_Packet, Scale_Frame, &got_packet);
-
-                            if (got_packet)
-                            {
-                                if (OutputMethod==Output_Jpeg)
-                                {
-                                    bytes* JpegItem=new bytes;
-                                    JpegItem->Data=new unsigned char[JpegOutput_Packet->size];
-                                    memcpy(JpegItem->Data, JpegOutput_Packet->data, JpegOutput_Packet->size);
-                                    JpegItem->Size=JpegOutput_Packet->size;
-                                    JpegList.push_back(JpegItem);
-                                }
-                                av_free_packet(Packet);
-                            }
-                            }
-                            break;
-        default          :  ;
-    }
-
-    //Filtering
-    if (!Filter.empty())
-        av_frame_unref(FilteredFrame);
-    if (!true)
-        Scale_Frame=NULL;
-
-    // All is OK
-    return true;
+    if (MustOutput)
+        OutputFrame(Packet, false);
 }
 
 //***************************************************************************
@@ -705,72 +1189,243 @@ int FFmpeg_Glue::StreamCount_Get()
 }
 
 //---------------------------------------------------------------------------
-string FFmpeg_Glue::VideoFormat_Get()
+int FFmpeg_Glue::BitRate_Get()
 {
-    if (VideoStream==NULL || VideoStream->codec==NULL || VideoStream->codec->codec==NULL || VideoStream->codec->codec->long_name==NULL)
-        return "";
+    if (FormatContext==NULL)
+        return 0;
 
-    return VideoStream->codec->codec->long_name;
+    return FormatContext->bit_rate;
 }
 
 //---------------------------------------------------------------------------
-double FFmpeg_Glue::VideoFrameRate_Get()
+string FFmpeg_Glue::VideoFormat_Get()
 {
-    if (VideoStream==NULL || VideoStream->codec==NULL || VideoStream->codec->codec==NULL || VideoStream->codec->codec->long_name==NULL)
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
+        return "";
+
+    return InputData->Stream->codec->codec->long_name;
+}
+
+//---------------------------------------------------------------------------
+double FFmpeg_Glue::VideoDuration_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL)
         return 0;
 
-    if (VideoStream->avg_frame_rate.num && VideoStream->avg_frame_rate.den)
-        return ((double)VideoStream->avg_frame_rate.num)/VideoStream->avg_frame_rate.den;
-    
-    if (VideoFrameCount && VideoDuration)
-        return VideoFrameCount/VideoDuration;
+    return InputData->Duration;
+}
+
+//---------------------------------------------------------------------------
+double FFmpeg_Glue::FramesDivDuration_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
+        return 0;
+
+    if (InputData->FrameCount && InputData->Duration)
+        return InputData->FrameCount/InputData->Duration;
 
     return 0; // Unknown
 }
 
 //---------------------------------------------------------------------------
-int FFmpeg_Glue::Width_Get()
+string FFmpeg_Glue::RVideoFrameRate_Get()
 {
-    if (VideoStream==NULL || VideoStream->codec==NULL)
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
+        return string();
+    
+    ostringstream convert;
+    if (InputData->Stream->r_frame_rate.num==0)
+        return "Und";
+    else
+    {
+        convert << InputData->Stream->r_frame_rate.num << "/" << InputData->Stream->r_frame_rate.den;
+        return convert.str();
+    }
+}
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::AvgVideoFrameRate_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
+        return string();
+    
+    ostringstream convert;
+    if (InputData->Stream->avg_frame_rate.num==0)
+        return "Und";
+    else
+    {
+        convert << InputData->Stream->avg_frame_rate.num << "/" << InputData->Stream->avg_frame_rate.den;
+        return convert.str();
+    }
+}
+
+//---------------------------------------------------------------------------
+size_t FFmpeg_Glue::VideoFramePos_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL)
         return 0;
 
-    return VideoStream->codec->width;
+    return InputData->FramePos;
+}
+
+//---------------------------------------------------------------------------
+size_t FFmpeg_Glue::VideoFrameCount_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL)
+        return 0;
+
+    return InputData->FrameCount;
+}
+
+//---------------------------------------------------------------------------
+int FFmpeg_Glue::Width_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
+        return 0;
+
+    return InputData->Stream->codec->width;
 }
 
 //---------------------------------------------------------------------------
 int FFmpeg_Glue::Height_Get()
 {
-    if (VideoStream==NULL || VideoStream->codec==NULL)
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
         return 0;
 
-    return VideoStream->codec->height;
+    return InputData->Stream->codec->height;
 }
 
 //---------------------------------------------------------------------------
 double FFmpeg_Glue::DAR_Get()
 {
-    if (VideoStream==NULL || VideoStream->codec==NULL || VideoStream->codec->codec==NULL || VideoStream->codec->codec->long_name==NULL)
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
         return 0;
 
     double DAR;
-    if (VideoStream->codec->sample_aspect_ratio.num && VideoStream->codec->sample_aspect_ratio.den)
-        DAR=((double)VideoStream->codec->width)/VideoStream->codec->height*VideoStream->codec->sample_aspect_ratio.num/VideoStream->codec->sample_aspect_ratio.den;
-    else if ((VideoStream->codec->width>=704 && VideoStream->codec->width<=720) //NTSC / PAL
-          && ((VideoStream->codec->height>=480 && VideoStream->codec->height<=486)
-           || VideoStream->codec->height==576))
-        DAR=((double)4)/3;
+    if (InputData->Stream->codec->sample_aspect_ratio.num && InputData->Stream->codec->sample_aspect_ratio.den)
+        DAR=((double)InputData->Stream->codec->width)/InputData->Stream->codec->height*InputData->Stream->codec->sample_aspect_ratio.num/InputData->Stream->codec->sample_aspect_ratio.den;
     else
-        DAR=((double)VideoStream->codec->width)/VideoStream->codec->height;
+        DAR=((double)InputData->Stream->codec->width)/InputData->Stream->codec->height;
     return DAR;
+}
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::SAR_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
+        return string();
+
+    ostringstream convert;
+    if (InputData->Stream->codec->sample_aspect_ratio.num==0)
+        return "Und";
+    else
+    {
+        convert << InputData->Stream->codec->sample_aspect_ratio.num << "/" << InputData->Stream->codec->sample_aspect_ratio.den;
+        return convert.str();
+    }
 }
 
 //---------------------------------------------------------------------------
 string FFmpeg_Glue::PixFormat_Get()
 {
-    if (VideoStream==NULL || VideoStream->codec==NULL)
-        return "";
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
 
-    switch (VideoStream->codec->pix_fmt)
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
+        return string();
+
+    switch (InputData->Stream->codec->pix_fmt)
     {
         case AV_PIX_FMT_YUV420P: return "planar YUV 4:2:0, 12bpp, (1 Cr & Cb sample per 2x2 Y samples)";
         case AV_PIX_FMT_YUYV422: return "packed YUV 4:2:2, 16bpp, Y0 Cb Y1 Cr";
@@ -956,48 +1611,188 @@ string FFmpeg_Glue::PixFormat_Get()
 }
 
 //---------------------------------------------------------------------------
+string FFmpeg_Glue::ColorSpace_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
+        return string();
+
+    switch (InputData->Stream->codec->colorspace)
+    {
+        case AVCOL_SPC_RGB: return "RGB: order of coefficients is actually GBR, also IEC 61966-2-1 (sRGB)";
+        case AVCOL_SPC_BT709: return "BT.709 / ITU-R BT1361 / IEC 61966-2-4 xvYCC709 / SMPTE RP177 Annex B";
+        case AVCOL_SPC_UNSPECIFIED: return "Unspecified";
+        case AVCOL_SPC_RESERVED: return "Reserved";
+        case AVCOL_SPC_FCC: return "FCC Title 47 Code of Federal Regulations 73.682 (a)(20)";
+        case AVCOL_SPC_BT470BG: return "BT.470bg / ITU-R BT601-6 625 / ITU-R BT1358 625 / ITU-R BT1700 625 PAL & SECAM / IEC 61966-2-4 xvYCC601";
+        case AVCOL_SPC_SMPTE170M: return "SMPTE 170m / ITU-R BT601-6 525 / ITU-R BT1358 525 / ITU-R BT1700 NTSC";
+        case AVCOL_SPC_SMPTE240M: return "SMPTE 240m";
+        case AVCOL_SPC_YCOCG: return "YCOCG: Used by Dirac / VC-2 and H.264 FRext, see ITU-T SG16";
+        case AVCOL_SPC_BT2020_NCL: return "ITU-R BT2020 non-constant luminance system";
+        case AVCOL_SPC_BT2020_CL: return "ITU-R BT2020 constant luminance system";
+        case AVCOL_SPC_NB: return "Not part of ABI.";
+        default: return string();
+    }
+}
+
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::ColorRange_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
+        return string();
+
+    switch (InputData->Stream->codec->color_range)
+    {
+        case AVCOL_RANGE_UNSPECIFIED: return "Unspecified";
+        case AVCOL_RANGE_MPEG: return "Broadcast Range (219*2^n-1)";
+        case AVCOL_RANGE_JPEG: return "Full Range (2^n-1)";
+        case AVCOL_RANGE_NB: return "Not part of ABI";
+        default: return string();
+    }
+}
+
+//---------------------------------------------------------------------------
 string FFmpeg_Glue::AudioFormat_Get()
 {
-    if (AudioStream==NULL || AudioStream->codec==NULL || AudioStream->codec->codec==NULL || AudioStream->codec->codec->long_name==NULL)
-        return "";
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_AUDIO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
 
-    return AudioStream->codec->codec->long_name;
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
+        return string();
+
+    return InputData->Stream->codec->codec->long_name;
 }
 
 //---------------------------------------------------------------------------
 string FFmpeg_Glue::SampleFormat_Get()
 {
-    if (AudioStream==NULL || AudioStream->codec==NULL || AudioStream->codec->codec==NULL || AudioStream->codec->codec->long_name==NULL)
-        return "";
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_AUDIO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+        if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
+            return "";
 
-    return "";
-}
+        switch (InputData->Stream->codec->sample_fmt)
+        {
+            case AV_SAMPLE_FMT_NONE: return "none";
+            case AV_SAMPLE_FMT_U8: return "unsigned 8 bits";
+            case AV_SAMPLE_FMT_S16: return "signed 16 bits";
+            case AV_SAMPLE_FMT_S32: return "signed 32 bits";
+            case AV_SAMPLE_FMT_FLT: return "float";
+            case AV_SAMPLE_FMT_DBL: return "double";
+            case AV_SAMPLE_FMT_U8P: return "unsigned 8 bits, planar";
+            case AV_SAMPLE_FMT_S16P: return "signed 16 bits, planar";
+            case AV_SAMPLE_FMT_S32P: return "signed 32 bits, planar";
+            case AV_SAMPLE_FMT_FLTP: return "float, planar";
+            case AV_SAMPLE_FMT_DBLP: return "double, planar";
+            case AV_SAMPLE_FMT_NB: return "number of sample formats";
+            default: return string();
+        }
+    }
 
 //---------------------------------------------------------------------------
 int FFmpeg_Glue::SamplingRate_Get()
 {
-    if (AudioStream==NULL || AudioStream->time_base.den==0)
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_AUDIO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->time_base.den==0)
         return 0;
 
-    return AudioStream->time_base.den;
+    return InputData->Stream->time_base.den;
 }
 
 //---------------------------------------------------------------------------
 string FFmpeg_Glue::ChannelLayout_Get()
 {
-    if (AudioStream==NULL || AudioStream->codec==NULL || AudioStream->codec->codec==NULL || AudioStream->codec->codec->long_name==NULL)
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_AUDIO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL)
         return "";
 
-    return "";
+    switch (InputData->Stream->codec->channel_layout)
+    {
+        case AV_CH_LAYOUT_MONO: return "mono";
+        case AV_CH_LAYOUT_STEREO: return "stereo"; 
+        case AV_CH_LAYOUT_2POINT1: return "2.1"; 
+        case AV_CH_LAYOUT_SURROUND: return "3.0"; 
+        case AV_CH_LAYOUT_2_1: return "3.0(back)";
+        case AV_CH_LAYOUT_4POINT0: return "4.0";
+        case AV_CH_LAYOUT_QUAD: return "quad";
+        case AV_CH_LAYOUT_2_2: return "quad(side)";
+        case AV_CH_LAYOUT_3POINT1: return "3.1";
+        case AV_CH_LAYOUT_5POINT0_BACK: return "5.0";
+        case AV_CH_LAYOUT_5POINT0: return "5.0(side)";
+        case AV_CH_LAYOUT_4POINT1: return "4.1";
+        case AV_CH_LAYOUT_5POINT1_BACK: 
+        case AV_CH_LAYOUT_5POINT1: return "5.1(side)";
+        case AV_CH_LAYOUT_6POINT0: return "6.0";
+        case AV_CH_LAYOUT_6POINT0_FRONT: return "6.0(front)";
+        case AV_CH_LAYOUT_HEXAGONAL: return "hexagonal";
+        case AV_CH_LAYOUT_6POINT1: return "6.1";
+        case AV_CH_LAYOUT_6POINT1_BACK: return "6.1";
+        case AV_CH_LAYOUT_6POINT1_FRONT: return "6.1(front)";
+        case AV_CH_LAYOUT_7POINT0: return "7.0";
+        case AV_CH_LAYOUT_7POINT0_FRONT: return "7.0(front)";
+        case AV_CH_LAYOUT_7POINT1: return "7.1";
+        case AV_CH_LAYOUT_7POINT1_WIDE_BACK: return "7.1(wide)";
+        case AV_CH_LAYOUT_7POINT1_WIDE: return "7.1(wide-side)";
+        case AV_CH_LAYOUT_OCTAGONAL: return "octagonal";
+        case AV_CH_LAYOUT_STEREO_DOWNMIX: return "downmix";
+        default: return string();
+    }
 }
 
 //---------------------------------------------------------------------------
-int FFmpeg_Glue::BitDepth_Get()
+int FFmpeg_Glue::ABitDepth_Get()
 {
-    if (AudioStream==NULL || AudioStream->codec==NULL || AudioStream->codec->codec==NULL || AudioStream->codec->codec->long_name==NULL)
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_AUDIO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL || InputData->Stream->codec->codec==NULL || InputData->Stream->codec->codec->long_name==NULL)
         return 0;
 
-    return 0;
+    return InputData->Stream->codec->bits_per_coded_sample;
 }
 
 //---------------------------------------------------------------------------

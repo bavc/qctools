@@ -10,9 +10,16 @@ CONFIG += qt release
 CONFIG += no_keywords
 
 HEADERS = \
+    ../../Source/Core/AudioCore.h \
+    ../../Source/Core/AudioStats.h \
+    ../../Source/Core/CommonStats.h \
     ../../Source/Core/Core.h \
+    ../../Source/Core/BlackmagicDeckLink.h \
+    ../../Source/Core/BlackmagicDeckLink_Glue.h \
     ../../Source/Core/FFmpeg_Glue.h \
+    ../../Source/Core/VideoCore.h \
     ../../Source/Core/VideoStats.h \
+    ../../Source/GUI/blackmagicdecklink_userinput.h \
     ../../Source/GUI/BigDisplay.h \
     ../../Source/GUI/Control.h \
     ../../Source/GUI/FileInformation.h \
@@ -21,14 +28,25 @@ HEADERS = \
     ../../Source/GUI/Info.h \
     ../../Source/GUI/mainwindow.h \
     ../../Source/GUI/preferences.h \
+    ../../Source/GUI/Plot.h \
     ../../Source/GUI/Plots.h \
+    ../../Source/GUI/PlotLegend.h \
+    ../../Source/GUI/PlotScaleWidget.h \
     ../../Source/GUI/TinyDisplay.h \
     ../../Source/ThirdParty/tinyxml2/tinyxml2.h
 
 SOURCES = \
+    "../../../Blackmagic DeckLink SDK/Mac/include/DeckLinkAPIDispatch.cpp" \
+    ../../Source/Core/AudioCore.cpp \
+    ../../Source/Core/AudioStats.cpp \
+    ../../Source/Core/CommonStats.cpp \
     ../../Source/Core/Core.cpp \
+    ../../Source/Core/BlackmagicDeckLink.cpp \
+    ../../Source/Core/BlackmagicDeckLink_Glue.cpp \
     ../../Source/Core/FFmpeg_Glue.cpp \
+    ../../Source/Core/VideoCore.cpp \
     ../../Source/Core/VideoStats.cpp \
+    ../../Source/GUI/blackmagicdecklink_userinput.cpp \
     ../../Source/GUI/BigDisplay.cpp \
     ../../Source/GUI/Control.cpp \
     ../../Source/GUI/FileInformation.cpp \
@@ -40,14 +58,18 @@ SOURCES = \
     ../../Source/GUI/mainwindow_Callbacks.cpp \
     ../../Source/GUI/mainwindow_More.cpp \
     ../../Source/GUI/mainwindow_Ui.cpp \
+    ../../Source/GUI/Plot.cpp \
     ../../Source/GUI/Plots.cpp \
+    ../../Source/GUI/PlotLegend.cpp \
+    ../../Source/GUI/PlotScaleWidget.cpp \
     ../../Source/GUI/preferences.cpp \
     ../../Source/GUI/TinyDisplay.cpp \
     ../../Source/ThirdParty/tinyxml2/tinyxml2.cpp
 
 FORMS += \
     ../../Source/GUI/mainwindow.ui \
-    ../../Source/GUI/preferences.ui
+    ../../Source/GUI/preferences.ui \
+    ../../Source/GUI/blackmagicdecklink_userinput.ui
 
 RESOURCES += \
     ../../Source/Resource/Resources.qrc
@@ -60,8 +82,9 @@ INCLUDEPATH += $$PWD/../../Source
 INCLUDEPATH += $$PWD/../../Source/ThirdParty/tinyxml2
 INCLUDEPATH += $$QWT_ROOT/src
 INCLUDEPATH += $$PWD/../../../ffmpeg
+INCLUDEPATH += "$$PWD/../../../Blackmagic DeckLink SDK"
 
-LIBS      += -L$${QWT_ROOT}/lib -lqwt
+LIBS      += -L$${QWT_ROOT}/lib -lqwt -l lzma
 LIBS      += -lz
 LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
              -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
@@ -73,13 +96,11 @@ LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
              -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
              -L$${PWD}/../../../ffmpeg/libavutil -lavutil
 LIBS      += -L$${PWD}/../../../openjpeg/usr/lib -lopenjpeg
+#LIBS      += -L$${PWD}/../../../openjpeg/usr/lib -lfreetype #No freetype for the moment
 LIBS      += -lbz2
-!macx
-{
-LIBS      += -lrt
-}
 
-macx:
-{
-    ICON = ../../Source/Resource/Logo.icns 
-}
+!macx:LIBS      += -lrt
+
+macx:ICON = ../../Source/Resource/Logo.icns
+macx:QMAKE_LFLAGS += -framework CoreFoundation -framework CoreVideo -framework VideoDecodeAcceleration
+macx:LIBS += -liconv

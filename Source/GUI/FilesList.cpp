@@ -11,6 +11,10 @@
 //---------------------------------------------------------------------------
 #include "GUI/FileInformation.h"
 #include "GUI/mainwindow.h"
+#include "Core/CommonStats.h"
+#include "Core/VideoCore.h"
+#include "Core/AudioCore.h"
+#include "Core/FFmpeg_Glue.h"
 #include <QFileInfo>
 #include <QHeaderView>
 #include <QMenu>
@@ -30,8 +34,8 @@ enum statstype
 struct percolumn
 {
     statstype       Stats_Type;
-    PlotName        Stats_PlotName;
-    PlotName        Stats_PlotName2;
+    size_t          Stats_Item;
+    size_t          Stats_Item2;
     const char*     HeaderName;
     const char*     ToolTip;
 };
@@ -52,6 +56,7 @@ enum col_names
     Col_MSEfY,
     Col_Format,
     Col_StreamCount,
+    Col_BitRate,
     Col_Duration,
     Col_FileSize,
   //Col_Encoder,
@@ -59,46 +64,57 @@ enum col_names
     Col_Width,
     Col_Height,
     Col_DAR,
+    Col_SAR,
     Col_PixFormat,
-    Col_FrameRate,
+    Col_ColorSpace,
+    Col_ColorRange,
+    Col_FramesDivDuration,
+    Col_RFrameRate,
+    Col_AvgFrameRate,
     Col_AudioFormat,
   //Col_SampleFormat,
     Col_SamplingRate,
-  //Col_ChannelLayout,
-  //Col_BitDepth,
+    Col_ChannelLayout,
+    Col_ABitDepth,
     Col_Max
 };
 
 percolumn PerColumn[Col_Max]=
 {
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Processed",        NULL, },
-    { StatsType_Average,    PlotName_YAVG,          PlotName_Max,           "Yav",              "average of Y values", },
-    { StatsType_Average,    PlotName_YHIGH,         PlotName_YLOW,          "Yrang",            "average of ( YHIGH - YLOW ), indicative of contrast range", },
-    { StatsType_Average,    PlotName_UAVG,          PlotName_Max,           "Uav",              NULL, },
-    { StatsType_Average,    PlotName_VAVG,          PlotName_Max,           "Vav",              "average of V values", },
-    { StatsType_Average,    PlotName_TOUT,          PlotName_Max,           "TOUTav",           "average of TOUT values", },
-    { StatsType_Count,      PlotName_TOUT,          PlotName_Max,           "TOUTc",            "count of TOUT > 0.005", },
-    { StatsType_Count,      PlotName_SATMAX,        PlotName_Max,           "SATb",             "count of frames with MAXSAT > 88.7, outside of broadcast color levels", },
-    { StatsType_Count2,     PlotName_SATMAX,        PlotName_Max,           "SATi",             "count of frames with MAXSAT > 118.2, illegal YUV color", },
-    { StatsType_Average,    PlotName_BRNG,          PlotName_Max,           "BRNGav",           "average of BRNG", },
-    { StatsType_Count,      PlotName_BRNG,          PlotName_Max,           "BRNGc",            "count of frames with BRNG > 0.02", },
-    { StatsType_Count,      PlotName_MSE_y,         PlotName_Max,           "MSEfY",            "count of frames with MSEfY over 1000", },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Format",           NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Streams count",    NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Duration",         NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "File size",        NULL, },
-  //{ StatsType_None,       PlotName_Max,           PlotName_Max,           "Encoder",          NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "V. Format",        NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Width",            NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Height",           NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "DAR",              NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Pix Format",       NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Frame rate",       NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "A. Format",        NULL, },
-  //{ StatsType_None,       PlotName_Max,           PlotName_Max,           "Sample format",    NULL, },
-    { StatsType_None,       PlotName_Max,           PlotName_Max,           "Sampling rate",    NULL, },
-  //{ StatsType_None,       PlotName_Max,           PlotName_Max,           "Channel layout",   NULL, },
-  //{ StatsType_None,       PlotName_Max,           PlotName_Max,           "Bit depth",        NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Processed",        "Percentage of frames processed by QCTools", },
+    { StatsType_Average,    Item_YAVG,              Item_VideoMax,          "Yav",              "average of Y values", },
+    { StatsType_Average,    Item_YHIGH,             Item_YLOW,              "Yrang",            "average of ( YHIGH - YLOW ), indicative of contrast range", },
+    { StatsType_Average,    Item_UAVG,              Item_VideoMax,          "Uav",              "average of U values", },
+    { StatsType_Average,    Item_VAVG,              Item_VideoMax,          "Vav",              "average of V values", },
+    { StatsType_Average,    Item_TOUT,              Item_VideoMax,          "TOUTav",           "average of TOUT values", },
+    { StatsType_Count,      Item_TOUT,              Item_VideoMax,          "TOUTc",            "count of TOUT > 0.005", },
+    { StatsType_Count,      Item_SATMAX,            Item_VideoMax,          "SATb",             "count of frames with MAXSAT > 88.7, outside of broadcast color levels", },
+    { StatsType_Count2,     Item_SATMAX,            Item_VideoMax,          "SATi",             "count of frames with MAXSAT > 118.2, illegal YUV color", },
+    { StatsType_Average,    Item_BRNG,              Item_VideoMax,          "BRNGav",           "average of BRNG", },
+    { StatsType_Count,      Item_BRNG,              Item_VideoMax,          "BRNGc",            "count of frames with BRNG > 0.02", },
+    { StatsType_Count,      Item_MSE_y,             Item_VideoMax,          "MSEfY",            "count of frames with MSEfY over 1000", },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Format",           NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Streams count",    NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Bit Rate",         NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Duration",         NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "File size",        NULL, },
+  //{ StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Encoder",          NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Video Format",     NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Width",            NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Height",           NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "DAR",              "Display Aspect Ratio", },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "SAR",              "Sample Aspect Ratio", },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Pix Format",       "The pixel format describes the color space, bit depth,\nand soemtimes the chroma subsampling and endianness of pixel data.", },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Color Space",      "YUV colorspace type, such as ", },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Color Range",      "YUV color range: broadcast, full, or unspecified.", },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Frames/Dur",       "The number of frames divided by the duration.\nIf this is less than the intended frame rate\nthere may be dropped frames or variable frame rate.", },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "R Frame rate",     "Real base framerate of the stream.\nThis is the lowest framerate with which all timestamps\ncan be represented accurately (it is the least common\nmultiple of all framerates in the stream). Note, this\nvalue is just a guess! For example, if the time base is\n1/90000 and all frames have either approximately 3600\nor 1800 timer ticks, then r_frame_rate will be 50/1.", },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Avg Frame rate",   "Average Frame Rate", },
+    { StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Audio Format",     NULL, },
+  //{ StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Sample format",    NULL, },
+    { StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Sampling rate",    "measured in Hz", },
+    { StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Channel layout",   NULL, },
+    { StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Audio Bit depth",  NULL, },
 };
 
 
@@ -162,7 +178,10 @@ void FilesList::UpdateAll()
     {
         QString     Format;
         QString     StreamCount;
-        QString     FrameRate;
+        QString     BitRate;
+        QString     FramesDivDuration;
+        QString     RFrameRate;
+        QString     AvgFrameRate;
         string      Duration;
         QString     ShortFileName;
         QString     FileSize;
@@ -170,12 +189,15 @@ void FilesList::UpdateAll()
         QString     Width;
         QString     Height;
         QString     DAR_String;
+        QString     SAR;
         QString     PixFormat;
+        QString     ColorSpace;
+        QString     ColorRange;
         QString     AudioFormat;
         QString     SampleFormat;
         QString     SamplingRate_String;
         QString     ChannelLayout;
-        QString     BitDepth_String;
+        QString     ABitDepth_String;
 
         QFileInfo   FileInfo(Main->Files[Files_Pos]->FileName);
 
@@ -184,21 +206,27 @@ void FilesList::UpdateAll()
             // Data from FFmpeg
             Format=                             Main->Files[Files_Pos]->Glue->ContainerFormat_Get().c_str();
             StreamCount=QString::number(        Main->Files[Files_Pos]->Glue->StreamCount_Get());
+            BitRate=QString::number(            Main->Files[Files_Pos]->Glue->BitRate_Get());
             int Milliseconds=(int)(             Main->Files[Files_Pos]->Glue->VideoDuration_Get()*1000);
             VideoFormat=                        Main->Files[Files_Pos]->Glue->VideoFormat_Get().c_str();
             Width=QString::number(              Main->Files[Files_Pos]->Glue->Width_Get());
             Height=QString::number(             Main->Files[Files_Pos]->Glue->Height_Get());
             double DAR=                         Main->Files[Files_Pos]->Glue->DAR_Get();
-            double FrameRated=                  Main->Files[Files_Pos]->Glue->VideoFrameRate_Get();
+            SAR=                                Main->Files[Files_Pos]->Glue->SAR_Get().c_str();
+            double FramesDivDurationd=          Main->Files[Files_Pos]->Glue->FramesDivDuration_Get();
+            RFrameRate=                         Main->Files[Files_Pos]->Glue->RVideoFrameRate_Get().c_str();
+            AvgFrameRate=                       Main->Files[Files_Pos]->Glue->AvgVideoFrameRate_Get().c_str();
             PixFormat=                          Main->Files[Files_Pos]->Glue->PixFormat_Get().c_str();
+            ColorSpace=                         Main->Files[Files_Pos]->Glue->ColorSpace_Get().c_str();
+            ColorRange=                         Main->Files[Files_Pos]->Glue->ColorRange_Get().c_str();
             AudioFormat=                        Main->Files[Files_Pos]->Glue->AudioFormat_Get().c_str();
             SampleFormat=                       Main->Files[Files_Pos]->Glue->SampleFormat_Get().c_str();
             double SamplingRate=                Main->Files[Files_Pos]->Glue->SamplingRate_Get();
             ChannelLayout=                      Main->Files[Files_Pos]->Glue->ChannelLayout_Get().c_str();
-            double BitDepth=                    Main->Files[Files_Pos]->Glue->BitDepth_Get();
+            double ABitDepth=                    Main->Files[Files_Pos]->Glue->ABitDepth_Get();
 
             // Parsing
-            FrameRate=QString::number(FrameRated, 'f', 3);
+            FramesDivDuration=QString::number(FramesDivDurationd, 'f', 3);
 
             if (Milliseconds)
             {
@@ -225,33 +253,11 @@ void FilesList::UpdateAll()
                 Duration.append(1, '0'+m3);
             }
 
-                 if (DAR>=(float)1.23 && DAR<(float)1.27) DAR_String="5:4";
-            else if (DAR>=(float)1.30 && DAR<(float)1.37) DAR_String="4:3";
-            else if (DAR>=(float)1.45 && DAR<(float)1.55) DAR_String="3:2";
-            else if (DAR>=(float)1.55 && DAR<(float)1.65) DAR_String="16:10";
-            else if (DAR>=(float)1.74 && DAR<(float)1.82) DAR_String="16:9";
-            else if (DAR>=(float)1.82 && DAR<(float)1.88) DAR_String="1.85:1";
-            else if (DAR>=(float)2.15 && DAR<(float)2.22) DAR_String="2.2:1";
-            else if (DAR>=(float)2.23 && DAR<(float)2.30) DAR_String="2.25:1";
-            else if (DAR>=(float)2.30 && DAR<(float)2.37) DAR_String="2.35:1";
-            else if (DAR>=(float)2.37 && DAR<(float)2.45) DAR_String="2.40:1";
-            else              DAR_String=QString::number(DAR, 'f', 3);
-                 if (SamplingRate==96000)
-                SamplingRate_String="96 kHz";
-            else if (SamplingRate==88200)
-                SamplingRate_String="88.2 kHz";
-            else if (SamplingRate==48000)
-                SamplingRate_String="48 kHz";
-            else if (SamplingRate==44100)
-                SamplingRate_String="44.1 kHz";
-            else if (SamplingRate==24000)
-                SamplingRate_String="24 kHz";
-            else if (SamplingRate==22500)
-                SamplingRate_String="22.05 kHz";
-            else if (SamplingRate)
-                SamplingRate_String=QString::number(SamplingRate)+" Hz";
-            if (BitDepth)
-                BitDepth_String=QString::number(BitDepth)+"-bit";
+            DAR_String=QString::number(DAR, 'f', 4);
+            if (SamplingRate)
+                SamplingRate_String=QString::number(SamplingRate);
+            if (ABitDepth)
+                ABitDepth_String=QString::number(ABitDepth);
 
             FileSize=QString::number(FileInfo.size());
         }
@@ -263,6 +269,7 @@ void FilesList::UpdateAll()
 
         setItem((int)Files_Pos, Col_Format,         new QTableWidgetItem(Format));
         setItem((int)Files_Pos, Col_StreamCount,    new QTableWidgetItem(StreamCount));
+        setItem((int)Files_Pos, Col_BitRate,        new QTableWidgetItem(BitRate));
         setItem((int)Files_Pos, Col_Duration,       new QTableWidgetItem(Duration.c_str()));
         setItem((int)Files_Pos, Col_FileSize,       new QTableWidgetItem(FileSize));
       //setItem((int)Files_Pos, Col_Encoder,        new QTableWidgetItem("(TODO)"));
@@ -270,13 +277,18 @@ void FilesList::UpdateAll()
         setItem((int)Files_Pos, Col_Width,          new QTableWidgetItem(Width));
         setItem((int)Files_Pos, Col_Height,         new QTableWidgetItem(Height));
         setItem((int)Files_Pos, Col_DAR,            new QTableWidgetItem(DAR_String));
+        setItem((int)Files_Pos, Col_SAR,            new QTableWidgetItem(SAR));
         setItem((int)Files_Pos, Col_PixFormat,      new QTableWidgetItem(PixFormat));
-        setItem((int)Files_Pos, Col_FrameRate,      new QTableWidgetItem(FrameRate));
+        setItem((int)Files_Pos, Col_ColorSpace,     new QTableWidgetItem(ColorSpace));
+        setItem((int)Files_Pos, Col_ColorRange,     new QTableWidgetItem(ColorRange));
+        setItem((int)Files_Pos, Col_FramesDivDuration, new QTableWidgetItem(FramesDivDuration));
+        setItem((int)Files_Pos, Col_RFrameRate,     new QTableWidgetItem(RFrameRate));
+        setItem((int)Files_Pos, Col_AvgFrameRate,   new QTableWidgetItem(AvgFrameRate));
         setItem((int)Files_Pos, Col_AudioFormat,    new QTableWidgetItem(AudioFormat));
       //setItem((int)Files_Pos, Col_SampleFormat,   new QTableWidgetItem(SampleFormat));
         setItem((int)Files_Pos, Col_SamplingRate,   new QTableWidgetItem(SamplingRate_String));
-      //setItem((int)Files_Pos, Col_ChannelLayout,  new QTableWidgetItem(ChannelLayout));
-      //setItem((int)Files_Pos, Col_BitDepth,       new QTableWidgetItem(BitDepth_String));
+        setItem((int)Files_Pos, Col_ChannelLayout,  new QTableWidgetItem(ChannelLayout));
+        setItem((int)Files_Pos, Col_ABitDepth,       new QTableWidgetItem(ABitDepth_String));
 
         for (int Pos=0; Pos<Col_Max; Pos++)
         {
@@ -311,8 +323,15 @@ void FilesList::Update()
 //---------------------------------------------------------------------------
 void FilesList::Update(size_t Files_Pos)
 {
+    CommonStats* Stats=Main->Files[Files_Pos]->ReferenceStat();
+    if (!Stats)
+    {
+        setItem((int)Files_Pos, Col_Processed, new QTableWidgetItem("N/A"));
+        return;
+    }
+
     stringstream Message;
-    Message<<(int)(Main->Files[Files_Pos]->Videos[0]->State_Get()*100)<<"%";
+    Message<<(int)(Stats->State_Get()*100)<<"%";
     setItem((int)Files_Pos, Col_Processed, new QTableWidgetItem(QString::fromStdString(Message.str())));
     
     // Stats
@@ -323,19 +342,19 @@ void FilesList::Update(size_t Files_Pos)
             switch (PerColumn[Col].Stats_Type)
             {
                 case StatsType_Average : 
-                                            if (PerColumn[Col].Stats_PlotName2==PlotName_Max)
-                                                Item->setText(Main->Files[Files_Pos]->Videos[0]->Average_Get(PerColumn[Col].Stats_PlotName).c_str());
+                                            if (PerColumn[Col].Stats_Item2==Item_VideoMax)
+                                                Item->setText(Stats->Average_Get(PerColumn[Col].Stats_Item).c_str());
                                             else
-                                                Item->setText(Main->Files[Files_Pos]->Videos[0]->Average_Get(PerColumn[Col].Stats_PlotName, PerColumn[Col].Stats_PlotName2).c_str());
+                                                Item->setText(Stats->Average_Get(PerColumn[Col].Stats_Item, PerColumn[Col].Stats_Item2).c_str());
                                             break;
                 case StatsType_Count : 
-                                            Item->setText(Main->Files[Files_Pos]->Videos[0]->Count_Get(PerColumn[Col].Stats_PlotName).c_str());
+                                            Item->setText(Stats->Count_Get(PerColumn[Col].Stats_Item).c_str());
                                             break;
                 case StatsType_Count2 :
-                                            Item->setText(Main->Files[Files_Pos]->Videos[0]->Count2_Get(PerColumn[Col].Stats_PlotName).c_str());
+                                            Item->setText(Stats->Count2_Get(PerColumn[Col].Stats_Item).c_str());
                                             break;
                 case StatsType_Percent : 
-                                            Item->setText(Main->Files[Files_Pos]->Videos[0]->Percent_Get(PerColumn[Col].Stats_PlotName).c_str());
+                                            Item->setText(Stats->Percent_Get(PerColumn[Col].Stats_Item).c_str());
                                             break;
                 default:    ;
             }

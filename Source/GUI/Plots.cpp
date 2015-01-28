@@ -5,584 +5,461 @@
  */
 
 //---------------------------------------------------------------------------
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
 
 #include "GUI/Plots.h"
+#include "GUI/Plot.h"
+#include "GUI/PlotLegend.h"
+#include "GUI/PlotScaleWidget.h"
 #include "Core/Core.h"
-
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_picker.h>
-#include <qwt_plot_zoomer.h>
-#include <qwt_legend.h>
-#include <qwt_plot_grid.h>
+#include <QComboBox>
+#include <QGridLayout>
+#include <QEvent>
 #include <qwt_plot_layout.h>
-#include <qwt_plot_picker.h>
-#include <qwt_plot_renderer.h>
-#include <qwt_scale_widget.h>
-#include <qwt_picker_machine.h>
-#include <qwt_plot_marker.h>
-//---------------------------------------------------------------------------
-
-//***************************************************************************
-// Constants
-//***************************************************************************
-
-
-//***************************************************************************
-// Constructor / Desructor
-//***************************************************************************
+#include <qwt_plot_canvas.h>
+#include <cmath>
 
 //---------------------------------------------------------------------------
-Plots::Plots(QWidget *parent, FileInformation* FileInformationData_) :
-    QWidget(parent),
-    FileInfoData(FileInformationData_)
+
+class XAxisFormatBox: public QComboBox
 {
-    // To update
-    TinyDisplayArea=NULL;
-    ControlArea=NULL;
-    InfoArea=NULL;
+public:
+    XAxisFormatBox( QWidget* parent = NULL ):
+        QComboBox( parent )
+    {
+        setContentsMargins( 0, 0, 0, 0 );
 
-    // Positioning info
-    ZoomScale=1;
+        addItem( "Frames" );
+        addItem( "Seconds" );
+        addItem( "Minutes" );
+        addItem( "Hours" );
+        addItem( "Time" );
+    }
+};
 
-    // Status
-    memset(Status, true, sizeof(bool)*PlotType_Max);
+//---------------------------------------------------------------------------
+Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
+    QWidget( parent ),
+    m_zoomFactor ( 0 ),
+    m_fileInfoData( fileInformation ),
+    m_dataTypeIndex( Plots::AxisSeconds )
+{
+    QGridLayout* layout = new QGridLayout( this );
+    layout->setSpacing( 1 );
+    layout->setContentsMargins( 0, 0, 0, 0 );
 
-    // Layouts and Widgets
-    Layout=NULL;
-    memset(Layouts      , 0, sizeof(QHBoxLayout*  )*PlotType_Max);
-    memset(paddings     , 0, sizeof(QWidget*      )*PlotType_Max);
-    memset(plots        , 0, sizeof(QwtPlot*      )*PlotType_Max);
-    memset(legends      , 0, sizeof(QwtLegend*    )*PlotType_Max);
+    // bottom scale
+    m_scaleWidget = new PlotScaleWidget();
+    m_scaleWidget->setFormat( Plots::AxisTime );
+    setVisibleFrames( 0, numFrames() - 1 );
 
-    // Widgets addons
-    memset(plotsCurves  , 0, sizeof(QwtPlotCurve* )*PlotType_Max*5);
-    memset(plotsZoomers , 0, sizeof(QwtPlotZoomer*)*PlotType_Max);
-    memset(plotsPickers , 0, sizeof(QwtPlotPicker*)*PlotType_Max);
-    memset(plotsMarkers , 0, sizeof(QwtPlotMarker*)*PlotType_Max);
+    // plots and legends
+    m_plots = new Plot**[m_fileInfoData->Stats.size()];
+    size_t layout_y=0;
+    
+    for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
+    {
+        size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+        size_t countOfGroups = PerStreamType[type].CountOfGroups;
+        
+        m_plots[streamPos] = new Plot*[countOfGroups + 1]; //+1 for axix
+    
+        for ( size_t group = 0; group < countOfGroups; group++ )
+        {
+            Plot* plot = new Plot( streamPos, type, group, this );
 
-    // X axis info
-    XAxis_Kind=NULL;
-    XAxis_Kind_index=1;
-    Zoom_Left=0;
-    Zoom_Width=0;
-    Marker_FramePos=(size_t)-1;
-    Data_FramePos_Max=0;
-    Data_FramePos_Current=0;
+            // we allow to shrink the plot below height of the size hint
+            plot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
+            plot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
+            initYAxis( plot );
+            updateSamples( plot );
 
-    // Y axis info
-    memset(plots_YMax, 0, sizeof(double)*PlotType_Max);
+            connect( plot, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
 
-    // Plots
-    Plots_Create();
+            plot->canvas()->installEventFilter( this );
+
+            layout->addWidget( plot, layout_y, 0 );
+            layout->addWidget( plot->legend(), layout_y, 1 );
+
+            m_plots[streamPos][group] = plot;
+
+            layout_y++;
+        }
+    }
+
+    layout->addWidget( m_scaleWidget, layout_y, 0, 1, 2 );
+
+    // combo box for the axis format
+    XAxisFormatBox* xAxisBox = new XAxisFormatBox();
+    xAxisBox->setCurrentIndex( Plots::AxisTime );
+    connect( xAxisBox, SIGNAL( currentIndexChanged( int ) ),
+        this, SLOT( onXAxisFormatChanged( int ) ) );
+
+    int axisBoxRow = layout->rowCount() - 1;
+#if 1
+    // one row below to have space enough for bottom scale tick labels
+    layout->addWidget( xAxisBox, layout_y + 1, 1 );
+#else
+    layout->addWidget( xAxisBox, layout_y, 1 );
+#endif
+
+    layout->setColumnStretch( 0, 10 );
+    layout->setColumnStretch( 1, 0 );
+
+    m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
+
+    setCursorPos( framePos() );
 }
 
 //---------------------------------------------------------------------------
 Plots::~Plots()
 {
-    for (size_t Type=0; Type<PlotType_Max; Type++)
-    {
-        // Widgets addons
-        for(unsigned j=0; j<5; ++j)
-            delete plotsCurves[Type][j];
-        delete plotsZoomers [Type];
-        delete plotsPickers [Type];
-        delete plotsMarkers [Type];
-
-        // Layouts and Widgets
-        delete Layouts      [Type];
-        delete paddings     [Type];
-        delete plots        [Type];
-        delete legends      [Type];
-    }
-}
-
-//***************************************************************************
-//
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-void Plots::Plots_Create()
-{
-    //Creating data
-    for (size_t Type=0; Type<PlotType_Max; Type++)
-        Plots_Create((PlotType)Type);
-
-    // XAxis_Kind
-    XAxis_Kind=new QComboBox(this);
-    XAxis_Kind->setVisible(false);
-    XAxis_Kind->addItem("Frames");
-    XAxis_Kind->addItem("Seconds");
-    XAxis_Kind->addItem("Minutes");
-    XAxis_Kind->addItem("Hours");
-    XAxis_Kind->setCurrentIndex(XAxis_Kind_index);
-    //XAxis_Kind->setEnabled(false);
-    connect(XAxis_Kind, SIGNAL(currentIndexChanged(int)), this, SLOT(on_XAxis_Kind_currentIndexChanged(int)));
 }
 
 //---------------------------------------------------------------------------
-void Plots::Plots_Create(PlotType Type)
+const QwtPlot* Plots::plot( size_t streamPos, size_t Group ) const
 {
-    // Paddings
-    if (paddings[Type]==NULL)
+    return m_plots[streamPos][Group];
+}
+
+//---------------------------------------------------------------------------
+void Plots::refresh()
+{
+    for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
     {
-        paddings[Type]=new QWidget(this);
-        paddings[Type]->setVisible(false);
-    }
-
-    // General design of plot
-    QwtPlot* plot = new QwtPlot(this);
-    plot->setVisible(false);
-    plot->setMinimumHeight(1);
-    plot->enableAxis(QwtPlot::xBottom, Type==PlotType_Axis);
-    plot->setAxisMaxMajor(QwtPlot::yLeft, 0);
-    plot->setAxisMaxMinor(QwtPlot::yLeft, 0);
-    plot->setAxisScale(QwtPlot::xBottom, 0, FileInfoData->Videos[0]->x_Max[XAxis_Kind_index]);
-    if (PerPlotGroup[Type].Count>3)
-        plot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-    // Plot grid
-    QwtPlotGrid *grid = new QwtPlotGrid();
-    grid->enableXMin(true);
-    grid->enableYMin(true);
-    grid->setMajorPen(Qt::darkGray, 0, Qt::DotLine );
-    grid->setMinorPen(Qt::gray, 0 , Qt::DotLine );
-    grid->attach(plot);
-
-    // Plot curves
-    for(unsigned j=0; j<PerPlotGroup[Type].Count; ++j)
-    {
-        plotsCurves[Type][j] = new QwtPlotCurve(PerPlotName[PerPlotGroup[Type].Start+j].Name);
-        QColor c;
-
-        switch (PerPlotGroup[Type].Count)
+        size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+        for ( int i = 0; i < PerStreamType[type].CountOfGroups; i++ )
         {
-             case 1 :
-                        switch (Type)
-                        {
-                            case PlotType_YDiff: c=Qt::darkGreen; break;
-                            case PlotType_UDiff: c=Qt::darkBlue; break;
-                            case PlotType_VDiff: c=Qt::darkRed; break;
-                            default: c=Qt::black;
-                        }
-                        break;
-             case 2 :
-                        switch (j)
-                        {
-                            case 0: c=Qt::darkGreen; break;
-                            case 1: c=Qt::darkRed; break;
-                            default: c=Qt::black;
-                        }
-                        break;
-             case 3 :
-                        switch (j)
-                        {
-                            case 0: c=Qt::darkRed; break;
-                            case 1: c=Qt::darkBlue; break;
-                            case 2: c=Qt::darkGreen; break;
-                            default: c=Qt::black;
-                        }
-                        break;
-             case 5 :
-                        switch (j)
-                        {
-                            case 0: c=Qt::red; break;
-                            case 1: c=QColor::fromRgb(0x00, 0x66, 0x00); break; //Qt::green
-                            case 2: c=Qt::black; break;
-                            case 3: c=Qt::green; break;
-                            case 4: c=Qt::red; break;
-                            default: c=Qt::black;
-                        }
-                        break;
-            default:    c=Qt::black;
+            initYAxis( m_plots[streamPos][i] );
+            updateSamples( m_plots[streamPos][i] );
         }
-
-        plotsCurves[Type][j]->setPen(c);
-        plotsCurves[Type][j]->setRenderHint(QwtPlotItem::RenderAntialiased);
-        plotsCurves[Type][j]->setZ(plotsCurves[Type][j]->z()-j); //Invert data order (e.g. MAX before MIN)
-        plotsCurves[Type][j]->attach(plot);
-     }
-
-    // Legends
-    QwtLegend *legend = new QwtLegend(this);
-    legend->setVisible(false);
-    legend->setMinimumHeight(1);
-    legend->setMaxColumns(1);
-    QFont Font=legend->font();
-    #ifdef _WIN32
-        Font.setPointSize(6);
-    #else // _WIN32
-        Font.setPointSize(8);
-    #endif //_WIN32
-    legend->setFont(Font);
-    connect(plot, SIGNAL(legendDataChanged(const QVariant &, const QList<QwtLegendData> &)), legend, SLOT(updateLegend(const QVariant &, const QList<QwtLegendData> &)));
-    plot->updateLegend();
-
-    // Assignment
-    plots[Type]=plot;
-    legends[Type]=legend;
-
-    // Pickers
-    plotsPickers[Type] = new QwtPlotPicker( QwtPlot::xBottom, QwtPlot::yLeft, QwtPlotPicker::CrossRubberBand, QwtPicker::AlwaysOn, plots[Type]->canvas() );
-    plotsPickers[Type]->setStateMachine( new QwtPickerDragPointMachine () );
-    plotsPickers[Type]->setRubberBandPen( QColor( Qt::green ) );
-    plotsPickers[Type]->setTrackerPen( QColor( Qt::white ) );
-    connect(plotsPickers[Type], SIGNAL(moved(const QPointF&)), SLOT(plot_moved(const QPointF&)));
-    connect(plotsPickers[Type], SIGNAL(selected(const QPointF&)), SLOT(plot_moved(const QPointF&)));
-
-    // Marker
-    QwtPlotMarker* plotMarker=new QwtPlotMarker;
-    plotMarker->setLineStyle(QwtPlotMarker::VLine);
-    plotMarker->setLinePen(QPen(Qt::magenta, 1));
-    plotMarker->setXValue(0);
-    plotMarker->attach(plot);
-    plotsMarkers[Type]=plotMarker;
-}
-
-//---------------------------------------------------------------------------
-void Plots::Plots_Update()
-{
-    size_t FramePos=FileInfoData->Frames_Pos_Get();
-    double X=FileInfoData->Videos[0]->x[XAxis_Kind_index][FramePos];
-
-    // Put the current frame in center
-    if (ZoomScale!=1)
-    {
-        size_t Increment=Data_FramePos_Max/ZoomScale;
-        size_t NewBegin=0;
-        if (FramePos>Increment/2)
-        {
-            NewBegin=FramePos-Increment/2;
-            if (NewBegin+Increment>Data_FramePos_Max)
-                NewBegin=Data_FramePos_Max-Increment;
-        }
-        Zoom_Move(NewBegin);
     }
 
-    Marker_Update(X);
+    setCursorPos( framePos() );
+    replotAll();
 }
 
 //---------------------------------------------------------------------------
-void Plots::Marker_Update()
+void Plots::setVisibleFrames( int from, int to , bool force)
 {
-    if (Marker_FramePos==FileInfoData->Frames_Pos_Get())
-        return;
+    if ( from != m_frameInterval.from || to != m_frameInterval.to || force)
+    {
+        m_frameInterval.from = from;
+        m_frameInterval.to = to;
+
+        const double* x = stats(0)->x[m_dataTypeIndex];
+        m_timeInterval.from = x[from];
+        m_timeInterval.to = x[to];
+
+        // Handling unfinished parsing with estimated x
+        if ( m_timeInterval.from == 0  && from)
+            m_timeInterval.from = stats(0)->x_Max[m_dataTypeIndex] / stats(0)->x_Max[0] * from;
+        if ( m_timeInterval.to == 0 )
+            m_timeInterval.to = stats(0)->x_Max[m_dataTypeIndex] / stats(0)->x_Max[0] * to;
+    }
+}
+
+//---------------------------------------------------------------------------
+FrameInterval Plots::visibleFrames() const
+{
+    return m_frameInterval;
+}
+
+//---------------------------------------------------------------------------
+void Plots::onCurrentFrameChanged()
+{
+    // position of the current frame has changed 
+
+    if ( isZoomed() )
+    {
+        const int n = m_frameInterval.count();
+
+        const int from = qBound( 0, framePos() - n / 2, numFrames() - n );
+        const int to = from + n - 1;
+
+        if ( from != m_frameInterval.from )
+        {
+            setVisibleFrames( from, to );
+            replotAll();
+        }
+    }
+
+    setCursorPos( framePos() );
+}
+
+//---------------------------------------------------------------------------
+void Plots::setCursorPos( int newFramePos )
+{
+    setFramePos( newFramePos );
+
+    for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
+    {
+        const double x = m_fileInfoData->Stats[streamPos]->x[m_dataTypeIndex][framePos(streamPos)];
+
+        size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+
+        for ( int i = 0; i < PerStreamType[type].CountOfGroups; ++i )
+            m_plots[streamPos][i]->setCursorPos( x );
+    }
+
+    m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
+    m_scaleWidget->update();
+
+    replotAll();
+}
+
+//---------------------------------------------------------------------------
+void Plots::initYAxis( Plot* plot )
+{
+    const size_t plotType = plot->type();
+    const size_t plotGroup = plot->group();
+
+    CommonStats* stat = stats( plot->streamPos() );
+    const struct per_group& group = PerStreamType[plotType].PerGroup[plotGroup];
+
+    double yMin = stat->y_Min[plotGroup];
+    double yMax = stat->y_Max[plotGroup];
+    if ( ( group.Min != group.Max ) && ( yMax - yMin >= ( group.Max - group.Min) / 2 ) )
+        yMax = group.Max;
+
+    if ( yMin != yMax )
+    {
+        plot->setYAxis( yMin, yMax, group.StepsCount );
+    }
+    else
+    {
+        //Special case, in order to force a scale of 0 to 1
+        plot->setYAxis( 0.0, 1.0, 1 );
+    }
+
+}
+
+//---------------------------------------------------------------------------
+void Plots::updateSamples( Plot* plot )
+{
+    const size_t plotType = plot->type();
+    const size_t plotGroup = plot->group();
+    const CommonStats* stat = stats( plot->streamPos() );
+
+    for (size_t type = 0; type < CountOfStreamTypes; type++)
+        for( unsigned j = 0; j < PerStreamType[type].CountOfGroups; ++j )
+        {
+            plot->setCurveSamples( j, stat->x[m_dataTypeIndex],
+                stat->y[PerStreamType[plotType].PerGroup[plotGroup].Start + j], stat->x_Current );
+        }
+}
+
+//---------------------------------------------------------------------------
+void Plots::Zoom_Move( int Begin )
+{
+    const int n = m_frameInterval.count();
+
+    const int from = qMax( Begin, 0 );
+    const int to = qMin( numFrames(), from + n ) - 1;
+
+    setVisibleFrames( to - n + 1, to );
+
+    for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
+    {
+		size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+
+        for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
+            m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
+    }
+
+    m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
+
+    refresh();
+
+    m_scaleWidget->update();
+
+    replotAll();
+}
+
+//---------------------------------------------------------------------------
+void Plots::alignYAxes()
+{
+    double maxExtent = 0;
+
+    for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
+    {
+        size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
         
-    Marker_FramePos=FileInfoData->Frames_Pos_Get();
-    Marker_Update(FileInfoData->Videos[0]->x[XAxis_Kind_index][Marker_FramePos]);
-}
-
-//---------------------------------------------------------------------------
-void Plots::Marker_Update(double X)
-{
-    for (size_t Type=0; Type<PlotType_Max; ++Type)
-    {
-        plotsMarkers[Type]->setXValue(X);
-        plots[Type]->replot();
-    }
-}
-
-//---------------------------------------------------------------------------
-void Plots::createData_Init()
-{
-    // Create
-    createData_Update();
-    refreshDisplay();
-}
-
-//---------------------------------------------------------------------------
-void Plots::createData_Update()
-{
-    //Creating data
-    for (size_t Type=0; Type<PlotType_Max; Type++)
-        if (plots[Type] && plots[Type]->isVisible())
-            createData_Update((PlotType)Type);
-    
-    //Update of zoom in case of total duration change
-    if (Data_FramePos_Max+1!=FileInfoData->Videos[0]->x_Current_Max)
-    {
-        Data_FramePos_Max=FileInfoData->Videos[0]->x_Current_Max-1;
-        Zoom_Update();
-    }
-
-    //Update of zoom in case of total duration change
-    //if (Data_FramePos_Current!=FileInfoData->Videos[0]->x_Current)
-    //{
-    //    Data_FramePos_Current=FileInfoData->Videos[0]->x_Current;
-    //    plot_moved(Marker_RealPoint);
-    //}
-}
-
-//---------------------------------------------------------------------------
-void Plots::createData_Update(PlotType Type)
-{
-    if (PerPlotGroup[Type].Min!=PerPlotGroup[Type].Max && FileInfoData->Videos[0]->y_Max[Type]>=PerPlotGroup[Type].Max/2)
-        FileInfoData->Videos[0]->y_Max[Type]=PerPlotGroup[Type].Max;
-    double y_Max_ForThisPlot=FileInfoData->Videos[0]->y_Max[Type];
-
-    //plot->setMinimumHeight(0);
-
-    if (y_Max_ForThisPlot)
-    {
-        double StepCount=PerPlotGroup[Type].StepsCount;
-
-        if (y_Max_ForThisPlot>plots_YMax[Type])
+        for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
         {
-            double Step=floor(y_Max_ForThisPlot/StepCount);
-            if (Step==0)
-            {
-                Step=floor(y_Max_ForThisPlot/StepCount*10)/10;
-                if (Step==0)
-                {
-                    Step=floor(y_Max_ForThisPlot/StepCount*100)/100;
-                    if (Step==0)
-                    {
-                        Step=floor(y_Max_ForThisPlot/StepCount*1000)/1000;
-                        if (Step==0)
-                        {
-                            Step=floor(y_Max_ForThisPlot/StepCount*10000)/10000;
-                            if (Step==0)
-                            {
-                                Step=floor(y_Max_ForThisPlot/StepCount*100000)/100000;
-                                if (Step==0)
-                                {
-                                    Step=floor(y_Max_ForThisPlot/StepCount*1000000)/1000000;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            QwtScaleWidget *scaleWidget = m_plots[streamPos][group]->axisWidget( QwtPlot::yLeft );
 
-            if (FileInfoData->Videos[0]->y_Max[Type]==0)
-            {
-                FileInfoData->Videos[0]->y_Max[Type]=1; //Special case, in order to force a scale instead of -1 to 1
-                Step=1;
-            };
+            QwtScaleDraw* scaleDraw = scaleWidget->scaleDraw();
+            scaleDraw->setMinimumExtent( 0.0 );
 
-            if (Step)
+            if ( m_plots[streamPos][group]->isVisibleTo( this ) )
             {
-                plots_YMax[Type]=FileInfoData->Videos[0]->y_Max[Type];
-                plots[Type]->setAxisScale(QwtPlot::yLeft, 0, plots_YMax[Type], Step);
+                const double extent = scaleDraw->extent( scaleWidget->font() );
+                maxExtent = qMax( extent, maxExtent );
             }
         }
+        maxExtent += 3; // margin
     }
-    else
+
+    for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
     {
-        plots[Type]->setAxisScale(QwtPlot::yLeft, 0, 1, 1); //Special case, in order to force a scale instead of -1 to 1
-    }
-
-    for(unsigned j=0; j<PerPlotGroup[Type].Count; ++j)
-        plotsCurves[Type][j]->setRawSamples(FileInfoData->Videos[0]->x[XAxis_Kind_index], FileInfoData->Videos[0]->y[PerPlotGroup[Type].Start+j], FileInfoData->Videos[0]->x_Current);
-    plots[Type]->replot();
-}
-
-//---------------------------------------------------------------------------
-void Plots::Zoom_Update()
-{
-    size_t Increment=Data_FramePos_Max/ZoomScale;
-    int Pos=FileInfoData->Frames_Pos_Get();
-    if (Pos==(int)-1)
-        return;    
-    if (Pos>Increment/2)
-        Pos-=Increment/2;
-    else
-        Pos=0;
-    Zoom_Move(Pos);
-}
-
-//---------------------------------------------------------------------------
-void Plots::Zoom_Move(size_t Begin)
-{
-    size_t Increment=Data_FramePos_Max/ZoomScale;
-    if (Begin+Increment>Data_FramePos_Max)
-        Begin=Data_FramePos_Max-Increment;
-
-    Zoom_Left=FileInfoData->Videos[0]->x[XAxis_Kind_index][Begin];
-    Zoom_Width=FileInfoData->Videos[0]->x_Max[XAxis_Kind_index]/ZoomScale;
-
-    for (size_t Type=0; Type<PlotType_Max; Type++)
-        if (plots[Type])
+        size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+        
+        for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
         {
-            QwtPlotZoomer* zoomer = new QwtPlotZoomer(plots[Type]->canvas());
-            QRectF Rect=zoomer->zoomBase();
-            Rect.setLeft(Zoom_Left);
-            Rect.setWidth(Zoom_Width);
-            zoomer->zoom(Rect);
-            delete zoomer;
+            QwtScaleWidget *scaleWidget = m_plots[streamPos][group]->axisWidget( QwtPlot::yLeft );
+            scaleWidget->scaleDraw()->setMinimumExtent( maxExtent );
         }
+    }
 }
 
-//---------------------------------------------------------------------------
-void Plots::refreshDisplay()
+bool Plots::eventFilter( QObject *object, QEvent *event )
 {
-    if (Layout==NULL)
+    if ( event->type() == QEvent::Move || event->type() == QEvent::Resize )
     {
-        Layout=new QVBoxLayout(this);
-        Layout->setSpacing(0);
-        Layout->setMargin(0);
-        Layout->setContentsMargins(0,0,0,0);
-    }
-
-    int Pos=0;
-    for (size_t Type=0; Type<PlotType_Max; Type++)
-        if (Status[Type])
+        for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
         {
-            if (Layouts[Type]==NULL)
+            size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+        
+            for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
             {
-                if (Layouts[Type]==NULL)
-                    Layouts[Type]=new QHBoxLayout();
-                Layouts[Type]->setSpacing(0);
-                Layouts[Type]->setMargin(0);
-                Layouts[Type]->setContentsMargins(0,0,0,0);
-
-                Layouts[Type]->addWidget(paddings[Type]);
-                //paddings[Type]->setStyleSheet("background-color:blue;"); // For GUI debug
-
-                Layouts[Type]->addWidget(plots[Type]);
-                Layouts[Type]->setStretchFactor(plots[Type], 1);
-                //plots[Type]->setStyleSheet("background-color:green;"); // For GUI debug
-
-                createData_Update((PlotType)Type);
-                if (Type!=PlotType_Axis)
+                if ( m_plots[streamPos][group]->isVisibleTo( this ) )
                 {
-                    legends[Type]->setContentsMargins(0, 0, 0, 0);
-                    Layouts[Type]->addWidget(legends[Type]);
-                    //legends[Type]->setStyleSheet("background-color:blue;"); // For GUI debug
+                    if ( object == m_plots[streamPos][group]->canvas() )
+                        alignXAxis( m_plots[streamPos][group] );
+
+                    break;
                 }
-                else
-                {
-                    plots[PlotType_Axis]->setMaximumHeight(plots[PlotType_Axis]->axisWidget(QwtPlot::xBottom)->height());
-
-                    XAxis_Kind->setContentsMargins(0, 0, 0, 0);
-                    Layouts[Type]->addWidget(XAxis_Kind);
-                    //XAxis_Kind->setStyleSheet("background-color:blue;"); // For GUI debug
-                }
-
-                Layout->insertLayout(Pos, Layouts[Type]);
-                if (Type!=PlotType_Axis)
-                    Layout->setStretchFactor(Layouts[Type], 1);
-
-                paddings[Type]->setVisible(true);
-                plots[Type]->setVisible(true);
-                if (Type!=PlotType_Axis)
-                     legends[Type]->setVisible(true);
-                else
-                     XAxis_Kind->setVisible(true);
             }
-            Pos++;
         }
-        else
-        {
-            if (paddings[Type])
-                paddings[Type]->setVisible(false);
-            if (plots[Type])
-                plots[Type]->setVisible(false);
-            if (legends[Type])
-                legends[Type]->setVisible(false);
-            Layout->removeItem(Layouts[Type]);
-            delete Layouts[Type]; Layouts[Type]=NULL;
-        }
+    }
 
-    setLayout(Layout);
-    createData_Update();
+    return QWidget::eventFilter( object, event );
+}
+
+void Plots::alignXAxis( const Plot* plot )
+{
+    const QWidget* canvas = plot->canvas();
+
+    QRect r = canvas->geometry(); 
+    r.moveTopLeft( mapFromGlobal( plot->mapToGlobal( r.topLeft() ) ) );
+
+    int left = r.left();
+    left += plot->plotLayout()->canvasMargin( QwtPlot::yLeft );
+
+    int right = width() - ( r.right() - 1 );
+    right += plot->plotLayout()->canvasMargin( QwtPlot::yRight );
+
+    m_scaleWidget->setBorderDist( left, right );
 }
 
 //---------------------------------------------------------------------------
-void Plots::refreshDisplay_Axis()
+void Plots::onCursorMoved( int framePos )
 {
-    // Paddings
-    int Width_Max=0;
-    for (size_t Type=0; Type<PlotType_Max; Type++)
-    {
-        int Width_Temp=plots[Type]->axisWidget(QwtPlot::yLeft)->width();
-        if (Width_Temp>Width_Max)
-            Width_Max=Width_Temp;
-    }
-    for (size_t Type=0; Type<PlotType_Max; Type++)
-    {
-        int temp_Width=Width_Max-plots[Type]->axisWidget(QwtPlot::yLeft)->width();
-        paddings[Type]->setMinimumWidth(temp_Width);
-        paddings[Type]->setMaximumWidth(temp_Width);
-    }
-
-    // Legends
-    Width_Max=0;
-    for (size_t Type=0; Type<PlotType_Max; Type++)
-    {
-        int Width_Temp;
-        if (Type==PlotType_Axis)
-        {
-            #ifdef _WIN32
-                Width_Temp=XAxis_Kind->width();
-            #else // _WIN32
-                Width_Temp=XAxis_Kind->width()-3; // FIXME: For a reason I ignore, plots and XAxis_Kind overlap on Mac, this is an hack to show them correctly
-            #endif //_WIN32
-        }
-        else
-            Width_Temp=legends[Type]->width();
-        if (Width_Temp>Width_Max)
-            Width_Max=Width_Temp;
-    }
-    for (size_t Type=0; Type<PlotType_Max; Type++)
-    {
-        if (Type==PlotType_Axis)
-        {
-            #ifdef _WIN32
-                XAxis_Kind->setMinimumWidth(Width_Max);
-                XAxis_Kind->setMaximumWidth(Width_Max);
-            #else // _WIN32
-                XAxis_Kind->setMinimumWidth(Width_Max+3); // FIXME: For a reason I ignore, plots and XAxis_Kind overlap on Mac, this is an hack to show them correctly
-                XAxis_Kind->setMaximumWidth(Width_Max+3);
-            #endif //_WIN32
-        }
-        else
-        {
-            legends[Type]->setMinimumWidth(Width_Max);
-            legends[Type]->setMaximumWidth(Width_Max);
-        }
-    }
-
-    //RePlot
-    for (size_t Type=0; Type<PlotType_Max; Type++)
-        if (plots[Type])
-            plots[Type]->replot();
+    m_fileInfoData->Frames_Pos_Set( framePos );
+    setCursorPos( framePos );
 }
 
-void Plots::plot_moved( const QPointF &pos )
+//---------------------------------------------------------------------------
+void Plots::onXAxisFormatChanged( int format )
 {
-    Marker_RealPoint=pos;
+    if ( format == m_scaleWidget->format() )
+        return;
 
-    double X=pos.x();
-    if (X<0)
-        X=0;
+    int dataTypeIndex = format;
+    if ( format == AxisTime )
+        dataTypeIndex = AxisSeconds;
 
-    double* x=FileInfoData->Videos[0]->x[XAxis_Kind_index];
-    size_t Pos=0;  
-    while (Pos<FileInfoData->Videos[0]->x_Current_Max && X>=x[Pos])
-        Pos++;
-    if (Pos)
+    if ( m_dataTypeIndex != dataTypeIndex )
     {
-        if (Pos>=FileInfoData->Videos[0]->x_Current)
-            Pos=FileInfoData->Videos[0]->x_Current-1;
+        m_dataTypeIndex = dataTypeIndex;
 
-        double Distance1=X-x[Pos-1];
-        double Distance2=x[Pos]-X;
-        if (Distance1<Distance2)
-            Pos--;
+        setVisibleFrames( m_frameInterval.from, m_frameInterval.to, true );
+
+        for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
+        {
+		    size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+
+            for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
+                m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
+        }
+
+        m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
+
+        refresh();
     }
-    X=x[Pos];
 
-    FileInfoData->Frames_Pos_Set(Pos);
-    Marker_Update(X);
+    m_scaleWidget->setFormat( format );
+    m_scaleWidget->update();
+
+    replotAll();
 }
 
-void Plots::on_XAxis_Kind_currentIndexChanged(int index)
+//---------------------------------------------------------------------------
+void Plots::setPlotVisible( size_t type, size_t group, bool on )
 {
-    XAxis_Kind_index=index;
+    for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
+    {
+        if ( type == m_fileInfoData->Stats[streamPos]->Type_Get() && on != m_plots[streamPos][group]->isVisibleTo( this ))
+        {
+            m_plots[streamPos][group]->setVisible( on );
+            m_plots[streamPos][group]->legend()->setVisible( on );
+        }
+    }
 
-    createData_Update();
-    Zoom_Update();
+    alignYAxes();
+}
+
+//---------------------------------------------------------------------------
+void Plots::zoomXAxis( bool up )
+{
+    if ( up )
+        m_zoomFactor++;
+    else if ( m_zoomFactor )
+        m_zoomFactor--;
+        
+    int numVisibleFrames = m_fileInfoData->Frames_Count_Get() >> m_zoomFactor;
+
+    int to = qMin( framePos() + numVisibleFrames / 2, numFrames() );
+    int from = qMax( 0, to - numVisibleFrames );
+    if ( to - from < numVisibleFrames)
+        to = from + numVisibleFrames;
+
+    setVisibleFrames( from, to );
+
+    for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
+    {
+		size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+
+        for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
+            m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
+    }
+
+    m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
+
+    refresh();
+
+    m_scaleWidget->update();
+
+    replotAll();
+}
+
+bool Plots::isZoomed() const
+{
+    return m_frameInterval.count() < numFrames();
+}
+
+//---------------------------------------------------------------------------
+void Plots::replotAll()
+{
+    for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
+    {
+		size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+
+        for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
+        {
+            m_plots[streamPos][group]->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
+            if ( m_plots[streamPos][group]->isVisibleTo( this ) )
+                m_plots[streamPos][group]->replot();
+        }
+    }
 }

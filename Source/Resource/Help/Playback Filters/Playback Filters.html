@@ -1,62 +1,116 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
-        <title>Playback Filter Descriptions - QCTools Help Guide</title>
+        <title>
+            Playback Filter Descriptions - QCTools Help Guide
+        </title>
     </head>
     <body>
-       <h1>Playback Filter Descriptions</h1>
-       <p>The QCTools preview window is intended as an analytical playback environent that allows the user to review video through multiple filters simultaneously. The playback window includes two viewing windows which may be set to different combinations of filters. This allows a user to playback a video by viewing a waveform and a vectorscope or perhaps by viewing a waveform and the video with highlighted pixels that are outside of broadcast range.</p>
-        <h2 style="color:blue">Normal</h2>
-        <p>This view simply shows the video as QCTools interprets it, no special effects or filtering are added.</p>
-
-        <h2 style="color:blue">Field Difference</h2>
+        <h1>
+            Playback Filter Descriptions
+        </h1>
         <p>
-		This presentation visualizes the difference between video field 1 and field 2. A middle gray image would mean that field 1 and field 2 were identical, whereas deviation to white or black indicates a difference.<br/><br/>
-        <img src="fielddiff.jpg" alt="Field Difference"/>
-		</p>
-		
-        <h2 style="color:blue">Histogram</h2>
-        <p>The histogram shows the frequency of occurrence of values per channel. Typically the histogram will show one graph per channel (one for each Y, U, and V or one for each red, green, and blue).Video with a lot of contrast and a well distributed range of luminance values will result in a histogram with an even spread. You may also select <strong>'Field Split'</strong> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).</p>
-
-        <h2 style="color:blue">Waveform</h2>
-        <p>The waveform plots the brightness of the image, each column of the waveform corresponds to a column of pixels in the source video. The pixels of each column are then plotted in a scale from 0 to 110 IRE. The range from 0 to 7.5 IRE is highlighted in blue and indicates a black value that is below traditional NTSC broadcast range. The range from 100 to 110 IRE is highlighted in red and indicates a white value that is above broadcast range. For most analog media the intended pixel luminsotiy values should exist between 7.5 and 100 IRE. You may also select <strong>'Field Split'</strong> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).</p>
-
-        <h2 style="color:blue">Vectorscope</h2>
+            The QCTools preview window is intended as an analytical playback environment that allows the user to review video through multiple filters simultaneously. The playback window includes two viewing windows which may be set to different combinations of filters. This allows a user to playback a video by viewing a waveform and a vectorscope or perhaps by viewing a waveform and the video with highlighted pixels that are outside of broadcast range.
+        </p>
+        <h2 style="color:blue">
+            Normal
+        </h2>
         <p>
-		A vectorscope display. This display plots chroma values (U/V color placement) in two dimensional graph (which is called a vectorscope). It can be used to read of the hue and saturation of the current frame. The whiter a pixel in the vectorscope, the more pixels of the input frame correspond to that pixel (that is the more pixels have this chroma value). The V component is displayed on the vertical (Y) axis, with the bottom edge being V = 0 and the top being V = 255. The U component is displayed on the horizontal (Y) axis, with the left representing U = 0 and the right representing U = 255.<br/>Six blocks are highlighted to depict standardized color points for red (90, 16), green (54, 222), blue (240, 146), cyan (166, 240), magenta (202, 44), and yellow (16, 110). All valid chroma values fall within a circlular shape from the center to the outer edge of the plot.You may also select <strong>'Field Split'</strong> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).<br/><br/>
-        <img src="vectorscope_illegal.jpg" alt="Vectorscope"/><br/><br/>
-		<br/><br/>
-        <img src="playback_layout_two_windows.jpg" width="65%" height="65%" alt="Vectorscope Split Screen"/><br/><br/>
-		</p>
-		
-        <h2 style="color:blue">Extract Planes</h2>
-        <p>This filter extracts a video plane which represents the luma or part of the chroma data from the video and then applies a histogram equalization which redistributes the pixel intensities to equalize their distribution across the intensity range. This filter is useful for analyzing compressed video channel signals.</p>
-
-        <h2 style="color:blue">Extract Planes UV</h2>
-        <p>This filter extracts the U/V channel which represents part of the chroma data from the video and then applies a histogram equalization which redistributes the pixel intensities to equalize their distribution across the intensity range. This filter is useful for analyzing compressed video channel signals.</p>
-
-        <h2 style="color:blue">Bit Plane</h2>
+            This view simply shows the video as QCTools interprets it, no special effects or filtering are added. In this view, however, you also have the option of displaying as <strong>'Field Split'</strong> which, as the name implies, takes the two video fields for the selected frame and diplays them as discrete images.
+        </p>
+        <h2 style="color:blue">
+            Field Difference
+        </h2>
         <p>
-		This filter selects the bit position of each plane for display. Selecting 'None' for a plane will replace all values with 0x80 (middle gray for Y and no color for U or V). Selecting 'All' will send the display plane as is. Selecting 'Bit [1-8]' will display only that specific bit position of each pixel of the plane. For the Y plane a pixel will display as black is that bit is '0' or white is that bit is '1'. For U a pixel will be yellow-green if '0' purple if '1'. For V a pixel will be green for '0' and red for '1'.<br/>
-        Generally lossy video codecs will show blocky structured patterns at higher numbered bit positions. See the <a href="https://en.wikipedia.org/wiki/Bit_plane">bit plane article</a> in Wikipedia for more information about the application of bit plane filtering.<br/>
-		<img src="1A_seattle_parade_transfer_a_messedup-1.jpg" alt="Bit Plane"/><br/><br/>
-		(Video sample and permission to use provided by <a href="http://www.seattle.gov">seattle.gov</a>)
-		</p>
-		
-		<h2 style="color:blue">Vertical Line Repetitions</h2>
-        <p>This filter displays repetitive lines of video data.</p>
-
-        <h2 style="color:blue">Broadcast Range Pixels</h2>
-        <p>This is the same presentation as 'Normal' except that pixels that are outside of broadcast range are highlighted as white. Again here, you have the option of selecting <strong>'Field Split'</strong> to display field 1 (top) and field 2 (bottom) separately. </p>
-
-        <h2 style="color:blue">Temporal Outlier Pixels</h2>
-        <p>This is the same presentation as 'Normal' except that pixels that are labelled as temporal outliers are highlighted as white. Temporal outliers are pixels that significantly differ from their neighbors and often correspond to tape damage or playback error. Select <strong>'Field Split'</strong> to see the fields displayed separately. </p>
-
-        <h2 style="color:blue">Chroma Adjust</h2>
-        <p>This filter enables the hue and saturation levels to be adjusted. Hue adjustments may be expressed in degrees where 0 is no change and 180 would invert the color. For saturation a value of 1 needs the saturation unchanged, 0 removes all color, and the saturation may be increased up to a maximum of 10.</p>
-
-        <h2 style="color:blue">Value Highlight</h2>
-        <p>This filter selects a video plane and highlights values with a specified range of minimum value to maximum value. The original image of the plane will be presented in grayscale and values within the range will be highlighted as yellow; for instance to highlight Y values below NTSC broadcast range, set plane to Y, min to 0 and max to 16. The resulting image will highlight Y values below broadcast range in yellow.</p>
+            This presentation visualizes the difference between video field 1 and field 2. A middle gray image would mean that field 1 and field 2 were identical, whereas deviation to white or black indicates a difference.<br />
+            <br />
+            <img src="fielddiff.jpg" alt="Field Difference" />
+        </p>
+        <h2 style="color:blue">
+            Histogram
+        </h2>
+        <p>
+            The histogram shows the frequency of occurrence of values per channel. Typically the histogram will show one graph per channel (one for each Y, U, and V or one for each red, green, and blue).Video with a lot of contrast and a well distributed range of luminance values will result in a histogram with an even spread. You may also select <strong>'Field Split'</strong> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).
+        </p>
+        <h2 style="color:blue">
+            Waveform
+        </h2>
+        <p>
+            The waveform plots the brightness of the image, each column of the waveform corresponds to a column of pixels in the source video. The pixels of each column are then plotted in a scale from 0 to 110 IRE. The range from 0 to 7.5 IRE is highlighted in blue and indicates a black value that is below traditional NTSC broadcast range. The range from 100 to 110 IRE is highlighted in red and indicates a white value that is above broadcast range. For most analog media the intended pixel luminsotiy values should exist between 7.5 and 100 IRE. You may also select <strong>'Field Split'</strong> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).
+        </p>
+        <h2 style="color:blue">
+            Vectorscope
+        </h2>
+        <p>
+            A vectorscope display. This display plots chroma values (U/V color placement) in two dimensional graph (which is called a vectorscope). It can be used to read of the hue and saturation of the current frame. The whiter a pixel in the vectorscope, the more pixels of the input frame correspond to that pixel (that is the more pixels have this chroma value). The V component is displayed on the vertical (Y) axis, with the bottom edge being V = 0 and the top being V = 255. The U component is displayed on the horizontal (Y) axis, with the left representing U = 0 and the right representing U = 255.<br />
+            Six blocks are highlighted to depict standardized color points for red (90, 16), green (54, 222), blue (240, 146), cyan (166, 240), magenta (202, 44), and yellow (16, 110). All valid chroma values fall within a circlular shape from the center to the outer edge of the plot.You may also select <strong>'Field Split'</strong> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).<br />
+            <br />
+            <img src="vectorscope_illegal.jpg" alt="Vectorscope" /><br />
+            <br />
+            <br />
+            <br />
+            <img src="playback_layout_two_windows.jpg" width="65%" height="65%" alt="Vectorscope Split Screen" /><br />
+            <br />
+        </p>
+        <h2 style="color:blue">
+            Extract Planes
+        </h2>
+        <p>
+            This filter extracts a video plane which represents the luma or part of the chroma data from the video and then applies a histogram equalization which redistributes the pixel intensities to equalize their distribution across the intensity range. This filter is useful for analyzing compressed video channel signals.
+        </p>
+        <h2 style="color:blue">
+            Extract Planes UV
+        </h2>
+        <p>
+            This filter extracts the U/V channel which represents part of the chroma data from the video and then applies a histogram equalization which redistributes the pixel intensities to equalize their distribution across the intensity range. This filter is useful for analyzing compressed video channel signals.
+        </p>
+        <h2 style="color:blue">
+            Bit Plane
+        </h2>
+        <p>
+            This filter selects the bit position of each plane for display. Selecting 'None' for a plane will replace all values with 0x80 (middle gray for Y and no color for U or V). Selecting 'All' will send the display plane as is. Selecting 'Bit [1-8]' will display only that specific bit position of each pixel of the plane. For the Y plane a pixel will display as black is that bit is '0' or white is that bit is '1'. For U a pixel will be yellow-green if '0' purple if '1'. For V a pixel will be green for '0' and red for '1'.<br />
+            Generally lossy video codecs will show blocky structured patterns at higher numbered bit positions. See the <a href="https://en.wikipedia.org/wiki/Bit_plane">bit plane article</a> in Wikipedia for more information about the application of bit plane filtering.<br />
+            <img src="1A_seattle_parade_transfer_a_messedup-1.jpg" alt="Bit Plane" /><br />
+            <br />
+            (Video sample and permission to use provided by <a href="http://www.seattle.gov">seattle.gov</a>)
+        </p>
+        <h2 style="color:blue">
+            Vertical Line Repetitions
+        </h2>
+        <p>
+            This filter displays repetitive lines of video data.
+        </p>
+        <h2 style="color:blue">
+            Broadcast Range Pixels
+        </h2>
+        <p>
+            This is the same presentation as 'Normal' except that pixels that are outside of broadcast range are highlighted as white. Again here, you have the option of selecting <strong>'Field Split'</strong> to display field 1 (top) and field 2 (bottom) separately.
+        </p>
+        <h2 style="color:blue">
+            Broadcast Illegal Focus
+        </h2>
+        <p>
+            For video that uses the YUV colorspace and decode in a broadcast range. Values from 0-16 (on an 8 bit scale) will all decode to black on a computer monitor, while values from 235-255 will decode as white. This filter allows the users to select to feature pixel data that is outside of broadcast range. Select "above whites" to set pixels with luma values from 236-255 to a range of grays (while all other pixels are set to black). Select "below black" to set pixels with luma values from 0-15 to a range of grays (while all other pixels are set to black). If a video frame only contains pixels that have luma values within broadcast range, then this filter will play black only black pixels. This filter portrays broadcast range compliance in somewhat the opposite way as the "Broadcast Range Pixels" filter since it focuses on values that may be crushed to black or white because they fall outside of broadcast range. Note that some videos may intentionally be encoded in 'full range' where this filter is less relevant.
+        </p>
+        <h2 style="color:blue">
+            Temporal Outlier Pixels
+        </h2>
+        <p>
+            This is the same presentation as 'Normal' except that pixels that are labelled as temporal outliers are highlighted as white. Temporal outliers are pixels that significantly differ from their neighbors and often correspond to tape damage or playback error. Select <strong>'Field Split'</strong> to see the fields displayed separately.
+        </p>
+        <h2 style="color:blue">
+            Chroma Adjust
+        </h2>
+        <p>
+            This filter enables the hue and saturation levels to be adjusted. Hue adjustments may be expressed in degrees where 0 is no change and 180 would invert the color. For saturation a value of 1 needs the saturation unchanged, 0 removes all color, and the saturation may be increased up to a maximum of 10.
+        </p>
+        <h2 style="color:blue">
+            Value Highlight
+        </h2>
+        <p>
+            This filter selects a video plane and highlights values with a specified range of minimum value to maximum value. The original image of the plane will be presented in grayscale and values within the range will be highlighted as yellow; for instance to highlight Y values below NTSC broadcast range, set plane to Y, min to 0 and max to 16. The resulting image will highlight Y values below broadcast range in yellow.
+        </p>
     </body>
 </html>

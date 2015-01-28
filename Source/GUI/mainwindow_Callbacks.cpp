@@ -8,6 +8,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "Core/Core.h"
+#include "Core/CommonStats.h"
+#include "GUI/Plots.h"
 
 #include <QFileDialog>
 #include <QScrollBar>
@@ -48,7 +50,8 @@ void MainWindow::TimeOut ()
     // Simultaneous parsing
     for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
     {
-        if (Files[Files_Pos]->Videos[0]->State_Get()<1)
+        CommonStats* Stats=Files[Files_Pos]->ReferenceStat();
+        if (Stats && Stats->State_Get()==0)
             Files[Files_Pos]->Parse();
     }
 
@@ -62,8 +65,12 @@ void MainWindow::TimeOut ()
         int VideoFramePos_Total=0;
         for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
         {
-            VideoFramePos_Total+=Files[Files_Pos]->Videos[0]->x_Current;
-            VideoFrameCount_Total+=Files[Files_Pos]->Videos[0]->x_Current_Max;
+            CommonStats* Stats=Files[Files_Pos]->ReferenceStat();
+            if (Stats)
+            {
+                VideoFramePos_Total+=Stats->x_Current;
+                VideoFrameCount_Total+=Stats->x_Current_Max;
+            }
         }
         if (Files_Completed!=Files.size())
         {
@@ -74,17 +81,21 @@ void MainWindow::TimeOut ()
         }
     }
     for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
-        if (Files[Files_Pos]->Videos[0]->State_Get()>=1)
+    {
+        CommonStats* Stats=Files[Files_Pos]->ReferenceStat();
+        if (Stats && Stats->State_Get()>=1)
             Files_Completed++;
+    }
 
     if (Files_CurrentPos!=(size_t)-1)
     {
-        if (Files[Files_CurrentPos]->Videos[0]->State_Get()<1)
+        CommonStats* Stats=Files[Files_CurrentPos]->ReferenceStat();
+        if (Stats && Stats->State_Get()<1)
         {
             stringstream Message;
-            Message<<"Parsing frame "<<Files[Files_CurrentPos]->Videos[0]->x_Current;
-            if (Files[Files_CurrentPos]->Videos[0]->x_Current_Max)
-                Message<<"/"<<Files[Files_CurrentPos]->Videos[0]->x_Current_Max<<" ("<<(int)((double)Files[Files_CurrentPos]->Videos[0]->x_Current)*100/Files[Files_CurrentPos]->Videos[0]->x_Current_Max<<"%)";
+            Message<<"Parsing frame "<<Stats->x_Current;
+            if (Stats->x_Current_Max)
+                Message<<"/"<<Stats->x_Current_Max<<" ("<<(int)((double)Stats->x_Current)*100/Stats->x_Current_Max<<"%)";
             QStatusBar* StatusBar=statusBar();
             if (StatusBar)
                 StatusBar->showMessage((Message.str()+Message_Total.str()).c_str());
@@ -103,6 +114,9 @@ void MainWindow::TimeOut ()
         if (FilesListArea)
             FilesListArea->Update();
     }
+
+    if (PlotsArea)
+        PlotsArea->refresh();
 }
 
 //---------------------------------------------------------------------------

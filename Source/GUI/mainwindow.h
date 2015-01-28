@@ -18,7 +18,6 @@ using namespace std;
 
 #include "Core/Core.h"
 #include "GUI/FileInformation.h"
-#include "GUI/Plots.h"
 #include "GUI/TinyDisplay.h"
 #include "GUI/Control.h"
 #include "GUI/Info.h"
@@ -28,6 +27,7 @@ namespace Ui {
 class MainWindow;
 }
 
+class Plots;
 class QPixmap;
 class QLabel;
 class QToolButton;
@@ -38,6 +38,8 @@ class QComboBox;
 class QCheckBox;
 
 class PerPicture;
+
+class BlackmagicDeckLink_Glue;
 
 class MainWindow : public QMainWindow
 {
@@ -55,6 +57,7 @@ public:
     void                        Ui_Init                     ();
     void                        configureZoom               ();
     void                        openFile                    ();
+    void                        openCapture                 ();
     void                        closeFile                   ();
     void                        closeAllFiles               ();
     void                        Zoom_Move                   (size_t Begin);
@@ -63,7 +66,6 @@ public:
     void                        Export_CSV                  ();
     void                        Export_PDF                  ();
     void                        refreshDisplay              ();
-    void                        refreshDisplay_Axis         ();
     void                        Options_Preferences         ();
     void                        Help_GettingStarted         ();
     void                        Help_HowToUse               ();
@@ -83,6 +85,7 @@ public:
     void                        clearGraphsLayout           ();
     void                        createGraphsLayout          ();
     void                        addFile                     (const QString &FileName);
+    void                        addFile                     (BlackmagicDeckLink_Glue* BlackmagicDeckLink_Glue, int FrameCount, const std::string &Encoding_FileName=std::string());
     void                        addFile_finish              ();
     void                        selectFile                  (int newFilePos);
     void                        selectDisplayFile           (int newFilePos);
@@ -98,7 +101,7 @@ public:
     QLabel*                     DragDrop_Text;
 
     //CheckBoxes
-    QCheckBox*                  CheckBoxes[PlotType_Max];
+    std::vector<QCheckBox*>     CheckBoxes[CountOfStreamTypes];
 
     // Files
     std::vector<FileInformation*> Files;
@@ -112,6 +115,8 @@ private Q_SLOTS:
     void on_actionQuit_triggered();
 
     void on_actionOpen_triggered();
+
+    void on_actionBlackmagicDeckLinkCapture_triggered();
 
     void on_actionClose_triggered();
 
@@ -181,7 +186,14 @@ private Q_SLOTS:
 
     void on_Full_triggered();
 
+    void on_CurrentFrameChanged();
+
+
 private:
+    void updateScrollBar( bool blockSignals = false );
+    bool isPlotZoomable() const;
+    void Zoom( bool );
+
     Ui::MainWindow *ui;
 };
 

@@ -45,6 +45,15 @@
 
 
 //***************************************************************************
+// Config
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+// Default filters (check Filters order)
+const size_t Filters_Default1 = 2; // 2 = Normal
+const size_t Filters_Default2 = 7; // 7 = Waveform
+
+//***************************************************************************
 // Info
 //***************************************************************************
 
@@ -54,9 +63,12 @@ enum args_type
     Args_Type_None,
     Args_Type_Toggle,
     Args_Type_Slider,
+    Args_Type_Win_Func,
+    Args_Type_Wave_Mode,
     Args_Type_Yuv,  // Y, U , V
     Args_Type_YuvA, // Y, U, V, All
-    Args_Type_Tile, // 4x4, 6x6, 8x8, 10x10
+    Args_Type_Ranges, // above whites, below black
+    Args_Type_ColorMatrix, // bt601, bt709, smpte240m, fcc
     Args_Type_ClrPck, // Color picker
 };
 
@@ -73,6 +85,7 @@ struct args
 struct filter
 {
     const char*         Name;
+    const int           Type; // 0 = Video, 1 = Audio
     const args          Args[Args_Max];
     const char*         Formula[1<<Args_Max]; //Max 2^Args_Max toggles
 };
@@ -82,6 +95,7 @@ const filter Filters[]=
 {
     {
         "Help",
+        -1,
         {
             { Args_Type_None,   0, 0, 0, 0, },
             { Args_Type_None,   0, 0, 0, 0, },
@@ -95,6 +109,7 @@ const filter Filters[]=
     },
     {
         "No display",
+        -1,
         {
             { Args_Type_None,   0, 0, 0, 0, },
             { Args_Type_None,   0, 0, 0, 0, },
@@ -108,6 +123,7 @@ const filter Filters[]=
     },
     {
         "Normal",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_None,     0,   0,   0,   0, },
@@ -117,11 +133,12 @@ const filter Filters[]=
         },
         {
             "",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1][b1]framepack=tab",
+            "il=l=d:c=d",
         },
     },
     {
         "(Separator)",
+        -1,
         {
             { Args_Type_None,   0, 0, 0, 0, },
             { Args_Type_None,   0, 0, 0, 0, },
@@ -135,6 +152,7 @@ const filter Filters[]=
     },
     {
         "Field Difference",
+        0,
         {
             { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
             { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
@@ -149,23 +167,38 @@ const filter Filters[]=
             "transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3},transpose=2",
         },
     },
-    /*
     {
-        "Frame Metadata Play",
+        "Temporal Difference",
+        0,
         {
-            { Args_Type_None,   0, 0, 0, 0, },
-            { Args_Type_None,   0, 0, 0, 0, },
-            { Args_Type_None,   0, 0, 0, 0, },
-            { Args_Type_None,   0, 0, 0, 0, },
-            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
+            { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
+            { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,drawtext=fontfile=Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=yellow:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=drawtext.txt",
+            "extractplanes=${1},tblend=all_mode=difference128,histeq=strength=${2}:intensity=${3}",
+            "tblend=all_mode=difference128,histeq=strength=${2}:intensity=${3}",
         },
     },
-    */
+    {
+        "Pixel Offset Subtraction",
+        0,
+        {
+            { Args_Type_Slider,   1,-120, 120,   1, "Y H" },
+            { Args_Type_Slider,   0,-120, 120,   1, "Y V" },
+            { Args_Type_Slider,   0,-120, 120,   1, "UV H" },
+            { Args_Type_Slider,   0,-120, 120,   1, "UV V" },
+            { Args_Type_Slider,   0,   0,  10,  10, "Strength" },
+        },
+        {
+            "geq=lum=lum(X\\,Y)-lum(X-${1}\\,Y-${2})+128:cb=cb(X\\,Y)-cb(X-${3}\\,Y-${4})+128:cr=cr(X\\,Y)-cr(X-${3}\\,Y-${4})+128,histeq=strength=${5}",
+        },
+    },
     {
         "Histogram",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_Toggle,   0,   0,   0,   0, "RGB" },
@@ -186,6 +219,7 @@ const filter Filters[]=
     },
     {
         "Waveform",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_Slider,  20,   1, 255,   1, "Brightness" },
@@ -206,6 +240,7 @@ const filter Filters[]=
     },
     {
         "Line Select",
+        0,
         {
             { Args_Type_Slider,   1,   1,   0,   1, "Line" },
             { Args_Type_Slider, 255,   1, 255,   1, "Brightness" },
@@ -222,6 +257,7 @@ const filter Filters[]=
     },
     {
         "Vectorscope",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_Slider,   5,   1,  10,   1, "Brightness" },
@@ -231,11 +267,12 @@ const filter Filters[]=
         },
         {
             "histogram=mode=color2,lutyuv=y=val*${2},transpose=dir=2,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram=mode=color2,lutyuv=y=val*${2},transpose=dir=2,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8[a2];[b1]histogram=mode=color2,lutyuv=y=val*${2},transpose=dir=2,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8[b2];[a2][b2]framepack=tab,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            "format=yuv444p,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram=mode=color2,lutyuv=y=val*${2},transpose=dir=2,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8[a2];[b1]histogram=mode=color2,lutyuv=y=val*${2},transpose=dir=2,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8[b2];[a2][b2]framepack=tab,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
         },
     },
     {
         "Extract Planes UV Equal.",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
@@ -245,11 +282,12 @@ const filter Filters[]=
         },
         {
             "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:intensity=${3}",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:strength=${3}[a2];[b1]format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:intensity=${3}[b2];[a2][b2]framepack=tab",
+            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:strength=${3}",
         },
     },
     {
         "Extract Planes Equalized",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_Yuv,      2,   0,   0,   0, "Plane"},
@@ -259,11 +297,12 @@ const filter Filters[]=
         },
         {
             "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:intensity=${4}",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:strength=${4}[a2];[b1]format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:intensity=${4}[b2];[a2][b2]framepack=tab",
+            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:strength=${4}",
         },
     },
     {
         "Bit Plane",
+        0,
         {
             { Args_Type_Slider,   1,  -1,   8,   1, "Y bit position" },
             { Args_Type_Slider,   -1, -1,   8,   1, "U bit position" },
@@ -275,8 +314,25 @@ const filter Filters[]=
             "lutyuv=y=if(eq(${1}\\,-1)\\,128\\,if(eq(${1}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${1}))*pow(2\\,${1}))):u=if(eq(${2}\\,-1)\\,128\\,if(eq(${2}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${2}))*pow(2\\,${2}))):v=if(eq(${3}\\,-1)\\,128\\,if(eq(${3}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${3}))*pow(2\\,${3}))),format=yuv444p|rgb24",
         },
     },
+    /*
+    {
+        "Frame Metadata Play",
+        0,
+        {
+            { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+        },
+        {
+            "cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,drawtext=fontfile=/Users/rice/Downloads/Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=${1}:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=/Users/rice/Downloads/drawtext.txt",
+        },
+    },
+    */
     {
         "Value Highlight",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_Yuv,      0,   0,   0,   0, "Plane" },
@@ -286,25 +342,60 @@ const filter Filters[]=
         },
         {
             "extractplanes=${2},lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)",
-            "extractplanes=${2},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)[a2];[b1]lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)[b2];[a2][b2]framepack=tab",
+            "extractplanes=${2},il=l=d:c=d,lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)",
+        },
+    },
+    {
+        "Saturation Highlight",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Sat as Lum" },
+            { Args_Type_Slider,  89,   0, 182,   1, "Min"},
+            { Args_Type_Slider, 182,   0, 182,   1, "Max"},
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "format=yuv444p,geq=lum=lum(X\\,Y):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)",
+            "format=yuv444p,geq=lum=hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)*(256/189):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)",
+            "il=l=d:c=d,format=yuv444p,geq=lum=lum(X\\,Y):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)",
+            "il=l=d:c=d,format=yuv444p,geq=lum=hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)*(256/189):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)"
         },
     },
     {
         "Chroma Adjust",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
-            { Args_Type_Slider,   0,   0, 360,   1, "Hue"},
-            { Args_Type_Slider,   1, -10,  10,   1, "Saturation"},
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Vectorscope" },
+            { Args_Type_Slider,   0,-180, 180,   1, "Hue"},
+            { Args_Type_Slider,  10,   0,  30,  10, "Saturation"},
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "hue=h=${2}:s=${3}",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]hue=h=${2}:s=${3}[a2];[b1]hue=h=${2}:s=${3}[b2];[a2][b2]framepack=tab",
+            "hue=h=${3}:s=${4}",
+            "hue=h=${3}:s=${4},split[a][b];[a]histogram=mode=color2,transpose=dir=2,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height},setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
+            "il=l=d:c=d,hue=h=${3}:s=${4}",
+            "hue=h=${3}:s=${4},split[a][b];[a]histogram=mode=color2,transpose=dir=2,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height},setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
+        },
+    },
+    {
+        "Color Matrix",
+        0,
+        {
+            { Args_Type_ColorMatrix,   0,   0,   0,   0, },
+            { Args_Type_ColorMatrix,   1,   0,   0,   0, },
+            { Args_Type_Slider,        0,   0,   0,   1, "reveal" },
+            { Args_Type_None,          0,   0,   0,   0, },
+            { Args_Type_None,          0,   0,   0,   0, },
+        },
+        {
+            "split[a][b];[a]crop=${3}:${height}:0:0[a1];[b]colormatrix=${1}:${2}[b1];[a1][b1]overlay",
         },
     },
     {
         "Broadcast Range Pixels",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
@@ -314,11 +405,29 @@ const filter Filters[]=
         },
         {
             "signalstats=out=brng:c=${2},format=yuv444p|rgb24",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]signalstats=out=brng:c=${2},format=yuv444p|rgb24[a2];[b1]signalstats=out=brng:c=${2},format=yuv444p|rgb24[b2];[a2][b2]framepack=tab",
+            "il=l=d:c=d,signalstats=out=brng:c=${2},format=yuv444p|rgb24",
+        },
+    },
+    {
+        "Broadcast Illegal Focus",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
+            { Args_Type_Ranges,   1,   0,   0,   0, "Outer Range"},
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+                       "geq=lum=if(gt(lum(X\\,Y)\\,235)\\,(lum(X\\,Y)-235)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
+                       "geq=lum=if(lt(lum(X\\,Y)\\,16)\\,(lum(X\\,Y)+1)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
+            "il=l=d:c=d,geq=lum=if(gt(lum(X\\,Y)\\,235)\\,(lum(X\\,Y)-235)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
+            "il=l=d:c=d,geq=lum=if(lt(lum(X\\,Y)\\,16)\\,(lum(X\\,Y)+1)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
         },
     },
     {
         "Temporal Outlier Pixels",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
@@ -328,11 +437,12 @@ const filter Filters[]=
         },
         {
             "signalstats=out=tout:c=${2}",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]signalstats=out=tout:c=${2}[a2];[b1]signalstats=out=tout:c=${2}[b2];[a2][b2]framepack=tab",
+            "il=l=d:c=d,signalstats=out=tout:c=${2}",
         },
     },
     {
         "Vertical Repetition Pixels",
+        0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
             { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
@@ -342,41 +452,127 @@ const filter Filters[]=
         },
         {
             "signalstats=out=vrep:c=${2}",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]signalstats=out=vrep:c=${2}[a2];[b1]signalstats=out=vrep:c=${2}[b2];[a2][b2]framepack=tab",
+            "il=l=d:c=d,signalstats=out=vrep:c=${2}",
         },
     },
-    /*
     {
-        "Tile",
+        "Frame Tiles",
+        0,
         {
-            { Args_Type_Tile,     1,   0,   0,   0, "Frames" },
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Slider,   2,   1,   12,   1, "Width"},
+            { Args_Type_Slider,   2,   1,   12,   1, "Height"},
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "scale=iw/${1}:ih/${1}"
+            "scale=iw/${1}:ih/${2},tile=${1}x${2}"
         },
     },
-    */
-    /*
     {
         "Zoom",
+        0,
         {
             { Args_Type_Slider,   0,   0,   0,   1, "x" },
             { Args_Type_Slider,   0,   0,   0,   1, "y" },
-            { Args_Type_Slider,  12,   0,   0,   1, "s" },
+            { Args_Type_Slider,  60,  16,   0,   1, "s" },
             { Args_Type_Slider,   0,   0,  10,  10, "Strength" },
             { Args_Type_Slider,   0,   0,  10,  10, "Intensity" },
         },
         {
-            "crop=${3}:${3}/dar:${1}:${2},histeq=strength=${4}:intensity=${5}",
+            "crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,scale=${width}:${height}:flags=neighbor,histeq=strength=${4}:intensity=${5}",
+        },
+    },
+    {
+        "(Separator)",
+        -1,
+        {
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+        },
+        {
+            "",
+        },
+    },
+    {
+        "Audio Spectrum",
+        1,
+        {
+            { Args_Type_Slider,   1, -10,  10,   1, "Saturation" },
+            { Args_Type_Win_Func, 0,   0,   0,   0, "Win Func" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "showspectrum=slide=scroll:mode=separate:color=intensity:saturation=${1}:win_func=${2}",
+        },
+    },
+    {
+        "Audio Waveform",
+        1,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Split Channels" },
+            { Args_Type_Slider,   2,   1,  20,   1, "Samples per column"},
+            { Args_Type_Wave_Mode,2,   0,   0,   0, "Mode" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "showwaves=mode=${3}:n=${2}:s=${width}x${height}:split_channels=0,negate",
+            "showwaves=mode=${3}:n=${2}:s=${width}x${height}:split_channels=1,negate",
+        },
+    },
+    {
+        "Show CQT",
+        1,
+        {
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "showcqt=fullhd=0",
+        },
+    },
+    {
+        "Audio Vectorscope",
+        1,
+        {
+            { Args_Type_Slider,   1,   1,  10,   1, "Zoom" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "avectorscope=m=lissajous:s=512x512:zoom=${1}",
+        },
+    },
+    /*
+    {
+        "EBU r128 Loudness Meter",
+        1,
+        {
+            { Args_Type_Slider,   1,   1,  10,   1, "Zoom" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "ebur128=video=1[out0],anullsink",
         },
     },
     */
     {
         "(End)",
+        -1,
         {
             { Args_Type_None,   0, 0, 0, 0, },
             { Args_Type_None,   0, 0, 0, 0, },
@@ -428,8 +624,8 @@ void ImageLabel::paintEvent(QPaintEvent *event)
     QImage* Image;
     switch (Pos)
     {
-        case 1 : Image=(*Picture)->Image1; break;
-        case 2 : Image=(*Picture)->Image2; break;
+        case 1 : Image=(*Picture)->Image_Get(0); break;
+        case 2 : Image=(*Picture)->Image_Get(1); break;
         default: return;
     }
     if (!Image)
@@ -446,9 +642,14 @@ void ImageLabel::paintEvent(QPaintEvent *event)
             (*Picture)->Scale_Change(Size.width(), Size.height());
             switch (Pos)
             {
-                case 1 : Image=(*Picture)->Image1; break;
-                case 2 : Image=(*Picture)->Image2; break;
+                case 1 : Image=(*Picture)->Image_Get(0); break;
+                case 2 : Image=(*Picture)->Image_Get(1); break;
                 default: return;
+            }
+            if (!Image)
+            {
+                painter.drawPixmap(0, 0, QPixmap().scaled(event->rect().width(), event->rect().height()));
+                return;
             }
         }
         #if QT_VERSION>0x040700
@@ -769,15 +970,15 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     Layout->addWidget(Slider, 2, 0, 1, 3);
 
     // Control
-    ControlArea=new Control(this, FileInfoData, NULL, Control::Style_Cols, true);
+    ControlArea=new Control(this, FileInfoData, Control::Style_Cols, true);
     Layout->addWidget(ControlArea, 3, 0, 1, 3, Qt::AlignBottom);
 
     setLayout(Layout);
 
     // Picture
     Picture=NULL;
-    Picture_Current1=2;
-    Picture_Current2=6;
+    Picture_Current1=Filters_Default1;
+    Picture_Current2=Filters_Default2;
     Options[0].FiltersList->setCurrentIndex(Picture_Current1);
     Options[1].FiltersList->setCurrentIndex(Picture_Current2);
     connect(Options[0].FiltersList, SIGNAL(currentIndexChanged(int)), this, SLOT(on_FiltersList1_currentIndexChanged(int)));
@@ -872,7 +1073,7 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                                 SelectWidth=Filters[FilterPos].Args[OptionPos2].Default?true:false;
                                         Max=SelectWidth?FileInfoData->Glue->Width_Get():FileInfoData->Glue->Height_Get();
                                     }
-                                    else if (MaxTemp=="x" || MaxTemp=="s")
+                                    else if (MaxTemp=="x" || MaxTemp=="s" || MaxTemp=="reveal" )
                                         Max=FileInfoData->Glue->Width_Get();
                                     else if (MaxTemp=="y")
                                         Max=FileInfoData->Glue->Height_Get();
@@ -893,24 +1094,57 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                     Widget_XPox+=2;
                                     }
                                     break;
+            case Args_Type_Win_Func:
+                                    Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
+                                    for (size_t OptionPos2=0; OptionPos2<4; OptionPos2++)
+                                    {
+                                        Options[Pos].Radios[OptionPos][OptionPos2]=new QRadioButton();
+                                        Options[Pos].Radios[OptionPos][OptionPos2]->setFont(Font);
+                                        switch (OptionPos2)
+                                        {
+                                            case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("none"); break;
+                                            case 1: Options[Pos].Radios[OptionPos][OptionPos2]->setText("hann"); break;
+                                            case 2: Options[Pos].Radios[OptionPos][OptionPos2]->setText("hamming"); break;
+                                            case 3: Options[Pos].Radios[OptionPos][OptionPos2]->setText("blackman"); break;
+                                            default:;
+                                        }
+                                        if (OptionPos2==PreviousValues[Pos][FilterPos].Values[OptionPos])
+                                            Options[Pos].Radios[OptionPos][OptionPos2]->setChecked(true);
+                                        connect(Options[Pos].Radios[OptionPos][OptionPos2], SIGNAL(toggled(bool)), this, Pos==0?(SLOT(on_FiltersOptions1_toggle(bool))):SLOT(on_FiltersOptions2_toggle(bool)));
+                                        Layout0->addWidget(Options[Pos].Radios[OptionPos][OptionPos2], 0, Widget_XPox+OptionPos2);
+                                        Options[Pos].Radios_Group[OptionPos]->addButton(Options[Pos].Radios[OptionPos][OptionPos2]);
+                                    }
+                                    Widget_XPox+=4;
+                                    break;
+            case Args_Type_Wave_Mode:
+                                    Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
+                                    for (size_t OptionPos2=0; OptionPos2<4; OptionPos2++)
+                                    {
+                                        Options[Pos].Radios[OptionPos][OptionPos2]=new QRadioButton();
+                                        Options[Pos].Radios[OptionPos][OptionPos2]->setFont(Font);
+                                        switch (OptionPos2)
+                                        {
+                                            case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("point"); break;
+                                            case 1: Options[Pos].Radios[OptionPos][OptionPos2]->setText("line"); break;
+                                            case 2: Options[Pos].Radios[OptionPos][OptionPos2]->setText("p2p"); break;
+                                            case 3: Options[Pos].Radios[OptionPos][OptionPos2]->setText("cline"); break;
+                                            default:;
+                                        }
+                                        if (OptionPos2==PreviousValues[Pos][FilterPos].Values[OptionPos])
+                                            Options[Pos].Radios[OptionPos][OptionPos2]->setChecked(true);
+                                        connect(Options[Pos].Radios[OptionPos][OptionPos2], SIGNAL(toggled(bool)), this, Pos==0?(SLOT(on_FiltersOptions1_toggle(bool))):SLOT(on_FiltersOptions2_toggle(bool)));
+                                        Layout0->addWidget(Options[Pos].Radios[OptionPos][OptionPos2], 0, Widget_XPox+OptionPos2);
+                                        Options[Pos].Radios_Group[OptionPos]->addButton(Options[Pos].Radios[OptionPos][OptionPos2]);
+                                    }
+                                    Widget_XPox+=4;
+                                    break;
             case Args_Type_Yuv:
             case Args_Type_YuvA:
-            case Args_Type_Tile:
                                     Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
                                     for (size_t OptionPos2=0; OptionPos2<(Filters[FilterPos].Args[OptionPos].Type==Args_Type_Yuv?3:4); OptionPos2++)
                                     {
                                         Options[Pos].Radios[OptionPos][OptionPos2]=new QRadioButton();
                                         Options[Pos].Radios[OptionPos][OptionPos2]->setFont(Font);
-                                        if (Filters[FilterPos].Args[OptionPos].Type==Args_Type_Tile)
-                                            switch (OptionPos2)
-                                            {
-                                                case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("4x4"); break;
-                                                case 1: Options[Pos].Radios[OptionPos][OptionPos2]->setText("6x6"); break;
-                                                case 2: Options[Pos].Radios[OptionPos][OptionPos2]->setText("8x8"); break;
-                                                case 3: Options[Pos].Radios[OptionPos][OptionPos2]->setText("10x10"); break;
-                                                default:;
-                                            }
-                                        else
                                             switch (OptionPos2)
                                             {
                                                 case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("Y"); break;
@@ -926,6 +1160,48 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                         Options[Pos].Radios_Group[OptionPos]->addButton(Options[Pos].Radios[OptionPos][OptionPos2]);
                                     }
                                     Widget_XPox+=Filters[FilterPos].Args[OptionPos].Type==Args_Type_Yuv?3:4;
+                                    break;
+            case Args_Type_Ranges:
+                                    Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
+                                    for (size_t OptionPos2=0; OptionPos2<2; OptionPos2++)
+                                    {
+                                        Options[Pos].Radios[OptionPos][OptionPos2]=new QRadioButton();
+                                        Options[Pos].Radios[OptionPos][OptionPos2]->setFont(Font);
+                                        switch (OptionPos2)
+                                        {
+                                            case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("above white"); break;
+                                            case 1: Options[Pos].Radios[OptionPos][OptionPos2]->setText("below black"); break;
+                                            default:;
+                                        }
+                                        if (OptionPos2==PreviousValues[Pos][FilterPos].Values[OptionPos])
+                                            Options[Pos].Radios[OptionPos][OptionPos2]->setChecked(true);
+                                        connect(Options[Pos].Radios[OptionPos][OptionPos2], SIGNAL(toggled(bool)), this, Pos==0?(SLOT(on_FiltersOptions1_toggle(bool))):SLOT(on_FiltersOptions2_toggle(bool)));
+                                        Layout0->addWidget(Options[Pos].Radios[OptionPos][OptionPos2], 0, Widget_XPox+OptionPos2);
+                                        Options[Pos].Radios_Group[OptionPos]->addButton(Options[Pos].Radios[OptionPos][OptionPos2]);
+                                    }
+                                    Widget_XPox+=2;
+                                    break;
+            case Args_Type_ColorMatrix:
+                                    Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
+                                    for (size_t OptionPos2=0; OptionPos2<4; OptionPos2++)
+                                    {
+                                        Options[Pos].Radios[OptionPos][OptionPos2]=new QRadioButton();
+                                        Options[Pos].Radios[OptionPos][OptionPos2]->setFont(Font);
+                                        switch (OptionPos2)
+                                        {
+                                            case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("bt601"); break;
+                                            case 1: Options[Pos].Radios[OptionPos][OptionPos2]->setText("bt709"); break;
+                                            case 2: Options[Pos].Radios[OptionPos][OptionPos2]->setText("smpte240m"); break;
+                                            case 3: Options[Pos].Radios[OptionPos][OptionPos2]->setText("fcc"); break;
+                                            default:;
+                                        }
+                                        if (OptionPos2==PreviousValues[Pos][FilterPos].Values[OptionPos])
+                                            Options[Pos].Radios[OptionPos][OptionPos2]->setChecked(true);
+                                        connect(Options[Pos].Radios[OptionPos][OptionPos2], SIGNAL(toggled(bool)), this, Pos==0?(SLOT(on_FiltersOptions1_toggle(bool))):SLOT(on_FiltersOptions2_toggle(bool)));
+                                        Layout0->addWidget(Options[Pos].Radios[OptionPos][OptionPos2], 0, Widget_XPox+OptionPos2);
+                                        Options[Pos].Radios_Group[OptionPos]->addButton(Options[Pos].Radios[OptionPos][OptionPos2]);
+                                    }
+                                    Widget_XPox+=4;
                                     break;
             case Args_Type_ClrPck:
                                     {
@@ -1075,25 +1351,33 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                     WithSliders[OptionPos]=Options[Pos].Sliders_SpinBox[OptionPos]->value();
                                     PreviousValues[Pos][Picture_Current].Values[OptionPos]=Options[Pos].Sliders_SpinBox[OptionPos]->value();
                                     break;
+            case Args_Type_Win_Func:
+            case Args_Type_Wave_Mode:
+                Modified=true;
+                for (size_t OptionPos2=0; OptionPos2<4; OptionPos2++)
+                {
+                    if (Options[Pos].Radios[OptionPos][OptionPos2] && Options[Pos].Radios[OptionPos][OptionPos2]->isChecked())
+                    {
+                        WithRadios[OptionPos]=Options[Pos].Radios[OptionPos][OptionPos2]->text().toUtf8().data();
+                        size_t X_Pos=WithRadios[OptionPos].find('x');
+                        if (X_Pos!=string::npos)
+                            WithRadios[OptionPos].resize(X_Pos);
+                        PreviousValues[Pos][Picture_Current].Values[OptionPos]=OptionPos2;
+                        break;
+                    }
+                }
+                break;
             case Args_Type_YuvA:
                                     Value_Pos<<=1;
                                     Value_Pos|=Options[Pos].Radios[OptionPos][3]->isChecked()?1:0; // 3 = pos of "all"
                                     //No break
             case Args_Type_Yuv:
-            case Args_Type_Tile:
                                     Modified=true;
                                     for (size_t OptionPos2=0; OptionPos2<(Filters[Picture_Current].Args[OptionPos].Type?4:3); OptionPos2++)
                                     {
                                         if (Options[Pos].Radios[OptionPos][OptionPos2] && Options[Pos].Radios[OptionPos][OptionPos2]->isChecked())
                                         {
-                                            if (Filters[Picture_Current].Args[OptionPos].Type==Args_Type_Tile)
-                                            {
-                                                WithRadios[OptionPos]=Options[Pos].Radios[OptionPos][OptionPos2]->text().toUtf8().data();
-                                                size_t X_Pos=WithRadios[OptionPos].find('x');
-                                                if (X_Pos!=string::npos)
-                                                    WithRadios[OptionPos].resize(X_Pos);
-                                            }
-                                            else if (string(Filters[Picture_Current].Name)=="Waveform")
+                                            if (string(Filters[Picture_Current].Name)=="Waveform")
                                                 switch (OptionPos2)
                                                 {
                                                     case 0: WithRadios[OptionPos]="0"; break;
@@ -1125,6 +1409,10 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                         }
                                     }
                                     break;
+            case Args_Type_Ranges:
+                                    Value_Pos<<=1;
+                                    Value_Pos|=Options[Pos].Radios[OptionPos][1]->isChecked()?1:0;
+                                    //No break
             case Args_Type_ClrPck:
                                     Modified=true;
                                     WithSliders[OptionPos]=Options[Pos].ColorValue[OptionPos];
@@ -1169,9 +1457,10 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                         }
                                         }
                                         break;
+                case Args_Type_Win_Func:
+                case Args_Type_Wave_Mode:
                 case Args_Type_Yuv:
                 case Args_Type_YuvA:
-                case Args_Type_Tile:
                 case Args_Type_ClrPck:
                                         {
                                         char ToFind1[3];
@@ -1277,7 +1566,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
 void BigDisplay::FiltersList1_currentOptionChanged(size_t Picture_Current)
 {
     string Modified_String=FiltersList_currentOptionChanged(0, Picture_Current);
-    Picture->Filter1_Change(Modified_String.c_str());
+    Picture->Filter_Change(0, Filters[Picture_Current1].Type, Modified_String.c_str());
 
     Frames_Pos=(size_t)-1;
     ShowPicture ();
@@ -1287,7 +1576,7 @@ void BigDisplay::FiltersList1_currentOptionChanged(size_t Picture_Current)
 void BigDisplay::FiltersList2_currentOptionChanged(size_t Picture_Current)
 {
     string Modified_String=FiltersList_currentOptionChanged(1, Picture_Current);
-    Picture->Filter2_Change(Modified_String.c_str());
+    Picture->Filter_Change(1, Filters[Picture_Current2].Type, Modified_String.c_str());
 
     Frames_Pos=(size_t)-1;
     ShowPicture ();
@@ -1322,15 +1611,19 @@ void BigDisplay::ShowPicture ()
         int height=QDesktopWidget().screenGeometry().height()*2/5;
         if (height%2)
             height--; //odd number is wanted for filters
-        Picture=new FFmpeg_Glue(FileName_string.c_str(), &FileInfoData->Videos, width, height, FFmpeg_Glue::Output_QImage, "", "", Picture_Current1<FiltersListDefault_Count, Picture_Current2<FiltersListDefault_Count); ///*Filters[Picture_Current1].Value[0], Filters[Picture_Current2].Value[0] removed else there is random crashs in libavfilters, maybe due to bad libavfilter config
+        Picture=new FFmpeg_Glue(FileName_string.c_str(), &FileInfoData->Stats);
+        if (FileName_string.empty())
+            Picture->InputData_Set(FileInfoData->Glue->InputData_Get()); // Using data from the analyzed file
+        Picture->AddOutput(0, width, height, FFmpeg_Glue::Output_QImage);
+        Picture->AddOutput(1, width, height, FFmpeg_Glue::Output_QImage);
         FiltersList1_currentIndexChanged(Picture_Current1);
         FiltersList2_currentIndexChanged(Picture_Current2);
     }
     Picture->FrameAtPosition(Frames_Pos);
-    if (Picture->Image1)
+    if (Picture->Image_Get(0))
     {
-        Image_Width=Picture->Image1->width();
-        Image_Height=Picture->Image1->height();
+        Image_Width=Picture->Image_Get(0)->width();
+        Image_Height=Picture->Image_Get(0)->height();
     }
 
     if (Slider->sliderPosition()!=Frames_Pos)
@@ -1518,7 +1811,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
     // None
     if (action->text()=="No display")
     {
-        Picture->With1_Change(false);
+        Picture->Disable(0);
         Image1->Remove();
         Layout->setColumnStretch(0, 0);
         //move(pos().x()+Image_Width, pos().y());
@@ -1547,7 +1840,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
             }
             Picture_Current1=Pos;
             //Picture->Filter1_Change(Filters[Pos].Formula[0]);
-            Picture->Filter1_Change(FiltersList_currentOptionChanged(Pos, 0));
+            Picture->Filter_Change(0, 0, FiltersList_currentOptionChanged(Pos, 0));
 
             Frames_Pos=(size_t)-1;
             ShowPicture ();
@@ -1570,7 +1863,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
     // None
     if (Pos==1)
     {
-        Picture->With1_Change(false);
+        Picture->Disable(0);
         Image1->Remove();
         Layout->setColumnStretch(0, 0);
         //move(pos().x()+Image_Width, pos().y());
@@ -1609,7 +1902,7 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(int Pos)
     // None
     if (Pos==1)
     {
-        Picture->With2_Change(false);
+        Picture->Disable(1);
         Image2->Remove();
         Layout->setColumnStretch(2, 0);
         //adjustSize();
@@ -1633,7 +1926,7 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(QAction * action)
     // None
     if (action->text()=="No display")
     {
-        Picture->With2_Change(false);
+        Picture->Disable(1);
         Image2->Remove();
         Layout->setColumnStretch(2, 0);
         //adjustSize();

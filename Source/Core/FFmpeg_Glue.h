@@ -30,7 +30,7 @@ struct AVFilterInOut;
 struct AVFilterInOut;
 
 class QImage;
-class VideoStats;
+class CommonStats;
 
 class FFmpeg_Glue
 {
@@ -41,46 +41,65 @@ public:
         Output_None,
         Output_QImage,
         Output_Jpeg,
+        Output_Stats,
     };
-    FFmpeg_Glue(const string &FileName, std::vector<VideoStats*>* Videos, int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, const string &Filter1=string(), const string &Filter2=string(), bool With1=true, bool With2=false, bool WithStats=false);
+    FFmpeg_Glue(const string &FileName, std::vector<CommonStats*>* Stats, bool WithStats=false);
     ~FFmpeg_Glue();
 
     // Images
-    QImage*                     Image1;
-    QImage*                     Image2;
+    QImage*                     Image_Get(size_t Pos)                                                                   {if (Pos>=OutputDatas.size() || !OutputDatas[Pos] || !OutputDatas[Pos]->Enabled) return NULL; return OutputDatas[Pos]->Image;}
     struct bytes
     {
         unsigned char* Data;
         size_t         Size;
+
+        bytes()
+            :
+            Data(NULL),
+            Size(0)
+        {
+        }
+
+        ~bytes()
+        {
+            delete[] Data;
+        }
     };
-    std::vector<bytes*>         JpegList;
+    bytes*                      Thumbnail_Get(size_t Pos, size_t FramePos)                                              {if (Pos>=OutputDatas.size() || !OutputDatas[Pos] || !OutputDatas[Pos]->Enabled) return NULL; return OutputDatas[Pos]->Thumbnails[FramePos];}
+    size_t                      Thumbnails_Size(size_t Pos)                                                             {if (Pos>=OutputDatas.size() || !OutputDatas[Pos] || !OutputDatas[Pos]->Enabled) return 0; return OutputDatas[Pos]->Thumbnails.size();}
     
     // Status
-    size_t                      VideoFramePos_Get()                                                                     {return VideoFramePos;}
+    size_t                      VideoFramePos_Get();
 
     // Data
-    std::vector<VideoStats*>*   Videos;
+    std::vector<CommonStats*>*  Stats;
 
     // Container information
     string                      ContainerFormat_Get();
     int                         StreamCount_Get();
+    int                         BitRate_Get();
 
     // Video information
     string                      VideoFormat_Get();
-    double                      VideoDuration_Get()                                                                     {return VideoDuration;}
-    double                      VideoFrameRate_Get();
-    size_t                      VideoFrameCount_Get()                                                                   {return VideoFrameCount;}
+    double                      VideoDuration_Get();
+    double                      FramesDivDuration_Get();
+    string                      RVideoFrameRate_Get();
+    string                      AvgVideoFrameRate_Get();
+    size_t                      VideoFrameCount_Get();
     int                         Width_Get();
     int                         Height_Get();
     double                      DAR_Get();
+    string                      SAR_Get();
     string                      PixFormat_Get();
+    string                      ColorSpace_Get();
+    string                      ColorRange_Get();
     
     // Audio information
     string                      AudioFormat_Get();
     string                      SampleFormat_Get();
     int                         SamplingRate_Get();
     string                      ChannelLayout_Get();
-    int                         BitDepth_Get();
+    int                         ABitDepth_Get();
     
     // FFmpeg information
     string                      FFmpeg_Version();
@@ -90,73 +109,134 @@ public:
     string                      FFmpeg_LibsVersion();
  
     // Actions
+    void                        AddInput(int CodecType, size_t FrameCount, double Duration, int Width, int Height);
+    void                        AddOutput(size_t FilterPos, int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, int FilterType=0, const string &Filter=string());
+    void                        AddOutput(const string &FileName);
+    void                        CloseOutput();
+    void                        ModifyOutput(size_t InputPos, size_t OutputPos, size_t FilterPos, int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, int FilterType=0, const string &Filter=string());
     void                        Seek(size_t Pos);
     void                        FrameAtPosition(size_t Pos);
     bool                        NextFrame();
     bool                        OutputFrame(AVPacket* Packet, bool Decode=true);
-    void                        Filter1_Change(const string &Filter);
-    void                        Filter2_Change(const string &Filter);
-    void                        With1_Change(bool With);
-    void                        With2_Change(bool With);
+    bool                        OutputFrame(unsigned char* Data, size_t Size, int FramePos);
+    void                        Filter_Change(size_t FilterPos, int FilterType, const string &Filter);
+    void                        Disable(const size_t Pos);
     void                        Scale_Change(int Scale_Width, int Scale_Height);
 
+    // Between different FFmpeg_Glue instances
+    void*                       InputData_Get() { return InputDatas[0]; }
+    void                        InputData_Set(void* InputData) {InputDatas.push_back((inputdata*)InputData); InputDatas_Copy=true;}
+
 private:
-    // FFmpeg related actions
-    bool                        Scale_Adapt(AVFrame* Frame);
-    bool                        FilterGraph_Init(AVFilterGraph* &FilterGraph, AVFilterContext* &FilterGraph_Source_Context, AVFilterContext* &FilterGraph_Sink_Context, const string &Filter);
-    void                        FilterGraph_Free(AVFilterGraph* &FilterGraph);
-    bool                        Scale_Init(AVFrame* FilteredFrame, SwsContext* &Scale_Context, AVFrame* &Scale_Frame);
-    void                        Scale_Free(AVFrame* FilteredFrame, SwsContext* &Scale_Context, AVFrame* &Scale_Frame);
-    bool                        Process(AVFrame* &FilteredFrame, AVFilterGraph* &FilterGraph, AVFilterContext* &FilterGraph_Source_Context, AVFilterContext* &FilterGraph_Sink_Context, const string &Filter, SwsContext* &Scale_Context, AVFrame* &Scale_Frame, QImage* &Image);
-    bool                        JpegOutput_Init();
-    
+    // Stream information
+    struct inputdata
+    {
+        // Constructor / Destructor
+        inputdata();
+        ~inputdata();
+        
+        //Actions
+
+        // In
+        bool                    Enabled;
+
+        // FFmpeg pointers - Input
+        int                     Type;
+        AVStream*               Stream;
+        AVFrame*                DecodedFrame;
+
+        // Status
+        size_t                  FramePos;               // Current position of playback
+        
+        // General information
+        size_t                  FrameCount;             // Total count of frames (may be estimated)
+        double                  FirstTimeStamp;         // First PTS met in seconds
+        double                  Duration;               // Duration in seconds
+
+        // Cache
+        std::vector<AVFrame*>*  FramesCache;
+        AVFrame*                FramesCache_Default;
+    };
+    struct outputdata
+    {
+        // Constructor / Destructor
+        outputdata();
+        ~outputdata();
+        
+        //Actions
+        void                    Process(AVFrame* DecodedFrame);
+        void                    ApplyFilter();
+        void                    ApplyScale();
+        void                    ReplaceImage();
+        void                    AddThumbnail();
+        void                    Encode();
+        void                    CloseEncode();
+        void                    DiscardScaledFrame();
+        void                    DiscardFilteredFrame();
+
+        // In
+        bool                    Enabled;
+        string                  Filter;
+        size_t                  FilterPos;
+
+        // FFmpeg pointers - Input
+        int                     Type;
+        AVStream*               Stream;
+        AVFrame*                DecodedFrame;
+
+        // FFmpeg pointers - Filter
+        AVFilterGraph*          FilterGraph;
+        AVFilterContext*        FilterGraph_Source_Context;
+        AVFilterContext*        FilterGraph_Sink_Context;
+        AVFrame*                FilteredFrame;
+
+        // FFmpeg pointers - Scale
+        SwsContext*             ScaleContext;
+        AVFrame*                ScaledFrame;
+
+        // FFmpeg pointers - Output
+        AVCodecContext*         JpegOutput_CodecContext;
+        AVPacket*               JpegOutput_Packet;
+
+        // Out
+        outputmethod            OutputMethod;
+        QImage*                 Image;
+        std::vector<bytes*>     Thumbnails;
+        CommonStats*            Stats;
+
+        // Encode
+        string                  Encode_FileName;
+        AVFormatContext*        Encode_FormatContext;
+        AVCodecContext*         Encode_CodecContext;
+        AVStream*               Encode_Stream;
+        AVPacket*               Encode_Packet;
+
+        // Status
+        size_t                  FramePos;               // Current position of playback
+
+        // Helpers
+        bool                    InitThumnails();
+        bool                    InitEncode();
+        bool                    FilterGraph_Init();
+        void                    FilterGraph_Free();
+        bool                    Scale_Init();
+        void                    Scale_Free();
+        bool                    AdaptDAR();
+        int                     Width;
+        int                     Height;
+    };
+    std::vector<inputdata*>     InputDatas;
+    std::vector<outputdata*>    OutputDatas;
+    bool                        InputDatas_Copy;
+
     // FFmpeg pointers - Input
     AVFormatContext*            FormatContext;
-    AVStream*                   VideoStream;
-    AVStream*                   AudioStream;
-    int                         VideoStream_Index;
-    AVFrame*                    Frame;
     AVPacket*                   Packet;
-
-    // FFmpeg pointers - Filter
-    AVFilterGraph*              FilterGraph1;
-    AVFilterGraph*              FilterGraph2;
-    AVFilterContext*            FilterGraph1_Source_Context;
-    AVFilterContext*            FilterGraph2_Source_Context;
-    AVFilterContext*            FilterGraph1_Sink_Context;
-    AVFilterContext*            FilterGraph2_Sink_Context;
-    AVFrame*                    Filtered1_Frame;
-    AVFrame*                    Filtered2_Frame;
-
-    // FFmpeg pointers - Scale
-    SwsContext*                 Scale1_Context;
-    SwsContext*                 Scale2_Context;
-    AVFrame*                    Scale1_Frame;
-    AVFrame*                    Scale2_Frame;
-
-    // FFmpeg pointers - Output
-    AVCodecContext*             JpegOutput_CodecContext;
-    AVPacket*                   JpegOutput_Packet;
+    AVFrame*                    Frame;
 
     // In
     string                      FileName;
-    string                      Filter1;
-    string                      Filter2;
-    int                         Scale_Width;
-    int                         Scale_Height;
-    bool                        Scale_Adapted;
-    outputmethod                OutputMethod;
     bool                        WithStats;
-    bool                        With1;
-    bool                        With2;
-
-    // Status
-    size_t                      VideoFramePos;          // Current position of playback
-
-    // Video information
-    size_t                      VideoFrameCount;        // Total count of frames (may be estimated)
-    double                      VideoFirstTimeStamp;    // First PTS met in seconds
-    double                      VideoDuration;          // Duration in seconds
 
     // Seek
     int64_t                     Seek_TimeStamp;

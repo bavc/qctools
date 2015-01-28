@@ -1,3 +1,21 @@
+<next>
+-----
++ Saturation Highlight playback filter
++ Zoom playback filter
++ Graph tracker text with semi transparent gray background
++ Basic support of Blackmagic DeckLink (tested on Mac, looking for a tester on Windows and Linux)
++ Added metadata columns in table view for color space, color range, frame rate details, sample aspect ratio
++ Added 'Broadcast Illegal Focus' filter
+x Zooming in with more than the default graphs, shifts display offset (GitHub issue #41)
+x Left-align graph labels, instead of centering them (GitHub issue #45)
+x Y-scale label values disappear when zooming (GitHub issue #46)
+x Seek was not possible in the playback window during the analysis
+x Some colors change, marker text contains data values (GitHub issue #23)
+
+0.6.2, 2014-10-29
+-----
+x Memory leaks removed
+
 0.6.1, 2014-10-15
 -----
 x Crash with MP4 files on Mac OS X 10.7 (GitHub issue #40)

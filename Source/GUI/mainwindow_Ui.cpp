@@ -10,7 +10,10 @@
 
 #include "GUI/preferences.h"
 #include "GUI/Help.h"
+#include "GUI/Plots.h"
 #include "Core/Core.h"
+#include "Core/VideoCore.h"
+#include "Core/BlackmagicDeckLink_Glue.h"
 
 #include <QFileDialog>
 #include <QScrollBar>
@@ -93,10 +96,6 @@ void MainWindow::Ui_Init()
     ui->verticalLayout->setStretch(0, 1);
     ui->verticalLayout->setContentsMargins(0,0,0,0);
 
-    QLabel* DragDrop=new QLabel();
-    DragDrop->setAlignment(Qt::AlignCenter);
-    DragDrop->setPixmap(QPixmap(":/icon/window-out.png"));
-
     // Window
     setWindowTitle("QCTools");
     setWindowIcon(QIcon(":/icon/logo.png"));
@@ -110,16 +109,19 @@ void MainWindow::Ui_Init()
     //ToolTip
     if (ui->fileNamesBox)
         ui->fileNamesBox->hide();
-    for (size_t j=0; j<PlotType_Axis; j++)
-    {
-        CheckBoxes[j]=new QCheckBox(PerPlotGroup[j].Name);
-        CheckBoxes[j]->setToolTip(PerPlotGroup[j].Description);
-        CheckBoxes[j]->setCheckable(true);
-        CheckBoxes[j]->setChecked(PerPlotGroup[j].CheckedByDefault);
-        CheckBoxes[j]->setVisible(false);
-        QObject::connect(CheckBoxes[j], SIGNAL(toggled(bool)), this, SLOT(on_check_toggled(bool)));
-        ui->horizontalLayout->addWidget(CheckBoxes[j]);
-    }
+    for (size_t type = 0; type < CountOfStreamTypes; type++)
+        for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ ) // Group_Axis
+        {
+            QCheckBox* CheckBox=new QCheckBox(PerStreamType[type].PerGroup[group].Name);
+            CheckBox->setToolTip(PerStreamType[type].PerGroup[group].Description);
+            CheckBox->setCheckable(true);
+            CheckBox->setChecked(PerStreamType[type].PerGroup[group].CheckedByDefault);
+            CheckBox->setVisible(false);
+            QObject::connect(CheckBox, SIGNAL(toggled(bool)), this, SLOT(on_check_toggled(bool)));
+            ui->horizontalLayout->addWidget(CheckBox);
+
+            CheckBoxes[type].push_back(CheckBox);
+        }
 
     configureZoom();
 
@@ -145,23 +147,36 @@ void MainWindow::Ui_Init()
     // Not implemented action
     if (ui->actionExport_XmlGz_Custom)
         ui->actionExport_XmlGz_Custom->setVisible(false);
+
+    #if defined(BLACKMAGICDECKLINK_YES)
+        // Deck menu
+        if (BlackmagicDeckLink_Glue::CardsList().empty())
+        {
+            ui->actionBlackmagicDeckLinkCapture->setVisible(false);
+            ui->menuBlackmagicDeckLink->menuAction()->setVisible(false);
+        }
+    #endif
+}
+
+//---------------------------------------------------------------------------
+bool MainWindow::isPlotZoomable() const
+{
+    return PlotsArea && PlotsArea->visibleFrames().count() > 4;
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::configureZoom()
 {
-    if (Files.empty() || PlotsArea==NULL || PlotsArea->ZoomScale==1)
+    updateScrollBar();
+
+    if (Files.empty() || PlotsArea==NULL || !PlotsArea->isZoomed() )
     {
-        ui->horizontalScrollBar->setRange(0, 0);
-        ui->horizontalScrollBar->setMaximum(0);
-        ui->horizontalScrollBar->setPageStep(1);
-        ui->horizontalScrollBar->setSingleStep(1);
-        ui->horizontalScrollBar->setEnabled(false);
         ui->actionZoomOut->setEnabled(false);
-        if (Files_CurrentPos<Files.size() && PlotsArea && PlotsArea->ZoomScale<Files[Files_CurrentPos]->Videos[0]->x_Current_Max/4)
+        if (Files_CurrentPos<Files.size() && isPlotZoomable())
             ui->actionZoomIn->setEnabled(true);
         else
             ui->actionZoomIn->setEnabled(false);
+
         ui->actionGoTo->setEnabled(!Files.empty());
         ui->actionExport_XmlGz_Prompt->setEnabled(!Files.empty());
         ui->actionExport_XmlGz_Sidecar->setEnabled(!Files.empty());
@@ -171,16 +186,8 @@ void MainWindow::configureZoom()
         return;
     }
 
-    size_t Increment=Files[Files_CurrentPos]->Videos[0]->x_Current_Max/PlotsArea->ZoomScale;
-    ui->horizontalScrollBar->setMaximum(Files[Files_CurrentPos]->Videos[0]->x_Current_Max-Increment);
-    ui->horizontalScrollBar->setPageStep(Increment);
-    ui->horizontalScrollBar->setSingleStep(Increment);
-    ui->horizontalScrollBar->setEnabled(true);
     ui->actionZoomOut->setEnabled(true);
-    if (PlotsArea->ZoomScale<Files[Files_CurrentPos]->Videos[0]->x_Current_Max/4)
-        ui->actionZoomIn->setEnabled(true);
-    else
-        ui->actionZoomIn->setEnabled(false);
+    ui->actionZoomIn->setEnabled( isPlotZoomable() );
     ui->actionGoTo->setEnabled(true);
     ui->actionExport_XmlGz_Prompt->setEnabled(true);
     ui->actionExport_XmlGz_Sidecar->setEnabled(true);
@@ -193,42 +200,51 @@ void MainWindow::configureZoom()
 void MainWindow::Zoom_Move(size_t Begin)
 {
     PlotsArea->Zoom_Move(Begin);
-
-    ui->horizontalScrollBar->setValue(Begin);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::Zoom_In()
 {
-    if (PlotsArea->ZoomScale<Files[Files_CurrentPos]->Videos[0]->x_Current_Max/4)
-        PlotsArea->ZoomScale*=2;
-    configureZoom();
-    size_t Position=Files[Files_CurrentPos]->Frames_Pos_Get();
-    size_t Increment=Files[Files_CurrentPos]->Videos[0]->x_Current_Max/PlotsArea->ZoomScale;
-    if (Position+Increment/2>Files[Files_CurrentPos]->Videos[0]->x_Current_Max)
-        Position=Files[Files_CurrentPos]->Videos[0]->x_Current_Max-Increment/2;
-    if (Position>Increment/2)
-        Position-=Increment/2;
-    else
-        Position=0;
-    Zoom_Move(Position);
+    Zoom( true );
+    updateScrollBar();
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::Zoom_Out()
 {
-    if (PlotsArea->ZoomScale>1)
-        PlotsArea->ZoomScale/=2;
+    Zoom( false );
+    updateScrollBar();
+}
+
+void MainWindow::Zoom( bool on )
+{
+    PlotsArea->zoomXAxis( on );
     configureZoom();
-    size_t Position=Files[Files_CurrentPos]->Frames_Pos_Get();
-    size_t Increment=Files[Files_CurrentPos]->Videos[0]->x_Current_Max/PlotsArea->ZoomScale;
-    if (Position+Increment/2>Files[Files_CurrentPos]->Videos[0]->x_Current_Max)
-        Position=Files[Files_CurrentPos]->Videos[0]->x_Current_Max-Increment/2;
-    if (Position>Increment/2)
-        Position-=Increment/2;
+}
+
+void MainWindow::updateScrollBar( bool blockSignals )
+{
+    QScrollBar* sb = ui->horizontalScrollBar;
+
+    if ( PlotsArea==NULL || !PlotsArea->isZoomed() )
+    {
+        sb->hide();
+    }
     else
-        Position=0;
-    Zoom_Move(Position);
+    {
+        const FrameInterval intv = PlotsArea->visibleFrames();
+
+        sb->blockSignals( blockSignals );
+
+        sb->setRange( 0, PlotsArea->numFrames() - intv.count() + 1 );
+        sb->setValue( intv.from );
+        sb->setPageStep( intv.count() );
+        sb->setSingleStep( intv.count() );
+
+        sb->blockSignals( false );
+
+        sb->show();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -257,9 +273,12 @@ void MainWindow::Export_PDF()
     printer.setPageMargins(8,3,3,5,QPrinter::Millimeter);
     QPainter painter(&printer);  */
 
+    /*
     QwtPlotRenderer PlotRenderer;
-    PlotRenderer.renderDocument(PlotsArea->plots[0], SaveFileName, "PDF", QSizeF(210, 297), 150);
+    PlotRenderer.renderDocument(const_cast<QwtPlot*>( PlotsArea->plot(TempType, Group_Y) ), 
+        SaveFileName, "PDF", QSizeF(210, 297), 150);
     QDesktopServices::openUrl(QUrl("file:///"+SaveFileName, QUrl::TolerantMode));
+    */
 }
 
 //---------------------------------------------------------------------------
@@ -267,21 +286,10 @@ void MainWindow::refreshDisplay()
 {
     if (PlotsArea)
     {
-        for (size_t j=0; j<PlotType_Axis; j++)
-            PlotsArea->Status[j]=CheckBoxes[j]->checkState()==Qt::Checked;
-        PlotsArea->Status[PlotType_Axis]=true;
-        PlotsArea->refreshDisplay();
+        for (size_t type = 0; type<CountOfStreamTypes; type++)
+            for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
+                PlotsArea->setPlotVisible( type, group, CheckBoxes[type][group]->checkState()==Qt::Checked );
     }
-
-
-    refreshDisplay_Axis();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::refreshDisplay_Axis()
-{
-    if (PlotsArea)
-        PlotsArea->refreshDisplay_Axis();
 }
 
 //---------------------------------------------------------------------------

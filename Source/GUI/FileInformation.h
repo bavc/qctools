@@ -11,16 +11,17 @@
 
 //---------------------------------------------------------------------------
 #include "Core/Core.h"
-#include "Core/FFmpeg_Glue.h"
-#include "Core/VideoStats.h"
+#include <string>
 
 #include <QThread>
 #include <QPixmap>
 
 class MainWindow;
+class CommonStats;
+class FFmpeg_Glue;
+class BlackmagicDeckLink_Glue;
+
 //---------------------------------------------------------------------------
-
-
 class FileInformation : public QThread
 {
     //thread part
@@ -29,7 +30,7 @@ class FileInformation : public QThread
 
 public:
     // Constructor/Destructor
-                                FileInformation             (MainWindow* Main, const QString &FileName);
+                                FileInformation             (MainWindow* Main, const QString &FileName, BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue=NULL, int FrameCount=0, const std::string &Encoding_FileName=std::string());
                                 ~FileInformation            ();
 
     // Parsing
@@ -42,19 +43,26 @@ public:
     // Infos
     QPixmap*                    Picture_Get                 (size_t Pos);
     QString                     FileName;
-    int                         Frames_Pos_Get              ()                                      {return Frames_Pos;}
-    void                        Frames_Pos_Set              (int Frames_Pos);
+    size_t                      ReferenceStream_Pos_Get     () {return ReferenceStream_Pos;}
+    int                         Frames_Count_Get            (size_t Stats_Pos=(size_t)-1);
+    int                         Frames_Pos_Get              (size_t Stats_Pos=(size_t)-1);
+    void                        Frames_Pos_Set              (int Frames_Pos, size_t Stats_Pos=(size_t)-1);
     void                        Frames_Pos_Minus            ();
     void                        Frames_Pos_Plus             ();
     bool                        PlayBackFilters_Available   ();
 
+    // Deck control information
+    BlackmagicDeckLink_Glue*    blackmagicDeckLink_Glue;
+
     // FFmpeg glue
     FFmpeg_Glue*                Glue;
-    std::vector<VideoStats*>    Videos;
+    std::vector<CommonStats*>   Stats;
+    CommonStats*                ReferenceStat               () {if (ReferenceStream_Pos<Stats.size()) return Stats[ReferenceStream_Pos]; else return NULL;}
 
 private:
     // Info
     QPixmap                     Pixmap;
+    size_t                      ReferenceStream_Pos;
     int                         Frames_Pos;
     MainWindow*                 Main;
 

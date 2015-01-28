@@ -17,6 +17,8 @@
 #include <QMessageBox>
 
 #include "Core/Core.h"
+#include "GUI/Plots.h"
+#include "GUI/blackmagicdecklink_userinput.h"
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -31,6 +33,11 @@
 //---------------------------------------------------------------------------
 void MainWindow::openFile()
 {
+    clearFiles();
+    addFile("");
+    addFile_finish();
+    return;
+    
     QStringList List=QFileDialog::getOpenFileNames(this, "Open file", "", "Video files (*.avi *.mkv *.mov *.mxf *.mp4);;Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
     if (List.empty())
         return;
@@ -42,6 +49,20 @@ void MainWindow::openFile()
     }
 
     addFile_finish();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::openCapture()
+{
+    BlackmagicDeckLink_UserInput* blackmagicDeckLink_UserInput=new BlackmagicDeckLink_UserInput();
+    if (!blackmagicDeckLink_UserInput->exec())
+        return;
+    
+    clearFiles();
+    addFile(blackmagicDeckLink_UserInput->Card, blackmagicDeckLink_UserInput->FrameCount, blackmagicDeckLink_UserInput->Encoding_FileName.toUtf8().data());
+    addFile_finish();
+
+    delete blackmagicDeckLink_UserInput;
 }
 
 //---------------------------------------------------------------------------
@@ -94,7 +115,6 @@ void MainWindow::processFile(const QString &FileName)
     ui->fileNamesBox->clear();
 
     // Layout
-    QLayout* Layout=layout();
     if (FilesListArea)
     {
         ui->verticalLayout->removeWidget(FilesListArea);
@@ -255,9 +275,10 @@ void MainWindow::createGraphsLayout()
 
     if (Files_CurrentPos==(size_t)-1)
     {
-        for (size_t Pos=0; Pos<PlotType_Max; Pos++)
-            if (CheckBoxes[Pos])
-                CheckBoxes[Pos]->hide();
+        for (size_t type = 0; type < CountOfStreamTypes; type++)
+            for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
+                if (CheckBoxes[type][group])
+                    CheckBoxes[type][group]->hide();
         if (ui->fileNamesBox)
             ui->fileNamesBox->hide();
 
@@ -266,13 +287,14 @@ void MainWindow::createGraphsLayout()
     }
     clearDragDrop();
 
-    for (size_t Pos=0; Pos<PlotType_Max; Pos++)
-        if (CheckBoxes[Pos])
-            CheckBoxes[Pos]->show();
+    for (size_t type = 0; type < CountOfStreamTypes; type++)
+        for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
+            if (CheckBoxes[type][group])
+                CheckBoxes[type][group]->show();
     if (ui->fileNamesBox)
         ui->fileNamesBox->show();
 
-    PlotsArea=new Plots(this, Files[Files_CurrentPos]);
+    PlotsArea=Files[Files_CurrentPos]->Stats.empty()?NULL:new Plots(this, Files[Files_CurrentPos]);
     if (!ui->actionGraphsLayout->isChecked())
         PlotsArea->hide();
     ui->verticalLayout->addWidget(PlotsArea);
@@ -282,7 +304,10 @@ void MainWindow::createGraphsLayout()
         TinyDisplayArea->hide();
     ui->verticalLayout->addWidget(TinyDisplayArea);
 
-    ControlArea=new Control(this, Files[Files_CurrentPos], PlotsArea, Control::Style_Cols);
+    ControlArea=new Control(this, Files[Files_CurrentPos], Control::Style_Cols);
+    connect( ControlArea, SIGNAL( currentFrameChanged() ), 
+        this, SLOT( on_CurrentFrameChanged() ) );
+
     if (!ui->actionGraphsLayout->isChecked())
         ControlArea->hide();
     ui->verticalLayout->addWidget(ControlArea);
@@ -290,18 +315,13 @@ void MainWindow::createGraphsLayout()
     //InfoArea=new Info(this, Files[Files_CurrentPos], Info::Style_Grid);
     //ui->verticalLayout->addWidget(InfoArea);
 
-    PlotsArea->TinyDisplayArea=TinyDisplayArea;
-    PlotsArea->ControlArea=ControlArea;
-    PlotsArea->InfoArea=InfoArea;
     TinyDisplayArea->ControlArea=ControlArea;
     ControlArea->TinyDisplayArea=TinyDisplayArea;
     ControlArea->InfoArea=InfoArea;
 
     refreshDisplay();
-    PlotsArea->createData_Init();
 
     configureZoom();
-    ui->verticalLayout->removeItem(ui->verticalSpacer);
 }
 
 //---------------------------------------------------------------------------
@@ -312,6 +332,16 @@ void MainWindow::addFile(const QString &FileName)
 
     // Launch analysis
     FileInformation* Temp=new FileInformation(this, FileName);
+
+    Files.push_back(Temp);
+    ui->fileNamesBox->addItem(Temp->FileName);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::addFile(BlackmagicDeckLink_Glue* BlackmagicDeckLink_Glue, int FrameCount, const string &Encoding_FileName)
+{
+    // Launch analysis
+    FileInformation* Temp=new FileInformation(this, QString(), BlackmagicDeckLink_Glue, FrameCount, Encoding_FileName);
 
     Files.push_back(Temp);
     ui->fileNamesBox->addItem(Temp->FileName);

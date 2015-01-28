@@ -6,6 +6,7 @@
 
 //---------------------------------------------------------------------------
 #include "Core/VideoStats.h"
+#include "Core/VideoCore.h"
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -32,88 +33,15 @@ using namespace tinyxml2;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-VideoStats::VideoStats (size_t FrameCount, double Duration, size_t FrameCount_Max, double Frequency_)
+VideoStats::VideoStats (size_t FrameCount, double Duration, double Frequency_)
     :
-    Frequency(Frequency_)
+    CommonStats(VideoPerItem, 0, Group_VideoMax, Item_VideoMax, FrameCount, Duration, Frequency_)
 {
-    // Adaptation for having a graph even with 1 frame
-    if (FrameCount<2)
-        FrameCount=2;
-    if (FrameCount_Max<2)
-        FrameCount_Max=2;
-
-    // Status
-    IsComplete=false;
-    VideoFirstTimeStamp=DBL_MAX;
-
-    // Memory management
-    Data_Reserved=FrameCount_Max;
-
-    // VideoStats
-    memset(Stats_Totals, 0x00, PlotName_Max*sizeof(double));
-    memset(Stats_Counts, 0x00, PlotName_Max*sizeof(uint64_t));
-    memset(Stats_Counts2, 0x00, PlotName_Max*sizeof(uint64_t));
-
-    // Data - x and y
-    x = new double*[4];
-    for (size_t j=0; j<4; ++j)
-    {
-        x[j]=new double[FrameCount_Max];
-        memset(x[j], 0x00, FrameCount_Max*sizeof(double));
-    }
-    y = new double*[PlotName_Max];
-    for (size_t j=0; j<PlotName_Max; ++j)
-    {
-        y[j] = new double[FrameCount_Max];
-        memset(y[j], 0x00, FrameCount_Max*sizeof(double));
-    }
-
-    // Data - Extra
-    durations = new double[FrameCount_Max];
-    memset(durations, 0x00, FrameCount_Max*sizeof(double));
-    key_frames = new bool[FrameCount_Max];
-    memset(key_frames, 0x00, FrameCount_Max*sizeof(bool));
-
-    Data_Reserve(0);
-
-    // Data - Maximums
-    x_Current=0;
-    x_Current_Max=FrameCount;
-    x_Max[0]=x_Current_Max;
-    x_Max[1]=Duration;
-    x_Max[2]=x_Max[1]/60;
-    x_Max[3]=x_Max[2]/60;
-    memset(y_Max, 0x00, PlotType_Max*sizeof(double));
 }
 
 //---------------------------------------------------------------------------
 VideoStats::~VideoStats()
 {
-    // Data - x and y
-    for (size_t j=0; j<4; ++j)
-        delete[] x[j];
-    delete[] x;
-
-    for (size_t j=0; j<PlotName_Max; ++j)
-        delete[] y[j];
-    delete[] y;
-}
-
-//***************************************************************************
-// Status
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-double VideoStats::State_Get()
-{
-    if (IsComplete || x_Current_Max==0)
-        return 1;
-
-    double Value=((double)x_Current)/x_Current_Max;
-    if (Value>=1)
-        Value=0.99; // It is not yet complete, so not 100%
-
-    return Value;
 }
 
 //***************************************************************************
@@ -121,7 +49,7 @@ double VideoStats::State_Get()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void VideoStats::VideoStatsFromExternalData (const string &Data)
+void VideoStats::StatsFromExternalData (const string &Data)
 {
     // VideoStats from external data
     // XML input
@@ -153,7 +81,7 @@ void VideoStats::VideoStatsFromExternalData (const string &Data)
 
                         Attribute=Frame->Attribute("key_frame");
                         if (Attribute)
-                            key_frames[x_Current]=std::atof(Attribute);
+                            key_frames[x_Current]=std::atof(Attribute)?true:false;
 
                         Attribute=Frame->Attribute("pkt_pts_time");
                         if (!Attribute || !strcmp(Attribute, "N/A"))
@@ -161,11 +89,11 @@ void VideoStats::VideoStatsFromExternalData (const string &Data)
                         if (Attribute && strcmp(Attribute, "N/A"))
                         {
                             x[1][x_Current]=std::atof(Attribute);
-                            if (VideoFirstTimeStamp==DBL_MAX)
-                                VideoFirstTimeStamp=x[1][x_Current];
-                            if (x[1][x_Current]<VideoFirstTimeStamp)
+                            if (FirstTimeStamp==DBL_MAX)
+                                FirstTimeStamp=x[1][x_Current];
+                            if (x[1][x_Current]<FirstTimeStamp)
                             {
-                                double Difference=VideoFirstTimeStamp-x[1][x_Current];
+                                double Difference=FirstTimeStamp-x[1][x_Current];
                                 for (size_t Pos=0; Pos<x_Current; Pos++)
                                 {
                                     x[1][Pos]-=Difference;
@@ -173,7 +101,7 @@ void VideoStats::VideoStatsFromExternalData (const string &Data)
                                     x[3][Pos]=x[2][Pos]/60;
                                 }
                             }
-                            x[1][x_Current]-=VideoFirstTimeStamp;
+                            x[1][x_Current]-=FirstTimeStamp;
                             x[2][x_Current]=x[1][x_Current]/60;
                             x[3][x_Current]=x[2][x_Current]/60;
                         }
@@ -197,17 +125,17 @@ void VideoStats::VideoStatsFromExternalData (const string &Data)
                         {
                             if (!strcmp(Tag->Value(), "tag"))
                             {
-                                PlotName j=PlotName_Max;
+                                size_t j=Item_VideoMax;
                                 const char* key=Tag->Attribute("key");
                                 if (key)
-                                    for (size_t Plot_Pos=0; Plot_Pos<PlotName_Max; Plot_Pos++)
-                                        if (!strcmp(key, PerPlotName[Plot_Pos].FFmpeg_Name_2_3))
+                                    for (size_t Plot_Pos=0; Plot_Pos<Item_VideoMax; Plot_Pos++)
+                                        if (!strcmp(key, PerItem[Plot_Pos].FFmpeg_Name))
                                         {
-                                            j=(PlotName)Plot_Pos;
+                                            j=Plot_Pos;
                                             break;
                                         }
 
-                                if (j!=PlotName_Max)
+                                if (j!=Item_VideoMax)
                                 {
                                     double value;
                                     Attribute=Tag->Attribute("value");
@@ -228,18 +156,22 @@ void VideoStats::VideoStatsFromExternalData (const string &Data)
                                     else
                                         y[j][x_Current]=value;
 
-                                    if (PerPlotName[j].Group1!=PlotType_Max && y_Max[PerPlotName[j].Group1]<y[j][x_Current])
-                                        y_Max[PerPlotName[j].Group1]=y[j][x_Current];
-                                    if (PerPlotName[j].Group2!=PlotType_Max && y_Max[PerPlotName[j].Group2]<y[j][x_Current])
-                                        y_Max[PerPlotName[j].Group2]=y[j][x_Current];
+                                    if (PerItem[j].Group1!=Group_VideoMax && y_Max[PerItem[j].Group1]<y[j][x_Current])
+                                        y_Max[PerItem[j].Group1]=y[j][x_Current];
+                                    if (PerItem[j].Group2!=Group_VideoMax && y_Max[PerItem[j].Group2]<y[j][x_Current])
+                                        y_Max[PerItem[j].Group2]=y[j][x_Current];
+                                    if (PerItem[j].Group1!=Group_VideoMax && y_Min[PerItem[j].Group1]>y[j][x_Current])
+                                        y_Min[PerItem[j].Group1]=y[j][x_Current];
+                                    if (PerItem[j].Group2!=Group_VideoMax && y_Min[PerItem[j].Group2]>y[j][x_Current])
+                                        y_Min[PerItem[j].Group2]=y[j][x_Current];
 
                                     //VideoStats
                                     Stats_Totals[j]+=y[j][x_Current];
-                                    if (PerPlotName[j].DefaultLimit!=DBL_MAX)
+                                    if (PerItem[j].DefaultLimit!=DBL_MAX)
                                     {
-                                        if (y[j][x_Current]>PerPlotName[j].DefaultLimit)
+                                        if (y[j][x_Current]>PerItem[j].DefaultLimit)
                                             Stats_Counts[j]++;
-                                        if (PerPlotName[j].DefaultLimit2!=DBL_MAX && y[j][x_Current]>PerPlotName[j].DefaultLimit2)
+                                        if (PerItem[j].DefaultLimit2!=DBL_MAX && y[j][x_Current]>PerItem[j].DefaultLimit2)
                                             Stats_Counts2[j]++;
                                     }
                                 }
@@ -274,28 +206,28 @@ void VideoStats::VideoStatsFromExternalData (const string &Data)
     }
 
     Frequency=1;
-    VideoStatsFinish();
+    StatsFinish();
 }
 
 //---------------------------------------------------------------------------
-void VideoStats::VideoStatsFromFrame (struct AVFrame* Frame, int Width, int Height)
+void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
 {
     AVDictionary * m=av_frame_get_metadata (Frame);
     AVDictionaryEntry* e=NULL;
     string A;
     for (;;)
     {
-        e=av_dict_get 	(m, "", e, AV_DICT_IGNORE_SUFFIX);
+        e=av_dict_get     (m, "", e, AV_DICT_IGNORE_SUFFIX);
         if (!e)
             break;
         size_t j=0;
-        for (; j<PlotName_Max; j++)
+        for (; j<Item_VideoMax; j++)
         {
-            if (strcmp(e->key, PerPlotName[j].FFmpeg_Name_2_3)==0)
+            if (strcmp(e->key, PerItem[j].FFmpeg_Name)==0)
                 break;
         }
 
-        if (j<PlotName_Max)
+        if (j<Item_VideoMax)
         {
             double value=std::atof(e->value);
                                             
@@ -311,18 +243,22 @@ void VideoStats::VideoStatsFromFrame (struct AVFrame* Frame, int Width, int Heig
             else
                 y[j][x_Current]=value;
 
-            if (PerPlotName[j].Group1!=PlotType_Max && y_Max[PerPlotName[j].Group1]<y[j][x_Current])
-                y_Max[PerPlotName[j].Group1]=y[j][x_Current];
-            if (PerPlotName[j].Group2!=PlotType_Max && y_Max[PerPlotName[j].Group2]<y[j][x_Current])
-                y_Max[PerPlotName[j].Group2]=y[j][x_Current];
+            if (PerItem[j].Group1!=Group_VideoMax && y_Max[PerItem[j].Group1]<y[j][x_Current])
+                y_Max[PerItem[j].Group1]=y[j][x_Current];
+            if (PerItem[j].Group2!=Group_VideoMax && y_Max[PerItem[j].Group2]<y[j][x_Current])
+                y_Max[PerItem[j].Group2]=y[j][x_Current];
+            if (PerItem[j].Group1!=Group_VideoMax && y_Min[PerItem[j].Group1]>y[j][x_Current])
+                y_Min[PerItem[j].Group1]=y[j][x_Current];
+            if (PerItem[j].Group2!=Group_VideoMax && y_Min[PerItem[j].Group2]>y[j][x_Current])
+                y_Min[PerItem[j].Group2]=y[j][x_Current];
 
             //Stats
             Stats_Totals[j]+=y[j][x_Current];
-            if (PerPlotName[j].DefaultLimit!=DBL_MAX)
+            if (PerItem[j].DefaultLimit!=DBL_MAX)
             {
-                if (y[j][x_Current]>PerPlotName[j].DefaultLimit)
+                if (y[j][x_Current]>PerItem[j].DefaultLimit)
                     Stats_Counts[j]++;
-                if (PerPlotName[j].DefaultLimit2!=DBL_MAX && y[j][x_Current]>PerPlotName[j].DefaultLimit2)
+                if (PerItem[j].DefaultLimit2!=DBL_MAX && y[j][x_Current]>PerItem[j].DefaultLimit2)
                     Stats_Counts2[j]++;
             }
         }
@@ -366,15 +302,15 @@ void VideoStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
 
     int64_t ts=(Frame->pkt_pts==AV_NOPTS_VALUE)?Frame->pkt_dts:Frame->pkt_pts; // Using DTS is PTS is not available
     if (ts==AV_NOPTS_VALUE && FramePos)
-        ts=(VideoFirstTimeStamp+x[1][FramePos-1]+durations[FramePos-1])*Frequency; // If time stamp is not present, creating a fake one from last frame duration
+        ts=(int64_t)((FirstTimeStamp+x[1][FramePos-1]+durations[FramePos-1])*Frequency); // If time stamp is not present, creating a fake one from last frame duration
     if (ts!=AV_NOPTS_VALUE)
     {
-        if (VideoFirstTimeStamp==DBL_MAX)
-            VideoFirstTimeStamp=ts/Frequency;
+        if (FirstTimeStamp==DBL_MAX)
+            FirstTimeStamp=ts/Frequency;
         x[1][FramePos]=((double)ts)/Frequency;
-        if (x[1][FramePos]<VideoFirstTimeStamp)
+        if (x[1][FramePos]<FirstTimeStamp)
         {
-            double Difference=VideoFirstTimeStamp-x[1][x_Current];
+            double Difference=FirstTimeStamp-x[1][x_Current];
             for (size_t Pos=0; Pos<x_Current; Pos++)
             {
                 x[1][Pos]-=Difference;
@@ -382,43 +318,12 @@ void VideoStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
                 x[3][Pos]=x[2][Pos]/60;
             }
         }
-        x[1][FramePos]-=VideoFirstTimeStamp;
+        x[1][FramePos]-=FirstTimeStamp;
         x[2][FramePos]=x[1][FramePos]/60;
         x[3][FramePos]=x[2][FramePos]/60;
     }
     if (Frame->pkt_duration!=AV_NOPTS_VALUE)
         durations[FramePos]=((double)Frame->pkt_duration)/Frequency;
-}
-
-//---------------------------------------------------------------------------
-void VideoStats::VideoStatsFinish ()
-{
-    // Adaptation
-    if (x_Current==1)
-    {
-        x[0][1]=1;
-        x[1][1]=durations[0]?durations[0]:1; //forcing to 1 in case duration is not available
-        x[2][1]=durations[0]?(durations[0]/60):1; //forcing to 1 in case duration is not available
-        x[3][1]=durations[0]?(durations[0]/3600):1; //forcing to 1 in case duration is not available
-        for (size_t Plot_Pos=0; Plot_Pos<PlotName_Max; Plot_Pos++)
-            y[Plot_Pos][1]= y[Plot_Pos][0];
-        x_Current++;
-    }
-
-    // Forcing max values to the last real ones, in case max values were estimated
-    if (x_Current)
-    {
-        x_Max[0]=x[0][x_Current-1];
-        if (x[1][x_Current-1])
-        {
-            x_Max[1]=x[1][x_Current-1];
-            x_Max[2]=x[2][x_Current-1];
-            x_Max[3]=x[3][x_Current-1];
-        }
-    }
-
-    x_Current_Max=x_Current;
-    IsComplete=true;
 }
 
 //---------------------------------------------------------------------------
@@ -429,7 +334,7 @@ string VideoStats::StatsToCSV()
     #ifdef _WIN32
         Value<<"\r\n";
     #else
-        #ifdef __APPLE__
+        #if defined(__APPLE__) && defined(__MACH__)
             Value<<"\r";
         #else
             Value<<"\n";
@@ -440,14 +345,14 @@ string VideoStats::StatsToCSV()
         Value<<",,,,,,";
         Value<<fixed<<setprecision(6)<<x[1][Pos];
         Value<<",,,,,,,,,,,,,,";
-        for (size_t Pos2=0; Pos2<PlotName_Max; Pos2++)
+        for (size_t Pos2=0; Pos2<Item_VideoMax; Pos2++)
         {
-            Value<<','<<fixed<<setprecision(PerPlotName[Pos2].DigitsAfterComma)<<y[Pos2][Pos];
+            Value<<','<<fixed<<setprecision(PerItem[Pos2].DigitsAfterComma)<<y[Pos2][Pos];
         }
         #ifdef _WIN32
             Value<<"\r\n";
         #else
-            #ifdef __APPLE__
+            #if defined(__APPLE__) && defined(__MACH__)
                 Value<<"\r";
             #else
                 Value<<"\n";
@@ -468,7 +373,7 @@ string VideoStats::StatsToXML (int Width, int Height)
     stringstream height; height<<Height; // Note: we use the same value for all frame, we should later use the right value per frame
     for (size_t x_Pos=0; x_Pos<x_Current; ++x_Pos)
     {
-        stringstream pkt_pts_time; pkt_pts_time<<fixed<<setprecision(7)<<(x[1][x_Pos]+VideoFirstTimeStamp);
+        stringstream pkt_pts_time; pkt_pts_time<<fixed<<setprecision(7)<<(x[1][x_Pos]+FirstTimeStamp);
         stringstream pkt_duration_time; pkt_duration_time<<fixed<<setprecision(7)<<durations[x_Pos];
         stringstream key_frame; key_frame<<key_frames[x_Pos]?'1':'0';
         Data<<"        <frame media_type=\"video\" key_frame=\"" << key_frame.str() << "\" pkt_pts_time=\"" << pkt_pts_time.str() << "\"";
@@ -476,20 +381,20 @@ string VideoStats::StatsToXML (int Width, int Height)
             Data<<" pkt_duration_time=\"" << pkt_duration_time.str() << "\"";
         Data<<" width=\"" << width.str() << "\" height=\"" << height.str() <<"\">\n";
 
-        for (size_t Plot_Pos=0; Plot_Pos<PlotName_Max; Plot_Pos++)
+        for (size_t Plot_Pos=0; Plot_Pos<Item_VideoMax; Plot_Pos++)
         {
-            string key=PerPlotName[Plot_Pos].FFmpeg_Name_2_3;
+            string key=PerItem[Plot_Pos].FFmpeg_Name;
 
             stringstream value;
             switch (Plot_Pos)
             {
-                case PlotName_Crop_x2 :
-                case PlotName_Crop_w :
+                case Item_Crop_x2 :
+                case Item_Crop_w :
                                         // Special case, values are from width
                                         value<<Width-y[Plot_Pos][x_Pos];
                                         break;
-                case PlotName_Crop_y2 :
-                case PlotName_Crop_h :
+                case Item_Crop_y2 :
+                case Item_Crop_h :
                                         // Special case, values are from height
                                         value<<Height-y[Plot_Pos][x_Pos];
                                         break;
@@ -504,111 +409,4 @@ string VideoStats::StatsToXML (int Width, int Height)
     }
 
    return Data.str();
-}
-
-//***************************************************************************
-// Stats
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-string VideoStats::Average_Get(PlotName Pos)
-{
-    if (x_Current==0)
-        return string();
-
-    double Value=Stats_Totals[Pos]/x_Current;
-    stringstream str;
-    str<<fixed<<setprecision(PerPlotName[Pos].DigitsAfterComma)<<Value;
-    return str.str();
-}
-
-//---------------------------------------------------------------------------
-string VideoStats::Average_Get(PlotName Pos, PlotName Pos2)
-{
-    if (x_Current==0)
-        return string();
-
-    double Value=(Stats_Totals[Pos]-Stats_Totals[Pos2])/x_Current;
-    stringstream str;
-    str<<fixed<<setprecision(PerPlotName[Pos].DigitsAfterComma)<<Value;
-    return str.str();
-}
-
-//---------------------------------------------------------------------------
-string VideoStats::Count_Get(PlotName Pos)
-{
-    if (x_Current==0)
-        return string();
-
-    stringstream str;
-    str<<Stats_Counts[Pos];
-    return str.str();
-}
-
-//---------------------------------------------------------------------------
-string VideoStats::Count2_Get(PlotName Pos)
-{
-    if (x_Current==0)
-        return string();
-
-    stringstream str;
-    str<<Stats_Counts2[Pos];
-    return str.str();
-}
-
-//---------------------------------------------------------------------------
-string VideoStats::Percent_Get(PlotName Pos)
-{
-    if (x_Current==0)
-        return string();
-
-    double Value=Stats_Counts[Pos]/x_Current;
-    stringstream str;
-    str<<Value*100<<"%";
-    return str.str();
-}
-
-//***************************************************************************
-// Memory management
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-void VideoStats::Data_Reserve(size_t NewValue)
-{
-    // Saving old data
-    size_t                      Data_Reserved_Old = Data_Reserved;
-    double**                    x_Old = new double*[4];
-    memcpy (x_Old, x, sizeof(double*)*4);
-    double**                    y_Old = new double*[PlotName_Max];
-    memcpy (y_Old, y, sizeof(double*)*PlotName_Max);
-    double*                     durations_Old=durations;
-    bool*                       key_frames_Old=key_frames;
-
-    // Computing new value
-    while (Data_Reserved<NewValue+(1<<18)) //We reserve extra space, minimum 2^18 frames added
-        Data_Reserved<<=1;
-
-    // Creating new data - x and y
-    x = new double*[4];
-    for (size_t j=0; j<4; ++j)
-    {
-        x[j]=new double[Data_Reserved];
-        memset(x[j], 0x00, Data_Reserved*sizeof(double));
-        memcpy(x[j], x_Old[j], Data_Reserved_Old*sizeof(double));
-    }
-    y = new double*[PlotName_Max];
-    for (size_t j=0; j<PlotName_Max; ++j)
-    {
-        y[j] = new double[Data_Reserved];
-        memset(y[j], 0x00, Data_Reserved*sizeof(double));
-        memcpy(y[j], y_Old[j], Data_Reserved_Old*sizeof(double));
-    }
-
-    // Creating new data - Extra
-    durations = new double[Data_Reserved];
-    memset(durations, 0x00, Data_Reserved*sizeof(double));
-    memcpy(durations, durations_Old, Data_Reserved_Old*sizeof(double));
-    key_frames = new bool[Data_Reserved];
-    memset(key_frames, 0x00, Data_Reserved*sizeof(bool));
-    memcpy(key_frames, key_frames_Old, Data_Reserved_Old*sizeof(bool));
 }

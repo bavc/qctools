@@ -7,6 +7,7 @@
 //---------------------------------------------------------------------------
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "GUI/Plots.h"
 
 #include <QFileDialog>
 #include <QScrollBar>
@@ -37,10 +38,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     // FilesList
     FilesListArea=NULL;
-
-    // CheckBoxes
-    for (size_t Pos=0; Pos<PlotType_Max; Pos++)
-        CheckBoxes[Pos]=NULL;
 
     // Plots
     PlotsArea=NULL;
@@ -105,6 +102,12 @@ void MainWindow::on_actionOpen_triggered()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_actionBlackmagicDeckLinkCapture_triggered()
+{
+    openCapture();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::on_actionClose_triggered()
 {
     closeFile();
@@ -146,9 +149,9 @@ void MainWindow::on_actionGoTo_triggered()
         return;
 
     bool ok;
-    int i = QInputDialog::getInt(this, tr("Go to frame at position..."), Files[Files_CurrentPos]->Videos[0]->x_Current_Max?("frame position (0-"+QString::number(Files[Files_CurrentPos]->Videos[0]->x_Current_Max-1)+"):"):QString("frame position (0-based)"), Files[Files_CurrentPos]->Frames_Pos_Get(), 0, Files[Files_CurrentPos]->Videos[0]->x_Current_Max-1, 1, &ok);
-    if (Files[Files_CurrentPos]->Videos[0]->x_Current_Max && i>=Files[Files_CurrentPos]->Videos[0]->x_Current_Max)
-        i=Files[Files_CurrentPos]->Videos[0]->x_Current_Max-1;
+    int i = QInputDialog::getInt(this, tr("Go to frame at position..."), Files[Files_CurrentPos]->ReferenceStat()->x_Current_Max?("frame position (0-"+QString::number(Files[Files_CurrentPos]->ReferenceStat()->x_Current_Max-1)+"):"):QString("frame position (0-based)"), Files[Files_CurrentPos]->Frames_Pos_Get(), 0, Files[Files_CurrentPos]->ReferenceStat()->x_Current_Max-1, 1, &ok);
+    if (Files[Files_CurrentPos]->ReferenceStat()->x_Current_Max && i>=Files[Files_CurrentPos]->ReferenceStat()->x_Current_Max)
+        i=Files[Files_CurrentPos]->ReferenceStat()->x_Current_Max-1;
     if (ok)
     {
         Files[Files_CurrentPos]->Frames_Pos_Set(i);
@@ -263,9 +266,9 @@ void MainWindow::on_actionFilesList_triggered()
         ui->actionZoomOut->setVisible(false);
     if (ui->actionWindowOut)
         ui->actionWindowOut->setVisible(false);
-    for (size_t Pos=0; Pos<PlotType_Max; Pos++)
-        if (CheckBoxes[Pos])
-            CheckBoxes[Pos]->hide();
+    for (size_t type = 0; type < CountOfStreamTypes; type++)
+        for (size_t group=0; group<CheckBoxes[type].size(); group++)
+            CheckBoxes[type][group]->hide();
     if (ui->fileNamesBox)
         ui->fileNamesBox->hide();
     if (PlotsArea)
@@ -301,9 +304,9 @@ void MainWindow::on_actionGraphsLayout_triggered()
         ui->actionZoomOut->setVisible(true);
     if (ui->actionWindowOut)
         ui->actionWindowOut->setVisible(false);
-    for (size_t Pos=0; Pos<PlotType_Max; Pos++)
-        if (CheckBoxes[Pos])
-            CheckBoxes[Pos]->show();
+    for (size_t type = 0; type < CountOfStreamTypes; type++)
+        for (size_t group=0; group<CheckBoxes[group].size(); group++)
+            CheckBoxes[type][group]->show();
     if (ui->fileNamesBox)
         ui->fileNamesBox->show();
     if (PlotsArea)
@@ -435,6 +438,13 @@ void MainWindow::on_Full_triggered()
      setWindowState(Qt::WindowActive);
   else
      setWindowState(Qt::WindowFullScreen);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_CurrentFrameChanged()
+{
+    PlotsArea->onCurrentFrameChanged();
+    updateScrollBar( true );
 }
 
 //---------------------------------------------------------------------------
