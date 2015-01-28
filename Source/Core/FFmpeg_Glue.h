@@ -88,6 +88,7 @@ public:
     size_t                      VideoFrameCount_Get();
     int                         Width_Get();
     int                         Height_Get();
+    string                      FieldOrder_Get();
     double                      DAR_Get();
     string                      SAR_Get();
     string                      PixFormat_Get();

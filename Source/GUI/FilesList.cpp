@@ -63,6 +63,7 @@ enum col_names
     Col_VideoFormat,
     Col_Width,
     Col_Height,
+    Col_FieldOrder,
     Col_DAR,
     Col_SAR,
     Col_PixFormat,
@@ -102,6 +103,7 @@ percolumn PerColumn[Col_Max]=
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Video Format",     NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Width",            NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Height",           NULL, },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Field Order",      NULL, },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "DAR",              "Display Aspect Ratio", },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "SAR",              "Sample Aspect Ratio", },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Pix Format",       "The pixel format describes the color space, bit depth,\nand soemtimes the chroma subsampling and endianness of pixel data.", },
@@ -188,6 +190,7 @@ void FilesList::UpdateAll()
         QString     VideoFormat;
         QString     Width;
         QString     Height;
+        QString     FieldOrder;
         QString     DAR_String;
         QString     SAR;
         QString     PixFormat;
@@ -211,6 +214,7 @@ void FilesList::UpdateAll()
             VideoFormat=                        Main->Files[Files_Pos]->Glue->VideoFormat_Get().c_str();
             Width=QString::number(              Main->Files[Files_Pos]->Glue->Width_Get());
             Height=QString::number(             Main->Files[Files_Pos]->Glue->Height_Get());
+            FieldOrder=                         Main->Files[Files_Pos]->Glue->FieldOrder_Get().c_str();
             double DAR=                         Main->Files[Files_Pos]->Glue->DAR_Get();
             SAR=                                Main->Files[Files_Pos]->Glue->SAR_Get().c_str();
             double FramesDivDurationd=          Main->Files[Files_Pos]->Glue->FramesDivDuration_Get();
@@ -276,6 +280,7 @@ void FilesList::UpdateAll()
         setItem((int)Files_Pos, Col_VideoFormat,    new QTableWidgetItem(VideoFormat));
         setItem((int)Files_Pos, Col_Width,          new QTableWidgetItem(Width));
         setItem((int)Files_Pos, Col_Height,         new QTableWidgetItem(Height));
+        setItem((int)Files_Pos, Col_FieldOrder,     new QTableWidgetItem(FieldOrder));
         setItem((int)Files_Pos, Col_DAR,            new QTableWidgetItem(DAR_String));
         setItem((int)Files_Pos, Col_SAR,            new QTableWidgetItem(SAR));
         setItem((int)Files_Pos, Col_PixFormat,      new QTableWidgetItem(PixFormat));

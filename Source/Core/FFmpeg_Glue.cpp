@@ -1367,6 +1367,32 @@ int FFmpeg_Glue::Height_Get()
 }
 
 //---------------------------------------------------------------------------
+string FFmpeg_Glue::FieldOrder_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
+        return string();
+
+    switch (InputData->Stream->codec->field_order)
+    {
+        case AV_FIELD_UNKNOWN: return "unknown";
+        case AV_FIELD_PROGRESSIVE: return "progressive";
+        case AV_FIELD_TT:   return "TFF: top coded first, top displayed first";
+        case AV_FIELD_BB:   return "BFF: bottom coded_first, bottom displayed first";
+        case AV_FIELD_TB:   return "TFF: top coded_first, bottom displayed first";
+        case AV_FIELD_BT:   return "BFF: bottom coded_first, top displayed first";
+        default: return string();
+    }
+}
+
+//---------------------------------------------------------------------------
 double FFmpeg_Glue::DAR_Get()
 {
     inputdata* InputData=NULL;
