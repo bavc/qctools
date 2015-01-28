@@ -1418,6 +1418,25 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                     WithSliders[OptionPos]=Options[Pos].ColorValue[OptionPos];
                                     PreviousValues[Pos][Picture_Current].Values[OptionPos]=Options[Pos].ColorValue[OptionPos];
                                     break ;
+            case Args_Type_ColorMatrix:
+                                    Modified=true;
+                                    for (size_t OptionPos2=0; OptionPos2<(Filters[Picture_Current].Args[OptionPos].Type?4:3); OptionPos2++)
+                                    {
+                                        if (Options[Pos].Radios[OptionPos][OptionPos2] && Options[Pos].Radios[OptionPos][OptionPos2]->isChecked())
+                                        {
+                                            switch (OptionPos2)
+                                            {
+                                                case 0: WithRadios[OptionPos]="bt601"; break;
+                                                case 1: WithRadios[OptionPos]="bt709"; break;
+                                                case 2: WithRadios[OptionPos]="smpte240m"; break;
+                                                case 3: WithRadios[OptionPos]="fcc"; break;
+                                                default:;
+                                            }
+                                            PreviousValues[Pos][Picture_Current].Values[OptionPos]=OptionPos2;
+                                            break;
+                                        }
+                                    }
+                                    break;
             default:                ;
         }
     }
@@ -1462,6 +1481,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                 case Args_Type_Yuv:
                 case Args_Type_YuvA:
                 case Args_Type_ClrPck:
+                case Args_Type_ColorMatrix:
                                         {
                                         char ToFind1[3];
                                         ToFind1[0]='$';
