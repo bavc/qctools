@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/icon">
+        <file alias="capture_layout.png">capture_layout.png</file>
         <file alias="document-open.png">document-open.png</file>
         <file alias="export_csv.png">export_csv.png</file>
         <file alias="export_xml.png">export_xml.png</file>

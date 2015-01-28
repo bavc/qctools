@@ -160,6 +160,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionOpen"/>
+   <addaction name="actionBlackmagicDeckLinkCapture"/>
    <addaction name="separator"/>
    <addaction name="actionCSV"/>
    <addaction name="actionPrint"/>
