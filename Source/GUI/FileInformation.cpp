@@ -209,7 +209,7 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, B
         Stats.push_back(Audio);
         Audio->StatsFromExternalData(StatsFromExternalData);
     }
-    Glue=new FFmpeg_Glue(FileName_string.c_str(), &Stats, true);
+    Glue=new FFmpeg_Glue(FileName_string.c_str(), &Stats, Stats.empty());
     if (FileName_string.empty())
     {
         Glue->AddInput(0, FrameCount, FrameCount/30, 720, 486);
