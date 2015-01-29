@@ -770,7 +770,7 @@ FFmpeg_Glue::~FFmpeg_Glue()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::AddInput(int CodecType, size_t FrameCount, double Duration, int Width, int Height)
+void FFmpeg_Glue::AddInput(int CodecType, size_t FrameCount, int time_base_num, int time_base_den, int Width, int Height)
 {
     if (avformat_alloc_output_context2(&FormatContext, NULL, "mpeg", NULL)<0)
         return;
@@ -778,8 +778,8 @@ void FFmpeg_Glue::AddInput(int CodecType, size_t FrameCount, double Duration, in
     inputdata* InputData=new inputdata;
     InputData->Type=0;
     InputData->Stream=avformat_new_stream(FormatContext, NULL);
-    InputData->Stream->time_base.num=1;
-    InputData->Stream->time_base.den=30;
+    InputData->Stream->time_base.num=time_base_num;
+    InputData->Stream->time_base.den=time_base_den;
     InputData->Stream->start_time=0;
     InputData->Stream->duration=FrameCount;
     AVCodec* Codec=avcodec_find_decoder(AV_CODEC_ID_RAWVIDEO);
@@ -794,7 +794,7 @@ void FFmpeg_Glue::AddInput(int CodecType, size_t FrameCount, double Duration, in
     InputData->Stream->codec=CodecContext;
 
     InputData->FrameCount=FrameCount;
-    InputData->Duration=Duration;
+    InputData->Duration=((double)FrameCount)*time_base_num/time_base_den;
 
     // Stats
     if (WithStats)

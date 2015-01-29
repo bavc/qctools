@@ -212,7 +212,7 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, B
     Glue=new FFmpeg_Glue(FileName_string.c_str(), &Stats, Stats.empty());
     if (FileName_string.empty())
     {
-        Glue->AddInput(0, FrameCount, FrameCount/30, 720, 486);
+        Glue->AddInput(0, FrameCount, 1001, 30000, 720, 486);
     }
     else if (Glue->ContainerFormat_Get().empty())
     {

@@ -110,7 +110,7 @@ public:
     string                      FFmpeg_LibsVersion();
  
     // Actions
-    void                        AddInput(int CodecType, size_t FrameCount, double Duration, int Width, int Height);
+    void                        AddInput(int CodecType, size_t FrameCount, int time_base_num, int time_base_den, int Width, int Height);
     void                        AddOutput(size_t FilterPos, int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, int FilterType=0, const string &Filter=string());
     void                        AddOutput(const string &FileName);
     void                        CloseOutput();
