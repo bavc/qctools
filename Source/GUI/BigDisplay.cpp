@@ -1185,6 +1185,8 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                     Widget_XPox+=2;
                                     break;
             case Args_Type_ColorMatrix:
+                                    Options[Pos].Sliders_Label[OptionPos]=new QLabel(Filters[FilterPos].Args[OptionPos].Name+QString(": "));
+                                    Layout0->addWidget(Options[Pos].Sliders_Label[OptionPos], 0, Widget_XPox);
                                     Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
                                     for (size_t OptionPos2=0; OptionPos2<4; OptionPos2++)
                                     {
@@ -1201,10 +1203,10 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                         if (OptionPos2==PreviousValues[Pos][FilterPos].Values[OptionPos])
                                             Options[Pos].Radios[OptionPos][OptionPos2]->setChecked(true);
                                         connect(Options[Pos].Radios[OptionPos][OptionPos2], SIGNAL(toggled(bool)), this, Pos==0?(SLOT(on_FiltersOptions1_toggle(bool))):SLOT(on_FiltersOptions2_toggle(bool)));
-                                        Layout0->addWidget(Options[Pos].Radios[OptionPos][OptionPos2], 0, Widget_XPox+OptionPos2);
+                                        Layout0->addWidget(Options[Pos].Radios[OptionPos][OptionPos2], 0, Widget_XPox+1+OptionPos2);
                                         Options[Pos].Radios_Group[OptionPos]->addButton(Options[Pos].Radios[OptionPos][OptionPos2]);
                                     }
-                                    Widget_XPox+=4;
+                                    Widget_XPox+=5;
                                     break;
             case Args_Type_ClrPck:
                                     {
