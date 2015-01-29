@@ -16,7 +16,7 @@
 #if !defined (BLACKMAGICDECKLINK) && defined(_DEBUG) // Simulation
 struct Debug_Simulation
 {
-    FFmpeg_Glue* Glue;
+    FFmpeg_Glue** Glue;
     int FrameCount;
 };
 #endif
@@ -42,13 +42,8 @@ BlackmagicDeckLink_Glue::BlackmagicDeckLink_Glue(size_t CardPos) :
 
         Handle=helper;
     #elif defined(_DEBUG) // Simulation
-        int FrameCount_In, FrameCount_Out;
-        GET_FRAME_COUNT(FrameCount_In, TC_in, 30, 1);
-        GET_FRAME_COUNT(FrameCount_Out, TC_out, 30, 1);
-        
         Debug_Simulation* simulation=new Debug_Simulation;
-        simulation->Glue=Glue;
-        simulation->FrameCount=FrameCount_Out-FrameCount_In;
+        simulation->Glue=&Glue;
 
         Status=BlackmagicDeckLink_Glue::connected;
 
@@ -84,17 +79,25 @@ void BlackmagicDeckLink_Glue::Start()
             unsigned char FillingValue=0;
             unsigned char Data[720*486*2];
 
-            for (int FramePos=0; FramePos<((Debug_Simulation*)Handle)->FrameCount; FramePos++)
+            int FrameCount_In, FrameCount_Out;
+            GET_FRAME_COUNT(FrameCount_In, TC_in, 30, 1);
+            GET_FRAME_COUNT(FrameCount_Out, TC_out, 30, 1);
+        
+            Debug_Simulation* simulation=new Debug_Simulation;
+            simulation->Glue=&Glue;
+            int FrameCount=FrameCount_Out-FrameCount_In;
+
+            for (int FramePos=0; FramePos<FrameCount; FramePos++)
             {
                 memset(Data, FillingValue, 720*486*2);
-                if (!((Debug_Simulation*)Handle)->Glue->OutputFrame(Data, 720*486*2, FramePos))
+                if (!(*((Debug_Simulation*)Handle)->Glue)->OutputFrame(Data, 720*486*2, FramePos))
                     break;
                 FillingValue++;
             }
 
             Status=BlackmagicDeckLink_Glue::captured;
 
-            ((Debug_Simulation*)Handle)->Glue->CloseOutput();
+            (*((Debug_Simulation*)Handle)->Glue)->CloseOutput();
         #endif
     }
 }
@@ -126,7 +129,14 @@ bool BlackmagicDeckLink_Glue::Stop()
 //---------------------------------------------------------------------------
 std::vector<std::string> BlackmagicDeckLink_Glue::CardsList()
 {
-    return DeckLinkCardsList();
+    #if defined(BLACKMAGICDECKLINK_YES)
+        return DeckLinkCardsList();
+    #else
+        std::vector<std::string> ToReturn;
+        ToReturn.push_back("Fake Card 1");
+        ToReturn.push_back("Fake Card 2");
+        return ToReturn;
+    #endif
 }
 
 //---------------------------------------------------------------------------
