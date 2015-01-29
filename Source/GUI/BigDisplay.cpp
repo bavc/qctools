@@ -337,14 +337,14 @@ const filter Filters[]=
         "Color Matrix",
         0,
         {
-            { Args_Type_ColorMatrix,   0,   0,   0,   0, },
-            { Args_Type_ColorMatrix,   1,   0,   0,   0, },
-            { Args_Type_Slider,        0,   0,   0,   1, "reveal" },
+            { Args_Type_ColorMatrix,   0,   0,   0,   0, "Src" },
+            { Args_Type_ColorMatrix,   1,   0,   0,   0, "Dst" },
+            { Args_Type_Slider,        0,   0,   0,   1, "Reveal" },
             { Args_Type_None,          0,   0,   0,   0, },
             { Args_Type_None,          0,   0,   0,   0, },
         },
         {
-            "split[a][b];[a]crop=${3}:${height}:0:0[a1];[b]colormatrix=${1}:${2}[b1];[a1][b1]overlay",
+            "split[a][b];[a]crop=${3}:${height}:0:0[a1];[b]colormatrix=${1}:${2}[b1];[b1][a1]overlay",
         },
     },
     {
@@ -1046,6 +1046,9 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
             //Special case : default for Line Select is Height/2
             if (Filters[FilterPos].Args[OptionPos].Name && string(Filters[FilterPos].Args[OptionPos].Name)=="Line")
                 PreviousValues[Pos][FilterPos].Values[OptionPos]=FileInfoData->Glue->Height_Get()/2;
+            //Special case : default for Color Matrix is Width/2
+            if (Filters[FilterPos].Args[OptionPos].Name && string(Filters[FilterPos].Args[OptionPos].Name)=="Reveal")
+                PreviousValues[Pos][FilterPos].Values[OptionPos]=FileInfoData->Glue->Width_Get()/2;
         }
 
         switch (Filters[FilterPos].Args[OptionPos].Type)
@@ -1073,7 +1076,7 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                                 SelectWidth=Filters[FilterPos].Args[OptionPos2].Default?true:false;
                                         Max=SelectWidth?FileInfoData->Glue->Width_Get():FileInfoData->Glue->Height_Get();
                                     }
-                                    else if (MaxTemp=="x" || MaxTemp=="s" || MaxTemp=="reveal" )
+                                    else if (MaxTemp=="x" || MaxTemp=="s" || MaxTemp=="Reveal" )
                                         Max=FileInfoData->Glue->Width_Get();
                                     else if (MaxTemp=="y")
                                         Max=FileInfoData->Glue->Height_Get();
