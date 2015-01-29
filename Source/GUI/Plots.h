@@ -86,7 +86,7 @@ public:
     void                        zoomXAxis( bool up );
     bool                        isZoomed() const;
     FrameInterval               visibleFrames() const;
-    int                         numFrames() const { return stats(0)->x_Current_Max; }
+    int                         numFrames() const { return stats()->x_Current_Max; }
 
     virtual bool                eventFilter( QObject *, QEvent * );
 
@@ -111,10 +111,10 @@ private:
 
     void                        setVisibleFrames( int from, int to, bool force = false );
 
-    const CommonStats*          stats( size_t statsPos ) const { return m_fileInfoData->Stats[statsPos]; }
-    CommonStats*                stats( size_t statsPos ) { return m_fileInfoData->Stats[statsPos]; }
-    int                         framePos( size_t statsPos = 0 ) const { return m_fileInfoData->Frames_Pos_Get(statsPos); }
-    void                        setFramePos( size_t framePos, size_t statsPos = 0 ) const { m_fileInfoData->Frames_Pos_Set(framePos, statsPos); }
+    const CommonStats*          stats( size_t statsPos = (size_t)-1 ) const { if ( statsPos == (size_t)-1 ) return m_fileInfoData->ReferenceStat(); else return m_fileInfoData->Stats[statsPos]; }
+    CommonStats*                stats( size_t statsPos = (size_t)-1 ) { if ( statsPos == (size_t)-1 ) return m_fileInfoData->ReferenceStat(); else return m_fileInfoData->Stats[statsPos]; }
+    int                         framePos( size_t statsPos = (size_t)-1 ) const { return m_fileInfoData->Frames_Pos_Get(statsPos); }
+    void                        setFramePos( size_t framePos, size_t statsPos = (size_t)-1 ) const { m_fileInfoData->Frames_Pos_Set(framePos, statsPos); }
 
 private:
     PlotScaleWidget*            m_scaleWidget;

@@ -146,15 +146,15 @@ void Plots::setVisibleFrames( int from, int to , bool force)
         m_frameInterval.from = from;
         m_frameInterval.to = to;
 
-        const double* x = stats(0)->x[m_dataTypeIndex];
+        const double* x = stats()->x[m_dataTypeIndex];
         m_timeInterval.from = x[from];
         m_timeInterval.to = x[to];
 
         // Handling unfinished parsing with estimated x
         if ( m_timeInterval.from == 0  && from)
-            m_timeInterval.from = stats(0)->x_Max[m_dataTypeIndex] / stats(0)->x_Max[0] * from;
+            m_timeInterval.from = stats()->x_Max[m_dataTypeIndex] / stats()->x_Max[0] * from;
         if ( m_timeInterval.to == 0 )
-            m_timeInterval.to = stats(0)->x_Max[m_dataTypeIndex] / stats(0)->x_Max[0] * to;
+            m_timeInterval.to = stats()->x_Max[m_dataTypeIndex] / stats()->x_Max[0] * to;
     }
 }
 
