@@ -15,18 +15,22 @@
             The QCTools preview window is intended as an analytical playback environment that allows the user to review video through multiple filters simultaneously. The playback window includes two viewing windows which may be set to different combinations of filters. This allows a user to playback a video by viewing a waveform and a vectorscope or perhaps by viewing a waveform and the video with highlighted pixels that are outside of broadcast range.
         </p>
         <h2 style="color:blue">
+            Help
+        </h2>
+        <p>
+            This selection will launch the Playback Filters window where you may review the documentation.
+        </p>
+         <h2 style="color:blue">
+            No Display
+        </h2>
+        <p>
+           This option enables you to remove one display, thereby only showing one view. 
+        </p>
+        <h2 style="color:blue">
             Normal
         </h2>
         <p>
             This view simply shows the video as QCTools interprets it, no special effects or filtering are added. In this view, however, you also have the option of displaying as <strong>'Field Split'</strong> which, as the name implies, takes the two video fields for the selected frame and diplays them as discrete images.
-        </p>
-        <h2 style="color:blue">
-            Field Difference
-        </h2>
-        <p>
-            This presentation visualizes the difference between video field 1 and field 2. A middle gray image would mean that field 1 and field 2 were identical, whereas deviation to white or black indicates a difference.<br />
-            <br />
-            <img src="fielddiff.jpg" alt="Field Difference" />
         </p>
         <h2 style="color:blue">
             Histogram
@@ -39,6 +43,12 @@
         </h2>
         <p>
             The waveform plots the brightness of the image, each column of the waveform corresponds to a column of pixels in the source video. The pixels of each column are then plotted in a scale from 0 to 110 IRE. The range from 0 to 7.5 IRE is highlighted in blue and indicates a black value that is below traditional NTSC broadcast range. The range from 100 to 110 IRE is highlighted in red and indicates a white value that is above broadcast range. For most analog media the intended pixel luminsotiy values should exist between 7.5 and 100 IRE. You may also select <strong>'Field Split'</strong> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).
+        </p>
+         <h2 style="color:blue">
+            Line Select
+        </h2>
+        <p>
+            TBD    
         </p>
         <h2 style="color:blue">
             Vectorscope
@@ -54,18 +64,19 @@
             <img src="playback_layout_two_windows.jpg" width="65%" height="65%" alt="Vectorscope Split Screen" /><br />
             <br />
         </p>
+       <h2 style="color:blue">
+            Extract Planes UV
+        </h2>
+        <p>
+            This filter extracts the U/V channel which represents part of the chroma data from the video and then applies a histogram equalization which redistributes the pixel intensities to equalize their distribution across the intensity range. This filter is useful for analyzing compressed video channel signals.
+        </p>
         <h2 style="color:blue">
             Extract Planes
         </h2>
         <p>
             This filter extracts a video plane which represents the luma or part of the chroma data from the video and then applies a histogram equalization which redistributes the pixel intensities to equalize their distribution across the intensity range. This filter is useful for analyzing compressed video channel signals.
         </p>
-        <h2 style="color:blue">
-            Extract Planes UV
-        </h2>
-        <p>
-            This filter extracts the U/V channel which represents part of the chroma data from the video and then applies a histogram equalization which redistributes the pixel intensities to equalize their distribution across the intensity range. This filter is useful for analyzing compressed video channel signals.
-        </p>
+        
         <h2 style="color:blue">
             Bit Plane
         </h2>
@@ -76,11 +87,49 @@
             <br />
             (Video sample and permission to use provided by <a href="http://www.seattle.gov">seattle.gov</a>)
         </p>
-        <h2 style="color:blue">
-            Vertical Line Repetitions
+         <h2 style="color:blue">
+            Value Highlight
         </h2>
         <p>
-            This filter displays repetitive lines of video data.
+            This filter selects a video plane and highlights values with a specified range of minimum value to maximum value. The original image of the plane will be presented in grayscale and values within the range will be highlighted as yellow; for instance to highlight Y values below NTSC broadcast range, set plane to Y, min to 0 and max to 16. The resulting image will highlight Y values below broadcast range in yellow.
+        </p>
+        <h2 style="color:blue">
+            Saturation Highlight
+        </h2>
+        <p>
+            TBD
+        </p>
+        <h2 style="color:blue">
+            Chroma Adjust
+        </h2>
+        <p>
+            This filter enables the hue and saturation levels to be adjusted. Hue adjustments may be expressed in degrees where 0 is no change and 180 would invert the color. For saturation a value of 1 needs the saturation unchanged, 0 removes all color, and the saturation may be increased up to a maximum of 10.
+        </p>
+        <h2 style="color:blue">
+            Color Matrix
+        </h2>
+        <p>
+            TBD
+        </p>
+         <h2 style="color:blue">
+            Field Difference
+        </h2>
+        <p>
+            This presentation visualizes the difference between video field 1 and field 2. A middle gray image would mean that field 1 and field 2 were identical, whereas deviation to white or black indicates a difference.<br />
+            <br />
+            <img src="fielddiff.jpg" alt="Field Difference" />
+        </p>
+        <h2 style="color:blue">
+            Temporal Difference
+        </h2>
+        <p>
+            TBD
+        </p>
+        <h2 style="color:blue">
+            Pixel Offset Subtraction
+        </h2>
+        <p>
+            TBD
         </p>
         <h2 style="color:blue">
             Broadcast Range Pixels
@@ -101,16 +150,27 @@
             This is the same presentation as 'Normal' except that pixels that are labelled as temporal outliers are highlighted as white. Temporal outliers are pixels that significantly differ from their neighbors and often correspond to tape damage or playback error. Select <strong>'Field Split'</strong> to see the fields displayed separately.
         </p>
         <h2 style="color:blue">
-            Chroma Adjust
+            Vertical Line Repetitions
         </h2>
         <p>
-            This filter enables the hue and saturation levels to be adjusted. Hue adjustments may be expressed in degrees where 0 is no change and 180 would invert the color. For saturation a value of 1 needs the saturation unchanged, 0 removes all color, and the saturation may be increased up to a maximum of 10.
+            This filter displays repetitive lines of video data.
         </p>
         <h2 style="color:blue">
-            Value Highlight
+            Frame Tiles
         </h2>
         <p>
-            This filter selects a video plane and highlights values with a specified range of minimum value to maximum value. The original image of the plane will be presented in grayscale and values within the range will be highlighted as yellow; for instance to highlight Y values below NTSC broadcast range, set plane to Y, min to 0 and max to 16. The resulting image will highlight Y values below broadcast range in yellow.
+            TBD
         </p>
+        <h2 style="color:blue">
+            Zoom
+        </h2>
+        <p>
+            TBD
+        </p>
+        
+        
+        
+        
+       
     </body>
 </html>
