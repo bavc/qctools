@@ -307,7 +307,7 @@ void MainWindow::on_actionGraphsLayout_triggered()
     if (ui->actionWindowOut)
         ui->actionWindowOut->setVisible(false);
     for (size_t type = 0; type < CountOfStreamTypes; type++)
-        for (size_t group=0; group<CheckBoxes[group].size(); group++)
+        for (size_t group=0; group<CheckBoxes[type].size(); group++)
             CheckBoxes[type][group]->show();
     if (ui->fileNamesBox)
         ui->fileNamesBox->show();
