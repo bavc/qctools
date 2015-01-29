@@ -426,6 +426,7 @@ bool FFmpeg_Glue::outputdata::InitThumnails()
     JpegOutput_CodecContext=avcodec_alloc_context3 (JpegOutput_Codec);
     if (!JpegOutput_CodecContext)
         return false;
+    JpegOutput_CodecContext->qmin          = 8;
     JpegOutput_CodecContext->qmax          = 12;
     JpegOutput_CodecContext->width         = Width;
     JpegOutput_CodecContext->height        = Height;
