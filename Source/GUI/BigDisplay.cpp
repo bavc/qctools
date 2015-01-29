@@ -151,52 +151,6 @@ const filter Filters[]=
         },
     },
     {
-        "Field Difference",
-        0,
-        {
-            { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
-            { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
-            { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
-            { Args_Type_Toggle,   0,   0,   0,   0, "Columns" },
-            { Args_Type_None,     0,   0,   0,   0, },
-        },
-        {
-            "extractplanes=${1},split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3}",
-            "extractplanes=${1},transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3},transpose=2",
-            "split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3}",
-            "transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3},transpose=2",
-        },
-    },
-    {
-        "Temporal Difference",
-        0,
-        {
-            { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
-            { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
-            { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-        },
-        {
-            "extractplanes=${1},tblend=all_mode=difference128,histeq=strength=${2}:intensity=${3}",
-            "tblend=all_mode=difference128,histeq=strength=${2}:intensity=${3}",
-        },
-    },
-    {
-        "Pixel Offset Subtraction",
-        0,
-        {
-            { Args_Type_Slider,   1,-120, 120,   1, "Y H" },
-            { Args_Type_Slider,   0,-120, 120,   1, "Y V" },
-            { Args_Type_Slider,   0,-120, 120,   1, "UV H" },
-            { Args_Type_Slider,   0,-120, 120,   1, "UV V" },
-            { Args_Type_Slider,   0,   0,  10,  10, "Strength" },
-        },
-        {
-            "geq=lum=lum(X\\,Y)-lum(X-${1}\\,Y-${2})+128:cb=cb(X\\,Y)-cb(X-${3}\\,Y-${4})+128:cr=cr(X\\,Y)-cr(X-${3}\\,Y-${4})+128,histeq=strength=${5}",
-        },
-    },
-    {
         "Histogram",
         0,
         {
@@ -391,6 +345,52 @@ const filter Filters[]=
         },
         {
             "split[a][b];[a]crop=${3}:${height}:0:0[a1];[b]colormatrix=${1}:${2}[b1];[a1][b1]overlay",
+        },
+    },
+    {
+        "Field Difference",
+        0,
+        {
+            { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
+            { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
+            { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Columns" },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "extractplanes=${1},split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3}",
+            "extractplanes=${1},transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3},transpose=2",
+            "split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3}",
+            "transpose=1,split[a][b];[a]field=bottom[a1];[b]field=top,negate[b2];[a1][b2]blend=all_mode=average,histeq=strength=${2}:intensity=${3},transpose=2",
+        },
+    },
+    {
+        "Temporal Difference",
+        0,
+        {
+            { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
+            { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
+            { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "extractplanes=${1},tblend=all_mode=difference128,histeq=strength=${2}:intensity=${3}",
+            "tblend=all_mode=difference128,histeq=strength=${2}:intensity=${3}",
+        },
+    },
+    {
+        "Pixel Offset Subtraction",
+        0,
+        {
+            { Args_Type_Slider,   1,-120, 120,   1, "Y H" },
+            { Args_Type_Slider,   0,-120, 120,   1, "Y V" },
+            { Args_Type_Slider,   0,-120, 120,   1, "UV H" },
+            { Args_Type_Slider,   0,-120, 120,   1, "UV V" },
+            { Args_Type_Slider,   0,   0,  10,  10, "Strength" },
+        },
+        {
+            "geq=lum=lum(X\\,Y)-lum(X-${1}\\,Y-${2})+128:cb=cb(X\\,Y)-cb(X-${3}\\,Y-${4})+128:cr=cr(X\\,Y)-cr(X-${3}\\,Y-${4})+128,histeq=strength=${5}",
         },
     },
     {
