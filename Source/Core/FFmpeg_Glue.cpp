@@ -143,6 +143,7 @@ FFmpeg_Glue::outputdata::outputdata()
     // Out
     OutputMethod(Output_None),
     Image(NULL),
+    Thumbnails_Modulo(1),
     Stats(NULL),
     
     // Helpers
@@ -321,6 +322,12 @@ void FFmpeg_Glue::outputdata::ReplaceImage()
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::outputdata::AddThumbnail()
 {
+    if (Thumbnails.size()%Thumbnails_Modulo)
+    {
+        Thumbnails.push_back(NULL);
+        return; // Not wanting to saturate memory. TODO: Find a smarter way to detect memory usage
+    }
+        
     int got_packet=0;
     if (!JpegOutput_CodecContext && !InitThumnails())
     {
@@ -1165,6 +1172,29 @@ void FFmpeg_Glue::Scale_Change(int Scale_Width_, int Scale_Height_)
 
     if (MustOutput)
         OutputFrame(Packet, false);
+}
+
+//---------------------------------------------------------------------------
+void FFmpeg_Glue::Thumbnails_Modulo_Change(size_t Modulo)
+{
+    for (size_t Pos=0; Pos<OutputDatas.size(); Pos++)
+    {
+        outputdata* OutputData=OutputDatas[Pos];
+
+        if (OutputData)
+        {
+            OutputData->Thumbnails_Modulo=Modulo;
+            size_t Thumbnails_Size=OutputData->Thumbnails.size();
+            for (size_t Pos = 0; Pos < Thumbnails_Size; Pos++)
+            {
+                if (Pos%Modulo)
+                    continue;
+                bytes* OldThumbnail = OutputData->Thumbnails[Pos];
+                OutputData->Thumbnails[Pos]=NULL;
+                delete OldThumbnail; // pointer is deleted after deferencing it in order to avoid a race condition (e.g. vector is read during the deletion)
+            }
+        }
+    }
 }
 
 //***************************************************************************

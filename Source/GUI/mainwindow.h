@@ -106,6 +106,7 @@ public:
     // Files
     std::vector<FileInformation*> Files;
     size_t                      Files_CurrentPos;
+    size_t                      Thumbnails_Modulo;
 
 private Q_SLOTS:
 

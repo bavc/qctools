@@ -123,6 +123,7 @@ public:
     void                        Filter_Change(size_t FilterPos, int FilterType, const string &Filter);
     void                        Disable(const size_t Pos);
     void                        Scale_Change(int Scale_Width, int Scale_Height);
+    void                        Thumbnails_Modulo_Change(size_t Modulo);
 
     // Between different FFmpeg_Glue instances
     void*                       InputData_Get() { return InputDatas[0]; }
@@ -203,6 +204,7 @@ private:
         outputmethod            OutputMethod;
         QImage*                 Image;
         std::vector<bytes*>     Thumbnails;
+        size_t                  Thumbnails_Modulo;
         CommonStats*            Stats;
 
         // Encode

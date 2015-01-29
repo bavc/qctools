@@ -363,7 +363,16 @@ QPixmap* FileInformation::Picture_Get (size_t Pos)
         Pixmap=Pixmap.scaled(72, 72);
     }
     else
-        Pixmap.loadFromData(Glue->Thumbnail_Get(0, Pos)->Data, Glue->Thumbnail_Get(0, Pos)->Size);
+    {
+        FFmpeg_Glue::bytes* Thumbnail=Glue->Thumbnail_Get(0, Pos);
+        if (Thumbnail)
+            Pixmap.loadFromData(Thumbnail->Data, Thumbnail->Size);
+        else
+        {
+            Pixmap.load(":/icon/logo.png");
+            Pixmap=Pixmap.scaled(72, 72);
+        }
+    }
     return &Pixmap;
 }
 

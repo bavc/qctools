@@ -34,6 +34,7 @@
 //---------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
+    Thumbnails_Modulo(1),
     ui(new Ui::MainWindow)
 {
     // FilesList
