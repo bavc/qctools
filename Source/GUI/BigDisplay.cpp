@@ -108,7 +108,7 @@ const filter Filters[]=
         },
     },
     {
-        "No display",
+        "No Display",
         -1,
         {
             { Args_Type_None,   0, 0, 0, 0, },
