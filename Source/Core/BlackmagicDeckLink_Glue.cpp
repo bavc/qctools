@@ -39,7 +39,6 @@ BlackmagicDeckLink_Glue::BlackmagicDeckLink_Glue(size_t CardPos)
         Debug_Simulation* simulation=new Debug_Simulation;
         simulation->Glue=&Glue;
 
-        Config_Out.Status=BlackmagicDeckLink_Glue::connected;
         Config_Out.VideoOutputConnections=0x3D;
 
         Handle=simulation;
@@ -90,20 +89,9 @@ void BlackmagicDeckLink_Glue::Start()
                 FillingValue++;
             }
 
-            Config_Out.Status=BlackmagicDeckLink_Glue::captured;
+            Config_Out.Status=BlackmagicDeckLink_Glue::finished;
 
             (*((Debug_Simulation*)Handle)->Glue)->CloseOutput();
-        #endif
-    }
-}
-
-//---------------------------------------------------------------------------
-void BlackmagicDeckLink_Glue::Pause()
-{
-    if (Handle)
-    {
-        #if defined(BLACKMAGICDECKLINK_YES)
-            ((CaptureHelper*)Handle)->pauseCapture();
         #endif
     }
 }
@@ -114,7 +102,7 @@ bool BlackmagicDeckLink_Glue::Stop()
     if (Handle)
     {
         #if defined(BLACKMAGICDECKLINK_YES)
-            return ((CaptureHelper*)Handle)->stopCapture();
+            return ((CaptureHelper*)Handle)->finishCapture();
         #endif
     }
 

@@ -27,7 +27,6 @@ public:
     ~BlackmagicDeckLink_Glue();
 
     void                        Start();
-    void                        Pause();
     bool                        Stop();
     
     int                         Width_Get();

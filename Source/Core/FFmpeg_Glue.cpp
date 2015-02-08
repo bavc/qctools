@@ -860,6 +860,11 @@ void FFmpeg_Glue::CloseOutput()
             OutputData->CloseEncode();
         }
     }
+
+    // Complete
+    if (WithStats)
+        for (size_t Pos=0; Pos<Stats->size(); Pos++)
+            (*Stats)[Pos]->StatsFinish();
 }
 
 //---------------------------------------------------------------------------

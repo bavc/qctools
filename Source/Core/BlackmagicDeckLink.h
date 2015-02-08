@@ -68,8 +68,7 @@ public:
     virtual                    ~CaptureHelper();
     
     void                        startCapture();
-    void                        pauseCapture();
-    bool                        stopCapture(bool force=false);
+    bool                        finishCapture();
 
     void                        getTimeCode();
     

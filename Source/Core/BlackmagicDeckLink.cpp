@@ -226,7 +226,10 @@ CaptureHelper::CaptureHelper(size_t CardPos, BlackmagicDeckLink_Glue::config_in*
 //---------------------------------------------------------------------------
 CaptureHelper::~CaptureHelper()
 {
-    stopCapture(true);
+    finishCapture();
+    cleanupControl();
+    cleanupInput();
+    cleanupCard();
 }
 
 //***************************************************************************
@@ -516,33 +519,17 @@ void CaptureHelper::startCapture()
 }
 
 //---------------------------------------------------------------------------
-void CaptureHelper::pauseCapture()
+bool CaptureHelper::finishCapture()
 {
-    if (!m_control)
-        return;
-
-    cout << "*** Pause capture ***" << endl;
-
-    // Stop
-    BMDDeckControlError bmdDeckControlError;
-    if (m_control->Stop(&bmdDeckControlError) != S_OK)
-        cout << "Could not stop (" << BMDDeckControlError2String(bmdDeckControlError) << ")" << endl;
-
-    cout << "OK" << endl;
-}
-
-//---------------------------------------------------------------------------
-bool CaptureHelper::stopCapture(bool force)
-{
-    if (!cleanupControl() && !force)
-        return false;
-    if (!cleanupInput() && !force)
-        return false;
-    if (!cleanupCard() && !force)
+    if (Config_Out->Status==BlackmagicDeckLink_Glue::finished)
         return false;
 
     if (Glue && *Glue)
         (*Glue)->CloseOutput();
+
+    Config_Out->Status=BlackmagicDeckLink_Glue::finished;
+    cout << "Capture finished" << endl ;
+
     return true;
 }
 
@@ -567,11 +554,15 @@ HRESULT CaptureHelper::DeckControlEventReceived (BMDDeckControlEvent bmdDeckCont
                                                     cout << "Prepare for capture" << endl;
                                                     break;
         case bmdDeckControlCaptureCompleteEvent:
-                                                    Config_Out->Status=BlackmagicDeckLink_Glue::finished;
+                                                    cout << "Capture completed" << endl;
+                                                    finishCapture();
+                                                    break;
+        case bmdDeckControlAbortedEvent:
+                                                    cout << "Capture aborted" << endl;
+                                                    finishCapture();
                                                     break;
         default:
-                                                    Config_Out->Status=BlackmagicDeckLink_Glue::aborting;
-                                                    break;
+                                                    finishCapture();
     }
     
     return S_OK;
@@ -616,14 +607,18 @@ HRESULT CaptureHelper::VideoInputFrameArrived (IDeckLinkVideoInputFrame* arrived
 
     BMDTimecodeBCD tcBCD;
     bool ShouldDecode=true;
+    if (Config_In->FrameCount != -1
+         && m_FramePos >= Config_In->FrameCount)
+         ShouldDecode=false;
     if ( timecode )
     {
         tcBCD= timecode->GetBCD();
 
         // Handle the frame if time code is in [TC_in, TC_out[
-        if ((Config_Out->TC_current != -1 && tcBCD == Config_Out->TC_current) //Ignore frames with same time code (TODO: check if it is relevant)
-          || tcBCD < Config_In->TC_in 
-          || tcBCD >= Config_In->TC_out )
+        if (Config_In->TC_in !=-1 
+         && ((Config_Out->TC_current != -1 && tcBCD == Config_Out->TC_current) //Ignore frames with same time code (TODO: check if it is relevant)
+           || tcBCD < Config_In->TC_in 
+           || tcBCD >= Config_In->TC_out ))
           ShouldDecode=false;
 
         // this frame is within the in-and out-points, do something useful with it
@@ -640,27 +635,45 @@ HRESULT CaptureHelper::VideoInputFrameArrived (IDeckLinkVideoInputFrame* arrived
     }
     else
     {
-        cout << "New frame (no timecode)" << endl;
+        if (Config_In->TC_in!=-1)
+            ShouldDecode=false;
+        cout << "New frame (no timecode)";
+        if (!ShouldDecode)
+            cout << ", is discarded";
+        cout << endl;
     }
 
     if (ShouldDecode)
     {
+        void *buffer;
+        arrivedVideoFrame->GetBytes(&buffer);
+        if (Glue && *Glue)
+            (*Glue)->OutputFrame((unsigned char*)buffer, 720*486*2, m_FramePos);
+
         m_FramePos++;
 
         if (Config_In->FrameCount != -1
          && m_FramePos >= Config_In->FrameCount)
         {
-            Config_Out->Status=BlackmagicDeckLink_Glue::aborting;
-            if (m_control->Abort() != S_OK)
-                cout << "Could not abort capture" << endl;
+            if (Config_In->TC_in !=-1)
+            {
+                if (m_control->Abort() != S_OK)
+                    cout << "Could not abort capture" << endl;
+                else
+                    cout << "Aborting capture" << endl;
+                Config_Out->Status=BlackmagicDeckLink_Glue::aborting;
+            }
             else
-                cout << "Aborting capture" << endl;
+            {
+                // Stop
+                BMDDeckControlError bmdDeckControlError;
+                if (m_control->Stop(&bmdDeckControlError) != S_OK)
+                    cout << "Could not stop (" << BMDDeckControlError2String(bmdDeckControlError) << ")" << endl;
+                else
+                    cout << "Stopped" << endl;
+                finishCapture();
+            }
         }
-
-        void *buffer;
-        arrivedVideoFrame->GetBytes(&buffer);
-        if (Glue && *Glue)
-            (*Glue)->OutputFrame((unsigned char*)buffer, 720*486*2, m_FramePos);
     }
     
     return S_OK;

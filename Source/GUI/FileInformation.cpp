@@ -46,21 +46,18 @@ void FileInformation::run()
                 case BlackmagicDeckLink_Glue::instancied:
                                                         blackmagicDeckLink_Glue->Start();
                                                         break;
-                case BlackmagicDeckLink_Glue::aborting: 
+                case BlackmagicDeckLink_Glue::finished: 
                                                         WantToStop=true;
                                                         break;
                 default : ;
             }
                 
             if (WantToStop)
-            {
-                if (blackmagicDeckLink_Glue->Stop())
-                    break;
-            }
+                break;
             yieldCurrentThread();
         }
 
-        delete blackmagicDeckLink_Glue;
+        delete blackmagicDeckLink_Glue; blackmagicDeckLink_Glue=NULL;
     }
     else
     {
