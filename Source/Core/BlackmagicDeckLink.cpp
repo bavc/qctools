@@ -414,7 +414,6 @@ bool CaptureHelper::cleanupControl()
     // Stop
     switch (Config_Out->Status)
     {
-        case BlackmagicDeckLink_Glue::seeking :
         case BlackmagicDeckLink_Glue::capturing :
                                                     if (Config_In->TC_in != -1)
                                                     {
@@ -504,13 +503,14 @@ void CaptureHelper::startCapture()
              << " to " << setw(2) << (((Config_In->TC_out)>>24)&0xFF) << ":" << setw(2) << (((Config_In->TC_out)>>16)&0xFF) << ":" << setw(2) << (((Config_In->TC_out)>>8)&0xFF) << ":" << setw(2) << (((Config_In->TC_out))&0xFF) << endl ;
 
         // Start capture
-        Config_Out->Status=BlackmagicDeckLink_Glue::seeking;
         if (m_control->StartCapture(true, (Config_In->TC_in), (Config_In->TC_out), &bmdDeckControlError) != S_OK)
         {
+            Config_Out->Status=BlackmagicDeckLink_Glue::finished;
             cout << "Could not start capture (" << BMDDeckControlError2String(bmdDeckControlError) << ")" << endl;
             return;
         }
 
+        Config_Out->Status=BlackmagicDeckLink_Glue::capturing;
         cout << "Waiting for deck answer" << endl ;
     }
 }
@@ -564,11 +564,10 @@ HRESULT CaptureHelper::DeckControlEventReceived (BMDDeckControlEvent bmdDeckCont
     switch (bmdDeckControlEvent)
     {
         case bmdDeckControlPrepareForCaptureEvent:
-                                                    Config_Out->Status=BlackmagicDeckLink_Glue::capturing;
-                                                    cout << "Capturing" << endl;
+                                                    cout << "Prepare for capture" << endl;
                                                     break;
         case bmdDeckControlCaptureCompleteEvent:
-                                                    Config_Out->Status=BlackmagicDeckLink_Glue::captured;
+                                                    Config_Out->Status=BlackmagicDeckLink_Glue::finished;
                                                     break;
         default:
                                                     Config_Out->Status=BlackmagicDeckLink_Glue::aborting;
@@ -590,12 +589,10 @@ HRESULT CaptureHelper::DeckControlStatusChanged (BMDDeckControlStatusFlags bmdDe
     cout <<"*** Deck control status change ***" << endl;
     cout << BMDDeckControlStatusFlags2String(bmdDeckControlStatusFlags) << endl;
     
-    if ((Config_Out->Status==BlackmagicDeckLink_Glue::connecting)
-     && (mask & bmdDeckControlStatusDeckConnected)
+    if ((mask & bmdDeckControlStatusDeckConnected)
      && (bmdDeckControlStatusFlags & bmdDeckControlStatusDeckConnected))
     {
         cout << "Connected" << endl;
-        Config_Out->Status=BlackmagicDeckLink_Glue::connected;
 
         if (WantTimeCode)
         {
@@ -648,11 +645,6 @@ HRESULT CaptureHelper::VideoInputFrameArrived (IDeckLinkVideoInputFrame* arrived
 
     if (ShouldDecode)
     {
-        void *buffer;
-        arrivedVideoFrame->GetBytes(&buffer);
-        if (Glue && *Glue)
-            (*Glue)->OutputFrame((unsigned char*)buffer, 720*486*2, m_FramePos);
-
         m_FramePos++;
 
         if (Config_In->FrameCount != -1
@@ -664,6 +656,11 @@ HRESULT CaptureHelper::VideoInputFrameArrived (IDeckLinkVideoInputFrame* arrived
             else
                 cout << "Aborting capture" << endl;
         }
+
+        void *buffer;
+        arrivedVideoFrame->GetBytes(&buffer);
+        if (Glue && *Glue)
+            (*Glue)->OutputFrame((unsigned char*)buffer, 720*486*2, m_FramePos);
     }
     
     return S_OK;

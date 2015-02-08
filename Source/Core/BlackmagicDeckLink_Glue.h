@@ -39,13 +39,9 @@ public:
     enum status
     {
         instancied,
-        connecting,
-        connected,
-        seeking,
         capturing,
-        captured,
         aborting,
-        aborted,
+        finished,
     };
     struct config_in
     {
@@ -80,7 +76,7 @@ public:
 
         config_out()
             : VideoOutputConnections(-1)
-            , Status(connecting)
+            , Status(instancied)
             , TC_current(-1)
         {
         }
