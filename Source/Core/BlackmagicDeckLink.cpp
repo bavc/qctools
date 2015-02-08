@@ -571,7 +571,7 @@ HRESULT CaptureHelper::DeckControlEventReceived (BMDDeckControlEvent bmdDeckCont
                                                     Config_Out->Status=BlackmagicDeckLink_Glue::captured;
                                                     break;
         default:
-                                                    Config_Out->Status=BlackmagicDeckLink_Glue::aborted;
+                                                    Config_Out->Status=BlackmagicDeckLink_Glue::aborting;
                                                     break;
     }
     
@@ -658,7 +658,11 @@ HRESULT CaptureHelper::VideoInputFrameArrived (IDeckLinkVideoInputFrame* arrived
         if (Config_In->FrameCount != -1
          && m_FramePos >= Config_In->FrameCount)
         {
-            stopCapture();
+            Config_Out->Status=BlackmagicDeckLink_Glue::aborting;
+            if (m_control->Abort() != S_OK)
+                cout << "Could not abort capture" << endl;
+            else
+                cout << "Aborting capture" << endl;
         }
     }
     

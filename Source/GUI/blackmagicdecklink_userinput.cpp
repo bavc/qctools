@@ -104,6 +104,9 @@ void BlackmagicDeckLink_UserInput::on_accepted()
         GET_FRAME_COUNT(FrameCount_Out, Card->Config_In.TC_out, 30, 1);
         Card->Config_In.FrameCount=FrameCount_Out-FrameCount_In;
     }
+
+    Card->Config_In.TimeCodeIsAvailable_Callback=NULL;
+    Card->Config_In.TimeCodeIsAvailable_Private=NULL;
 }
 
 void BlackmagicDeckLink_UserInput::on_Record_GroupBox_toggled(bool on)
