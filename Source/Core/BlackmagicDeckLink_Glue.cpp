@@ -39,7 +39,7 @@ BlackmagicDeckLink_Glue::BlackmagicDeckLink_Glue(size_t CardPos)
         Debug_Simulation* simulation=new Debug_Simulation;
         simulation->Glue=&Glue;
 
-        Config_Out.VideoOutputConnections=0x3D;
+        Config_Out.VideoInputConnections=0x3D;
 
         Handle=simulation;
     #endif

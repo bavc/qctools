@@ -254,6 +254,65 @@ bool CaptureHelper::setupCard(size_t CardPos)
 
     // Increment reference count of the object
     m_card->AddRef();
+ 
+    // Attributes
+    IDeckLinkAttributes* deckLinkAttributes;
+    if (m_card->QueryInterface(IID_IDeckLinkAttributes, (void **)&deckLinkAttributes) != S_OK)
+    {
+        cout << "Could not obtain the DeckLinkAttributes, offering all options" << endl;
+    }
+    else
+    {
+        LONGLONG Temp;
+
+        BOOL DeckLinkHasSerialPort=0;
+        if (deckLinkAttributes->GetFlag(BMDDeckLinkHasSerialPort, &DeckLinkHasSerialPort) != S_OK)
+        {
+            cout << "Could not obtain HasSerialPort" << endl;
+        }
+        else
+        {
+            cout << "HasSerialPort: " << (DeckLinkHasSerialPort ? "Yes" : "No") << endl;
+        }
+
+        Temp=0;
+        if (deckLinkAttributes->GetInt(BMDDeckLinkVideoInputConnections, &Temp) != S_OK)
+        {
+            cout << "Could not obtain VideoInputConnections" << endl;
+        }
+        else
+        {
+            Config_Out->VideoInputConnections=(int)Temp;
+            cout << "VideoInputConnections: " << (bitset<32>)Temp << endl;
+        }
+
+        Temp=0;
+        if (deckLinkAttributes->GetInt(BMDDeckLinkMaximumAudioChannels, &Temp) != S_OK)
+        {
+            cout << "Could not obtain MaximumAudioChannels" << endl;
+        }
+        else
+        {
+            cout << "MaximumAudioChannels: " << Temp << endl;
+        }
+    }
+
+    // Configuration
+    IDeckLinkConfiguration *configuration;
+    if (m_card->QueryInterface(IID_IDeckLinkConfiguration, (void **)&configuration) != S_OK)
+    {
+        cout << "Error: Could not obtain the Configuration interface" << endl;
+    }
+    else
+    {
+        if (Config_In->VideoInputConnection!=-1)
+        {
+            if (configuration->SetInt(bmdDeckLinkConfigVideoInputConnection, Config_In->VideoInputConnection) != S_OK)
+                cout << "Error: Could not obtain the Configuration interface" << endl;
+            else
+                cout << "VideoInputConnection set to " << Config_In->VideoInputConnection << endl;
+        }
+    }
 
     cout << "OK" << endl;
     return true;
@@ -481,6 +540,10 @@ void CaptureHelper::readTimeCode()
 //---------------------------------------------------------------------------
 void CaptureHelper::startCapture()
 {
+    // Reset (including updated Config)
+    cleanupInput();
+    setupInput();
+
     cout << "*** CaptureHelper::startCapture() ***" << endl;
 
     if (!setupInput())

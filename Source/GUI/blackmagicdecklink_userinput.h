@@ -33,6 +33,7 @@ private Q_SLOTS:
     void on_accepted();
     void on_Record_GroupBox_toggled(bool on);
     void on_CardsList_currentIndexChanged(int Pos);
+    void on_VideoInputConnection_currentIndexChanged(int Pos);
 };
 
 #endif // BLACKMAGIC_DECKLINK_USERINPUT_H

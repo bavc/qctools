@@ -53,6 +53,7 @@ public:
         bool                    DropFrame;
         timecodeisavailable_callback* TimeCodeIsAvailable_Callback;
         void*                   TimeCodeIsAvailable_Private;
+        int                     VideoInputConnection;
 
         config_in()
             : TC_in(-1)
@@ -64,17 +65,18 @@ public:
             , DropFrame(true)
             , TimeCodeIsAvailable_Callback(NULL)
             , TimeCodeIsAvailable_Private(NULL)
+            , VideoInputConnection(-1)
         {
         }
     };
     struct config_out
     {
-        int                     VideoOutputConnections;
+        int                     VideoInputConnections;
         status                  Status;
         int                     TC_current;
 
         config_out()
-            : VideoOutputConnections(-1)
+            : VideoInputConnections(-1)
             , Status(instancied)
             , TC_current(-1)
         {

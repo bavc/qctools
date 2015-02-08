@@ -391,6 +391,51 @@
     </rect>
    </property>
   </widget>
+  <widget class="QComboBox" name="VideoInputConnection">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>50</y>
+     <width>121</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>SDI</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>HDMI</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Optical SDI</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Component</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Composite</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>S-Video</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Default</string>
+    </property>
+   </item>
+  </widget>
  </widget>
  <resources/>
  <connections>
