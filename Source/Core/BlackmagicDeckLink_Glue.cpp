@@ -135,12 +135,10 @@ std::vector<std::string> BlackmagicDeckLink_Glue::CardsList()
 }
 
 //---------------------------------------------------------------------------
-int BlackmagicDeckLink_Glue::CurrentTimecode()
+void BlackmagicDeckLink_Glue::CurrentTimecode()
 {
     #if defined(BLACKMAGICDECKLINK_YES)
-        return ((CaptureHelper*)Handle)->getTimeCode();
+        ((CaptureHelper*)Handle)->getTimeCode();
     #endif
-
-    return 0;
 }
 

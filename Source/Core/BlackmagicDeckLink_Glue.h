@@ -18,6 +18,7 @@
 #include <vector>
 
 class FFmpeg_Glue;
+typedef void (__stdcall timecodeisavailable_callback)(void* Private);
 
 class BlackmagicDeckLink_Glue
 {
@@ -32,7 +33,7 @@ public:
     int                         Width_Get();
     int                         Height_Get();
 
-    int                         CurrentTimecode();
+    void                        CurrentTimecode();
 
     FFmpeg_Glue*                Glue;
     enum status
@@ -55,6 +56,8 @@ public:
         int                     BitDepth;
         int                     TimeScale;
         bool                    DropFrame;
+        timecodeisavailable_callback* TimeCodeIsAvailable_Callback;
+        void*                   TimeCodeIsAvailable_Private;
 
         config_in()
             : TC_in(-1)
@@ -64,6 +67,8 @@ public:
             , BitDepth(0)
             , TimeScale(0)
             , DropFrame(true)
+            , TimeCodeIsAvailable_Callback(NULL)
+            , TimeCodeIsAvailable_Private(NULL)
         {
         }
     };
@@ -71,10 +76,12 @@ public:
     {
         int                     VideoOutputConnections;
         status                  Status;
+        int                     TC_current;
 
         config_out()
             : VideoOutputConnections(-1)
             , Status(connecting)
+            , TC_current(-1)
         {
         }
     };

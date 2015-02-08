@@ -59,6 +59,9 @@ private:
     // Control
     bool                        setupControl();
     bool                        cleanupControl();
+
+    // Timecode
+    void                        readTimeCode();
     
 public:
                                 CaptureHelper(size_t CardPos, BlackmagicDeckLink_Glue::config_in* Config_In, BlackmagicDeckLink_Glue::config_out* Config_Out);
@@ -68,7 +71,7 @@ public:
     void                        pauseCapture();
     bool                        stopCapture(bool force=false);
 
-    int                         getTimeCode();
+    void                        getTimeCode();
     
     // IDeckLinkDeckControlStatusCallback
     virtual HRESULT STDMETHODCALLTYPE TimecodeUpdate (BMDTimecodeBCD currentTimecode);
@@ -89,7 +92,7 @@ public:
     BlackmagicDeckLink_Glue::config_out*    Config_Out;
     FFmpeg_Glue**               Glue;
     int                         m_FramePos;
-    int                         TC_current;
+    bool                        WantTimeCode;
 };
 
 //***************************************************************************

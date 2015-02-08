@@ -210,7 +210,7 @@ CaptureHelper::CaptureHelper(size_t CardPos, BlackmagicDeckLink_Glue::config_in*
     , Glue(NULL)
     , Config_In(Config_In_)
     , Config_Out(Config_Out_)
-    , TC_current(-1)
+    , WantTimeCode(false)
 {
     cout << endl;
     cout << "***********************************" << endl;
@@ -282,6 +282,8 @@ bool CaptureHelper::setupInput()
 {
     if (m_input)
         return true;
+
+    cout << "*** Setup of Input ***" << endl;
 
     m_width = -1;
     
@@ -380,7 +382,6 @@ bool CaptureHelper::setupControl()
     cout << "*** Setup of Control ***" << endl;
 
     // Get interface
-    cout << m_card << endl;
     if (m_card->QueryInterface(IID_IDeckLinkDeckControl, (void **)&m_control) != S_OK)
     {
         cout << "Error: Could not obtain the Control interface" << endl;
@@ -388,12 +389,10 @@ bool CaptureHelper::setupControl()
     }
 
     // set callback
-    cout << m_control << endl;
     m_control->SetCallback(this);
     
     // open connection to deck
     BMDDeckControlError bmdDeckControlError;
-    cout << Config_In << endl;
     if (m_control->Open(m_timeScale, m_frameDuration, Config_In->DropFrame, &bmdDeckControlError) != S_OK)
     {
         cout << "Error: could not open (" << BMDDeckControlError2String(bmdDeckControlError) << ")" << endl;
@@ -437,31 +436,41 @@ bool CaptureHelper::cleanupControl()
 }
 
 //---------------------------------------------------------------------------
-int CaptureHelper::getTimeCode()
+void CaptureHelper::getTimeCode()
 {
     if (!setupControl())
-        return -1; 
+        return; 
 
+    readTimeCode();
+}
+
+//---------------------------------------------------------------------------
+void CaptureHelper::readTimeCode()
+{
     cout << "*** Timecode ***" << endl;
 
-    int TC;
-    
     BMDDeckControlError bmdDeckControlError;
     IDeckLinkTimecode *currentTimecode=NULL;
     if (m_control->GetTimecode(&currentTimecode, &bmdDeckControlError) != S_OK)
     {
-        cout << "Error: " << BMDDeckControlError2String(bmdDeckControlError) << endl;
-        TC=-1;
+        if (bmdDeckControlError==bmdDeckControlNoCommunicationError)
+        {
+            cout << "Waiting for deck answer" << endl;
+            WantTimeCode=true;
+        }
+        else
+            cout << "Error: " << BMDDeckControlError2String(bmdDeckControlError) << endl;
+        Config_Out->TC_current=-1;
     }
     else
     {
-        TC=currentTimecode->GetBCD();
-        cout << "OK " << hex << TC << endl;
-    }
-    
-    if (currentTimecode)
+        Config_Out->TC_current=currentTimecode->GetBCD();
         currentTimecode->Release();
-    return TC;
+        cout << "OK " << hex << Config_Out->TC_current << endl;
+
+        if (Config_In->TimeCodeIsAvailable_Callback)
+            Config_In->TimeCodeIsAvailable_Callback(Config_In->TimeCodeIsAvailable_Private);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -529,7 +538,7 @@ HRESULT CaptureHelper::TimecodeUpdate (BMDTimecodeBCD currentTimecode)
 HRESULT CaptureHelper::DeckControlEventReceived (BMDDeckControlEvent bmdDeckControlEvent, BMDDeckControlError bmdDeckControlError)
 {
     cout <<"*** Deck control event ***" << endl;
-    cout << BMDDeckControlEvent2String(bmdDeckControlEvent) << endl;
+    cout << BMDDeckControlEvent2String(bmdDeckControlEvent);
     if (bmdDeckControlError != bmdDeckControlNoError)
         cout << " (error: " << BMDDeckControlError2String(bmdDeckControlError) << ")";
     cout << endl;
@@ -569,6 +578,12 @@ HRESULT CaptureHelper::DeckControlStatusChanged (BMDDeckControlStatusFlags bmdDe
     {
         cout << "Connected" << endl;
         Config_Out->Status=BlackmagicDeckLink_Glue::connected;
+
+        if (WantTimeCode)
+        {
+            readTimeCode();
+            WantTimeCode=false;
+        }
     }
 
     return S_OK;
@@ -587,7 +602,7 @@ HRESULT CaptureHelper::VideoInputFrameArrived (IDeckLinkVideoInputFrame* arrived
 
     // Handle the frame if time code is in [TC_in, TC_out[
     BMDTimecodeBCD tcBCD = timecode->GetBCD();
-    if ( (TC_current == -1 || tcBCD != TC_current) //Ignore frames with same time code (TODO: check if it is relevant)
+    if ( (Config_Out->TC_current == -1 || tcBCD != Config_Out->TC_current) //Ignore frames with same time code (TODO: check if it is relevant)
       && tcBCD >= Config_In->TC_in 
       && tcBCD < Config_In->TC_out )
     {
@@ -602,7 +617,7 @@ HRESULT CaptureHelper::VideoInputFrameArrived (IDeckLinkVideoInputFrame* arrived
         if (Glue && *Glue)
             (*Glue)->OutputFrame((unsigned char*)buffer, 720*486*2, m_FramePos);
 
-        TC_current = tcBCD;
+        Config_Out->TC_current = tcBCD;
         m_FramePos++;
     }
         

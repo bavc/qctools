@@ -21,6 +21,9 @@ public:
     int                         FrameCount;
     QString                     Encoding_FileName;
 
+    // Callbacks
+    void                        TimeCode_IsAvailable();
+
 private:
     Ui::BlackmagicDeckLink_UserInput *ui;
 

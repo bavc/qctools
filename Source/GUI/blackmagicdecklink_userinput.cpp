@@ -4,6 +4,12 @@
 #include <QStandardPaths>
 #include <QThread>
 
+void __stdcall BlackmagicDeckLink_UserInput_TimeCodeCallback(void* Private)
+{
+    BlackmagicDeckLink_UserInput* CallBack = (BlackmagicDeckLink_UserInput*)Private;
+    CallBack->TimeCode_IsAvailable();
+}
+
 BlackmagicDeckLink_UserInput::BlackmagicDeckLink_UserInput(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::BlackmagicDeckLink_UserInput),
@@ -78,15 +84,22 @@ void BlackmagicDeckLink_UserInput::on_CardsList_currentIndexChanged(int Pos)
 {
     delete Card;
     Card=new BlackmagicDeckLink_Glue(Pos);
-    int TC;
-    while ((TC=Card->CurrentTimecode())==-1)
-        thread()->yieldCurrentThread();
-    ui->In_1->setValue(((TC>>28)&0xF)*10+((TC>>24)&0xF));
-    ui->In_2->setValue(((TC>>20)&0xF)*10+((TC>>16)&0xF));
-    ui->In_3->setValue(((TC>>12)&0xF)*10+((TC>>8)&0xF));
-    ui->In_4->setValue(((TC>>4)&0xF)*10+((TC)&0xF));
-    ui->Out_1->setValue(((TC>>28)&0xF)*10+((TC>>24)&0xF));
-    ui->Out_2->setValue(((TC>>20)&0xF)*10+((TC>>16)&0xF));
-    ui->Out_3->setValue(((TC>>12)&0xF)*10+((TC>>8)&0xF)+10); //TODO: better handling of timecodes
-    ui->Out_4->setValue(((TC>>4)&0xF)*10+((TC)&0xF));
+
+    Card->Config_In.TimeCodeIsAvailable_Callback=BlackmagicDeckLink_UserInput_TimeCodeCallback;
+    Card->Config_In.TimeCodeIsAvailable_Private=this;
+
+    Card->CurrentTimecode(); // TimeCode_IsAvailable() will be called when available
+}
+
+//---------------------------------------------------------------------------
+void BlackmagicDeckLink_UserInput::TimeCode_IsAvailable()
+{
+    ui->In_1->setValue(((Card->Config_Out.TC_current>>28)&0xF)*10+((Card->Config_Out.TC_current>>24)&0xF));
+    ui->In_2->setValue(((Card->Config_Out.TC_current>>20)&0xF)*10+((Card->Config_Out.TC_current>>16)&0xF));
+    ui->In_3->setValue(((Card->Config_Out.TC_current>>12)&0xF)*10+((Card->Config_Out.TC_current>>8)&0xF));
+    ui->In_4->setValue(((Card->Config_Out.TC_current>>4)&0xF)*10+((Card->Config_Out.TC_current)&0xF));
+    ui->Out_1->setValue(((Card->Config_Out.TC_current>>28)&0xF)*10+((Card->Config_Out.TC_current>>24)&0xF));
+    ui->Out_2->setValue(((Card->Config_Out.TC_current>>20)&0xF)*10+((Card->Config_Out.TC_current>>16)&0xF));
+    ui->Out_3->setValue(((Card->Config_Out.TC_current>>12)&0xF)*10+((Card->Config_Out.TC_current>>8)&0xF)+10); //TODO: better handling of timecodes
+    ui->Out_4->setValue(((Card->Config_Out.TC_current>>4)&0xF)*10+((Card->Config_Out.TC_current)&0xF));
 }
