@@ -38,9 +38,9 @@
 class CaptureHelper : public IDeckLinkDeckControlStatusCallback , public IDeckLinkInputCallback
 {
 private:
-    IDeckLink*                  m_deckLink;
-    IDeckLinkInput*             m_deckLinkInput;
-    IDeckLinkDeckControl*       m_deckControl;
+    IDeckLink*                  m_card;
+    IDeckLinkInput*             m_input;
+    IDeckLinkDeckControl*       m_control;
 
     // video mode
     long                        m_width;
@@ -48,13 +48,17 @@ private:
     BMDTimeScale                m_timeScale;
     BMDTimeValue                m_frameDuration;
     
-    bool                        setupDeck(size_t CardPos);
-    bool                        setupDeckLinkInput();
-    bool                        setupDeckControl();
-    
-    bool                        cleanupDeckControl();
-    bool                        cleanupDeckLinkInput();
-    bool                        cleanupDeck();
+    // Card
+    bool                        setupCard(size_t CardPos);
+    bool                        cleanupCard();
+
+    // Input
+    bool                        setupInput();
+    bool                        cleanupInput();
+
+    // Control
+    bool                        setupControl();
+    bool                        cleanupControl();
     
 public:
                                 CaptureHelper(size_t CardPos, BlackmagicDeckLink_Glue::config_in* Config_In, BlackmagicDeckLink_Glue::config_out* Config_Out);

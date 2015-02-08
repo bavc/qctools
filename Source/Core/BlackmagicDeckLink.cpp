@@ -199,9 +199,9 @@ std::vector<std::string> DeckLinkCardsList()
 
 //---------------------------------------------------------------------------
 CaptureHelper::CaptureHelper(size_t CardPos, BlackmagicDeckLink_Glue::config_in* Config_In_, BlackmagicDeckLink_Glue::config_out* Config_Out_)
-    : m_deckLink(NULL)
-    , m_deckLinkInput(NULL)
-    , m_deckControl(NULL)
+    : m_card(NULL)
+    , m_input(NULL)
+    , m_control(NULL)
     , m_width(-1)
     , m_height(-1)
     , m_timeScale(0)
@@ -219,23 +219,8 @@ CaptureHelper::CaptureHelper(size_t CardPos, BlackmagicDeckLink_Glue::config_in*
     cout << endl;
 
     // Setup DeckLink Input interface
-    if (!setupDeck(CardPos))
+    if (!setupCard(CardPos))
         return;
-
-    // Setup DeckLink Input interface
-    if (!setupDeckLinkInput())
-    {
-        cleanupDeck();
-        return;
-    }
-    
-    // Setup DeckControl interface
-    if (!setupDeckControl())
-    {
-        cleanupDeckLinkInput();
-        cleanupDeck();
-        return;
-    }
 }
 
 //---------------------------------------------------------------------------
@@ -244,47 +229,74 @@ CaptureHelper::~CaptureHelper()
     stopCapture(true);
 }
 
+//***************************************************************************
+// Deck
+//***************************************************************************
+
 //---------------------------------------------------------------------------
-bool CaptureHelper::setupDeck(size_t CardPos)
+bool CaptureHelper::setupCard(size_t CardPos)
 {
-    cout << "*** Setup of Deck ***" << endl;
+    if (m_card)
+        return true;
+
+    cout << "*** Setup of Card ***" << endl;
 
     // Find the card
-    m_deckLink = getDeckLinkCard(CardPos);
-    if (!m_deckLink)
+    m_card = getDeckLinkCard(CardPos);
+    if (!m_card)
+    {
+        cout << "Error: Could not obtain the Card interface" << endl;
         return false;
+    }
 
     // Increment reference count of the object
-    m_deckLink->AddRef();
-
-    // Get interfaces
-    if (m_deckLink->QueryInterface(IID_IDeckLinkInput, (void **)&m_deckLinkInput) != S_OK)
-    {
-        cout << "Could not obtain the DeckLink Input interface" << endl;
-        return false;
-    }
-    if (m_deckLink->QueryInterface(IID_IDeckLinkDeckControl, (void **)&m_deckControl) != S_OK)
-    {
-        cout << "Could not obtain the DeckControl interface" << endl;
-        return false;
-    }
+    m_card->AddRef();
 
     cout << "OK" << endl;
     return true;
 }
 
 //---------------------------------------------------------------------------
-bool CaptureHelper::setupDeckLinkInput()
+bool CaptureHelper::cleanupCard()
 {
-    cout << "*** Setup of DeckLinkInput ***" << endl;
+    if (!m_card)
+        return true;
+
+    cout << "*** Cleanup of Card ***" << endl;
     
+    // Decrement reference count of the object
+    m_card->Release();
+    m_card=NULL;
+
+    cout << "OK" << endl;
+
+    return true;
+}
+
+//***************************************************************************
+// Input
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+bool CaptureHelper::setupInput()
+{
+    if (m_input)
+        return true;
+
     m_width = -1;
     
+    // Get interface
+    if (m_card->QueryInterface(IID_IDeckLinkInput, (void **)&m_input) != S_OK)
+    {
+        cout << "Error: Could not obtain the Input interface" << endl;
+        return false;
+    }
+
     // get frame scale and duration for the video mode
     IDeckLinkDisplayModeIterator* displayModeIterator = NULL;
-    if (m_deckLinkInput->GetDisplayModeIterator(&displayModeIterator) != S_OK)
+    if (m_input->GetDisplayModeIterator(&displayModeIterator) != S_OK)
     {
-        cout << "Setup of DeckLinkInput error: problem with GetDisplayModeIterator" << endl;
+        cout << "Error: problem with GetDisplayModeIterator" << endl;
         return false;
     }
 
@@ -307,24 +319,24 @@ bool CaptureHelper::setupDeckLinkInput()
     
     if (m_width == -1)
     {
-        cout << "Setup of DeckLinkInput error: unable to find requested video mode" << endl;
+        cout << "Error: unable to find requested video mode" << endl;
         return false;
     }
     
     // set callback
-    m_deckLinkInput->SetCallback(this);
+    m_input->SetCallback(this);
     
     // enable video input
-    if (m_deckLinkInput->EnableVideoInput(bmdModeNTSC, bmdFormat8BitYUV, bmdVideoInputFlagDefault) != S_OK)
+    if (m_input->EnableVideoInput(bmdModeNTSC, bmdFormat8BitYUV, bmdVideoInputFlagDefault) != S_OK)
     {
-        cout << "Setup of DeckLinkInput error: could not enable video input" << endl;
+        cout << "Error: could not enable video input" << endl;
         return false;
     }
     
     // start streaming
-    if (m_deckLinkInput->StartStreams() != S_OK)
+    if (m_input->StartStreams() != S_OK)
     {
-        cout << "Setup of DeckLinkInput error: could not start streams" << endl;
+        cout << "Error: could not start streams" << endl;
         return false;
     }
 
@@ -333,18 +345,58 @@ bool CaptureHelper::setupDeckLinkInput()
 }
 
 //---------------------------------------------------------------------------
-bool CaptureHelper::setupDeckControl()
+bool CaptureHelper::cleanupInput()
 {
-    cout << "*** Setup of DeckControl ***" << endl;
+    if (!m_input)
+        return true;
 
-    // set callback, preroll and offset
-    m_deckControl->SetCallback(this);
+    cout << "*** Cleanup of Input ***" << endl;
+
+    m_input->StopStreams();
+    m_input->DisableVideoInput();
+    m_input->SetCallback(NULL);
+    m_input->Release();
+    m_input = NULL;
+
+    cout << "OK" << endl;
+
+    return true;
+}
+
+//***************************************************************************
+// Control
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+bool CaptureHelper::setupControl()
+{
+    // We need time scale and time duration
+    if (!setupInput())
+        return false;
+    
+    if (m_control)
+        return true;
+
+    cout << "*** Setup of Control ***" << endl;
+
+    // Get interface
+    cout << m_card << endl;
+    if (m_card->QueryInterface(IID_IDeckLinkDeckControl, (void **)&m_control) != S_OK)
+    {
+        cout << "Error: Could not obtain the Control interface" << endl;
+        return false;
+    }
+
+    // set callback
+    cout << m_control << endl;
+    m_control->SetCallback(this);
     
     // open connection to deck
     BMDDeckControlError bmdDeckControlError;
-    if (m_deckControl->Open(m_timeScale, m_frameDuration, Config_In->DropFrame, &bmdDeckControlError) != S_OK)
+    cout << Config_In << endl;
+    if (m_control->Open(m_timeScale, m_frameDuration, Config_In->DropFrame, &bmdDeckControlError) != S_OK)
     {
-        cout << "Setup of DeckControl error: could not open (" << BMDDeckControlError2String(bmdDeckControlError) << ")" << endl;
+        cout << "Error: could not open (" << BMDDeckControlError2String(bmdDeckControlError) << ")" << endl;
         return false;
     }
 
@@ -353,9 +405,9 @@ bool CaptureHelper::setupDeckControl()
 }
 
 //---------------------------------------------------------------------------
-bool CaptureHelper::cleanupDeckControl()
+bool CaptureHelper::cleanupControl()
 {
-    if (!m_deckControl)
+    if (!m_control)
         return true;
 
     cout << "*** Cleanup of DeckControl ***" << endl;
@@ -366,7 +418,7 @@ bool CaptureHelper::cleanupDeckControl()
         case BlackmagicDeckLink_Glue::seeking :
         case BlackmagicDeckLink_Glue::capturing :
                                                 Config_Out->Status=BlackmagicDeckLink_Glue::aborting;
-                                                if (m_deckControl->Abort() != S_OK)
+                                                if (m_control->Abort() != S_OK)
                                                     cout << "Could not abort capture" << endl;
                                                 else
                                                     cout << "Aborting capture" << endl;
@@ -374,47 +426,10 @@ bool CaptureHelper::cleanupDeckControl()
     }
 
     // Close
-    m_deckControl->Close(false);
-    m_deckControl->SetCallback(NULL);
-
-    m_deckControl->Release();
-    m_deckControl = NULL;
-
-    cout << "OK" << endl;
-
-    return true;
-}
-
-//---------------------------------------------------------------------------
-bool CaptureHelper::cleanupDeckLinkInput()
-{
-    if (!m_deckLinkInput)
-        return true;
-
-    cout << "*** Cleanup of DeckLinkInput ***" << endl;
-
-    m_deckLinkInput->StopStreams();
-    m_deckLinkInput->DisableVideoInput();
-    m_deckLinkInput->SetCallback(NULL);
-    m_deckLinkInput->Release();
-    m_deckLinkInput = NULL;
-
-    cout << "OK" << endl;
-
-    return true;
-}
-
-//---------------------------------------------------------------------------
-bool CaptureHelper::cleanupDeck()
-{
-    if (!m_deckLink)
-        return true;
-
-    cout << "*** Cleanup of Deck ***" << endl;
-    
-    // Decrement reference count of the object
-    m_deckLink->Release();
-    m_deckLink=NULL;
+    m_control->Close(false);
+    m_control->SetCallback(NULL);
+    m_control->Release();
+    m_control = NULL;
 
     cout << "OK" << endl;
 
@@ -424,21 +439,24 @@ bool CaptureHelper::cleanupDeck()
 //---------------------------------------------------------------------------
 int CaptureHelper::getTimeCode()
 {
+    if (!setupControl())
+        return -1; 
+
+    cout << "*** Timecode ***" << endl;
+
     int TC;
     
-    //cout << "*** Timecode ***" << endl;
-
     BMDDeckControlError bmdDeckControlError;
     IDeckLinkTimecode *currentTimecode=NULL;
-    if (m_deckControl->GetTimecode(&currentTimecode, &bmdDeckControlError) != S_OK)
+    if (m_control->GetTimecode(&currentTimecode, &bmdDeckControlError) != S_OK)
     {
-        //cout << "Error: " << BMDDeckControlError2String(bmdDeckControlError) << endl;
-        TC=(int)-1;
+        cout << "Error: " << BMDDeckControlError2String(bmdDeckControlError) << endl;
+        TC=-1;
     }
     else
     {
         TC=currentTimecode->GetBCD();
-        //cout << "OK " << hex << TC << endl;
+        cout << "OK " << hex << TC << endl;
     }
     
     if (currentTimecode)
@@ -449,6 +467,11 @@ int CaptureHelper::getTimeCode()
 //---------------------------------------------------------------------------
 void CaptureHelper::startCapture()
 {
+    if (!setupInput())
+        return;
+    if (!setupControl())
+        return;
+
     cout << "*** Start capture ***" << endl;
 
     cout.setf (ios::hex, ios::basefield);
@@ -459,7 +482,7 @@ void CaptureHelper::startCapture()
     // Start capture
     Config_Out->Status=BlackmagicDeckLink_Glue::seeking;
     BMDDeckControlError bmdDeckControlError;
-    if (m_deckControl->StartCapture(true, (Config_In->TC_in), (Config_In->TC_out), &bmdDeckControlError) != S_OK)
+    if (m_control->StartCapture(true, (Config_In->TC_in), (Config_In->TC_out), &bmdDeckControlError) != S_OK)
         cout << "Could not start capture (" << BMDDeckControlError2String(bmdDeckControlError) << ")" << endl;
 
     cout << "Waiting for deck answer" << endl ;
@@ -468,14 +491,14 @@ void CaptureHelper::startCapture()
 //---------------------------------------------------------------------------
 void CaptureHelper::pauseCapture()
 {
-    if (!m_deckControl)
+    if (!m_control)
         return;
 
     cout << "*** Pause capture ***" << endl;
 
     // Stop
     BMDDeckControlError bmdDeckControlError;
-    if (m_deckControl->Stop(&bmdDeckControlError) != S_OK)
+    if (m_control->Stop(&bmdDeckControlError) != S_OK)
         cout << "Could not stop (" << BMDDeckControlError2String(bmdDeckControlError) << ")" << endl;
 
     cout << "OK" << endl;
@@ -484,11 +507,11 @@ void CaptureHelper::pauseCapture()
 //---------------------------------------------------------------------------
 bool CaptureHelper::stopCapture(bool force)
 {
-    if (!cleanupDeckControl() && !force)
+    if (!cleanupControl() && !force)
         return false;
-    if (!cleanupDeckLinkInput() && !force)
+    if (!cleanupInput() && !force)
         return false;
-    if (!cleanupDeck() && !force)
+    if (!cleanupCard() && !force)
         return false;
 
     if (Glue && *Glue)
@@ -505,7 +528,8 @@ HRESULT CaptureHelper::TimecodeUpdate (BMDTimecodeBCD currentTimecode)
 //---------------------------------------------------------------------------
 HRESULT CaptureHelper::DeckControlEventReceived (BMDDeckControlEvent bmdDeckControlEvent, BMDDeckControlError bmdDeckControlError)
 {
-    cout <<"Deck control event: " << BMDDeckControlEvent2String(bmdDeckControlEvent);
+    cout <<"*** Deck control event ***" << endl;
+    cout << BMDDeckControlEvent2String(bmdDeckControlEvent) << endl;
     if (bmdDeckControlError != bmdDeckControlNoError)
         cout << " (error: " << BMDDeckControlError2String(bmdDeckControlError) << ")";
     cout << endl;
@@ -514,7 +538,7 @@ HRESULT CaptureHelper::DeckControlEventReceived (BMDDeckControlEvent bmdDeckCont
     {
         case bmdDeckControlPrepareForCaptureEvent:
                                                     Config_Out->Status=BlackmagicDeckLink_Glue::capturing;
-                                                    cout << "OK" << endl;
+                                                    cout << "Capturing" << endl;
                                                     break;
         case bmdDeckControlCaptureCompleteEvent:
                                                     Config_Out->Status=BlackmagicDeckLink_Glue::captured;
@@ -536,13 +560,14 @@ HRESULT CaptureHelper::VTRControlStateChanged (BMDDeckControlVTRControlState new
 //---------------------------------------------------------------------------
 HRESULT CaptureHelper::DeckControlStatusChanged (BMDDeckControlStatusFlags bmdDeckControlStatusFlags, bmdl_uint32_t mask)
 {
-    cout <<"Deck control status change: " << BMDDeckControlStatusFlags2String(bmdDeckControlStatusFlags) << endl;
+    cout <<"*** Deck control status change ***" << endl;
+    cout << BMDDeckControlStatusFlags2String(bmdDeckControlStatusFlags) << endl;
     
     if ((Config_Out->Status==BlackmagicDeckLink_Glue::connecting)
      && (mask & bmdDeckControlStatusDeckConnected)
      && (bmdDeckControlStatusFlags & bmdDeckControlStatusDeckConnected))
     {
-        cout << "OK" << endl;
+        cout << "Connected" << endl;
         Config_Out->Status=BlackmagicDeckLink_Glue::connected;
     }
 
