@@ -39,31 +39,31 @@ void BlackmagicDeckLink_UserInput::on_accepted()
     if (!Card)
         return;
 
-    Card->TC_in=0;
-    Card->TC_in+=(ui->In_1->value()/10)<<28;
-    Card->TC_in+=(ui->In_1->value()%10)<<24;
-    Card->TC_in+=(ui->In_2->value()/10)<<20;
-    Card->TC_in+=(ui->In_2->value()%10)<<16;
-    Card->TC_in+=(ui->In_3->value()/10)<<12;
-    Card->TC_in+=(ui->In_3->value()%10)<< 8;
-    Card->TC_in+=(ui->In_4->value()/10)<< 4;
-    Card->TC_in+=(ui->In_4->value()%10)<< 0;
-    Card->TC_out=0;
-    Card->TC_out+=(ui->Out_1->value()/10)<<28;
-    Card->TC_out+=(ui->Out_1->value()%10)<<24;
-    Card->TC_out+=(ui->Out_2->value()/10)<<20;
-    Card->TC_out+=(ui->Out_2->value()%10)<<16;
-    Card->TC_out+=(ui->Out_3->value()/10)<<12;
-    Card->TC_out+=(ui->Out_3->value()%10)<< 8;
-    Card->TC_out+=(ui->Out_4->value()/10)<< 4;
-    Card->TC_out+=(ui->Out_4->value()%10)<< 0;
+    Card->Config_In.TC_in=0;
+    Card->Config_In.TC_in+=(ui->In_1->value()/10)<<28;
+    Card->Config_In.TC_in+=(ui->In_1->value()%10)<<24;
+    Card->Config_In.TC_in+=(ui->In_2->value()/10)<<20;
+    Card->Config_In.TC_in+=(ui->In_2->value()%10)<<16;
+    Card->Config_In.TC_in+=(ui->In_3->value()/10)<<12;
+    Card->Config_In.TC_in+=(ui->In_3->value()%10)<< 8;
+    Card->Config_In.TC_in+=(ui->In_4->value()/10)<< 4;
+    Card->Config_In.TC_in+=(ui->In_4->value()%10)<< 0;
+    Card->Config_In.TC_out=0;
+    Card->Config_In.TC_out+=(ui->Out_1->value()/10)<<28;
+    Card->Config_In.TC_out+=(ui->Out_1->value()%10)<<24;
+    Card->Config_In.TC_out+=(ui->Out_2->value()/10)<<20;
+    Card->Config_In.TC_out+=(ui->Out_2->value()%10)<<16;
+    Card->Config_In.TC_out+=(ui->Out_3->value()/10)<<12;
+    Card->Config_In.TC_out+=(ui->Out_3->value()%10)<< 8;
+    Card->Config_In.TC_out+=(ui->Out_4->value()/10)<< 4;
+    Card->Config_In.TC_out+=(ui->Out_4->value()%10)<< 0;
 
     if (ui->Record_GroupBox->isChecked())
         Encoding_FileName=ui->Encoding_FileName_Line->text();
 
     int FrameCount_In, FrameCount_Out;
-    GET_FRAME_COUNT(FrameCount_In, Card->TC_in, 30, 1);
-    GET_FRAME_COUNT(FrameCount_Out, Card->TC_out, 30, 1);
+    GET_FRAME_COUNT(FrameCount_In, Card->Config_In.TC_in, 30, 1);
+    GET_FRAME_COUNT(FrameCount_Out, Card->Config_In.TC_out, 30, 1);
     FrameCount=FrameCount_Out-FrameCount_In;
 }
 

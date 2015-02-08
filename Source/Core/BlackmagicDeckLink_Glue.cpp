@@ -26,26 +26,21 @@ struct Debug_Simulation
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-BlackmagicDeckLink_Glue::BlackmagicDeckLink_Glue(size_t CardPos) :
-    Handle(NULL),
-    Glue(NULL),
-    TC_in(NULL),
-    TC_out(NULL),
-    Status(connecting)
+BlackmagicDeckLink_Glue::BlackmagicDeckLink_Glue(size_t CardPos)
+    : Handle(NULL)
+    , Glue(NULL)
 {
     #if defined(BLACKMAGICDECKLINK_YES)
-        CaptureHelper* helper=new CaptureHelper(CardPos, true);
-        helper->Status=&Status;
+        CaptureHelper* helper=new CaptureHelper(CardPos, &Config_In, &Config_Out);
         helper->Glue=&Glue;
-        helper->TC_in=&TC_in;
-        helper->TC_out=&TC_out;
 
         Handle=helper;
     #elif defined(_DEBUG) // Simulation
         Debug_Simulation* simulation=new Debug_Simulation;
         simulation->Glue=&Glue;
 
-        Status=BlackmagicDeckLink_Glue::connected;
+        Config_Out.Status=BlackmagicDeckLink_Glue::connected;
+        Config_Out.VideoOutputConnections=0x3D;
 
         Handle=simulation;
     #endif
@@ -80,8 +75,8 @@ void BlackmagicDeckLink_Glue::Start()
             unsigned char Data[720*486*2];
 
             int FrameCount_In, FrameCount_Out;
-            GET_FRAME_COUNT(FrameCount_In, TC_in, 30, 1);
-            GET_FRAME_COUNT(FrameCount_Out, TC_out, 30, 1);
+            GET_FRAME_COUNT(FrameCount_In, Config_In.TC_in, 30, 1);
+            GET_FRAME_COUNT(FrameCount_Out, Config_In.TC_out, 30, 1);
         
             Debug_Simulation* simulation=new Debug_Simulation;
             simulation->Glue=&Glue;
@@ -95,7 +90,7 @@ void BlackmagicDeckLink_Glue::Start()
                 FillingValue++;
             }
 
-            Status=BlackmagicDeckLink_Glue::captured;
+            Config_Out.Status=BlackmagicDeckLink_Glue::captured;
 
             (*((Debug_Simulation*)Handle)->Glue)->CloseOutput();
         #endif

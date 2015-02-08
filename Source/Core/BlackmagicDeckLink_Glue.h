@@ -35,11 +35,9 @@ public:
     int                         CurrentTimecode();
 
     FFmpeg_Glue*                Glue;
-    int                         TC_in;
-    int                         TC_out;
-
     enum status
     {
+        instancied,
         connecting,
         connected,
         seeking,
@@ -48,7 +46,40 @@ public:
         aborting,
         aborted,
     };
-    status                      Status;
+    struct config_in
+    {
+        int                     TC_in;
+        int                     TC_out;
+        int                     FrameCount;
+        int                     FrameDuration;
+        int                     BitDepth;
+        int                     TimeScale;
+        bool                    DropFrame;
+
+        config_in()
+            : TC_in(-1)
+            , TC_out(-1)
+            , FrameCount(0)
+            , FrameDuration(0)
+            , BitDepth(0)
+            , TimeScale(0)
+            , DropFrame(true)
+        {
+        }
+    };
+    struct config_out
+    {
+        int                     VideoOutputConnections;
+        status                  Status;
+
+        config_out()
+            : VideoOutputConnections(-1)
+            , Status(connecting)
+        {
+        }
+    };
+    config_in                   Config_In;
+    config_out                  Config_Out;
 
     static std::vector<std::string> CardsList();
 

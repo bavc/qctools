@@ -47,7 +47,6 @@ private:
     long                        m_height;
     BMDTimeScale                m_timeScale;
     BMDTimeValue                m_frameDuration;
-    bool                        m_dropframe;
     
     bool                        setupDeck(size_t CardPos);
     bool                        setupDeckLinkInput();
@@ -58,7 +57,7 @@ private:
     bool                        cleanupDeck();
     
 public:
-                                CaptureHelper(size_t CardPos, bool dropframe);
+                                CaptureHelper(size_t CardPos, BlackmagicDeckLink_Glue::config_in* Config_In, BlackmagicDeckLink_Glue::config_out* Config_Out);
     virtual                    ~CaptureHelper();
     
     void                        startCapture();
@@ -82,12 +81,11 @@ public:
     ULONG STDMETHODCALLTYPE     AddRef ()                                       {return 1;}
     ULONG STDMETHODCALLTYPE     Release ()                                      {return 1;}
 
-    BlackmagicDeckLink_Glue::status* Status;
+    BlackmagicDeckLink_Glue::config_in*     Config_In;
+    BlackmagicDeckLink_Glue::config_out*    Config_Out;
     FFmpeg_Glue**               Glue;
     int                         m_FramePos;
-    int*                        TC_in;
     int                         TC_current;
-    int*                        TC_out;
 };
 
 //***************************************************************************

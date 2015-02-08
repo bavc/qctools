@@ -41,7 +41,7 @@ void FileInformation::run()
             
         for (;;)
         {
-            switch (blackmagicDeckLink_Glue->Status)
+            switch (blackmagicDeckLink_Glue->Config_Out.Status)
             {
                 case BlackmagicDeckLink_Glue::connected:
                                                         blackmagicDeckLink_Glue->Start();
