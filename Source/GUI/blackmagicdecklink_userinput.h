@@ -18,7 +18,6 @@ public:
     ~BlackmagicDeckLink_UserInput();
 
     BlackmagicDeckLink_Glue*    Card;
-    int                         FrameCount;
     QString                     Encoding_FileName;
 
     // Callbacks
@@ -26,6 +25,8 @@ public:
 
 private:
     Ui::BlackmagicDeckLink_UserInput *ui;
+
+    int                         TC_Now;
 
 private Q_SLOTS:
 

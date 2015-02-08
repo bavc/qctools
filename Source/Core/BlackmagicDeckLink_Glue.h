@@ -62,7 +62,7 @@ public:
         config_in()
             : TC_in(-1)
             , TC_out(-1)
-            , FrameCount(0)
+            , FrameCount(-1)
             , FrameDuration(0)
             , BitDepth(0)
             , TimeScale(0)

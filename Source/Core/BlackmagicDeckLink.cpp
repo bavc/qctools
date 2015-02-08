@@ -483,18 +483,30 @@ void CaptureHelper::startCapture()
 
     cout << "*** Start capture ***" << endl;
 
-    cout.setf (ios::hex, ios::basefield);
-    cout.fill ('0');
-    cout << "Starting capure from " << setw(2) << (((Config_In->TC_in)>>24)&0xFF) << ":" << setw(2) << (((Config_In->TC_in)>>16)&0xFF) << ":" << setw(2) << (((Config_In->TC_in)>>8)&0xFF) << ":" << setw(2) << (((Config_In->TC_in))&0xFF)
-         << " to " << setw(2) << (((Config_In->TC_out)>>24)&0xFF) << ":" << setw(2) << (((Config_In->TC_out)>>16)&0xFF) << ":" << setw(2) << (((Config_In->TC_out)>>8)&0xFF) << ":" << setw(2) << (((Config_In->TC_out))&0xFF) << endl ;
-
-    // Start capture
-    Config_Out->Status=BlackmagicDeckLink_Glue::seeking;
     BMDDeckControlError bmdDeckControlError;
-    if (m_control->StartCapture(true, (Config_In->TC_in), (Config_In->TC_out), &bmdDeckControlError) != S_OK)
-        cout << "Could not start capture (" << BMDDeckControlError2String(bmdDeckControlError) << ")" << endl;
+    if (Config_In->TC_in==-1)
+    {
+        if (m_control->Play(&bmdDeckControlError) != S_OK)
+            cout << "Could not start capture (" << BMDDeckControlError2String(bmdDeckControlError) << ")" << endl;
+        Config_Out->Status=BlackmagicDeckLink_Glue::capturing;
+    }
+    else
+    {
+        cout.setf (ios::hex, ios::basefield);
+        cout.fill ('0');
+        cout << "Starting capure from " << setw(2) << (((Config_In->TC_in)>>24)&0xFF) << ":" << setw(2) << (((Config_In->TC_in)>>16)&0xFF) << ":" << setw(2) << (((Config_In->TC_in)>>8)&0xFF) << ":" << setw(2) << (((Config_In->TC_in))&0xFF)
+             << " to " << setw(2) << (((Config_In->TC_out)>>24)&0xFF) << ":" << setw(2) << (((Config_In->TC_out)>>16)&0xFF) << ":" << setw(2) << (((Config_In->TC_out)>>8)&0xFF) << ":" << setw(2) << (((Config_In->TC_out))&0xFF) << endl ;
 
-    cout << "Waiting for deck answer" << endl ;
+        // Start capture
+        Config_Out->Status=BlackmagicDeckLink_Glue::seeking;
+        if (m_control->StartCapture(true, (Config_In->TC_in), (Config_In->TC_out), &bmdDeckControlError) != S_OK)
+        {
+            cout << "Could not start capture (" << BMDDeckControlError2String(bmdDeckControlError) << ")" << endl;
+            return;
+        }
+
+        cout << "Waiting for deck answer" << endl ;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -590,38 +602,59 @@ HRESULT CaptureHelper::DeckControlStatusChanged (BMDDeckControlStatusFlags bmdDe
 }
 
 //---------------------------------------------------------------------------
-HRESULT CaptureHelper::VideoInputFrameArrived (IDeckLinkVideoInputFrame* arrivedFrame, IDeckLinkAudioInputPacket*)
+HRESULT CaptureHelper::VideoInputFrameArrived (IDeckLinkVideoInputFrame* arrivedVideoFrame, IDeckLinkAudioInputPacket* arrivedAudioFrame)
 {
     // check the serial timecode only when we were told the capture is about to start (bmdDeckControlPrepareForCaptureEvent)
     if (Config_Out->Status!=BlackmagicDeckLink_Glue::capturing)
         return S_OK;
 
     IDeckLinkTimecode *timecode = NULL;
-    if (arrivedFrame->GetTimecode(bmdTimecodeSerial, &timecode) != S_OK)
-        return S_OK;
+    arrivedVideoFrame->GetTimecode(bmdTimecodeSerial, &timecode);
 
-    // Handle the frame if time code is in [TC_in, TC_out[
-    BMDTimecodeBCD tcBCD = timecode->GetBCD();
-    if ( (Config_Out->TC_current == -1 || tcBCD != Config_Out->TC_current) //Ignore frames with same time code (TODO: check if it is relevant)
-      && tcBCD >= Config_In->TC_in 
-      && tcBCD < Config_In->TC_out )
+    BMDTimecodeBCD tcBCD;
+    bool ShouldDecode=true;
+    if ( timecode )
     {
+        tcBCD= timecode->GetBCD();
+
+        // Handle the frame if time code is in [TC_in, TC_out[
+        if ((Config_Out->TC_current != -1 && tcBCD == Config_Out->TC_current) //Ignore frames with same time code (TODO: check if it is relevant)
+          || tcBCD < Config_In->TC_in 
+          || tcBCD >= Config_In->TC_out )
+          ShouldDecode=false;
+
         // this frame is within the in-and out-points, do something useful with it
         uint8_t hours, minutes, seconds, frames;
         timecode->GetComponents(&hours, &minutes, &seconds, &frames);        
         cout.setf(ios::dec, ios::basefield);
-        //cout << "New frame (timecode is " << setw(2) << (int)hours << ":" << setw(2) << (int)minutes << ":" <<  setw(2) << (int)seconds << ":" << setw(2) << (int)frames << ")" << endl;
+        cout << "New frame (timecode is " << setw(2) << (int)hours << ":" << setw(2) << (int)minutes << ":" <<  setw(2) << (int)seconds << ":" << setw(2) << (int)frames << ")";
+        if (!ShouldDecode)
+            cout << ", is discarded";
+        cout << endl;
 
+        Config_Out->TC_current = tcBCD;
+        timecode->Release();
+    }
+    else
+    {
+        cout << "New frame (no timecode)" << endl;
+    }
+
+    if (ShouldDecode)
+    {
         void *buffer;
-        arrivedFrame->GetBytes(&buffer);
+        arrivedVideoFrame->GetBytes(&buffer);
         if (Glue && *Glue)
             (*Glue)->OutputFrame((unsigned char*)buffer, 720*486*2, m_FramePos);
 
-        Config_Out->TC_current = tcBCD;
         m_FramePos++;
+
+        if (Config_In->FrameCount != -1
+         && m_FramePos >= Config_In->FrameCount)
+        {
+            stopCapture();
+        }
     }
-        
-    timecode->Release();
     
     return S_OK;
 }

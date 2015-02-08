@@ -59,7 +59,7 @@ void MainWindow::openCapture()
         return;
     
     clearFiles();
-    addFile(blackmagicDeckLink_UserInput->Card, blackmagicDeckLink_UserInput->FrameCount, blackmagicDeckLink_UserInput->Encoding_FileName.toUtf8().data());
+    addFile(blackmagicDeckLink_UserInput->Card, blackmagicDeckLink_UserInput->Card->Config_In.FrameCount, blackmagicDeckLink_UserInput->Encoding_FileName.toUtf8().data());
     addFile_finish();
 
     delete blackmagicDeckLink_UserInput;

@@ -32,8 +32,8 @@
   <widget class="QGroupBox" name="Record_GroupBox">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>240</y>
+     <x>20</x>
+     <y>270</y>
      <width>611</width>
      <height>161</height>
     </rect>
@@ -158,90 +158,125 @@
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>50</y>
+     <x>20</x>
+     <y>80</y>
      <width>481</width>
-     <height>91</height>
+     <height>81</height>
     </rect>
    </property>
    <property name="title">
     <string>In</string>
    </property>
    <widget class="QSpinBox" name="In_3">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>60</y>
+      <x>260</x>
+      <y>50</y>
       <width>42</width>
       <height>22</height>
      </rect>
     </property>
    </widget>
    <widget class="QSpinBox" name="In_4">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>270</x>
-      <y>60</y>
+      <x>310</x>
+      <y>50</y>
       <width>42</width>
       <height>22</height>
      </rect>
     </property>
    </widget>
-   <widget class="QLabel" name="InLabel">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>60</y>
-      <width>91</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Timecode:</string>
-    </property>
-   </widget>
    <widget class="QSpinBox" name="In_1">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>60</y>
+      <x>160</x>
+      <y>50</y>
       <width>37</width>
       <height>20</height>
      </rect>
     </property>
    </widget>
    <widget class="QSpinBox" name="In_2">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>60</y>
+      <x>210</x>
+      <y>50</y>
       <width>42</width>
       <height>22</height>
      </rect>
     </property>
    </widget>
-   <zorder>InLabel</zorder>
-   <zorder>In_2</zorder>
+   <widget class="QRadioButton" name="In_Now">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>451</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>From now</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="In_Timecode">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>461</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Specific timecode (waiting for deck answer)</string>
+    </property>
+   </widget>
+   <zorder>In_Now</zorder>
+   <zorder>In_Timecode</zorder>
    <zorder>In_4</zorder>
    <zorder>In_1</zorder>
    <zorder>In_3</zorder>
+   <zorder>In_2</zorder>
   </widget>
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>140</y>
+     <x>20</x>
+     <y>170</y>
      <width>481</width>
-     <height>91</height>
+     <height>81</height>
     </rect>
    </property>
    <property name="title">
     <string>Out</string>
    </property>
    <widget class="QSpinBox" name="Out_2">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>200</x>
       <y>50</y>
       <width>42</width>
       <height>22</height>
@@ -249,9 +284,12 @@
     </property>
    </widget>
    <widget class="QSpinBox" name="Out_3">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>220</x>
+      <x>250</x>
       <y>50</y>
       <width>42</width>
       <height>22</height>
@@ -259,9 +297,12 @@
     </property>
    </widget>
    <widget class="QSpinBox" name="Out_4">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>270</x>
+      <x>300</x>
       <y>50</y>
       <width>42</width>
       <height>22</height>
@@ -269,33 +310,76 @@
     </property>
    </widget>
    <widget class="QSpinBox" name="Out_1">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>160</x>
       <y>50</y>
       <width>42</width>
       <height>22</height>
      </rect>
     </property>
    </widget>
-   <widget class="QLabel" name="OutLabel">
+   <widget class="QRadioButton" name="Out_FrameCout">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Frame count:</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="Out_Frames">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>20</y>
+      <width>81</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>0</number>
+    </property>
+    <property name="maximum">
+     <number>999999</number>
+    </property>
+    <property name="value">
+     <number>300</number>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="Out_Timecode">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>50</y>
-      <width>91</width>
-      <height>16</height>
+      <width>461</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Timecode:</string>
+     <string>Specific timecode (waiting for deck answer)</string>
     </property>
    </widget>
-   <zorder>OutLabel</zorder>
-   <zorder>Out_1</zorder>
+   <zorder>Out_FrameCout</zorder>
+   <zorder>Out_Frames</zorder>
+   <zorder>Out_Timecode</zorder>
    <zorder>Out_4</zorder>
-   <zorder>Out_3</zorder>
+   <zorder>Out_1</zorder>
    <zorder>Out_2</zorder>
+   <zorder>Out_3</zorder>
   </widget>
   <widget class="QComboBox" name="CardsList">
    <property name="geometry">
