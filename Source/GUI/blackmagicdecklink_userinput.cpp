@@ -28,6 +28,7 @@ BlackmagicDeckLink_UserInput::BlackmagicDeckLink_UserInput(QWidget *parent) :
     ui->Out_4->setVisible(false);
 
     connect( this, SIGNAL( accepted() ), this, SLOT( on_accepted() ) );
+    connect( this, SIGNAL( rejected() ), this, SLOT( on_accepted() ) );
     connect( ui->Record_GroupBox, SIGNAL( toggled(bool) ), this, SLOT( on_Record_GroupBox_toggled(bool) ) );
     connect( ui->CardsList, SIGNAL(currentIndexChanged(int)), this, SLOT(on_CardsList_currentIndexChanged(int)));
 

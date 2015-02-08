@@ -395,7 +395,7 @@ bool CaptureHelper::setupControl()
     BMDDeckControlError bmdDeckControlError;
     if (m_control->Open(m_timeScale, m_frameDuration, Config_In->DropFrame, &bmdDeckControlError) != S_OK)
     {
-        cout << "Error: could not open (" << BMDDeckControlError2String(bmdDeckControlError) << ")" << endl;
+        cout << "Error: could not open the Control interface (" << BMDDeckControlError2String(bmdDeckControlError) << ")" << endl;
         return false;
     }
 
@@ -416,12 +416,15 @@ bool CaptureHelper::cleanupControl()
     {
         case BlackmagicDeckLink_Glue::seeking :
         case BlackmagicDeckLink_Glue::capturing :
-                                                Config_Out->Status=BlackmagicDeckLink_Glue::aborting;
-                                                if (m_control->Abort() != S_OK)
-                                                    cout << "Could not abort capture" << endl;
-                                                else
-                                                    cout << "Aborting capture" << endl;
-                                                return false;
+                                                    if (Config_In->TC_in != -1)
+                                                    {
+                                                        Config_Out->Status=BlackmagicDeckLink_Glue::aborting;
+                                                        if (m_control->Abort() != S_OK)
+                                                            cout << "Could not abort capture" << endl;
+                                                        else
+                                                            cout << "Aborting capture" << endl;
+                                                        return false;
+                                                    }
     }
 
     // Close
@@ -476,9 +479,9 @@ void CaptureHelper::readTimeCode()
 //---------------------------------------------------------------------------
 void CaptureHelper::startCapture()
 {
+    cout << "*** CaptureHelper::startCapture() ***" << endl;
+
     if (!setupInput())
-        return;
-    if (!setupControl())
         return;
 
     cout << "*** Start capture ***" << endl;
@@ -492,6 +495,9 @@ void CaptureHelper::startCapture()
     }
     else
     {
+        if (!setupControl())
+            return;
+
         cout.setf (ios::hex, ios::basefield);
         cout.fill ('0');
         cout << "Starting capure from " << setw(2) << (((Config_In->TC_in)>>24)&0xFF) << ":" << setw(2) << (((Config_In->TC_in)>>16)&0xFF) << ":" << setw(2) << (((Config_In->TC_in)>>8)&0xFF) << ":" << setw(2) << (((Config_In->TC_in))&0xFF)
