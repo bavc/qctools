@@ -110,7 +110,8 @@ public:
     string                      FFmpeg_LibsVersion();
  
     // Actions
-    void                        AddInput(int CodecType, size_t FrameCount, int time_base_num, int time_base_den, int Width, int Height);
+    void                        AddInput_Video(size_t FrameCount, int time_base_num, int time_base_den, int Width, int Height, int BitDepth);
+    void                        AddInput_Audio(size_t FrameCount, int time_base_num, int time_base_den, int Samplerate, int Channels);
     void                        AddOutput(size_t FilterPos, int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, int FilterType=0, const string &Filter=string());
     void                        AddOutput(const string &FileName);
     void                        CloseOutput();
@@ -119,7 +120,7 @@ public:
     void                        FrameAtPosition(size_t Pos);
     bool                        NextFrame();
     bool                        OutputFrame(AVPacket* Packet, bool Decode=true);
-    bool                        OutputFrame(unsigned char* Data, size_t Size, int FramePos);
+    bool                        OutputFrame(unsigned char* Data, size_t Size, int stream_index, int FramePos);
     void                        Filter_Change(size_t FilterPos, int FilterType, const string &Filter);
     void                        Disable(const size_t Pos);
     void                        Scale_Change(int Scale_Width, int Scale_Height);
@@ -158,6 +159,15 @@ private:
         // Cache
         std::vector<AVFrame*>*  FramesCache;
         AVFrame*                FramesCache_Default;
+
+        // Encode
+        bool                    InitEncode();
+        void                    Encode(AVPacket* SourcePacket);
+        void                    CloseEncode();
+        AVFormatContext*        Encode_FormatContext;   // copy of pointer, do not delete
+        AVCodecContext*         Encode_CodecContext;
+        AVStream*               Encode_Stream;
+        AVPacket*               Encode_Packet;
     };
     struct outputdata
     {
@@ -171,8 +181,6 @@ private:
         void                    ApplyScale();
         void                    ReplaceImage();
         void                    AddThumbnail();
-        void                    Encode();
-        void                    CloseEncode();
         void                    DiscardScaledFrame();
         void                    DiscardFilteredFrame();
 
@@ -207,19 +215,11 @@ private:
         size_t                  Thumbnails_Modulo;
         CommonStats*            Stats;
 
-        // Encode
-        string                  Encode_FileName;
-        AVFormatContext*        Encode_FormatContext;
-        AVCodecContext*         Encode_CodecContext;
-        AVStream*               Encode_Stream;
-        AVPacket*               Encode_Packet;
-
         // Status
         size_t                  FramePos;               // Current position of playback
 
         // Helpers
         bool                    InitThumnails();
-        bool                    InitEncode();
         bool                    FilterGraph_Init();
         void                    FilterGraph_Free();
         bool                    Scale_Init();
@@ -240,6 +240,13 @@ private:
     // In
     string                      FileName;
     bool                        WithStats;
+
+    // Encode
+    bool                        InitEncode();
+    void                        Encode();
+    void                        CloseEncode();
+    string                      Encode_FileName;
+    AVFormatContext*            Encode_FormatContext;
 
     // Seek
     int64_t                     Seek_TimeStamp;

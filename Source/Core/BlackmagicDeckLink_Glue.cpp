@@ -71,20 +71,30 @@ void BlackmagicDeckLink_Glue::Start()
             ((CaptureHelper*)Handle)->startCapture();
         #elif defined(_DEBUG) // Simulation
             unsigned char FillingValue=0;
-            unsigned char Data[720*486*2];
+            unsigned char VideoData[720*486*2];
+            unsigned char AudioData[1600*16*2/8];
 
-            int FrameCount_In, FrameCount_Out;
-            GET_FRAME_COUNT(FrameCount_In, Config_In.TC_in, 30, 1);
-            GET_FRAME_COUNT(FrameCount_Out, Config_In.TC_out, 30, 1);
-        
+            int FrameCount;
+            if (Config_In.TC_in!=-1)
+            {
+                int FrameCount_In, FrameCount_Out;
+                GET_FRAME_COUNT(FrameCount_In, Config_In.TC_in, 30, 1);
+                GET_FRAME_COUNT(FrameCount_Out, Config_In.TC_out, 30, 1);
+                FrameCount=FrameCount_Out-FrameCount_In;
+            }
+            else
+                FrameCount=Config_In.FrameCount;
+
             Debug_Simulation* simulation=new Debug_Simulation;
             simulation->Glue=&Glue;
-            int FrameCount=FrameCount_Out-FrameCount_In;
 
             for (int FramePos=0; FramePos<FrameCount; FramePos++)
             {
-                memset(Data, FillingValue, 720*486*2);
-                if (!(*((Debug_Simulation*)Handle)->Glue)->OutputFrame(Data, 720*486*2, FramePos))
+                memset(VideoData, FillingValue, 720*486*2);
+                memset(AudioData, FillingValue, 1600*16*2/8);
+                if (!(*((Debug_Simulation*)Handle)->Glue)->OutputFrame(VideoData, 720*486*2, 0, FramePos))
+                    break;
+                if (!(*((Debug_Simulation*)Handle)->Glue)->OutputFrame(AudioData, 1600*16*2/8, 1, FramePos))
                     break;
                 FillingValue++;
             }

@@ -397,6 +397,12 @@ bool CaptureHelper::setupInput()
         return false;
     }
     
+    // enable audio input
+    if (m_input->EnableAudioInput(bmdAudioSampleRate48kHz, bmdAudioSampleType16bitInteger, 2) != S_OK)
+    {
+        cout << "Setup of DeckLinkInput error: could not enable audio input" << endl;
+        return false;
+    }
     // start streaming
     if (m_input->StartStreams() != S_OK)
     {
@@ -689,6 +695,8 @@ HRESULT CaptureHelper::VideoInputFrameArrived (IDeckLinkVideoInputFrame* arrived
         timecode->GetComponents(&hours, &minutes, &seconds, &frames);        
         cout.setf(ios::dec, ios::basefield);
         cout << "New frame (timecode is " << setw(2) << (int)hours << ":" << setw(2) << (int)minutes << ":" <<  setw(2) << (int)seconds << ":" << setw(2) << (int)frames << ")";
+        if (arrivedAudioFrame)
+            cout << ", " << dec << arrivedAudioFrame->GetSampleFrameCount() << " audio samples";
         if (!ShouldDecode)
             cout << ", is discarded";
         cout << endl;
@@ -701,6 +709,8 @@ HRESULT CaptureHelper::VideoInputFrameArrived (IDeckLinkVideoInputFrame* arrived
         if (Config_In->TC_in!=-1)
             ShouldDecode=false;
         cout << "New frame (no timecode)";
+        if (arrivedAudioFrame)
+            cout << ", " << dec << arrivedAudioFrame->GetSampleFrameCount() << " audio samples";
         if (!ShouldDecode)
             cout << ", is discarded";
         cout << endl;
@@ -708,10 +718,15 @@ HRESULT CaptureHelper::VideoInputFrameArrived (IDeckLinkVideoInputFrame* arrived
 
     if (ShouldDecode)
     {
-        void *buffer;
-        arrivedVideoFrame->GetBytes(&buffer);
+        void* videoBuffer;
+        void* audioBuffer;
+        arrivedVideoFrame->GetBytes(&videoBuffer);
+        arrivedAudioFrame->GetBytes(&audioBuffer);
         if (Glue && *Glue)
-            (*Glue)->OutputFrame((unsigned char*)buffer, 720*486*2, m_FramePos);
+        {
+            (*Glue)->OutputFrame((unsigned char*)videoBuffer, arrivedVideoFrame->GetRowBytes()*arrivedVideoFrame->GetHeight(), 0, m_FramePos);
+            (*Glue)->OutputFrame((unsigned char*)audioBuffer, arrivedAudioFrame->GetSampleFrameCount()*2*16 /*m_audioChannels*(m_audioSampleDepth*//8, 1, m_FramePos);
+        }
 
         m_FramePos++;
 

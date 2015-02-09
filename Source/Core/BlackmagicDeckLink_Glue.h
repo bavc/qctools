@@ -60,7 +60,7 @@ public:
             , TC_out(-1)
             , FrameCount(-1)
             , FrameDuration(0)
-            , BitDepth(0)
+            , BitDepth(8)
             , TimeScale(0)
             , DropFrame(true)
             , TimeCodeIsAvailable_Callback(NULL)
