@@ -48,7 +48,7 @@ public:
         int                     TC_out;
         int                     FrameCount;
         int                     FrameDuration;
-        int                     BitDepth;
+        int                     VideoBitDepth;
         int                     TimeScale;
         bool                    DropFrame;
         timecodeisavailable_callback* TimeCodeIsAvailable_Callback;
@@ -60,7 +60,7 @@ public:
             , TC_out(-1)
             , FrameCount(-1)
             , FrameDuration(0)
-            , BitDepth(8)
+            , VideoBitDepth(8)
             , TimeScale(0)
             , DropFrame(true)
             , TimeCodeIsAvailable_Callback(NULL)

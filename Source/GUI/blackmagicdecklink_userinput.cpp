@@ -105,6 +105,12 @@ void BlackmagicDeckLink_UserInput::on_accepted()
         Card->Config_In.FrameCount=FrameCount_Out-FrameCount_In;
     }
 
+    switch (ui->comboBox_2->currentIndex())
+    {
+        case 1 : Card->Config_In.VideoBitDepth=10; break;
+        default: Card->Config_In.VideoBitDepth=8;
+    }
+
     Card->Config_In.TimeCodeIsAvailable_Callback=NULL;
     Card->Config_In.TimeCodeIsAvailable_Private=NULL;
 }

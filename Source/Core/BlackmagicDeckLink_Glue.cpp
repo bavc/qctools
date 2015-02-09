@@ -71,7 +71,14 @@ void BlackmagicDeckLink_Glue::Start()
             ((CaptureHelper*)Handle)->startCapture();
         #elif defined(_DEBUG) // Simulation
             unsigned char FillingValue=0;
-            unsigned char VideoData[720*486*2];
+            size_t VideoSize;
+            switch (Config_In.VideoBitDepth)
+            {
+                case 10: VideoSize=((720+47)/48)*128*486; break;
+                default: VideoSize=720*486*2; //Default is 8 bpp
+            }
+            unsigned char* VideoData=new unsigned char[VideoSize];
+
             unsigned char AudioData[1600*16*2/8];
 
             int FrameCount;
@@ -90,14 +97,16 @@ void BlackmagicDeckLink_Glue::Start()
 
             for (int FramePos=0; FramePos<FrameCount; FramePos++)
             {
-                memset(VideoData, FillingValue, 720*486*2);
+                memset(VideoData, FillingValue, VideoSize);
                 memset(AudioData, FillingValue, 1600*16*2/8);
-                if (!(*((Debug_Simulation*)Handle)->Glue)->OutputFrame(VideoData, 720*486*2, 0, FramePos))
+                if (!(*((Debug_Simulation*)Handle)->Glue)->OutputFrame(VideoData, VideoSize, 0, FramePos))
                     break;
                 if (!(*((Debug_Simulation*)Handle)->Glue)->OutputFrame(AudioData, 1600*16*2/8, 1, FramePos))
                     break;
                 FillingValue++;
             }
+
+            delete[] VideoData;
 
             Config_Out.Status=BlackmagicDeckLink_Glue::finished;
 

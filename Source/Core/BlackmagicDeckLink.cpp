@@ -391,7 +391,13 @@ bool CaptureHelper::setupInput()
     m_input->SetCallback(this);
     
     // enable video input
-    if (m_input->EnableVideoInput(bmdModeNTSC, bmdFormat8BitYUV, bmdVideoInputFlagDefault) != S_OK)
+    BMDPixelFormat PixelFormat;
+    switch(Config_In->VideoBitDepth)
+    {
+        case 10: PixelFormat=bmdFormat10BitYUV; break;
+        default: PixelFormat=bmdFormat8BitYUV; break;
+    }
+    if (m_input->EnableVideoInput(bmdModeNTSC, PixelFormat, bmdVideoInputFlagDefault) != S_OK)
     {
         cout << "Error: could not enable video input" << endl;
         return false;

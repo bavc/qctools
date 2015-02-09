@@ -86,6 +86,11 @@
       <string>8-bit</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>10-bit</string>
+     </property>
+    </item>
    </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
