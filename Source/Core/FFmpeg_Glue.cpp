@@ -29,6 +29,11 @@ extern "C"
 #include <libavfilter/buffersink.h>
 #include <libavfilter/buffersrc.h>
 
+#include <libavutil/opt.h>
+#include <libavutil/channel_layout.h>
+#include <libavutil/samplefmt.h>
+#include <libswresample/swresample.h>
+
 #include <config.h>
 #include <libavutil/ffversion.h>
 }
@@ -107,7 +112,8 @@ FFmpeg_Glue::inputdata::inputdata()
     Encode_FormatContext(NULL),
     Encode_CodecContext(NULL),
     Encode_Stream(NULL),
-    Encode_Packet(NULL)
+    Encode_Packet(NULL),
+    Encode_CodecID(AV_CODEC_ID_NONE)
 {
 }
 
@@ -150,7 +156,11 @@ bool FFmpeg_Glue::inputdata::InitEncode()
 
     if (Type==AVMEDIA_TYPE_AUDIO)
     {
-        AVCodec *Encode_Codec=avcodec_find_encoder(Stream->codec->codec_id);
+        AVCodec *Encode_Codec;
+        if (Encode_CodecID==AV_CODEC_ID_NONE)
+            Encode_Codec=avcodec_find_encoder(Stream->codec->codec_id);
+        else
+            Encode_Codec=avcodec_find_encoder((AVCodecID)Encode_CodecID);
         if (!Encode_Codec)
             return false;
 
@@ -183,7 +193,26 @@ void FFmpeg_Glue::inputdata::Encode(AVPacket* SourcePacket)
     AVPacket TempPacket=*SourcePacket;
     TempPacket.pts=AV_NOPTS_VALUE;
     TempPacket.dts=AV_NOPTS_VALUE;
-    av_interleaved_write_frame(Encode_FormatContext, &TempPacket);
+
+    if (Encode_CodecID==AV_CODEC_ID_NONE)
+        av_interleaved_write_frame(Encode_FormatContext, &TempPacket);
+    else
+    {
+        // 32 to 24-bit
+        TempPacket.size=SourcePacket->size*3/4;
+        TempPacket.data=new unsigned char[SourcePacket->size];
+        unsigned char* Source=SourcePacket->data;
+        unsigned char* Source_End=SourcePacket->data+SourcePacket->size;
+        unsigned char* Dest=TempPacket.data;
+        while (Source<Source_End)
+        {
+            ++Source;
+            *(Dest++)=*(Source++);
+            *(Dest++)=*(Source++);
+            *(Dest++)=*(Source++);
+        }
+        av_interleaved_write_frame(Encode_FormatContext, &TempPacket);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -801,7 +830,7 @@ void FFmpeg_Glue::AddInput_Video(size_t FrameCount, int time_base_num, int time_
 }
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::AddInput_Audio(size_t FrameCount, int time_base_num, int time_base_den, int Samplerate, int BitDepth, int Channels)
+void FFmpeg_Glue::AddInput_Audio(size_t FrameCount, int time_base_num, int time_base_den, int Samplerate, int BitDepth, int OutputBitDepth, int Channels)
 {
     if (!FormatContext && avformat_alloc_output_context2(&FormatContext, NULL, "mpeg", NULL)<0)
         return;
@@ -838,7 +867,14 @@ void FFmpeg_Glue::AddInput_Audio(size_t FrameCount, int time_base_num, int time_
 
     //
     InputDatas.push_back(InputData);
-}
+
+    // Encode
+    switch (OutputBitDepth)
+    {
+        case 24: InputData->Encode_CodecID=AV_CODEC_ID_PCM_S24LE; break;
+        default: ;
+    }
+ }
 
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::AddOutput(size_t FilterPos, int Scale_Width, int Scale_Height, outputmethod OutputMethod, int FilterType, const string &Filter)

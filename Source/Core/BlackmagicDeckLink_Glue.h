@@ -50,6 +50,7 @@ public:
         int                     FrameDuration;
         int                     VideoBitDepth;
         int                     AudioBitDepth;
+        int                     AudioTargetBitDepth;
         int                     ChannelsCount;
         int                     TimeScale;
         bool                    DropFrame;
@@ -64,6 +65,7 @@ public:
             , FrameDuration(0)
             , VideoBitDepth(8)
             , AudioBitDepth(16)
+            , AudioTargetBitDepth(16)
             , ChannelsCount(2)
             , TimeScale(0)
             , DropFrame(true)

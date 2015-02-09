@@ -113,8 +113,9 @@ void BlackmagicDeckLink_UserInput::on_accepted()
 
     switch (ui->AudioBitDepth->currentIndex())
     {
-        case 1 : Card->Config_In.AudioBitDepth=32; break;
-        default: Card->Config_In.AudioBitDepth=16;
+        case 1 : Card->Config_In.AudioBitDepth=32; Card->Config_In.AudioTargetBitDepth=24; break;
+        case 2 : Card->Config_In.AudioBitDepth=32; Card->Config_In.AudioTargetBitDepth=32; break;
+        default: Card->Config_In.AudioBitDepth=16; Card->Config_In.AudioTargetBitDepth=16;
     }
 
     switch (ui->AudioChannelsCount->currentIndex())

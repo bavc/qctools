@@ -203,6 +203,11 @@
     </item>
     <item>
      <property name="text">
+      <string>24-bit</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
       <string>32-bit</string>
      </property>
     </item>

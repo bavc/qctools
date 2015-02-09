@@ -405,12 +405,13 @@ bool CaptureHelper::setupInput()
     
     // enable audio input
     BMDAudioSampleType AudioSampleType;
-    switch(Config_In->VideoBitDepth)
+    switch(Config_In->AudioBitDepth)
     {
-        case 10: AudioSampleType=bmdAudioSampleType32bitInteger; break;
+        case 24:
+        case 32: AudioSampleType=bmdAudioSampleType32bitInteger; break;
         default: AudioSampleType=bmdAudioSampleType16bitInteger; break;
     }
-    if (m_input->EnableAudioInput(bmdAudioSampleRate48kHz, AudioSampleType, Config_In->AudioBitDepth) != S_OK)
+    if (m_input->EnableAudioInput(bmdAudioSampleRate48kHz, AudioSampleType, Config_In->ChannelsCount) != S_OK)
     {
         cout << "Setup of DeckLinkInput error: could not enable audio input" << endl;
         return false;
