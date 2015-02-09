@@ -12,7 +12,7 @@ const struct per_group AudioPerGroup [Group_AudioMax]=
 {
     //R128
     {
-        Item_R128M,     1,    0,    0,  3,  "R.128",  true,
+        Item_R128M,     1,  -70,    0,  3,  "R.128",  true,
         "(TODO)\n",
     },
     //LRA
