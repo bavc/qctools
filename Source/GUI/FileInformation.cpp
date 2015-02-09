@@ -84,7 +84,7 @@ void FileInformation::run()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue_, int FrameCount, const string &Encoding_FileName) :
+FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue_, int FrameCount, const string &Encoding_FileName, const std::string &Encoding_Format) :
     FileName(FileName_),
     Main(Main_),
     blackmagicDeckLink_Glue(blackmagicDeckLink_Glue_)
@@ -223,7 +223,7 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, B
     {
         Glue->AddOutput(0, 72, 72, FFmpeg_Glue::Output_Jpeg);
         if (!Encoding_FileName.empty())
-            Glue->AddOutput(Encoding_FileName);
+            Glue->AddOutput(Encoding_FileName, Encoding_Format);
         Glue->AddOutput(1, 0, 0, FFmpeg_Glue::Output_Stats, 0, Filters[0]);
         Glue->AddOutput(0, 0, 0, FFmpeg_Glue::Output_Stats, 1, Filters[1]);
     }

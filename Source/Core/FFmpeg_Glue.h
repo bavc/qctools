@@ -113,7 +113,7 @@ public:
     void                        AddInput_Video(size_t FrameCount, int time_base_num, int time_base_den, int Width, int Height, int BitDepth, bool Compression);
     void                        AddInput_Audio(size_t FrameCount, int time_base_num, int time_base_den, int Samplerate, int BitDepth, int OutputBitDepth, int Channels);
     void                        AddOutput(size_t FilterPos, int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, int FilterType=0, const string &Filter=string());
-    void                        AddOutput(const string &FileName);
+    void                        AddOutput(const string &FileName, const string &Format);
     void                        CloseOutput();
     void                        ModifyOutput(size_t InputPos, size_t OutputPos, size_t FilterPos, int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, int FilterType=0, const string &Filter=string());
     void                        Seek(size_t Pos);
@@ -247,6 +247,7 @@ private:
     void                        Encode();
     void                        CloseEncode();
     string                      Encode_FileName;
+    string                      Encode_Format;
     AVFormatContext*            Encode_FormatContext;
 
     // Seek

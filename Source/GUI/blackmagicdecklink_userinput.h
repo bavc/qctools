@@ -19,6 +19,7 @@ public:
 
     BlackmagicDeckLink_Glue*    Card;
     QString                     Encoding_FileName;
+    QString                     Encoding_Format;
 
     // Callbacks
     void                        TimeCode_IsAvailable();

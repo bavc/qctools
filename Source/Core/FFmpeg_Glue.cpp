@@ -957,9 +957,10 @@ void FFmpeg_Glue::AddOutput(size_t FilterPos, int Scale_Width, int Scale_Height,
 }
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::AddOutput(const string &FileName)
+void FFmpeg_Glue::AddOutput(const string &FileName, const string &Format)
 {
     Encode_FileName=FileName;
+    Encode_Format=Format;
 }
 
 //---------------------------------------------------------------------------
@@ -1235,7 +1236,7 @@ bool FFmpeg_Glue::OutputFrame(unsigned char* Data, size_t Size, int stream_index
 bool FFmpeg_Glue::InitEncode()
 {
     //
-    if (avformat_alloc_output_context2(&Encode_FormatContext, NULL, NULL, Encode_FileName.c_str())<0)
+    if (avformat_alloc_output_context2(&Encode_FormatContext, NULL, Encode_Format.c_str(), Encode_FileName.c_str())<0)
         return false;
 
     //

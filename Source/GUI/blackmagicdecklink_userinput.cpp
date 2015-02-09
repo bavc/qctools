@@ -95,7 +95,10 @@ void BlackmagicDeckLink_UserInput::on_accepted()
     }
 
     if (ui->Record_GroupBox->isChecked())
+    {
         Encoding_FileName=ui->Encoding_FileName_Line->text();
+        Encoding_Format = "MOV";
+    }
 
     if (Card->Config_In.FrameCount==-1)
     {

@@ -59,7 +59,7 @@ void MainWindow::openCapture()
         return;
     
     clearFiles();
-    addFile(blackmagicDeckLink_UserInput->Card, blackmagicDeckLink_UserInput->Card->Config_In.FrameCount, blackmagicDeckLink_UserInput->Encoding_FileName.toUtf8().data());
+    addFile(blackmagicDeckLink_UserInput->Card, blackmagicDeckLink_UserInput->Card->Config_In.FrameCount, blackmagicDeckLink_UserInput->Encoding_FileName.toUtf8().data(), blackmagicDeckLink_UserInput->Encoding_Format.toUtf8().data());
     addFile_finish();
 
     delete blackmagicDeckLink_UserInput;
@@ -338,10 +338,10 @@ void MainWindow::addFile(const QString &FileName)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::addFile(BlackmagicDeckLink_Glue* BlackmagicDeckLink_Glue, int FrameCount, const string &Encoding_FileName)
+void MainWindow::addFile(BlackmagicDeckLink_Glue* BlackmagicDeckLink_Glue, int FrameCount, const string &Encoding_FileName, const string &Encoding_Format)
 {
     // Launch analysis
-    FileInformation* Temp=new FileInformation(this, QString(), BlackmagicDeckLink_Glue, FrameCount, Encoding_FileName);
+    FileInformation* Temp=new FileInformation(this, QString(), BlackmagicDeckLink_Glue, FrameCount, Encoding_FileName, Encoding_Format);
 
     Files.push_back(Temp);
     ui->fileNamesBox->addItem(Temp->FileName);

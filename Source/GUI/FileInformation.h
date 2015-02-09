@@ -30,7 +30,7 @@ class FileInformation : public QThread
 
 public:
     // Constructor/Destructor
-                                FileInformation             (MainWindow* Main, const QString &FileName, BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue=NULL, int FrameCount=0, const std::string &Encoding_FileName=std::string());
+                                FileInformation             (MainWindow* Main, const QString &FileName, BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue=NULL, int FrameCount=0, const std::string &Encoding_FileName=std::string(), const std::string &Encoding_Format=std::string());
                                 ~FileInformation            ();
 
     // Parsing

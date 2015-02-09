@@ -136,7 +136,7 @@
      <string>File name</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="comboBox_3">
+   <widget class="QComboBox" name="ContainerFormat">
     <property name="geometry">
      <rect>
       <x>110</x>
@@ -147,7 +147,7 @@
     </property>
     <item>
      <property name="text">
-      <string>Autodetect</string>
+      <string>MP4 (QuickTime)</string>
      </property>
     </item>
    </widget>
