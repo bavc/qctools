@@ -29,6 +29,8 @@ extern "C"
 #include <libavfilter/buffersink.h>
 #include <libavfilter/buffersrc.h>
 
+#include <libavutil/imgutils.h>
+
 #include <config.h>
 #include <libavutil/ffversion.h>
 }
@@ -127,7 +129,11 @@ bool FFmpeg_Glue::inputdata::InitEncode()
 {
     if (Type==AVMEDIA_TYPE_VIDEO)
     {
-        AVCodec *Encode_Codec=avcodec_find_encoder(Stream->codec->codec_id);
+        AVCodec *Encode_Codec;
+        if (Encode_CodecID==AV_CODEC_ID_NONE)
+            Encode_Codec=avcodec_find_encoder(Stream->codec->codec_id);
+        else
+            Encode_Codec=avcodec_find_encoder((AVCodecID)Encode_CodecID);
         if (!Encode_Codec)
             return false;
 
@@ -137,9 +143,15 @@ bool FFmpeg_Glue::inputdata::InitEncode()
         Encode_CodecContext=Encode_Stream->codec;
         if (!Encode_CodecContext)
             return false;
+        Encode_CodecContext->flags         = CODEC_FLAG_GLOBAL_HEADER;
         Encode_CodecContext->width         = Stream->codec->width;
         Encode_CodecContext->height        = Stream->codec->height;
-        Encode_CodecContext->pix_fmt       = Stream->codec->pix_fmt;
+        if (Encode_CodecID==AV_CODEC_ID_NONE)
+            Encode_CodecContext->pix_fmt   = Stream->codec->pix_fmt;
+        else if (Stream->codec->bits_per_raw_sample==10)
+            Encode_CodecContext->pix_fmt   = AV_PIX_FMT_YUV422P10;
+        else
+            Encode_CodecContext->pix_fmt   = AV_PIX_FMT_YUV422P;
         Encode_CodecContext->time_base.num = Stream->codec->time_base.num;
         Encode_CodecContext->time_base.den = Stream->codec->time_base.den;
         Encode_CodecContext->sample_aspect_ratio.num = 9;
@@ -191,7 +203,7 @@ void FFmpeg_Glue::inputdata::Encode(AVPacket* SourcePacket)
 
     if (Encode_CodecID==AV_CODEC_ID_NONE)
         av_interleaved_write_frame(Encode_FormatContext, &TempPacket);
-    else
+    else if (Encode_CodecID==AV_CODEC_ID_PCM_S24LE)
     {
         // 32 to 24-bit
         TempPacket.size=SourcePacket->size*3/4;
@@ -207,6 +219,60 @@ void FFmpeg_Glue::inputdata::Encode(AVPacket* SourcePacket)
             *(Dest++)=*(Source++);
         }
         av_interleaved_write_frame(Encode_FormatContext, &TempPacket);
+    }
+    else if (Encode_CodecID==AV_CODEC_ID_FFV1)
+    {
+        // FFV1
+        AVFrame* SourceFrame = av_frame_alloc();
+        unsigned char* SourceFrame_Data = NULL;
+        int SourceFrame_Size = -1;
+        if (Stream->codec->bits_per_raw_sample==10)
+        {
+            int SourceFrame_Size = avpicture_get_size(Stream->codec->pix_fmt, Stream->codec->width, Stream->codec->height);
+            SourceFrame_Data = new unsigned char[SourceFrame_Size];
+            avpicture_fill((AVPicture*)SourceFrame, SourceFrame_Data, Stream->codec->pix_fmt, Stream->codec->width, Stream->codec->height);
+            int got_frame;
+            int Bytes=avcodec_decode_video2(Stream->codec, SourceFrame, &got_frame, SourcePacket);
+            got_frame=0;
+        }
+        else
+        {
+            SourceFrame->width = Stream->codec->width;
+            SourceFrame->height = Stream->codec->height;
+            SourceFrame->format = Stream->codec->pix_fmt;
+            avpicture_fill((AVPicture*)SourceFrame, SourcePacket->data, (AVPixelFormat)SourceFrame->format, SourceFrame->width, SourceFrame->height);
+        }
+
+        AVFrame* DestFrame = av_frame_alloc();
+        DestFrame->width = Stream->codec->width;
+        DestFrame->height = Stream->codec->height;
+        if (Stream->codec->bits_per_raw_sample==10)
+            DestFrame->format = AV_PIX_FMT_YUV422P10;
+        else
+            DestFrame->format = AV_PIX_FMT_YUV422P;
+        int DestFrame_Size = avpicture_get_size((AVPixelFormat)DestFrame->format, DestFrame->width, DestFrame->height);
+        unsigned char* DestFrame_Data = new unsigned char[DestFrame_Size];
+        avpicture_fill((AVPicture*)DestFrame, DestFrame_Data, (AVPixelFormat)DestFrame->format, DestFrame->width, DestFrame->height);
+
+        struct SwsContext* Context = sws_getContext(SourceFrame->width, SourceFrame->height, (AVPixelFormat)SourceFrame->format, DestFrame->width, DestFrame->height, (AVPixelFormat)DestFrame->format, SWS_FAST_BILINEAR, NULL, NULL, NULL);
+        int Result = sws_scale(Context, SourceFrame->data, SourceFrame->linesize, 0, SourceFrame->height, DestFrame->data, DestFrame->linesize);
+
+        AVPacket TempPacket;
+
+        av_init_packet(&TempPacket);
+        TempPacket.data=NULL;
+        TempPacket.size=0;
+        TempPacket.stream_index=0;
+        int got_packet=0;
+        if (avcodec_encode_video2(Encode_CodecContext, &TempPacket, DestFrame, &got_packet) < 0 || !got_packet)
+        {
+            delete[] DestFrame_Data;
+            return;
+        }
+
+        av_interleaved_write_frame(Encode_FormatContext, &TempPacket);
+        delete[] SourceFrame_Data;
+        delete[] DestFrame_Data;
     }
 }
 
@@ -782,7 +848,7 @@ FFmpeg_Glue::~FFmpeg_Glue()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::AddInput_Video(size_t FrameCount, int time_base_num, int time_base_den, int Width, int Height, int BitDepth)
+void FFmpeg_Glue::AddInput_Video(size_t FrameCount, int time_base_num, int time_base_den, int Width, int Height, int BitDepth, bool Compression)
 {
     if (!FormatContext && avformat_alloc_output_context2(&FormatContext, NULL, "mpeg", NULL)<0)
         return;
@@ -792,7 +858,7 @@ void FFmpeg_Glue::AddInput_Video(size_t FrameCount, int time_base_num, int time_
     switch (BitDepth)
     {
         case  8: codec_id=AV_CODEC_ID_RAWVIDEO; pix_fmt=AV_PIX_FMT_UYVY422; break;
-        case 10: codec_id=AV_CODEC_ID_V210;     pix_fmt=AV_PIX_FMT_YUV444P10LE; break;
+        case 10: codec_id=AV_CODEC_ID_V210;     pix_fmt=AV_PIX_FMT_NONE; break;
         default: return; // Not supported
     }
     inputdata* InputData=new inputdata;
@@ -822,6 +888,10 @@ void FFmpeg_Glue::AddInput_Video(size_t FrameCount, int time_base_num, int time_
 
     //
     InputDatas.push_back(InputData);
+
+    // Encode
+    if (Compression)
+        InputData->Encode_CodecID=AV_CODEC_ID_FFV1;
 }
 
 //---------------------------------------------------------------------------

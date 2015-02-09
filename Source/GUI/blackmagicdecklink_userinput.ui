@@ -57,7 +57,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QComboBox" name="comboBox">
+   <widget class="QComboBox" name="VideoFormat">
     <property name="geometry">
      <rect>
       <x>110</x>
@@ -69,6 +69,11 @@
     <item>
      <property name="text">
       <string>Raw video</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>FFV1</string>
      </property>
     </item>
    </widget>

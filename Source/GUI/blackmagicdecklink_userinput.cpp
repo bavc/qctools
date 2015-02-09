@@ -111,6 +111,12 @@ void BlackmagicDeckLink_UserInput::on_accepted()
         default: Card->Config_In.VideoBitDepth=8;
     }
 
+    switch (ui->VideoFormat->currentIndex())
+    {
+        case 1 : Card->Config_In.VideoCompression=true; break;
+        default: Card->Config_In.VideoCompression=false;
+    }
+
     switch (ui->AudioBitDepth->currentIndex())
     {
         case 1 : Card->Config_In.AudioBitDepth=32; Card->Config_In.AudioTargetBitDepth=24; break;

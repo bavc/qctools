@@ -49,6 +49,7 @@ public:
         int                     FrameCount;
         int                     FrameDuration;
         int                     VideoBitDepth;
+        bool                    VideoCompression;
         int                     AudioBitDepth;
         int                     AudioTargetBitDepth;
         int                     ChannelsCount;
@@ -64,6 +65,7 @@ public:
             , FrameCount(-1)
             , FrameDuration(0)
             , VideoBitDepth(8)
+            , VideoCompression(false)
             , AudioBitDepth(16)
             , AudioTargetBitDepth(16)
             , ChannelsCount(2)
