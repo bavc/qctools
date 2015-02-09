@@ -111,6 +111,19 @@ void BlackmagicDeckLink_UserInput::on_accepted()
         default: Card->Config_In.VideoBitDepth=8;
     }
 
+    switch (ui->AudioBitDepth->currentIndex())
+    {
+        case 1 : Card->Config_In.AudioBitDepth=32; break;
+        default: Card->Config_In.AudioBitDepth=16;
+    }
+
+    switch (ui->AudioChannelsCount->currentIndex())
+    {
+        case 1 : Card->Config_In.ChannelsCount=8; break;
+        case 2 : Card->Config_In.ChannelsCount=16; break;
+        default: Card->Config_In.ChannelsCount=2;
+    }
+
     Card->Config_In.TimeCodeIsAvailable_Callback=NULL;
     Card->Config_In.TimeCodeIsAvailable_Private=NULL;
 }

@@ -187,7 +187,7 @@
      <string>Audio format:</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="comboBox_5">
+   <widget class="QComboBox" name="AudioBitDepth">
     <property name="geometry">
      <rect>
       <x>340</x>
@@ -199,6 +199,11 @@
     <item>
      <property name="text">
       <string>16-bit</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>32-bit</string>
      </property>
     </item>
    </widget>
@@ -512,7 +517,7 @@
     </property>
    </item>
   </widget>
-  <widget class="QComboBox" name="VideoInputConnection_3">
+  <widget class="QComboBox" name="AudioChannelsCount">
    <property name="geometry">
     <rect>
      <x>140</x>
@@ -524,6 +529,16 @@
    <item>
     <property name="text">
      <string>2-channel</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>8-channel</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>16-channel</string>
     </property>
    </item>
   </widget>

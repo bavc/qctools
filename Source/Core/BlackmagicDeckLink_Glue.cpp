@@ -79,7 +79,8 @@ void BlackmagicDeckLink_Glue::Start()
             }
             unsigned char* VideoData=new unsigned char[VideoSize];
 
-            unsigned char AudioData[1600*16*2/8];
+            size_t AudioSize=1601*Config_In.AudioBitDepth*Config_In.ChannelsCount/8;
+            unsigned char* AudioData=new unsigned char[AudioSize];
 
             int FrameCount;
             if (Config_In.TC_in!=-1)
@@ -98,15 +99,16 @@ void BlackmagicDeckLink_Glue::Start()
             for (int FramePos=0; FramePos<FrameCount; FramePos++)
             {
                 memset(VideoData, FillingValue, VideoSize);
-                memset(AudioData, FillingValue, 1600*16*2/8);
+                memset(AudioData, FillingValue, AudioSize);
                 if (!(*((Debug_Simulation*)Handle)->Glue)->OutputFrame(VideoData, VideoSize, 0, FramePos))
                     break;
-                if (!(*((Debug_Simulation*)Handle)->Glue)->OutputFrame(AudioData, 1600*16*2/8, 1, FramePos))
+                if (!(*((Debug_Simulation*)Handle)->Glue)->OutputFrame(AudioData, AudioSize, 1, FramePos))
                     break;
                 FillingValue++;
             }
 
             delete[] VideoData;
+            delete[] AudioData;
 
             Config_Out.Status=BlackmagicDeckLink_Glue::finished;
 

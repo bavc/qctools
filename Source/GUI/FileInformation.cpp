@@ -209,7 +209,7 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, B
     if (FileName_string.empty())
     {
         Glue->AddInput_Video(FrameCount, 1001, 30000, 720, 486, blackmagicDeckLink_Glue->Config_In.VideoBitDepth);
-        Glue->AddInput_Audio(FrameCount, 1001, 30000, 48000, 2);
+        Glue->AddInput_Audio(FrameCount, 1001, 30000, 48000, blackmagicDeckLink_Glue->Config_In.AudioBitDepth, blackmagicDeckLink_Glue->Config_In.ChannelsCount);
     }
     else if (Glue->ContainerFormat_Get().empty())
     {

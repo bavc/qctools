@@ -49,6 +49,8 @@ public:
         int                     FrameCount;
         int                     FrameDuration;
         int                     VideoBitDepth;
+        int                     AudioBitDepth;
+        int                     ChannelsCount;
         int                     TimeScale;
         bool                    DropFrame;
         timecodeisavailable_callback* TimeCodeIsAvailable_Callback;
@@ -61,6 +63,8 @@ public:
             , FrameCount(-1)
             , FrameDuration(0)
             , VideoBitDepth(8)
+            , AudioBitDepth(16)
+            , ChannelsCount(2)
             , TimeScale(0)
             , DropFrame(true)
             , TimeCodeIsAvailable_Callback(NULL)

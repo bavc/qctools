@@ -126,7 +126,7 @@ bool FFmpeg_Glue::inputdata::InitEncode()
 {
     if (Type==AVMEDIA_TYPE_VIDEO)
     {
-        AVCodec *Encode_Codec=avcodec_find_encoder(CODEC_ID_RAWVIDEO);
+        AVCodec *Encode_Codec=avcodec_find_encoder(Stream->codec->codec_id);
         if (!Encode_Codec)
             return false;
 
@@ -150,7 +150,7 @@ bool FFmpeg_Glue::inputdata::InitEncode()
 
     if (Type==AVMEDIA_TYPE_AUDIO)
     {
-        AVCodec *Encode_Codec=avcodec_find_encoder(AV_CODEC_ID_PCM_S16LE);
+        AVCodec *Encode_Codec=avcodec_find_encoder(Stream->codec->codec_id);
         if (!Encode_Codec)
             return false;
 
@@ -163,7 +163,7 @@ bool FFmpeg_Glue::inputdata::InitEncode()
         Encode_CodecContext->bits_per_raw_sample=Stream->codec->bits_per_raw_sample;
         Encode_CodecContext->sample_rate   = Stream->codec->sample_rate;
         Encode_CodecContext->channels      = Stream->codec->channels;
-        Encode_CodecContext->channel_layout= av_get_default_channel_layout(Encode_CodecContext->channels);
+        Encode_CodecContext->channel_layout= Stream->codec->channel_layout;
         Encode_CodecContext->sample_fmt    =  Stream->codec->sample_fmt;
         if (avcodec_open2(Encode_CodecContext, Encode_Codec, NULL) < 0)
             return false;
@@ -801,10 +801,18 @@ void FFmpeg_Glue::AddInput_Video(size_t FrameCount, int time_base_num, int time_
 }
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::AddInput_Audio(size_t FrameCount, int time_base_num, int time_base_den, int Samplerate, int Channels)
+void FFmpeg_Glue::AddInput_Audio(size_t FrameCount, int time_base_num, int time_base_den, int Samplerate, int BitDepth, int Channels)
 {
     if (!FormatContext && avformat_alloc_output_context2(&FormatContext, NULL, "mpeg", NULL)<0)
         return;
+
+    enum AVCodecID codec_id;
+    switch (BitDepth)
+    {
+        case 16: codec_id=AV_CODEC_ID_PCM_S16LE; break;
+        case 32: codec_id=AV_CODEC_ID_PCM_S32LE; break;
+        default: return; // Not supported
+    }
 
     inputdata* InputData=new inputdata;
     InputData->Type=AVMEDIA_TYPE_AUDIO;
@@ -812,15 +820,14 @@ void FFmpeg_Glue::AddInput_Audio(size_t FrameCount, int time_base_num, int time_
     InputData->Stream->time_base.num=time_base_num;
     InputData->Stream->time_base.den=time_base_den;
     InputData->Stream->duration=FrameCount;
-    AVCodec* Codec=avcodec_find_decoder(AV_CODEC_ID_PCM_S16LE);
+    AVCodec* Codec=avcodec_find_decoder(codec_id);
     AVCodecContext* CodecContext=avcodec_alloc_context3(Codec);
     CodecContext->sample_rate=Samplerate;
     CodecContext->channels=Channels;
-    //CodecContext->codec_tag=0x74776F73; // sowt
     if (avcodec_open2(CodecContext, Codec, NULL)<0)
         return;
     InputData->Stream->codec=CodecContext;
-    InputData->Stream->codec->channel_layout=3;
+    InputData->Stream->codec->channel_layout=av_get_default_channel_layout(CodecContext->channels);
 
     InputData->FrameCount=FrameCount;
     InputData->Duration=((double)FrameCount)*time_base_num/time_base_den;
