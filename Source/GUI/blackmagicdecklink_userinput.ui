@@ -88,12 +88,12 @@
     </property>
     <item>
      <property name="text">
-      <string>8-bit</string>
+      <string>8 bit</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>10-bit</string>
+      <string>10 bit</string>
      </property>
     </item>
    </widget>
@@ -203,17 +203,17 @@
     </property>
     <item>
      <property name="text">
-      <string>16-bit</string>
+      <string>16 bit</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>24-bit</string>
+      <string>24 bit</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>32-bit</string>
+      <string>32 bit</string>
      </property>
     </item>
    </widget>
@@ -538,17 +538,17 @@
    </property>
    <item>
     <property name="text">
-     <string>2-channel</string>
+     <string>2 channel</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>8-channel</string>
+     <string>8 channel</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>16-channel</string>
+     <string>16 channel</string>
     </property>
    </item>
   </widget>
