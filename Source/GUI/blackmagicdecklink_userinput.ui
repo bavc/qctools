@@ -324,7 +324,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Specific timecode (waiting for deck answer)</string>
+     <string>Timecode (waiting for deck to answer)</string>
     </property>
    </widget>
    <zorder>In_Now</zorder>
@@ -446,7 +446,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Specific timecode (waiting for deck answer)</string>
+     <string>Timecode (waiting for deck to answer)</string>
     </property>
    </widget>
    <zorder>Out_FrameCout</zorder>
