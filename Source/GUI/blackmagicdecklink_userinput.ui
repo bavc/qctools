@@ -77,7 +77,7 @@
      </property>
     </item>
    </widget>
-   <widget class="QComboBox" name="comboBox_2">
+   <widget class="QComboBox" name="VideoBitDepth">
     <property name="geometry">
      <rect>
       <x>110</x>
