@@ -184,9 +184,9 @@ void BlackmagicDeckLink_UserInput::TimeCode_IsAvailable()
     ui->Out_3->setValue(((Card->Config_Out.TC_current>>12)&0xF)*10+((Card->Config_Out.TC_current>>8)&0xF)+10); //TODO: better handling of timecodes
     ui->Out_4->setValue(((Card->Config_Out.TC_current>>4)&0xF)*10+((Card->Config_Out.TC_current)&0xF));
 
-    ui->In_Timecode->setText("Specific timecode:");
+    ui->In_Timecode->setText("Timecode:");
     ui->In_Timecode->setEnabled(true);
-    ui->Out_Timecode->setText("Specific timecode:");
+    ui->Out_Timecode->setText("Timecode:");
     ui->Out_Timecode->setEnabled(true);
 
     ui->In_1->setVisible(true);

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Select Timecodes in and out</string>
+   <string>Configure Decklink Input</string>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
@@ -39,7 +39,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Recording</string>
+    <string>Record to File</string>
    </property>
    <property name="checkable">
     <bool>true</bool>
@@ -107,7 +107,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Video format:</string>
+     <string>Video codec:</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_2">
@@ -161,7 +161,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Container format:</string>
+     <string>Container:</string>
     </property>
    </widget>
    <widget class="QComboBox" name="comboBox_4">
@@ -189,7 +189,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Audio format:</string>
+     <string>Audio codec:</string>
     </property>
    </widget>
    <widget class="QComboBox" name="AudioBitDepth">
