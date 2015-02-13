@@ -68,7 +68,7 @@
     </property>
     <item>
      <property name="text">
-      <string>Raw video</string>
+      <string>Uncompressed</string>
      </property>
     </item>
     <item>
@@ -107,7 +107,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Video codec:</string>
+     <string>Video codec</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_2">
@@ -161,7 +161,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Container:</string>
+     <string>Container</string>
     </property>
    </widget>
    <widget class="QComboBox" name="comboBox_4">
