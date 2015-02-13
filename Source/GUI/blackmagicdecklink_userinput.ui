@@ -50,7 +50,7 @@
    <widget class="QLineEdit" name="Encoding_FileName_Line">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>150</x>
       <y>20</y>
       <width>491</width>
       <height>20</height>
@@ -60,9 +60,9 @@
    <widget class="QComboBox" name="VideoFormat">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>150</x>
       <y>80</y>
-      <width>121</width>
+      <width>150</width>
       <height>22</height>
      </rect>
     </property>
@@ -80,9 +80,9 @@
    <widget class="QComboBox" name="VideoBitDepth">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>150</x>
       <y>110</y>
-      <width>121</width>
+      <width>150</width>
       <height>22</height>
      </rect>
     </property>
@@ -102,7 +102,7 @@
      <rect>
       <x>10</x>
       <y>80</y>
-      <width>91</width>
+      <width>100</width>
       <height>16</height>
      </rect>
     </property>
@@ -115,7 +115,7 @@
      <rect>
       <x>10</x>
       <y>110</y>
-      <width>91</width>
+      <width>100</width>
       <height>16</height>
      </rect>
     </property>
@@ -128,7 +128,7 @@
      <rect>
       <x>10</x>
       <y>20</y>
-      <width>91</width>
+      <width>125</width>
       <height>16</height>
      </rect>
     </property>
@@ -139,9 +139,9 @@
    <widget class="QComboBox" name="ContainerFormat">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>150</x>
       <y>50</y>
-      <width>121</width>
+      <width>150</width>
       <height>22</height>
      </rect>
     </property>
@@ -156,8 +156,8 @@
      <rect>
       <x>10</x>
       <y>50</y>
-      <width>91</width>
-      <height>16</height>
+      <width>150</width>
+      <height>22</height>
      </rect>
     </property>
     <property name="text">
@@ -167,9 +167,9 @@
    <widget class="QComboBox" name="comboBox_4">
     <property name="geometry">
      <rect>
-      <x>340</x>
+      <x>450</x>
       <y>80</y>
-      <width>121</width>
+      <width>150</width>
       <height>22</height>
      </rect>
     </property>
@@ -182,22 +182,22 @@
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>350</x>
       <y>80</y>
-      <width>91</width>
-      <height>16</height>
+      <width>150</width>
+      <height>22</height>
      </rect>
     </property>
     <property name="text">
-     <string>Audio codec:</string>
+     <string>Audio codec</string>
     </property>
    </widget>
    <widget class="QComboBox" name="AudioBitDepth">
     <property name="geometry">
      <rect>
-      <x>340</x>
+      <x>450</x>
       <y>110</y>
-      <width>121</width>
+      <width>150</width>
       <height>22</height>
      </rect>
     </property>
@@ -220,10 +220,10 @@
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>350</x>
       <y>110</y>
-      <width>91</width>
-      <height>16</height>
+      <width>150</width>
+      <height>22</height>
      </rect>
     </property>
     <property name="text">
