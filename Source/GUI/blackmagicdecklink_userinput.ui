@@ -243,32 +243,6 @@
    <property name="title">
     <string>In</string>
    </property>
-   <widget class="QSpinBox" name="In_3">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>50</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="In_4">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>50</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QSpinBox" name="In_1">
     <property name="enabled">
      <bool>true</bool>
@@ -288,7 +262,33 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>200</x>
+      <x>192</x>
+      <y>50</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="In_3">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>234</x>
+      <y>50</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="In_4">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>276</x>
       <y>50</y>
       <width>42</width>
       <height>22</height>
@@ -346,13 +346,26 @@
    <property name="title">
     <string>Out</string>
    </property>
+   <widget class="QSpinBox" name="Out_1">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>50</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
    <widget class="QSpinBox" name="Out_2">
     <property name="enabled">
      <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>200</x>
+      <x>192</x>
       <y>50</y>
       <width>42</width>
       <height>22</height>
@@ -365,7 +378,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>250</x>
+      <x>234</x>
       <y>50</y>
       <width>42</width>
       <height>22</height>
@@ -378,20 +391,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>300</x>
-      <y>50</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="Out_1">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>150</x>
+      <x>276</x>
       <y>50</y>
       <width>42</width>
       <height>22</height>
