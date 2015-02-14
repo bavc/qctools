@@ -21,7 +21,9 @@ struct Debug_Simulation
     bool WantToStop;
 
     Debug_Simulation()
-        : WantToStop(false);
+        : WantToStop(false)
+    {
+    }
 };
 #endif
 

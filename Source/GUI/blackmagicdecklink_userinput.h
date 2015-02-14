@@ -32,9 +32,15 @@ private:
 private Q_SLOTS:
 
     void on_accepted();
-    void on_Record_GroupBox_toggled(bool on);
-    void on_CardsList_currentIndexChanged(int Pos);
-    void on_VideoInputConnection_currentIndexChanged(int Pos);
+    void on_Record_Group_toggled(bool on);
+    void on_CardsList_Value_currentIndexChanged(int Pos);
+    void on_Deck_Source_Value_currentIndexChanged(int Pos);
+    void on_In_Now_Label_toggled(bool checked);
+    void on_In_Timecode_Label_toggled(bool checked);
+    void on_Out_FrameCout_toggled(bool checked);
+    void on_Out_DurationTC_Label_toggled(bool checked);
+    void on_Out_DurationTS_Label_toggled(bool checked);
+    void on_Out_Timecode_Label_toggled(bool checked);
 };
 
 #endif // BLACKMAGIC_DECKLINK_USERINPUT_H
