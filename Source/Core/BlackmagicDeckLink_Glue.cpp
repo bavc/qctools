@@ -18,6 +18,10 @@ struct Debug_Simulation
 {
     FFmpeg_Glue** Glue;
     int FrameCount;
+    bool WantToStop;
+
+    Debug_Simulation()
+        : WantToStop(false);
 };
 #endif
 
@@ -105,6 +109,9 @@ void BlackmagicDeckLink_Glue::Start()
                 if (!(*((Debug_Simulation*)Handle)->Glue)->OutputFrame(AudioData, AudioSize, 1, FramePos))
                     break;
                 FillingValue++;
+
+                if (((Debug_Simulation*)Handle)->WantToStop)
+                    break;
             }
 
             delete[] VideoData;
@@ -124,6 +131,8 @@ bool BlackmagicDeckLink_Glue::Stop()
     {
         #if defined(BLACKMAGICDECKLINK_YES)
             return ((CaptureHelper*)Handle)->finishCapture();
+        #elif defined(_DEBUG) // Simulation
+            ((Debug_Simulation*)Handle)->WantToStop=true;
         #endif
     }
 
