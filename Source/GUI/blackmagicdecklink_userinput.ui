@@ -45,7 +45,7 @@
     <bool>true</bool>
    </property>
    <property name="checked">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <widget class="QLineEdit" name="Record_DirectoryName_Value">
     <property name="geometry">
