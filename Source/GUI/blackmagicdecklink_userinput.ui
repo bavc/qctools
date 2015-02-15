@@ -48,6 +48,9 @@
     <bool>true</bool>
    </property>
    <widget class="QLineEdit" name="Record_DirectoryName_Value">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>110</x>
@@ -289,7 +292,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Specific timecode (waiting for deck to answer)</string>
+     <string>Timecode (waiting for deck to answer)</string>
     </property>
    </widget>
    <widget class="QLabel" name="In_DropFrame_Label">
@@ -377,12 +380,12 @@
    <zorder>In_Timecode_HH</zorder>
    <zorder>In_Timecode_SS</zorder>
    <zorder>In_Timecode_MM</zorder>
-   <zorder>In_DropFrame_Label</zorder>
-   <zorder>In_DropFrame_Value</zorder>
    <zorder>In_FrameRate_Value</zorder>
    <zorder>In_FrameRate_Label</zorder>
+   <zorder>In_DropFrame_Label</zorder>
+   <zorder>In_DropFrame_Value</zorder>
   </widget>
-  <widget class="QGroupBox" name="groupBox_3">
+  <widget class="QGroupBox" name="Out_Group">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -394,6 +397,22 @@
    <property name="title">
     <string>Out</string>
    </property>
+   <widget class="QSpinBox" name="Out_Timecode_HH">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>30</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>23</number>
+    </property>
+   </widget>
    <widget class="QSpinBox" name="Out_Timecode_MM">
     <property name="enabled">
      <bool>false</bool>
@@ -438,24 +457,11 @@
       <height>22</height>
      </rect>
     </property>
-   </widget>
-   <widget class="QSpinBox" name="Out_Timecode_HH">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>710</x>
-      <y>30</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
     <property name="maximum">
-     <number>23</number>
+     <number>29</number>
     </property>
    </widget>
-   <widget class="QRadioButton" name="Out_FrameCout">
+   <widget class="QRadioButton" name="Out_FrameCount_Label">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -471,7 +477,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QSpinBox" name="Out_Frames">
+   <widget class="QSpinBox" name="Out_FrameCount_Value">
     <property name="geometry">
      <rect>
       <x>120</x>
@@ -481,7 +487,7 @@
      </rect>
     </property>
     <property name="minimum">
-     <number>0</number>
+     <number>1</number>
     </property>
     <property name="maximum">
      <number>999999</number>
@@ -503,7 +509,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>End timecode (waiting for deck to answer)</string>
+     <string>Timecode (waiting for deck to answer)</string>
     </property>
    </widget>
    <widget class="QRadioButton" name="Out_DurationTC_Label">
@@ -585,6 +591,9 @@
       <height>22</height>
      </rect>
     </property>
+    <property name="maximum">
+     <number>29</number>
+    </property>
    </widget>
    <widget class="QRadioButton" name="Out_DurationTS_Label">
     <property name="enabled">
@@ -649,6 +658,9 @@
       <height>22</height>
      </rect>
     </property>
+    <property name="maximum">
+     <number>999</number>
+    </property>
    </widget>
    <widget class="QSpinBox" name="Out_DurationTS_MM">
     <property name="enabled">
@@ -666,23 +678,23 @@
      <number>59</number>
     </property>
    </widget>
+   <zorder>Out_FrameCount_Label</zorder>
+   <zorder>Out_FrameCount_Value</zorder>
    <zorder>Out_DurationTS_Label</zorder>
    <zorder>Out_DurationTC_Label</zorder>
-   <zorder>Out_FrameCout</zorder>
    <zorder>Out_Timecode_Label</zorder>
-   <zorder>Out_Frames</zorder>
-   <zorder>Out_Timecode_FF</zorder>
    <zorder>Out_Timecode_HH</zorder>
    <zorder>Out_Timecode_MM</zorder>
    <zorder>Out_Timecode_SS</zorder>
+   <zorder>Out_Timecode_FF</zorder>
    <zorder>Out_DurationTC_HH</zorder>
-   <zorder>Out_DurationTC_SS</zorder>
    <zorder>Out_DurationTC_MM</zorder>
+   <zorder>Out_DurationTC_SS</zorder>
    <zorder>Out_DurationTC_FF</zorder>
-   <zorder>Out_DurationTS_SS</zorder>
    <zorder>Out_DurationTS_HH</zorder>
-   <zorder>Out_DurationTS_mmm</zorder>
    <zorder>Out_DurationTS_MM</zorder>
+   <zorder>Out_DurationTS_SS</zorder>
+   <zorder>Out_DurationTS_mmm</zorder>
   </widget>
   <widget class="QGroupBox" name="Deck_Group">
    <property name="geometry">

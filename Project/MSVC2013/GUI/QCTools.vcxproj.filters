@@ -183,6 +183,9 @@
     <ClCompile Include="..\..\..\Source\Core\BlackmagicDeckLink.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Core\TimeCode.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="_Automated\ui_mainwindow.h">
@@ -268,6 +271,9 @@
     </ClInclude>
     <ClInclude Include="DeckLinkAPI_h.h">
       <Filter>Header Files\Blackmagic DeckLink</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Core\TimeCode.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

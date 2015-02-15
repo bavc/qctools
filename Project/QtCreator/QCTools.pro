@@ -19,6 +19,7 @@ HEADERS = \
     ../../Source/Core/FFmpeg_Glue.h \
     ../../Source/Core/VideoCore.h \
     ../../Source/Core/VideoStats.h \
+    ../../Source/Core/Timecode.h \
     ../../Source/GUI/blackmagicdecklink_userinput.h \
     ../../Source/GUI/BigDisplay.h \
     ../../Source/GUI/Control.h \
@@ -46,6 +47,7 @@ SOURCES = \
     ../../Source/Core/FFmpeg_Glue.cpp \
     ../../Source/Core/VideoCore.cpp \
     ../../Source/Core/VideoStats.cpp \
+    ../../Source/Core/Timecode.cpp \
     ../../Source/GUI/blackmagicdecklink_userinput.cpp \
     ../../Source/GUI/BigDisplay.cpp \
     ../../Source/GUI/Control.cpp \

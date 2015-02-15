@@ -27,7 +27,8 @@ public:
 private:
     Ui::BlackmagicDeckLink_UserInput *ui;
 
-    int                         TC_Now;
+    bool                        In_InModification;
+    bool                        Out_InModification;
 
 private Q_SLOTS:
 
@@ -37,10 +38,32 @@ private Q_SLOTS:
     void on_Deck_Source_Value_currentIndexChanged(int Pos);
     void on_In_Now_Label_toggled(bool checked);
     void on_In_Timecode_Label_toggled(bool checked);
-    void on_Out_FrameCout_toggled(bool checked);
+    void on_In_Timecode_HH_valueChanged(int i);
+    void on_In_Timecode_MM_valueChanged(int i);
+    void on_In_Timecode_SS_valueChanged(int i);
+    void on_In_Timecode_FF_valueChanged(int i);
+    void on_In_Timecode_XX_valueChanged();
+    void on_Out_FrameCount_Label_toggled(bool checked);
+    void on_Out_FrameCount_Value_valueChanged(int i);
     void on_Out_DurationTC_Label_toggled(bool checked);
+    void on_Out_DurationTC_HH_valueChanged(int i);
+    void on_Out_DurationTC_MM_valueChanged(int i);
+    void on_Out_DurationTC_SS_valueChanged(int i);
+    void on_Out_DurationTC_FF_valueChanged(int i);
+    void on_Out_DurationTC_XX_valueChanged();
     void on_Out_DurationTS_Label_toggled(bool checked);
+    void on_Out_DurationTS_HH_valueChanged(int i);
+    void on_Out_DurationTS_MM_valueChanged(int i);
+    void on_Out_DurationTS_SS_valueChanged(int i);
+    void on_Out_DurationTS_mmm_valueChanged(int i);
+    void on_Out_DurationTS_XX_valueChanged();
     void on_Out_Timecode_Label_toggled(bool checked);
+    void on_Out_Timecode_HH_valueChanged(int i);
+    void on_Out_Timecode_MM_valueChanged(int i);
+    void on_Out_Timecode_SS_valueChanged(int i);
+    void on_Out_Timecode_FF_valueChanged(int i);
+    void on_Out_Timecode_XX_valueChanged();
+    void on_Record_DirectoryName_Dialog_pressed();
 };
 
 #endif // BLACKMAGIC_DECKLINK_USERINPUT_H
