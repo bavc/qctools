@@ -7,6 +7,8 @@
 #include <QThread>
 #include <QStandardItemModel>
 #include <QFileDialog>
+#include <QFile>
+#include <QMessageBox>
 
 void __stdcall BlackmagicDeckLink_UserInput_TimeCodeCallback(void* Private)
 {
@@ -55,6 +57,24 @@ BlackmagicDeckLink_UserInput::BlackmagicDeckLink_UserInput(QWidget *parent) :
 BlackmagicDeckLink_UserInput::~BlackmagicDeckLink_UserInput()
 {
     delete ui;
+}
+
+void BlackmagicDeckLink_UserInput::done(int r)
+{
+    if (r != QDialog::Accepted || !QFile::exists(ui->Record_DirectoryName_Value->text() + "/" + ui->Record_FileName_Value->text()))
+    {
+        // No need
+        QDialog::done(r);
+        return;
+    }
+
+    // Warning to user
+    QMessageBox MessageBox(QMessageBox::Warning, "File already exists", ui->Record_DirectoryName_Value->text() + "/" + ui->Record_FileName_Value->text() + " already exists, are you sure you want to overwrite it?", QMessageBox::Yes|QMessageBox::No, this);
+    if (MessageBox.exec() == QMessageBox::Yes)
+    {
+        QDialog::done(r);
+        return;
+    }
 }
 
 void BlackmagicDeckLink_UserInput::on_accepted()

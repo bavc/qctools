@@ -32,6 +32,8 @@ private:
 
 private Q_SLOTS:
 
+    void done(int r);
+
     void on_accepted();
     void on_Record_Group_toggled(bool on);
     void on_CardsList_Value_currentIndexChanged(int Pos);
