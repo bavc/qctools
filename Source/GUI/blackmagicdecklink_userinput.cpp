@@ -36,10 +36,6 @@ BlackmagicDeckLink_UserInput::BlackmagicDeckLink_UserInput(QWidget *parent) :
     if (ui->Record_Group->isChecked())
         on_Record_Group_toggled(true);
 
-    // Config
-    connect( this, SIGNAL( accepted() ), this, SLOT( on_accepted() ) );
-    connect( ui->Record_Group, SIGNAL( toggled(bool) ), this, SLOT( on_Record_GroupBox_toggled(bool) ) );
-
     // Deck menu
     std::vector<std::string> List=BlackmagicDeckLink_Glue::CardsList();
     for (size_t Pos = 0; Pos<List.size(); Pos++)
@@ -59,26 +55,16 @@ BlackmagicDeckLink_UserInput::~BlackmagicDeckLink_UserInput()
     delete ui;
 }
 
-void BlackmagicDeckLink_UserInput::done(int r)
+void BlackmagicDeckLink_UserInput::accept()
 {
-    if (r != QDialog::Accepted || !QFile::exists(ui->Record_DirectoryName_Value->text() + "/" + ui->Record_FileName_Value->text()))
+    if (QFile::exists(ui->Record_DirectoryName_Value->text() + "/" + ui->Record_FileName_Value->text()))
     {
-        // No need
-        QDialog::done(r);
-        return;
+        // Warning to user
+        QMessageBox MessageBox(QMessageBox::Warning, "File already exists", ui->Record_DirectoryName_Value->text() + "/" + ui->Record_FileName_Value->text() + " already exists, are you sure you want to overwrite it?", QMessageBox::Yes|QMessageBox::No, this);
+        if (MessageBox.exec() != QMessageBox::Yes)
+            return;
     }
 
-    // Warning to user
-    QMessageBox MessageBox(QMessageBox::Warning, "File already exists", ui->Record_DirectoryName_Value->text() + "/" + ui->Record_FileName_Value->text() + " already exists, are you sure you want to overwrite it?", QMessageBox::Yes|QMessageBox::No, this);
-    if (MessageBox.exec() == QMessageBox::Yes)
-    {
-        QDialog::done(r);
-        return;
-    }
-}
-
-void BlackmagicDeckLink_UserInput::on_accepted()
-{
     if (!Card)
         return;
 
@@ -157,6 +143,8 @@ void BlackmagicDeckLink_UserInput::on_accepted()
 
     Card->Config_In.TimeCodeIsAvailable_Callback=NULL;
     Card->Config_In.TimeCodeIsAvailable_Private=NULL;
+
+    QDialog::accept();
 }
 
 void BlackmagicDeckLink_UserInput::on_Record_Group_toggled(bool on)
