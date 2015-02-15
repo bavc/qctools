@@ -9,6 +9,7 @@
 #include "Core/BlackmagicDeckLink.h"
 #if !defined (BLACKMAGICDECKLINK) && defined(_DEBUG)
     #include "Core/FFmpeg_Glue.h"
+    #include <cstring>
 #endif
 //---------------------------------------------------------------------------
 
@@ -104,8 +105,8 @@ void BlackmagicDeckLink_Glue::Start()
 
             for (int FramePos=0; FramePos<FrameCount; FramePos++)
             {
-                memset(VideoData, FillingValue, VideoSize);
-                memset(AudioData, FillingValue, AudioSize);
+                std::memset(VideoData, FillingValue, VideoSize);
+                std::memset(AudioData, FillingValue, AudioSize);
                 if (!(*((Debug_Simulation*)Handle)->Glue)->OutputFrame(VideoData, VideoSize, 0, FramePos))
                     break;
                 if (!(*((Debug_Simulation*)Handle)->Glue)->OutputFrame(AudioData, AudioSize, 1, FramePos))
