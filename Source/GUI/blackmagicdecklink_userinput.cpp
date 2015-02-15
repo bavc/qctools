@@ -44,6 +44,8 @@ BlackmagicDeckLink_UserInput::BlackmagicDeckLink_UserInput(QWidget *parent) :
         ui->CardsList_Value->addItem(List[Pos].c_str());
 
     // Not yet supported
+    ui->Deck_Source_Label->setVisible(false);
+    ui->Deck_Source_Value->setVisible(false);
     ui->In_FrameRate_Label->setVisible(false);
     ui->In_FrameRate_Value->setVisible(false);
     ui->In_DropFrame_Label->setVisible(false);
