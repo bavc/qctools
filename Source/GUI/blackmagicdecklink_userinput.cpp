@@ -3,7 +3,9 @@
 
 #include "Core/TimeCode.h"
 
-#include <QStandardPaths>
+#if QT_VERSION >= 0x050000
+    #include <QStandardPaths>
+#endif
 #include <QThread>
 #include <QStandardItemModel>
 #include <QFileDialog>
@@ -150,7 +152,11 @@ void BlackmagicDeckLink_UserInput::accept()
 void BlackmagicDeckLink_UserInput::on_Record_Group_toggled(bool on)
 {
     if (on && ui->Record_FileName_Value->text().isEmpty())
-        ui->Record_DirectoryName_Value->setText(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
+        #if QT_VERSION >= 0x050000
+            ui->Record_DirectoryName_Value->setText(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
+        #else
+            ui->Record_DirectoryName_Value->setText("~/");
+        #endif
     if (on && ui->Record_FileName_Value->text().isEmpty())
         ui->Record_FileName_Value->setText("QCTools_Capture.mov");
 }
