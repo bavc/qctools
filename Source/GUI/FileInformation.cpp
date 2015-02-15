@@ -223,7 +223,10 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, B
     {
         Glue->AddOutput(0, 72, 72, FFmpeg_Glue::Output_Jpeg);
         if (!Encoding_FileName.empty())
+        {
             Glue->AddOutput(Encoding_FileName, Encoding_Format);
+            FileName=QString::fromUtf8(Encoding_FileName.c_str());
+        }
         Glue->AddOutput(1, 0, 0, FFmpeg_Glue::Output_Stats, 0, Filters[0]);
         Glue->AddOutput(0, 0, 0, FFmpeg_Glue::Output_Stats, 1, Filters[1]);
     }
