@@ -62,7 +62,7 @@ void BlackmagicDeckLink_UserInput::on_accepted()
     if (!Card)
         return;
 
-    if (ui->Out_Timecode_Label->isChecked())
+    if (ui->In_Timecode_Label->isChecked())
     {
         Card->Config_In.TC_in=0;
         Card->Config_In.TC_in+=(ui->In_Timecode_HH->value()/10)<<28;
@@ -73,18 +73,7 @@ void BlackmagicDeckLink_UserInput::on_accepted()
         Card->Config_In.TC_in+=(ui->In_Timecode_SS->value()%10)<< 8;
         Card->Config_In.TC_in+=(ui->In_Timecode_FF->value()/10)<< 4;
         Card->Config_In.TC_in+=(ui->In_Timecode_FF->value()%10)<< 0;
-    }
-    else if (ui->Out_Timecode_Label->isChecked())
-    {
-        Card->Config_In.TC_in=Card->Config_Out.TC_current;
-    }
-    else
-    {
-        Card->Config_In.TC_in=-1;
-    }
 
-    if (ui->Out_Timecode_Label->isChecked())
-    {
         Card->Config_In.TC_out=0;
         Card->Config_In.TC_out+=(ui->Out_Timecode_HH->value()/10)<<28;
         Card->Config_In.TC_out+=(ui->Out_Timecode_HH->value()%10)<<24;
@@ -94,16 +83,15 @@ void BlackmagicDeckLink_UserInput::on_accepted()
         Card->Config_In.TC_out+=(ui->Out_Timecode_SS->value()%10)<< 8;
         Card->Config_In.TC_out+=(ui->Out_Timecode_FF->value()/10)<< 4;
         Card->Config_In.TC_out+=(ui->Out_Timecode_FF->value()%10)<< 0;
+
         Card->Config_In.FrameCount=-1;
-    }
-    else if (ui->In_Timecode_Label->isChecked())
-    {
-        Card->Config_In.TC_out=-0x23595929;
-        Card->Config_In.FrameCount = ui->Out_FrameCount_Value->text().toInt();
     }
     else
     {
-        Card->Config_In.TC_out=-1;
+        Card->Config_In.TC_in=-1;
+
+        Card->Config_In.TC_out=-0x23595929;
+
         Card->Config_In.FrameCount = ui->Out_FrameCount_Value->text().toInt();
     }
 
