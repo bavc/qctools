@@ -616,7 +616,7 @@ bool CaptureHelper::finishCapture()
 }
 
 //---------------------------------------------------------------------------
-bool CaptureHelper::stop()
+void CaptureHelper::stop()
 {
     if (Config_In->TC_in !=-1)
     {
