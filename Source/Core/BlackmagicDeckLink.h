@@ -69,6 +69,7 @@ public:
     
     void                        startCapture();
     bool                        finishCapture();
+    bool                        stop();
 
     void                        getTimeCode();
     

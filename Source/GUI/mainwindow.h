@@ -108,6 +108,9 @@ public:
     size_t                      Files_CurrentPos;
     size_t                      Thumbnails_Modulo;
 
+    // Deck
+    bool                        DeckRunning;
+
 private Q_SLOTS:
 
     void TimeOut();

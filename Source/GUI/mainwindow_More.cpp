@@ -54,6 +54,20 @@ void MainWindow::openFile()
 //---------------------------------------------------------------------------
 void MainWindow::openCapture()
 {
+    if (DeckRunning)
+    {
+        for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
+        {
+            if (Files[Files_Pos]->blackmagicDeckLink_Glue)
+                Files[Files_Pos]->blackmagicDeckLink_Glue->Stop();
+        }
+
+        ui->actionBlackmagicDeckLinkCapture->setIcon(QIcon(":/icon/capture_layout.png"));
+
+        DeckRunning=false;
+        return;
+    }
+        
     BlackmagicDeckLink_UserInput* blackmagicDeckLink_UserInput=new BlackmagicDeckLink_UserInput();
     if (!blackmagicDeckLink_UserInput->exec())
         return;

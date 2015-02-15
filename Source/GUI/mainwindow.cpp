@@ -61,6 +61,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // UI
     Ui_Init();
+
+    // Deck
+    DeckRunning=false;
 }
 
 //---------------------------------------------------------------------------

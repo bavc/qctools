@@ -56,6 +56,8 @@ void MainWindow::TimeOut ()
             Files[Files_Pos]->Parse();
     }
 
+    bool DeckRunning_New=false;
+
     // Status
     stringstream Message_Total;
     int Files_Completed=0;
@@ -96,6 +98,9 @@ void MainWindow::TimeOut ()
         CommonStats* Stats=Files[Files_Pos]->ReferenceStat();
         if (Stats && Stats->State_Get()>=1)
             Files_Completed++;
+
+        if (Files[Files_Pos]->blackmagicDeckLink_Glue)
+            DeckRunning_New=true;
     }
 
     if (Files_CurrentPos!=(size_t)-1)
@@ -128,6 +133,17 @@ void MainWindow::TimeOut ()
 
     if (PlotsArea)
         PlotsArea->refresh();
+
+    // Deck
+    if (DeckRunning_New != DeckRunning)
+    {
+        if (DeckRunning_New)
+            ui->actionBlackmagicDeckLinkCapture->setIcon(QIcon(":/icon/capture_stop.png"));
+        else
+            ui->actionBlackmagicDeckLinkCapture->setIcon(QIcon(":/icon/capture_layout.png"));
+
+        DeckRunning=DeckRunning_New;
+    }
 }
 
 //---------------------------------------------------------------------------

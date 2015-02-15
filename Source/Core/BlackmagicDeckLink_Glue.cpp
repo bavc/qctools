@@ -132,7 +132,7 @@ bool BlackmagicDeckLink_Glue::Stop()
     if (Handle)
     {
         #if defined(BLACKMAGICDECKLINK_YES)
-            return ((CaptureHelper*)Handle)->finishCapture();
+            return ((CaptureHelper*)Handle)->stop();
         #elif defined(_DEBUG) // Simulation
             ((Debug_Simulation*)Handle)->WantToStop=true;
         #endif

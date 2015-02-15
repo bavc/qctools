@@ -616,6 +616,29 @@ bool CaptureHelper::finishCapture()
 }
 
 //---------------------------------------------------------------------------
+bool CaptureHelper::stop()
+{
+    if (Config_In->TC_in !=-1)
+    {
+        if (m_control->Abort() != S_OK)
+            cout << "Could not abort capture" << endl;
+        else
+            cout << "Aborting capture" << endl;
+        Config_Out->Status=BlackmagicDeckLink_Glue::aborting;
+    }
+    else
+    {
+        // Stop
+        BMDDeckControlError bmdDeckControlError;
+        if (m_control->Stop(&bmdDeckControlError) != S_OK)
+            cout << "Could not stop (" << BMDDeckControlError2String(bmdDeckControlError) << ")" << endl;
+        else
+            cout << "Stopped" << endl;
+        finishCapture();
+    }
+}
+
+//---------------------------------------------------------------------------
 HRESULT CaptureHelper::TimecodeUpdate (BMDTimecodeBCD currentTimecode)
 {
     return S_OK;
@@ -746,24 +769,7 @@ HRESULT CaptureHelper::VideoInputFrameArrived (IDeckLinkVideoInputFrame* arrived
         if (Config_In->FrameCount != -1
          && m_FramePos >= Config_In->FrameCount)
         {
-            if (Config_In->TC_in !=-1)
-            {
-                if (m_control->Abort() != S_OK)
-                    cout << "Could not abort capture" << endl;
-                else
-                    cout << "Aborting capture" << endl;
-                Config_Out->Status=BlackmagicDeckLink_Glue::aborting;
-            }
-            else
-            {
-                // Stop
-                BMDDeckControlError bmdDeckControlError;
-                if (m_control->Stop(&bmdDeckControlError) != S_OK)
-                    cout << "Could not stop (" << BMDDeckControlError2String(bmdDeckControlError) << ")" << endl;
-                else
-                    cout << "Stopped" << endl;
-                finishCapture();
-            }
+            stop();
         }
     }
     
