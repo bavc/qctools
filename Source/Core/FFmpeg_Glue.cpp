@@ -1206,7 +1206,7 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
         InputData->FramePos++;
         if (InputData->FramePos>InputData->FrameCount)
             InputData->FrameCount=InputData->FramePos;
-        if (!InputDatas_Copy && FileName.empty())
+        if (!InputDatas_Copy && FileName.empty() && (!InputData->FramesCache || InputData->FramesCache->size()<300)) // Value arbitrary choosen
         {
             AVFrame* NewFrame = av_frame_alloc();
             NewFrame->width = Frame->width;
