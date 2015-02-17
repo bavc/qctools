@@ -1,4 +1,4 @@
-<next>
+0.7.0, 2015-02-17
 -----
 + Saturation Highlight playback filter
 + Zoom playback filter
