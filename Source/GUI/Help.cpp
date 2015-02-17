@@ -73,8 +73,14 @@ Help::Help(QWidget * parent)
     QTextBrowser* Text6=new QTextBrowser(this);
     Text6->setReadOnly(true);
     Text6->setOpenExternalLinks(true);
-    Text6->setSource(QUrl("qrc:/Help/About.html"));
-    Central->addTab(Text6, tr("About"));
+    Text6->setSource(QUrl("qrc:/Help/Recording/Recording.html"));
+    Central->addTab(Text6, tr("Recording"));
+
+    QTextBrowser* Text7=new QTextBrowser(this);
+    Text7->setReadOnly(true);
+    Text7->setOpenExternalLinks(true);
+    Text7->setSource(QUrl("qrc:/Help/About.html"));
+    Central->addTab(Text7, tr("About"));
 
     L->addWidget(Central);
     L->addWidget(Close);
