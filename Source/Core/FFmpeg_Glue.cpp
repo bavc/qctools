@@ -128,7 +128,6 @@ FFmpeg_Glue::inputdata::~inputdata()
     {
         for (size_t Pos = 0; Pos < FramesCache->size(); Pos++)
         {
-            avpicture_free((AVPicture*)((*FramesCache)[Pos]));
             av_frame_free(&((*FramesCache)[Pos]));
         }
         delete FramesCache;
