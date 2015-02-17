@@ -149,6 +149,23 @@ bool FFmpeg_Glue::inputdata::InitEncode()
             return false;
 
         Encode_Stream=avformat_new_stream(Encode_FormatContext, Encode_Codec);
+        if (TimecodeBCD != -1)
+        {
+            char timecode[12];
+            timecode[ 0] = '0' + ((TimecodeBCD>>28)&0xF);
+            timecode[ 1] = '0' + ((TimecodeBCD>>24)&0xF);
+            timecode[ 2] = ':';
+            timecode[ 3] = '0' + ((TimecodeBCD>>20)&0xF);
+            timecode[ 4] = '0' + ((TimecodeBCD>>16)&0xF);
+            timecode[ 5] = ':';
+            timecode[ 6] = '0' + ((TimecodeBCD>>12)&0xF);
+            timecode[ 7] = '0' + ((TimecodeBCD>> 8)&0xF);
+            timecode[ 8] = ';';
+            timecode[ 9] = '0' + ((TimecodeBCD>> 4)&0xF);
+            timecode[10] = '0' + ( TimecodeBCD     &0xF);
+            timecode[11] = '\0';
+            av_dict_set(&Encode_Stream->metadata, "timecode", timecode, 0);
+        }
         Encode_Stream->id=Encode_FormatContext->nb_streams-1;
 
         Encode_CodecContext=Encode_Stream->codec;
@@ -859,7 +876,7 @@ FFmpeg_Glue::~FFmpeg_Glue()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::AddInput_Video(size_t FrameCount, int time_base_num, int time_base_den, int Width, int Height, int BitDepth, bool Compression)
+void FFmpeg_Glue::AddInput_Video(size_t FrameCount, int time_base_num, int time_base_den, int Width, int Height, int BitDepth, bool Compression, int TimecodeBCD)
 {
     if (!FormatContext && avformat_alloc_output_context2(&FormatContext, NULL, "mpeg", NULL)<0)
         return;
@@ -892,6 +909,7 @@ void FFmpeg_Glue::AddInput_Video(size_t FrameCount, int time_base_num, int time_
 
     InputData->FrameCount=FrameCount;
     InputData->Duration=((double)FrameCount)*time_base_num/time_base_den;
+    InputData->TimecodeBCD=TimecodeBCD;
 
     // Stats
     if (WithStats)
@@ -1262,7 +1280,7 @@ bool FFmpeg_Glue::InitEncode()
     //
     if (avio_open(&Encode_FormatContext->pb, Encode_FileName.c_str(), AVIO_FLAG_WRITE)<0)
         return false;
-    if (avformat_write_header(Encode_FormatContext, NULL))
+     if (avformat_write_header(Encode_FormatContext, NULL))
     {
         avio_close(Encode_FormatContext->pb);
         avformat_free_context(Encode_FormatContext);

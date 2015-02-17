@@ -110,7 +110,7 @@ public:
     string                      FFmpeg_LibsVersion();
  
     // Actions
-    void                        AddInput_Video(size_t FrameCount, int time_base_num, int time_base_den, int Width, int Height, int BitDepth, bool Compression);
+    void                        AddInput_Video(size_t FrameCount, int time_base_num, int time_base_den, int Width, int Height, int BitDepth, bool Compression, int TimecodeBCD=-1);
     void                        AddInput_Audio(size_t FrameCount, int time_base_num, int time_base_den, int Samplerate, int BitDepth, int OutputBitDepth, int Channels);
     void                        AddOutput(size_t FilterPos, int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, int FilterType=0, const string &Filter=string());
     void                        AddOutput(const string &FileName, const string &Format);
@@ -155,6 +155,7 @@ private:
         size_t                  FrameCount;             // Total count of frames (may be estimated)
         double                  FirstTimeStamp;         // First PTS met in seconds
         double                  Duration;               // Duration in seconds
+        int                     TimecodeBCD;            // Timecode in BCD format
 
         // Cache
         std::vector<AVFrame*>*  FramesCache;
