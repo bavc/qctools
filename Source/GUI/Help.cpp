@@ -129,6 +129,6 @@ void Help::DataFormat ()
 //---------------------------------------------------------------------------
 void Help::About ()
 {
-    Central->setCurrentIndex(5);
+    Central->setCurrentIndex(6);
     show();
 }
