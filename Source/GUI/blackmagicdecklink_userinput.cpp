@@ -59,7 +59,7 @@ BlackmagicDeckLink_UserInput::~BlackmagicDeckLink_UserInput()
 
 void BlackmagicDeckLink_UserInput::accept()
 {
-    if (QFile::exists(ui->Record_DirectoryName_Value->text() + "/" + ui->Record_FileName_Value->text()))
+    if (ui->Record_Group->isChecked() && QFile::exists(ui->Record_DirectoryName_Value->text() + "/" + ui->Record_FileName_Value->text()))
     {
         // Warning to user
         QMessageBox MessageBox(QMessageBox::Warning, "File already exists", ui->Record_DirectoryName_Value->text() + "/" + ui->Record_FileName_Value->text() + " already exists, are you sure you want to overwrite it?", QMessageBox::Yes|QMessageBox::No, this);
