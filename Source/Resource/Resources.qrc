@@ -53,5 +53,8 @@
         <file>Help/Playback Filters/playback_layout_two_windows.jpg</file>
         <file>Help/Playback Filters/vectorscope_illegal.jpg</file>
         <file>Help/Data Format/Data Format.html</file>
+        <file>Help/Recording/Recording.html</file>
+        <file>Help/Recording/record_in_toolbar.jpg</file>
+        <file>Help/Recording/record_config.jpg</file>
     </qresource>
 </RCC>
