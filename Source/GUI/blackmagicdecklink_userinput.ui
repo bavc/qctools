@@ -39,7 +39,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Deck configuration</string>
+    <string>Blackmagic configuration</string>
    </property>
    <widget class="QComboBox" name="CardsList_Value">
     <property name="geometry">
@@ -257,7 +257,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>In</string>
+    <string>In Time</string>
    </property>
    <widget class="QRadioButton" name="In_Now_Label">
     <property name="geometry">
@@ -443,7 +443,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Out</string>
+    <string>Out Time</string>
    </property>
    <widget class="QRadioButton" name="Out_FrameCount_Label">
     <property name="geometry">
@@ -829,7 +829,7 @@
      <rect>
       <x>10</x>
       <y>50</y>
-      <width>91</width>
+      <width>120</width>
       <height>16</height>
      </rect>
     </property>
@@ -840,7 +840,7 @@
    <widget class="QComboBox" name="Record_ContainerFormat_Value">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>120</x>
       <y>50</y>
       <width>131</width>
       <height>22</height>
