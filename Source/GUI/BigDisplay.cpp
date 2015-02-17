@@ -225,6 +225,20 @@ const filter Filters[]=
         },
     },
     {
+        "Waveform / Vectorscope",
+        0,
+        {
+            { Args_Type_Slider,  20,   1, 255,   1, "Waveform" },
+            { Args_Type_Slider,   1,   1,  10,   1, "Vectorscope" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "split[a][b];[a]histogram=mode=color2,lutyuv=y=val*${2},transpose=dir=2,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8,pad=${width}:ih:(ow-iw)/2:(oh-ih)/2,scale=720:512,setsar=1/1[a1];[b]histogram=step=${1}:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:0,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,scale=720:512,setsar=1/1[b1];[b1][a1]blend=c0_mode=addition:c1_mode=average:c2_mode=average,hue=s=2",
+        },
+    },
+    {
         "Extract Planes UV Equal.",
         0,
         {
