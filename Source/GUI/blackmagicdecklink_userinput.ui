@@ -29,62 +29,91 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QGroupBox" name="Record_Group">
+  <widget class="QGroupBox" name="Deck_Group">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>220</y>
+     <y>0</y>
      <width>901</width>
      <height>81</height>
     </rect>
    </property>
    <property name="title">
-    <string>Record to File</string>
+    <string>Deck configuration</string>
    </property>
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <widget class="QLineEdit" name="Record_DirectoryName_Value">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
+   <widget class="QComboBox" name="CardsList_Value">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>10</x>
       <y>20</y>
-      <width>451</width>
-      <height>20</height>
+      <width>171</width>
+      <height>22</height>
      </rect>
     </property>
    </widget>
-   <widget class="QComboBox" name="Record_VideoFormat_Value">
+   <widget class="QLabel" name="Deck_Source_Label">
     <property name="geometry">
      <rect>
-      <x>430</x>
+      <x>10</x>
       <y>50</y>
-      <width>131</width>
+      <width>91</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Source</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="Deck_Source_Value">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>50</y>
+      <width>101</width>
       <height>22</height>
      </rect>
     </property>
     <item>
      <property name="text">
-      <string>Uncompressed</string>
+      <string>SDI</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>FFV1</string>
+      <string>HDMI</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Optical SDI</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Component</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Composite</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>S-Video</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Default</string>
      </property>
     </item>
    </widget>
-   <widget class="QLabel" name="Record_VideoFormat_Label">
+   <widget class="QLabel" name="Deck_VideoInputConnection_Label">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>50</y>
+      <x>470</x>
+      <y>20</y>
       <width>91</width>
       <height>16</height>
      </rect>
@@ -93,110 +122,129 @@
      <string>Video format</string>
     </property>
    </widget>
-   <widget class="QLabel" name="Record_DirectoryName_Label">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>81</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>File directory</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="Record_ContainerFormat_Value">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>50</y>
-      <width>131</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <item>
-     <property name="text">
-      <string>MP4 (QuickTime)</string>
-     </property>
-    </item>
-   </widget>
-   <widget class="QLabel" name="Record_ContainerFormat_Label">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>50</y>
-      <width>91</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Container format</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="Record_AudioFormat_Value">
-    <property name="geometry">
-     <rect>
-      <x>760</x>
-      <y>50</y>
-      <width>131</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <item>
-     <property name="text">
-      <string>PCM</string>
-     </property>
-    </item>
-   </widget>
-   <widget class="QLabel" name="Record_AudioFormat_Label">
-    <property name="geometry">
-     <rect>
-      <x>660</x>
-      <y>50</y>
-      <width>91</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Audio format</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="Record_FileName_Value">
-    <property name="geometry">
-     <rect>
-      <x>670</x>
-      <y>20</y>
-      <width>221</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="Record_FileName_Label">
-    <property name="geometry">
-     <rect>
-      <x>600</x>
-      <y>20</y>
-      <width>71</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>File name</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="Record_DirectoryName_Dialog">
+   <widget class="QComboBox" name="Deck_VideoInputConnection_Value">
     <property name="geometry">
      <rect>
       <x>570</x>
       <y>20</y>
-      <width>21</width>
-      <height>23</height>
+      <width>101</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>NTSC</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="Deck_VideoBitDepth_Label">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>50</y>
+      <width>101</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>...</string>
+     <string>Video bit depth</string>
     </property>
+   </widget>
+   <widget class="QComboBox" name="Deck_VideoBitDepth_Value">
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>50</y>
+      <width>101</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>8 bit</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>10 bit</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="Deck_AudioChannelsCount_Label">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>20</y>
+      <width>111</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Audio channels</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="Deck_AudioChannelsCount_Value">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>20</y>
+      <width>101</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>2 channel</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>8 channel</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>16 channel</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="Deck_AudioBitDepth_Label">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>50</y>
+      <width>111</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Audio bit depth</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="Deck_AudioBitDepth_Value">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>50</y>
+      <width>101</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>16 bit</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>24 bit</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>32 bit</string>
+     </property>
+    </item>
    </widget>
   </widget>
   <widget class="QGroupBox" name="In_Group">
@@ -211,58 +259,6 @@
    <property name="title">
     <string>In</string>
    </property>
-   <widget class="QSpinBox" name="In_Timecode_SS">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>420</x>
-      <y>20</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="In_Timecode_FF">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>470</x>
-      <y>20</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="In_Timecode_HH">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>320</x>
-      <y>20</y>
-      <width>37</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="In_Timecode_MM">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>370</x>
-      <y>20</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QRadioButton" name="In_Now_Label">
     <property name="geometry">
      <rect>
@@ -293,6 +289,58 @@
     </property>
     <property name="text">
      <string>Timecode (waiting for deck to answer)</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="In_Timecode_HH">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>20</y>
+      <width>37</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="In_Timecode_MM">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>20</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="In_Timecode_SS">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>20</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="In_Timecode_FF">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>20</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
     </property>
    </widget>
    <widget class="QLabel" name="In_DropFrame_Label">
@@ -337,6 +385,22 @@
      </property>
     </item>
    </widget>
+   <widget class="QLabel" name="In_FrameRate_Label">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>540</x>
+      <y>20</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Frame rate</string>
+    </property>
+   </widget>
    <widget class="QComboBox" name="In_FrameRate_Value">
     <property name="enabled">
      <bool>false</bool>
@@ -357,22 +421,6 @@
       <string>29.97</string>
      </property>
     </item>
-   </widget>
-   <widget class="QLabel" name="In_FrameRate_Label">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>540</x>
-      <y>20</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Frame rate</string>
-    </property>
    </widget>
    <zorder>In_Now_Label</zorder>
    <zorder>In_Timecode_Label</zorder>
@@ -397,6 +445,223 @@
    <property name="title">
     <string>Out</string>
    </property>
+   <widget class="QRadioButton" name="Out_FrameCount_Label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Frame count</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="Out_FrameCount_Value">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>30</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+    <property name="maximum">
+     <number>999999</number>
+    </property>
+    <property name="value">
+     <number>300</number>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="Out_DurationTC_Label">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>20</y>
+      <width>461</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Duration (time code)</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="Out_DurationTC_HH">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>20</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>23</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="Out_DurationTC_MM">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>20</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>59</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="Out_DurationTC_SS">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>460</x>
+      <y>20</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>59</number>
+    </property>
+    <property name="value">
+     <number>10</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="Out_DurationTC_FF">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>20</y>
+      <width>41</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>29</number>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="Out_DurationTS_Label">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>50</y>
+      <width>461</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Duration (time stamp)</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="Out_DurationTS_HH">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>50</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>23</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="Out_DurationTS_MM">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>50</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>59</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="Out_DurationTS_SS">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>460</x>
+      <y>50</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>59</number>
+    </property>
+    <property name="value">
+     <number>10</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="Out_DurationTS_mmm">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>50</y>
+      <width>51</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>999</number>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="Out_Timecode_Label">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>30</y>
+      <width>461</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Timecode (waiting for deck to answer)</string>
+    </property>
+   </widget>
    <widget class="QSpinBox" name="Out_Timecode_HH">
     <property name="enabled">
      <bool>false</bool>
@@ -461,223 +726,6 @@
      <number>29</number>
     </property>
    </widget>
-   <widget class="QRadioButton" name="Out_FrameCount_Label">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>30</y>
-      <width>141</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Frame count</string>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="Out_FrameCount_Value">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>30</y>
-      <width>71</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <number>1</number>
-    </property>
-    <property name="maximum">
-     <number>999999</number>
-    </property>
-    <property name="value">
-     <number>300</number>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="Out_Timecode_Label">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>570</x>
-      <y>30</y>
-      <width>461</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Timecode (waiting for deck to answer)</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="Out_DurationTC_Label">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>20</y>
-      <width>461</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Duration (time code)</string>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="Out_DurationTC_HH">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>20</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>23</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="Out_DurationTC_SS">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>460</x>
-      <y>20</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>59</number>
-    </property>
-    <property name="value">
-     <number>10</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="Out_DurationTC_MM">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>410</x>
-      <y>20</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>59</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="Out_DurationTC_FF">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>510</x>
-      <y>20</y>
-      <width>41</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>29</number>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="Out_DurationTS_Label">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>50</y>
-      <width>461</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Duration (time stamp)</string>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="Out_DurationTS_SS">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>460</x>
-      <y>50</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>59</number>
-    </property>
-    <property name="value">
-     <number>10</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="Out_DurationTS_HH">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>50</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>23</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="Out_DurationTS_mmm">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>510</x>
-      <y>50</y>
-      <width>51</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>999</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="Out_DurationTS_MM">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>410</x>
-      <y>50</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>59</number>
-    </property>
-   </widget>
    <zorder>Out_FrameCount_Label</zorder>
    <zorder>Out_FrameCount_Value</zorder>
    <zorder>Out_DurationTS_Label</zorder>
@@ -696,104 +744,87 @@
    <zorder>Out_DurationTS_SS</zorder>
    <zorder>Out_DurationTS_mmm</zorder>
   </widget>
-  <widget class="QGroupBox" name="Deck_Group">
+  <widget class="QGroupBox" name="Record_Group">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>0</y>
+     <y>220</y>
      <width>901</width>
      <height>81</height>
     </rect>
    </property>
    <property name="title">
-    <string>Deck configuration</string>
+    <string>Record to File</string>
    </property>
-   <widget class="QComboBox" name="Deck_Source_Value">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <widget class="QLabel" name="Record_DirectoryName_Label">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>50</y>
-      <width>101</width>
-      <height>22</height>
+      <x>10</x>
+      <y>20</y>
+      <width>81</width>
+      <height>16</height>
      </rect>
     </property>
-    <item>
-     <property name="text">
-      <string>SDI</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>HDMI</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Optical SDI</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Component</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Composite</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>S-Video</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Default</string>
-     </property>
-    </item>
+    <property name="text">
+     <string>File directory</string>
+    </property>
    </widget>
-   <widget class="QComboBox" name="Deck_VideoInputConnection_Value">
+   <widget class="QLineEdit" name="Record_DirectoryName_Value">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>20</y>
+      <width>451</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="Record_DirectoryName_Dialog">
     <property name="geometry">
      <rect>
       <x>570</x>
       <y>20</y>
-      <width>101</width>
-      <height>22</height>
+      <width>21</width>
+      <height>23</height>
      </rect>
     </property>
-    <item>
-     <property name="text">
-      <string>NTSC</string>
-     </property>
-    </item>
+    <property name="text">
+     <string>...</string>
+    </property>
    </widget>
-   <widget class="QComboBox" name="Deck_AudioChannelsCount_Value">
+   <widget class="QLabel" name="Record_FileName_Label">
     <property name="geometry">
      <rect>
-      <x>790</x>
+      <x>600</x>
       <y>20</y>
-      <width>101</width>
-      <height>22</height>
+      <width>71</width>
+      <height>16</height>
      </rect>
     </property>
-    <item>
-     <property name="text">
-      <string>2 channel</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>8 channel</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>16 channel</string>
-     </property>
-    </item>
+    <property name="text">
+     <string>File name</string>
+    </property>
    </widget>
-   <widget class="QLabel" name="Deck_Source_Label">
+   <widget class="QLineEdit" name="Record_FileName_Value">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>20</y>
+      <width>221</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="Record_ContainerFormat_Label">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -803,14 +834,29 @@
      </rect>
     </property>
     <property name="text">
-     <string>Source</string>
+     <string>Container format</string>
     </property>
    </widget>
-   <widget class="QLabel" name="Deck_VideoInputConnection_Label">
+   <widget class="QComboBox" name="Record_ContainerFormat_Value">
     <property name="geometry">
      <rect>
-      <x>470</x>
-      <y>20</y>
+      <x>110</x>
+      <y>50</y>
+      <width>131</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>MP4 (QuickTime)</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="Record_VideoFormat_Label">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>50</y>
       <width>91</width>
       <height>16</height>
      </rect>
@@ -819,99 +865,53 @@
      <string>Video format</string>
     </property>
    </widget>
-   <widget class="QLabel" name="Deck_AudioChannelsCount_Label">
+   <widget class="QComboBox" name="Record_VideoFormat_Value">
     <property name="geometry">
      <rect>
-      <x>680</x>
-      <y>20</y>
-      <width>111</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Audio channels</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="CardsList_Value">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>171</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="Deck_VideoBitDepth_Label">
-    <property name="geometry">
-     <rect>
-      <x>470</x>
+      <x>430</x>
       <y>50</y>
-      <width>101</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Video bit depth</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="Deck_VideoBitDepth_Value">
-    <property name="geometry">
-     <rect>
-      <x>570</x>
-      <y>50</y>
-      <width>101</width>
+      <width>131</width>
       <height>22</height>
      </rect>
     </property>
     <item>
      <property name="text">
-      <string>8 bit</string>
+      <string>Uncompressed</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>10 bit</string>
+      <string>FFV1</string>
      </property>
     </item>
    </widget>
-   <widget class="QComboBox" name="Deck_AudioBitDepth_Value">
+   <widget class="QLabel" name="Record_AudioFormat_Label">
     <property name="geometry">
      <rect>
-      <x>790</x>
+      <x>660</x>
       <y>50</y>
-      <width>101</width>
+      <width>91</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Audio format</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="Record_AudioFormat_Value">
+    <property name="geometry">
+     <rect>
+      <x>760</x>
+      <y>50</y>
+      <width>131</width>
       <height>22</height>
      </rect>
     </property>
     <item>
      <property name="text">
-      <string>16 bit</string>
+      <string>PCM</string>
      </property>
     </item>
-    <item>
-     <property name="text">
-      <string>24 bit</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>32 bit</string>
-     </property>
-    </item>
-   </widget>
-   <widget class="QLabel" name="Deck_AudioBitDepth_Label">
-    <property name="geometry">
-     <rect>
-      <x>680</x>
-      <y>50</y>
-      <width>111</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Audio bit depth</string>
-    </property>
    </widget>
   </widget>
  </widget>
