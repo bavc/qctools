@@ -70,8 +70,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>../../../../Qt\qtbase\lib\MSVC2010\Win32;../../../../Qt\qtbase\plugins\imageformats;../../../../qwt/lib;Lib;D:\Programmation\zlib\projects\MSVC2010\Win32\Debug</AdditionalLibraryDirectories>
-      <AdditionalDependencies>qwt.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;qwindows.lib;qminimal.lib;qtmain.lib;avformat.lib;avcodec.lib;avfilter.lib;swscale.lib;avutil.lib;winmm.lib;zlib.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../../../Qt\qtbase\lib;../../../../Qt\qtbase\plugins\imageformats;../../../../qwt/lib;../../../../zlib\projects\MSVC2013\Win32\Debug;Lib;../../../../Qt\qtbase\plugins\platforms</AdditionalLibraryDirectories>
+      <AdditionalDependencies>qwt.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;qwindows.lib;qminimal.lib;qtharfbuzzng.lib;qtmain.lib;avformat.lib;avcodec.lib;avfilter.lib;swscale.lib;avutil.lib;winmm.lib;ws2_32.lib;imm32.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
