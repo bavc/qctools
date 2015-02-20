@@ -37,7 +37,6 @@ HEADERS = \
     ../../Source/ThirdParty/tinyxml2/tinyxml2.h
 
 SOURCES = \
-    "../../../Blackmagic DeckLink SDK/Mac/include/DeckLinkAPIDispatch.cpp" \
     ../../Source/Core/AudioCore.cpp \
     ../../Source/Core/AudioStats.cpp \
     ../../Source/Core/CommonStats.cpp \
@@ -68,6 +67,9 @@ SOURCES = \
     ../../Source/GUI/TinyDisplay.cpp \
     ../../Source/ThirdParty/tinyxml2/tinyxml2.cpp
 
+!macx:SOURCES += "../../../Blackmagic DeckLink SDK/Linux/include/DeckLinkAPIDispatch.cpp"
+macx:SOURCES += "../../../Blackmagic DeckLink SDK/Mac/include/DeckLinkAPIDispatch.cpp"
+
 FORMS += \
     ../../Source/GUI/mainwindow.ui \
     ../../Source/GUI/preferences.ui \
@@ -86,7 +88,7 @@ INCLUDEPATH += $$QWT_ROOT/src
 INCLUDEPATH += $$PWD/../../../ffmpeg
 INCLUDEPATH += "$$PWD/../../../Blackmagic DeckLink SDK"
 
-LIBS      += -L$${QWT_ROOT}/lib -lqwt -l lzma
+LIBS      += -L$${QWT_ROOT}/lib -lqwt
 LIBS      += -lz
 LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
              -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
@@ -101,7 +103,7 @@ LIBS      += -L$${PWD}/../../../openjpeg/usr/lib -lopenjpeg
 #LIBS      += -L$${PWD}/../../../openjpeg/usr/lib -lfreetype #No freetype for the moment
 LIBS      += -lbz2
 
-!macx:LIBS      += -lrt
+!macx:LIBS      += -ldl -lrt
 
 macx:ICON = ../../Source/Resource/Logo.icns
 macx:QMAKE_LFLAGS += -framework CoreFoundation -framework CoreVideo -framework VideoDecodeAcceleration
