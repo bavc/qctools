@@ -1,7 +1,7 @@
 qctools
 =======
 
-QCTools (Quality Control Tools for Video Preservation) is a free and open source software tool that helps users analyze and understand their digitized video files through use of audiovisual analytics and filtering. QCTools is funded by the National Endowment for the Humanities and developed by the Bay Area Video Coalition.
+QCTools (Quality Control Tools for Video Preservation) is a free and open source software tool that helps users analyze and understand their digitized video files through use of audiovisual analytics and filtering. QCTools is funded by the National Endowment for the Humanities and the Knight Foundation, and developed by the Bay Area Video Coalition.
 
 Our (in progress) wiki is starting to develop [here](https://github.com/bavc/qctools/wiki).
 
