@@ -125,7 +125,7 @@ const filter Filters[]=
         "Normal",
         0,
         {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
@@ -154,7 +154,7 @@ const filter Filters[]=
         "Histogram",
         0,
         {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_Toggle,   0,   0,   0,   0, "RGB" },
             { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
             { Args_Type_None,     0,   0,   0,   0, },
@@ -175,8 +175,8 @@ const filter Filters[]=
         "Waveform",
         0,
         {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
-            { Args_Type_Slider,  20,   1, 255,   1, "Brightness" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Slider,  20,   1, 255,   1, "Intensity" },
             { Args_Type_YuvA,     0,   0,   0,   0, "Plane" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Vertical" },
             { Args_Type_None,     0,   0,   0,   0, },
@@ -213,8 +213,8 @@ const filter Filters[]=
         "Vectorscope",
         0,
         {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
-            { Args_Type_Slider,   5,   1,  10,   1, "Brightness" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Slider,   5,   1,  10,   1, "Intensity" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
@@ -242,7 +242,7 @@ const filter Filters[]=
         "Extract Planes UV Equal.",
         0,
         {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
             { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
             { Args_Type_None,     0,   0,   0,   0, },
@@ -257,7 +257,7 @@ const filter Filters[]=
         "Extract Planes Equalized",
         0,
         {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_Yuv,      2,   0,   0,   0, "Plane"},
             { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
             { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
@@ -302,7 +302,7 @@ const filter Filters[]=
         "Value Highlight",
         0,
         {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_Yuv,      0,   0,   0,   0, "Plane" },
             { Args_Type_Slider, 235,   0, 255,   1, "Min"},
             { Args_Type_Slider, 255,   0, 255,   1, "Max"},
@@ -317,7 +317,7 @@ const filter Filters[]=
         "Saturation Highlight",
         0,
         {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Sat as Lum" },
             { Args_Type_Slider,  89,   0, 182,   1, "Min"},
             { Args_Type_Slider, 182,   0, 182,   1, "Max"},
@@ -334,7 +334,7 @@ const filter Filters[]=
         "Chroma Adjust",
         0,
         {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Vectorscope" },
             { Args_Type_Slider,   0,-180, 180,   1, "Hue"},
             { Args_Type_Slider,  10,   0,  30,  10, "Saturation"},
@@ -411,7 +411,7 @@ const filter Filters[]=
         "Broadcast Range Pixels",
         0,
         {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
@@ -426,7 +426,7 @@ const filter Filters[]=
         "Broadcast Illegal Focus",
         0,
         {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_Ranges,   1,   0,   0,   0, "Outer Range"},
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
@@ -443,7 +443,7 @@ const filter Filters[]=
         "Temporal Outlier Pixels",
         0,
         {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
@@ -458,7 +458,7 @@ const filter Filters[]=
         "Vertical Repetition Pixels",
         0,
         {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field Split" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
