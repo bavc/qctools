@@ -103,7 +103,7 @@ void MainWindow::Ui_Init()
     setWindowIcon(QIcon(":/icon/logo.png"));
     move(75, 75);
     resize(QApplication::desktop()->screenGeometry().width()-150, QApplication::desktop()->screenGeometry().height()-150);
-    setUnifiedTitleAndToolBarOnMac(true);
+    //setUnifiedTitleAndToolBarOnMac(true); //Disabled because the toolbar dos not permit to move the window as expected by Mac users
 
     //ToolBar
     QObject::connect(ui->toolBar, SIGNAL(visibilityChanged(bool)), this, SLOT(on_Toolbar_visibilityChanged(bool)));
