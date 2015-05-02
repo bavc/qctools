@@ -838,10 +838,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<CommonStats*>* St
                 }
             }
             
-            if (Stat)
-            {
-                Stats->push_back(Stat);
-            }
+            Stats->push_back(Stat);
         }
     }
 
@@ -999,7 +996,8 @@ void FFmpeg_Glue::CloseOutput()
     // Complete
     if (WithStats)
         for (size_t Pos=0; Pos<Stats->size(); Pos++)
-            (*Stats)[Pos]->StatsFinish();
+            if ((*Stats)[Pos])
+                (*Stats)[Pos]->StatsFinish();
 }
 
 //---------------------------------------------------------------------------
@@ -1162,7 +1160,8 @@ bool FFmpeg_Glue::NextFrame()
     // Complete
     if (WithStats)
         for (size_t Pos=0; Pos<Stats->size(); Pos++)
-            (*Stats)[Pos]->StatsFinish();
+            if ((*Stats)[Pos])
+                (*Stats)[Pos]->StatsFinish();
 
     return false;
 }

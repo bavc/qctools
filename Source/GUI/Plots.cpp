@@ -57,34 +57,35 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     size_t layout_y=0;
     
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
-    {
-        size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
-        size_t countOfGroups = PerStreamType[type].CountOfGroups;
-        
-        m_plots[streamPos] = new Plot*[countOfGroups + 1]; //+1 for axix
-    
-        for ( size_t group = 0; group < countOfGroups; group++ )
+        if (m_fileInfoData->Stats[streamPos])
         {
-            Plot* plot = new Plot( streamPos, type, group, this );
+            size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+            size_t countOfGroups = PerStreamType[type].CountOfGroups;
+        
+            m_plots[streamPos] = new Plot*[countOfGroups + 1]; //+1 for axix
+    
+            for ( size_t group = 0; group < countOfGroups; group++ )
+            {
+                Plot* plot = new Plot( streamPos, type, group, this );
 
-            // we allow to shrink the plot below height of the size hint
-            plot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
-            plot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
-            initYAxis( plot );
-            updateSamples( plot );
+                // we allow to shrink the plot below height of the size hint
+                plot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
+                plot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
+                initYAxis( plot );
+                updateSamples( plot );
 
-            connect( plot, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
+                connect( plot, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
 
-            plot->canvas()->installEventFilter( this );
+                plot->canvas()->installEventFilter( this );
 
-            layout->addWidget( plot, layout_y, 0 );
-            layout->addWidget( plot->legend(), layout_y, 1 );
+                layout->addWidget( plot, layout_y, 0 );
+                layout->addWidget( plot->legend(), layout_y, 1 );
 
-            m_plots[streamPos][group] = plot;
+                m_plots[streamPos][group] = plot;
 
-            layout_y++;
+                layout_y++;
+            }
         }
-    }
 
     layout->addWidget( m_scaleWidget, layout_y, 0, 1, 2 );
 
@@ -125,14 +126,15 @@ const QwtPlot* Plots::plot( size_t streamPos, size_t Group ) const
 void Plots::refresh()
 {
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
-    {
-        size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
-        for ( int i = 0; i < PerStreamType[type].CountOfGroups; i++ )
+        if ( m_fileInfoData->Stats[streamPos] )
         {
-            initYAxis( m_plots[streamPos][i] );
-            updateSamples( m_plots[streamPos][i] );
+            size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+            for ( int i = 0; i < PerStreamType[type].CountOfGroups; i++ )
+            {
+                initYAxis( m_plots[streamPos][i] );
+                updateSamples( m_plots[streamPos][i] );
+            }
         }
-    }
 
     setCursorPos( framePos() );
     replotAll();
@@ -192,14 +194,15 @@ void Plots::setCursorPos( int newFramePos )
     setFramePos( newFramePos );
 
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
-    {
-        const double x = m_fileInfoData->Stats[streamPos]->x[m_dataTypeIndex][framePos(streamPos)];
+        if ( m_fileInfoData->Stats[streamPos] )
+        {
+            const double x = m_fileInfoData->Stats[streamPos]->x[m_dataTypeIndex][framePos(streamPos)];
 
-        size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+            size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
 
-        for ( int i = 0; i < PerStreamType[type].CountOfGroups; ++i )
-            m_plots[streamPos][i]->setCursorPos( x );
-    }
+            for ( int i = 0; i < PerStreamType[type].CountOfGroups; ++i )
+                m_plots[streamPos][i]->setCursorPos( x );
+        }
 
     m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
     m_scaleWidget->update();
@@ -259,12 +262,13 @@ void Plots::Zoom_Move( int Begin )
     setVisibleFrames( to - n + 1, to );
 
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
-    {
-		size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+        if ( m_fileInfoData->Stats[streamPos] )
+        {
+		    size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
 
-        for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
-            m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
-    }
+            for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
+                m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
+        }
 
     m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
 
@@ -281,35 +285,37 @@ void Plots::alignYAxes()
     double maxExtent = 0;
 
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
-    {
-        size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
-        
-        for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
+        if ( m_fileInfoData->Stats[streamPos] )
         {
-            QwtScaleWidget *scaleWidget = m_plots[streamPos][group]->axisWidget( QwtPlot::yLeft );
-
-            QwtScaleDraw* scaleDraw = scaleWidget->scaleDraw();
-            scaleDraw->setMinimumExtent( 0.0 );
-
-            if ( m_plots[streamPos][group]->isVisibleTo( this ) )
+            size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+        
+            for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
             {
-                const double extent = scaleDraw->extent( scaleWidget->font() );
-                maxExtent = qMax( extent, maxExtent );
+                QwtScaleWidget *scaleWidget = m_plots[streamPos][group]->axisWidget( QwtPlot::yLeft );
+
+                QwtScaleDraw* scaleDraw = scaleWidget->scaleDraw();
+                scaleDraw->setMinimumExtent( 0.0 );
+
+                if ( m_plots[streamPos][group]->isVisibleTo( this ) )
+                {
+                    const double extent = scaleDraw->extent( scaleWidget->font() );
+                    maxExtent = qMax( extent, maxExtent );
+                }
             }
+            maxExtent += 3; // margin
         }
-        maxExtent += 3; // margin
-    }
 
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
-    {
-        size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
-        
-        for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
+        if ( m_fileInfoData->Stats[streamPos] )
         {
-            QwtScaleWidget *scaleWidget = m_plots[streamPos][group]->axisWidget( QwtPlot::yLeft );
-            scaleWidget->scaleDraw()->setMinimumExtent( maxExtent );
+            size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+        
+            for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
+            {
+                QwtScaleWidget *scaleWidget = m_plots[streamPos][group]->axisWidget( QwtPlot::yLeft );
+                scaleWidget->scaleDraw()->setMinimumExtent( maxExtent );
+            }
         }
-    }
 }
 
 bool Plots::eventFilter( QObject *object, QEvent *event )
@@ -317,20 +323,21 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
     if ( event->type() == QEvent::Move || event->type() == QEvent::Resize )
     {
         for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
-        {
-            size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
-        
-            for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
+            if ( m_fileInfoData->Stats[streamPos] )
             {
-                if ( m_plots[streamPos][group]->isVisibleTo( this ) )
+                size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+        
+                for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
                 {
-                    if ( object == m_plots[streamPos][group]->canvas() )
-                        alignXAxis( m_plots[streamPos][group] );
+                    if ( m_plots[streamPos][group]->isVisibleTo( this ) )
+                    {
+                        if ( object == m_plots[streamPos][group]->canvas() )
+                            alignXAxis( m_plots[streamPos][group] );
 
-                    break;
+                        break;
+                    }
                 }
             }
-        }
     }
 
     return QWidget::eventFilter( object, event );
@@ -376,12 +383,13 @@ void Plots::onXAxisFormatChanged( int format )
         setVisibleFrames( m_frameInterval.from, m_frameInterval.to, true );
 
         for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
-        {
-		    size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+            if ( m_fileInfoData->Stats[streamPos] )
+            {
+		        size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
 
-            for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
-                m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
-        }
+                for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
+                    m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
+            }
 
         m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
 
@@ -398,13 +406,14 @@ void Plots::onXAxisFormatChanged( int format )
 void Plots::setPlotVisible( size_t type, size_t group, bool on )
 {
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
-    {
-        if ( type == m_fileInfoData->Stats[streamPos]->Type_Get() && on != m_plots[streamPos][group]->isVisibleTo( this ))
+        if ( m_fileInfoData->Stats[streamPos] )
         {
-            m_plots[streamPos][group]->setVisible( on );
-            m_plots[streamPos][group]->legend()->setVisible( on );
+            if ( type == m_fileInfoData->Stats[streamPos]->Type_Get() && on != m_plots[streamPos][group]->isVisibleTo( this ))
+            {
+                m_plots[streamPos][group]->setVisible( on );
+                m_plots[streamPos][group]->legend()->setVisible( on );
+            }
         }
-    }
 
     alignYAxes();
 }
@@ -427,12 +436,13 @@ void Plots::zoomXAxis( bool up )
     setVisibleFrames( from, to );
 
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
-    {
-		size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+        if ( m_fileInfoData->Stats[streamPos] )
+        {
+		    size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
 
-        for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
-            m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
-    }
+            for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
+                m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
+        }
 
     m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
 
@@ -452,14 +462,15 @@ bool Plots::isZoomed() const
 void Plots::replotAll()
 {
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
-    {
-		size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
-
-        for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
+        if ( m_fileInfoData->Stats[streamPos] )
         {
-            m_plots[streamPos][group]->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
-            if ( m_plots[streamPos][group]->isVisibleTo( this ) )
-                m_plots[streamPos][group]->replot();
+		    size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+
+            for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
+            {
+                m_plots[streamPos][group]->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
+                if ( m_plots[streamPos][group]->isVisibleTo( this ) )
+                    m_plots[streamPos][group]->replot();
+            }
         }
-    }
 }
