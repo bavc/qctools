@@ -1174,6 +1174,8 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
     if (TempPacket->stream_index>=InputDatas.size())
         return false;
     inputdata* InputData=InputDatas[TempPacket->stream_index];
+    if (!InputData)
+        return false;
 
     // Encode
     if (!Encode_FileName.empty())
@@ -1190,7 +1192,7 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
     {
         got_frame=0;
         int Bytes;
-        switch(InputDatas[TempPacket->stream_index]->Type)
+        switch(InputData->Type)
         {
             case AVMEDIA_TYPE_VIDEO : Bytes=avcodec_decode_video2(InputData->Stream->codec, Frame, &got_frame, TempPacket); break;
             case AVMEDIA_TYPE_AUDIO : Bytes=avcodec_decode_audio4(InputData->Stream->codec, Frame, &got_frame, TempPacket); break;

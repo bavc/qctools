@@ -4,6 +4,7 @@ x Fixed crash with MOV files having non video/audio tracks (e.g. a caption track
 x Fixed crash with some AVI files having streams with unknown format
 x Mac-styled toolbar disabled because the toolbar dos not permit to move the window as expected by Mac users
 x Show hh:mm:ss.mmm in playback window even if evaluation hasn’t happened yet
+x Fix crash with files having timecode as the first track
 
 0.7.0, 2015-02-17
 -----

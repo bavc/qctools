@@ -234,7 +234,7 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, B
     // Looking for the first video stream
     ReferenceStream_Pos=0;
     for (; ReferenceStream_Pos<Stats.size(); ReferenceStream_Pos++)
-        if (Stats[ReferenceStream_Pos]->Type_Get()==0)
+        if (Stats[ReferenceStream_Pos] && Stats[ReferenceStream_Pos]->Type_Get()==0)
             break;
     if (ReferenceStream_Pos>=Stats.size())
         ReferenceStream_Pos=0;
