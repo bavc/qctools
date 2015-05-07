@@ -14,6 +14,7 @@
 #include "GUI/Info.h"
 #include "GUI/FileInformation.h"
 #include "Core/CommonStats.h"
+#include "Core/FFmpeg_Glue.h"
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -23,6 +24,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QTime>
+#include <cfloat>
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -231,6 +233,12 @@ void Control::Update()
      && ( Frames_Pos<FileInfoData->ReferenceStat()->x_Current
       || (Frames_Pos<FileInfoData->ReferenceStat()->x_Current_Max && FileInfoData->ReferenceStat()->x[1][Frames_Pos]))) //Also includes when stats are not ready but timestamp is available
         Milliseconds=(int)(FileInfoData->ReferenceStat()->x[1][Frames_Pos]*1000);
+    else
+    {
+        double TimeStamp = FileInfoData->Glue->TimeStampOfCurrentFrame(0);
+        if (TimeStamp!=DBL_MAX)
+            Milliseconds=(int)(TimeStamp*1000);
+    }
 
     if (Frames_Pos!=(int)-1)
         Info_Frames->setText("Frame "+QString::number(Frames_Pos));

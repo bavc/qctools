@@ -1355,6 +1355,18 @@ void FFmpeg_Glue::Disable(const size_t Pos)
 }
 
 //---------------------------------------------------------------------------
+double FFmpeg_Glue::TimeStampOfCurrentFrame(const size_t OutputPos)
+{
+    if (OutputPos>=OutputDatas.size())
+        return DBL_MAX;
+    outputdata* OutputData=OutputDatas[OutputPos];
+    if (!OutputData)
+        return DBL_MAX;
+
+    return ((double)OutputData->DecodedFrame->pkt_pts)*OutputData->Stream->time_base.num/OutputData->Stream->time_base.den;
+}
+
+//---------------------------------------------------------------------------
 void FFmpeg_Glue::Scale_Change(int Scale_Width_, int Scale_Height_)
 {
     bool MustOutput=false;

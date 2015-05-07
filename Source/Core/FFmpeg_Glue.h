@@ -123,6 +123,7 @@ public:
     bool                        OutputFrame(unsigned char* Data, size_t Size, int stream_index, int FramePos);
     void                        Filter_Change(size_t FilterPos, int FilterType, const string &Filter);
     void                        Disable(const size_t Pos);
+    double                      TimeStampOfCurrentFrame(size_t OutputPos);
     void                        Scale_Change(int Scale_Width, int Scale_Height);
     void                        Thumbnails_Modulo_Change(size_t Modulo);
 
@@ -219,6 +220,7 @@ private:
 
         // Status
         size_t                  FramePos;               // Current position of playback
+        double                  TimeStamp;              // Current position of playback
 
         // Helpers
         bool                    InitThumnails();
