@@ -1888,12 +1888,12 @@ string FFmpeg_Glue::ColorSpace_Get()
     switch (InputData->Stream->codec->colorspace)
     {
         case AVCOL_SPC_RGB: return "RGB: order of coefficients is actually GBR, also IEC 61966-2-1 (sRGB)";
-        case AVCOL_SPC_BT709: return "BT.709 / ITU-R BT1361 / IEC 61966-2-4 xvYCC709 / SMPTE RP177 Annex B";
+        case AVCOL_SPC_BT709: return "BT.709"; // full: "BT.709 / ITU-R BT1361 / IEC 61966-2-4 xvYCC709 / SMPTE RP177 Annex B"
         case AVCOL_SPC_UNSPECIFIED: return "Unspecified";
         case AVCOL_SPC_RESERVED: return "Reserved";
         case AVCOL_SPC_FCC: return "FCC Title 47 Code of Federal Regulations 73.682 (a)(20)";
-        case AVCOL_SPC_BT470BG: return "BT.470bg / ITU-R BT601-6 625 / ITU-R BT1358 625 / ITU-R BT1700 625 PAL & SECAM / IEC 61966-2-4 xvYCC601";
-        case AVCOL_SPC_SMPTE170M: return "SMPTE 170m / ITU-R BT601-6 525 / ITU-R BT1358 525 / ITU-R BT1700 NTSC";
+        case AVCOL_SPC_BT470BG: return "BT.601 PAL";  // full: "BT.470bg / ITU-R BT601-6 625 / ITU-R BT1358 625 / ITU-R BT1700 625 PAL & SECAM / IEC 61966-2-4 xvYCC601"
+        case AVCOL_SPC_SMPTE170M: return "BT.601 NTSC"; // full:"SMPTE 170m / ITU-R BT601-6 525 / ITU-R BT1358 525 / ITU-R BT1700 NTSC"
         case AVCOL_SPC_SMPTE240M: return "SMPTE 240m";
         case AVCOL_SPC_YCOCG: return "YCOCG: Used by Dirac / VC-2 and H.264 FRext, see ITU-T SG16";
         case AVCOL_SPC_BT2020_NCL: return "ITU-R BT2020 non-constant luminance system";
