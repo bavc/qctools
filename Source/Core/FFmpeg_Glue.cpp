@@ -1920,8 +1920,8 @@ string FFmpeg_Glue::ColorRange_Get()
     switch (InputData->Stream->codec->color_range)
     {
         case AVCOL_RANGE_UNSPECIFIED: return "Unspecified";
-        case AVCOL_RANGE_MPEG: return "Broadcast Range (219*2^n-1)";
-        case AVCOL_RANGE_JPEG: return "Full Range (2^n-1)";
+        case AVCOL_RANGE_MPEG: return "Broadcast Range"; // full: "Broadcast Range (219*2^n-1)"
+        case AVCOL_RANGE_JPEG: return "Full Range"; // full: "Full Range (2^n-1)"
         case AVCOL_RANGE_NB: return "Not part of ABI";
         default: return string();
     }
