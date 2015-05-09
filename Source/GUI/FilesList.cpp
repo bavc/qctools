@@ -107,7 +107,7 @@ percolumn PerColumn[Col_Max]=
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "DAR",              "Display Aspect Ratio", },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "SAR",              "Sample Aspect Ratio", },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Pix Format",       "The pixel format describes the color space, bit depth,\nand soemtimes the chroma subsampling and endianness of pixel data.", },
-    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Color Space",      "YUV colorspace type, such as ", },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Color Space",      "YUV colorspace type, such as 'BT.601 NTSC', 'BT.601 PAL', 'BT.709', or 'unspecified'.", },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Color Range",      "YUV color range: broadcast, full, or unspecified.", },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Frames/Dur",       "The number of frames divided by the duration.\nIf this is less than the intended frame rate\nthere may be dropped frames or variable frame rate.", },
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "R Frame rate",     "Real base framerate of the stream.\nThis is the lowest framerate with which all timestamps\ncan be represented accurately (it is the least common\nmultiple of all framerates in the stream). Note, this\nvalue is just a guess! For example, if the time base is\n1/90000 and all frames have either approximately 3600\nor 1800 timer ticks, then r_frame_rate will be 50/1.", },
