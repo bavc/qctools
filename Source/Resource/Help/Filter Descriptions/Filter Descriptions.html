@@ -68,7 +68,7 @@
             <i>(For in-depth descriptions of how luma and/or chroma noise -- and other types of artifacts-- may present, the <b><a href="http://avaa.bavc.org/artifactatlas/index.php/Table_of_Contents">A/V Artifact Atlas</a></b> is an excellent reference.)</i>
         </p>
         <h3>
-            Y Value Filters: YMIN, YAVG, YMAX
+            Y Value Filters: Y MIN, Y AVG, Y MAX
         </h3>
         <table border="1" summary="qualities of Y value filters">
             <tbody>
@@ -88,7 +88,7 @@
                         Y Channel
                     </td>
                     <td>
-                        YMIN, YAVG, YMAX
+                        Y MIN, Y AVG, Y MAX
                     </td>
                     <td>
                         0-255
@@ -100,15 +100,15 @@
             *Appropriate for the 8-bit video samples analyzed by this tool.
         </p>
         <p>
-            Y Channels carry data about the brightness of a picture. Problematic variance in Y Channel values will manifest as a picture that is either too light or too dark, also known as containing luma noise. 8-bit video will have values falling in the range of 0-255 code values per pixel. A picture with well-balanced light levels will have an average, or mid-range Y Channel value of around 128 (YAVG). Graph readings outside of that range will indicate a picture that is either too bright or too dark. A Y Value of 0 would indicate total blackness and a value of 255 would present as entirely white. In the range of values, reference black is at value 16, while reference white is at value 235. Except during particular moments like scene changes where one might expect abrupt spikes , the average values of Y channels should remain relatively stable or constant with little variation. Portions of video showing extreme changes in average values (and not corresponding to a scene change or otherwise dramatic edit) likely indicate a picture error. Where you may expect luma spikes could be camera fade-ins/outs, or a sudden brightness in the picture, like a camera flash, for example.
+            Y Channels carry data about the brightness of a picture. Problematic variance in Y Channel values will manifest as a picture that is either too light or too dark, also known as containing luma noise. 8-bit video will have values falling in the range of 0-255 code values per pixel. A picture with well-balanced light levels will have an average, or mid-range Y Channel value of around 128 (Y AVG). Graph readings outside of that range will indicate a picture that is either too bright or too dark. A Y Value of 0 would indicate total blackness and a value of 255 would present as entirely white. In the range of values, reference black is at value 16, while reference white is at value 235. Except during particular moments like scene changes where one might expect abrupt spikes , the average values of Y channels should remain relatively stable or constant with little variation. Portions of video showing extreme changes in average values (and not corresponding to a scene change or otherwise dramatic edit) likely indicate a picture error. Where you may expect luma spikes could be camera fade-ins/outs, or a sudden brightness in the picture, like a camera flash, for example.
         </p>
         <p>
-            Y values = Combined graph of YMAX, YHIGH, YAVG, YLOW, and YMIN<br />
-            YMIN = Y channel minimum<br />
-            YLOW = Y channel 10th percentile<br />
-            YAVG = Y channel average<br />
-            YHIGH = Y channel 90th percentile<br />
-            YMAX = Y channel maximum<br />
+            Y values = Combined graph of Y MAX, Y HIGH, Y AVG, Y LOW, and Y MIN<br />
+            Y MIN = Y channel minimum<br />
+            Y LOW = Y channel 10th percentile<br />
+            Y AVG = Y channel average<br />
+            Y HIGH = Y channel 90th percentile<br />
+            Y MAX = Y channel maximum<br />
         </p>
         <h4>
             Samples which demonstrate Y Value anomalies:
@@ -118,7 +118,7 @@
             <img src="YMAX_DHC0177_trackingerror_ffv1_h264.jpg" alt="YMAX spikes" /><br />
         </p>
         <p>
-            The graph below illustrates a reading with many luma spikes in the YLOW, YAVG, and YHIGH, most notably in the first second of the graph.
+            The graph below illustrates a reading with many luma spikes in the Y LOW, Y AVG, and Y HIGH, most notably in the first second of the graph.
         </p>
         <p>
             <img src="YValues_293_0047_SKEW_ffv1_h264.jpg" alt="luma spikes" />
@@ -141,7 +141,7 @@
                         Y Channel
                     </td>
                     <td>
-                        YLOW, YHIGH
+                        Y LOW, Y HIGH
                     </td>
                     <td>
                         16-235
@@ -152,7 +152,7 @@
                         U Channel
                     </td>
                     <td>
-                        ULOW, UHIGH
+                        U LOW, U HIGH
                     </td>
                     <td>
                         16-235
@@ -163,7 +163,7 @@
                         V Channel
                     </td>
                     <td>
-                        VLOW, VHIGH
+                        V LOW, V HIGH
                     </td>
                     <td>
                         0-255
@@ -172,7 +172,7 @@
             </tbody>
         </table>
         <h3>
-            <a id="LowHigh" name="LowHigh">Y Value Filters: YLOW, YHIGH</a>
+            <a id="LowHigh" name="LowHigh">Y Value Filters: Y LOW, Y HIGH</a>
         </h3>
         <p>
             This filter works in a similar fashion as the YUV *MIN and *MAX filters, but instead of looking at the absolute minimum and maximum value for these channels, it looks at the 10th percentile (LOW, or 16 pixels) and 90th percentile (HIGH, or 235 pixels) which present the outside limits or 'headroom' of the <a href="http://en.wikipedia.org/wiki/Broadcast_range">legal broadcast range</a>. An extreme minimum or maximum value could dramatically skew the graph but because they may be outside the viewable broadcast image (or the range of human perception), they may not necessarily be meaningful indicators of a problematic visual image that can be human-detectable. This is why Low/High measurements are so useful-- they ignore the extreme outliers (Min/ Max) in favor of those abnormalities which fall in the range of human perception.
@@ -184,7 +184,7 @@
             <img src="YValues_DHC0267_trackingerror_ffv1_h264.jpg" alt="YHIGH" />
         </p>
         <h3>
-            U, V Value Filters: UMIN, UAVG, UMAX/ VMIN, VAVG, VMAX
+            U, V Value Filters: U MIN, U AVG, U MAX/ V MIN, V AVG, V MAX
         </h3>
         <table border="1" summary="qualities of U value filters">
             <tbody>
@@ -204,7 +204,7 @@
                         U Channel
                     </td>
                     <td>
-                        UMIN, UAVG, UMAX
+                        U MIN, U AVG, U MAX
                     </td>
                     <td>
                         0-255
@@ -215,7 +215,7 @@
                         V Channel
                     </td>
                     <td>
-                        VMIN, VAVG, VMAX
+                        V MIN, V AVG, V MAX
                     </td>
                     <td>
                         0-255
@@ -227,14 +227,14 @@
             The U and V Channels represent the <a href="http://preservation.bavc.org/artifactatlas/index.php/Chrominance_Noise">chrominance</a>, or color differences of a picture. U and V filters act to detect color abnormalities in video. It can be difficult to derive meaning from U or V values on their own, but they provide supplementary information and can be good indicators of artifacts, especially when occurring in tandem with similar Y Value readings. Black and white video contains no chrominance information so should present flat-lines (or no data) for UV channels. Activity in UV Channels for black and white video content, however, would certainly be an indication of chrominance noise. Alternatively, a color video which shows flat-lines for these channels would be an indicator of a color drop-out scenario.
         </p>
         <p>
-            U values, V values = Combined graph of UMIN, ULOW, UAVG, UHIGH, and UMAX, Combined graph of VMIN, VLOW, VAVG, VHIGH, VMAX
+            U values, V values = Combined graph of U MIN, U LOW, U AVG, U HIGH, and U MAX, Combined graph of V MIN, V LOW, V AVG, V HIGH, V MAX
         </p>
         <p>
-            UMIN, VMIN = U channel minimum, V channel minimum<br />
-            ULOW, VLOW = U channel 10th percentile, V channel 10th percentile<br />
-            UAVG, VAVG = U channel average, V channel average<br />
-            UHIGH, VHIGH = U channel 90th percentile, V channel 90th percentile<br />
-            UMAX, VMAX = U channel maximum, V channel maximum<br />
+            U MIN, V MIN = U channel minimum, V channel minimum<br />
+            U LOW, V LOW = U channel 10th percentile, V channel 10th percentile<br />
+            U AVG, V AVG = U channel average, V channel average<br />
+            U HIGH, V HIGH = U channel 90th percentile, V channel 90th percentile<br />
+            U MAX, V MAX = U channel maximum, V channel maximum<br />
             <br />
         </p>
         <h4>
@@ -251,7 +251,7 @@
             <img src="UV_293_0050_chrominancenoise_ffv1_h264.jpg" alt="UV Channels" />
         </p>
         <p>
-            Notice U noise in the graph below from approximately 2.86s to 4.37s. Also seen in UDIF reading.<br />
+            Notice U noise in the graph below from approximately 2.86s to 4.37s. Also seen in U DIF reading.<br />
             <br />
             <img src="UNoise_293_0047_JITTERS_ffv1.jpg" alt="U Noise" />
         </p>
@@ -273,7 +273,7 @@
                         Y Channel
                     </td>
                     <td>
-                        YDIF
+                        Y DIF
                     </td>
                 </tr>
                 <tr>
@@ -281,7 +281,7 @@
                         U Channel
                     </td>
                     <td>
-                        UDIF
+                        U DIF
                     </td>
                 </tr>
                 <tr>
@@ -289,7 +289,7 @@
                         V Channel
                     </td>
                     <td>
-                        VDIF
+                        V DIF
                     </td>
                 </tr>
             </tbody>
@@ -298,9 +298,9 @@
             This QCTools filter selects two successive frames of video and subtracts the values of one from the other in order to find the change, or difference, between the two frames (measured in pixels). This information is meaningful in that it indicates the rapidity with which a video picture is changing from one frame to the next. Aside from scene-change scenarios, a video picture should not undergo dramatic changes in these values unless an artifact is present. A scene-change would present as a short but dramatic spike in the graph, and that is normal. Other YUV Difference spikes may be present in cases where picture problems are visible. Often, head problems with corrupted frames will result in large YUV Difference values/graph spikes.
         </p>
         <p>
-            YDIF = Difference of Y Channel between two frames<br />
-            UDIF = Difference of U Channel between two frames<br />
-            VDIF = Difference of V Channel between two frames<br />
+            Y DIF = Difference of Y Channel between two frames<br />
+            U DIF = Difference of U Channel between two frames<br />
+            V DIF = Difference of V Channel between two frames<br />
         </p>
         <h4>
             Samples which demonstrate YUV Difference anomalies:
