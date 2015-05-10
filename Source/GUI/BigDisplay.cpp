@@ -69,6 +69,7 @@ enum args_type
     Args_Type_YuvA, // Y, U, V, All
     Args_Type_Ranges, // above whites, below black
     Args_Type_ColorMatrix, // bt601, bt709, smpte240m, fcc
+    Args_Type_SampleRange, // broadcast, full, auto
     Args_Type_ClrPck, // Color picker
 };
 
@@ -359,6 +360,20 @@ const filter Filters[]=
         },
         {
             "split[a][b];[a]crop=${3}:${height}:0:0[a1];[b]colormatrix=${1}:${2}[b1];[b1][a1]overlay",
+        },
+    },
+    {
+        "Sample Range",
+        0,
+        {
+            { Args_Type_SampleRange,   2,   0,   0,   0, "Src" },
+            { Args_Type_SampleRange,   1,   0,   0,   0, "Dst" },
+            { Args_Type_Slider,        0,   0,   0,   1, "Reveal" },
+            { Args_Type_None,          0,   0,   0,   0, },
+            { Args_Type_None,          0,   0,   0,   0, },
+        },
+        {
+            "split[a][b];[a]crop=${3}:${height}:0:0[a1];[b]scale=iw+1:ih:in_range=${1}:out_range=${2},scale=iw-1:ih[b1];[b1][a1]overlay",
         },
     },
     {
@@ -1222,6 +1237,29 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                     }
                                     Widget_XPox+=5;
                                     break;
+            case Args_Type_SampleRange:
+                                    Options[Pos].Sliders_Label[OptionPos]=new QLabel(Filters[FilterPos].Args[OptionPos].Name+QString(": "));
+                                    Layout0->addWidget(Options[Pos].Sliders_Label[OptionPos], 0, Widget_XPox);
+                                    Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
+                                    for (size_t OptionPos2=0; OptionPos2<3; OptionPos2++)
+                                    {
+                                        Options[Pos].Radios[OptionPos][OptionPos2]=new QRadioButton();
+                                        Options[Pos].Radios[OptionPos][OptionPos2]->setFont(Font);
+                                        switch (OptionPos2)
+                                        {
+                                            case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("auto"); break;
+                                            case 1: Options[Pos].Radios[OptionPos][OptionPos2]->setText("full"); break;
+                                            case 2: Options[Pos].Radios[OptionPos][OptionPos2]->setText("broadcast"); break;
+                                            default:;
+                                        }
+                                        if (OptionPos2==PreviousValues[Pos][FilterPos].Values[OptionPos])
+                                            Options[Pos].Radios[OptionPos][OptionPos2]->setChecked(true);
+                                        connect(Options[Pos].Radios[OptionPos][OptionPos2], SIGNAL(toggled(bool)), this, Pos==0?(SLOT(on_FiltersOptions1_toggle(bool))):SLOT(on_FiltersOptions2_toggle(bool)));
+                                        Layout0->addWidget(Options[Pos].Radios[OptionPos][OptionPos2], 0, Widget_XPox+1+OptionPos2);
+                                        Options[Pos].Radios_Group[OptionPos]->addButton(Options[Pos].Radios[OptionPos][OptionPos2]);
+                                    }
+                                    Widget_XPox+=4;
+                                    break;
             case Args_Type_ClrPck:
                                     {
                                     Options[Pos].ColorValue[OptionPos]=PreviousValues[Pos][FilterPos].Values[OptionPos];
@@ -1456,6 +1494,24 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                         }
                                     }
                                     break;
+            case Args_Type_SampleRange:
+                                    Modified=true;
+                                    for (size_t OptionPos2=0; OptionPos2<(Filters[Picture_Current].Args[OptionPos].Type?4:3); OptionPos2++)
+                                    {
+                                        if (Options[Pos].Radios[OptionPos][OptionPos2] && Options[Pos].Radios[OptionPos][OptionPos2]->isChecked())
+                                        {
+                                            switch (OptionPos2)
+                                            {
+                                                case 0: WithRadios[OptionPos]="auto"; break;
+                                                case 1: WithRadios[OptionPos]="full"; break;
+                                                case 2: WithRadios[OptionPos]="tv"; break;
+                                                default:;
+                                            }
+                                            PreviousValues[Pos][Picture_Current].Values[OptionPos]=OptionPos2;
+                                            break;
+                                        }
+                                    }
+                                    break;
             default:                ;
         }
     }
@@ -1501,6 +1557,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                 case Args_Type_YuvA:
                 case Args_Type_ClrPck:
                 case Args_Type_ColorMatrix:
+                case Args_Type_SampleRange:
                                         {
                                         char ToFind1[3];
                                         ToFind1[0]='$';
