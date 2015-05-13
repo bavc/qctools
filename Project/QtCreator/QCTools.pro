@@ -100,7 +100,6 @@ LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
              -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
              -L$${PWD}/../../../ffmpeg/libavutil -lavutil
 LIBS      += -L$${PWD}/../../../openjpeg/usr/lib -lopenjpeg
-#LIBS      += -L$${PWD}/../../../openjpeg/usr/lib -lfreetype #No freetype for the moment
 LIBS      += -lbz2
 
 !macx:LIBS      += -ldl -lrt
