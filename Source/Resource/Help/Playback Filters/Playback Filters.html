@@ -12,7 +12,7 @@
             Playback Filter Descriptions
         </h1>
         <p>
-            The QCTools preview window is intended as an analytical playback environment that allows the user to review video through multiple filters simultaneously. The playback window includes two viewing windows which may be set to different combinations of filters. This allows a user to playback a video by viewing a waveform and a vectorscope or perhaps by viewing a waveform and the video with highlighted pixels that are outside of broadcast range.
+            The QCTools preview window is intended as an analytical playback environment that allows the user to review video through multiple filters simultaneously. Often inconsistencies within the graph layout may be better understood by examaning those frames in the playback window. The playback window includes two viewing windows which may be set to different combinations of filters. This allows a user to playback a video by multiple forms of analysis simultaneously just as viewing a waveform and a vectorscope side-by-side or seeing the video with highlighted pixels that are outside of broadcast range while seeing the waveform display.
         </p>
         <h2 style="color:blue">
             Help
@@ -24,19 +24,24 @@
             No Display
         </h2>
         <p>
-           This option enables you to remove one display, thereby only showing one view. 
+           This option enables you to remove one display, thereby only showing one view. This option allows a single playback window to occupy a greater amount of screen-space.
         </p>
         <h2 style="color:blue">
             Normal
         </h2>
         <p>
-            This view simply shows the video as QCTools interprets it, no special effects or filtering are added. In this view, however, you also have the option of displaying as <strong>'Field'</strong> which, as the name implies, takes the two video fields for the selected frame and diplays them as discrete images.
+            This view simply shows the video as QCTools interprets it, no special effects or filtering are added. In this view, however, you also have the option of enabling a <strong>'Field'</strong> display which splits the two video fields for the selected frame and diplays them as discrete images. Thus all odd-numbered video lines appear are resorted to appear on the top of the image and the even-numbered lines appear on the bottom. Since many analog video issues occur differently between the two interlaced fields, splitting the fields into two distinct images can make it easier to see if a given issue is from problems with the analog video playback device (such as a head clog where the two fields would react very differently) and tape damage (where the two fields would react similarly).
+        </p>
+        <p>
+            This image shows two Normal displays side-by-side where the right image has <strong>'Field'</strong> enabled. By viewed the fields separated on the right, it is easily clear that while field 1 was read correctly from the tape, there was no color data was read for field 2. This issue was due to a head clog and fixed by cleaning the video player and re-digitizing the content.
+            <br />
+            <img src="fieldsplit.jpg" alt="Normal / Field Split" />
         </p>
         <h2 style="color:blue">
             Histogram
         </h2>
         <p>
-            The histogram shows the frequency of occurrence of values per channel. Typically the histogram will show one graph per channel (one for each Y, U, and V or one for each red, green, and blue).Video with a lot of contrast and a well distributed range of luminance values will result in a histogram with an even spread. You may also select <strong>'Field'</strong> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).
+            The histogram shows the frequency of occurrence of values per channel. Typically the histogram will show one graph per channel (one for each Y, U, and V or one for each red, green, and blue). Video with a lot of contrast and a well distributed range of luminance values will result in a histogram with an even spread. You may also select <strong>'Field'</strong> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).
         </p>
         <h2 style="color:blue">
             Waveform
@@ -44,11 +49,18 @@
         <p>
             The waveform plots the brightness of the image, each column of the waveform corresponds to a column of pixels in the source video. The pixels of each column are then plotted in a scale from 0 to 110 IRE. The range from 0 to 7.5 IRE is highlighted in blue and indicates a black value that is below traditional NTSC broadcast range. The range from 100 to 110 IRE is highlighted in red and indicates a white value that is above broadcast range. For most analog media the intended pixel luminsotiy values should exist between 7.5 and 100 IRE. You may also select <strong>'Field'</strong> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).
         </p>
+        <p>
+            Traditionally a waveform plots the values of each column of video pixels. The QCTools waveform also provides a <strong>'Vertical'</strong> option would plots the video as rows of pixels. The waveform will still show the value range of the whole frame whether <strong>'Vertical'</strong> is enabled or not, but with <strong>'Vertical'</strong> enabled it is often easier to detect video issues that affect rows of pixel data such as dropouts.
+            <br />
+            <img src="waveform.jpg" alt="Waveform" />
+        </p>
          <h2 style="color:blue">
             Line Select
         </h2>
         <p>
-            Allows a user to select one line of video signal to display as a waveform. Includes "Columns" and "Background" modes.     
+            Allows a user to select one line of video signal to display as a waveform. Includes <strong>'Vertical'</strong> and <strong>'Background'</strong> modes. When <strong>'Vertical'</strong> is enable the user may select to plot a waveform of a single column rather than the default plot of a single row. The <strong>'Background'</strong> option shows the frame image under the waveform with the highlighted row or column highlighted in yellow.
+            <br />
+            <img src="lineselect.jpg" alt="Line Select" />
         </p>
         <h2 style="color:blue">
             Vectorscope
@@ -56,27 +68,33 @@
         <p>
             A vectorscope display. This display plots chroma values (U/V color placement) in two dimensional graph (which is called a vectorscope). It can be used to read of the hue and saturation of the current frame. The whiter a pixel in the vectorscope, the more pixels of the input frame correspond to that pixel (that is the more pixels have this chroma value). The V component is displayed on the vertical (Y) axis, with the bottom edge being V = 0 and the top being V = 255. The U component is displayed on the horizontal (Y) axis, with the left representing U = 0 and the right representing U = 255.<br />
             Six blocks are highlighted to depict standardized color points for red (90, 16), green (54, 222), blue (240, 146), cyan (166, 240), magenta (202, 44), and yellow (16, 110). All valid chroma values fall within a circlular shape from the center to the outer edge of the plot.You may also select <strong>'Field'</strong> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).<br />
-            <br />
-            <img src="vectorscope_illegal.jpg" alt="Vectorscope" /><br />
-            <br />
-            <br />
-            <br />
-            <img src="playback_layout_two_windows.jpg" width="65%" height="65%" alt="Vectorscope Split Screen" /><br />
-            <br />
-        </p>
-       <h2 style="color:blue">
-            Extract Planes UV
+        <img src="playback_layout_two_windows.jpg" alt="Vectorscope Split Screen" />
+        <br />
+        <img src="vectorscope_illegal.jpg" alt="Vectorscope" />
+        <p />
+        <h2 style="color:blue">
+            Waveform / Vectorscope
         </h2>
         <p>
-            This filter extracts the U/V channel which represents part of the chroma data from the video and then applies a histogram equalization which redistributes the pixel intensities to equalize their distribution across the intensity range. This filter is useful for analyzing compressed video channel signals.
+            This filter plots the Waveform and Vectorscope on top of each other so that both are shown in one display. The brightness of both the waveform and vectorscope may be adjusted for clarity.
         </p>
         <h2 style="color:blue">
-            Extract Planes
+            Extract Planes Equalized
         </h2>
         <p>
-            This filter extracts a video plane which represents the luma or part of the chroma data from the video and then applies a histogram equalization which redistributes the pixel intensities to equalize their distribution across the intensity range. This filter is useful for analyzing compressed video channel signals.
+            This filter extracts a specified video plane (such as Y, U, or V) which represents the luma or part of the chroma data from the video so that it may be reviewed on its own. The filter also may apply histogram equalization to redistributes the pixel intensities to equalize their distribution across the intensity range (this feature can help exagerrate or clarify the details of the plane image). This filter is useful for detecting lossy compression in video signals or establishing provenance.
         </p>
-        
+        <p>
+            This image shows the Normal display on the left and Extract Planes on the right. The Extract Planes filters reveals the macroblock pattern of lossy MPEG2 compression in the square patterns throughout the image.
+            <br />
+            <img src="extractplanes.jpg" alt="Extract Planes" />
+        </p>
+        <h2 style="color:blue">
+            Extract Planes UV Equalized
+        </h2>
+        <p>
+            This filter is similar to the <strong>Extract Planes Equalized</strong> filter but shows the two chroma planes (U and V) side by side.
+        </p>
         <h2 style="color:blue">
             Bit Plane
         </h2>
@@ -109,7 +127,13 @@
             Color Matrix
         </h2>
         <p>
-            Allows for playback in various color spaces, including BT.601, BT.709, SMPTE240M and FCC. 
+            Allows for playback in various color spaces, including BT.601, BT.709, SMPTE240M and FCC. The filter includes a <strong>Reveal</strong> slider so that the original image and a version interpretted through the selected color matrix may be shown side-by-side for review.
+        </p>
+        <h2 style="color:blue">
+            Sample Range
+        </h2>
+        <p>
+            This filter operates similarly to <strong>Color Matrix</strong> but shows the original image alongside a version interpreted through a selected sample range. Here you can see how the video would look it interpretted as either full range or broadcast range.
         </p>
          <h2 style="color:blue">
             Field Difference
@@ -123,7 +147,7 @@
             Temporal Difference
         </h2>
         <p>
-            Displays an image obtained from the temporal difference between successive frames. 
+            Displays an image obtained from the temporal difference between successive frames. Note that because this filter requires more than one frame to display the filter will need to be in playback mode to reveal an image.
         </p>
         <h2 style="color:blue">
             Pixel Offset Subtraction
@@ -159,7 +183,7 @@
             Frame Tiles
         </h2>
         <p>
-            Displays a user-defined "tiled" mosaic of successive frames. Maximum 12x12 grid. 
+            Displays a user-defined "tiled" mosaic of successive frames. Maximum 12x12 grid. Note that because this filter requires more than one frame to display the filter will need to be in playback mode to reveal an image.
         </p>
         <h2 style="color:blue">
             Zoom
@@ -167,10 +191,29 @@
         <p>
             Allows a user to zoom to a particuar portion of the image using X and Y coordinates. Includes "Strength" and "Intensity" modes. 
         </p>
-        
-        
-        
-        
-       
+        <h2 style="color:blue">
+            Audio Spectrum
+        </h2>
+        <p>
+            Displays an visualization of the audio spectrum. Note that because this filter requires more than one frame to display the filter will need to be in playback mode to reveal an image.
+        </p>
+        <h2 style="color:blue">
+            Audio Waveform
+        </h2>
+        <p>
+            Displays an visualization of the audio waveform. Note that because this filter requires more than one frame to display the filter will need to be in playback mode to reveal an image.
+        </p>
+        <h2 style="color:blue">
+            Show CQT
+        </h2>
+        <p>
+            Displays an visualization of the audio on a musical scale.
+        </p>
+        <h2 style="color:blue">
+            Audio Vectorscope
+        </h2>
+        <p>
+            Plots two channels of audio against each other on different axis. This display can show if audio is out-of-phase (displays as a horizontal line), dual-mono (displays as a verical line), or stereo (displays as a two dimensional complex shape).
+        </p>
     </body>
 </html>

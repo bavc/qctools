@@ -199,7 +199,7 @@ const filter Filters[]=
         {
             { Args_Type_Slider,   1,   1,   0,   1, "Line" },
             { Args_Type_Slider, 255,   1, 255,   1, "Brightness" },
-            { Args_Type_Toggle,   0,   0,   0,   0, "Columns"},
+            { Args_Type_Toggle,   0,   0,   0,   0, "Verical"},
             { Args_Type_Toggle,   0,   0,   0,   0, "Background"},
             { Args_Type_None,     0,   0,   0,   0, },
         },
@@ -240,21 +240,6 @@ const filter Filters[]=
         },
     },
     {
-        "Extract Planes UV Equal.",
-        0,
-        {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
-            { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-        },
-        {
-            "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:intensity=${3}",
-            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:strength=${3}",
-        },
-    },
-    {
         "Extract Planes Equalized",
         0,
         {
@@ -267,6 +252,21 @@ const filter Filters[]=
         {
             "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:intensity=${4}",
             "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:strength=${4}",
+        },
+    },
+    {
+        "Extract Planes UV Equal.",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
+            { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:intensity=${3}",
+            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:strength=${3}",
         },
     },
     {
