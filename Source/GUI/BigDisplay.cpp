@@ -199,7 +199,7 @@ const filter Filters[]=
         {
             { Args_Type_Slider,   1,   1,   0,   1, "Line" },
             { Args_Type_Slider, 255,   1, 255,   1, "Brightness" },
-            { Args_Type_Toggle,   0,   0,   0,   0, "Columns"},
+            { Args_Type_Toggle,   0,   0,   0,   0, "Verical"},
             { Args_Type_Toggle,   0,   0,   0,   0, "Background"},
             { Args_Type_None,     0,   0,   0,   0, },
         },
