@@ -1003,6 +1003,8 @@ void FFmpeg_Glue::CloseOutput()
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::ModifyOutput(size_t InputPos, size_t OutputPos, size_t FilterPos, int Scale_Width, int Scale_Height, outputmethod OutputMethod, int FilterType, const string &Filter)
 {
+    if (InputPos>=InputDatas.size())
+        return;
     inputdata* InputData=InputDatas[InputPos];
 
     outputdata* OutputData=new outputdata;
@@ -1134,7 +1136,7 @@ bool FFmpeg_Glue::NextFrame()
     while (Packet->size || av_read_frame(FormatContext, Packet) >= 0)
     {
         AVPacket TempPacket=*Packet;
-        if (InputDatas[Packet->stream_index] && InputDatas[Packet->stream_index]->Enabled)
+        if (Packet->stream_index<InputDatas.size() && InputDatas[Packet->stream_index] && InputDatas[Packet->stream_index]->Enabled)
         {
             do
             {
@@ -1169,7 +1171,11 @@ bool FFmpeg_Glue::NextFrame()
 //---------------------------------------------------------------------------
 bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
 {
+    if (TempPacket->stream_index>=InputDatas.size())
+        return false;
     inputdata* InputData=InputDatas[TempPacket->stream_index];
+    if (!InputData)
+        return false;
 
     // Encode
     if (!Encode_FileName.empty())
@@ -1186,7 +1192,7 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
     {
         got_frame=0;
         int Bytes;
-        switch(InputDatas[TempPacket->stream_index]->Type)
+        switch(InputData->Type)
         {
             case AVMEDIA_TYPE_VIDEO : Bytes=avcodec_decode_video2(InputData->Stream->codec, Frame, &got_frame, TempPacket); break;
             case AVMEDIA_TYPE_AUDIO : Bytes=avcodec_decode_audio4(InputData->Stream->codec, Frame, &got_frame, TempPacket); break;
@@ -1348,6 +1354,18 @@ void FFmpeg_Glue::Disable(const size_t Pos)
         return;
 
     OutputData->Enabled=false;
+}
+
+//---------------------------------------------------------------------------
+double FFmpeg_Glue::TimeStampOfCurrentFrame(const size_t OutputPos)
+{
+    if (OutputPos>=OutputDatas.size())
+        return DBL_MAX;
+    outputdata* OutputData=OutputDatas[OutputPos];
+    if (!OutputData)
+        return DBL_MAX;
+
+    return ((double)OutputData->DecodedFrame->pkt_pts)*OutputData->Stream->time_base.num/OutputData->Stream->time_base.den;
 }
 
 //---------------------------------------------------------------------------
