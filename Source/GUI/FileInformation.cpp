@@ -300,7 +300,8 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
 
     // From stats
     for (size_t Pos=0; Pos<Stats.size(); Pos++)
-        Data<<Stats[Pos]->StatsToXML(Glue->Width_Get(), Glue->Height_Get());
+        if (Stats[Pos])
+            Data<<Stats[Pos]->StatsToXML(Glue->Width_Get(), Glue->Height_Get());
 
     // Footer
     Data<<"    </frames>\n";
