@@ -36,6 +36,8 @@ Download_Packages 1  x  x   x x ""           Debian_6.0    i386   _i386
 Download_Packages 1  x  x   x x ""           Debian_6.0    amd64  _amd64
 Download_Packages 1  x  x   x x ""           Debian_7.0    i386   _i386
 Download_Packages 1  x  x   x x ""           Debian_7.0    amd64  _amd64
+Download_Packages 1  x  x   x x ""           Debian_8.0    i386   _i386
+Download_Packages 1  x  x   x x ""           Debian_8.0    amd64  _amd64
 Download_Packages 1  x  x   x x ""           xUbuntu_10.04  i386   _i386
 Download_Packages 1  x  x   x x ""           xUbuntu_10.04  amd64  _amd64
 Download_Packages 1  x  x   x x ""           xUbuntu_11.10  i386   _i386
@@ -44,10 +46,16 @@ Download_Packages 1  x  x   x x ""           xUbuntu_12.04  i386   _i386
 Download_Packages 1  x  x   x x ""           xUbuntu_12.04  amd64  _amd64
 Download_Packages 1  x  x   x x ""           xUbuntu_12.10  i386   _i386
 Download_Packages 1  x  x   x x ""           xUbuntu_12.10  amd64  _amd64
+Download_Packages 1  x  x   x x ""           xUbuntu_13.04  i386   _i386
+Download_Packages 1  x  x   x x ""           xUbuntu_13.04  amd64  _amd64
+Download_Packages 1  x  x   x x ""           xUbuntu_13.10  i386   _i386
+Download_Packages 1  x  x   x x ""           xUbuntu_13.10  amd64  _amd64
 Download_Packages 1  x  x   x x ""           xUbuntu_14.04  i386   _i386
 Download_Packages 1  x  x   x x ""           xUbuntu_14.04  amd64  _amd64
 Download_Packages 1  x  x   x x ""           xUbuntu_14.10  i386   _i386
 Download_Packages 1  x  x   x x ""           xUbuntu_14.10  amd64  _amd64
+Download_Packages 1  x  x   x x ""           xUbuntu_15.04  i386   _i386
+Download_Packages 1  x  x   x x ""           xUbuntu_15.04  amd64  _amd64
 
 type="rpm"
 devext="devel"
@@ -92,7 +100,7 @@ Download_Packages $1 x  x   x x ""           openSUSE_Tumbleweed x86_64 .x86_64
 }
 
 
-qctoolsv="0.7.0"
+qctoolsv="0.7.1"
 destversion="1"
 
 Download_Global 29.1

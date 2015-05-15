@@ -1,4 +1,4 @@
-0.7.1
+0.7.1, 2015-05-15
 -----
 + Expanded documentation and example images
 + Sample range filter - show broadcast against full range interpretation

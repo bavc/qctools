@@ -10,7 +10,7 @@ VERSION="$2"
 FILES="$3"
 
 APPNAME="QCTools"
-VERSION="0.4.0"
+VERSION="0.7.1"
 SIGNATURE="MediaArea.net"
 
 DMG="tmp-${APPNAME}.dmg"
