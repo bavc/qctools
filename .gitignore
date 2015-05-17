@@ -1,6 +1,11 @@
 Makefile
+Project/QtCreator/.qmake.stash
 Project/QtCreator/Makefile
+Project/QtCreator/moc
+Project/QtCreator/QCTools.app
+Project/QtCreator/resources/qrc_Resources.cpp
+Project/QtCreator/*.h
 Source/Makefile
 Source/Source.pro
 Source/build
-
+*.o
