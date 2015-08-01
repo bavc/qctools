@@ -273,14 +273,14 @@ const filter Filters[]=
         "Bit Plane",
         0,
         {
-            { Args_Type_Slider,   1,  -1,   8,   1, "Y bit position" },
-            { Args_Type_Slider,   -1, -1,   8,   1, "U bit position" },
-            { Args_Type_Slider,   -1, -1,   8,   1, "V bit position" },
+            { Args_Type_Slider,   1,  -1,   10,   1, "Y bit position" },
+            { Args_Type_Slider,   -1, -1,   10,   1, "U bit position" },
+            { Args_Type_Slider,   -1, -1,   10,   1, "V bit position" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "lutyuv=y=if(eq(${1}\\,-1)\\,128\\,if(eq(${1}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${1}))*pow(2\\,${1}))):u=if(eq(${2}\\,-1)\\,128\\,if(eq(${2}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${2}))*pow(2\\,${2}))):v=if(eq(${3}\\,-1)\\,128\\,if(eq(${3}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${3}))*pow(2\\,${3}))),format=yuv444p|rgb24",
+            "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,lutyuv=y=if(eq(${1}\\,-1)\\,512\\,if(eq(${1}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${1}))*pow(2\\,${1}))):u=if(eq(${2}\\,-1)\\,512\\,if(eq(${2}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${2}))*pow(2\\,${2}))):v=if(eq(${3}\\,-1)\\,512\\,if(eq(${3}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${3}))*pow(2\\,${3}))),format=yuv444p",
         },
     },
     /*
