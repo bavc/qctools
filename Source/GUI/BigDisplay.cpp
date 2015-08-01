@@ -51,7 +51,6 @@
 //---------------------------------------------------------------------------
 // Default filters (check Filters order)
 const size_t Filters_Default1 = 2; // 2 = Normal
-const size_t Filters_Default2 = 7; // 7 = Waveform
 const size_t Filters_Default2 = 5; // 5 = Waveform
 
 //***************************************************************************
