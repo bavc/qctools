@@ -509,7 +509,7 @@ const filter Filters[]=
             { Args_Type_Slider,   0,   0,  10,  10, "Intensity" },
         },
         {
-            "crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,scale=${width}:${height}:flags=neighbor,histeq=strength=${4}:intensity=${5}",
+            "setsar=1/1,crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,scale=${width}:${height}:flags=neighbor,histeq=strength=${4}:intensity=${5}",
         },
     },
     {
