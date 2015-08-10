@@ -13,7 +13,12 @@ const struct per_group AudioPerGroup [Group_AudioMax]=
     //R128
     {
         Item_R128M,     1,  -70,    0,  3,  "R.128",  true,
-        "(TODO)\n",
+        "R 128 refers to a European Broadcasting Union (EBU) specification\n"
+        "document governing several loudness parameters, including momentary,\n"
+        "integrated, and short-term loudness. QCTools specifically examines momentary\n"
+        "loudness, or sudden changes in volume over brief intervals of time (up to 400ms).\n"
+        "This can be helpful in identifying areas where volume may exceed upper loudness\n"
+        "tolerance levels as perceived by an audience.\n",
     },
     //LRA
     //{
