@@ -482,7 +482,7 @@ void FFmpeg_Glue::outputdata::ApplyScale()
     ScaledFrame = av_frame_alloc();
     ScaledFrame->width=Width;
     ScaledFrame->height=Height;
-    avpicture_alloc((AVPicture*)ScaledFrame, OutputMethod==Output_QImage?PIX_FMT_RGB24:PIX_FMT_YUVJ420P, Width, Height);
+    avpicture_alloc((AVPicture*)ScaledFrame, OutputMethod==Output_QImage?AV_PIX_FMT_RGB24:AV_PIX_FMT_YUVJ420P, Width, Height);
     if (sws_scale(ScaleContext, FilteredFrame->data, FilteredFrame->linesize, 0, FilteredFrame->height, ScaledFrame->data, ScaledFrame->linesize)<0)
     {
         avpicture_free((AVPicture*)ScaledFrame);
@@ -574,7 +574,7 @@ bool FFmpeg_Glue::outputdata::InitThumnails()
     av_init_packet (JpegOutput_Packet);
    
     //
-    AVCodec *JpegOutput_Codec=avcodec_find_encoder(CODEC_ID_MJPEG);
+    AVCodec *JpegOutput_Codec=avcodec_find_encoder(AV_CODEC_ID_MJPEG);
     if (!JpegOutput_Codec)
         return false;
     JpegOutput_CodecContext=avcodec_alloc_context3 (JpegOutput_Codec);
@@ -584,7 +584,7 @@ bool FFmpeg_Glue::outputdata::InitThumnails()
     JpegOutput_CodecContext->qmax          = 12;
     JpegOutput_CodecContext->width         = Width;
     JpegOutput_CodecContext->height        = Height;
-    JpegOutput_CodecContext->pix_fmt       = PIX_FMT_YUVJ420P;
+    JpegOutput_CodecContext->pix_fmt       = AV_PIX_FMT_YUVJ420P;
     JpegOutput_CodecContext->time_base.num = Stream->codec->time_base.num;
     JpegOutput_CodecContext->time_base.den = Stream->codec->time_base.den;
     if (avcodec_open2(JpegOutput_CodecContext, JpegOutput_Codec, NULL) < 0)
@@ -689,12 +689,12 @@ bool FFmpeg_Glue::outputdata::Scale_Init()
     ScaleContext = sws_getContext(FilteredFrame->width, FilteredFrame->height,
                                     (AVPixelFormat)FilteredFrame->format,
                                     Width, Height,
-                                    OutputMethod==Output_QImage?PIX_FMT_RGB24:PIX_FMT_YUVJ420P,
+                                    OutputMethod==Output_QImage?AV_PIX_FMT_RGB24:AV_PIX_FMT_YUVJ420P,
                                     Output_QImage?SWS_BICUBIC:SWS_FAST_BILINEAR, NULL, NULL, NULL);
     ScaledFrame=av_frame_alloc();
     ScaledFrame->width=Width;
     ScaledFrame->height=Height;
-    avpicture_alloc((AVPicture*)ScaledFrame, OutputMethod==Output_QImage?PIX_FMT_RGB24:PIX_FMT_YUVJ420P, Width, Height);
+    avpicture_alloc((AVPicture*)ScaledFrame, OutputMethod==Output_QImage?AV_PIX_FMT_RGB24:AV_PIX_FMT_YUVJ420P, Width, Height);
 
     // All is OK
     return true;
@@ -1814,9 +1814,6 @@ string FFmpeg_Glue::PixFormat_Get()
         case AV_PIX_FMT_GBRP10LE: return "planar GBR 4:4:4 30bpp, little-endian";
         case AV_PIX_FMT_GBRP16BE: return "planar GBR 4:4:4 48bpp, big-endian";
         case AV_PIX_FMT_GBRP16LE: return "planar GBR 4:4:4 48bpp, little-endian";
-
-        case AV_PIX_FMT_YUVA422P_LIBAV: return "planar YUV 4:2:2 24bpp, (1 Cr & Cb sample per 2x1 Y & A samples)";
-        case AV_PIX_FMT_YUVA444P_LIBAV: return "planar YUV 4:4:4 32bpp, (1 Cr & Cb sample per 1x1 Y & A samples)";
 
         case AV_PIX_FMT_YUVA420P9BE: return "planar YUV 4:2:0 22.5bpp, (1 Cr & Cb sample per 2x2 Y & A samples), big-endian";
         case AV_PIX_FMT_YUVA420P9LE: return "planar YUV 4:2:0 22.5bpp, (1 Cr & Cb sample per 2x2 Y & A samples), little-endian";
