@@ -67,7 +67,7 @@ chmod u+x configure
 chmod u+x version.sh
 if yasm --version >/dev/null 2>&1
 then
-    ./configure --enable-gpl --enable-version3 --disable-securetransport --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug $FFMPEG_EXTRA
+    ./configure --enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug $FFMPEG_EXTRA
     if [$? -ne 0 ]
     then #on some distro, yasm version is too old
       cd ../yasm/
@@ -76,7 +76,7 @@ then
       make install
 
       cd ../ffmpeg
-      ./configure --enable-gpl --enable-version3 --disable-securetransport --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --yasmexe=../yasm/usr/bin/yasm $FFMPEG_EXTRA
+      ./configure --enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --yasmexe=../yasm/usr/bin/yasm $FFMPEG_EXTRA
     fi
 else
     cd ../yasm/
@@ -85,7 +85,7 @@ else
     make install
 
     cd ../ffmpeg
-    ./configure --enable-gpl --enable-version3 --disable-securetransport --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --yasmexe=../yasm/usr/bin/yasm $FFMPEG_EXTRA
+    ./configure --enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --yasmexe=../yasm/usr/bin/yasm $FFMPEG_EXTRA
 fi
 
 make
