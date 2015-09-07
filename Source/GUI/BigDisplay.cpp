@@ -1223,7 +1223,7 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                     {
                                         bool SelectWidth=false;
                                         for (size_t OptionPos2=0; OptionPos2<Args_Max; OptionPos2++)
-                                            if (Filters[FilterPos].Args[OptionPos2].Type!=Args_Type_None && string(Filters[FilterPos].Args[OptionPos2].Name)=="Columns")
+                                            if (Filters[FilterPos].Args[OptionPos2].Type!=Args_Type_None && string(Filters[FilterPos].Args[OptionPos2].Name)=="Vertical")
                                                 SelectWidth=Filters[FilterPos].Args[OptionPos2].Default?true:false;
                                         Max=SelectWidth?FileInfoData->Glue->Width_Get():FileInfoData->Glue->Height_Get();
                                     }
