@@ -795,7 +795,7 @@ void ImageLabel::Remove ()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Others_, int Min_, int Max_, int Divisor_, int Current, const char* Name, BigDisplay* Display_, size_t Pos_, bool IsBitSlice_, QWidget *parent) :
+DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Others_, int Min_, int Max_, int Divisor_, int Current, const char* Name, BigDisplay* Display_, size_t Pos_, bool IsBitSlice_, bool IsFilter_, bool IsPeak_, bool IsMode_, QWidget *parent) :
     Others(Others_),
     Divisor(Divisor_),
     Min(Min_),
@@ -803,6 +803,9 @@ DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Other
     Display(Display_),
     Pos(Pos_),
     IsBitSlice(IsBitSlice_),
+    IsFilter(IsFilter_),
+    IsPeak(IsPeak_),
+    IsMode(IsMode_),
     QDoubleSpinBox(parent)
 {
     Popup=NULL;
@@ -975,6 +978,36 @@ QString DoubleSpinBoxWithSlider::textFromValue (double value) const
         return "All";
     else if (IsBitSlice && value==-1)
         return "None";
+    else if (IsFilter && value==0)
+        return "lowpass";
+    else if (IsFilter && value==1)
+        return "flat";
+    else if (IsFilter && value==2)
+        return "aflat";
+    else if (IsFilter && value==3)
+        return "chroma";
+    else if (IsFilter && value==4)
+        return "achroma";
+    else if (IsFilter && value==5)
+        return "color";
+    else if (IsPeak && value==0)
+        return "none";
+    else if (IsPeak && value==1)
+        return "instant";
+    else if (IsPeak && value==2)
+        return "peak";
+    else if (IsPeak && value==3)
+        return "peak+instant";
+    else if (IsMode && value==0)
+        return "gray";
+    else if (IsMode && value==1)
+        return "color";
+    else if (IsMode && value==2)
+        return "color2";
+    else if (IsMode && value==3)
+        return "color3";
+    else if (IsMode && value==4)
+        return "color4";
     else
         return QDoubleSpinBox::textFromValue(value);
 }
@@ -1202,7 +1235,7 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                         Max=Filters[FilterPos].Args[OptionPos].Max;
 
                                     Options[Pos].Sliders_Label[OptionPos]=new QLabel(Filters[FilterPos].Args[OptionPos].Name+QString(": "));
-                                    Options[Pos].Sliders_SpinBox[OptionPos]=new DoubleSpinBoxWithSlider(Options[Pos].Sliders_SpinBox, Filters[FilterPos].Args[OptionPos].Min, Max, Filters[FilterPos].Args[OptionPos].Divisor, PreviousValues[Pos][FilterPos].Values[OptionPos], Filters[FilterPos].Args[OptionPos].Name, this, Pos, QString(Filters[FilterPos].Args[OptionPos].Name).contains(" bit position"), this);
+                                    Options[Pos].Sliders_SpinBox[OptionPos]=new DoubleSpinBoxWithSlider(Options[Pos].Sliders_SpinBox, Filters[FilterPos].Args[OptionPos].Min, Max, Filters[FilterPos].Args[OptionPos].Divisor, PreviousValues[Pos][FilterPos].Values[OptionPos], Filters[FilterPos].Args[OptionPos].Name, this, Pos, QString(Filters[FilterPos].Args[OptionPos].Name).contains(" bit position"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Filter"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Peak"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Mode"), this);
                                     connect(Options[Pos].Sliders_SpinBox[OptionPos], SIGNAL(valueChanged(double)), this, Pos==0?(SLOT(on_FiltersSpinBox1_click())):SLOT(on_FiltersSpinBox2_click()));
                                     Options[Pos].Sliders_Label[OptionPos]->setFont(Font);
                                     if (Options[Pos].Sliders_SpinBox[OptionPos])
@@ -1523,13 +1556,13 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                     {
                                         if (Options[Pos].Radios[OptionPos][OptionPos2] && Options[Pos].Radios[OptionPos][OptionPos2]->isChecked())
                                         {
-                                            if (string(Filters[Picture_Current].Name)=="Waveform")
+                                            if (string(Filters[Picture_Current].Name)=="Waveform" || string(Filters[Picture_Current].Name)=="Waveform 2.8")
                                                 switch (OptionPos2)
                                                 {
-                                                    case 0: WithRadios[OptionPos]="0"; break;
-                                                    case 1: WithRadios[OptionPos]="256"; break;
-                                                    case 2: WithRadios[OptionPos]="512"; break;
-                                                    case 3: WithRadios[OptionPos]="all"; break; //Special case: remove plane
+                                                    case 0: WithRadios[OptionPos]="1"; break;
+                                                    case 1: WithRadios[OptionPos]="2"; break;
+                                                    case 2: WithRadios[OptionPos]="4"; break;
+                                                    case 3: WithRadios[OptionPos]="7"; break; //Special case: remove plane
                                                     default:;
                                                 }
                                             else if (string(Filters[Picture_Current].Name)=="Histogram" && Options[Pos].Checks[1] && Options[Pos].Checks[1]->isChecked()) //RGB
