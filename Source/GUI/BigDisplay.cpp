@@ -672,6 +672,48 @@ const filter Filters[]=
             "avectorscope=m=lissajous:s=512x512:zoom=${1}",
         },
     },
+    {
+        "Audio Phase Meter",
+        1,
+        {
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "aphasemeter=mpc=red",
+        },
+    },
+    {
+        "Audio Frequency",
+        1,
+        {
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "showfreqs=mode=line:win_size=w1024",
+        },
+    },
+    {
+        "Audio Volume",
+        1,
+        {
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "showvolume",
+        },
+    },
     /*
     {
         "EBU r128 Loudness Meter",
