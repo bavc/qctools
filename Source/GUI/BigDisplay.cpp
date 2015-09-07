@@ -194,6 +194,28 @@ const filter Filters[]=
         },
     },
     {
+        "Waveform 2.8",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
+            { Args_Type_YuvA,     0,   0,   0,   0, "Plane" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Vertical" },
+            { Args_Type_Slider,   0,   0,   5,   1, "Filter" },
+            { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
+        },
+        {
+            "waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:e=${6},drawbox=y=(ih-(16*(ih/256))):w=iw:h=16*(ih/256):color=aqua@0.3:t=16*(ih/256),drawbox=w=iw:h=ih-(235*(ih/256)):color=crimson@0.3:t=16*(ih/256)",
+            "waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:e=${6},drawbox=x=(iw-(16*(iw/256))):h=ih:w=16*(iw/256):color=aqua@0.3:t=16*(iw/256),drawbox=h=ih:w=iw-(235*(iw/256)):color=crimson@0.3:t=16*(iw/256)",
+            "waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:e=${6}",
+            "waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:e=${6}",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:e=${6},drawbox=y=(ih-(16*(ih/256))):w=iw:h=16*(ih/256):color=aqua@0.3:t=16*(ih/256),drawbox=w=iw:h=ih-(235*(ih/256)):color=crimson@0.3:t=16*(ih/256)[a2];[b1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:e=${6},drawbox=y=(ih-(16*(ih/256))):w=iw:h=16*(ih/256):color=aqua@0.3:t=16*(ih/256),drawbox=w=iw:h=ih-(235*(ih/256)):color=crimson@0.3:t=16*(ih/256)[b2];[a2][b2]framepack=tab",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:e=${6},drawbox=x=(iw-(16*(iw/256))):h=ih:w=16*(iw/256):color=aqua@0.3:t=16*(iw/256),drawbox=h=ih:w=iw-(235*(iw/256)):color=crimson@0.3:t=16*(iw/256)[a2];[b1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:e=${6},drawbox=x=(iw-(16*(iw/256))):h=ih:w=16*(iw/256):color=aqua@0.3:t=16*(iw/256),drawbox=h=ih:w=iw-(235*(iw/256)):color=crimson@0.3:t=16*(iw/256)[b2];[a2][b2]framepack=tab",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:e=${6}[a2];[b1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:e=${6}[b2];[a2][b2]framepack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:e=${6}[a2];[b1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:e=${6}[b2];[b2][a2]framepack,transpose=1",
+        },
+    },
+    {
         "Line Select",
         0,
         {
