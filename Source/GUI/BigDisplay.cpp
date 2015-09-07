@@ -233,6 +233,22 @@ const filter Filters[]=
         },
     },
     {
+        "Line Select 2.8",
+        0,
+        {
+            { Args_Type_Slider,   1,   1,   0,   1, "Line" },
+            { Args_Type_Slider,  10,   0,  10,  10, "Intensity" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Vertical"},
+            { Args_Type_Toggle,   0,   0,   0,   0, "Background"},
+        },
+        {
+            "format=yuv444p|yuva444p10be|rgb24,crop=iw:1:0:${1},waveform=intensity=${2}:mode=column:mirror=1:c=1,drawbox=y=(ih-(16*(ih/256))):w=iw:h=16*(ih/256):color=aqua@0.3:t=16*(ih/256),drawbox=w=iw:h=ih-(235*(ih/256)):color=crimson@0.3:t=16*(ih/256)",
+            "split[a][b];[a]format=yuv444p|yuva444p10be|rgb24,crop=iw:1:0:${1},waveform=intensity=${2}:mode=column:mirror=1:c=1,drawbox=y=(ih-(16*(ih/256))):w=iw:h=16*(ih/256):color=aqua@0.3:t=16*(ih/256),drawbox=w=iw:h=ih-(235*(ih/256)):color=crimson@0.3:t=16*(ih/256),drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,scale=iw:${height},drawbox=y=${1}:w=iw:h=1:color=yellow,setsar=1/1[a1];[b]setsar=1/1[b1];[a1][b1]blend=addition",
+            "               format=yuv444p|yuva444p10be|rgb24,crop=1:ih:${1}:0,waveform=intensity=${2}:mode=row:   mirror=1:c=1,drawbox=x=(iw-(16*(iw/256))):h=ih:w=16*(iw/256):color=aqua@0.3:t=16*(iw/256),drawbox=h=ih:w=iw-(235*(iw/256)):color=crimson@0.3:t=16*(iw/256)",
+            "split[a][b];[a]format=yuv444p|yuva444p10be|rgb24,crop=1:ih:${1}:0,waveform=intensity=${2}:mode=row:   mirror=1:c=1,drawbox=x=(iw-(16*(iw/256))):h=ih:w=16*(iw/256):color=aqua@0.3:t=16*(iw/256),drawbox=h=ih:w=iw-(235*(iw/256)):color=crimson@0.3:t=16*(iw/256),scale=${width}:${height},drawbox=x=${1}:w=1:h=ih:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
+        },
+    },
+    {
         "Vectorscope",
         0,
         {
