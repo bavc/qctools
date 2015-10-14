@@ -111,7 +111,7 @@ void MainWindow::Ui_Init()
     //ToolTip
     if (ui->fileNamesBox)
         ui->fileNamesBox->hide();
-    for (size_t type = 0; type < CountOfStreamTypes; type++)
+    for (size_t type = 0; type < Type_Max; type++)
         for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ ) // Group_Axis
         {
             QCheckBox* CheckBox=new QCheckBox(PerStreamType[type].PerGroup[group].Name);
@@ -288,7 +288,7 @@ void MainWindow::refreshDisplay()
 {
     if (PlotsArea)
     {
-        for (size_t type = 0; type<CountOfStreamTypes; type++)
+        for (size_t type = 0; type<Type_Max; type++)
             for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
                 PlotsArea->setPlotVisible( type, group, CheckBoxes[type][group]->checkState()==Qt::Checked );
     }

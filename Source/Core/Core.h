@@ -46,7 +46,13 @@ struct stream_info
     const struct per_group*     PerGroup;
     const struct per_item*      PerItem;
 };
-const size_t CountOfStreamTypes=2;
-extern const struct stream_info PerStreamType    [CountOfStreamTypes];
+enum Types
+{
+    Type_Video,
+    Type_Audio,
+    Type_Max
+};
+
+extern const struct stream_info PerStreamType    [Type_Max];
 
 #endif // Core_H
