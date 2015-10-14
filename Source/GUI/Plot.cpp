@@ -15,6 +15,7 @@
 #include <qwt_widget_overlay.h>
 #include <qwt_scale_widget.h>
 #include <qwt_plot_canvas.h>
+#include <qwt_plot_marker.h>
 #include <qwt_series_data.h>
 #include <QResizeEvent>
 
@@ -211,6 +212,19 @@ protected:
 };
 
 //***************************************************************************
+// Helpers
+//***************************************************************************
+
+void Plot_AddHLine(QwtPlot* plot, double value)
+{
+    QwtPlotMarker *marker = new QwtPlotMarker();
+    marker->setLineStyle ( QwtPlotMarker::HLine );
+    marker->setLinePen( Qt::blue );
+    marker->attach( plot );
+    marker->setYValue( value );
+}
+
+//***************************************************************************
 // Constructor / Destructor
 //***************************************************************************
 
@@ -266,6 +280,19 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, QWidget *parent ) :
         curve->attach( this );
 
         m_curves += curve;
+    }
+
+    // visual helpers
+    if ( m_type == Type_Video )
+    switch (m_group)
+    {
+        case Group_Y :
+        case Group_U :
+        case Group_V :
+                        Plot_AddHLine( this,  16);
+                        Plot_AddHLine( this, 235);
+                        break;
+        default      :  ;  
     }
 
     PlotPicker* picker = new PlotPicker( canvas, &PerStreamType[m_type], m_group, &m_curves );
