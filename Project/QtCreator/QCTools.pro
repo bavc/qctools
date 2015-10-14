@@ -88,7 +88,7 @@ INCLUDEPATH += $$QWT_ROOT/src
 INCLUDEPATH += $$PWD/../../../ffmpeg
 INCLUDEPATH += "$$PWD/../../../Blackmagic DeckLink SDK"
 
-LIBS      += -L$${QWT_ROOT}/lib -lqwt
+LIBS      += -L$${QWT_ROOT}/lib -lqwt -l lzma
 LIBS      += -lz
 LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
              -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
@@ -99,7 +99,6 @@ LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
              -L$${PWD}/../../../ffmpeg/libswscale -lswscale \
              -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
              -L$${PWD}/../../../ffmpeg/libavutil -lavutil
-LIBS      += -L$${PWD}/../../../openjpeg/usr/lib -lopenjpeg
 LIBS      += -lbz2
 
 !macx:LIBS      += -ldl -lrt

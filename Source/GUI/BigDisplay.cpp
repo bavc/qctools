@@ -51,7 +51,7 @@
 //---------------------------------------------------------------------------
 // Default filters (check Filters order)
 const size_t Filters_Default1 = 2; // 2 = Normal
-const size_t Filters_Default2 = 7; // 7 = Waveform
+const size_t Filters_Default2 = 5; // 5 = Waveform
 
 //***************************************************************************
 // Info
@@ -226,6 +226,26 @@ const filter Filters[]=
         },
     },
     {
+        "Vectorscope Target",
+        0,
+        {
+            { Args_Type_Slider,   0,   0,   0,   1, "x" },
+            { Args_Type_Slider,   0,   0,   0,   1, "y" },
+            { Args_Type_Slider,  60,  16,   0,   1, "s" },
+            { Args_Type_Slider,   5,   1,  10,   1, "Intensity" },
+            { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
+        },
+        {
+            "crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,\
+            histogram=mode=color2,lutyuv=y=val*${4},transpose=dir=2,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            "split[a][b];\
+            [a]lutyuv=y=val/4,drawbox=w=${3}:h=${3}/dar:x=${1}-${3}/2:y=${2}-${3}/dar/2:t=1:c=yellow,scale=720:512,setsar=1/1[a1];\
+            [b]crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,\
+            histogram=mode=color2,lutyuv=y=val*${4},transpose=dir=2,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=720:512,setsar=1/1[b1];\
+            [a1][b1]blend=addition",
+        },
+    },
+    {
         "Waveform / Vectorscope",
         0,
         {
@@ -273,14 +293,30 @@ const filter Filters[]=
         "Bit Plane",
         0,
         {
-            { Args_Type_Slider,   1,  -1,   8,   1, "Y bit position" },
-            { Args_Type_Slider,   -1, -1,   8,   1, "U bit position" },
-            { Args_Type_Slider,   -1, -1,   8,   1, "V bit position" },
+            { Args_Type_Slider,   1,  -1,   10,   1, "Y bit position" },
+            { Args_Type_Slider,   -1, -1,   10,   1, "U bit position" },
+            { Args_Type_Slider,   -1, -1,   10,   1, "V bit position" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "lutyuv=y=if(eq(${1}\\,-1)\\,128\\,if(eq(${1}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${1}))*pow(2\\,${1}))):u=if(eq(${2}\\,-1)\\,128\\,if(eq(${2}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${2}))*pow(2\\,${2}))):v=if(eq(${3}\\,-1)\\,128\\,if(eq(${3}\\,0)\\,val\\,bitand(val\\,pow(2\\,8-${3}))*pow(2\\,${3}))),format=yuv444p|rgb24",
+            "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,lutyuv=y=if(eq(${1}\\,-1)\\,512\\,if(eq(${1}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${1}))*pow(2\\,${1}))):u=if(eq(${2}\\,-1)\\,512\\,if(eq(${2}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${2}))*pow(2\\,${2}))):v=if(eq(${3}\\,-1)\\,512\\,if(eq(${3}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${3}))*pow(2\\,${3}))),format=yuv444p",
+        },
+    },
+    {
+        "Bit Plane Noise",
+        0,
+        {
+            { Args_Type_Slider,   1,   1,  10,   1, "Bit position" },
+            { Args_Type_Yuv,      0,   0,   0,   0, "Plane"},
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,lutyuv=y=512:u=512:v=512:\
+                ${2}=bitand(val\\,pow(2\\,10-${1}))*pow(2\\,${1}),format=yuv444p,extractplanes=${2},format=yuv444p,geq=lum=128:cb=if(gte(eq(lum(X\\,Y)\\,lum(X-1\\,Y))+eq(lum(X\\,Y)\\,lum(X\\,Y-1))+eq(lum(X\\,Y)\\,lum(X-1\\,Y-1))\\,2)\\,0\\,255)"
+
         },
     },
     /*
@@ -509,7 +545,7 @@ const filter Filters[]=
             { Args_Type_Slider,   0,   0,  10,  10, "Intensity" },
         },
         {
-            "crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,scale=${width}:${height}:flags=neighbor,histeq=strength=${4}:intensity=${5}",
+            "setsar=1/1,crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,scale=${width}:${height}:flags=neighbor,histeq=strength=${4}:intensity=${5}",
         },
     },
     {
