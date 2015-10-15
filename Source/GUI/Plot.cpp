@@ -287,10 +287,13 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, QWidget *parent ) :
     switch (m_group)
     {
         case Group_Y :
+                        Plot_AddHLine( this,  16);
+                        Plot_AddHLine( this, 235);
+                        break;
         case Group_U :
         case Group_V :
                         Plot_AddHLine( this,  16);
-                        Plot_AddHLine( this, 235);
+                        Plot_AddHLine( this, 240);
                         break;
         default      :  ;  
     }
