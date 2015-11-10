@@ -215,11 +215,11 @@ protected:
 // Helpers
 //***************************************************************************
 
-void Plot_AddHLine(QwtPlot* plot, double value)
+void Plot_AddHLine(QwtPlot* plot, double value , double r , double g, double b)
 {
     QwtPlotMarker *marker = new QwtPlotMarker();
     marker->setLineStyle ( QwtPlotMarker::HLine );
-    marker->setLinePen( Qt::blue );
+    marker->setLinePen(QPen(QColor(r, g, b, 128), 1, Qt::DashDotLine));
     marker->attach( plot );
     marker->setYValue( value );
 }
@@ -287,13 +287,13 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, QWidget *parent ) :
     switch (m_group)
     {
         case Group_Y :
-                        Plot_AddHLine( this,  16);
-                        Plot_AddHLine( this, 235);
+                        Plot_AddHLine( this,  16,  61,  89, 171);
+                        Plot_AddHLine( this, 235, 220,  20,  60);
                         break;
         case Group_U :
         case Group_V :
-                        Plot_AddHLine( this,  16);
-                        Plot_AddHLine( this, 240);
+                        Plot_AddHLine( this,  16,  61,  89, 171);
+                        Plot_AddHLine( this, 240, 220,  20,  60);
                         break;
         default      :  ;  
     }
