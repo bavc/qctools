@@ -295,6 +295,10 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, QWidget *parent ) :
                         Plot_AddHLine( this,  16,  61,  89, 171);
                         Plot_AddHLine( this, 240, 220,  20,  60);
                         break;
+        case Group_Sat :
+                        Plot_AddHLine( this,  88, 255,   0, 255);
+                        Plot_AddHLine( this, 118, 220,  20,  60);
+                        break;
         default      :  ;  
     }
 
