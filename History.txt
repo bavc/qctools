@@ -1,6 +1,9 @@
 0.7.2, 
 -----
 + Add plotlines for reference black and white in YUV graphs (GitHub issue #96)
++ Add plotlines for broadcast illegal and yuv illegal saturation levels
++ Update waveform and vectorscope filters to new waveform and vectorscope filters in FFmpeg 2.8
++ Add field modes to Tile and Zoom
 
 0.7.1, 2015-05-15
 -----
