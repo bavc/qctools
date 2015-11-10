@@ -177,27 +177,6 @@ const filter Filters[]=
         0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Slider,  20,   1, 255,   1, "Intensity" },
-            { Args_Type_YuvA,     0,   0,   0,   0, "Plane" },
-            { Args_Type_Toggle,   0,   0,   0,   0, "Vertical" },
-            { Args_Type_None,     0,   0,   0,   0, },
-        },
-        {
-            "histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:${3},drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16",
-            "transpose=0,histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:${3},drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,transpose=1",
-            "histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,drawgrid=width=0:height=256:thickness=1:color=white@0.5",
-            "transpose=0,histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,drawgrid=width=0:height=256:thickness=1:color=white@0.5,transpose=1",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:${3},drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16[a2];[b1]histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:${3},drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16[b2];[a2][b2]framepack=tab",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]transpose=0,histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:${3},drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16[a2];[b1]transpose=0,histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,crop=iw:256:0:${3},drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16[b2];[a2][b2]framepack=tab,transpose=1",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,drawgrid=width=0:height=256:thickness=1:color=white@0.5[a2];[b1]histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,drawgrid=width=0:height=256:thickness=1:color=white@0.5[b2];[a2][b2]framepack",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]transpose=0,histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,drawgrid=width=0:height=256:thickness=1:color=white@0.5[a2];[b1]transpose=0,histogram=step=${2}:mode=waveform:waveform_mode=column:waveform_mirror=1,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,drawgrid=width=0:height=256:thickness=1:color=white@0.5[b2];[b2][a2]framepack,transpose=1",
-        },
-    },
-    {
-        "Waveform 2.8",
-        0,
-        {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
             { Args_Type_YuvA,     0,   0,   0,   0, "Plane" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Vertical" },
