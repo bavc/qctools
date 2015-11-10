@@ -207,23 +207,6 @@ const filter Filters[]=
         0,
         {
             { Args_Type_Slider,   1,   1,   0,   1, "Line" },
-            { Args_Type_Slider, 255,   1, 255,   1, "Brightness" },
-            { Args_Type_Toggle,   0,   0,   0,   0, "Vertical"},
-            { Args_Type_Toggle,   0,   0,   0,   0, "Background"},
-            { Args_Type_None,     0,   0,   0,   0, },
-        },
-        {
-            "format=yuv444p|rgb24,crop=iw:1:0:${1},histogram=step=${2}:mode=waveform:waveform_mode=column:display_mode=overlay:waveform_mirror=1,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16",
-            "split[a][b];[a]format=yuv444p|rgb24,crop=iw:1:0:${1},histogram=step=${2}:mode=waveform:waveform_mode=column:display_mode=overlay:waveform_mirror=1,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,scale=iw:${height},drawbox=y=${1}:w=iw:h=1:color=yellow,setsar=1/1[a1];[b]setsar=1/1[b1];[a1][b1]blend=addition",
-            "transpose=0,format=yuv444p|rgb24,crop=iw:1:0:${1},histogram=step=${2}:mode=waveform:waveform_mode=column:display_mode=overlay:waveform_mirror=1,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,transpose=1",
-            "split[a][b];[a]transpose=0,format=yuv444p|rgb24,crop=iw:1:0:${1},histogram=step=${2}:mode=waveform:waveform_mode=column:display_mode=overlay:waveform_mirror=1,drawbox=y=(256-16):w=iw:h=16:color=aqua@0.3:t=16,drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,transpose=1,scale=${width}:ih,drawbox=x=${1}:w=1:h=ih:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
-        },
-    },
-    {
-        "Line Select 2.8",
-        0,
-        {
-            { Args_Type_Slider,   1,   1,   0,   1, "Line" },
             { Args_Type_Slider,  10,   0,  10,  10, "Intensity" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Vertical"},
             { Args_Type_Toggle,   0,   0,   0,   0, "Background"},
