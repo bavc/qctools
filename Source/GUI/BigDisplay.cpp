@@ -536,12 +536,13 @@ const filter Filters[]=
         {
             { Args_Type_Slider,   2,   1,   12,   1, "Width"},
             { Args_Type_Slider,   2,   1,   12,   1, "Height"},
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Toggle,   0,   0,    0,   0, "Field" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "scale=iw/${1}:ih/${2},tile=${1}x${2}"
+            "scale=iw/${1}:ih/${2},tile=${1}x${2}",
+            "il=l=d:c=d,scale=iw/${1}:ih/${2},tile=${1}x${2}"
         },
     },
     {
@@ -553,9 +554,11 @@ const filter Filters[]=
             { Args_Type_Slider,  60,  16,   0,   1, "s" },
             { Args_Type_Slider,   0,   0,  10,  10, "Strength" },
             { Args_Type_Slider,   0,   0,  10,  10, "Intensity" },
+            { Args_Type_Toggle,   0,   0,    0,   0, "Field" },
         },
         {
             "setsar=1/1,crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,scale=${width}:${height}:flags=neighbor,histeq=strength=${4}:intensity=${5}",
+            "il=l=d:c=d,setsar=1/1,crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,scale=${width}:${height}:flags=neighbor,histeq=strength=${4}:intensity=${5}",
         },
     },
     {
