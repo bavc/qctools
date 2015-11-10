@@ -198,7 +198,7 @@ const filter Filters[]=
         0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
+            { Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
             { Args_Type_YuvA,     0,   0,   0,   0, "Plane" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Vertical" },
             { Args_Type_Slider,   0,   0,   5,   1, "Filter" },
