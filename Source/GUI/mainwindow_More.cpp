@@ -289,7 +289,7 @@ void MainWindow::createGraphsLayout()
 
     if (Files_CurrentPos==(size_t)-1)
     {
-        for (size_t type = 0; type < CountOfStreamTypes; type++)
+        for (size_t type = 0; type < Type_Max; type++)
             for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
                 if (CheckBoxes[type][group])
                     CheckBoxes[type][group]->hide();
@@ -301,7 +301,7 @@ void MainWindow::createGraphsLayout()
     }
     clearDragDrop();
 
-    for (size_t type = 0; type < CountOfStreamTypes; type++)
+    for (size_t type = 0; type < Type_Max; type++)
         for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
             if (CheckBoxes[type][group])
                 CheckBoxes[type][group]->show();

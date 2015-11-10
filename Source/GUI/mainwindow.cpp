@@ -270,7 +270,7 @@ void MainWindow::on_actionFilesList_triggered()
         ui->actionZoomOut->setVisible(false);
     if (ui->actionWindowOut)
         ui->actionWindowOut->setVisible(false);
-    for (size_t type = 0; type < CountOfStreamTypes; type++)
+    for (size_t type = 0; type < Type_Max; type++)
         for (size_t group=0; group<CheckBoxes[type].size(); group++)
             CheckBoxes[type][group]->hide();
     if (ui->fileNamesBox)
@@ -310,7 +310,7 @@ void MainWindow::on_actionGraphsLayout_triggered()
         ui->actionZoomOut->setVisible(true);
     if (ui->actionWindowOut)
         ui->actionWindowOut->setVisible(false);
-    for (size_t type = 0; type < CountOfStreamTypes; type++)
+    for (size_t type = 0; type < Type_Max; type++)
         for (size_t group=0; group<CheckBoxes[type].size(); group++)
             CheckBoxes[type][group]->show();
     if (ui->fileNamesBox)
