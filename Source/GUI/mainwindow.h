@@ -101,7 +101,7 @@ public:
     QLabel*                     DragDrop_Text;
 
     //CheckBoxes
-    std::vector<QCheckBox*>     CheckBoxes[CountOfStreamTypes];
+    std::vector<QCheckBox*>     CheckBoxes[Type_Max];
 
     // Files
     std::vector<FileInformation*> Files;

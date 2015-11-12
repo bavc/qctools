@@ -13,7 +13,7 @@
 const char* Version="0.6.0";
 
 //---------------------------------------------------------------------------
-const struct stream_info PerStreamType    [CountOfStreamTypes] =
+const struct stream_info PerStreamType    [Type_Max] =
 {
     { Group_VideoMax, Item_VideoMax, VideoPerGroup, VideoPerItem, },
     { Group_AudioMax, Item_AudioMax, AudioPerGroup, AudioPerItem, },

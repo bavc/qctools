@@ -243,7 +243,7 @@ void Plots::updateSamples( Plot* plot )
     const size_t plotGroup = plot->group();
     const CommonStats* stat = stats( plot->streamPos() );
 
-    for (size_t type = 0; type < CountOfStreamTypes; type++)
+    for (size_t type = 0; type < Type_Max; type++)
         for( unsigned j = 0; j < PerStreamType[type].CountOfGroups; ++j )
         {
             plot->setCurveSamples( j, stat->x[m_dataTypeIndex],
