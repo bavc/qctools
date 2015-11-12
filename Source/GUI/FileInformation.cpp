@@ -192,8 +192,10 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, B
     string Filters[Type_Max];
     if (StatsFromExternalData.empty())
     {
-        Filters[0]="signalstats=stat=tout+vrep+brng,cropdetect=reset=1:round=1,split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr";
-        Filters[1]="ebur128=metadata=1,astats=metadata=1:reset=1:length=0.4";
+        Filters[0]="signalstats=stat=tout+vrep+brng,cropdetect=reset=1:round=1";
+        Filters[0]+=",split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr";
+        Filters[1]="ebur128=metadata=1";
+        Filters[1]+=",astats=metadata=1:reset=1:length=0.4";
     }
     else
     {
