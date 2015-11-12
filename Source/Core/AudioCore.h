@@ -30,11 +30,8 @@ enum AudioItem
     Item_Max_difference,
     Item_Mean_difference,
     Item_Peak_level,
-    Item_RMS_level,
     Item_RMS_peak,
     Item_RMS_trough,
-    Item_Flat_factor,
-    Item_Peak_count,
     //Internal
     Item_AudioMax
 };
@@ -42,11 +39,9 @@ enum AudioItem
 enum AudioGroup
 {
     Group_R128,
-    Group_DC_offset,
     Group_astats_levels,
-    Group_astats_diffs,
+    Group_adif,
     Group_astats_RMS,
-    Group_astats_flat,
     //Group_LRA,
     Group_AudioMax
 };
