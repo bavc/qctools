@@ -50,11 +50,16 @@ CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t Cou
     FirstTimeStamp=DBL_MAX;
 
     // Memory management
-    Data_Reserved=1;
-    while (Data_Reserved<FrameCount)
-        Data_Reserved<<=1;
-    if (Data_Reserved+128>=FrameCount)
-        Data_Reserved<<=1;
+    if (FrameCount<10*3600*30)
+    {
+        Data_Reserved=1;
+        while (Data_Reserved<FrameCount)
+            Data_Reserved<<=1;
+        if (Data_Reserved+128>=FrameCount)
+            Data_Reserved<<=1;
+    }
+    else
+        Data_Reserved=1<<16; //Frame count is not reliable (too huge, e.g. it is sample count instead of frame count), reserving only a default count of frames.
 
     // Data - Counts
     Stats_Totals = new double[CountOfItems];
