@@ -78,7 +78,7 @@
                         Filter Name(s)
                     </th>
                     <th>
-                        Values*
+                        Values
                     </th>
                 </tr>
                 <tr>
@@ -94,9 +94,6 @@
                 </tr>
             </tbody>
         </table>
-        <p>
-            *Appropriate for the 8-bit video samples analyzed by this tool.
-        </p>
         <p>
             Y Channels carry data about the brightness of a picture. Problematic variance in Y Channel values will manifest as a picture that is either too light or too dark, also known as containing luma noise. 8-bit video will have values falling in the range of 0-255 code values per pixel. A picture with well-balanced light levels will have an average, or mid-range Y Channel value of around 128 (Y AVG). Graph readings outside of that range will indicate a picture that is either too bright or too dark. A Y Value of 0 would indicate total blackness and a value of 255 would present as entirely white. In the range of values, reference black is at value 16, while reference white is at value 235. Except during particular moments like scene changes where one might expect abrupt spikes , the average values of Y channels should remain relatively stable or constant with little variation. Portions of video showing extreme changes in average values (and not corresponding to a scene change or otherwise dramatic edit) likely indicate a picture error. Where you may expect luma spikes could be camera fade-ins/outs, or a sudden brightness in the picture, like a camera flash, for example.
         </p>
