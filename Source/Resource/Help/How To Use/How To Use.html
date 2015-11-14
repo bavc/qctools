@@ -19,6 +19,9 @@
                 <a href="#Load">Load Video Files</a>
             </li>
             <li>
+                <a href="#Preferences">Preferences</a>
+            </li>
+            <li>
                 <a href="#Select">Select Graph Filters</a>
             </li>
             <li>
@@ -49,6 +52,45 @@
         <p>
             Go to <a href="http://bavc.org/qctools">http://bavc.org/qctools</a> and download QCTools for your operating system (currently Windows, Mac OS X, and many Linux-based operating systems are supported). Initiate the install by double-clicking the icon, and follow the steps. New releases of QCTools will be periodically available at BAVC's <a href="http://www.bavc.org/qctools">QCTools project website</a> as well as the releases tab on the <a href="http://github.com/bavc/qctools/releases">QCTools github page</a>.
         </p>
+        <h2 id="Preferences">
+            Preferences
+        </h2>
+        <p>
+            QCTools provides a Preferences window to configure settings for running QCTools.
+        </p>
+        <h3>Filters</h3>
+        <p>QCTool's analysis methods depend on filters from FFmpeg's libavfilter library. Currently this includes: <a href="http://ffmpeg.org/ffmpeg-filters.html#signalstats">signalstats</a> (initially created as part the QCTools project), <a href="http://ffmpeg.org/ffmpeg-filters.html#psnr">PSNR</a>, <a href="http://ffmpeg.org/ffmpeg-filters.html#astats">astats</a>, and <a href="http://ffmpeg.org/ffmpeg-filters.html#ebur128">EBU R.128</a>.
+        </p>
+        <table border='1'>
+            <tr>
+                <th>filter name</th>
+                <th>track type</th>
+                <th>application in QCTools</th>
+            </tr>
+            <tr>
+                <td><a href="http://ffmpeg.org/ffmpeg-filters.html#signalstats">signalstats</a></td>
+                <td>video</td>
+                <td>The signalstats analysis filter generates data to plot statistics on video signal levels, frame-to-frame differences, saturation and hue averages, and quantifications of visual patterns and errors. It is highly recommended to enable this fitler.</td>
+            </tr>
+            <tr>
+                <td><a href="http://ffmpeg.org/ffmpeg-filters.html#psnr">PSNR</a></td>
+                <td>video</td>
+                <td>The PSNR filter is used in QCTools specifically to generate a comparison between the two fields of the frame. The resulting data documents how different the fields are (which can find head-clogs or other videotape playback errors).</td>
+            </tr>
+            <tr>
+                <td><a href="http://ffmpeg.org/ffmpeg-filters.html#astats">astats</a></td>
+                <td>audio</td>
+                <td>The astats filter compiles statistics on audio data for small units of time, including maximum and minimum audio levels, DC Offset, the amount of consecutive audio sample differences, and RMS data.</td>
+            </tr>
+            <tr>
+                <td><a href="http://ffmpeg.org/ffmpeg-filters.html#ebur128">EBU R.128</a></td>
+                <td>audio</td>
+                <td>The EBU R.128 filter provides data on the perceived loudness of audio volume.</td>
+            </tr>
+        </table>
+        <p>Enabling all filters naturally provides more data, but results in a slower analysis and large files. The EBU R.128 values represent perceived volume whereas the astats filters include metrics on actual volume (so the use of EBU R128 may not be considered essential if astats is in use).</p>
+        <h3>Tracks</h3>
+        <p>The 'Tracks' Preference pane allows the user to set if they would like to analyze only the first track or all tracks of video and audio. Setting QCTools to analyze only the first track will result in a faster analyze but the other tracks would be ignored.</p>
         <h2 id="Load">
             Load Video Files
         </h2>
