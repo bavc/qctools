@@ -47,20 +47,20 @@
             Waveform
         </h2>
         <p>
-            The waveform plots the brightness of the image, each column of the waveform corresponds to a column of pixels in the source video. The pixels of each column are then plotted in an 8-bit scale (0-255) which is equalivant to 0 to 110 IRE. The range from 0-16 (0 to 7.5 IRE) is highlighted in blue and indicates a black value that is below traditional NTSC broadcast range. The range from 235-255 (100 to 110 IRE) is highlighted in red and indicates a white value that is above broadcast range. For most analog media the intended pixel luminsotiy values should exist between 7.5 and 100 IRE. You may also select <strong>'Field'</strong> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).
+            The waveform plots the brightness of the image, each column of the waveform corresponds to a column of pixels in the source video. The pixels of each column are then plotted in an 8-bit scale (0-255) which is equivalent to 0 to 110 IRE. The range from 0-16 (0 to 7.5 IRE) is highlighted in blue and indicates a black value that is below traditional NTSC broadcast range. The range from 235-255 (100 to 110 IRE) is highlighted in red and indicates a white value that is above broadcast range. For most analog media the intended pixel luminosity values should exist between 7.5 and 100 IRE. You may also select <strong>'Field'</strong> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).
         </p>
         <p>
-            Traditionally a waveform plots the values of each column of video pixels. The QCTools waveform also provides a <strong>'Vertical'</strong> option would plots the video as rows of pixels. The waveform will still show the value range of the whole frame whether <strong>'Vertical'</strong> is enabled or not, but with <strong>'Vertical'</strong> enabled it is often easier to detect video issues that affect rows of pixel data such as dropouts. The waveform player is based on the <a href="http://ffmpeg.org/ffmpeg-filters.html#waveform">waveform filter</a> from FFmpeg.
+            Traditionally a waveform plots the values of each column of video pixels. The QCTools waveform also provides a <strong>'Vertical'</strong> option which plots the video as rows of pixels. The waveform will still show the value range of the whole frame whether <strong>'Vertical'</strong> is enabled or not, but with <strong>'Vertical'</strong> enabled it is often easier to detect video issues that affect rows of pixel data such as dropouts. The waveform player is based on the <a href="http://ffmpeg.org/ffmpeg-filters.html#waveform">waveform filter</a> from FFmpeg.
             <br />
             <img src="waveform.jpg" alt="Waveform" />
         </p>
         <p>
             The waveform player provides the following options:
             <ul>
-                <li>Field: If the checkbox is enabled the player will show two waveforms side-by-side that depicted field 1 and field 2 separately.</li>
+                <li>Field: If the checkbox is enabled the player will show two waveforms side-by-side that depicts field 1 and field 2 separately.</li>
                 <li>Intensity: Set intensity. Smaller values are useful to find out how many values of the same luminance are distributed across input rows/columns. Default value is 0.1. Allowed range is [0, 1]. </li>
                 <li>Y/U/V/A: Select which plane is presented in waveform view ("A" means that all planes are shown).</li>
-                <li>Vertical: If checked than the waveform will plot on rows rather than columns. It is the equilvanet of rotating the video image by 90 degrees and applying a waveform to the result.</li>
+                <li>Vertical: If checked then the waveform will plot on rows rather than columns. It is the equivalent of rotating the video image by 90 degrees and applying a waveform to the result.</li>
                 <li>Filter: The waveform filter can be adjusted to different displays. The default is 'lowpass'. See <a href="http://ffmpeg.org/ffmpeg-filters.html#waveform">FFmpeg's waveform documentation</a> for information on each option.</li>
                 <li>Peak: If enabled, the waveform will outline the extent of the plotted values to show an envelope around the plotted values. Peak may be adjusted to outline the extent frame-per-frame or over time.
             </ul>
@@ -83,7 +83,7 @@
         <p>
             The vectorscope player provides the following options:
             <ul>
-                <li>Field: If the checkbox is enabled the player will show two waveforms side-by-side that depicted field 1 and field 2 separately.</li>
+                <li>Field: If the checkbox is enabled the player will show two waveforms side-by-side that depict field 1 and field 2 separately.</li>
                 <li>Intensity: Set intensity. Smaller values are useful to find out how many values of the same luminance are distributed across input rows/columns. Default value is 0.1. Allowed range is [0, 1]. </li>
                 <li>Mode: The vectorscope filter can be adjusted to different displays. The default is 'color3'. See <a href="http://ffmpeg.org/ffmpeg-filters.html#vectorscope">FFmpeg's vectorscope documentation</a> for information on each option.</li>
                 <li>Peak: If enabled, the vectorscope will outline the extent of the plotted values to show an envelope around the plotted values. Peak may be adjusted to outline the extent frame-per-frame or over time.
