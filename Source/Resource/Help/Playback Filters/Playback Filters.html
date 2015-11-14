@@ -47,12 +47,23 @@
             Waveform
         </h2>
         <p>
-            The waveform plots the brightness of the image, each column of the waveform corresponds to a column of pixels in the source video. The pixels of each column are then plotted in a scale from 0 to 110 IRE. The range from 0 to 7.5 IRE is highlighted in blue and indicates a black value that is below traditional NTSC broadcast range. The range from 100 to 110 IRE is highlighted in red and indicates a white value that is above broadcast range. For most analog media the intended pixel luminsotiy values should exist between 7.5 and 100 IRE. You may also select <strong>'Field'</strong> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).
+            The waveform plots the brightness of the image, each column of the waveform corresponds to a column of pixels in the source video. The pixels of each column are then plotted in an 8-bit scale (0-255) which is equalivant to 0 to 110 IRE. The range from 0-16 (0 to 7.5 IRE) is highlighted in blue and indicates a black value that is below traditional NTSC broadcast range. The range from 235-255 (100 to 110 IRE) is highlighted in red and indicates a white value that is above broadcast range. For most analog media the intended pixel luminsotiy values should exist between 7.5 and 100 IRE. You may also select <strong>'Field'</strong> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).
         </p>
         <p>
-            Traditionally a waveform plots the values of each column of video pixels. The QCTools waveform also provides a <strong>'Vertical'</strong> option would plots the video as rows of pixels. The waveform will still show the value range of the whole frame whether <strong>'Vertical'</strong> is enabled or not, but with <strong>'Vertical'</strong> enabled it is often easier to detect video issues that affect rows of pixel data such as dropouts.
+            Traditionally a waveform plots the values of each column of video pixels. The QCTools waveform also provides a <strong>'Vertical'</strong> option would plots the video as rows of pixels. The waveform will still show the value range of the whole frame whether <strong>'Vertical'</strong> is enabled or not, but with <strong>'Vertical'</strong> enabled it is often easier to detect video issues that affect rows of pixel data such as dropouts. The waveform player is based on the <a href="http://ffmpeg.org/ffmpeg-filters.html#waveform">waveform filter</a> from FFmpeg.
             <br />
             <img src="waveform.jpg" alt="Waveform" />
+        </p>
+        <p>
+            The waveform player provides the following options:
+            <ul>
+                <li>Field: If the checkbox is enabled the player will show two waveforms side-by-side that depicted field 1 and field 2 separately.</li>
+                <li>Intensity: Set intensity. Smaller values are useful to find out how many values of the same luminance are distributed across input rows/columns. Default value is 0.1. Allowed range is [0, 1]. </li>
+                <li>Y/U/V/A: Select which plane is presented in waveform view ("A" means that all planes are shown).</li>
+                <li>Vertical: If checked than the waveform will plot on rows rather than columns. It is the equilvanet of rotating the video image by 90 degrees and applying a waveform to the result.</li>
+                <li>Filter: The waveform filter can be adjusted to different displays. The default is 'lowpass'. See <a href="http://ffmpeg.org/ffmpeg-filters.html#waveform">FFmpeg's waveform documentation</a> for information on each option.</li>
+                <li>Peak: If enabled, the waveform will outline the extent of the plotted values to show an envelope around the plotted values. Peak may be adjusted to outline the extent frame-per-frame or over time.
+            </ul>
         </p>
          <h2 style="color:blue">
             Line Select
@@ -69,9 +80,24 @@
             A vectorscope display. This display plots chroma values (U/V color placement) in two dimensional graph (which is called a vectorscope). It can be used to read of the hue and saturation of the current frame. The whiter a pixel in the vectorscope, the more pixels of the input frame correspond to that pixel (that is the more pixels have this chroma value). The V component is displayed on the vertical (Y) axis, with the bottom edge being V = 0 and the top being V = 255. The U component is displayed on the horizontal (Y) axis, with the left representing U = 0 and the right representing U = 255.<br />
             Six blocks are highlighted to depict standardized color points for red (90, 16), green (54, 222), blue (240, 146), cyan (166, 240), magenta (202, 44), and yellow (16, 110). All valid chroma values fall within a circlular shape from the center to the outer edge of the plot.You may also select <strong>'Field'</strong> option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).<br />
         <img src="playback_layout_two_windows.jpg" alt="Vectorscope Split Screen" />
+        <p>
+            The vectorscope player provides the following options:
+            <ul>
+                <li>Field: If the checkbox is enabled the player will show two waveforms side-by-side that depicted field 1 and field 2 separately.</li>
+                <li>Intensity: Set intensity. Smaller values are useful to find out how many values of the same luminance are distributed across input rows/columns. Default value is 0.1. Allowed range is [0, 1]. </li>
+                <li>Mode: The vectorscope filter can be adjusted to different displays. The default is 'color3'. See <a href="http://ffmpeg.org/ffmpeg-filters.html#vectorscope">FFmpeg's vectorscope documentation</a> for information on each option.</li>
+                <li>Peak: If enabled, the vectorscope will outline the extent of the plotted values to show an envelope around the plotted values. Peak may be adjusted to outline the extent frame-per-frame or over time.
+            </ul>
+        </p>
         <br />
         <img src="vectorscope_illegal.jpg" alt="Vectorscope" />
         <p />
+        <h2 style="color:blue">
+            Vectorscope Target
+        </h2>
+        <p>
+            The Vectorscope Target is similar to the Vectorscope filter but a box is drawn over the image by setting an x and y coordinate and size of the box. The vectorscope image drawn will depict the vectorscope plotting of only the samples within the box. The original image may be shown as a background to the vectorscope by enabling the 'Background' checkbox.
+        </p>
         <h2 style="color:blue">
             Waveform / Vectorscope
         </h2>
@@ -104,6 +130,12 @@
             <img src="1A_seattle_parade_transfer_a_messedup-1.jpg" alt="Bit Plane" /><br />
             <br />
             (Video sample and permission to use provided by <a href="http://www.seattle.gov">seattle.gov</a>)
+        </p>
+        <h2 style="color:blue">
+            Bit Plane Noise
+        </h2>
+        <p>
+            This filter is similar to Bit Plane, but instead of showing if the selected bit position of a selected plane is set to 0 or 1, it attempts to predict if that bit represents signal or noise. This filters uses a <a href="https://en.wikipedia.org/wiki/Bit_plane">method</a> for calculating this by comparing each pixel's selected bit (X,Y) to selected bit of three adjacent pixels (X-1,Y), (X,Y-1) and (X-1,Y-1). If the bit is the same as at least two of the three adjacent bits, it may not be noise. A noisy bit-plane will have 49% to 51% pixels that are noise.
         </p>
          <h2 style="color:blue">
             Value Highlight
@@ -214,6 +246,24 @@
         </h2>
         <p>
             Plots two channels of audio against each other on different axis. This display can show if audio is out-of-phase (displays as a horizontal line), dual-mono (displays as a verical line), or stereo (displays as a two dimensional complex shape).
+        </p>
+        <h2 style="color:blue">
+            Audio Phase Meter
+        </h2>
+        <p>
+            Shows the output of FFmpeg's <a href="http://ffmpeg.org/ffmpeg-filters.html#aphasemeter">aphasemeter</a> filter.
+        </p>
+        <h2 style="color:blue">
+            Audio Frequency
+        </h2>
+        <p>
+            Shows the output of FFmpeg's <a href="http://ffmpeg.org/ffmpeg-filters.html#showfreqs">showfreqs</a> filter.
+        </p>
+        <h2 style="color:blue">
+            Audio Volume
+        </h2>
+        <p>
+            Shows the output of FFmpeg's <a href="http://ffmpeg.org/ffmpeg-filters.html#showvolume">showvolume</a> filter.
         </p>
     </body>
 </html>
