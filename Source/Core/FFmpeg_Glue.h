@@ -43,7 +43,7 @@ public:
         Output_Jpeg,
         Output_Stats,
     };
-    FFmpeg_Glue(const string &FileName, std::vector<CommonStats*>* Stats, bool WithStats=false);
+    FFmpeg_Glue(const string &FileName, activealltracks ActiveAllTracks, std::vector<CommonStats*>* Stats, bool WithStats=false);
     ~FFmpeg_Glue();
 
     // Images

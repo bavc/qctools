@@ -57,14 +57,12 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     size_t layout_y=0;
     
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
+    {
         if (m_fileInfoData->Stats[streamPos])
         {
             size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
-            size_t typepos = m_fileInfoData->Stats[streamPos]->TypePos_Get();
             size_t countOfGroups = PerStreamType[type].CountOfGroups;
         
-            if (typepos==0 || m_fileInfoData->ActiveAllTracks[type])
-            {
             m_plots[streamPos] = new Plot*[countOfGroups + 1]; //+1 for axix
     
             for ( size_t group = 0; group < countOfGroups; group++ )
@@ -95,12 +93,12 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                     m_plots[streamPos][group] = NULL;
                 }
             }
-            }
-            else
-            {
-                m_plots[streamPos]=NULL;
-            }
         }
+        else
+        {
+            m_plots[streamPos]=NULL;
+        }
+    }
 
     layout->addWidget( m_scaleWidget, layout_y, 0, 1, 2 );
 

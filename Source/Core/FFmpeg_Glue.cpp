@@ -746,7 +746,7 @@ bool FFmpeg_Glue::outputdata::AdaptDAR()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<CommonStats*>* Stats_, bool WithStats_) :
+FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, activealltracks ActiveAllTracks, std::vector<CommonStats*>* Stats_, bool WithStats_) :
     Stats(Stats_),
     WithStats(WithStats_),
     FileName(FileName_),
@@ -836,8 +836,16 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, std::vector<CommonStats*>* St
             {
                 switch (InputData->Type)
                 {
-                    case AVMEDIA_TYPE_VIDEO: Stat=new VideoStats(VideoPos, InputData->FrameCount, InputData->Duration, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0); VideoPos++; break;
-                    case AVMEDIA_TYPE_AUDIO: Stat=new AudioStats(AudioPos, InputData->FrameCount, InputData->Duration, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0); AudioPos++; break;
+                    case AVMEDIA_TYPE_VIDEO:
+                                                if (!VideoPos || ActiveAllTracks[Type_Video])
+                                                    Stat=new VideoStats(InputData->FrameCount, InputData->Duration, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0);
+                                                VideoPos++;
+                                                break;
+                    case AVMEDIA_TYPE_AUDIO:
+                                                if (!AudioPos || ActiveAllTracks[Type_Audio])
+                                                    Stat=new AudioStats(InputData->FrameCount, InputData->Duration, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0); AudioPos++; break;
+                                                AudioPos++;
+                                                break;
                 }
             }
             
@@ -956,7 +964,7 @@ void FFmpeg_Glue::AddInput_Audio(size_t FrameCount, int time_base_num, int time_
 
     // Stats
     if (WithStats)
-        Stats->push_back(new AudioStats(0, InputData->FrameCount, InputData->Duration, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0));
+        Stats->push_back(new AudioStats(InputData->FrameCount, InputData->Duration, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0));
 
     //
     InputDatas.push_back(InputData);

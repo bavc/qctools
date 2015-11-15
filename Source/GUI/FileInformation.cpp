@@ -215,7 +215,7 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
         Stats.push_back(Audio);
         Audio->StatsFromExternalData(StatsFromExternalData);
     }
-    Glue=new FFmpeg_Glue(FileName_string.c_str(), &Stats, Stats.empty());
+    Glue=new FFmpeg_Glue(FileName_string.c_str(), ActiveAllTracks, &Stats, Stats.empty());
     if (FileName_string.empty())
     {
         Glue->AddInput_Video(FrameCount, 1001, 30000, 720, 486, blackmagicDeckLink_Glue->Config_In.VideoBitDepth, blackmagicDeckLink_Glue->Config_In.VideoCompression, blackmagicDeckLink_Glue->Config_In.TC_in);

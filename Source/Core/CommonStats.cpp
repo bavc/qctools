@@ -33,12 +33,11 @@ using namespace tinyxml2;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, int TypePos_, size_t CountOfGroups_, size_t CountOfItems_, size_t FrameCount, double Duration, double Frequency_)
+CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t CountOfGroups_, size_t CountOfItems_, size_t FrameCount, double Duration, double Frequency_)
     :
     Frequency(Frequency_),
     PerItem(PerItem_),
     Type(Type_),
-    TypePos(TypePos_),
     CountOfGroups(CountOfGroups_),
     CountOfItems(CountOfItems_)
 {
@@ -136,12 +135,6 @@ CommonStats::~CommonStats()
 int CommonStats::Type_Get()
 {
     return Type;
-}
-
-//---------------------------------------------------------------------------
-size_t CommonStats::TypePos_Get()
-{
-    return TypePos;
 }
 
 //---------------------------------------------------------------------------

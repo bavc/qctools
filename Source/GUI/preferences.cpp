@@ -66,7 +66,8 @@ void Preferences::Load()
 void Preferences::Save()
 {
     QSettings Settings;
-    Settings.setValue("Filters", (uint)ActiveFilters.to_ulong());
+    Settings.setValue("ActiveFilters", (uint)ActiveFilters.to_ulong());
+    Settings.setValue("ActiveAllTracks", (uint)ActiveAllTracks.to_ulong());
     Settings.sync();
 }
 
