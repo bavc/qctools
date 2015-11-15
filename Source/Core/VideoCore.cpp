@@ -36,21 +36,21 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         Item_YDIF,      1,    0,  255,  3,  "YDiff", false,
         "YDIF plots the amount of differences between the Y plane of the current\n"
         "frame and the preceding one. It indicates the extent of visual change\n"
-        "from one frame to the next.,"
+        "from one frame to the next.",
     },
     //UDiff
     {
         Item_UDIF,      1,    0,  255,  3,  "UDiff", false,
         "UDIF plots the amount of differences between the U plane of the current\n"
         "frame and the preceding one. It indicates the extent of visual change\n"
-        "from one frame to the next.,"
+        "from one frame to the next.",
     },
     //VDiff
     {
         Item_VDIF,      1,    0,  255,  3,  "VDiff", false,
         "VDIF plots the amount of differences between the V plane of the current\n"
         "frame and the preceding one. It indicates the extent of visual change\n"
-        "from one frame to the next.,"
+        "from one frame to the next.",
     },
     //Diffs
     {
