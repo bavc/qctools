@@ -1023,7 +1023,8 @@ void FFmpeg_Glue::ModifyOutput(size_t InputPos, size_t OutputPos, size_t FilterP
     OutputData->Width=Scale_Width;
     OutputData->Height=Scale_Height;
     OutputData->OutputMethod=OutputMethod;
-    OutputData->Filter=Filter;
+    if ((*Stats)[InputPos])
+        OutputData->Filter=Filter;
     OutputData->FilterPos=FilterPos;
 
     OutputData->Stream=InputData->Stream;
