@@ -255,9 +255,9 @@ void FFmpeg_Glue::inputdata::Encode(AVPacket* SourcePacket)
         int SourceFrame_Size = -1;
         if (Stream->codec->bits_per_raw_sample==10)
         {
-            int SourceFrame_Size = avpicture_get_size(Stream->codec->pix_fmt, Stream->codec->width, Stream->codec->height);
+            int SourceFrame_Size = av_image_get_buffer_size(Stream->codec->pix_fmt, Stream->codec->width, Stream->codec->height, 1);
             SourceFrame_Data = new unsigned char[SourceFrame_Size];
-            avpicture_fill((AVPicture*)SourceFrame, SourceFrame_Data, Stream->codec->pix_fmt, Stream->codec->width, Stream->codec->height);
+            av_image_fill_arrays(SourceFrame->data, SourceFrame->linesize, SourceFrame_Data, Stream->codec->pix_fmt, Stream->codec->width, Stream->codec->height, 1);
             int got_frame;
             int Bytes=avcodec_decode_video2(Stream->codec, SourceFrame, &got_frame, SourcePacket);
             got_frame=0;
@@ -267,7 +267,7 @@ void FFmpeg_Glue::inputdata::Encode(AVPacket* SourcePacket)
             SourceFrame->width = Stream->codec->width;
             SourceFrame->height = Stream->codec->height;
             SourceFrame->format = Stream->codec->pix_fmt;
-            avpicture_fill((AVPicture*)SourceFrame, SourcePacket->data, (AVPixelFormat)SourceFrame->format, SourceFrame->width, SourceFrame->height);
+            av_image_fill_arrays(SourceFrame->data, SourceFrame->linesize, SourcePacket->data, (AVPixelFormat)SourceFrame->format, SourceFrame->width, SourceFrame->height, 1);
         }
 
         AVFrame* DestFrame = av_frame_alloc();
@@ -277,9 +277,9 @@ void FFmpeg_Glue::inputdata::Encode(AVPacket* SourcePacket)
             DestFrame->format = AV_PIX_FMT_YUV422P10;
         else
             DestFrame->format = AV_PIX_FMT_YUV422P;
-        int DestFrame_Size = avpicture_get_size((AVPixelFormat)DestFrame->format, DestFrame->width, DestFrame->height);
+        int DestFrame_Size = av_image_get_buffer_size((AVPixelFormat)DestFrame->format, DestFrame->width, DestFrame->height, 1);
         unsigned char* DestFrame_Data = new unsigned char[DestFrame_Size];
-        avpicture_fill((AVPicture*)DestFrame, DestFrame_Data, (AVPixelFormat)DestFrame->format, DestFrame->width, DestFrame->height);
+        av_image_fill_arrays(DestFrame->data, DestFrame->linesize, DestFrame_Data, (AVPixelFormat)DestFrame->format, DestFrame->width, DestFrame->height, 1);
 
         struct SwsContext* Context = sws_getContext(SourceFrame->width, SourceFrame->height, (AVPixelFormat)SourceFrame->format, DestFrame->width, DestFrame->height, (AVPixelFormat)DestFrame->format, SWS_FAST_BILINEAR, NULL, NULL, NULL);
         int Result = sws_scale(Context, SourceFrame->data, SourceFrame->linesize, 0, SourceFrame->height, DestFrame->data, DestFrame->linesize);
@@ -363,7 +363,7 @@ FFmpeg_Glue::outputdata::~outputdata()
     // FFmpeg pointers - Output
     if (JpegOutput_Packet)
     {
-        av_free_packet(JpegOutput_Packet);
+        av_packet_unref(JpegOutput_Packet);
         delete JpegOutput_Packet;
     }
     if (JpegOutput_CodecContext)
@@ -372,7 +372,7 @@ FFmpeg_Glue::outputdata::~outputdata()
     // FFmpeg pointers - Scale
     if (ScaledFrame)
     {
-        avpicture_free((AVPicture*)ScaledFrame);
+        av_freep(&ScaledFrame->data[0]);
         av_frame_free(&ScaledFrame);
     }
     if (ScaleContext)
@@ -482,10 +482,10 @@ void FFmpeg_Glue::outputdata::ApplyScale()
     ScaledFrame = av_frame_alloc();
     ScaledFrame->width=Width;
     ScaledFrame->height=Height;
-    avpicture_alloc((AVPicture*)ScaledFrame, OutputMethod==Output_QImage?AV_PIX_FMT_RGB24:AV_PIX_FMT_YUVJ420P, Width, Height);
+    av_image_alloc(ScaledFrame->data, ScaledFrame->linesize, Width, Height, OutputMethod==Output_QImage?AV_PIX_FMT_RGB24:AV_PIX_FMT_YUVJ420P, 1);
     if (sws_scale(ScaleContext, FilteredFrame->data, FilteredFrame->linesize, 0, FilteredFrame->height, ScaledFrame->data, ScaledFrame->linesize)<0)
     {
-        avpicture_free((AVPicture*)ScaledFrame);
+        av_freep(&ScaledFrame->data[0]);
         av_frame_free(&ScaledFrame);
         ScaledFrame=FilteredFrame;
     }
@@ -543,7 +543,7 @@ void FFmpeg_Glue::outputdata::DiscardScaledFrame()
 
     if (ScaledFrame!=FilteredFrame)
     {
-        avpicture_free((AVPicture*)ScaledFrame);
+        av_freep(&ScaledFrame->data[0]);
         av_frame_free(&ScaledFrame);
     }
     ScaledFrame=NULL;
@@ -694,7 +694,7 @@ bool FFmpeg_Glue::outputdata::Scale_Init()
     ScaledFrame=av_frame_alloc();
     ScaledFrame->width=Width;
     ScaledFrame->height=Height;
-    avpicture_alloc((AVPicture*)ScaledFrame, OutputMethod==Output_QImage?AV_PIX_FMT_RGB24:AV_PIX_FMT_YUVJ420P, Width, Height);
+    av_image_alloc(ScaledFrame->data, ScaledFrame->linesize, Width, Height, OutputMethod==Output_QImage?AV_PIX_FMT_RGB24:AV_PIX_FMT_YUVJ420P, 1);
 
     // All is OK
     return true;
@@ -711,7 +711,7 @@ void FFmpeg_Glue::outputdata::Scale_Free()
 
     if (ScaledFrame)
     {
-        avpicture_free((AVPicture*)ScaledFrame);
+        av_freep(&ScaledFrame->data[0]);
         av_frame_free(&ScaledFrame);
         ScaledFrame=NULL;
     }
@@ -864,7 +864,7 @@ FFmpeg_Glue::~FFmpeg_Glue()
 
     if (Packet)
     {
-        //av_free_packet(Packet);
+        //av_packet_unref(Packet);
         delete Packet;
     }
 
@@ -1124,9 +1124,9 @@ bool FFmpeg_Glue::NextFrame()
                     InputDatas[0]->FramesCache_Default->height = (*InputDatas[0]->FramesCache)[0]->height;
                     InputDatas[0]->FramesCache_Default->format = (*InputDatas[0]->FramesCache)[0]->format;
                     InputDatas[0]->FramesCache_Default->pkt_pts = (*InputDatas[0]->FramesCache)[0]->pkt_pts;
-                    int size = avpicture_get_size((AVPixelFormat)InputDatas[0]->FramesCache_Default->format, InputDatas[0]->FramesCache_Default->width, InputDatas[0]->FramesCache_Default->height);
+                    int size = av_image_get_buffer_size((AVPixelFormat)InputDatas[0]->FramesCache_Default->format, InputDatas[0]->FramesCache_Default->width, InputDatas[0]->FramesCache_Default->height, 1);
                     uint8_t* buffer = (uint8_t*)av_malloc(size);
-                    avpicture_fill((AVPicture*)InputDatas[0]->FramesCache_Default, buffer, (AVPixelFormat)InputDatas[0]->FramesCache_Default->format, InputDatas[0]->FramesCache_Default->width, InputDatas[0]->FramesCache_Default->height);
+                    av_image_fill_arrays(InputDatas[0]->FramesCache_Default->data, InputDatas[0]->FramesCache_Default->linesize, buffer, (AVPixelFormat)InputDatas[0]->FramesCache_Default->format, InputDatas[0]->FramesCache_Default->width, InputDatas[0]->FramesCache_Default->height, 1);
                     memset(InputDatas[0]->FramesCache_Default->data[0], 0xFF, InputDatas[0]->FramesCache_Default->linesize[0] * InputDatas[0]->FramesCache_Default->height);
                     memset(InputDatas[0]->FramesCache_Default->data[1], 0x80, InputDatas[0]->FramesCache_Default->linesize[1] * InputDatas[0]->FramesCache_Default->height / 2);
                     memset(InputDatas[0]->FramesCache_Default->data[2], 0x80, InputDatas[0]->FramesCache_Default->linesize[2] * InputDatas[0]->FramesCache_Default->height / 2);
@@ -1155,14 +1155,14 @@ bool FFmpeg_Glue::NextFrame()
                 if (OutputFrame(Packet))
                 {
                     if (Packet->size==0)
-                        av_free_packet(&TempPacket);
+                        av_packet_unref(&TempPacket);
                     if (InputDatas[Packet->stream_index]->Type==AVMEDIA_TYPE_VIDEO)
                         return true;
                 }
             }
             while (Packet->size > 0);
         }
-        av_free_packet(&TempPacket);
+        av_packet_unref(&TempPacket);
         Packet->size=0;
     }
     
@@ -1247,9 +1247,9 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
             NewFrame->height = Frame->height;
             NewFrame->format = Frame->format;
             NewFrame->pkt_pts = Frame->pkt_pts;
-            int size = avpicture_get_size((AVPixelFormat)NewFrame->format, NewFrame->width, NewFrame->height);
+            int size = av_image_get_buffer_size((AVPixelFormat)NewFrame->format, NewFrame->width, NewFrame->height, 1);
             uint8_t* buffer = (uint8_t*)av_malloc(size);
-            avpicture_fill((AVPicture*)NewFrame, buffer, (AVPixelFormat)NewFrame->format, NewFrame->width, NewFrame->height);
+            av_image_fill_arrays(NewFrame->data, NewFrame->linesize, buffer, (AVPixelFormat)NewFrame->format, NewFrame->width, NewFrame->height, 1);
             memcpy(NewFrame->data[0], Frame->data[0], NewFrame->linesize[0] * NewFrame->height);
             memcpy(NewFrame->data[1], Frame->data[1], NewFrame->linesize[1] * NewFrame->height / 2);
             memcpy(NewFrame->data[2], Frame->data[2], NewFrame->linesize[2] * NewFrame->height / 2);
