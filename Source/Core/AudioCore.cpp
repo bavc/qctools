@@ -19,6 +19,7 @@ const struct per_group AudioPerGroup [Group_AudioMax]=
         "loudness, or sudden changes in volume over brief intervals of time (up to 400ms).\n"
         "This can be helpful in identifying areas where volume may exceed upper loudness\n"
         "tolerance levels as perceived by an audience.\n",
+        ActiveFilter_Audio_EbuR128,
     },
     //astats levels
     {
@@ -27,6 +28,7 @@ const struct per_group AudioPerGroup [Group_AudioMax]=
         "amplitude displacement from zero), minimal sample level, and \n"
         "maximum sample level. Note that this value is plotted per audio\n"
         "frame and not per audio sample.",
+        ActiveFilter_Audio_astats,
     },
     //astats diff
     {
@@ -38,6 +40,7 @@ const struct per_group AudioPerGroup [Group_AudioMax]=
         "A sharp spike in the maximum difference between consecuritve samples\n"
         "may be indictative of an interstitial error. Note that this value\n"
         "is plotted per audio frame and not per audio sample.",
+        ActiveFilter_Audio_astats,
     },
     //astats rms
     {
@@ -46,6 +49,7 @@ const struct per_group AudioPerGroup [Group_AudioMax]=
         "level measured in dBFS and the Peak and trough values for RMS level\n"
         "measured over a short window.  Note that this value is plotted per\n"
         "audio frame and not per audio sample.",
+        ActiveFilter_Audio_astats,
     },
     //LRA
     //{

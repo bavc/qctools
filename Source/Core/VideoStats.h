@@ -22,7 +22,7 @@ class VideoStats : public CommonStats
 {
 public:
     // Constructor / Destructor
-    VideoStats(size_t FrameCount=0, double Duration=0, double Frequency=0);
+    VideoStats(size_t TypePos=0, size_t FrameCount=0, double Duration=0, double Frequency=0);
     ~VideoStats();
 
     // External data

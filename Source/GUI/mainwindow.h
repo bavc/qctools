@@ -38,6 +38,7 @@ class QComboBox;
 class QCheckBox;
 
 class PerPicture;
+class Preferences;
 
 class BlackmagicDeckLink_Glue;
 
@@ -110,6 +111,9 @@ public:
 
     // Deck
     bool                        DeckRunning;
+
+    //Preferences
+    Preferences*                Prefs;
 
 private Q_SLOTS:
 

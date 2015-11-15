@@ -16,6 +16,7 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "For all samples of the Y plane, plot the MAXimum, MIVimum, AVeraGe,\n"
         "LOW (10th percentile), and HIGH (90th percentile) values for each frame.\n"
         "The Y plane provides information about video brightness or luminance.",
+        ActiveFilter_Video_signalstats,
     },
     //U
     {
@@ -23,6 +24,7 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "For all samples of the U plane, plot the MAXimum, MIVimum, AVeraGe,\n"
         "LOW (10th percentile), and HIGH (90th percentile) values for each frame.\n"
         "The U plane (along with V) provides information about video color.",
+        ActiveFilter_Video_signalstats,
     },
     //V
     {
@@ -30,6 +32,7 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "For all samples of the V plane, plot the MAXimum, MIVimum, AVeraGe,\n"
         "LOW (10th percentile), and HIGH (90th percentile) values for each frame.\n"
         "The V plane (along with U) provides information about video color.",
+        ActiveFilter_Video_signalstats,
     },
     //YDiff
     {
@@ -37,6 +40,7 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "YDIF plots the amount of differences between the Y plane of the current\n"
         "frame and the preceding one. It indicates the extent of visual change\n"
         "from one frame to the next.",
+        ActiveFilter_Video_signalstats,
     },
     //UDiff
     {
@@ -44,6 +48,7 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "UDIF plots the amount of differences between the U plane of the current\n"
         "frame and the preceding one. It indicates the extent of visual change\n"
         "from one frame to the next.",
+        ActiveFilter_Video_signalstats,
     },
     //VDiff
     {
@@ -51,11 +56,13 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "VDIF plots the amount of differences between the V plane of the current\n"
         "frame and the preceding one. It indicates the extent of visual change\n"
         "from one frame to the next.",
+        ActiveFilter_Video_signalstats,
     },
     //Diffs
     {
         Item_VDIF,      3,    0,  255,  3,  "Diffs",  true,
         "Plots YDIF, UDIF, and VDIF all together.",
+        ActiveFilter_Video_signalstats,
     },
     //Sat
     {
@@ -71,6 +78,7 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "Values from 118.2 to the maximum value of 181.02 represent illegal YUV color data that\n"
         "can not be converted back to RGB without producing negatives or overflows,\n"
         "such values a indicative errors such as time base corrector errors or Digital Betacam damage.",
+        ActiveFilter_Video_signalstats,
     },
     //Hue
     {
@@ -78,6 +86,7 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "The hue filter expresses the average color hue in degrees from 0 to 360.\n"
         "Degrees are measured clockwise starting from 0 at the bottom side of a\n"
         "vectorscope. Skin tone is 147 degrees. Hue is plotted via median and average.",
+        ActiveFilter_Video_signalstats,
     },
     //TOUT
     {
@@ -86,6 +95,7 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "pixels of the previous and subsequent frames. Peaks in TOUT can show areas with\n"
         "skew or tracking issues which cause white speckle in the video. It can also\n"
         "indicate very noisy recordings.",
+        ActiveFilter_Video_signalstats,
     },
     //VREP
     {
@@ -95,6 +105,7 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "plots the number of repeated horizontal lines which is untypical for an analog\n"
         "recording to naturally produce. VREP would also plot clearn born digital \n"
         "which has many very similar lines of video in the image.",
+        ActiveFilter_Video_signalstats,
     },
     //BRNG
     {
@@ -102,6 +113,7 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "The BRNG filter is one that identifies the amount of pixels that fall\n"
         "outside the standard video broadcast range of 16-235 pixels for Y or\n"
         "16-240 for U and V.",
+        ActiveFilter_Video_signalstats,
     },
     //CropW
     {
@@ -109,6 +121,7 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "CropW plots the number of columns of pixels would could be safely removed\n"
         "from the left or right side of the image without removing any non-black\n"
         "pixels. It would detect video frames with pillarboxing.",
+        ActiveFilter_Video_signalstats,
     },
     //CropH
     {
@@ -116,12 +129,14 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "CropW plots the number of row of pixels would could be safely removed\n"
         "from the top or bottom side of the image without removing any non-black\n"
         "pixels. It would detect video frames with letterboxing.",
+        ActiveFilter_Video_signalstats,
     },
     //CropF
     {
         Item_Crop_w,   2,    0,    0,  4,  "CropF", false,
         "Presents the total number of rows (Crop Height) and columns (Crop Width)\n"
         "which could be removed from the edges to only remove black pixels.",
+        ActiveFilter_Video_signalstats,
     },
     //MSEf
     {
@@ -130,6 +145,7 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "Mean Square Error for each plane (Y, U, and V). Higher values may be\n"
         "indicative of differences between the images of field 1 and field 2 as\n"
         "may be caused by a head clog or playback error.",
+        ActiveFilter_Video_signalstats,
     },
     //PSNRf
     {
@@ -138,6 +154,7 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "Peak Signal to Noise Ratio for each plane (Y, U, and V). Lower values may\n"
         "be indicative of differences between the images of field 1 and field 2 as\n"
         "may be caused by a head clog or playback error.",
+        ActiveFilter_Video_Psnr,
     },
 };
 

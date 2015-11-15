@@ -84,8 +84,10 @@ void FileInformation::run()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue_, int FrameCount, const string &Encoding_FileName, const std::string &Encoding_Format) :
+FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, activefilters ActiveFilters_, activealltracks ActiveAllTracks_, BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue_, int FrameCount, const string &Encoding_FileName, const std::string &Encoding_Format) :
     FileName(FileName_),
+    ActiveFilters(ActiveFilters_),
+    ActiveAllTracks(ActiveAllTracks_),
     Main(Main_),
     blackmagicDeckLink_Glue(blackmagicDeckLink_Glue_)
 {
@@ -192,10 +194,16 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, B
     string Filters[Type_Max];
     if (StatsFromExternalData.empty())
     {
-        Filters[0]="signalstats=stat=tout+vrep+brng,cropdetect=reset=1:round=1";
-        Filters[0]+=",split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr";
-        Filters[1]="ebur128=metadata=1";
-        Filters[1]+=",astats=metadata=1:reset=1:length=0.4";
+        if (ActiveFilters[ActiveFilter_Video_signalstats])
+            Filters[0]+=",signalstats=stat=tout+vrep+brng,cropdetect=reset=1:round=1";
+        if (ActiveFilters[ActiveFilter_Video_Psnr])
+            Filters[0]+=",split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr";
+        Filters[0].erase(0, 1); // remove first comman
+        if (ActiveFilters[ActiveFilter_Audio_EbuR128])
+            Filters[1]+=",ebur128=metadata=1";
+        if (ActiveFilters[ActiveFilter_Audio_astats])
+            Filters[1]+=",astats=metadata=1:reset=1:length=0.4";
+        Filters[1].erase(0, 1); // remove first comman
     }
     else
     {

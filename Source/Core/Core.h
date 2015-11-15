@@ -9,12 +9,23 @@
 #define Core_H
 
 #include <cstddef>
+#include <bitset>
 
 #ifndef UNICODE
     #define UNICODE
 #endif //UNICODE
 
 extern const char* Version;
+
+enum activefilter
+{
+    ActiveFilter_Video_signalstats,
+    ActiveFilter_Video_Psnr,
+    ActiveFilter_Audio_EbuR128,
+    ActiveFilter_Audio_astats,
+    ActiveFilter_Max
+};
+typedef std::bitset<ActiveFilter_Max> activefilters;
 
 struct per_group
 {
@@ -26,6 +37,7 @@ struct per_group
     const   char*       Name;
     const   bool        CheckedByDefault;
     const   char*       Description;
+    activefilter        ActiveFilterGroup;
 };
 struct per_item
 {
@@ -52,6 +64,8 @@ enum Types
     Type_Audio,
     Type_Max
 };
+
+typedef std::bitset<Type_Max> activealltracks;
 
 extern const struct stream_info PerStreamType    [Type_Max];
 

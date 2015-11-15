@@ -30,7 +30,7 @@ class FileInformation : public QThread
 
 public:
     // Constructor/Destructor
-                                FileInformation             (MainWindow* Main, const QString &FileName, BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue=NULL, int FrameCount=0, const std::string &Encoding_FileName=std::string(), const std::string &Encoding_Format=std::string());
+                                FileInformation             (MainWindow* Main, const QString &FileName, activefilters ActiveFilters, activealltracks ActiveAllTracks, BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue=NULL, int FrameCount=0, const std::string &Encoding_FileName=std::string(), const std::string &Encoding_Format=std::string());
                                 ~FileInformation            ();
 
     // Parsing
@@ -43,6 +43,8 @@ public:
     // Infos
     QPixmap*                    Picture_Get                 (size_t Pos);
     QString                     FileName;
+    activefilters               ActiveFilters;
+    activealltracks             ActiveAllTracks;
     size_t                      ReferenceStream_Pos_Get     () {return ReferenceStream_Pos;}
     int                         Frames_Count_Get            (size_t Stats_Pos=(size_t)-1);
     int                         Frames_Pos_Get              (size_t Stats_Pos=(size_t)-1);

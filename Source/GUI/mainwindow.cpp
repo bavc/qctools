@@ -8,6 +8,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "GUI/Plots.h"
+#include "GUI/preferences.h"
 
 #include <QFileDialog>
 #include <QScrollBar>
@@ -312,7 +313,8 @@ void MainWindow::on_actionGraphsLayout_triggered()
         ui->actionWindowOut->setVisible(false);
     for (size_t type = 0; type < Type_Max; type++)
         for (size_t group=0; group<CheckBoxes[type].size(); group++)
-            CheckBoxes[type][group]->show();
+            if (CheckBoxes[type][group] && Files_CurrentPos<Files.size() && Files[Files_CurrentPos]->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
+                CheckBoxes[type][group]->show();
     if (ui->fileNamesBox)
         ui->fileNamesBox->show();
     if (PlotsArea)

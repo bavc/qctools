@@ -19,6 +19,7 @@
 #include "Core/Core.h"
 #include "GUI/Plots.h"
 #include "GUI/blackmagicdecklink_userinput.h"
+#include "GUI/preferences.h"
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -159,7 +160,7 @@ void MainWindow::processFile(const QString &FileName)
     statusBar()->showMessage("Scanning "+QFileInfo(FileName).fileName()+"...");
 
     // Launch analysis
-    Files.push_back(new FileInformation(this, FileName));
+    Files.push_back(new FileInformation(this, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks));
     Files_CurrentPos=0;
     ui->fileNamesBox->addItem(FileName);
 
@@ -303,8 +304,10 @@ void MainWindow::createGraphsLayout()
 
     for (size_t type = 0; type < Type_Max; type++)
         for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
-            if (CheckBoxes[type][group])
+            if (CheckBoxes[type][group] && Files_CurrentPos<Files.size() && Files[Files_CurrentPos]->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
                 CheckBoxes[type][group]->show();
+            else
+                CheckBoxes[type][group]->hide();
     if (ui->fileNamesBox)
         ui->fileNamesBox->show();
 
@@ -345,7 +348,7 @@ void MainWindow::addFile(const QString &FileName)
         return;
 
     // Launch analysis
-    FileInformation* Temp=new FileInformation(this, FileName);
+    FileInformation* Temp=new FileInformation(this, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks);
 
     Files.push_back(Temp);
     ui->fileNamesBox->addItem(Temp->FileName);
@@ -355,7 +358,7 @@ void MainWindow::addFile(const QString &FileName)
 void MainWindow::addFile(BlackmagicDeckLink_Glue* BlackmagicDeckLink_Glue, int FrameCount, const string &Encoding_FileName, const string &Encoding_Format)
 {
     // Launch analysis
-    FileInformation* Temp=new FileInformation(this, QString(), BlackmagicDeckLink_Glue, FrameCount, Encoding_FileName, Encoding_Format);
+    FileInformation* Temp=new FileInformation(this, QString(), Prefs->ActiveFilters, Prefs->ActiveAllTracks, BlackmagicDeckLink_Glue, FrameCount, Encoding_FileName, Encoding_Format);
 
     Files.push_back(Temp);
     ui->fileNamesBox->addItem(Temp->FileName);

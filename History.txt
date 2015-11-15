@@ -4,6 +4,7 @@
 + Add plotlines for broadcast illegal and yuv illegal saturation levels
 + Update waveform and vectorscope filters to new waveform and vectorscope filters in FFmpeg 2.8
 + Add field modes to Tile and Zoom
++ Preferences
 x Fixed crash with some big MOV files having count of audio samples of the count of audio blocks in the track header instead
 
 0.7.1, 2015-05-15
