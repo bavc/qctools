@@ -22,6 +22,16 @@ enum AudioItem
     //Item_LRAL,
     //Item_LRA,
     //Item_LRAH,
+    //astats
+    Item_DC_offset,
+    Item_Min_level,
+    Item_Max_level,
+    Item_Min_difference,
+    Item_Max_difference,
+    Item_Mean_difference,
+    Item_Peak_level,
+    Item_RMS_peak,
+    Item_RMS_trough,
     //Internal
     Item_AudioMax
 };
@@ -29,6 +39,9 @@ enum AudioItem
 enum AudioGroup
 {
     Group_R128,
+    Group_astats_levels,
+    Group_adif,
+    Group_astats_RMS,
     //Group_LRA,
     Group_AudioMax
 };
