@@ -145,7 +145,7 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "Mean Square Error for each plane (Y, U, and V). Higher values may be\n"
         "indicative of differences between the images of field 1 and field 2 as\n"
         "may be caused by a head clog or playback error.",
-        ActiveFilter_Video_signalstats,
+        ActiveFilter_Video_Psnr,
     },
     //PSNRf
     {
