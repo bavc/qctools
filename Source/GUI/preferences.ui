@@ -78,6 +78,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QCheckBox" name="Filters_Video_cropdetect">
+            <property name="text">
+             <string>cropdetect (detect image boundaries)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QCheckBox" name="Filters_Video_Psnr">
             <property name="text">
              <string>PSNR (video field comparisons)</string>

@@ -121,7 +121,7 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "CropW plots the number of columns of pixels would could be safely removed\n"
         "from the left or right side of the image without removing any non-black\n"
         "pixels. It would detect video frames with pillarboxing.",
-        ActiveFilter_Video_signalstats,
+        ActiveFilter_Video_cropdetect,
     },
     //CropH
     {
@@ -129,14 +129,14 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "CropW plots the number of row of pixels would could be safely removed\n"
         "from the top or bottom side of the image without removing any non-black\n"
         "pixels. It would detect video frames with letterboxing.",
-        ActiveFilter_Video_signalstats,
+        ActiveFilter_Video_cropdetect,
     },
     //CropF
     {
         Item_Crop_w,   2,    0,    0,  4,  "CropF", false,
         "Presents the total number of rows (Crop Height) and columns (Crop Width)\n"
         "which could be removed from the edges to only remove black pixels.",
-        ActiveFilter_Video_signalstats,
+        ActiveFilter_Video_cropdetect,
     },
     //MSEf
     {

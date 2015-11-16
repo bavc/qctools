@@ -20,6 +20,7 @@ extern const char* Version;
 enum activefilter
 {
     ActiveFilter_Video_signalstats,
+    ActiveFilter_Video_cropdetect,
     ActiveFilter_Video_Psnr,
     ActiveFilter_Audio_EbuR128,
     ActiveFilter_Audio_astats,

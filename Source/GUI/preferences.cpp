@@ -52,6 +52,7 @@ void Preferences::Load()
     ActiveAllTracks=activealltracks(Settings.value("ActiveAllTracks", 0).toInt());
 
     ui->Filters_Video_signalstats->setChecked(ActiveFilters[ActiveFilter_Video_signalstats]);
+    ui->Filters_Video_cropdetect->setChecked(ActiveFilters[ActiveFilter_Video_cropdetect]);
     ui->Filters_Video_Psnr->setChecked(ActiveFilters[ActiveFilter_Video_Psnr]);
     ui->Filters_Audio_EbuR128->setChecked(ActiveFilters[ActiveFilter_Audio_EbuR128]);
     ui->Filters_Audio_astats->setChecked(ActiveFilters[ActiveFilter_Audio_astats]);
@@ -81,6 +82,8 @@ void Preferences::OnAccepted()
     ActiveFilters.reset();
     if (ui->Filters_Video_signalstats->isChecked())
         ActiveFilters.set(ActiveFilter_Video_signalstats);
+    if (ui->Filters_Video_cropdetect->isChecked())
+        ActiveFilters.set(ActiveFilter_Video_cropdetect);
     if (ui->Filters_Video_Psnr->isChecked())
         ActiveFilters.set(ActiveFilter_Video_Psnr);
     if (ui->Filters_Audio_EbuR128->isChecked())

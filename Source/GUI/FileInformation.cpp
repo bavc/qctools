@@ -195,7 +195,9 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
     if (StatsFromExternalData.empty())
     {
         if (ActiveFilters[ActiveFilter_Video_signalstats])
-            Filters[0]+=",signalstats=stat=tout+vrep+brng,cropdetect=reset=1:round=1";
+            Filters[0]+=",signalstats=stat=tout+vrep+brng";
+        if (ActiveFilters[ActiveFilter_Video_cropdetect])
+            Filters[0]+=",cropdetect=reset=1:round=1";
         if (ActiveFilters[ActiveFilter_Video_Psnr])
             Filters[0]+=",split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr";
         Filters[0].erase(0, 1); // remove first comma

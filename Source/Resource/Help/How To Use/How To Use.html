@@ -59,7 +59,7 @@
             QCTools provides a Preferences window to configure settings for running QCTools.
         </p>
         <h3>Filters</h3>
-        <p>QCTool's analysis methods depend on filters from FFmpeg's libavfilter library. Currently this includes: <a href="http://ffmpeg.org/ffmpeg-filters.html#signalstats">signalstats</a> (initially created as part the QCTools project), <a href="http://ffmpeg.org/ffmpeg-filters.html#psnr">PSNR</a>, <a href="http://ffmpeg.org/ffmpeg-filters.html#astats">astats</a>, and <a href="http://ffmpeg.org/ffmpeg-filters.html#ebur128">EBU R.128</a>.
+        <p>QCTool's analysis methods depend on filters from FFmpeg's libavfilter library. Currently this includes: <a href="http://ffmpeg.org/ffmpeg-filters.html#signalstats">signalstats</a> (initially created as part the QCTools project), <a href="http://ffmpeg.org/ffmpeg-filters.html#cropdetect">cropdetect</a>, <a href="http://ffmpeg.org/ffmpeg-filters.html#psnr">PSNR</a>, <a href="http://ffmpeg.org/ffmpeg-filters.html#astats">astats</a>, and <a href="http://ffmpeg.org/ffmpeg-filters.html#ebur128">EBU R.128</a>.
         </p>
         <table border='1'>
             <tr>
@@ -71,6 +71,11 @@
                 <td><a href="http://ffmpeg.org/ffmpeg-filters.html#signalstats">signalstats</a></td>
                 <td>video</td>
                 <td>The signalstats analysis filter generates data to plot statistics on video signal levels, frame-to-frame differences, saturation and hue averages, and quantifications of visual patterns and errors. It is highly recommended to enable this fitler.</td>
+            </tr>
+            <tr>
+                <td><a href="http://ffmpeg.org/ffmpeg-filters.html#cropdetect">cropdetect</a></td>
+                <td>video</td>
+                <td>The cropdetect filter is used to determine how many columns and rows of nearly-black pixels border the visual image of the frame. The filter can detect changes in framing, letterboxing, pillarboxing, and adjustments to the aperature of the image.</td>
             </tr>
             <tr>
                 <td><a href="http://ffmpeg.org/ffmpeg-filters.html#psnr">PSNR</a></td>
