@@ -24,7 +24,7 @@ enum activefilter
     ActiveFilter_Video_Psnr,
     ActiveFilter_Audio_EbuR128,
     ActiveFilter_Audio_astats,
-    ActiveFilter_Max
+    ActiveFilter_Max //Note: always add a new ActiveFilter element before ActiveFilter_Max, never before any other element, else preferences of people already having the tool will be shifted when preferences are read from the profile
 };
 typedef std::bitset<ActiveFilter_Max> activefilters;
 
