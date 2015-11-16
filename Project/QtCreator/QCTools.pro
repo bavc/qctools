@@ -88,7 +88,7 @@ INCLUDEPATH += $$QWT_ROOT/src
 INCLUDEPATH += $$PWD/../../../ffmpeg
 INCLUDEPATH += "$$PWD/../../../Blackmagic DeckLink SDK"
 
-LIBS      += -L$${QWT_ROOT}/lib -lqwt -l lzma
+LIBS      += -L$${QWT_ROOT}/lib -lqwt
 LIBS      += -lz
 LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
              -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
