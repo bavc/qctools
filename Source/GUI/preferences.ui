@@ -131,6 +131,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QCheckBox" name="Filters_Audio_aphasemeter">
+            <property name="text">
+             <string>aphasemeter (detect audio phase)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QCheckBox" name="Filters_Audio_EbuR128">
             <property name="text">
              <string>EBU R128 (perceived volume analysis)</string>
