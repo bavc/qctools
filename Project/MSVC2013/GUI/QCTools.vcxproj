@@ -49,14 +49,17 @@
       <DisableSpecificWarnings>4018</DisableSpecificWarnings>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <MinimalRebuild>false</MinimalRebuild>
-      <PreprocessorDefinitions>BLACKMAGICDECKLINK_NO;_USING_V110_SDK71_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BLACKMAGICDECKLINK_NO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../../../Qt\qtbase\lib\MSVC2013\Win32;../../../../Qt\qtbase\plugins\imageformats;../../../../qwt/lib;../../../../zlib\projects\MSVC2013\Win32\Debug;Lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>qwtd.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;qwindowsd.lib;qminimald.lib;qtharfbuzzng.lib;qtmaind.lib;avformat.lib;avcodec.lib;avfilter.lib;swscale.lib;avutil.lib;winmm.lib;ws2_32.lib;imm32.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qwtd.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;qwindowsd.lib;qminimald.lib;qtharfbuzzngd.lib;qtmaind.lib;qtpcred.lib;avformat.lib;avcodec.lib;avfilter.lib;swscale.lib;avutil.lib;winmm.lib;ws2_32.lib;imm32.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WIN32;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -72,7 +75,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>../../../../Qt/qtbase/lib/MSVC2013/$(Platform);../../../../qwt/lib;../../../../zlib\projects\MSVC2013\Win32\Debug;Lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>qwt.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;qwindows.lib;qminimal.lib;qtharfbuzzng.lib;qtmain.lib;avformat.lib;avcodec.lib;avfilter.lib;swscale.lib;avutil.lib;winmm.lib;ws2_32.lib;imm32.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qwt.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;qwindows.lib;qminimal.lib;qtharfbuzzng.lib;qtmain.lib;qtpcred.lib;avformat.lib;avcodec.lib;avfilter.lib;swscale.lib;avutil.lib;winmm.lib;ws2_32.lib;imm32.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
