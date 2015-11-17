@@ -1089,7 +1089,7 @@ void FFmpeg_Glue::FrameAtPosition(size_t FramePos)
     {
         inputdata* InputData=InputDatas[Pos];
 
-        if (InputData->Type==AVMEDIA_TYPE_VIDEO)
+        if (InputData && InputData->Type==AVMEDIA_TYPE_VIDEO)
         {
             if (InputData->FramePos!=FramePos)
                 Seek(FramePos);
