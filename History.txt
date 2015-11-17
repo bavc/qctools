@@ -1,4 +1,4 @@
-0.7.2, 
+0.7.2, 2015-11-17
 -----
 + Add plotlines for reference black and white in YUV graphs (GitHub issue #96)
 + Add plotlines for broadcast illegal and yuv illegal saturation levels
