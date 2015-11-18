@@ -6,6 +6,6 @@ Version: 0.7.2-1
 Maintainer: MediaArea.net SARL <info@mediaarea.net>
 Homepage: http://www.bavc.org/qctools
 Standards-Version: 3.7.3
-Build-Depends: debhelper (>= 5), libqt4-dev, libqt4-opengl-dev, zlib1g-dev, libbz2-dev, pkg-config, cmake, yasm
+Build-Depends: debhelper (>= 5), libqt5-dev, libqt5-opengl-dev, zlib1g-dev, libbz2-dev, pkg-config, cmake, yasm
 Files: 
  00000000000000000000000000000000 000000 qctools_0.7.2-1.tar.gz

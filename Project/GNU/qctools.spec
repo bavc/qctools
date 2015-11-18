@@ -22,7 +22,7 @@ BuildRequires:  cmake
 %if %{undefined rhel_version} && %{undefined centos_version}
 BuildRequires:  yasm
 %endif
-BuildRequires:  libqt4-devel
+BuildRequires:  libqt5-devel
 %if 0%{?suse_version}
 BuildRequires:  update-desktop-files
 %endif
