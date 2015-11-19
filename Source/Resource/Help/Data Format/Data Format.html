@@ -118,7 +118,8 @@
                 Open a video file for evaluation and then select "Export &gt; To qctools.xml.gz".
             </li>
             <li>Via FFmpeg (version 2.3 or later)<br />
-                For a file with video and audio named EXAMPLE.mov<br />
+                
+                For a file with video and audio named EXAMPLE.mov (If your video does not contain audio streams, this command will result in an invalid argument)<br />
                 ffprobe -f lavfi -i "movie=EXAMPLE.mov:s=v+a[in0][in1],[in0]signalstats=stat=tout+vrep+brng,cropdetect=reset=1,split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr[out0];[in1]ebur128=metadata=1[out1]" -show_frames -show_versions -of xml=x=1:q=1 -noprivate | gzip &gt; EXAMPLE.mov.qctools.xml.gz<br />
                 For a file with video and no audio named EXAMPLE.mov<br />
                 ffprobe -f lavfi -i "movie=EXAMPLE.mov,signalstats=stat=tout+vrep+brng,cropdetect=reset=1,split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr" -show_frames -show_versions -of xml=x=1:q=1 -noprivate | gzip &gt; EXAMPLE.mov.qctools.xml.gz
