@@ -31,25 +31,6 @@ if [ ! $(which cmake) ] ; then
 	exit
 fi
 
-#cd openjpeg
-#cmake -DBUILD_SHARED_LIBS:BOOL=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=usr .
-#make
-#make install
-#cd ..
-
-# freetype
-if [ ! -d freetype ] ; then
-	wget https://downloads.sf.net/project/freetype/freetype2/2.5.3/freetype-2.5.3.tar.bz2
-	tar jxf freetype-2.5.3.tar.bz2
-	mv freetype-2.5.3 freetype
-fi
-cd freetype
-chmod u+x configure
-./configure --prefix="`pwd`/usr" --without-harfbuzz
-make
-make install
-cd ..
-
 # decklink
 #if [ ! -d decklinksdk ] ; then
 #	wget http://software.blackmagicdesign.com/SDK/Blackmagic_DeckLink_SDK_10.1.4.zip
@@ -61,7 +42,6 @@ cd ffmpeg
 if sw_vers >/dev/null 2>&1
 then
 	FFMPEG_EXTRA= --extra-cflags="-mmacosx-version-min=10.5" --extra-ldflags="-mmacosx-version-min=10.5"
-	FFMPEG_EXTRA+= --enable-libfreetype --extra-cflags="-I../freetype/usr/include" --extra-ldflags="-L../freetype/usr/lib"
 fi
 chmod u+x configure
 chmod u+x version.sh
