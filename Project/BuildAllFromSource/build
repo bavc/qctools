@@ -36,36 +36,35 @@ if [ ! -d ffmpeg ] ; then
 fi
 
 if [ ! -f ffmpeg/ffmpeg ] ; then
-cd ffmpeg
-if sw_vers >/dev/null 2>&1 ; then
-    FFMPEG_EXTRA= --extra-cflags="-mmacosx-version-min=10.5" --extra-ldflags="-mmacosx-version-min=10.5"
-fi
-chmod u+x configure
-chmod u+x version.sh
-if yasm --version >/dev/null 2>&1 ; then
-    ./configure --enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug $FFMPEG_EXTRA
-    if [$? -ne 0 ]
-    then #on some distro, yasm version is too old
-      cd ../yasm/
-      ./configure --prefix=`pwd`/usr
-      make
-      make install
-
-      cd ../ffmpeg
-      ./configure --enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --yasmexe=../yasm/usr/bin/yasm $FFMPEG_EXTRA
+    cd ffmpeg
+    if sw_vers >/dev/null 2>&1 ; then
+        FFMPEG_EXTRA= --extra-cflags="-mmacosx-version-min=10.5" --extra-ldflags="-mmacosx-version-min=10.5"
     fi
-else
-    cd ../yasm/
-    ./configure --prefix=`pwd`/usr
+    chmod u+x configure
+    chmod u+x version.sh
+    if yasm --version >/dev/null 2>&1 ; then
+        ./configure --enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug $FFMPEG_EXTRA
+        if [$? -ne 0 ] ; then #on some distro, yasm version is too old
+            cd ../yasm/
+            ./configure --prefix=`pwd`/usr
+            make
+            make install
+
+            cd ../ffmpeg
+            ./configure --enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --yasmexe=../yasm/usr/bin/yasm $FFMPEG_EXTRA
+        fi
+    else
+        cd ../yasm/
+        ./configure --prefix=`pwd`/usr
+        make
+        make install
+
+        cd ../ffmpeg
+        ./configure --enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --yasmexe=../yasm/usr/bin/yasm $FFMPEG_EXTRA
+    fi
+
     make
-    make install
-
-    cd ../ffmpeg
-    ./configure --enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --yasmexe=../yasm/usr/bin/yasm $FFMPEG_EXTRA
-fi
-
-make
-cd ..
+    cd ..
 fi
 
 cd qwt
