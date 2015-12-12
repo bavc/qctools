@@ -31,10 +31,14 @@ fi
 #    mv "Blackmagic DeckLink SDK 10.1.4" decklinksdk
 #fi
 
+if [ ! -d ffmpeg ] ; then
+    git clone git://source.ffmpeg.org/ffmpeg.git ffmpeg
+fi
+
+if [ ! -f ffmpeg/ffmpeg ] ; then
 cd ffmpeg
-if sw_vers >/dev/null 2>&1
-then
-	FFMPEG_EXTRA= --extra-cflags="-mmacosx-version-min=10.5" --extra-ldflags="-mmacosx-version-min=10.5"
+if sw_vers >/dev/null 2>&1 ; then
+    FFMPEG_EXTRA= --extra-cflags="-mmacosx-version-min=10.5" --extra-ldflags="-mmacosx-version-min=10.5"
 fi
 chmod u+x configure
 chmod u+x version.sh
@@ -62,6 +66,7 @@ fi
 
 make
 cd ..
+fi
 
 cd qwt
 $BINQMAKE
