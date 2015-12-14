@@ -37,13 +37,14 @@ fi
 
 if [ ! -f ffmpeg/ffmpeg ] ; then
     cd ffmpeg
+    FFMPEG_CONFIGURE_OPTS=(--enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug)
     if sw_vers >/dev/null 2>&1 ; then
-        FFMPEG_EXTRA= --extra-cflags="-mmacosx-version-min=10.5" --extra-ldflags="-mmacosx-version-min=10.5"
+        FFMPEG_CONFIGURE_OPTS+=(--extra-cflags="-mmacosx-version-min=10.5" --extra-ldflags="-mmacosx-version-min=10.5")
     fi
     chmod u+x configure
     chmod u+x version.sh
     if yasm --version >/dev/null 2>&1 ; then
-        ./configure --enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug $FFMPEG_EXTRA
+        ./configure "${FFMPEG_CONFIGURE_OPTS[@]}"
         if [$? -ne 0 ] ; then #on some distro, yasm version is too old
             cd ../yasm/
             ./configure --prefix=`pwd`/usr
@@ -51,7 +52,8 @@ if [ ! -f ffmpeg/ffmpeg ] ; then
             make install
 
             cd ../ffmpeg
-            ./configure --enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --yasmexe=../yasm/usr/bin/yasm $FFMPEG_EXTRA
+            FFMPEG_CONFIGURE_OPTS+=(--yasmexe=../yasm/usr/bin/yasm)
+            ./configure "${FFMPEG_CONFIGURE_OPTS[@]}"
         fi
     else
         cd ../yasm/
@@ -60,9 +62,9 @@ if [ ! -f ffmpeg/ffmpeg ] ; then
         make install
 
         cd ../ffmpeg
-        ./configure --enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --yasmexe=../yasm/usr/bin/yasm $FFMPEG_EXTRA
+        FFMPEG_CONFIGURE_OPTS+=(--yasmexe=../yasm/usr/bin/yasm)
+        ./configure "${FFMPEG_CONFIGURE_OPTS[@]}"
     fi
-
     make
     cd ..
 fi
