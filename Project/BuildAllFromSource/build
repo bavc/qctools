@@ -71,6 +71,9 @@ if [ ! -f ffmpeg/ffmpeg ] ; then
     cd ..
 fi
 
+if [ ! -d qwt ] ; then
+    svn checkout svn://svn.code.sf.net/p/qwt/code/branches/qwt-5.2 qwt
+fi
 cd qwt
 $BINQMAKE
 make
