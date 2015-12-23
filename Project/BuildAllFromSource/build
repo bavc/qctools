@@ -30,6 +30,9 @@ fi
 #    unzip Blackmagic_DeckLink_SDK_10.1.4.zip
 #    mv "Blackmagic DeckLink SDK 10.1.4" decklinksdk
 #fi
+INSTALL_DIR=$(cd $(dirname "$0") && cd ../../.. && pwd)
+cd "$INSTALL_DIR"
+
 
 if [ ! -d ffmpeg ] ; then
     git clone git://source.ffmpeg.org/ffmpeg.git ffmpeg
