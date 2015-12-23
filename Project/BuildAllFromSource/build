@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 if qmake --version >/dev/null 2>&1 ; then
     BINQMAKE=qmake
