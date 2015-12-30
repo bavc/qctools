@@ -72,7 +72,9 @@ if [ ! -f ffmpeg/ffmpeg ] ; then
 fi
 
 if [ ! -d qwt ] ; then
-    svn checkout svn://svn.code.sf.net/p/qwt/code/branches/qwt-5.2 qwt
+    wget http://downloads.sourceforge.net/project/qwt/qwt/6.1.2/qwt-6.1.2.tar.bz2
+    tar jxf qwt-6.1.2.tar.bz2
+    mv qwt-6.1.2 qwt
 fi
 cd qwt
 $BINQMAKE
