@@ -58,7 +58,14 @@ if [ ! -f ffmpeg/ffmpeg ] ; then
             ./configure "${FFMPEG_CONFIGURE_OPTS[@]}"
         fi
     else
-        cd ../yasm/
+        cd ..
+        if [ ! -d yasm ] ; then
+            wget http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
+            tar -zxvf yasm-1.3.0.tar.gz
+            rm yasm-1.3.0.tar.gz
+            mv yasm-1.3.0 yasm
+        fi
+        cd yasm/
         ./configure --prefix=`pwd`/usr
         make
         make install
