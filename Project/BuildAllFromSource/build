@@ -1,5 +1,12 @@
 #! /bin/bash
 
+_install_yasm(){
+    wget http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
+    tar -zxvf yasm-1.3.0.tar.gz
+    rm yasm-1.3.0.tar.gz
+    mv yasm-1.3.0 yasm
+}
+
 if qmake --version >/dev/null 2>&1 ; then
     BINQMAKE=qmake
 elif qmake-qt5 --version >/dev/null 2>&1 ; then
@@ -48,7 +55,11 @@ if [ ! -f ffmpeg/ffmpeg ] ; then
     if yasm --version >/dev/null 2>&1 ; then
         ./configure "${FFMPEG_CONFIGURE_OPTS[@]}"
         if [ "$?" -ne 0 ] ; then #on some distro, yasm version is too old
-            cd ../yasm/
+            cd ..
+            if [ ! -d yasm ] ; then
+                _install_yasm
+            fi
+            cd yasm/
             ./configure --prefix=`pwd`/usr
             make
             make install
@@ -60,10 +71,7 @@ if [ ! -f ffmpeg/ffmpeg ] ; then
     else
         cd ..
         if [ ! -d yasm ] ; then
-            wget http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
-            tar -zxvf yasm-1.3.0.tar.gz
-            rm yasm-1.3.0.tar.gz
-            mv yasm-1.3.0 yasm
+            _install_yasm
         fi
         cd yasm/
         ./configure --prefix=`pwd`/usr
