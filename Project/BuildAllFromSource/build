@@ -62,8 +62,6 @@ if [ ! -f ffmpeg/ffmpeg ] ; then
             cd yasm/
             ./configure --prefix=`pwd`/usr
             make
-            make install
-
             cd ../ffmpeg
             FFMPEG_CONFIGURE_OPTS+=(--yasmexe=../yasm/usr/bin/yasm)
             ./configure "${FFMPEG_CONFIGURE_OPTS[@]}"
@@ -76,8 +74,6 @@ if [ ! -f ffmpeg/ffmpeg ] ; then
         cd yasm/
         ./configure --prefix=`pwd`/usr
         make
-        make install
-
         cd ../ffmpeg
         FFMPEG_CONFIGURE_OPTS+=(--yasmexe=../yasm/usr/bin/yasm)
         ./configure "${FFMPEG_CONFIGURE_OPTS[@]}"
