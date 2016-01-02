@@ -47,7 +47,7 @@ if [ ! -f ffmpeg/ffmpeg ] ; then
     chmod u+x version.sh
     if yasm --version >/dev/null 2>&1 ; then
         ./configure "${FFMPEG_CONFIGURE_OPTS[@]}"
-        if [$? -ne 0 ] ; then #on some distro, yasm version is too old
+        if [ "$?" -ne 0 ] ; then #on some distro, yasm version is too old
             cd ../yasm/
             ./configure --prefix=`pwd`/usr
             make
