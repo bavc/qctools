@@ -55,31 +55,31 @@ if [ ! -f ffmpeg/ffmpeg ] ; then
     if yasm --version >/dev/null 2>&1 ; then
         ./configure "${FFMPEG_CONFIGURE_OPTS[@]}"
         if [ "$?" -ne 0 ] ; then #on some distro, yasm version is too old
-            cd ..
+            cd "$INSTALL_DIR"
             if [ ! -d yasm ] ; then
                 _install_yasm
             fi
             cd yasm/
             ./configure --prefix=`pwd`/usr
             make
-            cd ../ffmpeg
+            cd "${INSTALL_DIR}/ffmpeg"
             FFMPEG_CONFIGURE_OPTS+=(--yasmexe=../yasm/usr/bin/yasm)
             ./configure "${FFMPEG_CONFIGURE_OPTS[@]}"
         fi
     else
-        cd ..
+        cd "$INSTALL_DIR"
         if [ ! -d yasm ] ; then
             _install_yasm
         fi
         cd yasm/
         ./configure --prefix=`pwd`/usr
         make
-        cd ../ffmpeg
+        cd "${INSTALL_DIR}/ffmpeg"
         FFMPEG_CONFIGURE_OPTS+=(--yasmexe=../yasm/usr/bin/yasm)
         ./configure "${FFMPEG_CONFIGURE_OPTS[@]}"
     fi
     make
-    cd ..
+    cd "$INSTALL_DIR"
 fi
 
 if [ ! -d qwt ] ; then
@@ -120,7 +120,7 @@ fi
 cd qwt
 $BINQMAKE
 make
-cd ..
+cd "$INSTALL_DIR"
 
 cd qctools/Project/QtCreator
 if sw_vers >/dev/null 2>&1 ; then
