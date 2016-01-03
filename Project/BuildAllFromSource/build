@@ -118,6 +118,15 @@ if [ ! -d qwt ] ; then
 
  ######################################################################
  # You can use the MathML renderer of the Qt solutions package to 
+@@ -118,7 +118,7 @@
+ # Otherwise you have to build it from the designer directory.
+ ######################################################################
+ 
+-QWT_CONFIG     += QwtDesigner
++#QWT_CONFIG     += QwtDesigner
+ 
+ ######################################################################
+ # Compile all Qwt classes into the designer plugin instead
 EOF
 fi
 cd qwt
