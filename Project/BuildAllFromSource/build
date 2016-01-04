@@ -60,7 +60,6 @@ if [ ! -d ffmpeg ] ; then
     git clone git://source.ffmpeg.org/ffmpeg.git ffmpeg
 fi
 
-if [ ! -f ffmpeg/ffmpeg ] ; then
     cd ffmpeg
     FFMPEG_CONFIGURE_OPTS=(--enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --disable-lzma)
     FFMPEG_CONFIGURE_OPTS+=(--enable-libfreetype --extra-cflags="-I../freetype/usr/include" --extra-ldflags="-L../freetype/usr/lib")
@@ -97,7 +96,6 @@ if [ ! -f ffmpeg/ffmpeg ] ; then
     fi
     make
     cd "$INSTALL_DIR"
-fi
 
 if [ ! -d qwt ] ; then
     wget http://downloads.sourceforge.net/project/qwt/qwt/6.1.2/qwt-6.1.2.tar.bz2
