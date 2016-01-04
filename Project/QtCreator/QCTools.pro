@@ -99,6 +99,7 @@ LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
              -L$${PWD}/../../../ffmpeg/libswscale -lswscale \
              -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
              -L$${PWD}/../../../ffmpeg/libavutil -lavutil
+LIBS      += -L$${PWD}/../../../freetype/usr/lib -lfreetype
 LIBS      += -lbz2
 
 !macx:LIBS      += -ldl -lrt
