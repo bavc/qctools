@@ -14,6 +14,8 @@ PKGCONFIG += libswresample libswscale libavcodec libavutil freetype2
 
 CONFIG += link_pkgconfig
 
+QMAKE_CXXFLAGS += -DBLACKMAGICDECKLINK_NO -DWITH_SYSTEM_FFMPEG=1
+
 HEADERS = \
     ../../Source/Core/AudioCore.h \
     ../../Source/Core/AudioStats.h \

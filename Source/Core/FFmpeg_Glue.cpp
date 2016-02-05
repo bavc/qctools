@@ -30,9 +30,11 @@ extern "C"
 #include <libavfilter/buffersrc.h>
 
 #include <libavutil/imgutils.h>
-
-#include <config.h>
 #include <libavutil/ffversion.h>
+
+#ifndef WITH_SYSTEM_FFMPEG
+#include <config.h>
+#endif
 }
 
 #include <sstream>
@@ -50,6 +52,7 @@ void LibsVersion_Inject(stringstream &LibsVersion, const char* Name, const char*
     LibsVersion<<' ' << Name << "=\"" << Value << '\"';
 }
 
+#ifndef WITH_SYSTEM_FFMPEG
 #define LIBSVERSION(libname, LIBNAME)                                               \
     if (CONFIG_##LIBNAME)                                                           \
     {                                                                               \
@@ -62,7 +65,21 @@ void LibsVersion_Inject(stringstream &LibsVersion, const char* Name, const char*
         LibsVersion_Inject(LibsVersion, "version", version);                        \
         LibsVersion_Inject(LibsVersion, "ident",   LIB##LIBNAME##_IDENT);           \
         LibsVersion<<"/>\n";                                                        \
-    }                                                                               \
+    }
+#else
+#define LIBSVERSION(libname, LIBNAME)                                               \
+    do {                                                                            \
+        unsigned int version = libname##_version();                                 \
+        LibsVersion<<"        <library_version";                                    \
+        LibsVersion_Inject(LibsVersion, "name",    "lib" #libname);                 \
+        LibsVersion_Inject(LibsVersion, "major",   LIB##LIBNAME##_VERSION_MAJOR);   \
+        LibsVersion_Inject(LibsVersion, "minor",   LIB##LIBNAME##_VERSION_MINOR);   \
+        LibsVersion_Inject(LibsVersion, "micro",   LIB##LIBNAME##_VERSION_MICRO);   \
+        LibsVersion_Inject(LibsVersion, "version", version);                        \
+        LibsVersion_Inject(LibsVersion, "ident",   LIB##LIBNAME##_IDENT);           \
+        LibsVersion<<"/>\n";                                                        \
+    } while (0)
+#endif
 
 //***************************************************************************
 // Error manager of FFmpeg
@@ -2092,19 +2109,31 @@ string FFmpeg_Glue::FFmpeg_Version()
 //---------------------------------------------------------------------------
 int FFmpeg_Glue::FFmpeg_Year()
 {
+#ifdef WITH_SYSTEM_FFMPEG
+    return 0;
+#else
     return CONFIG_THIS_YEAR;
+#endif
 }
 
 //---------------------------------------------------------------------------
 string FFmpeg_Glue::FFmpeg_Compiler()
 {
+#ifdef WITH_SYSTEM_FFMPEG
+    return 0;
+#else
     return CC_IDENT;
+#endif
 }
 
 //---------------------------------------------------------------------------
 string FFmpeg_Glue::FFmpeg_Configuration()
 {
+#ifdef WITH_SYSTEM_FFMPEG
+    return 0;
+#else
     return FFMPEG_CONFIGURATION;
+#endif
 }
 
 //---------------------------------------------------------------------------
