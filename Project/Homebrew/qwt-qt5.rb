@@ -1,8 +1,10 @@
-class Qwt < Formula
-  desc "Qt Widgets for Technical Applications"
+class QwtQt5 < Formula
+  desc "Qt Widgets for Technical Applications (for Qt5)"
   homepage "http://qwt.sourceforge.net/"
   url "https://downloads.sourceforge.net/project/qwt/qwt/6.1.2/qwt-6.1.2.tar.bz2"
   sha256 "2b08f18d1d3970e7c3c6096d850f17aea6b54459389731d3ce715d193e243d0c"
+
+  keg_only "Qwt for Qt 5 conflicts with Qwt for Qt 4"
 
   option "with-qwtmathml", "Build the qwtmathml library"
   option "without-plugin", "Skip building the Qt Designer plugin"
@@ -17,16 +19,26 @@ class Qwt < Formula
     inreplace "qwtconfig.pri" do |s|
       s.gsub! /^\s*QWT_INSTALL_PREFIX\s*=(.*)$/, "QWT_INSTALL_PREFIX=#{prefix}"
       s.sub! /\+(=\s*QwtDesigner)/, "-\\1" if build.without? "plugin"
+
+      # Install Qt plugin in `lib/qt4/plugins/designer`, not `plugins/designer`.
+      s.sub! %r{(= \$\$\{QWT_INSTALL_PREFIX\})/(plugins/designer)$},
+             "\\1/lib/qt5/\\2"
     end
 
     args = ["-config", "release"]
+
+    if ENV.compiler == :clang && MacOS.version >= :mavericks
+      args << "-spec" << "macx-clang"
+    else
+      args << "-spec" << "macx-g++"
+    end
 
     if build.with? "qwtmathml"
       args << "QWT_CONFIG+=QwtMathML"
       prefix.install "textengines/mathml/qtmmlwidget-license"
     end
 
-    system "qmake", *args
+    system "#{Formula["qt5"].bin}/qmake", *args
     system "make"
     system "make", "install"
   end
