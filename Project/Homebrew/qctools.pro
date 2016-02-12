@@ -5,7 +5,7 @@ TEMPLATE = app
 
 QT_CONFIG -= no-pkg-config
 
-include ( $$system(brew --prefix qwt)/features/qwt.prf )
+include ( $$system(brew --prefix qwt-qt5)/features/qwt.prf )
 
 CONFIG += qt qwt release no_keywords
 
