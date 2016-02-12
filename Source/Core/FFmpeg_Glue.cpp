@@ -34,6 +34,8 @@ extern "C"
 
 #ifndef WITH_SYSTEM_FFMPEG
 #include <config.h>
+#else
+#include <ctime>
 #endif
 }
 
@@ -2110,7 +2112,9 @@ string FFmpeg_Glue::FFmpeg_Version()
 int FFmpeg_Glue::FFmpeg_Year()
 {
 #ifdef WITH_SYSTEM_FFMPEG
-    return 0;
+    time_t t = std::time(0);
+    struct tm * now = std::localtime(&t);
+    return now->tm_year + 1900;
 #else
     return CONFIG_THIS_YEAR;
 #endif
@@ -2120,7 +2124,7 @@ int FFmpeg_Glue::FFmpeg_Year()
 string FFmpeg_Glue::FFmpeg_Compiler()
 {
 #ifdef WITH_SYSTEM_FFMPEG
-    return 0;
+    return "not available";
 #else
     return CC_IDENT;
 #endif
@@ -2130,7 +2134,7 @@ string FFmpeg_Glue::FFmpeg_Compiler()
 string FFmpeg_Glue::FFmpeg_Configuration()
 {
 #ifdef WITH_SYSTEM_FFMPEG
-    return 0;
+    return "not available";
 #else
     return FFMPEG_CONFIGURATION;
 #endif
