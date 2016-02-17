@@ -3,6 +3,8 @@ QT += core gui widgets svg printsupport
 TARGET = QCTools
 TEMPLATE = app
 
+QMAKE_TARGET_BUNDLE_PREFIX = org.bavc
+
 QT_CONFIG -= no-pkg-config
 
 include ( $$system(brew --prefix qwt-qt5)/features/qwt.prf )
