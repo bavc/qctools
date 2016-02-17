@@ -188,24 +188,30 @@ void CommonStats::StatsFinish ()
 //---------------------------------------------------------------------------
 string CommonStats::Average_Get(size_t Pos)
 {
-    if (x_Current==0)
+    if (x_Current == 0 || Pos >= CountOfItems) {
         return string();
+    }
 
-    double Value=Stats_Totals[Pos]/x_Current;
+    double Value = Stats_Totals[Pos] / x_Current;
     stringstream str;
-    str<<fixed<<setprecision(PerItem[Pos].DigitsAfterComma)<<Value;
+    str << fixed;
+    str << setprecision(PerItem[Pos].DigitsAfterComma);
+    str << Value;
     return str.str();
 }
 
 //---------------------------------------------------------------------------
 string CommonStats::Average_Get(size_t Pos, size_t Pos2)
 {
-    if (x_Current==0)
+    if (x_Current == 0 || Pos >= CountOfItems) {
         return string();
+    }
 
-    double Value=(Stats_Totals[Pos]-Stats_Totals[Pos2])/x_Current;
+    double Value = (Stats_Totals[Pos] - Stats_Totals[Pos2]) / x_Current;
     stringstream str;
-    str<<fixed<<setprecision(PerItem[Pos].DigitsAfterComma)<<Value;
+    str << fixed;
+    str << setprecision(PerItem[Pos].DigitsAfterComma)
+    str << Value;
     return str.str();
 }
 
