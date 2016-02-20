@@ -210,7 +210,7 @@ string CommonStats::Average_Get(size_t Pos, size_t Pos2)
     double Value = (Stats_Totals[Pos] - Stats_Totals[Pos2]) / x_Current;
     stringstream str;
     str << fixed;
-    str << setprecision(PerItem[Pos].DigitsAfterComma)
+    str << setprecision(PerItem[Pos].DigitsAfterComma);
     str << Value;
     return str.str();
 }
