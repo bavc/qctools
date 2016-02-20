@@ -1,4 +1,10 @@
 Makefile
+Project/Homebrew/.qmake.stash
+Project/Homebrew/Makefile
+Project/Homebrew/moc
+Project/Homebrew/QCTools.app
+Project/Homebrew/resources/qrc_Resources.cpp
+Project/Homebrew/*.h
 Project/QtCreator/.qmake.stash
 Project/QtCreator/Makefile
 Project/QtCreator/moc
