@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>670</width>
-    <height>300</height>
+    <width>672</width>
+    <height>356</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>320</x>
-     <y>240</y>
+     <y>310</y>
      <width>341</width>
      <height>32</height>
     </rect>
@@ -35,7 +35,7 @@
      <x>0</x>
      <y>0</y>
      <width>671</width>
-     <height>241</height>
+     <height>311</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -51,7 +51,7 @@
        <x>9</x>
        <y>9</y>
        <width>651</width>
-       <height>201</height>
+       <height>261</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -64,9 +64,9 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>10</y>
+           <y>20</y>
            <width>631</width>
-           <height>80</height>
+           <height>82</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -88,6 +88,13 @@
            <widget class="QCheckBox" name="Filters_Video_Psnr">
             <property name="text">
              <string>PSNR (video field comparisons)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="Filters_Video_Ssim">
+            <property name="text">
+             <string>SSIM (video field comparisons)</string>
             </property>
            </widget>
           </item>
@@ -117,7 +124,7 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>10</y>
+           <y>20</y>
            <width>631</width>
            <height>80</height>
           </rect>

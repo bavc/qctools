@@ -156,6 +156,15 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "may be caused by a head clog or playback error.",
         ActiveFilter_Video_Psnr,
     },
+    //SSIMf
+    {
+        Item_SSIM_Y,    4,    0,    0,  4,  "SSIMf", false,
+        "Plots an assessment of visual difference of field 1 versus field 2 via\n"
+        "SSIM (Structural SImilarity Metric) for each plane (Y, U, and V). Lower values may\n"
+        "be indicative of differences between the images of field 1 and field 2 as\n"
+        "may be caused by a head clog or playback error.",
+        ActiveFilter_Video_Ssim,
+    },
 };
 
 const struct per_item VideoPerItem [Item_VideoMax]=
@@ -210,4 +219,9 @@ const struct per_item VideoPerItem [Item_VideoMax]=
     { Group_PSNR,    Group_VideoMax,       "PSNRf V",       "lavfi.psnr.psnr.v",         2,  true,   DBL_MAX, DBL_MAX },
     { Group_PSNR,    Group_VideoMax,       "PSNRf U",       "lavfi.psnr.psnr.u",         2,  false,  DBL_MAX, DBL_MAX },
     { Group_PSNR,    Group_VideoMax,       "PSNRf Y",       "lavfi.psnr.psnr.y",         2,  false,  DBL_MAX, DBL_MAX },
+    //SSIMf
+    { Group_SSIM,    Group_VideoMax,       "SSIMf All",     "lavfi.ssim.All",            2,  true,   DBL_MAX, DBL_MAX },
+    { Group_SSIM,    Group_VideoMax,       "SSIMf V",       "lavfi.ssim.V",              2,  false,  DBL_MAX, DBL_MAX },
+    { Group_SSIM,    Group_VideoMax,       "SSIMf U",       "lavfi.ssim.U",              2,  false,  DBL_MAX, DBL_MAX },
+    { Group_SSIM,    Group_VideoMax,       "SSIMf Y",       "lavfi.ssim.Y",              2,  false,  DBL_MAX, DBL_MAX },
 };
