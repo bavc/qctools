@@ -405,6 +405,17 @@ QColor Plot::curveColor( int index ) const
             }
             break;
         }
+        case 4 :
+        {
+            switch ( index )
+            {
+                case 0: c = Qt::darkRed; break;
+                case 1: c = Qt::darkBlue; break;
+                case 2: c = Qt::darkGreen; break;
+                default: c = Qt::black;
+            }
+            break;
+        }
         case 5 :
         {
             switch ( index )

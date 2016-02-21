@@ -46,6 +46,9 @@
                 <a href="#PSNRf">Peak Signal to Noise Ratio (PSNRf)</a>
             </li>
             <li>
+                <a href="#SSIMf">Structural SImilarity Metric (SSIMf)</a>
+            </li>
+            <li>
                 <a href="#MSEf">Mean Square Error (MSEf)</a>
             </li>
         </ol>
@@ -528,7 +531,13 @@
             <img src="NGA000006_msef.jpg" alt="MSEf" />
         </p>
         <h2 style="color:blue">
-            <a id="R128" name="R128">12. R.128</a>
+            <a id="SSIMf" name="SSIMf">12. Structural SImilarity Metric (SSIMf)</a>
+        </h2>
+        <p>
+            This filter plots the Structural SImilarity Metric between the video in field 1 (odd lines) versus the video in field 2 (even lines). Lower values indicate that field 1 and field 2 are becoming more different as would happen during a playback error such as a head clog. See <a href="http://ffmpeg.org/ffmpeg-filters.html#psnr">http://ffmpeg.org/ffmpeg-filters.html#ssim</a> for more information.
+        </p>
+        <h2 style="color:blue">
+            <a id="R128" name="R128">13. R.128</a>
         </h2>
         <p>
             R 128 refers to a European Broadcasting Union (EBU) <a href="https://tech.ebu.ch/docs/r/r128.pdf">specification document</a> governing several loudness parameters, including momentary, integrated, and short-term loudness. QCTools specifically examines momentary loudness, or sudden changes in volume over brief intervals of time (up to 400ms). This can be helpful in identifying areas where volume may exceed upper loudness tolerance levels as perceived by an audience.
