@@ -52,7 +52,7 @@ public:
     virtual void                TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos) = 0;
     virtual void                StatsFinish();
     virtual string              StatsToCSV() {return string();};
-    virtual string              StatsToXML(int Width, int Height) {return string();};
+    virtual string              StatsToXML(int, int) {return string();};
 
 protected:
     // Status
