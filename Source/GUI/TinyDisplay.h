@@ -4,12 +4,9 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
-//---------------------------------------------------------------------------
 #ifndef GUI_TinyDisplay_H
 #define GUI_TinyDisplay_H
-//---------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------
 #include <QWidget>
 
 class FileInformation;
@@ -18,11 +15,6 @@ class BigDisplay;
 
 class QLabel;
 class QToolButton;
-//---------------------------------------------------------------------------
-
-//***************************************************************************
-// Class
-//***************************************************************************
 
 class TinyDisplay : public QWidget
 {
@@ -33,29 +25,31 @@ public:
     ~TinyDisplay();
 
     // To update
-    Control*                    ControlArea;
-    BigDisplay*                 BigDisplayArea;
+    Control                    *ControlArea;
+    BigDisplay                 *BigDisplayArea;
 
     // Commands
-    void                        Update                      ();
-    void                        Filters_Show                (); //Quick hack for showing filters
+    void                        Update();
+    void                        Filters_Show(); //Quick hack for showing filters
 
-    // Info
-    bool                        ShouldUpate;
+private:
+    static const int            TOTAL_THUMBS = 9;
+    static const int            MID_THUMB_INDEX = 4;
+
+    QPixmap                     emptyPixmap;
 
 protected:
     // File information
     FileInformation*            FileInfoData;
-    int                         Frames_Pos;
-    int                         Labels_MustUpdateFrom;
-    int                         Labels_MustUpdateTo;
+
+    bool                        needsUpdate;
+    unsigned long               lastFramePos;
 
     // Widgets
-    QToolButton*                Labels[9];
-    QPixmap                     Labels_Temp[9];
+    QToolButton                *thumbnails[TOTAL_THUMBS];
 
 private Q_SLOTS:
-    void on_Labels_Middle_clicked(bool checked);
+    void                        on_thumbnails_clicked(bool checked);
 };
 
-#endif // GUI_TinyDisplay_H
+#endif
