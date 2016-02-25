@@ -1131,6 +1131,7 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     QDialog(parent),
     FileInfoData(FileInformationData_)
 {
+    setlocale(LC_NUMERIC, "C");
     setWindowTitle("QCTools - "+FileInfoData->FileName);
     setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
     setWindowFlags(windowFlags() &(0xFFFFFFFF-Qt::WindowContextHelpButtonHint));
