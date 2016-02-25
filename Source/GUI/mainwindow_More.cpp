@@ -34,11 +34,6 @@
 //---------------------------------------------------------------------------
 void MainWindow::openFile()
 {
-    clearFiles();
-    addFile("");
-    addFile_finish();
-    return;
-    
     QStringList List=QFileDialog::getOpenFileNames(this, "Open file", "", "Video files (*.avi *.mkv *.mov *.mxf *.mp4);;Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
     if (List.empty())
         return;
