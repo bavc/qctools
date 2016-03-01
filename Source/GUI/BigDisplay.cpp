@@ -1626,10 +1626,14 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
 
                                     break;
             case Args_Type_Slider:
-                                    Modified=true;
-                                    WithSliders[OptionPos]=Options[Pos].Sliders_SpinBox[OptionPos]->value();
-                                    PreviousValues[Pos][Picture_Current].Values[OptionPos]=Options[Pos].Sliders_SpinBox[OptionPos]->value();
-                                    break;
+                {
+                    Modified = true;
+                    double value = Options[Pos].Sliders_SpinBox[OptionPos]->value();
+                    double divisor = Filters[Picture_Current].Args[OptionPos].Divisor;
+                    WithSliders[OptionPos] = value;
+                    PreviousValues[Pos][Picture_Current].Values[OptionPos] = value * divisor;
+                }
+                break;
             case Args_Type_Win_Func:
             case Args_Type_Wave_Mode:
                 Modified=true;
