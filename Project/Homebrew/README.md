@@ -1,5 +1,6 @@
 Building
 --------
+Xcode needs to be installed before proceeding with your build. https://developer.apple.com/xcode/download/
 
 Install ffmpeg, freetype2, qt5
 
