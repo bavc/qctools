@@ -43,6 +43,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     m_fileInfoData( fileInformation ),
     m_dataTypeIndex( Plots::AxisSeconds )
 {
+    setlocale(LC_NUMERIC, "C");
     QGridLayout* layout = new QGridLayout( this );
     layout->setSpacing( 1 );
     layout->setContentsMargins( 0, 0, 0, 0 );

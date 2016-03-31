@@ -130,7 +130,11 @@ void TinyDisplay::Update()
         }
 
         lastFramePos = framePos;
-        needsUpdate = false;
+
+        // This assures that if the thumbs are not yet available due to pre-processing,
+        // we update thumbs again (till all thumbs for current frames are available)
+        if (framePos - center + TOTAL_THUMBS < current)
+            needsUpdate = false;
 
         if (BigDisplayArea) {
             BigDisplayArea->ShowPicture();

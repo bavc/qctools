@@ -17,6 +17,12 @@ installation
 =======
 Go to http://bavc.org/qctools or [Releases](https://github.com/bavc/qctools/releases) and download QCTools for your operating system. Initiate the install by double-clicking the icon, and follow the steps. New releases of QCTools will be periodically available at the QCTools Project website.
 
+Of if you have homebrew, get the latest by running:
+```
+brew install --HEAD amiaopensource/amiaos/qctools
+brew linkapps qctools
+```
+
 getting started
 =======
 Currently QCTools accepts a variety of video formats, including *.avi, *.mkv, *.mov, and *.mp4, as well as a diverse selection of codecs. By relying upon ffmpeg's libavcodec and libformat libraries, QCTools can support a wide variety of digital audiovisual formats.
