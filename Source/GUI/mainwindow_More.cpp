@@ -34,7 +34,7 @@
 //---------------------------------------------------------------------------
 void MainWindow::openFile()
 {
-    QFileDialog::Option options;
+    QFileDialog::Option options = QFileDialog::Option(0);
 
 #ifdef _WIN32
     // for Windows use the Qt builtin dialog which displays files,
