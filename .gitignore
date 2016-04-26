@@ -16,3 +16,6 @@ Source/Makefile
 Source/Source.pro
 Source/build
 *.o
+
+Docs/qctools.html
+Docs/qctools.pdf
