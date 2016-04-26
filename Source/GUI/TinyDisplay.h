@@ -9,6 +9,7 @@
 
 #include <QWidget>
 #include <QVector>
+#include <QResizeEvent>
 
 class FileInformation;
 class Control;
@@ -42,23 +43,25 @@ private:
     QPixmap                     emptyPixmap;
     QPixmap                     scaledLogo;
 
-    void                        updateThumbnails();
-
     int                         lastWidth;
 
     QHBoxLayout*                Layout;
 
 protected:
-    // File information
     FileInformation*            FileInfoData;
 
     bool                        needsUpdate;
     unsigned long               lastFramePos;
 
-    // Widgets
     QVector<QToolButton*>       thumbnails;
 
+    virtual void                resizeEvent(QResizeEvent *);
+
+Q_SIGNALS:
+    void                        resized();
+
 private Q_SLOTS:
+    void                        thumbsLayoutResized();
     void                        on_thumbnails_clicked(bool checked);
 };
 

@@ -18,7 +18,6 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QVector>
-#include <QDebug>
 
 TinyDisplay::TinyDisplay(QWidget *parent, FileInformation* FileInformationData_)
     : QWidget(parent),
@@ -45,7 +44,7 @@ TinyDisplay::TinyDisplay(QWidget *parent, FileInformation* FileInformationData_)
 
     setLayout(Layout);
 
-    updateThumbnails();
+    connect(this, SIGNAL(resized()), this, SLOT(thumbsLayoutResized()));
 }
 
 TinyDisplay::~TinyDisplay()
@@ -58,21 +57,20 @@ TinyDisplay::~TinyDisplay()
     delete Layout;
 }
 
-//TODO: need to overload resizeEvent in Layout
-void TinyDisplay::updateThumbnails()
+void TinyDisplay::resizeEvent(QResizeEvent *e)
+{
+    QWidget::resizeEvent(e);
+    Q_EMIT resized();
+}
+
+void TinyDisplay::thumbsLayoutResized()
 {
     const int width = QWidget::width();
-    const int THUMB_WANTED_WIDTH = 100;
+    const int THUMB_WANTED_WIDTH = 120;
 
     if (lastWidth != width) {
-        qDebug() << "-----------------------";
-        qDebug() << "New width:" << width;
-
         int total_thumbs = width / THUMB_WANTED_WIDTH;
         if (total_thumbs % 2 == 0) total_thumbs--;
-
-        qDebug() << "Current total thumbs:" << thumbnails.size();
-        qDebug() << "New total thumbs:" << total_thumbs;
 
         if (total_thumbs > thumbnails.size()) {
             int diff = total_thumbs - thumbnails.size();
@@ -116,6 +114,8 @@ void TinyDisplay::updateThumbnails()
                 if (!FileInfoData->PlayBackFilters_Available())
                     thumbnails[i]->setEnabled(false);
             }
+
+            Update();
         }
 
         lastWidth = width;
@@ -134,8 +134,6 @@ void TinyDisplay::Update()
     // current frame positions in the movie
     unsigned long current = FileInfoData->ReferenceStat()->x_Current;
     unsigned long current_max = FileInfoData->ReferenceStat()->x_Current_Max;
-
-    updateThumbnails();
 
     // do we need to update thumbnails?
     if (needsUpdate || lastFramePos != currentFrame) {
