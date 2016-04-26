@@ -17,6 +17,7 @@
 #include <qwt_plot_layout.h>
 #include <qwt_plot_canvas.h>
 #include <cmath>
+#include <clocale>
 
 //---------------------------------------------------------------------------
 
