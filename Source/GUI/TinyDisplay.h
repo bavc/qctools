@@ -8,6 +8,8 @@
 #define GUI_TinyDisplay_H
 
 #include <QWidget>
+#include <QVector>
+#include <QResizeEvent>
 
 class FileInformation;
 class Control;
@@ -15,6 +17,7 @@ class BigDisplay;
 
 class QLabel;
 class QToolButton;
+class QHBoxLayout;
 
 class TinyDisplay : public QWidget
 {
@@ -34,21 +37,31 @@ public:
 
 private:
     static const int            TOTAL_THUMBS = 9;
-    static const int            MID_THUMB_INDEX = 4;
+    static const int            THUMB_WIDTH = 84;
+    static const int            THUMB_HEIGHT = 84;
 
     QPixmap                     emptyPixmap;
+    QPixmap                     scaledLogo;
+
+    int                         lastWidth;
+
+    QHBoxLayout*                Layout;
 
 protected:
-    // File information
     FileInformation*            FileInfoData;
 
     bool                        needsUpdate;
     unsigned long               lastFramePos;
 
-    // Widgets
-    QToolButton                *thumbnails[TOTAL_THUMBS];
+    QVector<QToolButton*>       thumbnails;
+
+    virtual void                resizeEvent(QResizeEvent *);
+
+Q_SIGNALS:
+    void                        resized();
 
 private Q_SLOTS:
+    void                        thumbsLayoutResized();
     void                        on_thumbnails_clicked(bool checked);
 };
 
