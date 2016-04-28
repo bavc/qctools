@@ -310,6 +310,23 @@ const filter Filters[]=
         },
     },
     {
+        "CIE Scope",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Slider,   1,   0,   8,   1, "System"},
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Slider,   7,   0,  10,  10, "Contrast" },
+            { Args_Type_Slider,   1,   0, 100, 100, "Intensity" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "ciescope=system=${2}:contrast=${4}:intensity=${5}",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]ciescope=system=${2}:contrast=${4}:intensity=${5}[a2];[b1]ciescope=system=${2}:contrast=${4}:intensity=${5}[b2];[a2][b2]hstack",
+        },
+    },
+    {
         "Datascope",
         0,
         {
@@ -913,7 +930,7 @@ void ImageLabel::Remove ()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Others_, int Min_, int Max_, int Divisor_, int Current, const char* Name, BigDisplay* Display_, size_t Pos_, bool IsBitSlice_, bool IsFilter_, bool IsPeak_, bool IsMode_, bool IsScale_, bool IsColorspace_, bool IsDmode_, QWidget *parent) :
+DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Others_, int Min_, int Max_, int Divisor_, int Current, const char* Name, BigDisplay* Display_, size_t Pos_, bool IsBitSlice_, bool IsFilter_, bool IsPeak_, bool IsMode_, bool IsScale_, bool IsColorspace_, bool IsDmode_, bool IsSystem_, QWidget *parent) :
     Others(Others_),
     Divisor(Divisor_),
     Min(Min_),
@@ -927,6 +944,7 @@ DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Other
     IsScale(IsScale_),
     IsColorspace(IsColorspace_),
     IsDmode(IsDmode_),
+    IsSystem(IsSystem_),
     QDoubleSpinBox(parent)
 {
     Popup=NULL;
@@ -1149,6 +1167,24 @@ QString DoubleSpinBoxWithSlider::textFromValue (double value) const
         return "color";
     else if (IsDmode && value==2)
         return "color2";
+    else if (IsSystem && value==0)
+        return "NTSC 1953 Y'I'O' (ITU-R BT.470 System M)";
+    else if (IsSystem && value==1)
+        return "EBU Y'U'V' (PAL/SECAM) (ITU-R BT.470 System B, G)";
+    else if (IsSystem && value==2)
+        return "SMPTE-C RGB";
+    else if (IsSystem && value==3)
+        return "SMPTE-240M Y'PbPr";
+    else if (IsSystem && value==4)
+        return "Apple RGB";
+    else if (IsSystem && value==5)
+        return "Adobe Wide Gamut RGB";
+    else if (IsSystem && value==6)
+        return "CIE 1931 RGB";
+    else if (IsSystem && value==7)
+        return "ITU.BT-709 Y'CbCr";
+    else if (IsSystem && value==8)
+        return "ITU-R.BT-2020";
     else
         return QDoubleSpinBox::textFromValue(value);
 }
@@ -1377,7 +1413,7 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                         Max=Filters[FilterPos].Args[OptionPos].Max;
 
                                     Options[Pos].Sliders_Label[OptionPos]=new QLabel(Filters[FilterPos].Args[OptionPos].Name+QString(": "));
-                                    Options[Pos].Sliders_SpinBox[OptionPos]=new DoubleSpinBoxWithSlider(Options[Pos].Sliders_SpinBox, Filters[FilterPos].Args[OptionPos].Min, Max, Filters[FilterPos].Args[OptionPos].Divisor, PreviousValues[Pos][FilterPos].Values[OptionPos], Filters[FilterPos].Args[OptionPos].Name, this, Pos, QString(Filters[FilterPos].Args[OptionPos].Name).contains(" bit position"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Filter"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Peak"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Mode"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Scale"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Colorspace"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("DataMode"), this);
+                                    Options[Pos].Sliders_SpinBox[OptionPos]=new DoubleSpinBoxWithSlider(Options[Pos].Sliders_SpinBox, Filters[FilterPos].Args[OptionPos].Min, Max, Filters[FilterPos].Args[OptionPos].Divisor, PreviousValues[Pos][FilterPos].Values[OptionPos], Filters[FilterPos].Args[OptionPos].Name, this, Pos, QString(Filters[FilterPos].Args[OptionPos].Name).contains(" bit position"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Filter"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Peak"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Mode"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Scale"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Colorspace"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("DataMode"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("System"), this);
                                     connect(Options[Pos].Sliders_SpinBox[OptionPos], SIGNAL(valueChanged(double)), this, Pos==0?(SLOT(on_FiltersSpinBox1_click())):SLOT(on_FiltersSpinBox2_click()));
                                     Options[Pos].Sliders_Label[OptionPos]->setFont(Font);
                                     if (Options[Pos].Sliders_SpinBox[OptionPos])

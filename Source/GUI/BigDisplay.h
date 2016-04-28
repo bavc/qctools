@@ -65,7 +65,7 @@ class DoubleSpinBoxWithSlider : public QDoubleSpinBox
     Q_OBJECT
 
 public:
-    explicit DoubleSpinBoxWithSlider (DoubleSpinBoxWithSlider** Others, int Min, int Max, int Divisor, int Current, const char* Name, BigDisplay* Display, size_t Pos, bool IsBitSlice, bool IsFilter, bool IsPeak, bool IsMode, bool IsScale, bool IsColorspace, bool IsDmode, QWidget *parent=NULL);
+    explicit DoubleSpinBoxWithSlider (DoubleSpinBoxWithSlider** Others, int Min, int Max, int Divisor, int Current, const char* Name, BigDisplay* Display, size_t Pos, bool IsBitSlice, bool IsFilter, bool IsPeak, bool IsMode, bool IsScale, bool IsColorspace, bool IsDmode, bool IsSystem, QWidget *parent=NULL);
     ~DoubleSpinBoxWithSlider();
 
     bool IsBitSlice;
@@ -75,6 +75,7 @@ public:
     bool IsScale;
     bool IsColorspace;
     bool IsDmode;
+    bool IsSystem;
     void ChangeMax(int Max);
 
 protected:
