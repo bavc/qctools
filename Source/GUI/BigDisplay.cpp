@@ -260,15 +260,15 @@ const filter Filters[]=
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
-            { Args_Type_Slider,   3,   0,   4,   1, "Mode" },
+            { Args_Type_Slider,   3,   0,   5,   1, "Mode" },
             { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Slider,   1,   0,   2,   1, "Colorspace" },
+            { Args_Type_Slider,   0,   0,  10,  10, "Low Threshold" },
+            { Args_Type_Slider,  10,   0,  10,  10, "High Threshold" },
         },
         {
-            "vectorscope=i=${2}:mode=${3}:envelope=${4},vflip,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
-            "format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]vectorscope=i=${2}:mode=${3}:envelope=${4},vflip,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8[a2];[b1]vectorscope=i=${2}:mode=${3}:envelope=${4},vflip,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8[b2];[a2][b2]vstack,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            "vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:lthreshold=${6}:hthreshold=${7},pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            "format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:lthreshold=${6}:hthreshold=${7}[a2];[b1]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:lthreshold=${6}:hthreshold=${7}[b2];[a2][b2]vstack,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
         },
     },
     {
@@ -894,7 +894,7 @@ void ImageLabel::Remove ()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Others_, int Min_, int Max_, int Divisor_, int Current, const char* Name, BigDisplay* Display_, size_t Pos_, bool IsBitSlice_, bool IsFilter_, bool IsPeak_, bool IsMode_, bool IsScale_, QWidget *parent) :
+DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Others_, int Min_, int Max_, int Divisor_, int Current, const char* Name, BigDisplay* Display_, size_t Pos_, bool IsBitSlice_, bool IsFilter_, bool IsPeak_, bool IsMode_, bool IsScale_, bool IsColorspace_, QWidget *parent) :
     Others(Others_),
     Divisor(Divisor_),
     Min(Min_),
@@ -906,6 +906,7 @@ DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Other
     IsPeak(IsPeak_),
     IsMode(IsMode_),
     IsScale(IsScale_),
+    IsColorspace(IsColorspace_),
     QDoubleSpinBox(parent)
 {
     Popup=NULL;
@@ -1108,12 +1109,20 @@ QString DoubleSpinBoxWithSlider::textFromValue (double value) const
         return "color3";
     else if (IsMode && value==4)
         return "color4";
+    else if (IsMode && value==5)
+        return "color5";
     else if (IsScale && value==0)
         return "digital";
     else if (IsScale && value==1)
         return "ire";
     else if (IsScale && value==2)
         return "millivolts";
+    else if (IsColorspace && value==0)
+        return "auto";
+    else if (IsColorspace && value==1)
+        return "601";
+    else if (IsColorspace && value==2)
+        return "709";
     else
         return QDoubleSpinBox::textFromValue(value);
 }
@@ -1342,7 +1351,7 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                         Max=Filters[FilterPos].Args[OptionPos].Max;
 
                                     Options[Pos].Sliders_Label[OptionPos]=new QLabel(Filters[FilterPos].Args[OptionPos].Name+QString(": "));
-                                    Options[Pos].Sliders_SpinBox[OptionPos]=new DoubleSpinBoxWithSlider(Options[Pos].Sliders_SpinBox, Filters[FilterPos].Args[OptionPos].Min, Max, Filters[FilterPos].Args[OptionPos].Divisor, PreviousValues[Pos][FilterPos].Values[OptionPos], Filters[FilterPos].Args[OptionPos].Name, this, Pos, QString(Filters[FilterPos].Args[OptionPos].Name).contains(" bit position"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Filter"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Peak"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Mode"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Scale"), this);
+                                    Options[Pos].Sliders_SpinBox[OptionPos]=new DoubleSpinBoxWithSlider(Options[Pos].Sliders_SpinBox, Filters[FilterPos].Args[OptionPos].Min, Max, Filters[FilterPos].Args[OptionPos].Divisor, PreviousValues[Pos][FilterPos].Values[OptionPos], Filters[FilterPos].Args[OptionPos].Name, this, Pos, QString(Filters[FilterPos].Args[OptionPos].Name).contains(" bit position"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Filter"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Peak"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Mode"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Scale"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Colorspace"), this);
                                     connect(Options[Pos].Sliders_SpinBox[OptionPos], SIGNAL(valueChanged(double)), this, Pos==0?(SLOT(on_FiltersSpinBox1_click())):SLOT(on_FiltersSpinBox2_click()));
                                     Options[Pos].Sliders_Label[OptionPos]->setFont(Font);
                                     if (Options[Pos].Sliders_SpinBox[OptionPos])
