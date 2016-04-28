@@ -191,26 +191,26 @@ const filter Filters[]=
             { Args_Type_YuvA,     0,   0,   0,   0, "Plane" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Vertical" },
             { Args_Type_Slider,   0,   0,   5,   1, "Filter" },
-            { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
+            { Args_Type_Slider,   0,   0,   2,   1, "Scale" },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
             // field N, all planes N, vertical N
-            "waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:e=${6},drawbox=y=(ih-(16*(ih/256))):w=iw:h=16*(ih/256):color=aqua@0.3:t=16*(ih/256),drawbox=w=iw:h=ih-(235*(ih/256)):color=crimson@0.3:t=16*(ih/256)",
+            "waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}",
             // field N, all planes N, vertical Y
-            "waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:e=${6},drawbox=x=(iw-(16*(iw/256))):h=ih:w=16*(iw/256):color=aqua@0.3:t=16*(iw/256),drawbox=h=ih:w=iw-(235*(iw/256)):color=crimson@0.3:t=16*(iw/256)",
+            "waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}",
             // field N, all planes Y, vertical N
-            "waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:e=${6}",
+            "waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay",
             // field N, all planes Y, vertical Y
-            "waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:e=${6}",
+            "waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay",
             // field Y, all planes N, vertical N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:e=${6},drawbox=y=(ih-(16*(ih/256))):w=iw:h=16*(ih/256):color=aqua@0.3:t=16*(ih/256),drawbox=w=iw:h=ih-(235*(ih/256)):color=crimson@0.3:t=16*(ih/256)[a2];[b1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:e=${6},drawbox=y=(ih-(16*(ih/256))):w=iw:h=16*(ih/256):color=aqua@0.3:t=16*(ih/256),drawbox=w=iw:h=ih-(235*(ih/256)):color=crimson@0.3:t=16*(ih/256)[b2];[a2][b2]vstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[a2];[b1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b2];[a2][b2]vstack",
             // field Y, all planes N, vertical Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:e=${6},drawbox=x=(iw-(16*(iw/256))):h=ih:w=16*(iw/256):color=aqua@0.3:t=16*(iw/256),drawbox=h=ih:w=iw-(235*(iw/256)):color=crimson@0.3:t=16*(iw/256)[a2];[b1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:e=${6},drawbox=x=(iw-(16*(iw/256))):h=ih:w=16*(iw/256):color=aqua@0.3:t=16*(iw/256),drawbox=h=ih:w=iw-(235*(iw/256)):color=crimson@0.3:t=16*(iw/256)[b2];[a2][b2]hstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[a2];[b1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b2];[a2][b2]hstack",
             // field Y, all planes Y, vertical N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:e=${6}[a2];[b1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:e=${6}[b2];[a2][b2]hstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[a2];[b1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[b2];[a2][b2]vstack",
             // field Y, all planes Y, vertical Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:e=${6}[a2];[b1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:e=${6}[b2];[b2][a2]hstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[a2];[b1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[b2];[b2][a2]hstack",
         },
     },
     {
@@ -894,7 +894,7 @@ void ImageLabel::Remove ()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Others_, int Min_, int Max_, int Divisor_, int Current, const char* Name, BigDisplay* Display_, size_t Pos_, bool IsBitSlice_, bool IsFilter_, bool IsPeak_, bool IsMode_, QWidget *parent) :
+DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Others_, int Min_, int Max_, int Divisor_, int Current, const char* Name, BigDisplay* Display_, size_t Pos_, bool IsBitSlice_, bool IsFilter_, bool IsPeak_, bool IsMode_, bool IsScale_, QWidget *parent) :
     Others(Others_),
     Divisor(Divisor_),
     Min(Min_),
@@ -905,6 +905,7 @@ DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Other
     IsFilter(IsFilter_),
     IsPeak(IsPeak_),
     IsMode(IsMode_),
+    IsScale(IsScale_),
     QDoubleSpinBox(parent)
 {
     Popup=NULL;
@@ -1086,9 +1087,9 @@ QString DoubleSpinBoxWithSlider::textFromValue (double value) const
     else if (IsFilter && value==3)
         return "chroma";
     else if (IsFilter && value==4)
-        return "achroma";
-    else if (IsFilter && value==5)
         return "color";
+    else if (IsFilter && value==5)
+        return "acolor";
     else if (IsPeak && value==0)
         return "none";
     else if (IsPeak && value==1)
@@ -1107,6 +1108,12 @@ QString DoubleSpinBoxWithSlider::textFromValue (double value) const
         return "color3";
     else if (IsMode && value==4)
         return "color4";
+    else if (IsScale && value==0)
+        return "digital";
+    else if (IsScale && value==1)
+        return "ire";
+    else if (IsScale && value==2)
+        return "millivolts";
     else
         return QDoubleSpinBox::textFromValue(value);
 }
@@ -1335,7 +1342,7 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                         Max=Filters[FilterPos].Args[OptionPos].Max;
 
                                     Options[Pos].Sliders_Label[OptionPos]=new QLabel(Filters[FilterPos].Args[OptionPos].Name+QString(": "));
-                                    Options[Pos].Sliders_SpinBox[OptionPos]=new DoubleSpinBoxWithSlider(Options[Pos].Sliders_SpinBox, Filters[FilterPos].Args[OptionPos].Min, Max, Filters[FilterPos].Args[OptionPos].Divisor, PreviousValues[Pos][FilterPos].Values[OptionPos], Filters[FilterPos].Args[OptionPos].Name, this, Pos, QString(Filters[FilterPos].Args[OptionPos].Name).contains(" bit position"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Filter"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Peak"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Mode"), this);
+                                    Options[Pos].Sliders_SpinBox[OptionPos]=new DoubleSpinBoxWithSlider(Options[Pos].Sliders_SpinBox, Filters[FilterPos].Args[OptionPos].Min, Max, Filters[FilterPos].Args[OptionPos].Divisor, PreviousValues[Pos][FilterPos].Values[OptionPos], Filters[FilterPos].Args[OptionPos].Name, this, Pos, QString(Filters[FilterPos].Args[OptionPos].Name).contains(" bit position"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Filter"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Peak"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Mode"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Scale"), this);
                                     connect(Options[Pos].Sliders_SpinBox[OptionPos], SIGNAL(valueChanged(double)), this, Pos==0?(SLOT(on_FiltersSpinBox1_click())):SLOT(on_FiltersSpinBox2_click()));
                                     Options[Pos].Sliders_Label[OptionPos]->setFont(Font);
                                     if (Options[Pos].Sliders_SpinBox[OptionPos])
