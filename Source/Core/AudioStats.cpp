@@ -334,9 +334,12 @@ string AudioStats::StatsToXML (int Width, int Height)
         stringstream pkt_pts_time; pkt_pts_time<<fixed<<setprecision(7)<<(x[1][x_Pos]+FirstTimeStamp);
         stringstream pkt_duration_time; pkt_duration_time<<fixed<<setprecision(7)<<durations[x_Pos];
         stringstream key_frame; key_frame<<key_frames[x_Pos]?'1':'0';
-        Data<<"        <frame media_type=\"audio\" key_frame=\"" << key_frame.str() << "\" pkt_pts_time=\"" << pkt_pts_time.str() << "\"";
+        Data<<"        <frame media_type=\"audio\"";
+        Data<<" key_frame=\"" << key_frame.str() << "\"";
+        Data<<" pkt_pts_time=\"" << pkt_pts_time.str() << "\"";
         if (pkt_duration_time)
-            Data<<" pkt_duration_time=\"" << pkt_duration_time.str() << "\">\n";
+            Data<<" pkt_duration_time=\"" << pkt_duration_time.str() << "\"";
+        Data<<">\n";
 
         for (size_t Plot_Pos=0; Plot_Pos<Item_AudioMax; Plot_Pos++)
         {
