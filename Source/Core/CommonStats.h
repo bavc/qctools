@@ -45,7 +45,7 @@ public:
     string                      Count_Get(size_t Pos);
     string                      Count2_Get(size_t Pos);
     string                      Percent_Get(size_t Pos);
-    
+
     // External data
     virtual void                StatsFromExternalData(const string &Data) = 0;
     virtual void                StatsFromFrame(struct AVFrame* Frame, int Width, int Height) = 0;
