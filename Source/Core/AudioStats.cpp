@@ -71,7 +71,7 @@ void AudioStats::StatsFromExternalData (const string &Data)
                     const char* media_type=Frame->Attribute("media_type");
                     if (media_type && !strcmp(media_type, "audio"))
                     {
-                        if (x_Current>=Data_Reserved)
+                        if (x_Current >= Data_Reserved)
                             Data_Reserve(x_Current);
 
                         const char* Attribute;
@@ -251,12 +251,8 @@ void AudioStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
     if (Frequency==0)
         return; // Not supported
 
-    if (FramePos>=x_Current_Max)
-    {
-        x_Current_Max=FramePos+1;
-        if (x_Current_Max>Data_Reserved)
-            Data_Reserve(x_Current_Max);
-    }
+    if (FramePos >= Data_Reserved)
+        Data_Reserve(FramePos + 1);
 
     x[0][FramePos]=FramePos;
 
@@ -282,8 +278,8 @@ void AudioStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
         x[2][FramePos]=x[1][FramePos]/60;
         x[3][FramePos]=x[2][FramePos]/60;
     }
-    if (Frame->pkt_duration!=AV_NOPTS_VALUE)
-        durations[FramePos]=((double)Frame->pkt_duration)/Frequency;
+    if (Frame->pkt_duration != AV_NOPTS_VALUE)
+        durations[FramePos] = (double) Frame->pkt_duration / Frequency;
 }
 
 //---------------------------------------------------------------------------
