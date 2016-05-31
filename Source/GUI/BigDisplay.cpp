@@ -964,7 +964,10 @@ void DoubleSpinBoxWithSlider::enterEvent (QEvent* event)
         Slider->setMinimum(Min);
         Slider->setMaximum(Max);
         Slider->setToolTip(toolTip());
-        Slider->setGeometry(x()+width()-(255+30), y()+height(), 255+30, height());
+        int slider_width = 255 + 30;
+        // Assure that the initial position is always inside the window
+        int initial_x = max(x() + width() - slider_width, 5);
+        Slider->setGeometry(initial_x, y() + height(), slider_width, height());
         connect(Slider, SIGNAL(valueChanged(int)), this, SLOT(on_sliderMoved(int)));
         connect(Slider, SIGNAL(sliderMoved(int)), this, SLOT(on_sliderMoved(int)));
         Slider->setFocusPolicy(Qt::NoFocus);
