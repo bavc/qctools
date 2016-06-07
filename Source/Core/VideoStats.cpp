@@ -156,6 +156,8 @@ void VideoStats::StatsFromExternalData (const string &Data)
                                         y[j][x_Current]=Width-value;
                                     else if (Height && !strcmp(key, "lavfi.cropdetect.h"))
                                         y[j][x_Current]=Height-value;
+                                    else if (!strcmp(key, "lavfi.idet.multiple.current_frame"))
+                                        y[j][x_Current]=Height-value;
                                     else
                                         y[j][x_Current]=value;
 
@@ -397,6 +399,9 @@ string VideoStats::StatsToXML (int Width, int Height)
                                         // Special case, values are from height
                                         value<<Height-y[Plot_Pos][x_Pos];
                                         break;
+                case Item_IDET_R :
+                                        // Special case, values are strings
+                                        
                 default:
                                         value<<y[Plot_Pos][x_Pos];
             }

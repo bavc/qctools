@@ -73,6 +73,8 @@ enum VideoItem
     Item_SSIM_U,
     Item_SSIM_V,
     Item_SSIM_All,
+    //idet
+    Item_IDET_R,
     //Internal
     Item_VideoMax
 };
@@ -99,6 +101,7 @@ enum VideoGroup
     Group_MSE,
     Group_PSNR,
     Group_SSIM,
+    Group_IDET,
     Group_VideoMax
 };
 
