@@ -165,6 +165,12 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "may be caused by a head clog or playback error.",
         ActiveFilter_Video_Ssim,
     },
+    //idet
+    {
+        Item_IDET_R,    1,    0,    0,  4,  "IDET", false,
+        "Plots an interpretation of the interlacement pattern of the visual image.",
+        ActiveFilter_Video_Idet,
+    },
 };
 
 const struct per_item VideoPerItem [Item_VideoMax]=
@@ -224,4 +230,6 @@ const struct per_item VideoPerItem [Item_VideoMax]=
     { Group_SSIM,    Group_VideoMax,       "SSIMf V",       "lavfi.ssim.V",              2,  false,  DBL_MAX, DBL_MAX },
     { Group_SSIM,    Group_VideoMax,       "SSIMf U",       "lavfi.ssim.U",              2,  false,  DBL_MAX, DBL_MAX },
     { Group_SSIM,    Group_VideoMax,       "SSIMf Y",       "lavfi.ssim.Y",              2,  false,  DBL_MAX, DBL_MAX },
+    //IDET
+    { Group_IDET,    Group_VideoMax,       "idet",          "lavfi.idet.single.bff",     2,  true,   DBL_MAX, DBL_MAX },
 };
