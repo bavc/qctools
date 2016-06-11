@@ -231,16 +231,16 @@ const filter Filters[]=
             { Args_Type_Slider,  60,  16,   0,   1, "s" },
             { Args_Type_Slider,   8,   0,  10,  10, "Intensity" },
             { Args_Type_Slider,   0,   0,   5,   1, "Filter" },
-            { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
+            { Args_Type_Slider,   0,   0,   2,   1, "Scale" },
             { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
         },
         {
             "crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,\
-            waveform=intensity=${4}:mode=column:mirror=1:c=1:f=${5}:e=${6},drawbox=y=(ih-(16*(ih/256))):w=iw:h=16*(ih/256):color=aqua@0.3:t=16*(ih/256),drawbox=w=iw:h=ih-(235*(ih/256)):color=crimson@0.3:t=16*(ih/256),scale=720:512,setsar=1/1",
+            waveform=intensity=${4}:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=720:512,setsar=1/1",
             "split[a][b];\
             [a]lutyuv=y=val/4,drawbox=w=${3}:h=${3}/dar:x=${1}-${3}/2:y=${2}-${3}/dar/2:t=1:c=yellow,scale=720:512,setsar=1/1[a1];\
             [b]crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,\
-            waveform=intensity=${4}:mode=column:mirror=1:c=1:f=${5}:e=${6},drawbox=y=(ih-(16*(ih/256))):w=iw:h=16*(ih/256):color=aqua@0.3:t=16*(ih/256),drawbox=w=iw:h=ih-(235*(ih/256)):color=crimson@0.3:t=16*(ih/256),scale=720:512,setsar=1/1[b1];\
+            waveform=intensity=${4}:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=720:512,setsar=1/1[b1];\
             [a1][b1]blend=addition",
         },
     },
