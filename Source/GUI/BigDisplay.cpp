@@ -334,17 +334,15 @@ const filter Filters[]=
         "CIE Scope",
         0,
         {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_Slider,   1,   0,   8,   1, "System"},
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Slider,   1,   0,   8,   1, "Gamut"},
             { Args_Type_Slider,   7,   0,  10,  10, "Contrast" },
             { Args_Type_Slider,   1,   0, 100, 100, "Intensity" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "ciescope=system=${2}:contrast=${4}:intensity=${5}",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]ciescope=system=${2}:contrast=${4}:intensity=${5}[a2];[b1]ciescope=system=${2}:contrast=${4}:intensity=${5}[b2];[a2][b2]hstack",
+            "ciescope=system=${1}:gamuts=pow(2\\,${2}):contrast=${3}:intensity=${4}",
         },
     },
     {
@@ -1437,7 +1435,7 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                         Max=Filters[FilterPos].Args[OptionPos].Max;
 
                                     Options[Pos].Sliders_Label[OptionPos]=new QLabel(Filters[FilterPos].Args[OptionPos].Name+QString(": "));
-                                    Options[Pos].Sliders_SpinBox[OptionPos]=new DoubleSpinBoxWithSlider(Options[Pos].Sliders_SpinBox, Filters[FilterPos].Args[OptionPos].Min, Max, Filters[FilterPos].Args[OptionPos].Divisor, PreviousValues[Pos][FilterPos].Values[OptionPos], Filters[FilterPos].Args[OptionPos].Name, this, Pos, QString(Filters[FilterPos].Args[OptionPos].Name).contains(" bit position"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Filter"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Peak"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Mode"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Scale"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Colorspace"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("DataMode"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("System"), this);
+                                    Options[Pos].Sliders_SpinBox[OptionPos]=new DoubleSpinBoxWithSlider(Options[Pos].Sliders_SpinBox, Filters[FilterPos].Args[OptionPos].Min, Max, Filters[FilterPos].Args[OptionPos].Divisor, PreviousValues[Pos][FilterPos].Values[OptionPos], Filters[FilterPos].Args[OptionPos].Name, this, Pos, QString(Filters[FilterPos].Args[OptionPos].Name).contains(" bit position"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Filter"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Peak"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Mode"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Scale"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Colorspace"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("DataMode"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("System") || QString(Filters[FilterPos].Args[OptionPos].Name).contains("Gamut"), this);
                                     connect(Options[Pos].Sliders_SpinBox[OptionPos], SIGNAL(valueChanged(double)), this, Pos==0?(SLOT(on_FiltersSpinBox1_click())):SLOT(on_FiltersSpinBox2_click()));
                                     Options[Pos].Sliders_Label[OptionPos]->setFont(Font);
                                     if (Options[Pos].Sliders_SpinBox[OptionPos])
