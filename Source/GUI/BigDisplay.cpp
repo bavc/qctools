@@ -71,6 +71,7 @@ enum args_type
     Args_Type_ColorMatrix, // bt601, bt709, smpte240m, fcc
     Args_Type_SampleRange, // broadcast, full, auto
     Args_Type_ClrPck, // Color picker
+    Args_Type_LogLin,  // Logarithmic and linear
 };
 
 struct args
@@ -166,20 +167,28 @@ const filter Filters[]=
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_Toggle,   0,   0,   0,   0, "RGB" },
             { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_LogLin,   0,   0,   0,   0, "Levels" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "extractplanes=${3},histogram",
-            "histogram",
-            "format=rgb48,extractplanes=${3},histogram",
-            "format=rgb48,histogram",
-            "extractplanes=${3},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack",
-            "format=rgb48,extractplanes=${3},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack",
-            "format=rgb48,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack",
+            // field N, rgb, N, all planes N
+            "histogram=level_height=${height}-12:components=${3}:levels_mode=${4}",
+            // field N, rgb, N, all planes Y
+            "histogram=level_height=${height}:levels_mode=${4}",
+            // field N, rgb, Y, all planes N
+            "format=rgb24,histogram=level_height=${height}:components=${3}:levels_mode=${4}",
+            // field N, rgb, Y, all planes Y
+            "format=rgb24,histogram=level_height=${height}:levels_mode=${4}",
+            // field Y, rgb, N, all planes N
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram=components=${3}:levels_mode=${4}[a2];[b1]histogram=components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
+            // field Y, rgb, N, all planes Y
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram=levels_mode=${4}[a2];[b1]histogram=levels_mode=${4}[b2];[a2][b2]hstack",
+            // field Y, rgb, Y, all planes N
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=rgb24,histogram=components=${3}:levels_mode=${4}[a2];[b1]format=rgb24,histogram=components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
+            // field Y, rgb, Y, all planes Y
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=rgb24,histogram=levels_mode=${4}[a2];[b1]format=rgb24,histogram=levels_mode=${4}[b2];[a2][b2]hstack",
         },
     },
     {
@@ -1571,6 +1580,28 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                     Widget_XPox++;
                                     }
                                     break;
+            case Args_Type_LogLin:
+                                    //Options[Pos].Sliders_Label[OptionPos]=new QLabel(Filters[FilterPos].Args[OptionPos].Name+QString(": "));
+                                    Layout0->addWidget(Options[Pos].Sliders_Label[OptionPos], 0, Widget_XPox);
+                                    Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
+                                    for (size_t OptionPos2=0; OptionPos2<2; OptionPos2++)
+                                    {
+                                        Options[Pos].Radios[OptionPos][OptionPos2]=new QRadioButton();
+                                        Options[Pos].Radios[OptionPos][OptionPos2]->setFont(Font);
+                                        switch (OptionPos2)
+                                        {
+                                            case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("linear"); break;
+                                            case 1: Options[Pos].Radios[OptionPos][OptionPos2]->setText("log"); break;
+                                            default:;
+                                        }
+                                        if (OptionPos2==PreviousValues[Pos][FilterPos].Values[OptionPos])
+                                            Options[Pos].Radios[OptionPos][OptionPos2]->setChecked(true);
+                                        connect(Options[Pos].Radios[OptionPos][OptionPos2], SIGNAL(toggled(bool)), this, Pos==0?(SLOT(on_FiltersOptions1_toggle(bool))):SLOT(on_FiltersOptions2_toggle(bool)));
+                                        Layout0->addWidget(Options[Pos].Radios[OptionPos][OptionPos2], 0, Widget_XPox+1+OptionPos2);
+                                        Options[Pos].Radios_Group[OptionPos]->addButton(Options[Pos].Radios[OptionPos][OptionPos2]);
+                                    }
+                                    Widget_XPox++;
+                                    break;
             default:                ;
         }
     }
@@ -1738,33 +1769,14 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                     {
                                         if (Options[Pos].Radios[OptionPos][OptionPos2] && Options[Pos].Radios[OptionPos][OptionPos2]->isChecked())
                                         {
-                                            if (string(Filters[Picture_Current].Name)=="Waveform" || string(Filters[Picture_Current].Name)=="Waveform 2.8")
-                                                switch (OptionPos2)
-                                                {
-                                                    case 0: WithRadios[OptionPos]="1"; break;
-                                                    case 1: WithRadios[OptionPos]="2"; break;
-                                                    case 2: WithRadios[OptionPos]="4"; break;
-                                                    case 3: WithRadios[OptionPos]="7"; break; //Special case: remove plane
-                                                    default:;
-                                                }
-                                            else if (string(Filters[Picture_Current].Name)=="Histogram" && Options[Pos].Checks[1] && Options[Pos].Checks[1]->isChecked()) //RGB
-                                                switch (OptionPos2)
-                                                {
-                                                    case 0: WithRadios[OptionPos]="r"; break;
-                                                    case 1: WithRadios[OptionPos]="g"; break;
-                                                    case 2: WithRadios[OptionPos]="b"; break;
-                                                    case 3: WithRadios[OptionPos]="all"; break; //Special case: remove plane
-                                                    default:;
-                                                }
-                                            else
-                                                switch (OptionPos2)
-                                                {
-                                                    case 0: WithRadios[OptionPos]="y"; break;
-                                                    case 1: WithRadios[OptionPos]="u"; break;
-                                                    case 2: WithRadios[OptionPos]="v"; break;
-                                                    case 3: WithRadios[OptionPos]="all"; break; //Special case: remove plane
-                                                    default:;
-                                                }
+                                            switch (OptionPos2)
+                                            {
+                                                case 0: WithRadios[OptionPos]="1"; break;
+                                                case 1: WithRadios[OptionPos]="2"; break;
+                                                case 2: WithRadios[OptionPos]="4"; break;
+                                                case 3: WithRadios[OptionPos]="7"; break; //Special case: remove plane
+                                                default:;
+                                            }
                                             PreviousValues[Pos][Picture_Current].Values[OptionPos]=OptionPos2;
                                             break;
                                         }
@@ -1809,6 +1821,23 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                                 case 0: WithRadios[OptionPos]="auto"; break;
                                                 case 1: WithRadios[OptionPos]="full"; break;
                                                 case 2: WithRadios[OptionPos]="tv"; break;
+                                                default:;
+                                            }
+                                            PreviousValues[Pos][Picture_Current].Values[OptionPos]=OptionPos2;
+                                            break;
+                                        }
+                                    }
+                                    break;
+            case Args_Type_LogLin:
+                                    Modified=true;
+                                    for (size_t OptionPos2=0; OptionPos2<(Filters[Picture_Current].Args[OptionPos].Type?4:3); OptionPos2++)
+                                    {
+                                        if (Options[Pos].Radios[OptionPos][OptionPos2] && Options[Pos].Radios[OptionPos][OptionPos2]->isChecked())
+                                        {
+                                            switch (OptionPos2)
+                                            {
+                                                case 0: WithRadios[OptionPos]="linear"; break;
+                                                case 1: WithRadios[OptionPos]="logarithmic"; break;
                                                 default:;
                                             }
                                             PreviousValues[Pos][Picture_Current].Values[OptionPos]=OptionPos2;
@@ -1862,6 +1891,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                 case Args_Type_ClrPck:
                 case Args_Type_ColorMatrix:
                 case Args_Type_SampleRange:
+                case Args_Type_LogLin:
                                         {
                                         char ToFind1[3];
                                         ToFind1[0]='$';
