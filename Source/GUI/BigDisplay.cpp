@@ -1795,7 +1795,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                     {
                                         if (Options[Pos].Radios[OptionPos][OptionPos2] && Options[Pos].Radios[OptionPos][OptionPos2]->isChecked())
                                         {
-                                            if (string(Filters[Picture_Current].Name)=="Extract Planes Equalized" || string(Filters[Picture_Current].Name)=="Bit Plane Noise")
+                                            if (string(Filters[Picture_Current].Name)=="Extract Planes Equalized" || string(Filters[Picture_Current].Name)=="Bit Plane Noise" || string(Filters[Picture_Current].Name)=="Value Highlight" || string(Filters[Picture_Current].Name)=="Field Difference" || string(Filters[Picture_Current].Name)=="Temporal Difference")
                                             {
                                                 switch (OptionPos2)
                                                 {
