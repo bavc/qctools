@@ -394,8 +394,8 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:intensity=${3}",
-            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:strength=${3}",
+            "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,hstack,histeq=strength=${2}:intensity=${3}",
+            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,hstack,histeq=strength=${2}:strength=${3}",
         },
     },
     {
@@ -1782,13 +1782,26 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                     {
                                         if (Options[Pos].Radios[OptionPos][OptionPos2] && Options[Pos].Radios[OptionPos][OptionPos2]->isChecked())
                                         {
-                                            switch (OptionPos2)
+                                            if (string(Filters[Picture_Current].Name)=="Extract Planes Equalized")
                                             {
-                                                case 0: WithRadios[OptionPos]="1"; break;
-                                                case 1: WithRadios[OptionPos]="2"; break;
-                                                case 2: WithRadios[OptionPos]="4"; break;
-                                                case 3: WithRadios[OptionPos]="7"; break; //Special case: remove plane
-                                                default:;
+                                                switch (OptionPos2)
+                                                {
+                                                    case 0: WithRadios[OptionPos]="y"; break;
+                                                    case 1: WithRadios[OptionPos]="u"; break;
+                                                    case 2: WithRadios[OptionPos]="v"; break;
+                                                    default:;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                switch (OptionPos2)
+                                                {
+                                                    case 0: WithRadios[OptionPos]="1"; break;
+                                                    case 1: WithRadios[OptionPos]="2"; break;
+                                                    case 2: WithRadios[OptionPos]="4"; break;
+                                                    case 3: WithRadios[OptionPos]="7"; break; //Special case: remove plane
+                                                    default:;
+                                                }
                                             }
                                             PreviousValues[Pos][Picture_Current].Values[OptionPos]=OptionPos2;
                                             break;
