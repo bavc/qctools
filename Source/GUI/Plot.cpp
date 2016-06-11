@@ -273,8 +273,16 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, QWidget *parent ) :
     for( unsigned j = 0; j < PerStreamType[m_type].PerGroup[m_group].Count; ++j )
     {
         QwtPlotCurve* curve = new QwtPlotCurve( PerStreamType[m_type].PerItem[PerStreamType[m_type].PerGroup[m_group].Start + j].Name );
-
-        curve->setPen( curveColor( j ) );
+        switch (m_group)
+        {
+            case Group_IDET_S :
+            case Group_IDET_M :
+            case Group_IDET_R :
+                curve->setPen( curveColor( j ), 2 );
+                break;
+            default :
+                curve->setPen( curveColor( j ) );
+        }
         curve->setRenderHint( QwtPlotItem::RenderAntialiased );
         curve->setZ( curve->z() - j ); //Invert data order (e.g. MAX before MIN)
         curve->attach( this );
@@ -396,23 +404,62 @@ QColor Plot::curveColor( int index ) const
         }
         case 3 :
         {
-            switch ( index )
+            switch ( m_group )
             {
-                case 0: c = Qt::darkRed; break;
-                case 1: c = Qt::darkBlue; break;
-                case 2: c = Qt::darkGreen; break;
-                default: c = Qt::black;
+                case Group_IDET_R:
+                {
+                    switch ( index )
+                    {
+                        case 0: c = Qt::red; break;
+                        case 1: c = Qt::blue; break;
+                        case 2: c = Qt::magenta; break;
+                        default: c = Qt::black;
+                    }
+                    break;
+                }
+                default:
+                {
+                    switch ( index )
+                    {
+                        case 0: c = Qt::darkRed; break;
+                        case 1: c = Qt::darkBlue; break;
+                        case 2: c = Qt::darkGreen; break;
+                        default: c = Qt::black;
+                    }
+                    break;
+                }
             }
             break;
         }
         case 4 :
         {
-            switch ( index )
+            switch ( m_group )
             {
-                case 0: c = Qt::darkRed; break;
-                case 1: c = Qt::darkBlue; break;
-                case 2: c = Qt::darkGreen; break;
-                default: c = Qt::black;
+                case Group_IDET_S:
+                case Group_IDET_M:
+                {
+                    switch ( index )
+                    {
+                        case 0: c = Qt::red; break;
+                        case 1: c = Qt::blue; break;
+                        case 2: c = Qt::darkGreen; break;
+                        case 3: c = Qt::magenta; break;
+                        default: c = Qt::black;
+                    }
+                    break;
+                }
+                default:
+                {
+                    switch ( index )
+                    {
+                        case 0: c = Qt::darkRed; break;
+                        case 1: c = Qt::darkBlue; break;
+                        case 2: c = Qt::darkGreen; break;
+                        case 3: c = Qt::black; break;
+                        default: c = Qt::black;
+                    }
+                    break;
+                }
             }
             break;
         }

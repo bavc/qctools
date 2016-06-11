@@ -55,6 +55,7 @@ void Preferences::Load()
     ui->Filters_Video_cropdetect->setChecked(ActiveFilters[ActiveFilter_Video_cropdetect]);
     ui->Filters_Video_Psnr->setChecked(ActiveFilters[ActiveFilter_Video_Psnr]);
     ui->Filters_Video_Ssim->setChecked(ActiveFilters[ActiveFilter_Video_Ssim]);
+    ui->Filters_Video_Idet->setChecked(ActiveFilters[ActiveFilter_Video_Idet]);
     ui->Filters_Audio_EbuR128->setChecked(ActiveFilters[ActiveFilter_Audio_EbuR128]);
     ui->Filters_Audio_astats->setChecked(ActiveFilters[ActiveFilter_Audio_astats]);
 
@@ -89,6 +90,8 @@ void Preferences::OnAccepted()
         ActiveFilters.set(ActiveFilter_Video_Psnr);
     if (ui->Filters_Video_Ssim->isChecked())
         ActiveFilters.set(ActiveFilter_Video_Ssim);
+    if (ui->Filters_Video_Idet->isChecked())
+        ActiveFilters.set(ActiveFilter_Video_Idet);
     if (ui->Filters_Audio_EbuR128->isChecked())
         ActiveFilters.set(ActiveFilter_Audio_EbuR128);
     if (ui->Filters_Audio_astats->isChecked())
