@@ -358,9 +358,9 @@ const filter Filters[]=
         },
         {
             "datascope=x=${2}:y=${3}:mode=${5}:axis=${4}",
-            "drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=62:height=18",
+            "drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=32:height=4,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=4:height=32",
             "il=l=d:c=d,datascope=x=${2}:y=${3}:mode=${5}:axis=${4}",
-            "il=l=d:c=d,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=62:height=18",
+            "il=l=d:c=d,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=32:height=4,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=4:height=32",
             
         },
     },
