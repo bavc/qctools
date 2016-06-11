@@ -165,10 +165,30 @@ const struct per_group VideoPerGroup [Group_VideoMax]=
         "may be caused by a head clog or playback error.",
         ActiveFilter_Video_Ssim,
     },
-    //idet
+    //idet.single
     {
-        Item_IDET_R,    1,    0,    0,  4,  "IDET", false,
-        "Plots an interpretation of the interlacement pattern of the visual image.",
+        Item_IDET_S_BFF,    4,    0,    2,  4,  "idet S", false,
+        "Plots an interpretation of the interlacement pattern of the visual image.\n"
+        "This version uses single frame detection which considers only immediately\n"
+        "adjacent frames when classifying each frame. Each frame's classification is\n"
+        "plotted with a half-life of 1.",
+        ActiveFilter_Video_Idet,
+    },
+    //idet.multiple
+    {
+        Item_IDET_M_BFF,    4,    0,    2,  4,  "idet M", false,
+        "Plots an interpretation of the interlacement pattern of the visual image.\n"
+        "This version uses multiple frame detection which incorporates the classification\n"
+        "history of previous frames. Each frame's classification is plotted with a\n"
+        "half-life of 1.",
+        ActiveFilter_Video_Idet,
+    },
+    //idet.repeat
+    {
+        Item_IDET_R_B,     3,    0,    2,  4,  "idet R", false,
+        "Plots an interpretation of the interlacement pattern of the visual image.\n"
+        "This plot shows fields that are repeated between adjacent frames (a sign\n"
+        "of telecine). Each frame's classification is plotted with a half-life of 1.",
         ActiveFilter_Video_Idet,
     },
 };
@@ -230,6 +250,18 @@ const struct per_item VideoPerItem [Item_VideoMax]=
     { Group_SSIM,    Group_VideoMax,       "SSIMf V",       "lavfi.ssim.V",              2,  false,  DBL_MAX, DBL_MAX },
     { Group_SSIM,    Group_VideoMax,       "SSIMf U",       "lavfi.ssim.U",              2,  false,  DBL_MAX, DBL_MAX },
     { Group_SSIM,    Group_VideoMax,       "SSIMf Y",       "lavfi.ssim.Y",              2,  false,  DBL_MAX, DBL_MAX },
-    //IDET
-    { Group_IDET,    Group_VideoMax,       "idet",          "lavfi.idet.single.bff",     2,  true,   DBL_MAX, DBL_MAX },
+    //IDET.single
+    { Group_IDET_S,    Group_VideoMax,     "s.bff",         "lavfi.idet.single.bff",     2,  false,   DBL_MAX, DBL_MAX },
+    { Group_IDET_S,    Group_VideoMax,     "s.tff",         "lavfi.idet.single.tff",     2,  false,   DBL_MAX, DBL_MAX },
+    { Group_IDET_S,    Group_VideoMax,     "s.prog",        "lavfi.idet.single.progressive",      2,  false,   DBL_MAX, DBL_MAX },
+    { Group_IDET_S,    Group_VideoMax,     "s.und",         "lavfi.idet.single.undetermined",     2,  false,   DBL_MAX, DBL_MAX },
+    //IDET.multiple
+    { Group_IDET_M,    Group_VideoMax,     "m.bff",         "lavfi.idet.multiple.bff",     2,  false,   DBL_MAX, DBL_MAX },
+    { Group_IDET_M,    Group_VideoMax,     "m.tff",         "lavfi.idet.multiple.tff",     2,  false,   DBL_MAX, DBL_MAX },
+    { Group_IDET_M,    Group_VideoMax,     "m.prog",        "lavfi.idet.multiple.progressive",      2,  false,   DBL_MAX, DBL_MAX },
+    { Group_IDET_M,    Group_VideoMax,     "m.und",         "lavfi.idet.multiple.undetermined",     2,  false,   DBL_MAX, DBL_MAX },
+    //IDET.repeat
+    { Group_IDET_R,    Group_VideoMax,     "bottom",        "lavfi.idet.repeated.bottom", 2,  false,   DBL_MAX, DBL_MAX },
+    { Group_IDET_R,    Group_VideoMax,     "top",           "lavfi.idet.repeated.top",    2,  false,   DBL_MAX, DBL_MAX },
+    { Group_IDET_R,    Group_VideoMax,     "neither",       "lavfi.idet.repeated.neither",     2,  false,   DBL_MAX, DBL_MAX },
 };

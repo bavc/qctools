@@ -73,8 +73,20 @@ enum VideoItem
     Item_SSIM_U,
     Item_SSIM_V,
     Item_SSIM_All,
-    //idet
-    Item_IDET_R,
+    //idet.single
+    Item_IDET_S_BFF,
+    Item_IDET_S_TFF,
+    Item_IDET_S_PROG,
+    Item_IDET_S_UND,
+    //idet.multiple
+    Item_IDET_M_BFF,
+    Item_IDET_M_TFF,
+    Item_IDET_M_PROG,
+    Item_IDET_M_UND,
+    //idet.repeat
+    Item_IDET_R_B,
+    Item_IDET_R_T,
+    Item_IDET_R_N,
     //Internal
     Item_VideoMax
 };
@@ -101,7 +113,9 @@ enum VideoGroup
     Group_MSE,
     Group_PSNR,
     Group_SSIM,
-    Group_IDET,
+    Group_IDET_S,
+    Group_IDET_M,
+    Group_IDET_R,
     Group_VideoMax
 };
 
