@@ -559,8 +559,8 @@ const filter Filters[]=
         0,
         {
             { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
-            { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
-            { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
+            { Args_Type_Slider,   0,   0,  10,  10, "Strength" },
+            { Args_Type_Slider,   0,   0,  10,  10, "Intensity" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Columns" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
