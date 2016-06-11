@@ -272,12 +272,21 @@ const filter Filters[]=
             { Args_Type_Slider,   3,   0,   5,   1, "Mode" },
             { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
             { Args_Type_Slider,   1,   0,   2,   1, "Colorspace" },
-            { Args_Type_Slider,   0,   0,  10,  10, "Low Threshold" },
-            { Args_Type_Slider,  10,   0,  10,  10, "High Threshold" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:lthreshold=${6}:hthreshold=${7},pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
-            "format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:lthreshold=${6}:hthreshold=${7}[a2];[b1]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:lthreshold=${6}:hthreshold=${7}[b2];[a2][b2]vstack,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            "vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            "format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name[a2];[b1]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name[b2];[a2][b2]hstack,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            // draft version with a low, med, high, and full vectorscope
+            //"split=4[v1][v2][v3][v4];\
+            [v1]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=0:h=.33[V1];\
+            [v2]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=.33:h=.66[V2];\
+            [v3]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=.66:h=1[V3];\
+            [v4]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name[V4];\
+            [V1][V2]hstack[W1];\
+            [V3][V4]hstack[W2];\
+            [W1][W2]vstack,scale=ih:ih,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
         },
     },
     {
