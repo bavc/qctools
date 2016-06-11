@@ -62,6 +62,13 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QCheckBox" name="Filters_Video_Idet">
+                <property name="text">
+                 <string>idet (interlacement detection)</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
            </layout>
