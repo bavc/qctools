@@ -23,6 +23,14 @@ brew install --HEAD amiaopensource/amiaos/qctools
 brew linkapps qctools
 ```
 
+Note that occasionally QCTools uses features from git-master of FFmpeg, thus you may need to update FFmpeg to git-master as well to try the newest pre-release QCTools features.
+
+```
+brew reinstall --HEAD ffmpeg
+brew install --HEAD amiaopensource/amiaos/qctools
+brew linkapps qctools
+```
+
 getting started
 =======
 Currently QCTools accepts a variety of video formats, including *.avi, *.mkv, *.mov, and *.mp4, as well as a diverse selection of codecs. By relying upon ffmpeg's libavcodec and libformat libraries, QCTools can support a wide variety of digital audiovisual formats.
