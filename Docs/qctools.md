@@ -35,7 +35,7 @@ Seattle Municipal Archives (SMA)
 
 Carol Shenk
 
- 2015 Seattle Municipal Archives
+() 2015 Seattle Municipal Archives
 
 City Hall, 600 Fourth Avenue • Third Floor
 
@@ -383,9 +383,9 @@ could be an indicator of odd glowing or **noise**.
 
 **Sample of Ideal Range: **
 
-**\Samples which demonstrate U/V Value anomalies: **
+**Samples which demonstrate U/V Value anomalies: **
 
-<span id="Diff" class="anchor"></span>**\3. YUV Values/ Difference **
+<span id="Diff" class="anchor"></span>**3. YUV Values/ Difference **
 
   **Graph Domain **   **Graph Name(s) **
   ------------------- --------------------
@@ -417,8 +417,6 @@ your Chroma and Luma settings.
 
 ![](media/image27.jpeg)
 
-
-**\**
 
 **4. Saturation **
 
@@ -512,7 +510,7 @@ Filter** section and the **Using the TBC with Scope Monitors** in the
 Processing Manual. For more information on the Hue graph measurements,
 look up the **Munsell** **Color** **System**.
 
-**\6. Temporal Outliers (TOUT) **
+**6. Temporal Outliers (TOUT) **
 
   **Graph Domain **   **Graph Name(s) **   **Values **   **Ideal Range**
   ------------------- -------------------- ------------- -----------------
@@ -545,7 +543,7 @@ class="anchor"></span>![](media/image31.jpeg)
 For more information on TOUT graphs and playback filters, consult the
 BAVC blog post **QCSchool: All About TOUT**.
 
-**\**
+****
 
 **7. Vertical Line Repetitions (VREP) **
 
@@ -576,7 +574,7 @@ Cleaning your deck and/or tape may remediate this problem.
 
 <span id="Range"
 class="anchor"></span>![](media/image34.jpeg)
-**\**<span id="PSNRf" class="anchor"></span>**8. Peak Signal to Noise Ratio
+****<span id="PSNRf" class="anchor"></span>**8. Peak Signal to Noise Ratio
 (PSNRf) **
 
   **Graph Domain **            **Graph Name(s) **   **Value**   **Ideal Range**
@@ -627,9 +625,9 @@ supplementary information.
 **Samples which demonstrate Mean Square
 Error anomalies: **
 
-**\**
+****
 
-**\**
+****
 
 ![](media/image37.jpg)
  **Playback Filter Descriptions **
@@ -678,7 +676,7 @@ Fields would react similarly).
 ![](media/image38.jpeg)
 
 
-**\**
+****
 
 ![](media/image39.png)
 **3. Histogram **
@@ -770,7 +768,7 @@ The **Extract Planes UV Equalized** filter is similar to the **Extract
 Planes Equalized** filter but shows the two Chroma planes (U and V) side
 by side.
 
-**\**
+****
 
 **7. Bit Plane **
 
@@ -844,7 +842,7 @@ levels. Select **Field** to see the Fields displayed separately.
 For more information on TOUT graphs and playback filters, consult the
 BAVC blog post **QCSchool: All About TOUT**.
 
-**\**![](media/image48.jpeg)
+****![](media/image48.jpeg)
 **15. Vertical Line Repetitions **
 
 This filter displays repetitive lines of video data. This information is
@@ -1188,7 +1186,7 @@ video level and troubleshoot fixing the image quality:
 -   Make sure all the other levels are still ideal and digitize
     the tape.
 
-**\**
+****
 
 **3. OverSaturation (Chroma Error)**
 
@@ -1266,7 +1264,7 @@ video level and troubleshoot fixing the image quality:
 -   Make sure all the other levels are still ideal and digitize
     the tape.
 
-**\**
+****
 
 ![](media/image58.jpeg)
 **4. Chrominance Noise**
@@ -1326,7 +1324,7 @@ the following steps to reduce the noise:
     try to reach ideal range. Do this as many times as necessary to
     achieve the best image quality possible.
 
-**\**
+****
 
 **5. Luminance Noise **
 
@@ -1384,7 +1382,7 @@ following steps to reduce the noise:
     to reach ideal range. Do this as many times as necessary to achieve
     the best image quality possible.
 
-**\**
+****
 
 **6. Hue**
 
@@ -1433,7 +1431,7 @@ using, do the following:
 -   For more information read the **Vectorscope** section in the **Video
     Processing Manual**.
 
-**\**
+****
 
 **7. Y/C Delay Error**
 
@@ -1620,7 +1618,7 @@ any point the distortion dissipates. If not, this may be a tracking
 error that would require a custom tape path alignment or might imply
 damage to the tape.
 
-**\**
+****
 
 **2. Skew Error**
 
@@ -1658,7 +1656,7 @@ way, but they can be made less noticeable. When bending (or hooking) is
 present, this is also the quickest test. As with tracking, you may not
 be able to completely fix this error.
 
-**\**
+****
 
 **3. Video Head Clog**
 
@@ -1713,7 +1711,7 @@ tape, there was no color data was read for Field 2.
 **How to Fix It -** This error can be fixed by cleaning the video player
 and re-digitizing the content.
 
-**\4. Head Switching Noise**
+**4. Head Switching Noise**
 
 **What Do You See During Playback –** a horizontal line or section along
 the bottom of the frame that is consistently out of alignment from the
@@ -1801,7 +1799,7 @@ its presence.
 > the head switching point but it is impossible to completely eliminate
 > the picture problem.
 
-**\**
+****
 
 **5. timecode Error**
 
@@ -1827,7 +1825,7 @@ show the interference. Furthermore, a tape recorded on a BVU-series
 machine and later copied using a VO-series machine will forever have the
 interference permanently on the copy.
 
-**\**
+****
 
 ![](media/image74.jpeg)
  **Tape Damage**
@@ -1841,7 +1839,7 @@ how to solve it.
 
 2.  **Tape Crease**
 
-**\**
+****
 
 ![](media/image75.jpeg)
 **1. Dropout**
@@ -1890,7 +1888,7 @@ be read entirely by the video head.
 treatable. Standard practices for safe "straightening" of videotape have
 not been developed.
 
-**\\
+**\
 **
 
 ![](media/image80.png)
@@ -2926,7 +2924,7 @@ is assembled from the original production material.
 
 ### **P**
 
-**\Pack slip** A lateral slip of select tape windings causing high or low
+**Pack slip** A lateral slip of select tape windings causing high or low
 spots (when viewed with tape reel lying flat on one side) in an
 otherwise smooth tape pack. Pack slip can cause subsequent [edge
 damage](http://www.bavc.org/preservation/resources/preservation-glossary#edged)
@@ -3383,7 +3381,7 @@ byproduct.
 
 ### **W**
 
-**\Waveform** Oscilloscope that reads luminance and other parts of the
+**Waveform** Oscilloscope that reads luminance and other parts of the
 [composite](http://www.bavc.org/preservation/resources/preservation-glossary#compos)
 [sync](http://www.bavc.org/preservation/resources/preservation-glossary#sync),
 [blanking](http://www.bavc.org/preservation/resources/preservation-glossary#blank),
