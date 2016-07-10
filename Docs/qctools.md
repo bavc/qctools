@@ -1,19 +1,13 @@
-![](media/image1.png){width="1.5930555555555554in"
-height="1.207638888888889in"}
+![](media/image1.png)
 
 Seattle Municipal Archives
 
 Moving Images Manual: QCTools
 
-> QCTool
-
-**\
-**
-
 **Seattle Municipal Archives**
 
-![](media/image2.png){width="1.6881944444444446in"
-height="1.6902777777777778in"}Moving Images Manual: QCTools
+![](media/image2.png)
+Moving Images Manual: QCTools
 
 This manual contains material from the following contributors:
 
@@ -41,7 +35,7 @@ Seattle Municipal Archives (SMA)
 
 Carol Shenk
 
- 2015 Seattle Municipal Archives
+() 2015 Seattle Municipal Archives
 
 City Hall, 600 Fourth Avenue • Third Floor
 
@@ -101,19 +95,15 @@ For more information on graphs and playback filters, consult the BAVC’s
 2015, only two posts exist. As more are posted, I will incorporate them
 into the manual.
 
-**\
-**
 
-**\
-**
+![](media/image3.jpg)
+ **Getting Started**
 
-![](media/image3.jpg){width="0.74334864391951in"
-height="0.5824168853893263in"} **Getting Started**
+![](media/image4.png)
+**Introduction**
 
-![](media/image4.png){width="0.6881944444444444in"
-height="0.5215277777777778in"}**Introduction**
+![](media/image5.png)
 
-![](media/image5.png){width="0.375in" height="0.2972222222222222in"}Open
 QCTools by double clicking the icon on the Dock.
 
 **Add Files:** click the in the upper left hand corner and select the
@@ -128,12 +118,12 @@ these options. If one doesn’t work, try the other.
 
 **Select and Navigate Graphs**
 
-![](media/image6.png){width="7.142857611548556in"
-height="3.802198162729659in"}
+![](media/image6.png)
 
-![](media/image7.png){width="0.32569444444444445in"
-height="0.3173611111111111in"}![](media/image8.png){width="0.29791666666666666in"
-height="0.31875in"}**Views**: QCTools automatically opens in **Graphs
+
+![](media/image7.png)
+![](media/image8.png)
+**Views**: QCTools automatically opens in **Graphs
 Layout**. To view a list of your current video files, click the **View**
 tab on the toolbar and select **File List**. To return and view the
 graphs for the most recently viewed file (not necessarily the most
@@ -145,8 +135,8 @@ different views by clicking on the corresponding icon.
 
 **Table (File View): **
 
-![](media/image9.jpeg){width="7.191666666666666in"
-height="2.595833333333333in"}The Table View enables you to view the
+![](media/image9.jpeg)
+The Table View enables you to view the
 progress of your file download, plus associated metadata:
 
 In addition to technical metadata about the file (duration, frame rate,
@@ -177,8 +167,8 @@ below) are located along the top of the window. Each title is followed
 by a check box. You can select or deselected any one(s) you want by
 checking or unchecking the corresponding box.
 
-![](media/image10.jpeg){width="4.909027777777778in"
-height="2.7847222222222223in"}
+![](media/image10.jpeg)
+
 
 **Video Thumbnails**: these are the squares (thumbnails of each frame)
 scrolling along the bottom of the window. The video thumbnails may be
@@ -190,8 +180,8 @@ the information. You may also double click a specific thumbnail and the
 playback window will appear displaying the image and with a variety of
 analytical playback filters.
 
-![](media/image11.png){width="3.4451388888888888in"
-height="0.5604166666666667in"}**Levels:** Moving your cursor over a
+![](media/image11.png)
+**Levels:** Moving your cursor over a
 particular point on a graph will reveal thesymbol in place of your
 cursor’s usual arrow. This symbol appears very faint and is sometimes
 hard to see; also you might have to try clicking around on the graph for
@@ -228,10 +218,8 @@ the **Video Analysis Window**. In the upper left and right hand corners
 are dropdown menus used to select the **playback filter(s)**
 corresponding to the screen on their respective sides.
 
-![](media/image12.jpeg){width="7.53125in" height="3.9479166666666665in"}
+![](media/image12.jpeg)
 
-***\
-***
 
 **Graph Descriptions **
 
@@ -355,8 +343,6 @@ variation for the majority of the movie.
 
 **Sample of Ideal Range:**
 
-**\
-**
 
 **Exceptions:** Portions of video showing extreme changes in average
 values (and not corresponding to a scene change or otherwise dramatic
@@ -366,8 +352,6 @@ like a camera flash, for example.
 
 **Samples which demonstrate Y Value anomalies: **
 
-**\
-**
 
 **2. U, V Values: U MIN, U AVG, U MAX/ V MIN, V AVG, V MAX **
 
@@ -399,11 +383,9 @@ could be an indicator of odd glowing or **noise**.
 
 **Sample of Ideal Range: **
 
-**\
-Samples which demonstrate U/V Value anomalies: **
+**Samples which demonstrate U/V Value anomalies: **
 
-<span id="Diff" class="anchor"></span>**\
-3. YUV Values/ Difference **
+<span id="Diff" class="anchor"></span>**3. YUV Values/ Difference **
 
   **Graph Domain **   **Graph Name(s) **
   ------------------- --------------------
@@ -411,8 +393,8 @@ Samples which demonstrate U/V Value anomalies: **
   U Channel           U DIF
   V Channel           V DIF
 
-![](media/image23.png){width="4.786111111111111in"
-height="2.4138888888888888in"}
+![](media/image23.png)
+
 
 **Overview:** This QCTools graph selects two successive frames of video
 and subtracts the values of one from the other in order to find the
@@ -433,11 +415,8 @@ your Chroma and Luma settings.
 
 **Samples which demonstrate YUV Difference anomalies: **
 
-![](media/image27.jpeg){width="5.641666666666667in"
-height="2.8694444444444445in"}
+![](media/image27.jpeg)
 
-**\
-**
 
 **4. Saturation **
 
@@ -523,16 +502,15 @@ missing. More information soon.
 
 **Sample of Ideal Range:**
 
-![](media/image30.png){width="6.061111111111111in"
-height="0.9298611111111111in"}
+![](media/image30.png)
+
 
 For more information on Vectorscopes, consult the **Vectorscope Playback
 Filter** section and the **Using the TBC with Scope Monitors** in the
 Processing Manual. For more information on the Hue graph measurements,
 look up the **Munsell** **Color** **System**.
 
-**\
-6. Temporal Outliers (TOUT) **
+**6. Temporal Outliers (TOUT) **
 
   **Graph Domain **   **Graph Name(s) **   **Values **   **Ideal Range**
   ------------------- -------------------- ------------- -----------------
@@ -550,8 +528,8 @@ a quality error.
 **How the Graph Should Look:** The plot should remain relatively flat
 and as close to 0 as possible.
 
-![](media/image30.png){width="7.647916666666666in"
-height="0.7055555555555556in"}**Sample of Ideal Range:**
+![](media/image30.png)
+**Sample of Ideal Range:**
 
 **Samples which demonstrate Temporal Outliers' anomalies: **
 
@@ -559,14 +537,13 @@ You can see several blips in the graph reading, especially around 7.5s,
 15s, and 24s
 
 <span id="VREP"
-class="anchor"></span>![](media/image31.jpeg){width="5.856944444444444in"
-height="2.9791666666666665in"}
+class="anchor"></span>![](media/image31.jpeg)
+
 
 For more information on TOUT graphs and playback filters, consult the
 BAVC blog post **QCSchool: All About TOUT**.
 
-**\
-**
+****
 
 **7. Vertical Line Repetitions (VREP) **
 
@@ -587,18 +564,17 @@ Cleaning your deck and/or tape may remediate this problem.
 
 **Sample of Ideal Range:**
 
-![](media/image32.png){width="7.913194444444445in"
-height="2.702777777777778in"}
+![](media/image32.png)
+
 
 **Samples which demonstrate Vertical Repetition anomalies: **
 
-![](media/image33.jpeg){width="6.038888888888889in"
-height="3.1131944444444444in"}
+![](media/image33.jpeg)
+
 
 <span id="Range"
-class="anchor"></span>![](media/image34.jpeg){width="6.0125in"
-height="3.027083333333333in"}**\
-**<span id="PSNRf" class="anchor"></span>**8. Peak Signal to Noise Ratio
+class="anchor"></span>![](media/image34.jpeg)
+****<span id="PSNRf" class="anchor"></span>**8. Peak Signal to Noise Ratio
 (PSNRf) **
 
   **Graph Domain **            **Graph Name(s) **   **Value**   **Ideal Range**
@@ -627,8 +603,8 @@ different which would happen during a playback error (ex. head clog).
 
 **Samples which demonstrate Peak Signal to Noise Ratio anomalies:**
 <span id="MSEf"
-class="anchor"></span>![](media/image35.jpeg){width="7.195833333333334in"
-height="3.622916666666667in"}
+class="anchor"></span>![](media/image35.jpeg)
+
 
 **9. Mean Square Error (MSEf) **
 
@@ -645,18 +621,16 @@ to 0 as possible with few deviations) and that the PSNR stays between
 30-50 dB. These two graphs are best used alongside others as
 supplementary information.
 
-![](media/image36.jpeg){width="6.447916666666667in"
-height="3.2465277777777777in"}**Samples which demonstrate Mean Square
+![](media/image36.jpeg)
+**Samples which demonstrate Mean Square
 Error anomalies: **
 
-**\
-**
+****
 
-**\
-**
+****
 
-![](media/image37.jpg){width="0.8066819772528434in"
-height="0.8410094050743657in"} **Playback Filter Descriptions **
+![](media/image37.jpg)
+ **Playback Filter Descriptions **
 
 The QCTools preview window is intended as an analytical playback
 environment that allows the user to review video through multiple
@@ -699,14 +673,13 @@ Fields would react similarly).
 
 **What to Look For: **
 
-![](media/image38.jpeg){width="5.752777777777778in"
-height="2.6055555555555556in"}
+![](media/image38.jpeg)
 
-**\
-**
 
-![](media/image39.png){width="5.567361111111111in"
-height="1.8555555555555556in"}**3. Histogram **
+****
+
+![](media/image39.png)
+**3. Histogram **
 
 The histogram charts the exposure and brightness of the video image.
 When you select this filter, check the RGB box. Typically the histogram
@@ -741,8 +714,8 @@ darker objects produce a waveform toward the bottom. For NTSC video in
 the United States, luminance levels should range from 7.5 to 100 IRE
 (sometimes referred to as the legal broadcast limit).
 
-![](media/image40.png){width="5.576388888888889in"
-height="1.9006944444444445in"}
+![](media/image40.png)
+
 
 The waveform monitor is a graphical representation of the image, showing
 Luma values in the same position relative to those within the frame. For
@@ -757,8 +730,8 @@ center of the frame out to the right. The trace should not go above 100
 or below 0. However, sometimes analog video will have a black border
 around the image; it is okay if the border goes below 0%.
 
-![](media/image41.png){width="5.567361111111111in"
-height="1.8416666666666666in"}**5. Vectorscope **
+![](media/image41.png)
+**5. Vectorscope **
 
 The Vectorscope displays a circular chart, similar to a color wheel that
 shows the video’s chrominance information (U and V Channels).
@@ -779,8 +752,8 @@ separately (Field 1 on top, Field 2 on bottom).
 
 **6. Extract Planes Equalized **
 
-![](media/image42.jpeg){width="3.8715277777777777in"
-height="1.4645833333333333in"}**& Extract Planes UV Equalized**
+![](media/image42.jpeg)
+**& Extract Planes UV Equalized**
 
 The **Extract Planes Equalized** filter extracts a specified video plane
 (such as Y, U, or V) which represents the Luma or part of the Chroma
@@ -795,13 +768,12 @@ The **Extract Planes UV Equalized** filter is similar to the **Extract
 Planes Equalized** filter but shows the two Chroma planes (U and V) side
 by side.
 
-**\
-**
+****
 
 **7. Bit Plane **
 
-![](media/image43.jpeg){width="4.946527777777778in"
-height="2.6951388888888888in"}This filter selects the bit position of
+![](media/image43.jpeg)
+This filter selects the bit position of
 each plane for display. Selecting 'None' for a plane will replace all
 values with 0x80 (middle gray for Y and no color for U or V). Selecting
 'All' will send the display plane as is. Selecting 'Bit \[1-8\]' will
@@ -813,8 +785,8 @@ lossy video codecs will show blocky structured patterns at higher
 numbered bit positions. (Video sample and permission to use provided by
 [*seattle.gov*](http://www.seattle.gov))
 
-![](media/image44.jpeg){width="5.789583333333334in"
-height="2.48125in"}**8. Chroma Adjust **
+![](media/image44.jpeg)
+**8. Chroma Adjust **
 
 This filter enables the Hue and Saturation levels to be adjusted. Hue
 adjustments may be expressed in degrees where 0 is no change and 180
@@ -822,15 +794,15 @@ would invert the color. For Saturation a value of 1 leaves the
 Saturation unchanged, 0 removes all color, and the Saturation may be
 increased up to a maximum of 10.
 
-![](media/image45.jpeg){width="3.4034722222222222in"
-height="1.20625in"}**9. Field Difference **
+![](media/image45.jpeg)
+**9. Field Difference **
 
 This presentation visualizes the difference between video Field 1 and
 Field 2. A middle gray image would mean that Field 1 and Field 2 were
 identical, whereas deviation to white or black indicates a difference.
 
-![](media/image46.png){width="4.9875in"
-height="1.7027777777777777in"}**12. Broadcast Range Pixels **
+![](media/image46.png)
+**12. Broadcast Range Pixels **
 
 This is the same presentation as 'Normal' except that pixels that are
 outside of broadcast range are highlighted as white. This can often
@@ -855,8 +827,8 @@ crushed to black or white because they fall outside of broadcast range.
 Note that some videos may intentionally be encoded in 'full range' where
 this filter is less relevant.
 
-![](media/image47.jpeg){width="5.29375in"
-height="2.0284722222222222in"}**14. Temporal Outlier Pixels **
+![](media/image47.jpeg)
+**14. Temporal Outlier Pixels **
 
 This filter was created to detect white speckle noise in analog VHS and
 8mm video. This is the same presentation as 'Normal' except that pixels
@@ -870,9 +842,8 @@ levels. Select **Field** to see the Fields displayed separately.
 For more information on TOUT graphs and playback filters, consult the
 BAVC blog post **QCSchool: All About TOUT**.
 
-**\
-**![](media/image48.jpeg){width="5.1819444444444445in"
-height="2.126388888888889in"}**15. Vertical Line Repetitions **
+****![](media/image48.jpeg)
+**15. Vertical Line Repetitions **
 
 This filter displays repetitive lines of video data. This information is
 useful in analyzing U-Matic tapes and detecting artifacts generated in
@@ -1055,10 +1026,10 @@ range may mean detail in the video image is being lost during
 digitization. Video levels that are too high can also introduce noise
 into the image that is not in the original source.
 
-> ![](media/image49.jpeg){width="2.565538057742782in"
-> height="1.9220778652668415in"}
-> ![](media/image50.jpeg){width="2.5655391513560803in"
-> height="1.9220778652668415in"}
+> ![](media/image49.jpeg)
+}
+> ![](media/image50.jpeg)
+}
 >
 > *Before* *After*
 
@@ -1068,10 +1039,10 @@ display. If the waves are consistently above the **100-110** mark and
 crushed/flat, this could indicate that the video signals are out of
 range.
 
-![](media/image51.jpeg){width="2.884251968503937in"
-height="1.6753248031496062in"}
-![](media/image52.jpeg){width="2.8664916885389324in"
-height="1.6623370516185476in"}
+![](media/image51.jpeg)
+
+![](media/image52.jpeg)
+
 
 *Before* *After*
 
@@ -1131,8 +1102,8 @@ video level and troubleshoot fixing the image quality:
 -   Make sure all the other levels are still ideal and digitize
     the tape.
 
-![](media/image53.png){width="5.298611111111111in"
-height="2.8041666666666667in"}\
+![](media/image53.png)
+\
 **2. UnderSaturation**
 
 **What Do You See During Playback –** The video signal is undersaturated
@@ -1150,10 +1121,10 @@ from the original film may be present. A fading of the cyan and yellow
 dyes resulting in an oversaturation of magenta is the most common
 manifestation of this problem.
 
-![](media/image54.jpeg){width="3.224258530183727in"
-height="2.4155839895013123in"}
-![](media/image55.jpeg){width="3.1895898950131234in"
-height="2.389610673665792in"}
+![](media/image54.jpeg)
+
+![](media/image55.jpeg)
+
 
 *Before* *After*
 
@@ -1215,8 +1186,7 @@ video level and troubleshoot fixing the image quality:
 -   Make sure all the other levels are still ideal and digitize
     the tape.
 
-**\
-**
+****
 
 **3. OverSaturation (Chroma Error)**
 
@@ -1230,10 +1200,10 @@ color bars use 75% Saturation as the maximum value for calibration,
 although there are other patterns used for testing which contain 100%
 Saturation values.
 
-![](media/image56.jpeg){width="3.2069247594050743in"
-height="2.4025973315835523in"}
-![](media/image57.jpeg){width="3.2069247594050743in"
-height="2.4025973315835523in"}
+![](media/image56.jpeg)
+
+![](media/image57.jpeg)
+
 
 *Before* *After*
 
@@ -1294,11 +1264,10 @@ video level and troubleshoot fixing the image quality:
 -   Make sure all the other levels are still ideal and digitize
     the tape.
 
-**\
-**
+****
 
-![](media/image58.jpeg){width="3.20625in"
-height="2.402083333333333in"}**4. Chrominance Noise**
+![](media/image58.jpeg)
+**4. Chrominance Noise**
 
 **What Do You See During Playback – Chrominance noise** can be
 identified as traces and specks of color in an otherwise clear picture.
@@ -1320,8 +1289,8 @@ trace pattern.
 Look for any areas with abrupt spikes or plummets (particularly in the
 MIN and MAX).
 
-![](media/image17.jpeg){width="6.324305555555555in"
-height="3.238888888888889in"}
+![](media/image17.jpeg)
+
 
 **How to Check in QCTools (Filter) –** double-click a frame with Chroma
 noise (corresponding to the same time signature as a spike in the graph)
@@ -1355,13 +1324,12 @@ the following steps to reduce the noise:
     try to reach ideal range. Do this as many times as necessary to
     achieve the best image quality possible.
 
-**\
-**
+****
 
 **5. Luminance Noise **
 
-![](media/image59.jpeg){width="4.673611111111111in"
-height="4.58125in"}**What Do You See During Playback –** Luminance noise
+![](media/image59.jpeg)
+**What Do You See During Playback –** Luminance noise
 is noise where only the brightness of a colored pixels is affected (but
 the color as such is fine). This appears as a bright layer of white
 noise (a translucent layer of snow) over the image.
@@ -1414,8 +1382,7 @@ following steps to reduce the noise:
     to reach ideal range. Do this as many times as necessary to achieve
     the best image quality possible.
 
-**\
-**
+****
 
 **6. Hue**
 
@@ -1464,8 +1431,7 @@ using, do the following:
 -   For more information read the **Vectorscope** section in the **Video
     Processing Manual**.
 
-**\
-**
+****
 
 **7. Y/C Delay Error**
 
@@ -1482,10 +1448,10 @@ lettering on the sign behind them. This is caused by misaligned Y and C
 components in the video signal. The error is corrected in the *After*
 image (image on the right).
 
-![](media/image60.jpeg){width="3.172253937007874in"
-height="2.3766229221347333in"}
-![](media/image61.jpeg){width="3.172253937007874in"
-height="2.3766229221347333in"}
+![](media/image60.jpeg)
+
+![](media/image61.jpeg)
+
 
 *Before* *After*
 
@@ -1546,8 +1512,8 @@ and a line error now appearing along the bottom. During playback, this
 tape showed a vertically shaky display that wasn't occurring before the
 signal was sent through the TBC.
 
-![](media/image62.jpeg){width="6.415277777777778in"
-height="2.428472222222222in"}
+![](media/image62.jpeg)
+
 
 *Correct Incorrect*
 
@@ -1564,8 +1530,8 @@ playback or a different and more effective TBC must be used.
 
 **How to Fix It –**
 
-![](media/image63.jpeg){width="1.2197801837270341in"
-height="0.4593722659667542in"}**Mechanical Problems**
+![](media/image63.jpeg)
+**Mechanical Problems**
 
 The bullet points under each item are formatted to explain how to spot
 this error during play back, how to confirm this using QCTools, know
@@ -1582,8 +1548,8 @@ how to solve it.
 
 5.  **Timecode Error**
 
-![](media/image64.jpeg){width="3.207638888888889in"
-height="2.4027777777777777in"}**1. Tracking Error**
+![](media/image64.jpeg)
+**1. Tracking Error**
 
 **What Do You See During Playback –** Tracking error is visible as a
 distortion produced during playback caused by the inability of video
@@ -1602,9 +1568,9 @@ Outliers (TOUT) graph. Check the boxes to generate graphs for both
 **TOUT** and **VREP**. Examples of TOUT graph and playback images with
 tracking errors below.
 
-![](media/image65.png){width="4.63125in"
-height="2.517361111111111in"}![](media/image66.png){width="4.634027777777778in"
-height="3.089583333333333in"}**How to Check in QCTools (Filter) –**
+![](media/image65.png)
+![](media/image66.png)
+**How to Check in QCTools (Filter) –**
 Double click on the thumbnail (at the bottom of the QCTools window) that
 corresponds to the problematic area. The **Video Analysis Window** will
 pop-up. On the right side, select the **Temporal Outlier Pixels**
@@ -1616,8 +1582,8 @@ certain level of this is so be expected, especially on older tapes, but
 the lines of the **TOUT** graph should remain between 0-0.009 and be
 closer to 0 for the majority of the playback.
 
-![](media/image67.jpeg){width="6.337661854768154in"
-height="2.324675196850394in"}
+![](media/image67.jpeg)
+
 
 The yellow highlighted pixels should also be evenly scattered and not
 too concentrated in one or more spot (see example above). Note any
@@ -1625,8 +1591,8 @@ significant increases in the pixels, corresponding to the distortion on
 the **Normal** playback and spikes in the **TOUT** graph (see image
 below).
 
-![](media/image68.jpeg){width="6.259739720034996in"
-height="2.298701881014873in"}
+![](media/image68.jpeg)
+
 
 In the above image, the pixels are concentrated in places where the
 white or black levels are out of range (overly dark or overly
@@ -1652,13 +1618,12 @@ any point the distortion dissipates. If not, this may be a tracking
 error that would require a custom tape path alignment or might imply
 damage to the tape.
 
-**\
-**
+****
 
 **2. Skew Error**
 
-![](media/image69.jpeg){width="3.189583333333333in"
-height="2.3895833333333334in"}**What Do You See During Playback –** Tape
+![](media/image69.jpeg)
+**What Do You See During Playback –** Tape
 is susceptible to expansion and shrinkage, see Lengthwise Tape Expansion
 or Shrinkage These dimensional changes impact the length and angle of
 the recorded tracks. On playback, the loss of correspondence between the
@@ -1691,13 +1656,12 @@ way, but they can be made less noticeable. When bending (or hooking) is
 present, this is also the quickest test. As with tracking, you may not
 be able to completely fix this error.
 
-**\
-**
+****
 
 **3. Video Head Clog**
 
-![](media/image70.jpeg){width="3.240972222222222in"
-height="2.428472222222222in"}**What Do You See During Playback –** When
+![](media/image70.jpeg)
+**What Do You See During Playback –** When
 loose oxide builds up in the tape path, it can travel with the tape to
 the drum assembly and prevent the video head from making contact with
 the tape. The result is a heavily obscured image or a complete loss of
@@ -1747,8 +1711,7 @@ tape, there was no color data was read for Field 2.
 **How to Fix It -** This error can be fixed by cleaning the video player
 and re-digitizing the content.
 
-**\
-4. Head Switching Noise**
+**4. Head Switching Noise**
 
 **What Do You See During Playback –** a horizontal line or section along
 the bottom of the frame that is consistently out of alignment from the
@@ -1770,10 +1733,10 @@ format records information on tape.
 > effectively masks the lines created during head switching with video
 > black.
 
-![](media/image71.jpeg){width="2.807638888888889in"
-height="1.8694444444444445in"}![](media/image72.jpeg){width="2.8180555555555555in"
-height="1.8763888888888889in"}![](media/image73.jpeg){width="2.7291666666666665in"
-height="1.8180555555555555in"}
+![](media/image71.jpeg)
+![](media/image72.jpeg)
+![](media/image73.jpeg)
+
 
 Playback from a normal VHS VCR into a card that captures from line 23,
 showing normal switching noise.
@@ -1836,8 +1799,7 @@ its presence.
 > the head switching point but it is impossible to completely eliminate
 > the picture problem.
 
-**\
-**
+****
 
 **5. timecode Error**
 
@@ -1863,11 +1825,10 @@ show the interference. Furthermore, a tape recorded on a BVU-series
 machine and later copied using a VO-series machine will forever have the
 interference permanently on the copy.
 
-**\
-**
+****
 
-![](media/image74.jpeg){width="0.8630271216097988in"
-height="0.4486800087489064in"} **Tape Damage**
+![](media/image74.jpeg)
+ **Tape Damage**
 
 The bullet points under each item are formatted to explain how to spot
 this error during play back, how to confirm this using QCTools, know
@@ -1878,14 +1839,13 @@ how to solve it.
 
 2.  **Tape Crease**
 
-**\
-**
+****
 
-![](media/image75.jpeg){width="3.1145833333333335in"
-height="2.3368055555555554in"}**1. Dropout**
+![](media/image75.jpeg)
+**1. Dropout**
 
-![](media/image76.jpeg){width="2.895138888888889in"
-height="2.1708333333333334in"}**What Do You See During Playback –**
+![](media/image76.jpeg)
+**What Do You See During Playback –**
 Brief signal loss caused by a tape head clog, defect in the tape,
 debris, or other feature that causes an increase in the head-to-tape
 spacing. A dropout can also be caused by missing magnetic material. A
@@ -1897,8 +1857,8 @@ that the tape binder is deteriorating.
 
 **How to Check in QCTools (Graph) – VREP and TOUT**
 
-![](media/image77.jpeg){width="7.5in"
-height="3.6534722222222222in"}**How to Check in QCTools (Filter) –
+![](media/image77.jpeg)
+**How to Check in QCTools (Filter) –
 VREP**
 
 **Can You Fix It? –**Maybe. If media is scratched so that oxide is
@@ -1909,13 +1869,13 @@ confirmed by "stepping through" the tape in a slow playback mode.
 **How to Fix It –** Environmental dirt or loose oxide can be removed by
 machine or hand-cleaning. If cleaning, it makes sense to rehouse and/or
 clean the cassette shell at the same
-time.![](media/image78.gif){width="2.973611111111111in"
-height="2.973611111111111in"}
+time.![](media/image78.gif)
+
 
 **2. Tape Crease**
 
-![](media/image79.jpeg){width="3.223611111111111in"
-height="2.415277777777778in"}**What Do You See During Playback –** A
+![](media/image79.jpeg)
+**What Do You See During Playback –** A
 tape crease is a fold or a wrinkle that can be created by a variety of
 circumstances, most of which involve VTR transport problems, damaged or
 misaligned tape guides, capstan/pinch roller malfunction, tape cinching,
@@ -1929,11 +1889,10 @@ treatable. Standard practices for safe "straightening" of videotape have
 not been developed.
 
 **\
-\
 **
 
-![](media/image80.png){width="0.7802198162729659in"
-height="0.7802198162729659in"} **Glossary**
+![](media/image80.png)
+ **Glossary**
 
 ### **This glossary has incorporated the terms used at Seattle Municipal Archives with the *Preservation Glossary* published by Bay Area Video Coalition with contributions from Rebecca Bachman, Pip Laurenson, Heather Weaver, Dr. John Van Bogart, and Snader & Associates Incorporated.**
 
@@ -2310,8 +2269,7 @@ obsolescence of a particular
 The worldwide body for conservation is the International Institute of
 Conservation (IIC) <http://www.iiconservation.org/>
 
-**\
-Conservation report** A detailed description of the work of art or
+**Conservation report** A detailed description of the work of art or
 artifact, its condition, an analysis of the risks to that object and a
 description of how those risks might be mitigated. If treatment is
 proposed the report should document each stage of any action taken, the
@@ -2853,8 +2811,7 @@ and
 
 ### **M**
 
-**\
-Magnetic media** Tape and discs that store information on a magnetized
+**Magnetic media** Tape and discs that store information on a magnetized
 surface such as videotape, audiotape or computer floppy discs. [See
 image.](http://www.bavc.org/preservation/resources/preservation-glossary#layers)
 
@@ -2916,8 +2873,7 @@ frequencies.
 
 ### **N**
 
-**\
-Noise** Any unwanted
+**Noise** Any unwanted
 [signal](http://www.bavc.org/preservation/resources/preservation-glossary#sign)
 present in the total signal.
 
@@ -2954,8 +2910,7 @@ two colors in 1:1 ratio without third color).
 
 ### **O**
 
-**\
-Off-Line Editing** that is done using inexpensive, nonbroadcast quality
+**Off-Line Editing** that is done using inexpensive, nonbroadcast quality
 equipment to produce an edit decision list
 ([EDL](http://www.bavc.org/preservation/resources/preservation-glossary#edl))
 which will be used later for assembling a broadcast quality program
@@ -2969,8 +2924,7 @@ is assembled from the original production material.
 
 ### **P**
 
-**\
-Pack slip** A lateral slip of select tape windings causing high or low
+**Pack slip** A lateral slip of select tape windings causing high or low
 spots (when viewed with tape reel lying flat on one side) in an
 otherwise smooth tape pack. Pack slip can cause subsequent [edge
 damage](http://www.bavc.org/preservation/resources/preservation-glossary#edged)
@@ -3427,8 +3381,7 @@ byproduct.
 
 ### **W**
 
-**\
-Waveform** Oscilloscope that reads luminance and other parts of the
+**Waveform** Oscilloscope that reads luminance and other parts of the
 [composite](http://www.bavc.org/preservation/resources/preservation-glossary#compos)
 [sync](http://www.bavc.org/preservation/resources/preservation-glossary#sync),
 [blanking](http://www.bavc.org/preservation/resources/preservation-glossary#blank),

@@ -10,7 +10,7 @@ qctools.html: qctools.md
 	pandoc -o "$@" "$<"
 
 qctools.pdf:  qctools.md
-	pandoc -o "$@" "$<"
+	pandoc -o "$@" "$<" --latex-engine=xelatex
 
 clean:
 	rm -f qctools.pdf qctools.html
