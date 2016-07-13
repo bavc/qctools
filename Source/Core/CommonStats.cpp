@@ -258,38 +258,47 @@ void CommonStats::Data_Reserve(size_t NewValue)
 {
     // Saving old data
     size_t                      Data_Reserved_Old = Data_Reserved;
-    double**                    x_Old = new double*[4];
-    memcpy (x_Old, x, sizeof(double*)*4);
-    double**                    y_Old = new double*[CountOfItems];
-    memcpy (y_Old, y, sizeof(double*)*CountOfItems);
-    double*                     durations_Old=durations;
-    bool*                       key_frames_Old=key_frames;
+    double**                    x_Old = x;
+    double**                    y_Old = y;
+    double*                     durations_Old = durations;
+    bool*                       key_frames_Old = key_frames;
 
     // Computing new value
-    while (Data_Reserved<NewValue+(1<<18)) //We reserve extra space, minimum 2^18 frames added
-        Data_Reserved<<=1;
+    while (Data_Reserved < NewValue + (1 << 18)) //We reserve extra space, minimum 2^18 frames added
+        Data_Reserved <<= 1;
+
+    size_t diff = Data_Reserved - Data_Reserved_Old;
 
     // Creating new data - x and y
     x = new double*[4];
-    for (size_t j=0; j<4; ++j)
+    for (size_t j = 0; j < 4; ++j)
     {
-        x[j]=new double[Data_Reserved];
-        memset(x[j], 0x00, Data_Reserved*sizeof(double));
-        memcpy(x[j], x_Old[j], Data_Reserved_Old*sizeof(double));
+        x[j] = new double[Data_Reserved];
+        memcpy(x[j], x_Old[j], Data_Reserved_Old * sizeof(double));
+        memset(&x[j][Data_Reserved_Old], 0x00, diff * sizeof(double));
+        delete[] x_Old[j];
     }
+
     y = new double*[CountOfItems];
-    for (size_t j=0; j<CountOfItems; ++j)
+    for (size_t j = 0; j < CountOfItems; ++j)
     {
         y[j] = new double[Data_Reserved];
-        memset(y[j], 0x00, Data_Reserved*sizeof(double));
-        memcpy(y[j], y_Old[j], Data_Reserved_Old*sizeof(double));
+        memcpy(y[j], y_Old[j], Data_Reserved_Old * sizeof(double));
+        memset(&y[j][Data_Reserved_Old], 0x00, diff * sizeof(double));
+        delete[] y_Old[j];
     }
 
     // Creating new data - Extra
     durations = new double[Data_Reserved];
-    memset(durations, 0x00, Data_Reserved*sizeof(double));
-    memcpy(durations, durations_Old, Data_Reserved_Old*sizeof(double));
+    memcpy(durations, durations_Old, Data_Reserved_Old * sizeof(double));
+    memset(&durations[Data_Reserved_Old], 0x00, diff * sizeof(double));
+
     key_frames = new bool[Data_Reserved];
-    memset(key_frames, 0x00, Data_Reserved*sizeof(bool));
-    memcpy(key_frames, key_frames_Old, Data_Reserved_Old*sizeof(bool));
+    memcpy(key_frames, key_frames_Old, Data_Reserved_Old * sizeof(bool));
+    memset(&key_frames[Data_Reserved_Old], 0x00, diff * sizeof(bool));
+
+    delete[] x_Old;
+    delete[] y_Old;
+    delete[] durations_Old;
+    delete[] key_frames_Old;
 }
