@@ -72,6 +72,7 @@
     </property>
     <addaction name="actionFilesList"/>
     <addaction name="actionGraphsLayout"/>
+    <addaction name="separator"/>
     <addaction name="actionFiltersLayout"/>
     <addaction name="separator"/>
     <addaction name="actionWindowOut"/>
@@ -167,10 +168,11 @@
    <addaction name="separator"/>
    <addaction name="actionZoomIn"/>
    <addaction name="actionZoomOut"/>
+   <addaction name="separator"/>
+   <addaction name="actionFiltersLayout"/>
    <addaction name="actionWindowOut"/>
    <addaction name="actionFilesList"/>
    <addaction name="actionGraphsLayout"/>
-   <addaction name="actionFiltersLayout"/>
    <addaction name="separator"/>
    <addaction name="actionGettingStarted"/>
   </widget>
@@ -305,9 +307,6 @@
    </property>
   </action>
   <action name="actionFiltersLayout">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="text">
     <string>Filters layout</string>
    </property>

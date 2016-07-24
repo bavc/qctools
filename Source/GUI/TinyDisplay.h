@@ -34,6 +34,7 @@ public:
     // Commands
     void                        Update();
     void                        Filters_Show(); //Quick hack for showing filters
+    void                        LoadBigDisplay();
 
 private:
     static const int            TOTAL_THUMBS = 9;

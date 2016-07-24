@@ -341,6 +341,8 @@ void MainWindow::on_actionPreferences_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionFiltersLayout_triggered()
 {
+    if (TinyDisplayArea)
+        TinyDisplayArea->LoadBigDisplay();
 }
 
 //---------------------------------------------------------------------------
