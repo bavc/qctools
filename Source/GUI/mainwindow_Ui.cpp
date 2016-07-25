@@ -141,7 +141,6 @@ void MainWindow::Ui_Init()
     Prefs=new Preferences(this);
 
     //Temp
-    ui->actionFiltersLayout->setVisible(false);
     ui->actionWindowOut->setVisible(false);
     ui->actionPrint->setVisible(false);
 

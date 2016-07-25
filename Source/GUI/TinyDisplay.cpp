@@ -216,7 +216,10 @@ void TinyDisplay::on_thumbnails_clicked(bool)
             }
         }
     }
+}
 
+void TinyDisplay::LoadBigDisplay()
+{
     if (BigDisplayArea == NULL) {
         BigDisplayArea = new BigDisplay(this, FileInfoData);
 
