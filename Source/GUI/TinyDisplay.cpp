@@ -216,6 +216,8 @@ void TinyDisplay::on_thumbnails_clicked(bool)
             }
         }
     }
+
+    LoadBigDisplay();
 }
 
 void TinyDisplay::LoadBigDisplay()
