@@ -1191,9 +1191,9 @@ QString DoubleSpinBoxWithSlider::textFromValue (double value) const
     else if (IsScale && value==0)
         return "digital";
     else if (IsScale && value==1)
-        return "ire";
-    else if (IsScale && value==2)
         return "millivolts";
+    else if (IsScale && value==2)
+        return "ire";
     else if (IsColorspace && value==0)
         return "auto";
     else if (IsColorspace && value==1)
