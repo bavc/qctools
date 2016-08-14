@@ -340,6 +340,7 @@ const filter Filters[]=
             { Args_Type_Slider,   1,   0, 100, 100, "Intensity" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
         },
         {
             "ciescope=system=${1}:gamuts=pow(2\\,${2}):contrast=${3}:intensity=${4}",
@@ -355,6 +356,7 @@ const filter Filters[]=
             { Args_Type_Slider,   1,   0,   1,   1, "Axis"},
             { Args_Type_Slider,   1,   0,   2,   1, "DataMode" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Show" },
+            { Args_Type_None,     0,   0,   0,   0, },
         },
         {
             "datascope=x=${2}:y=${3}:mode=${5}:axis=${4}",
