@@ -6,8 +6,9 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 TARGET = QCTools
 TEMPLATE = app
 
-CONFIG += qt release
+CONFIG += qt debug_and_release
 CONFIG += no_keywords
+QMAKE_CXXFLAGS += -DBLACKMAGICDECKLINK_NO -DWITH_SYSTEM_FFMPEG=1
 
 HEADERS = \
     ../../Source/Core/AudioCore.h \
@@ -67,8 +68,12 @@ SOURCES = \
     ../../Source/GUI/TinyDisplay.cpp \
     ../../Source/ThirdParty/tinyxml2/tinyxml2.cpp
 
-!macx:SOURCES += "../../../Blackmagic DeckLink SDK/Linux/include/DeckLinkAPIDispatch.cpp"
-macx:SOURCES += "../../../Blackmagic DeckLink SDK/Mac/include/DeckLinkAPIDispatch.cpp"
+linux:SOURCES += "../../../Blackmagic DeckLink SDK/Linux/include/DeckLinkAPIDispatch.cpp"
+macx:SOURCES += "../../../Blackmagic DeckLink SDK/Mac /include/DeckLinkAPIDispatch.cpp"
+
+win32 {
+    INCLUDEPATH += $$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib
+}
 
 FORMS += \
     ../../Source/GUI/mainwindow.ui \
@@ -79,7 +84,9 @@ RESOURCES += \
     ../../Source/Resource/Resources.qrc
 
 include( $${QWT_ROOT}/qwtconfig.pri )
-include( $${QWT_ROOT}/qwtbuild.pri )
+!win32 {
+    include( $${QWT_ROOT}/qwtbuild.pri )
+}
 include( $${QWT_ROOT}/qwtfunctions.pri )
 
 INCLUDEPATH += $$PWD/../../Source
@@ -88,8 +95,22 @@ INCLUDEPATH += $$QWT_ROOT/src
 INCLUDEPATH += $$PWD/../../../ffmpeg
 INCLUDEPATH += "$$PWD/../../../Blackmagic DeckLink SDK"
 
-LIBS      += -L$${QWT_ROOT}/lib -lqwt
-LIBS      += -lz
+!win32 {
+    LIBS      += -L$${QWT_ROOT}/lib -lqwt
+}
+
+win32 {
+    CONFIG(debug, debug|release) {
+        LIBS += -L$${QWT_ROOT}/lib -lqwtd
+    } else:CONFIG(release, debug|release) {
+        LIBS += -L$${QWT_ROOT}/lib -lqwt
+    }
+}
+
+!win32 {
+    LIBS += -lz
+}
+
 LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
              -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
              -L$${PWD}/../../../ffmpeg/libavfilter -lavfilter \
@@ -99,10 +120,15 @@ LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
              -L$${PWD}/../../../ffmpeg/libswscale -lswscale \
              -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
              -L$${PWD}/../../../ffmpeg/libavutil -lavutil
-LIBS      += -L$${PWD}/../../../freetype/usr/lib -lfreetype
-LIBS      += -lbz2
 
-!macx:LIBS      += -ldl -lrt
+!win32 {
+    LIBS      += -L$${PWD}/../../../freetype/usr/lib -lfreetype
+    LIBS      += -lbz2
+}
+
+unix {
+    LIBS      += -ldl -lrt
+}
 
 macx:ICON = ../../Source/Resource/Logo.icns
 macx:QMAKE_LFLAGS += -framework CoreFoundation -framework CoreVideo -framework VideoDecodeAcceleration
