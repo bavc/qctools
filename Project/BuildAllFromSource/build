@@ -76,6 +76,7 @@ fi
         cd yasm/
         ./configure --prefix=`pwd`/usr
         make
+        make install
         cd "${INSTALL_DIR}/ffmpeg"
         FFMPEG_CONFIGURE_OPTS+=(--yasmexe=../yasm/usr/bin/yasm)
         ./configure "${FFMPEG_CONFIGURE_OPTS[@]}"
