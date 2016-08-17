@@ -122,7 +122,6 @@ LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
              -L$${PWD}/../../../ffmpeg/libavutil -lavutil
 
 !win32 {
-    LIBS      += -L$${PWD}/../../../freetype/usr/lib -lfreetype
     LIBS      += -lbz2
 }
 
