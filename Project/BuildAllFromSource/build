@@ -3,12 +3,10 @@
 # if on Ubuntu start with this setup
 # sudo apt-get install git qt5-default cmake g++ yasm libbz2-dev
 
-_install_yasm(){
-    wget http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
-    tar -zxvf yasm-1.3.0.tar.gz
-    rm yasm-1.3.0.tar.gz
-    mv yasm-1.3.0 yasm
-}
+# could be also required (Ubuntu 14.04 LTS): 
+# sudo apt-get install zlib1g-dev
+# sudo apt-get install libgl1-mesa-dev
+# sudo apt-get install pkg-config
 
 if qmake --version >/dev/null 2>&1 ; then
     BINQMAKE=qmake
@@ -34,114 +32,13 @@ if [ ! $(which cmake) ] ; then
     exit
 fi
 
+SCRIPT_DIR=$(cd $(dirname "$0") && pwd)
+echo "SCRIPT_DIR: " + $SCRIPT_DIR
+
 INSTALL_DIR=$(cd $(dirname "$0") && cd ../../.. && pwd)
 cd "$INSTALL_DIR"
 
-if [ ! -d "Blackmagic DeckLink SDK" ] ; then
-    wget http://slackware.uk/sbosrcarch/by-name/multimedia/vlc/Blackmagic_DeckLink_SDK_10.1.4.zip
-    unzip Blackmagic_DeckLink_SDK_10.1.4.zip
-    mv "Blackmagic DeckLink SDK 10.1.4" "Blackmagic DeckLink SDK"
-fi
-
-if [ ! -d ffmpeg ] ; then
-    git clone git://source.ffmpeg.org/ffmpeg.git ffmpeg
-fi
-
-    cd ffmpeg
-    FFMPEG_CONFIGURE_OPTS=(--enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --disable-lzma)
-    if sw_vers >/dev/null 2>&1 ; then
-        FFMPEG_CONFIGURE_OPTS+=(--extra-cflags="-mmacosx-version-min=10.5" --extra-ldflags="-mmacosx-version-min=10.5")
-    fi
-    chmod u+x configure
-    chmod u+x version.sh
-    if yasm --version >/dev/null 2>&1 ; then
-        ./configure "${FFMPEG_CONFIGURE_OPTS[@]}"
-        if [ "$?" -ne 0 ] ; then #on some distro, yasm version is too old
-            cd "$INSTALL_DIR"
-            if [ ! -d yasm ] ; then
-                _install_yasm
-            fi
-            cd yasm/
-            ./configure --prefix=`pwd`/usr
-            make
-            cd "${INSTALL_DIR}/ffmpeg"
-            FFMPEG_CONFIGURE_OPTS+=(--yasmexe=../yasm/usr/bin/yasm)
-            ./configure "${FFMPEG_CONFIGURE_OPTS[@]}"
-        fi
-    else
-        cd "$INSTALL_DIR"
-        if [ ! -d yasm ] ; then
-            _install_yasm
-        fi
-        cd yasm/
-        ./configure --prefix=`pwd`/usr
-        make
-        make install
-        cd "${INSTALL_DIR}/ffmpeg"
-        FFMPEG_CONFIGURE_OPTS+=(--yasmexe=../yasm/usr/bin/yasm)
-        ./configure "${FFMPEG_CONFIGURE_OPTS[@]}"
-    fi
-    make
-    cd "$INSTALL_DIR"
-
-if [ ! -d qwt ] ; then
-    wget http://downloads.sourceforge.net/project/qwt/qwt/6.1.2/qwt-6.1.2.tar.bz2
-    tar jxf qwt-6.1.2.tar.bz2
-    rm qwt-6.1.2.tar.bz2
-    mv qwt-6.1.2 qwt
-    patch qwt/qwtconfig.pri <<EOF
---- qwtconfig.pri	2016-01-03 15:41:26.000000000 -0500
-+++ qwtconfig.pri copy	2016-01-03 15:41:26.000000000 -0500
-@@ -72,7 +72,7 @@
- # it will be a static library.
- ######################################################################
-
--QWT_CONFIG           += QwtDll
-+#QWT_CONFIG           += QwtDll
-
- ######################################################################
- # QwtPlot enables all classes, that are needed to use the QwtPlot 
-@@ -93,13 +93,13 @@
- # export a plot to a SVG document
- ######################################################################
-
--QWT_CONFIG     += QwtSvg
-+#QWT_CONFIG     += QwtSvg
-
- ######################################################################
- # If you want to use a OpenGL plot canvas
- ######################################################################
-
--QWT_CONFIG     += QwtOpenGL
-+#QWT_CONFIG     += QwtOpenGL
-
- ######################################################################
- # You can use the MathML renderer of the Qt solutions package to 
-@@ -118,7 +118,7 @@
- # Otherwise you have to build it from the designer directory.
- ######################################################################
-
--QWT_CONFIG     += QwtDesigner
-+#QWT_CONFIG     += QwtDesigner
-
- ######################################################################
- # Compile all Qwt classes into the designer plugin instead
-EOF
-fi
-cd qwt
-$BINQMAKE
-make
-cd "$INSTALL_DIR"
-
-cd qctools/Project/QtCreator
-if sw_vers >/dev/null 2>&1 ; then
-    #Qt 5.2 can not well detect the platform version for 10.9 then FFmpeg static link fails
-    MAJOR_MAC_VERSION=$(sw_vers -productVersion | awk -F '.' '{print $1 "." $2}')
-    $BINQMAKE QMAKE_MAC_SDK=macosx$MAJOR_MAC_VERSION
-else
-    $BINQMAKE
-fi
-make
-cd ../../..
-
-echo QCTools binary is in qctools/Project/QtCreator
+source $SCRIPT_DIR/init_blackmagic.sh
+source $SCRIPT_DIR/init_ffmpeg.sh
+source $SCRIPT_DIR/init_qwt.sh
+source $SCRIPT_DIR/build_qctools.sh
