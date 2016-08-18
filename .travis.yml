@@ -1,0 +1,26 @@
+sudo: required
+dist: trusty
+language: cpp
+
+os:
+  - linux
+
+compiler:
+  - gcc
+
+before_install:
+  - sudo add-apt-repository --yes ppa:beineri/opt-qt551-trusty
+  - sudo apt-get update -qq
+  - sudo apt-get install --force-yes -qq qt55base
+  - sudo chmod 777 ./Project/BuildAllFromSource/*
+  - source /opt/qt55/bin/qt55-env.sh
+
+install:
+  - source ./Project/BuildAllFromSource/init.sh
+  - cd .. # go out of qctools folder
+  - source $SCRIPT_DIR/init_blackmagic.sh
+  - source $SCRIPT_DIR/init_ffmpeg.sh
+  - source $SCRIPT_DIR/init_qwt.sh
+
+script:
+  - source $SCRIPT_DIR/build_qctools.sh
