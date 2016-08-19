@@ -1,26 +1,41 @@
+
 sudo: required
 dist: trusty
 language: cpp
 
 os:
+  - osx
   - linux
+  
+osx_image: xcode7.3
 
 compiler:
+  - clang
   - gcc
 
 before_install:
-  - sudo add-apt-repository --yes ppa:beineri/opt-qt551-trusty
-  - sudo apt-get update -qq
-  - sudo apt-get install --force-yes -qq qt55base
-  - sudo chmod 777 ./Project/BuildAllFromSource/*
-  - source /opt/qt55/bin/qt55-env.sh
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install qt5 && export PATH=/usr/local/opt/qt5/bin:$PATH; fi
+  
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo add-apt-repository --yes ppa:beineri/opt-qt551-trusty; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update -qq; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --force-yes -qq qt55base; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo chmod 777 ./Project/BuildAllFromSource/*; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then source /opt/qt55/bin/qt55-env.sh; fi
 
 install:
-  - source ./Project/BuildAllFromSource/init.sh
-  - cd .. # go out of qctools folder
-  - source $SCRIPT_DIR/init_blackmagic.sh
-  - source $SCRIPT_DIR/init_ffmpeg.sh
-  - source $SCRIPT_DIR/init_qwt.sh
+  - if [ $TRAVIS_OS_NAME == linux ]; then source ./Project/BuildAllFromSource/init.sh; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then cd ..; fi # go out of qctools folder
+  - if [ $TRAVIS_OS_NAME == linux ]; then source $SCRIPT_DIR/init_blackmagic.sh; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then source $SCRIPT_DIR/init_ffmpeg.sh; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then source $SCRIPT_DIR/init_qwt.sh; fi
+
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew install ffmpeg; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew tap amiaopensource/homebrew-amiaos; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew install amiaopensource/amiaos/qwt-qt5; fi
 
 script:
-  - source $SCRIPT_DIR/build_qctools.sh
+  - if [ $TRAVIS_OS_NAME == linux ]; then source $SCRIPT_DIR/build_qctools.sh; fi
+  
+  - if [ $TRAVIS_OS_NAME == osx ]; then cd ./Project/Homebrew; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then qmake; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then make; fi
