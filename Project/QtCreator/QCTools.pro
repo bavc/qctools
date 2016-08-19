@@ -125,7 +125,7 @@ macx {
     LIBS      += -lbz2
 }
 
-unix {
+linux {
     LIBS      += -ldl -lrt
 }
 
