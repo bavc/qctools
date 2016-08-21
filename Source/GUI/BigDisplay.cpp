@@ -257,10 +257,10 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "               format=yuv444p|yuva444p10be|rgb24,crop=iw:1:0:${1},format=yuv444p|rgb24,waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
-            "split[a][b];[a]format=yuv444p|yuva444p10be|rgb24,crop=iw:1:0:${1},format=yuv444p|rgb24,waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=iw:${height},drawbox=y=${1}:w=iw:h=1:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
-            "               format=yuv444p|yuva444p10be|rgb24,crop=1:ih:${1}:0,format=yuv444p|rgb24,waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
-            "split[a][b];[a]format=yuv444p|yuva444p10be|rgb24,crop=1:ih:${1}:0,format=yuv444p|rgb24,waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=${width}:${height},drawbox=x=${1}:w=1:h=ih:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
+            "               crop=iw:1:0:${1}:0:1,waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
+            "split[a][b];[a]crop=iw:1:0:${1}:0:1,waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=iw:${height},drawbox=y=${1}:w=iw:h=1:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
+            "               crop=1:ih:${1}:0:0:1,waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
+            "split[a][b];[a]crop=1:ih:${1}:0:0:1,waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=${width}:${height},drawbox=x=${1}:w=1:h=ih:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
         },
     },
     {
@@ -340,6 +340,7 @@ const filter Filters[]=
             { Args_Type_Slider,   1,   0, 100, 100, "Intensity" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
         },
         {
             "ciescope=system=${1}:gamuts=pow(2\\,${2}):contrast=${3}:intensity=${4}",
@@ -355,6 +356,7 @@ const filter Filters[]=
             { Args_Type_Slider,   1,   0,   1,   1, "Axis"},
             { Args_Type_Slider,   1,   0,   2,   1, "DataMode" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Show" },
+            { Args_Type_None,     0,   0,   0,   0, },
         },
         {
             "datascope=x=${2}:y=${3}:mode=${5}:axis=${4}",
@@ -1191,9 +1193,9 @@ QString DoubleSpinBoxWithSlider::textFromValue (double value) const
     else if (IsScale && value==0)
         return "digital";
     else if (IsScale && value==1)
-        return "ire";
-    else if (IsScale && value==2)
         return "millivolts";
+    else if (IsScale && value==2)
+        return "ire";
     else if (IsColorspace && value==0)
         return "auto";
     else if (IsColorspace && value==1)

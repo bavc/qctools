@@ -8,6 +8,8 @@ Project/Homebrew/qrc_Resources.cpp
 Project/Homebrew/*.h
 Project/QtCreator/.qmake.stash
 Project/QtCreator/Makefile
+Project/QtCreator/Makefile.Debug
+Project/QtCreator/Makefile.Release
 Project/QtCreator/moc
 Project/QtCreator/QCTools.app
 Project/QtCreator/resources/qrc_Resources.cpp
