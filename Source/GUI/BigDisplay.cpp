@@ -430,6 +430,7 @@ const filter Filters[]=
         0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            // TODO: Adjust slider max to bit depth.
             { Args_Type_Slider,   1,   1,  16,   1, "Bit position" },
             { Args_Type_YuvA,     0,   0,   0,   0, "Plane"},
             { Args_Type_None,     0,   0,   0,   0, },
@@ -449,6 +450,7 @@ const filter Filters[]=
         "Bit Plane Noise Graph",
         0,
         {
+            // TODO: Adjust slider max to bit depth.
             { Args_Type_Slider,   1,   1,  16,   1, "Bit position" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
