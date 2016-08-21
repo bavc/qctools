@@ -645,7 +645,7 @@ bool FFmpeg_Glue::outputdata::FilterGraph_Init()
                 << "/"                          << Stream->codec->time_base.den
                 <<":sample_rate="               << Stream->codec->sample_rate
                 <<":sample_fmt="                << av_get_sample_fmt_name(Stream->codec->sample_fmt)
-                <<":channel_layout=0x"          << std::hex << Stream->codec->channel_layout;
+                <<":channel_layout=0x"          << std::hex << (Stream->codec->channel_layout ? Stream->codec->channel_layout : av_get_default_channel_layout(Stream->codec->channels));
             ;
     }
     if (avfilter_graph_create_filter(&FilterGraph_Source_Context, Source, "in", Args.str().c_str(), NULL, FilterGraph)<0)
