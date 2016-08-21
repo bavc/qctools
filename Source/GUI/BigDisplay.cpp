@@ -445,6 +445,22 @@ const filter Filters[]=
 
         },
     },
+    {
+        "Bit Plane Noise Graph",
+        0,
+        {
+            { Args_Type_Slider,   1,   1,  16,   1, "Bit position" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "bitplanenoise=${1},drawgraph=fg1=0x006400:fg2=0x00008B:fg3=0x8B0000:m1=lavfi.bitplanenoise.0.${1}:m2=lavfi.bitplanenoise.1.${1}:m3=lavfi.bitplanenoise.2.${1}:min=0:max=1:slide=rscroll:s=${width}x${height}",
+        },
+    },
     /*
     {
         "Frame Metadata Play",
