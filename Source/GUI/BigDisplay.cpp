@@ -257,10 +257,10 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "               format=yuv444p|yuva444p10be|rgb24,crop=iw:1:0:${1},format=yuv444p|rgb24,waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
-            "split[a][b];[a]format=yuv444p|yuva444p10be|rgb24,crop=iw:1:0:${1},format=yuv444p|rgb24,waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=iw:${height},drawbox=y=${1}:w=iw:h=1:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
-            "               format=yuv444p|yuva444p10be|rgb24,crop=1:ih:${1}:0,format=yuv444p|rgb24,waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
-            "split[a][b];[a]format=yuv444p|yuva444p10be|rgb24,crop=1:ih:${1}:0,format=yuv444p|rgb24,waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=${width}:${height},drawbox=x=${1}:w=1:h=ih:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
+            "               crop=iw:1:0:${1}:0:1,waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
+            "split[a][b];[a]crop=iw:1:0:${1}:0:1,waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=iw:${height},drawbox=y=${1}:w=iw:h=1:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
+            "               crop=1:ih:${1}:0:0:1,waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
+            "split[a][b];[a]crop=1:ih:${1}:0:0:1,waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=${width}:${height},drawbox=x=${1}:w=1:h=ih:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
         },
     },
     {
