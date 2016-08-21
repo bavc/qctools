@@ -12,7 +12,7 @@ include ( $$system(brew --prefix qwt-qt5)/features/qwt.prf )
 CONFIG += qt qwt release no_keywords
 
 PKGCONFIG += libavdevice libavcodec libavfilter libavformat libpostproc
-PKGCONFIG += libswresample libswscale libavcodec libavutil freetype2
+PKGCONFIG += libswresample libswscale libavcodec libavutil
 
 CONFIG += link_pkgconfig
 
