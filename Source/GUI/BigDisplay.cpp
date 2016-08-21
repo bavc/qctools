@@ -430,20 +430,18 @@ const filter Filters[]=
         0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Slider,   1,   1,  10,   1, "Bit position" },
-            { Args_Type_Yuv,      0,   0,   0,   0, "Plane"},
+            { Args_Type_Slider,   1,   1,  16,   1, "Bit position" },
+            { Args_Type_YuvA,     0,   0,   0,   0, "Plane"},
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,lutyuv=y=512:u=512:v=512:\
-            ${3}=bitand(val\\,pow(2\\,10-${2}))*pow(2\\,${2}),format=yuv444p,extractplanes=${3},format=yuv444p,\
-            geq=lum=128:cb=if(gte(eq(lum(X\\,Y)\\,lum(X-1\\,Y))+eq(lum(X\\,Y)\\,lum(X\\,Y-1))+eq(lum(X\\,Y)\\,lum(X-1\\,Y-1))\\,2)\\,0\\,255)",
-            "il=l=d:c=d,format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,lutyuv=y=512:u=512:v=512:\
-            ${3}=bitand(val\\,pow(2\\,10-${2}))*pow(2\\,${2}),format=yuv444p,extractplanes=${3},format=yuv444p,\
-            geq=lum=128:cb=if(gte(eq(lum(X\\,Y)\\,lum(X-1\\,Y))+eq(lum(X\\,Y)\\,lum(X\\,Y-1))+eq(lum(X\\,Y)\\,lum(X-1\\,Y-1))\\,2)\\,0\\,255)",
+            "extractplanes=${3},bitplanenoise=bitplane=${2}:filter=1",
+            "bitplanenoise=bitplane=${2}:filter=1",
+            "il=l=d:c=d,extractplanes=${3},bitplanenoise=bitplane=${2}:filter=1",
+            "il=l=d:c=d,bitplanenoise=bitplane=${2}:filter=1",
 
         },
     },
