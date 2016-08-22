@@ -121,7 +121,7 @@ LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
              -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
              -L$${PWD}/../../../ffmpeg/libavutil -lavutil
 
-macx {
+!win32 {
     LIBS      += -lbz2
 }
 
