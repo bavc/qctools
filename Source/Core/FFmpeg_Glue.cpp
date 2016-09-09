@@ -483,7 +483,7 @@ void FFmpeg_Glue::outputdata::ApplyFilter()
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::outputdata::ApplyScale()
 {
-    if (!FilteredFrame)
+    if (!FilteredFrame || !FilteredFrame->width || !FilteredFrame->height)
         return;
 
     switch (OutputMethod)
