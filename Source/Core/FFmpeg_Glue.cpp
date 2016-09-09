@@ -1042,7 +1042,7 @@ void FFmpeg_Glue::ModifyOutput(size_t InputPos, size_t OutputPos, size_t FilterP
     OutputData->Width=Scale_Width;
     OutputData->Height=Scale_Height;
     OutputData->OutputMethod=OutputMethod;
-    if ((*Stats)[InputPos])
+    if ((*Stats)[InputPos] || OutputMethod==Output_QImage)
         OutputData->Filter=Filter;
     OutputData->FilterPos=FilterPos;
 
