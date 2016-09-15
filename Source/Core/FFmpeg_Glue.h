@@ -91,6 +91,8 @@ public:
     string                      FieldOrder_Get();
     double                      DAR_Get();
     string                      SAR_Get();
+
+    double                      OutputDAR_Get(int Pos);
     string                      PixFormat_Get();
     string                      ColorSpace_Get();
     string                      ColorRange_Get();

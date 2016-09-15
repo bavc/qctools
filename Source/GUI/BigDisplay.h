@@ -18,6 +18,7 @@ class FFmpeg_Glue;
 class Control;
 class Info;
 class FileInformation;
+class ImageLabel;
 
 class QLabel;
 class QToolButton;
@@ -35,29 +36,6 @@ class QPushButton;
 //---------------------------------------------------------------------------
 const size_t Args_Max=7;
 //---------------------------------------------------------------------------
-
-//***************************************************************************
-// Helper
-//***************************************************************************
-
-class ImageLabel : public QWidget
-{
-    Q_OBJECT
-
-public:
-    explicit ImageLabel (FFmpeg_Glue** Picture, size_t Pos, QWidget *parent=NULL);
-    void                        Remove ();
-    bool                        Pixmap_MustRedraw;
-    bool                        IsMain;
-
-protected:
-    void paintEvent (QPaintEvent*);
-
-private:
-    QPixmap                     Pixmap;
-    FFmpeg_Glue**               Picture;
-    size_t                      Pos;
-};
 
 class BigDisplay;
 class DoubleSpinBoxWithSlider : public QDoubleSpinBox
@@ -77,6 +55,8 @@ public:
     bool IsDmode;
     bool IsSystem;
     void ChangeMax(int Max);
+
+    void applyValue(double value, bool notify);
 
 protected:
     void enterEvent (QEvent* event);
@@ -103,6 +83,9 @@ private:
 public Q_SLOTS:
     void on_valueChanged(double);
     void on_sliderMoved(int);
+
+Q_SIGNALS:
+    void controlValueChanged(double);
 };
 
 //***************************************************************************
@@ -126,7 +109,7 @@ public:
 
     // Content
     Control*                    ControlArea;
-
+    
 protected:
     // File information
     FileInformation*            FileInfoData;
@@ -181,6 +164,8 @@ protected:
     std::string                 FiltersList_currentOptionChanged(size_t Pos, size_t Picture_Current);
     void                        FiltersList1_currentOptionChanged(size_t Picture_Current);
     void                        FiltersList2_currentOptionChanged(size_t Picture_Current);
+
+    void updateSelection(int Pos, ImageLabel* image, options& opts);
 
 public Q_SLOTS:
     void on_FiltersList1_currentIndexChanged(QAction * action);
