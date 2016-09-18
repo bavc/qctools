@@ -1978,6 +1978,22 @@ string FFmpeg_Glue::ColorRange_Get()
     }
 }
 
+int FFmpeg_Glue::BitsPerRawSample_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
+        return 0;
+
+    return InputData->Stream->codec->bits_per_raw_sample;
+}
+
 //---------------------------------------------------------------------------
 string FFmpeg_Glue::AudioFormat_Get()
 {

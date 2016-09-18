@@ -46,7 +46,7 @@ enum AudioGroup
     Group_AudioMax
 };
 
-extern const struct per_group  AudioPerGroup    [Group_AudioMax];
+extern struct per_group  AudioPerGroup    [Group_AudioMax];
 extern const struct per_item   AudioPerItem     [Item_AudioMax];
 
 #endif // Core_H

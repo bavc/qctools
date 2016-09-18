@@ -509,3 +509,8 @@ bool FileInformation::PlayBackFilters_Available ()
     return Glue;
 }
 
+int FileInformation::BitsPerRawSample() const
+{
+    return Glue->BitsPerRawSample_Get();
+}
+

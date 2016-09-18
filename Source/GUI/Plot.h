@@ -45,6 +45,8 @@ public:
 
     int frameAt( double x ) const;
 
+    void addGuidelines(int bitsPerRawSample);
+
 Q_SIGNALS:
     void cursorMoved( int index );
 

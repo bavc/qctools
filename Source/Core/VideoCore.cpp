@@ -8,7 +8,7 @@
 #include <Core/VideoCore.h>
 #include <cfloat>
 
-const struct per_group VideoPerGroup [Group_VideoMax]=
+struct per_group VideoPerGroup [Group_VideoMax]=
 {
     //Y
     {

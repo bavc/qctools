@@ -41,6 +41,10 @@ struct per_group
     const   bool        CheckedByDefault;
     const   char*       Description;
     activefilter        ActiveFilterGroup;
+
+    void    setMax(double value) {
+        (const_cast<double&> (Max)) = value;
+    }
 };
 struct per_item
 {
@@ -60,6 +64,10 @@ struct stream_info
     size_t                      CountOfItems;
     const struct per_group*     PerGroup;
     const struct per_item*      PerItem;
+
+    struct per_group*           GetPerGroup(int group) const {
+        return const_cast<struct per_group*> (PerGroup) + group;
+    }
 };
 enum Types
 {
