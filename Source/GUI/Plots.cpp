@@ -11,6 +11,7 @@
 #include "GUI/PlotLegend.h"
 #include "GUI/PlotScaleWidget.h"
 #include "Core/Core.h"
+#include "Core/VideoCore.h"
 #include <QComboBox>
 #include <QGridLayout>
 #include <QEvent>
@@ -70,26 +71,30 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
             for ( size_t group = 0; group < countOfGroups; group++ )
             {
                 if (m_fileInfoData->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
-            {
-                Plot* plot = new Plot( streamPos, type, group, this );
+                {
+                    Plot* plot = new Plot( streamPos, type, group, this );
+                    plot->addGuidelines(m_fileInfoData->BitsPerRawSample());
 
-                // we allow to shrink the plot below height of the size hint
-                plot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
-                plot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
-                initYAxis( plot );
-                updateSamples( plot );
+                    if(type == Type_Video)
+                        adjustGroupMax(group, m_fileInfoData->BitsPerRawSample());
 
-                connect( plot, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
+                    // we allow to shrink the plot below height of the size hint
+                    plot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
+                    plot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
+                    initYAxis( plot );
+                    updateSamples( plot );
 
-                plot->canvas()->installEventFilter( this );
+                    connect( plot, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
 
-                layout->addWidget( plot, layout_y, 0 );
-                layout->addWidget( plot->legend(), layout_y, 1 );
+                    plot->canvas()->installEventFilter( this );
 
-                m_plots[streamPos][group] = plot;
+                    layout->addWidget( plot, layout_y, 0 );
+                    layout->addWidget( plot->legend(), layout_y, 1 );
 
-                layout_y++;
-            }
+                    m_plots[streamPos][group] = plot;
+
+                    layout_y++;
+                }
                 else
                 {
                     m_plots[streamPos][group] = NULL;
@@ -238,6 +243,7 @@ void Plots::initYAxis( Plot* plot )
 
     double yMin = stat->y_Min[plotGroup];
     double yMax = stat->y_Max[plotGroup];
+
     if ( ( group.Min != group.Max ) && ( yMax - yMin >= ( group.Max - group.Min) / 2 ) )
         yMax = group.Max;
 
@@ -361,6 +367,22 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
     }
 
     return QWidget::eventFilter( object, event );
+}
+
+void Plots::adjustGroupMax(int group, int bitsPerRawSample)
+{
+    int defaultBitesPerRawSample = 8;
+    if(bitsPerRawSample == 0)
+        bitsPerRawSample = defaultBitesPerRawSample;
+
+    if(group == Group_Y || group == Group_U || group == Group_V)
+    {
+        PerStreamType[Type_Video].GetPerGroup(group)->setMax((1 << bitsPerRawSample) - 1);
+    }
+    if(group == Group_Sat)
+    {
+        PerStreamType[Type_Video].GetPerGroup(group)->setMax(sqrt(2) * (1 << bitsPerRawSample) / 2);
+    }
 }
 
 void Plots::alignXAxis( const Plot* plot )

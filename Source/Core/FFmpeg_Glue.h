@@ -94,7 +94,8 @@ public:
     string                      PixFormat_Get();
     string                      ColorSpace_Get();
     string                      ColorRange_Get();
-    
+    int                         BitsPerRawSample_Get();
+
     // Audio information
     string                      AudioFormat_Get();
     string                      SampleFormat_Get();

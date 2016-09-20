@@ -229,6 +229,34 @@ void Plot_AddHLine(QwtPlot* plot, double value , double r , double g, double b)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+void Plot::addGuidelines(int bitsPerRawSample)
+{
+    int defaultBitesPerRawSample = 8;
+    if(bitsPerRawSample == 0)
+        bitsPerRawSample = defaultBitesPerRawSample;
+
+    int multiplier = pow(2, (bitsPerRawSample - defaultBitesPerRawSample));
+
+    if ( m_type == Type_Video )
+    switch (m_group)
+    {
+        case Group_Y :
+                        Plot_AddHLine( this,  16 * multiplier,  61,  89, 171);
+                        Plot_AddHLine( this, 235 * multiplier, 220,  20,  60);
+                        break;
+        case Group_U :
+        case Group_V :
+                        Plot_AddHLine( this,  16 * multiplier,  61,  89, 171);
+                        Plot_AddHLine( this, 240 * multiplier, 220,  20,  60);
+                        break;
+        case Group_Sat :
+                        Plot_AddHLine( this,  88 * multiplier, 255,   0, 255);
+                        Plot_AddHLine( this, 118 * multiplier, 220,  20,  60);
+                        break;
+        default      :  ;
+    }
+}
+
 Plot::Plot( size_t streamPos, size_t Type, size_t Group, QWidget *parent ) :
     QwtPlot( parent ),
     m_streamPos( streamPos ),
@@ -288,26 +316,6 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, QWidget *parent ) :
         curve->attach( this );
 
         m_curves += curve;
-    }
-
-    // visual helpers
-    if ( m_type == Type_Video )
-    switch (m_group)
-    {
-        case Group_Y :
-                        Plot_AddHLine( this,  16,  61,  89, 171);
-                        Plot_AddHLine( this, 235, 220,  20,  60);
-                        break;
-        case Group_U :
-        case Group_V :
-                        Plot_AddHLine( this,  16,  61,  89, 171);
-                        Plot_AddHLine( this, 240, 220,  20,  60);
-                        break;
-        case Group_Sat :
-                        Plot_AddHLine( this,  88, 255,   0, 255);
-                        Plot_AddHLine( this, 118, 220,  20,  60);
-                        break;
-        default      :  ;  
     }
 
     PlotPicker* picker = new PlotPicker( canvas, &PerStreamType[m_type], m_group, &m_curves );

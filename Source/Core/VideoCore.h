@@ -119,7 +119,7 @@ enum VideoGroup
     Group_VideoMax
 };
 
-extern const struct per_group  VideoPerGroup    [Group_VideoMax];
+extern struct per_group  VideoPerGroup    [Group_VideoMax];
 extern const struct per_item   VideoPerItem     [Item_VideoMax];
 
 #endif // Core_H

@@ -61,6 +61,7 @@ public:
     std::vector<CommonStats*>   Stats;
     CommonStats*                ReferenceStat               () {if (ReferenceStream_Pos<Stats.size()) return Stats[ReferenceStream_Pos]; else return NULL;}
 
+    int                         BitsPerRawSample            () const;
 private:
     // Info
     QPixmap                     Pixmap;
