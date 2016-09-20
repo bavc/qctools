@@ -87,6 +87,19 @@ enum VideoItem
     Item_IDET_R_B,
     Item_IDET_R_T,
     Item_IDET_R_N,
+    //bitplanenoisey4
+    Item_BPN_Y1,
+    Item_BPN_Y2,
+    Item_BPN_Y3,
+    Item_BPN_Y4,
+    Item_BPN_U1,
+    Item_BPN_U2,
+    Item_BPN_U3,
+    Item_BPN_U4,
+    Item_BPN_V1,
+    Item_BPN_V2,
+    Item_BPN_V3,
+    Item_BPN_V4,
     //Internal
     Item_VideoMax
 };
@@ -116,6 +129,9 @@ enum VideoGroup
     Group_IDET_S,
     Group_IDET_M,
     Group_IDET_R,
+    Group_BPN_Y,
+    Group_BPN_U,
+    Group_BPN_V,
     Group_VideoMax
 };
 

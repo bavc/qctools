@@ -191,6 +191,24 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "of telecine). Each frame's classification is plotted with a half-life of 1.",
         ActiveFilter_Video_Idet,
     },
+    //bitplanenoise
+    {
+        Item_BPN_Y1,       4,    0,    1,  4,  "bpn y", false,
+        "Plots data from bitplanenoise",
+        ActiveFilter_Video_BPN4,
+    },
+    //bitplanenoise
+    {
+        Item_BPN_U1,       4,    0,    1,  4,  "bpn u", false,
+        "Plots data from bitplanenoise",
+        ActiveFilter_Video_BPN4,
+    },
+    //bitplanenoise
+    {
+        Item_BPN_V1,       4,    0,    1,  4,  "bpn v", false,
+        "Plots data from bitplanenoise",
+        ActiveFilter_Video_BPN4,
+    },
 };
 
 const struct per_item VideoPerItem [Item_VideoMax]=
@@ -264,4 +282,19 @@ const struct per_item VideoPerItem [Item_VideoMax]=
     { Group_IDET_R,    Group_VideoMax,     "bottom",        "lavfi.idet.repeated.bottom", 2,  false,   DBL_MAX, DBL_MAX },
     { Group_IDET_R,    Group_VideoMax,     "top",           "lavfi.idet.repeated.top",    2,  false,   DBL_MAX, DBL_MAX },
     { Group_IDET_R,    Group_VideoMax,     "neither",       "lavfi.idet.repeated.neither",     2,  false,   DBL_MAX, DBL_MAX },
+    //bitplanenoise.y
+    { Group_BPN_Y,     Group_VideoMax,     "y.1",           "lavfi.bitplanenoise.0.1",    2,  false,   DBL_MAX, DBL_MAX },
+    { Group_BPN_Y,     Group_VideoMax,     "y.2",           "lavfi.bitplanenoise.0.2",    2,  false,   DBL_MAX, DBL_MAX },
+    { Group_BPN_Y,     Group_VideoMax,     "y.3",           "lavfi.bitplanenoise.0.3",    2,  false,   DBL_MAX, DBL_MAX },
+    { Group_BPN_Y,     Group_VideoMax,     "y.4",           "lavfi.bitplanenoise.0.4",    2,  false,   DBL_MAX, DBL_MAX },
+    //bitplanenoise.u
+    { Group_BPN_U,     Group_VideoMax,     "u.1",           "lavfi.bitplanenoise.1.1",    2,  false,   DBL_MAX, DBL_MAX },
+    { Group_BPN_U,     Group_VideoMax,     "u.2",           "lavfi.bitplanenoise.1.2",    2,  false,   DBL_MAX, DBL_MAX },
+    { Group_BPN_U,     Group_VideoMax,     "u.3",           "lavfi.bitplanenoise.1.3",    2,  false,   DBL_MAX, DBL_MAX },
+    { Group_BPN_U,     Group_VideoMax,     "u.4",           "lavfi.bitplanenoise.1.4",    2,  false,   DBL_MAX, DBL_MAX },
+    //bitplanenoise.v
+    { Group_BPN_V,     Group_VideoMax,     "v.1",           "lavfi.bitplanenoise.2.1",    2,  false,   DBL_MAX, DBL_MAX },
+    { Group_BPN_V,     Group_VideoMax,     "v.2",           "lavfi.bitplanenoise.2.2",    2,  false,   DBL_MAX, DBL_MAX },
+    { Group_BPN_V,     Group_VideoMax,     "v.3",           "lavfi.bitplanenoise.2.3",    2,  false,   DBL_MAX, DBL_MAX },
+    { Group_BPN_V,     Group_VideoMax,     "v.4",           "lavfi.bitplanenoise.2.4",    2,  false,   DBL_MAX, DBL_MAX },
 };

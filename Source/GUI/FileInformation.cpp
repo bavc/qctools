@@ -200,6 +200,8 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
             Filters[0]+=",cropdetect=reset=1:round=1";
         if (ActiveFilters[ActiveFilter_Video_Idet])
             Filters[0]+=",idet=half_life=1";
+        if (ActiveFilters[ActiveFilter_Video_BPN4])
+            Filters[0]+=",bitplanenoise=1,bitplanenoise=2,bitplanenoise=3,bitplanenoise=4";
         if (ActiveFilters[ActiveFilter_Video_Psnr] && ActiveFilters[ActiveFilter_Video_Ssim])
         {
             Filters[0]+=",split[a][b];[a]field=top[a1];[b]field=bottom,split[b1][b2];[a1][b1]psnr[c1];[c1][b2]ssim";
