@@ -462,14 +462,25 @@ void Plots::setPlotVisible( size_t type, size_t group, bool on )
 }
 
 //---------------------------------------------------------------------------
-void Plots::zoomXAxis( bool up )
+void Plots::zoomXAxis( ZoomTypes zoomType )
 {
-    if ( up )
+    m_zoomType = zoomType;
+
+    if ( zoomType == ZoomIn )
         m_zoomFactor++;
-    else if ( m_zoomFactor )
+    else if ( zoomType == ZoomOut && m_zoomFactor )
         m_zoomFactor--;
+    else if ( zoomType == ZoomOneToOne)
+        m_zoomFactor = 0;
         
+    qDebug() << "m_zoomFactor: " << m_zoomFactor;
     int numVisibleFrames = m_fileInfoData->Frames_Count_Get() >> m_zoomFactor;
+
+    if(m_zoomType == ZoomOneToOne)
+    {
+        numVisibleFrames = plot(0, 0)->canvas()->contentsRect().width();
+        m_zoomFactor = log(m_fileInfoData->Frames_Count_Get() / numVisibleFrames) / log(2);
+    }
 
     int to = qMin( framePos() + numVisibleFrames / 2, numFrames() );
     int from = qMax( 0, to - numVisibleFrames );

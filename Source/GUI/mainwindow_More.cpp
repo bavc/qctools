@@ -284,6 +284,8 @@ void MainWindow::clearGraphsLayout()
         ui->verticalLayout->removeWidget(InfoArea);
         delete InfoArea; InfoArea=NULL;
     }
+
+    configureZoom();
 }
 
 //---------------------------------------------------------------------------

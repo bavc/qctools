@@ -197,6 +197,8 @@ private Q_SLOTS:
     void on_CurrentFrameChanged();
 
 
+    void on_actionZoomOne_triggered();
+
 private:
     void updateScrollBar( bool blockSignals = false );
     bool isPlotZoomable() const;

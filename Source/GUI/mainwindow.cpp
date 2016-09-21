@@ -139,6 +139,15 @@ void MainWindow::on_actionZoomIn_triggered()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_actionZoomOne_triggered()
+{
+    PlotsArea->zoomXAxis( Plots::ZoomOneToOne );
+    configureZoom();
+
+    updateScrollBar();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::on_actionZoomOut_triggered()
 {
     Zoom_Out();
@@ -267,6 +276,8 @@ void MainWindow::on_actionFilesList_triggered()
         ui->actionPrint->setVisible(false);
     if (ui->actionZoomIn)
         ui->actionZoomIn->setVisible(false);
+    if (ui->actionZoomOne)
+        ui->actionZoomOne->setVisible(false);
     if (ui->actionZoomOut)
         ui->actionZoomOut->setVisible(false);
     if (ui->actionWindowOut)
@@ -307,6 +318,8 @@ void MainWindow::on_actionGraphsLayout_triggered()
     //    ui->actionPrint->setVisible(true);
     if (ui->actionZoomIn)
         ui->actionZoomIn->setVisible(true);
+    if (ui->actionZoomOne)
+        ui->actionZoomOne->setVisible(true);
     if (ui->actionZoomOut)
         ui->actionZoomOut->setVisible(true);
     if (ui->actionWindowOut)
@@ -481,4 +494,3 @@ void MainWindow::dropEvent(QDropEvent *Event)
     clearDragDrop();
     addFile_finish();
 }
-
