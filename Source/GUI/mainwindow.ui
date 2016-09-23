@@ -78,6 +78,7 @@
     <addaction name="actionWindowOut"/>
     <addaction name="separator"/>
     <addaction name="actionZoomIn"/>
+    <addaction name="actionZoomOne"/>
     <addaction name="actionZoomOut"/>
     <addaction name="separator"/>
     <addaction name="actionGoTo"/>
@@ -167,6 +168,7 @@
    <addaction name="actionPrint"/>
    <addaction name="separator"/>
    <addaction name="actionZoomIn"/>
+   <addaction name="actionZoomOne"/>
    <addaction name="actionZoomOut"/>
    <addaction name="separator"/>
    <addaction name="actionFiltersLayout"/>
@@ -377,6 +379,23 @@
   <action name="actionBlackmagicDeckLinkCapture">
    <property name="text">
     <string>Capture from deck</string>
+   </property>
+  </action>
+  <action name="actionZoomOne">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Zoom 1:1</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom 1:1</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+0</string>
    </property>
   </action>
  </widget>

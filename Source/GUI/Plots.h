@@ -73,6 +73,13 @@ public:
         AxisTime
     };
 
+    enum ZoomTypes
+    {
+        ZoomIn,
+        ZoomOut,
+        ZoomOneToOne
+    };
+
     explicit                    Plots( QWidget *parent, FileInformation* );
     virtual                     ~Plots();
 
@@ -83,7 +90,7 @@ public:
     void                        Zoom_Move( int Begin );
     void                        refresh();
 
-    void                        zoomXAxis( bool up );
+    void                        zoomXAxis( ZoomTypes type );
     bool                        isZoomed() const;
     FrameInterval               visibleFrames() const;
     int                         numFrames() const { return stats()->x_Current_Max; }
@@ -124,6 +131,7 @@ private:
     FrameInterval               m_frameInterval;
     TimeInterval                m_timeInterval;
     int                         m_zoomFactor;
+    ZoomTypes                   m_zoomType;
 
     // X axis info
     int                         m_dataTypeIndex;

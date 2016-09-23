@@ -82,6 +82,7 @@ void MainWindow::Ui_Init()
     ui->actionExport_XmlGz_Prompt->setIcon(QIcon(":/icon/export_xml.png"));
     ui->actionPrint->setIcon(QIcon(":/icon/document-print.png"));
     ui->actionZoomIn->setIcon(QIcon(":/icon/zoom-in.png"));
+    ui->actionZoomOne->setIcon(QIcon(":/icon/zoom-one.png"));
     ui->actionZoomOut->setIcon(QIcon(":/icon/zoom-out.png"));
     ui->actionFilesList->setIcon(QIcon(":/icon/multifile_layout.png"));
     ui->actionGraphsLayout->setIcon(QIcon(":/icon/graph_layout.png"));
@@ -172,10 +173,16 @@ void MainWindow::configureZoom()
     if (Files.empty() || PlotsArea==NULL || !PlotsArea->isZoomed() )
     {
         ui->actionZoomOut->setEnabled(false);
+        ui->actionZoomOne->setEnabled(false);
         if (Files_CurrentPos<Files.size() && isPlotZoomable())
+        {
             ui->actionZoomIn->setEnabled(true);
+            ui->actionZoomOne->setEnabled(true);
+        }
         else
+        {
             ui->actionZoomIn->setEnabled(false);
+        }
 
         ui->actionGoTo->setEnabled(!Files.empty());
         ui->actionExport_XmlGz_Prompt->setEnabled(!Files.empty());
@@ -186,6 +193,7 @@ void MainWindow::configureZoom()
         return;
     }
 
+    ui->actionZoomOne->setEnabled(true);
     ui->actionZoomOut->setEnabled(true);
     ui->actionZoomIn->setEnabled( isPlotZoomable() );
     ui->actionGoTo->setEnabled(true);
@@ -218,7 +226,7 @@ void MainWindow::Zoom_Out()
 
 void MainWindow::Zoom( bool on )
 {
-    PlotsArea->zoomXAxis( on );
+    PlotsArea->zoomXAxis( on ? Plots::ZoomIn : Plots::ZoomOut );
     configureZoom();
 }
 
