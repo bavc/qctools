@@ -6,6 +6,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 TARGET = QCTools
 TEMPLATE = app
 
+CONFIG += c++11
 CONFIG += qt debug_and_release
 CONFIG += no_keywords
 QMAKE_CXXFLAGS += -DBLACKMAGICDECKLINK_NO -DWITH_SYSTEM_FFMPEG=1
@@ -35,7 +36,10 @@ HEADERS = \
     ../../Source/GUI/PlotLegend.h \
     ../../Source/GUI/PlotScaleWidget.h \
     ../../Source/GUI/TinyDisplay.h \
-    ../../Source/ThirdParty/tinyxml2/tinyxml2.h
+    ../../Source/GUI/SelectionArea.h \
+    ../../Source/ThirdParty/tinyxml2/tinyxml2.h \
+    ../../Source/GUI/Imagelabel.h \
+    ../../Source/GUI/config.h
 
 SOURCES = \
     ../../Source/Core/AudioCore.cpp \
@@ -66,7 +70,10 @@ SOURCES = \
     ../../Source/GUI/PlotScaleWidget.cpp \
     ../../Source/GUI/preferences.cpp \
     ../../Source/GUI/TinyDisplay.cpp \
-    ../../Source/ThirdParty/tinyxml2/tinyxml2.cpp
+    ../../Source/GUI/SelectionArea.cpp \
+    ../../Source/ThirdParty/tinyxml2/tinyxml2.cpp \
+    ../../Source/GUI/Imagelabel.cpp \
+    ../../Source/GUI/config.cpp
 
 linux:SOURCES += "../../../Blackmagic DeckLink SDK/Linux/include/DeckLinkAPIDispatch.cpp"
 macx:SOURCES += "../../../Blackmagic DeckLink SDK/Mac/include/DeckLinkAPIDispatch.cpp"
@@ -78,7 +85,8 @@ win32 {
 FORMS += \
     ../../Source/GUI/mainwindow.ui \
     ../../Source/GUI/preferences.ui \
-    ../../Source/GUI/blackmagicdecklink_userinput.ui
+    ../../Source/GUI/blackmagicdecklink_userinput.ui \
+    ../../Source/GUI/imagelabel.ui
 
 RESOURCES += \
     ../../Source/Resource/Resources.qrc

@@ -6,6 +6,7 @@
 
 //---------------------------------------------------------------------------
 #include "BigDisplay.h"
+#include "SelectionArea.h"
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -14,6 +15,8 @@
 #include "GUI/Info.h"
 #include "GUI/Help.h"
 #include "GUI/FileInformation.h"
+#include "GUI/imagelabel.h"
+#include "GUI/config.h"
 #include "Core/FFmpeg_Glue.h"
 
 #include <QDesktopWidget>
@@ -39,6 +42,7 @@
 #include <QColorDialog>
 #include <QShortcut>
 #include <QApplication>
+#include <QDebug>
 
 #include <sstream>
 //---------------------------------------------------------------------------
@@ -229,12 +233,14 @@ const filter Filters[]=
             { Args_Type_Slider,   0,   0,   0,   1, "x" },
             { Args_Type_Slider,   0,   0,   0,   1, "y" },
             { Args_Type_Slider,  60,  16,   0,   1, "s" },
-            { Args_Type_Slider,   8,   0,  10,  10, "Intensity" },
+            { Args_Type_Slider,  60,  16,   0,   1, "s" },
+            //{ Args_Type_Slider,   8,   0,  10,  10, "Intensity" },
             { Args_Type_Slider,   0,   0,   5,   1, "Filter" },
             { Args_Type_Slider,   0,   0,   2,   1, "Scale" },
             { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
         },
         {
+            /*
             "crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,\
             waveform=intensity=${4}:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=720:512,setsar=1/1",
             "split[a][b];\
@@ -242,6 +248,15 @@ const filter Filters[]=
             [b]crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,\
             waveform=intensity=${4}:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=720:512,setsar=1/1[b1];\
             [a1][b1]blend=addition",
+            */
+
+            "crop=${3}:${4}:${1}:${2},\
+                        waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1",
+                        "split[a][b];\
+                        [a]lutyuv=y=val/4,drawbox=w=${3}:h=${4}:x=${1}:y=${2}:t=1:c=yellow,scale=${width}:${height},setsar=1/1[a1];\
+                        [b]crop=${3}:${4}:${1}:${2},\
+                        waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1[b1];\
+                        [a1][b1]blend=addition",
         },
     },
     {
@@ -893,91 +908,7 @@ const filter Filters[]=
     },
 };
 
-//***************************************************************************
-// Helper
-//***************************************************************************
-
 //---------------------------------------------------------------------------
-ImageLabel::ImageLabel(FFmpeg_Glue** Picture_, size_t Pos_, QWidget *parent) :
-    QWidget(parent),
-    Picture(Picture_),
-    Pos(Pos_)
-{
-    Pixmap_MustRedraw=false;
-    IsMain=true;
-}
-
-//---------------------------------------------------------------------------
-void ImageLabel::paintEvent(QPaintEvent *event)
-{
-    //QWidget::paintEvent(event);
-
-    QPainter painter(this);
-    if (!*Picture)
-    {
-        painter.drawPixmap(0, 0, QPixmap().scaled(event->rect().width(), event->rect().height()));
-        return;
-    }
-
-    /*
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    QSize pixSize = Pixmap.size();
-    pixSize.scale(event->rect().size(), Qt::KeepAspectRatio);
-
-    QPixmap scaledPix = Pixmap.scaled(pixSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    */
-
-    QImage* Image;
-    switch (Pos)
-    {
-        case 1 : Image=(*Picture)->Image_Get(0); break;
-        case 2 : Image=(*Picture)->Image_Get(1); break;
-        default: return;
-    }
-    if (!Image)
-    {
-        painter.drawPixmap(0, 0, QPixmap().scaled(event->rect().width(), event->rect().height()));
-        return;
-    }
-
-    QSize Size = event->rect().size();
-    if (Pixmap_MustRedraw || Size.width()!=Pixmap.width() || Size.height()!=Pixmap.height())
-    {
-        if (IsMain && (Size.width()!=Pixmap.width() || Size.height()!=Pixmap.height()))
-        {
-            (*Picture)->Scale_Change(Size.width(), Size.height());
-            switch (Pos)
-            {
-                case 1 : Image=(*Picture)->Image_Get(0); break;
-                case 2 : Image=(*Picture)->Image_Get(1); break;
-                default: return;
-            }
-            if (!Image)
-            {
-                painter.drawPixmap(0, 0, QPixmap().scaled(event->rect().width(), event->rect().height()));
-                return;
-            }
-        }
-        #if QT_VERSION>0x040700
-            Pixmap.convertFromImage(*Image);
-        #else //QT_VERSION>0x040700
-            Pixmap=QPixmap::fromImage(*Image);
-        #endif //QT_VERSION>0x040700
-        Pixmap_MustRedraw=false;
-    }
-
-    painter.drawPixmap((event->rect().width()-Pixmap.size().width())/2, (event->rect().height()-Pixmap.size().height())/2, Pixmap);
-}
-
-//---------------------------------------------------------------------------
-void ImageLabel::Remove ()
-{
-    Pixmap=QPixmap();
-    resize(0, 0);
-    repaint();
-    setVisible(false);
-}
 
 //***************************************************************************
 // Helper
@@ -1030,6 +961,32 @@ DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Other
     setFont(Font);
 
     setFocusPolicy(Qt::NoFocus);
+
+    //Popup=new QWidget((QWidget*)parent(), Qt::Popup | Qt::Window);
+    //Popup=new QWidget((QWidget*)parent(), Qt::FramelessWindowHint);
+    //Popup->setGeometry(((QWidget*)parent())->geometry().x()+x()+width()-(255+30), ((QWidget*)parent())->geometry().y()+y()+height(), 255+30, height());
+    //Popup->setGeometry(x()+width()-(255+30), y()+height(), 255+30, height());
+    //Popup->setWindowModality(Qt::NonModal);
+    //Popup->setFocusPolicy(Qt::NoFocus);
+    //QLayout* Layout=new QGridLayout();
+    //Layout->setContentsMargins(0, 0, 0, 0);
+    //Layout->setSpacing(0);
+    Slider=new QSlider(Qt::Horizontal, parentWidget());
+    Slider->setFocusPolicy(Qt::NoFocus);
+    Slider->setMinimum(Min);
+    Slider->setMaximum(Max);
+    Slider->setToolTip(toolTip());
+    int slider_width = 255 + 30;
+    // Assure that the initial position is always inside the window
+    int initial_x = max(x() + width() - slider_width, 5);
+    Slider->setGeometry(initial_x, y() + height(), slider_width, height());
+    connect(Slider, SIGNAL(valueChanged(int)), this, SLOT(on_sliderMoved(int)));
+    connect(Slider, SIGNAL(sliderMoved(int)), this, SLOT(on_sliderMoved(int)));
+    Slider->setFocusPolicy(Qt::NoFocus);
+    //Layout->addWidget(Slider);
+    //Popup->setFocusPolicy(Qt::NoFocus);
+    //Popup->setLayout(Layout);
+    connect(this, SIGNAL(valueChanged(double)), this, SLOT(on_valueChanged(double)));
 }
 
 //---------------------------------------------------------------------------
@@ -1044,31 +1001,7 @@ void DoubleSpinBoxWithSlider::enterEvent (QEvent* event)
 {
     if (Slider==NULL)
     {
-        //Popup=new QWidget((QWidget*)parent(), Qt::Popup | Qt::Window);
-        //Popup=new QWidget((QWidget*)parent(), Qt::FramelessWindowHint);
-        //Popup->setGeometry(((QWidget*)parent())->geometry().x()+x()+width()-(255+30), ((QWidget*)parent())->geometry().y()+y()+height(), 255+30, height());
-        //Popup->setGeometry(x()+width()-(255+30), y()+height(), 255+30, height());
-        //Popup->setWindowModality(Qt::NonModal);
-        //Popup->setFocusPolicy(Qt::NoFocus);
-        //QLayout* Layout=new QGridLayout();
-        //Layout->setContentsMargins(0, 0, 0, 0);
-        //Layout->setSpacing(0);
-        Slider=new QSlider(Qt::Horizontal, (QWidget*)parent());
-        Slider->setFocusPolicy(Qt::NoFocus);
-        Slider->setMinimum(Min);
-        Slider->setMaximum(Max);
-        Slider->setToolTip(toolTip());
-        int slider_width = 255 + 30;
-        // Assure that the initial position is always inside the window
-        int initial_x = max(x() + width() - slider_width, 5);
-        Slider->setGeometry(initial_x, y() + height(), slider_width, height());
-        connect(Slider, SIGNAL(valueChanged(int)), this, SLOT(on_sliderMoved(int)));
-        connect(Slider, SIGNAL(sliderMoved(int)), this, SLOT(on_sliderMoved(int)));
-        Slider->setFocusPolicy(Qt::NoFocus);
-        //Layout->addWidget(Slider);
-        //Popup->setFocusPolicy(Qt::NoFocus);
-        //Popup->setLayout(Layout);
-        connect(this, SIGNAL(valueChanged(double)), this, SLOT(on_valueChanged(double)));
+        Slider->show();
     }
     for (size_t Pos=0; Pos<Args_Max; Pos++)
         if (Others[Pos] && Others[Pos]!=this)
@@ -1089,6 +1022,29 @@ void DoubleSpinBoxWithSlider::ChangeMax(int Max_)
     setMaximum(Max);
     if (Slider)
         Slider->setMaximum(Max);
+}
+
+void DoubleSpinBoxWithSlider::applyValue(double value, bool notify)
+{
+    if (IsBitSlice)
+    {
+        if (value<1)
+            setPrefix(QString());
+        else
+            setPrefix("Bit ");
+    }
+
+    if (Slider)
+    {
+        double Value=value*Divisor;
+        int ValueInt=(int)Value;
+        if(Value-0.5>=ValueInt)
+            ValueInt++;
+        Slider->setValue(Value);
+
+        if(notify)
+            Q_EMIT controlValueChanged(Value);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -1129,22 +1085,7 @@ void DoubleSpinBoxWithSlider::hidePopup ()
 //---------------------------------------------------------------------------
 void DoubleSpinBoxWithSlider::on_valueChanged (double value)
 {
-    if (IsBitSlice)
-    {
-        if (value<1)
-            setPrefix(QString());
-        else
-            setPrefix("Bit ");
-    }
-
-    if (Slider)
-    {
-        double Value=value*Divisor;
-        int ValueInt=(int)Value;
-        if(Value-0.5>=ValueInt)
-            ValueInt++;
-        Slider->setValue(Value);
-    }
+    applyValue(value, false);
 }
 
 //---------------------------------------------------------------------------
@@ -1320,17 +1261,17 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
 
     //Image1
     Image1=new ImageLabel(&Picture, 1, this);
-    Image1->IsMain=true;
     Image1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     Image1->setMinimumSize(20, 20);
+    Image1->showDebugOverlay(Config::instance().getDebug());
     //Layout->addWidget(Image1, 1, 0, 1, 1);
     //Layout->setColumnStretch(0, 1);
 
     //Image2
     Image2=new ImageLabel(&Picture, 2, this);
-    Image2->IsMain=false;
     Image2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     Image2->setMinimumSize(20, 20);
+    Image2->showDebugOverlay(Config::instance().getDebug());
     //Layout->addWidget(Image2, 1, 2, 1, 1);
     //Layout->setColumnStretch(2, 1);
 
@@ -1705,6 +1646,8 @@ void BigDisplay::FiltersList1_currentIndexChanged(size_t FilterPos)
     }
     Picture_Current1=FilterPos;
     FiltersList1_currentOptionChanged(Picture_Current1);
+
+    updateSelection(FilterPos, Image1, Options[0]);
 }
 
 //---------------------------------------------------------------------------
@@ -1729,6 +1672,8 @@ void BigDisplay::FiltersList2_currentIndexChanged(size_t FilterPos)
     }
     Picture_Current2=FilterPos;
     FiltersList2_currentOptionChanged(Picture_Current2);
+
+    updateSelection(FilterPos, Image2, Options[1]);
 }
 
 //---------------------------------------------------------------------------
@@ -2025,6 +1970,15 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
     }
 
     // Variables
+    QString str = QString::fromStdString(Modified_String);
+
+    str.replace(QString("${width}"), QString::number(FileInfoData->Glue->Width_Get()));
+    str.replace(QString("${height}"), QString::number(FileInfoData->Glue->Height_Get()));
+    str.replace(QString("${dar}"), QString::number(FileInfoData->Glue->DAR_Get()));
+
+    Modified_String = str.toStdString();
+
+    /*
     Pos=Modified_String.find("${width}");
     if (Pos!=string::npos)
     {
@@ -2049,6 +2003,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
         ss<<FileInfoData->Glue->DAR_Get();
         Modified_String.insert(Pos, ss.str());
     }
+    */
 
     return Modified_String;
 }
@@ -2120,10 +2075,8 @@ void BigDisplay::ShowPicture ()
     if (Slider->sliderPosition()!=Frames_Pos)
         Slider->setSliderPosition(Frames_Pos);
 
-    Image1->Pixmap_MustRedraw=true;
-    Image1->repaint();
-    Image2->Pixmap_MustRedraw=true;
-    Image2->repaint();
+    Image1->UpdatePixmap();
+    Image2->UpdatePixmap();
 
     // Stats
     if (ControlArea)
@@ -2308,8 +2261,6 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
         //move(pos().x()+Image_Width, pos().y());
         //adjustSize();
         Picture_Current1=1;
-        Image1->IsMain=false;
-        Image2->IsMain=true;
         repaint();
         return;
     }
@@ -2323,8 +2274,6 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
             if (Picture_Current1<2)
             {
                 Image1->setVisible(true);
-                Image1->IsMain=true;
-                Image2->IsMain=false;
                 Layout->setColumnStretch(0, 1);
                 //move(pos().x()-Image_Width, pos().y());
                 //resize(width()+Image_Width, height());
@@ -2335,12 +2284,62 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
 
             Frames_Pos=(size_t)-1;
             ShowPicture ();
+            updateSelection(Pos, Image1, Options[0]);
             return;
         }
     }
 }
 
 //---------------------------------------------------------------------------
+void BigDisplay::updateSelection(int Pos, ImageLabel* image, options& opts)
+{
+    if(strcmp(Filters[Pos].Name, "Waveform Target") == 0)
+    {
+        auto& xSpinBox = opts.Sliders_SpinBox[0];
+        auto& ySpinBox = opts.Sliders_SpinBox[1];
+        auto& wSpinBox = opts.Sliders_SpinBox[2];
+        auto& hSpinBox = opts.Sliders_SpinBox[3];
+
+        image->setSelectionArea(xSpinBox->value(), ySpinBox->value(), wSpinBox->value(), hSpinBox->value());
+
+        image->setMinSelectionSize(QSizeF(wSpinBox->minimum(), hSpinBox->minimum()));
+        image->setMaxSelectionSize(QSizeF(wSpinBox->maximum(), hSpinBox->maximum()));
+
+        connect(xSpinBox, &DoubleSpinBoxWithSlider::controlValueChanged, image, &ImageLabel::moveSelectionX);
+        connect(ySpinBox, &DoubleSpinBoxWithSlider::controlValueChanged, image, &ImageLabel::moveSelectionY);
+        connect(wSpinBox, &DoubleSpinBoxWithSlider::controlValueChanged, image, &ImageLabel::changeSelectionWidth);
+        connect(hSpinBox, &DoubleSpinBoxWithSlider::controlValueChanged, image, &ImageLabel::changeSelectionHeight);
+
+        connect(image, &ImageLabel::selectionChangeFinished, [&](const QRectF& geometry) {
+            qDebug() << "x: " << geometry.x();
+            qDebug() << "y: " << geometry.y();
+
+            xSpinBox->applyValue(geometry.topLeft().x(), true);
+            ySpinBox->applyValue(geometry.topLeft().y(), true);
+            wSpinBox->applyValue(geometry.width(), true);
+            hSpinBox->applyValue(geometry.height(), true);
+
+        });
+
+        connect(image, &ImageLabel::selectionChanged, [&](const QRectF& geometry) {
+            qDebug() << "x: " << geometry.x();
+            qDebug() << "y: " << geometry.y();
+
+            qDebug() << "width: " << geometry.width();
+            qDebug() << "height: " << geometry.height();
+
+            xSpinBox->applyValue(geometry.x(), false);
+            ySpinBox->applyValue(geometry.y(), false);
+            wSpinBox->applyValue(geometry.width(), false);
+            hSpinBox->applyValue(geometry.height(), false);
+        });
+    }
+    else
+    {
+        image->setSelectionArea(0, 0, 0, 0);
+    }
+}
+
 void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
 {
     // Help
@@ -2359,16 +2358,12 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
         Layout->setColumnStretch(0, 0);
         //move(pos().x()+Image_Width, pos().y());
         //adjustSize();
-        Image1->IsMain=false;
-        Image2->IsMain=true;
         repaint();
     }
 
     if (Picture_Current1<2)
     {
         Image1->setVisible(true);
-        Image1->IsMain=true;
-        Image2->IsMain=false;
         Layout->setColumnStretch(0, 1);
         //move(pos().x()-Image_Width, pos().y());
         //resize(width()+Image_Width, height());
@@ -2377,6 +2372,8 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
 
     Frames_Pos=(size_t)-1;
     ShowPicture ();
+
+    updateSelection(Pos, Image1, Options[0]);
 }
 
 //---------------------------------------------------------------------------
@@ -2401,6 +2398,7 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(int Pos)
     }
 
     FiltersList2_currentIndexChanged(Pos);
+    updateSelection(Pos, Image2, Options[1]);
 }
 
 //---------------------------------------------------------------------------
@@ -2433,6 +2431,7 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(QAction * action)
         if (action->text()==Filters[Pos].Name)
         {
             FiltersList2_currentIndexChanged(Pos);
+            updateSelection(Pos, Image2, Options[1]);
             return;
         }
     }
@@ -2469,8 +2468,9 @@ void BigDisplay::resizeEvent(QResizeEvent* Event)
 
     //Frames_Pos=(size_t)-1;
     //ShowPicture ();
-    Image1->Pixmap_MustRedraw=true;
-    Image2->Pixmap_MustRedraw=true;
+
+    Image1->UpdatePixmap();
+    Image2->UpdatePixmap();
 }
 
 //---------------------------------------------------------------------------

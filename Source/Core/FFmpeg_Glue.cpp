@@ -1408,6 +1408,7 @@ double FFmpeg_Glue::TimeStampOfCurrentFrame(const size_t OutputPos)
 void FFmpeg_Glue::Scale_Change(int Scale_Width_, int Scale_Height_)
 {
     bool MustOutput=false;
+
     for (size_t Pos=0; Pos<OutputDatas.size(); Pos++)
     {
         outputdata* OutputData=OutputDatas[Pos];
@@ -1724,6 +1725,27 @@ string FFmpeg_Glue::SAR_Get()
         convert << InputData->Stream->codec->sample_aspect_ratio.num << "/" << InputData->Stream->codec->sample_aspect_ratio.den;
         return convert.str();
     }
+}
+
+double FFmpeg_Glue::OutputDAR_Get(int Pos)
+{
+    double DAR = 1.0f;
+
+    outputdata* OutputData=OutputDatas[Pos];
+
+    if (OutputData)
+    {
+        auto DecodedFrame = OutputData->DecodedFrame;
+
+        if (!DecodedFrame)
+            DAR=4.0/3.0; // TODO: video frame DAR
+//        else if (DecodedFrame->sample_aspect_ratio.num && DecodedFrame->sample_aspect_ratio.den)
+//            DAR=((double)DecodedFrame->width)/DecodedFrame->height*DecodedFrame->sample_aspect_ratio.num/DecodedFrame->sample_aspect_ratio.den;
+        else
+            DAR=((double)DecodedFrame->width)/DecodedFrame->height;
+    }
+
+    return DAR;
 }
 
 //---------------------------------------------------------------------------

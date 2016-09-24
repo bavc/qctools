@@ -3,6 +3,7 @@ QT += core gui widgets svg printsupport
 TARGET = QCTools
 TEMPLATE = app
 
+CONFIG += c++11
 QMAKE_TARGET_BUNDLE_PREFIX = org.bavc
 
 QT_CONFIG -= no-pkg-config
@@ -43,7 +44,10 @@ HEADERS = \
     ../../Source/GUI/PlotLegend.h \
     ../../Source/GUI/PlotScaleWidget.h \
     ../../Source/GUI/TinyDisplay.h \
-    ../../Source/ThirdParty/tinyxml2/tinyxml2.h
+    ../../Source/GUI/SelectionArea.h \
+    ../../Source/ThirdParty/tinyxml2/tinyxml2.h \
+    ../../Source/GUI/Imagelabel.h \
+    ../../Source/GUI/config.h
 
 SOURCES = \
     ../../Source/Core/AudioCore.cpp \
@@ -74,12 +78,16 @@ SOURCES = \
     ../../Source/GUI/PlotScaleWidget.cpp \
     ../../Source/GUI/preferences.cpp \
     ../../Source/GUI/TinyDisplay.cpp \
-    ../../Source/ThirdParty/tinyxml2/tinyxml2.cpp
+    ../../Source/GUI/SelectionArea.cpp \
+    ../../Source/ThirdParty/tinyxml2/tinyxml2.cpp \
+    ../../Source/GUI/Imagelabel.cpp \
+    ../../Source/GUI/config.cpp
 
 FORMS += \
     ../../Source/GUI/mainwindow.ui \
     ../../Source/GUI/preferences.ui \
-    ../../Source/GUI/blackmagicdecklink_userinput.ui
+    ../../Source/GUI/blackmagicdecklink_userinput.ui \
+    ../../Source/GUI/imagelabel.ui
 
 RESOURCES += \
     ../../Source/Resource/Resources.qrc

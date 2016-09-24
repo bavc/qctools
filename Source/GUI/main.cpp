@@ -18,13 +18,23 @@
 using namespace std;
 
 #include "mainwindow.h"
+#include "config.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w(NULL);
     for (int Pos=1; Pos<argc; Pos++)
-        w.addFile(QString::fromLocal8Bit(argv[Pos]));
+    {
+        if(strcmp(argv[Pos], "--debug") == 0)
+        {
+            Config::instance().setDebug(true);
+        }
+        else
+        {
+            w.addFile(QString::fromLocal8Bit(argv[Pos]));
+        }
+    }
     w.addFile_finish();
     w.show();
     return a.exec();
