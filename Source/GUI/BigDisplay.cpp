@@ -298,21 +298,22 @@ const filter Filters[]=
         "Vectorscope Target",
         0,
         {
-            { Args_Type_Slider,   0,   0,   0,   1, "x" },
-            { Args_Type_Slider,   0,   0,   0,   1, "y" },
-            { Args_Type_Slider,  60,  16,   0,   1, "s" },
-            { Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
+            { Args_Type_Slider,  20,   0,   0,   1, "x" },
+            { Args_Type_Slider,  20,   0,   0,   1, "y" },
+            { Args_Type_Slider, 120,  16,   0,   1, "s" },
+            { Args_Type_Slider, 120,  16,   0,   1, "s" },
+            //{ Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
             { Args_Type_Slider,   3,   0,   4,   1, "Mode" },
             { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
             { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
         },
         {
-            "crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,\
-            format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=${4}:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            "crop=${3}:${4}:${1}:${2},\
+            format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
             "split[a][b];\
-            [a]lutyuv=y=val/4,drawbox=w=${3}:h=${3}/dar:x=${1}-${3}/2:y=${2}-${3}/dar/2:t=1:c=yellow,scale=720:512,setsar=1/1[a1];\
-            [b]crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,\
-            format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=${4}:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=720:512,setsar=1/1[b1];\
+            [a]lutyuv=y=val/4,drawbox=w=${3}:h=${4}:x=${1}:y=${2}:t=1:c=yellow,scale=${width}:${height},setsar=1/1,format=yuv444p|yuv444p10le[a1];\
+            [b]crop=${3}:${4}:${1}:${2},\
+            format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height},setsar=1/1[b1];\
             [a1][b1]blend=addition",
         },
     },
