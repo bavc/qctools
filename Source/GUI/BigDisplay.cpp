@@ -240,23 +240,13 @@ const filter Filters[]=
             { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
         },
         {
-            /*
-            "crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,\
-            waveform=intensity=${4}:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=720:512,setsar=1/1",
-            "split[a][b];\
-            [a]lutyuv=y=val/4,drawbox=w=${3}:h=${3}/dar:x=${1}-${3}/2:y=${2}-${3}/dar/2:t=1:c=yellow,scale=720:512,setsar=1/1[a1];\
-            [b]crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,\
-            waveform=intensity=${4}:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=720:512,setsar=1/1[b1];\
-            [a1][b1]blend=addition",
-            */
-
             "crop=${3}:${4}:${1}:${2},\
-                        waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1",
-                        "split[a][b];\
-                        [a]lutyuv=y=val/4,drawbox=w=${3}:h=${4}:x=${1}:y=${2}:t=1:c=yellow,scale=${width}:${height},setsar=1/1[a1];\
-                        [b]crop=${3}:${4}:${1}:${2},\
-                        waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1[b1];\
-                        [a1][b1]blend=addition",
+            waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1",
+            "split[a][b];\
+            [a]lutyuv=y=val/4,drawbox=w=${3}:h=${4}:x=${1}:y=${2}:t=1:c=yellow,scale=${width}:${height},setsar=1/1[a1];\
+            [b]crop=${3}:${4}:${1}:${2},\
+            waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1[b1];\
+            [a1][b1]blend=addition",
         },
     },
     {
