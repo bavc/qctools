@@ -2287,7 +2287,9 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
 //---------------------------------------------------------------------------
 void BigDisplay::updateSelection(int Pos, ImageLabel* image, options& opts)
 {
-    if(strcmp(Filters[Pos].Name, "Waveform Target") == 0 || strcmp(Filters[Pos].Name, "Vectorscope Target") ==  0)
+    if(strcmp(Filters[Pos].Name, "Waveform Target") == 0 ||
+            strcmp(Filters[Pos].Name, "Vectorscope Target") ==  0 ||
+            strcmp(Filters[Pos].Name, "Zoom") ==  0)
     {
         auto& xSpinBox = opts.Sliders_SpinBox[0];
         auto& ySpinBox = opts.Sliders_SpinBox[1];
