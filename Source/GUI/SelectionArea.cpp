@@ -146,13 +146,21 @@ bool SelectionArea::eventFilter(QObject * watched, QEvent * event)
 
 void SelectionArea::paintEvent(QPaintEvent *event)
 {
-    QPainter painter;
-    QPen pen(Qt::green, 2);
-    pen.setStyle(Qt::SolidLine);
+    QPainter painter(this);
+    {
+        QPen pen(Qt::black, 2);
+        pen.setStyle(Qt::SolidLine);
+        painter.setPen(pen);
+        painter.drawRect(event->rect());
+    }
 
-    painter.begin(this);
-    painter.setPen(pen);
-    painter.drawRect(event->rect());
+    {
+        QPen pen(Qt::green, 2);
+        pen.setStyle(Qt::DotLine);
+        painter.setPen(pen);
+        painter.drawRect(event->rect());
+    }
+
 
     if(debugOverlay)
     {
