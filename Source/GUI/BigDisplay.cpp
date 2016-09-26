@@ -232,8 +232,8 @@ const filter Filters[]=
         {
             { Args_Type_Slider,  20,   0,   0,   1, "x" },
             { Args_Type_Slider,  20,   0,   0,   1, "y" },
-            { Args_Type_Slider, 121,  16,   0,   1, "s" },
-            { Args_Type_Slider, 121,  16,   0,   1, "s" },
+            { Args_Type_Slider, 121,  16,   0,   1, "w" },
+            { Args_Type_Slider, 121,  16,   0,   1, "h" },
             //{ Args_Type_Slider,   8,   0,  10,  10, "Intensity" },
             { Args_Type_Slider,   0,   0,   5,   1, "Filter" },
             { Args_Type_Slider,   0,   0,   2,   1, "Scale" },
@@ -300,8 +300,8 @@ const filter Filters[]=
         {
             { Args_Type_Slider,  20,   0,   0,   1, "x" },
             { Args_Type_Slider,  20,   0,   0,   1, "y" },
-            { Args_Type_Slider, 120,  16,   0,   1, "s" },
-            { Args_Type_Slider, 120,  16,   0,   1, "s" },
+            { Args_Type_Slider, 120,  16,   0,   1, "w" },
+            { Args_Type_Slider, 120,  16,   0,   1, "h" },
             //{ Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
             { Args_Type_Slider,   3,   0,   4,   1, "Mode" },
             { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
@@ -723,8 +723,8 @@ const filter Filters[]=
         {
             { Args_Type_Slider,  20,   0,   0,   1, "x" },
             { Args_Type_Slider,  20,   0,   0,   1, "y" },
-            { Args_Type_Slider, 120,  16,   0,   1, "s" },
-            { Args_Type_Slider, 120,  16,   0,   1, "s" },
+            { Args_Type_Slider, 120,  16,   0,   1, "w" },
+            { Args_Type_Slider, 120,  16,   0,   1, "h" },
             { Args_Type_Slider,   0,   0,  10,  10, "Strength" },
             //{ Args_Type_Slider,   0,   0,  10,  10, "Intensity" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
@@ -1399,7 +1399,7 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                     }
                                     else if (MaxTemp=="x" || MaxTemp=="Reveal" )
                                         Max=FileInfoData->Glue->Width_Get();
-                                    else if (MaxTemp=="y" || MaxTemp=="s" )
+                                    else if (MaxTemp=="y" || MaxTemp=="s" || MaxTemp=="w" || MaxTemp=="h")
                                         Max=FileInfoData->Glue->Height_Get();
                                     else
                                         Max=Filters[FilterPos].Args[OptionPos].Max;
