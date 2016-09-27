@@ -28,6 +28,8 @@
 #include <QCheckBox>
 #include <QTimer>
 
+#include "GUI/draggablechildrenbehaviour.h"
+
 //***************************************************************************
 // Constructor / Desructor
 //***************************************************************************
@@ -65,6 +67,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Deck
     DeckRunning=false;
+
+    new DraggableChildrenBehaviour(ui->horizontalLayout);
 }
 
 //---------------------------------------------------------------------------
