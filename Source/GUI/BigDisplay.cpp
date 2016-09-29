@@ -232,8 +232,8 @@ const filter Filters[]=
         {
             { Args_Type_Slider,  20,   0,   0,   1, "x" },
             { Args_Type_Slider,  20,   0,   0,   1, "y" },
-            { Args_Type_Slider, 121,  16,   0,   1, "s" },
-            { Args_Type_Slider, 121,  16,   0,   1, "s" },
+            { Args_Type_Slider, 121,  16,   0,   1, "w" },
+            { Args_Type_Slider, 121,  16,   0,   1, "h" },
             //{ Args_Type_Slider,   8,   0,  10,  10, "Intensity" },
             { Args_Type_Slider,   0,   0,   5,   1, "Filter" },
             { Args_Type_Slider,   0,   0,   2,   1, "Scale" },
@@ -243,7 +243,7 @@ const filter Filters[]=
             "crop=${3}:${4}:${1}:${2},\
             waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1",
             "split[a][b];\
-            [a]lutyuv=y=val/4,drawbox=w=${3}:h=${4}:x=${1}:y=${2}:t=1:c=yellow,scale=${width}:${height},setsar=1/1[a1];\
+            [a]lutyuv=y=val/4,scale=${width}:${height},setsar=1/1,format=yuv444p|yuv444p10le[a1];\
             [b]crop=${3}:${4}:${1}:${2},\
             waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1[b1];\
             [a1][b1]blend=addition",
@@ -298,21 +298,22 @@ const filter Filters[]=
         "Vectorscope Target",
         0,
         {
-            { Args_Type_Slider,   0,   0,   0,   1, "x" },
-            { Args_Type_Slider,   0,   0,   0,   1, "y" },
-            { Args_Type_Slider,  60,  16,   0,   1, "s" },
-            { Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
+            { Args_Type_Slider,  20,   0,   0,   1, "x" },
+            { Args_Type_Slider,  20,   0,   0,   1, "y" },
+            { Args_Type_Slider, 120,  16,   0,   1, "w" },
+            { Args_Type_Slider, 120,  16,   0,   1, "h" },
+            //{ Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
             { Args_Type_Slider,   3,   0,   4,   1, "Mode" },
             { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
             { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
         },
         {
-            "crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,\
-            format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=${4}:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            "crop=${3}:${4}:${1}:${2},\
+            format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
             "split[a][b];\
-            [a]lutyuv=y=val/4,drawbox=w=${3}:h=${3}/dar:x=${1}-${3}/2:y=${2}-${3}/dar/2:t=1:c=yellow,scale=720:512,setsar=1/1[a1];\
-            [b]crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,\
-            format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=${4}:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=720:512,setsar=1/1[b1];\
+            [a]lutyuv=y=val/4,drawbox=w=${3}:h=${4}:x=${1}:y=${2}:t=1:c=yellow,scale=${width}:${height},setsar=1/1,format=yuv444p|yuv444p10le[a1];\
+            [b]crop=${3}:${4}:${1}:${2},\
+            format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height},setsar=1/1[b1];\
             [a1][b1]blend=addition",
         },
     },
@@ -720,17 +721,20 @@ const filter Filters[]=
         "Zoom",
         0,
         {
-            { Args_Type_Slider,   0,   0,   0,   1, "x" },
-            { Args_Type_Slider,   0,   0,   0,   1, "y" },
-            { Args_Type_Slider,  60,  16,   0,   1, "s" },
+            { Args_Type_Slider,  20,   0,   0,   1, "x" },
+            { Args_Type_Slider,  20,   0,   0,   1, "y" },
+            { Args_Type_Slider, 120,  16,   0,   1, "w" },
+            { Args_Type_Slider, 120,  16,   0,   1, "h" },
             { Args_Type_Slider,   0,   0,  10,  10, "Strength" },
-            { Args_Type_Slider,   0,   0,  10,  10, "Intensity" },
+            //{ Args_Type_Slider,   0,   0,  10,  10, "Intensity" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Toggle,   1,   0,   0,   0, "Zoom"},
         },
         {
-            "setsar=1/1,crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,scale=${width}:${height}:flags=neighbor,histeq=strength=${4}:intensity=${5}",
-            "il=l=d:c=d,setsar=1/1,crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,scale=${width}:${height}:flags=neighbor,histeq=strength=${4}:intensity=${5}",
+            "setsar=1/1,drawbox=x=${1}:y=${2}:w=${3}:h=${4}:t=1:c=yellow,scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
+            "setsar=1/1,crop=x=${1}:y=${2}:w=${3}:h=${4},scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
+            "il=l=d:c=d,setsar=1/1,drawbox=x=${1}:y=${2}:w=${3}:h=${4}:t=1:c=yellow,scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
+            "il=l=d:c=d,setsar=1/1,crop=x=${1}:y=${2}:w=${3}:h=${4},scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
         },
     },
     {
@@ -1395,7 +1399,7 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                     }
                                     else if (MaxTemp=="x" || MaxTemp=="Reveal" )
                                         Max=FileInfoData->Glue->Width_Get();
-                                    else if (MaxTemp=="y" || MaxTemp=="s" )
+                                    else if (MaxTemp=="y" || MaxTemp=="s" || MaxTemp=="w" || MaxTemp=="h")
                                         Max=FileInfoData->Glue->Height_Get();
                                     else
                                         Max=Filters[FilterPos].Args[OptionPos].Max;
@@ -2283,7 +2287,9 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
 //---------------------------------------------------------------------------
 void BigDisplay::updateSelection(int Pos, ImageLabel* image, options& opts)
 {
-    if(strcmp(Filters[Pos].Name, "Waveform Target") == 0)
+    if(strcmp(Filters[Pos].Name, "Waveform Target") == 0 ||
+            strcmp(Filters[Pos].Name, "Vectorscope Target") ==  0 ||
+            strcmp(Filters[Pos].Name, "Zoom") ==  0)
     {
         auto& xSpinBox = opts.Sliders_SpinBox[0];
         auto& ySpinBox = opts.Sliders_SpinBox[1];
