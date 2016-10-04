@@ -11,6 +11,7 @@
 #include "GUI/preferences.h"
 #include "GUI/Help.h"
 #include "GUI/Plots.h"
+#include "GUI/draggablechildrenbehaviour.h"
 #include "Core/Core.h"
 #include "Core/VideoCore.h"
 #include "Core/BlackmagicDeckLink_Glue.h"
@@ -38,6 +39,7 @@
 #include <QActionGroup>
 
 #include <qwt_plot_renderer.h>
+#include <QDebug>
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -116,6 +118,10 @@ void MainWindow::Ui_Init()
         for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ ) // Group_Axis
         {
             QCheckBox* CheckBox=new QCheckBox(PerStreamType[type].PerGroup[group].Name);
+
+            CheckBox->setProperty("type", (quint64) type); // unfortunately QVariant doesn't support size_t
+            CheckBox->setProperty("group", (quint64) group);
+
             CheckBox->setToolTip(PerStreamType[type].PerGroup[group].Description);
             CheckBox->setCheckable(true);
             CheckBox->setChecked(PerStreamType[type].PerGroup[group].CheckedByDefault);
@@ -125,6 +131,8 @@ void MainWindow::Ui_Init()
 
             CheckBoxes[type].push_back(CheckBox);
         }
+
+    qDebug() << "checkboxes in layout: " << ui->horizontalLayout->count();
 
     configureZoom();
 
@@ -228,6 +236,37 @@ void MainWindow::Zoom( bool on )
 {
     PlotsArea->zoomXAxis( on ? Plots::ZoomIn : Plots::ZoomOut );
     configureZoom();
+}
+
+void MainWindow::changeFilterSelectorsOrder(QList<std::tuple<int, int> > filtersInfo)
+{
+    QSignalBlocker blocker(draggableBehaviour);
+
+    auto boxlayout = static_cast<QHBoxLayout*> (ui->horizontalLayout);
+
+    QList<QLayoutItem*> items;
+
+    for(std::tuple<int, int> groupAndType : filtersInfo)
+    {
+        int group = std::get<0>(groupAndType);
+        int type = std::get<1>(groupAndType);
+
+        auto rowsCount = boxlayout->count();
+        for(auto row = 0; row < rowsCount; ++row)
+        {
+            auto checkboxItem = boxlayout->itemAt(row);
+            if(checkboxItem->widget()->property("group") == group && checkboxItem->widget()->property("type") == type)
+            {
+                items.append(boxlayout->takeAt(row));
+                break;
+            }
+        }
+    };
+
+    for(auto item : items)
+    {
+        boxlayout->addItem(item);
+    }
 }
 
 void MainWindow::updateScrollBar( bool blockSignals )

@@ -97,6 +97,7 @@ public:
 
     virtual bool                eventFilter( QObject *, QEvent * );
     void                        adjustGroupMax(int group, int bitsPerRawSample);
+    void                        changeOrder(QList<std::tuple<int, int>> filterSelectorsInfo);
 
 public Q_SLOTS:
     void                        onCurrentFrameChanged();
@@ -127,6 +128,7 @@ private:
 private:
     PlotScaleWidget*            m_scaleWidget;
     Plot***                     m_plots; // pointer on an array of streams and groups per stream and Plot* per group
+    int                         m_plotsCount;
 
     FrameInterval               m_frameInterval;
     TimeInterval                m_timeInterval;

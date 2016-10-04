@@ -57,7 +57,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
 
     // plots and legends
     m_plots = new Plot**[m_fileInfoData->Stats.size()];
-    size_t layout_y=0;
+    m_plotsCount = 0;
     
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
     {
@@ -88,12 +88,14 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
 
                     plot->canvas()->installEventFilter( this );
 
-                    layout->addWidget( plot, layout_y, 0 );
-                    layout->addWidget( plot->legend(), layout_y, 1 );
+                    layout->addWidget( plot, m_plotsCount, 0 );
+                    layout->addWidget( plot->legend(), m_plotsCount, 1 );
 
                     m_plots[streamPos][group] = plot;
 
-                    layout_y++;
+                    m_plotsCount++;
+
+                    qDebug() << "g: " << plot->group() << ", t: " << plot->type() << ", m_plotsCount: " << m_plotsCount;
                 }
                 else
                 {
@@ -107,7 +109,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
         }
     }
 
-    layout->addWidget( m_scaleWidget, layout_y, 0, 1, 2 );
+    layout->addWidget( m_scaleWidget, m_plotsCount, 0, 1, 2 );
 
     // combo box for the axis format
     XAxisFormatBox* xAxisBox = new XAxisFormatBox();
@@ -118,7 +120,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     int axisBoxRow = layout->rowCount() - 1;
 #if 1
     // one row below to have space enough for bottom scale tick labels
-    layout->addWidget( xAxisBox, layout_y + 1, 1 );
+    layout->addWidget( xAxisBox, m_plotsCount + 1, 1 );
 #else
     layout->addWidget( xAxisBox, layout_y, 1 );
 #endif
@@ -382,6 +384,128 @@ void Plots::adjustGroupMax(int group, int bitsPerRawSample)
     if(group == Group_Sat)
     {
         PerStreamType[Type_Video].GetPerGroup(group)->setMax(sqrt(2) * (1 << bitsPerRawSample) / 2);
+    }
+}
+
+void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
+{
+    qDebug() << "changeOrder: items = " << orderedFilterInfo.count();
+
+    auto gridLayout = static_cast<QGridLayout*> (layout());
+    auto rowsCount = gridLayout->rowCount();
+
+    Q_ASSERT(m_plotsCount <= rowsCount);
+
+    qDebug() << "plotsCount: " << m_plotsCount;
+
+    QList <std::tuple<size_t, size_t, size_t>> currentOrderedPlotsInfo;
+    QList <std::tuple<size_t, size_t, size_t>> expectedOrderedPlotsInfo;
+
+    for(auto row = 0; row < m_plotsCount; ++row)
+    {
+        auto plotItem = gridLayout->itemAtPosition(row, 0);
+        auto legendItem = gridLayout->itemAtPosition(row, 1);
+
+        Q_ASSERT(plotItem);
+        Q_ASSERT(legendItem);
+
+        auto plot = qobject_cast<Plot*> (plotItem->widget());
+        Q_ASSERT(plot);
+
+        currentOrderedPlotsInfo.push_back(std::make_tuple(plot->group(), plot->type(), plot->streamPos()));
+    }
+
+    for(auto filterInfo : orderedFilterInfo)
+    {
+        for(auto plotInfo : currentOrderedPlotsInfo)
+        {
+            if(std::get<0>(plotInfo) == std::get<0>(filterInfo) && std::get<1>(plotInfo) == std::get<1>(filterInfo))
+            {
+                expectedOrderedPlotsInfo.push_back(plotInfo);
+            }
+        }
+    }
+
+    Q_ASSERT(currentOrderedPlotsInfo.length() == expectedOrderedPlotsInfo.length());
+
+    for(auto i = 0; i < expectedOrderedPlotsInfo.length(); ++i)
+    {
+        qDebug() << "cg: " << std::get<0>(currentOrderedPlotsInfo[i])
+                 << ", "
+                 << "ct: " << std::get<1>(currentOrderedPlotsInfo[i])
+                 << ", "
+                 << "cp: " << std::get<2>(currentOrderedPlotsInfo[i])
+                 << ", "
+                 << "eg: " << std::get<0>(expectedOrderedPlotsInfo[i])
+                 << ", "
+                 << "et: " << std::get<1>(expectedOrderedPlotsInfo[i])
+                 << ", "
+                 << "ep: " << std::get<2>(expectedOrderedPlotsInfo[i]);
+    }
+
+    for(auto i = 0; i < expectedOrderedPlotsInfo.length(); ++i)
+    {
+        if(expectedOrderedPlotsInfo[i] != currentOrderedPlotsInfo[i])
+        {
+            // search current item which we should put at expected position
+            for(auto j = 0; j < expectedOrderedPlotsInfo.length(); ++j)
+            {
+                if(expectedOrderedPlotsInfo[i] == currentOrderedPlotsInfo[j])
+                {
+                    qDebug() << "i: " << i << ", j: " << j;
+
+                    auto plotWidget = gridLayout->itemAtPosition(j, 0)->widget();
+                    auto legendWidget = gridLayout->itemAtPosition(j, 1)->widget();
+
+                    {
+                        auto plot = qobject_cast<Plot*> (plotWidget);
+                        qDebug() << "jg: " << plot->group() << ", t: " << plot->type() << ", p: " << plot->streamPos() << ", ptr = " << plot;
+                    }
+
+                    auto swapPlotWidget = gridLayout->itemAtPosition(i, 0)->widget();
+                    auto swapLegendWidget = gridLayout->itemAtPosition(i, 1)->widget();
+
+                    {
+                        auto plot = qobject_cast<Plot*> (swapPlotWidget);
+                        qDebug() << "ig: " << plot->group() << ", t: " << plot->type() << ", p: " << plot->streamPos() << ", ptr = " << plot;
+                    }
+
+                    gridLayout->removeWidget(plotWidget);
+                    gridLayout->removeWidget(legendWidget);
+
+                    gridLayout->removeWidget(swapPlotWidget);
+                    gridLayout->removeWidget(swapLegendWidget);
+
+                    gridLayout->addWidget(plotWidget, i, 0);
+                    gridLayout->addWidget(legendWidget, i, 1);
+
+                    gridLayout->addWidget(swapPlotWidget, j, 0);
+                    gridLayout->addWidget(swapLegendWidget, j, 1);
+
+                    currentOrderedPlotsInfo[j] = currentOrderedPlotsInfo[i];
+                    currentOrderedPlotsInfo[i] = expectedOrderedPlotsInfo[i];
+
+                    break;
+                }
+            }
+        }
+    }
+
+    Q_ASSERT(rowsCount == gridLayout->rowCount());
+
+    for(auto row = 0; row < m_plotsCount; ++row)
+    {
+        auto plotItem = gridLayout->itemAtPosition(row, 0);
+        auto legendItem = gridLayout->itemAtPosition(row, 1);
+
+        Q_ASSERT(plotItem);
+        Q_ASSERT(legendItem);
+
+        auto plot = qobject_cast<Plot*> (plotItem->widget());
+        Q_ASSERT(plot);
+
+        Q_ASSERT(plot->group() == std::get<0>(expectedOrderedPlotsInfo[row]) &&
+                 plot->type() == std::get<1>(expectedOrderedPlotsInfo[row]));
     }
 }
 

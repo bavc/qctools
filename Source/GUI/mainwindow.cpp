@@ -35,6 +35,24 @@
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+QList<std::tuple<int, int>> MainWindow::getFilterSelectorsOrder(int start = 0, int end = -1)
+{
+    QList<std::tuple<int, int>> filtersInfo;
+    if(end == -1)
+        end = ui->horizontalLayout->count() - 1;
+
+    for(int i = start; i <= end; ++i)
+    {
+        auto o = ui->horizontalLayout->itemAt(i)->widget();
+        auto group = o->property("group").toInt();
+        auto type = o->property("type").toInt();
+
+        filtersInfo.push_back(std::make_tuple(group, type));
+    }
+
+    return filtersInfo;
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     Thumbnails_Modulo(1),
@@ -68,12 +86,32 @@ MainWindow::MainWindow(QWidget *parent) :
     // Deck
     DeckRunning=false;
 
-    new DraggableChildrenBehaviour(ui->horizontalLayout);
+    draggableBehaviour = new DraggableChildrenBehaviour(ui->horizontalLayout);
+    connect(draggableBehaviour, &DraggableChildrenBehaviour::childPositionChanged, [&](QWidget* child, int oldPos, int newPos) {
+
+        Q_UNUSED(child);
+
+        int start = oldPos;
+        int end = newPos;
+
+        if(oldPos > newPos)
+        {
+            start = newPos;
+            end = oldPos;
+        }
+
+        QList<std::tuple<int, int>> filtersSelectors = getFilterSelectorsOrder();
+
+        if(PlotsArea)
+            PlotsArea->changeOrder(filtersSelectors);
+    });
 }
 
 //---------------------------------------------------------------------------
 MainWindow::~MainWindow()
 {
+    Prefs->saveFilterSelectorsOrder(getFilterSelectorsOrder());
+
     // Files (must be deleted first in order to stop ffmpeg processes)
     for (size_t Pos=0; Pos<Files.size(); Pos++)
         delete Files[Pos];

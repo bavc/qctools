@@ -18,6 +18,7 @@
 
 #include "Core/Core.h"
 #include "GUI/Plots.h"
+#include "GUI/draggablechildrenbehaviour.h"
 #include "GUI/blackmagicdecklink_userinput.h"
 #include "GUI/preferences.h"
 //---------------------------------------------------------------------------
@@ -317,6 +318,11 @@ void MainWindow::createGraphsLayout()
         ui->fileNamesBox->show();
 
     PlotsArea=Files[Files_CurrentPos]->Stats.empty()?NULL:new Plots(this, Files[Files_CurrentPos]);
+
+    auto filtersInfo = Prefs->loadFilterSelectorsOrder();
+    changeFilterSelectorsOrder(filtersInfo);
+    PlotsArea->changeOrder(filtersInfo);
+
     if (!ui->actionGraphsLayout->isChecked())
         PlotsArea->hide();
     ui->verticalLayout->addWidget(PlotsArea);
