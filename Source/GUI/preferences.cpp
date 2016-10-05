@@ -9,7 +9,15 @@
 #include "ui_preferences.h"
 #include <QSettings>
 #include <QStandardPaths>
+#include <QMetaType>
+#include <QDebug>
 //---------------------------------------------------------------------------
+
+typedef std::tuple<int, int> GroupAndType;
+Q_DECLARE_METATYPE(GroupAndType)
+
+typedef QList<GroupAndType> FilterSelectorsOrder;
+Q_DECLARE_METATYPE(FilterSelectorsOrder)
 
 //***************************************************************************
 // Constructor/Destructor
@@ -32,12 +40,67 @@ Preferences::Preferences(QWidget *parent) :
     QCoreApplication::setApplicationName("QCTools");
 
     Load();
+
+    qRegisterMetaType<GroupAndType>("GroupAndType");
+    qRegisterMetaType<FilterSelectorsOrder>("FilterSelectorsOrder");
+    qRegisterMetaTypeStreamOperators<FilterSelectorsOrder>("FilterSelectorsOrder");
 }
 
 //---------------------------------------------------------------------------
 Preferences::~Preferences()
 {
     delete ui;
+}
+
+QDataStream &operator<<(QDataStream &out, const FilterSelectorsOrder &order) {
+
+    qDebug() << "serializing total " << order.length() << ": \n";
+
+    for(auto item : order) {
+        qDebug() << "g: " << std::get<0>(item) << ", t: " << std::get<1>(item);;
+    }
+
+    for(auto filterInfo : order)
+        out << std::get<0>(filterInfo) << std::get<1>(filterInfo);
+
+    return out;
+}
+QDataStream &operator>>(QDataStream &in, FilterSelectorsOrder &order) {
+    while(!in.atEnd())
+    {
+        int group;
+        int type;
+        in >> group;
+        in >> type;
+
+        auto entry = std::make_tuple(group, type);
+        if(!order.contains(entry))
+            order.push_back(entry);
+    }
+
+    qDebug() << "deserialized: total " << order.length() << "\n";
+
+    for(auto item : order) {
+        qDebug() << "g: " << std::get<0>(item) << ", t: " << std::get<1>(item);
+    }
+
+    return in;
+}
+
+QList<std::tuple<int, int> > Preferences::loadFilterSelectorsOrder()
+{
+    QSettings Settings;
+
+    auto order = Settings.value("filterSelectorsOrder", QVariant::fromValue(FilterSelectorsOrder())).value<FilterSelectorsOrder>();
+
+    return order;
+}
+
+void Preferences::saveFilterSelectorsOrder(const QList<std::tuple<int, int> > &order)
+{
+    QSettings Settings;
+
+    Settings.setValue("filterSelectorsOrder", QVariant::fromValue(order));
 }
 
 //***************************************************************************

@@ -41,7 +41,7 @@ class PerPicture;
 class Preferences;
 
 class BlackmagicDeckLink_Glue;
-
+class DraggableChildrenBehaviour;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -114,7 +114,9 @@ public:
 
     //Preferences
     Preferences*                Prefs;
-
+    
+    QList<std::tuple<int, int>> getFilterSelectorsOrder(int start, int end);
+    
 private Q_SLOTS:
 
     void TimeOut();
@@ -203,6 +205,9 @@ private:
     void updateScrollBar( bool blockSignals = false );
     bool isPlotZoomable() const;
     void Zoom( bool );
+    void changeFilterSelectorsOrder(QList<std::tuple<int, int> > filtersInfo);
+
+    DraggableChildrenBehaviour* draggableBehaviour;
 
     Ui::MainWindow *ui;
 };

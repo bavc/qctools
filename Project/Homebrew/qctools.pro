@@ -47,7 +47,8 @@ HEADERS = \
     ../../Source/GUI/SelectionArea.h \
     ../../Source/ThirdParty/tinyxml2/tinyxml2.h \
     ../../Source/GUI/Imagelabel.h \
-    ../../Source/GUI/config.h
+    ../../Source/GUI/config.h \
+    ../../Source/GUI/draggablechildrenbehaviour.h
 
 SOURCES = \
     ../../Source/Core/AudioCore.cpp \
@@ -81,7 +82,8 @@ SOURCES = \
     ../../Source/GUI/SelectionArea.cpp \
     ../../Source/ThirdParty/tinyxml2/tinyxml2.cpp \
     ../../Source/GUI/Imagelabel.cpp \
-    ../../Source/GUI/config.cpp
+    ../../Source/GUI/config.cpp \
+    ../../Source/GUI/draggablechildrenbehaviour.cpp
 
 FORMS += \
     ../../Source/GUI/mainwindow.ui \
