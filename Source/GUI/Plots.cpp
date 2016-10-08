@@ -389,6 +389,12 @@ void Plots::adjustGroupMax(int group, int bitsPerRawSample)
 
 void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
 {
+    if(orderedFilterInfo.empty())
+    {
+        qDebug() << "orderedFilterInfo is empty, do not reorder..";
+        return;
+    }
+
     qDebug() << "changeOrder: items = " << orderedFilterInfo.count();
 
     auto gridLayout = static_cast<QGridLayout*> (layout());
@@ -427,6 +433,8 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
     }
 
     Q_ASSERT(currentOrderedPlotsInfo.length() == expectedOrderedPlotsInfo.length());
+    if(currentOrderedPlotsInfo.length() != expectedOrderedPlotsInfo.length())
+        return;
 
     for(auto i = 0; i < expectedOrderedPlotsInfo.length(); ++i)
     {
