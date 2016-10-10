@@ -1,4 +1,4 @@
-Next
+0.7.3, 2016-10-10
 -----
 + Added graphing the SSIM (Structural SImilarity Metric) between the two fields
 + Added graphing interlacement detection data
