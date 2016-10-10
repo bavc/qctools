@@ -1,6 +1,20 @@
 Next
 -----
-+ Added graphing the SSIM (Structural SImilarity Metric) between the two fields.
++ Added graphing the SSIM (Structural SImilarity Metric) between the two fields
++ Added graphing interlacement detection data
++ Added graphing audio metric data via astats filter
++ Draggable/resizeable selection area in Waveform Target, Vectorscope Target, and Zoom
++ Support for plotting data in 10 bit when revelant (affects graphs for Y, U, V, Diffs, and SAT)
++ Add shortcut to zoom in on the graphs to show one sample per display pixel
++ Update waveform and vectorscope to show graticules
++ Sortable graph order
++ Improve playback filter for bitplanenoise
++ Add playback filter for bitplanenoisegraph
++ Add playback filter for waveform target
++ Improve playback filter for waveforms, datascope, line select, ciescope, histogram
+x Fixes error when opening files on external hard drives
+x Fixed many crashes
+x Fix on sliders when they increment in steps smaller than 1
 
 0.7.2, 2015-11-17
 -----
