@@ -311,7 +311,7 @@ const filter Filters[]=
             "crop=${3}:${4}:${1}:${2},\
             format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
             "split[a][b];\
-            [a]lutyuv=y=val/4,drawbox=w=${3}:h=${4}:x=${1}:y=${2}:t=1:c=yellow,scale=${width}:${height},setsar=1/1,format=yuv444p|yuv444p10le[a1];\
+            [a]lutyuv=y=val/4,scale=${width}:${height},setsar=1/1,format=yuv444p|yuv444p10le[a1];\
             [b]crop=${3}:${4}:${1}:${2},\
             format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height},setsar=1/1[b1];\
             [a1][b1]blend=addition",
@@ -731,9 +731,9 @@ const filter Filters[]=
             { Args_Type_Toggle,   1,   0,   0,   0, "Zoom"},
         },
         {
-            "setsar=1/1,drawbox=x=${1}:y=${2}:w=${3}:h=${4}:t=1:c=yellow,scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
+            "setsar=1/1,scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
             "setsar=1/1,crop=x=${1}:y=${2}:w=${3}:h=${4},scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
-            "il=l=d:c=d,setsar=1/1,drawbox=x=${1}:y=${2}:w=${3}:h=${4}:t=1:c=yellow,scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
+            "il=l=d:c=d,setsar=1/1,scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
             "il=l=d:c=d,setsar=1/1,crop=x=${1}:y=${2}:w=${3}:h=${4},scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
         },
     },
