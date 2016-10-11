@@ -607,7 +607,7 @@ void Control::on_P0_clicked(bool checked)
     if (IsSlave)
         return;
 
-    SelectedSpeed=Speed_P1;
+    SelectedSpeed=Speed_P0;
     Timer_Duration=67;
     Time_MinusPlus=true;
     Minus->setEnabled(false);
