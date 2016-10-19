@@ -19,11 +19,12 @@ public:
     ~ImageLabel();
 
     void                        Remove ();
-    bool                        UpdatePixmap();
+    bool                        UpdatePixmap(const QImage& image = QImage());
     size_t                      GetPos() const;
 
 public Q_SLOTS:
 
+    void setImage(const QImage& image);
     void moveSelectionX(double value);
     void moveSelectionY(double value);
     void changeSelectionWidth(double value);

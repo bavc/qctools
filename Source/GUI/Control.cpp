@@ -24,7 +24,12 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QTime>
+#include <QApplication>
 #include <cfloat>
+#include <QDebug>
+#include <QTime>
+#include <math.h> // for floor on mac
+#include <QCheckBox>
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -36,7 +41,8 @@ Control::Control(QWidget *parent, FileInformation* FileInformationData_, style S
     QWidget(parent),
     FileInfoData(FileInformationData_),
     Style(Style_),
-    IsSlave(IsSlave_)
+    IsSlave(IsSlave_),
+    playAllFrames(true)
 {
     // To update
     TinyDisplayArea=NULL;
@@ -125,6 +131,7 @@ Control::Control(QWidget *parent, FileInformation* FileInformationData_, style S
     PlayPause->setIcon(QIcon(":/icon/play.png"));
     PlayPause->setIconSize(QSize(48, 48));
     connect(PlayPause, SIGNAL(clicked(bool)), this, SLOT(on_PlayPause_clicked(bool)));
+
     if (Style==Style_Cols)
         Layout->addWidget(PlayPause, 0, 6, 1, 1);
     else
@@ -197,22 +204,31 @@ Control::Control(QWidget *parent, FileInformation* FileInformationData_, style S
     setLayout(Layout);
 
     Timer=NULL;
+    Thread = NULL;
     SelectedSpeed=Speed_O;
 
     // Info
     Frames_Pos=-1;
     ShouldUpate=false;
-    Time=NULL;
 
     Update();
 }
 
 //---------------------------------------------------------------------------
+void Control::stop()
+{
+    if(Thread)
+    {
+        Thread->quit();
+        Thread->wait();
+        Thread = nullptr;
+        Timer = nullptr;
+    }
+}
+
 Control::~Control()
 {
-    if (Timer)
-        Timer->stop();
-    delete Time;
+    stop();
 }
 
 //***************************************************************************
@@ -222,6 +238,16 @@ Control::~Control()
 //---------------------------------------------------------------------------
 void Control::Update()
 {
+    if(this->thread() != QThread::currentThread())
+    {
+        qDebug() << "Control::Update: called from non-UI thread";
+        QMetaObject::invokeMethod(this, "Update");
+        return;
+
+    } else {
+        qDebug() << "Control::Update: called from UI thread";
+    }
+
     if ((!ShouldUpate && Frames_Pos==FileInfoData->Frames_Pos_Get())
      || ( ShouldUpate && false)) // ToDo: try to optimize
         return;
@@ -273,11 +299,13 @@ void Control::Update()
     else
         Info_Time->setText(QString());
 
+    // qDebug() << "Milliseconds: " << Milliseconds;
+
     // Controls
     if (Frames_Pos==0)
     {
-        if (Timer)
-            Timer->stop();
+        stop();
+
         M2->setEnabled(false);
         M1->setEnabled(false);
         M0->setEnabled(false);
@@ -309,8 +337,8 @@ void Control::Update()
     }
     else if (Frames_Pos+1==FileInfoData->ReferenceStat()->x_Current_Max)
     {
-        if (Timer)
-            Timer->stop();
+        stop();
+
         M2->setEnabled(true);
         M1->setEnabled(true);
         M0->setEnabled(true);
@@ -397,6 +425,21 @@ void Control::Update()
             }
         }
     }
+}
+
+size_t Control::getCurrentFrame() const
+{
+    return FileInfoData->Frames_Pos_Get();
+}
+
+void Control::setPlayAllFrames(bool value)
+{
+    playAllFrames = value;
+}
+
+bool Control::getPlayAllFrames() const
+{
+    return playAllFrames;
 }
 
 //---------------------------------------------------------------------------
@@ -555,6 +598,17 @@ void Control::on_M0_clicked(bool checked)
 //---------------------------------------------------------------------------
 void Control::on_PlayPause_clicked(bool checked)
 {
+    qDebug() << "total frames: " << FileInfoData->ReferenceStat()->x_Current_Max;
+    qDebug() << "frame durations: ";
+
+    for(auto i = 0; i < FileInfoData->ReferenceStat()->x_Current_Max; ++i)
+    {
+        auto duration = FileInfoData->ReferenceStat()->durations[i];
+        if(i == 0 || !qFuzzyCompare(duration, FileInfoData->ReferenceStat()->durations[0]))
+            qDebug() << duration;
+    }
+
+
     if (SelectedSpeed==Control::Speed_O)
         on_P1_clicked(checked);
     else
@@ -597,8 +651,7 @@ void Control::on_Pause_clicked(bool checked)
         TinyDisplayArea->BigDisplayArea->ControlArea->P2->setEnabled(P2->isEnabled());
     }
 
-    if (Timer)
-        Timer->stop();
+    stop();
 }
 
 //---------------------------------------------------------------------------
@@ -738,6 +791,15 @@ void Control::on_P9_clicked(bool checked)
     }
 }
 
+void Control::setCurrentFrame(size_t frame)
+{
+    if (IsSlave)
+        return;
+
+    FileInfoData->Frames_Pos_Set(frame);
+    Q_EMIT currentFrameChanged();
+}
+
 //***************************************************************************
 // Time
 //***************************************************************************
@@ -745,49 +807,104 @@ void Control::on_P9_clicked(bool checked)
 //---------------------------------------------------------------------------
 void Control::TimeOut_Init()
 {
-    delete Time;
-    Time=new QTime();
+    stop();
+
+    Time = QTime();
+
+    startFrame = FileInfoData->Frames_Pos_Get();
+    startFrameTimeStamp = QTime::currentTime();
+    lastRenderedFrame = -1;
+
+    auto averageFrameRate = FileInfoData->averageFrameRate();
+    averageFrameDuration = averageFrameRate != 0.0 ? 1000.0 / averageFrameRate : 0.0;
+
     if (!Timer)
     {
-        Timer=new QTimer(this);
-        connect(Timer, SIGNAL(timeout()), this, SLOT(TimeOut()));
+        Thread = new QThread(this);
+        connect(Thread, SIGNAL(finished()), Thread, SLOT(deleteLater()));
+
+        Timer = new QTimer();
+        connect(Thread, SIGNAL(started()), Timer, SLOT(start()));
+        connect(Thread, SIGNAL(finished()), Timer, SLOT(stop()));
+        connect(Thread, SIGNAL(finished()), Timer, SLOT(deleteLater()));
+
+        connect(Timer, SIGNAL(timeout()), this, SLOT(TimeOut()), Qt::DirectConnection);
+
+        if (playAllFrames)
+            Timer->setInterval(Timer_Duration);
+        else
+            Timer->setInterval(averageFrameDuration / 3);
+
+        Timer->moveToThread(Thread);
+        Thread->start();
     }
-    TimeOut();
 }
 
 //---------------------------------------------------------------------------
 void Control::TimeOut ()
 {
+	qDebug() << "threadId: " << QThread::currentThreadId();
+
     if (Time_MinusPlus)
     {
         if (Frames_Pos+1==FileInfoData->ReferenceStat()->x_Current_Max)
         {
-            Timer->stop();
+            stop();
+
             SelectedSpeed=Speed_O;
             if(TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
                 TinyDisplayArea->BigDisplayArea->ControlArea->SelectedSpeed=SelectedSpeed;
             return;
         }
-        on_Plus_clicked(true); // Plus->click();
     }
     else
     {
         if (Frames_Pos==0)
         {
-            Timer->stop();
-            SelectedSpeed=Speed_O;
+            stop();
+
+			SelectedSpeed=Speed_O;
             if(TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
                 TinyDisplayArea->BigDisplayArea->ControlArea->SelectedSpeed=SelectedSpeed;
             return;
         }
-        on_Minus_clicked(true); // Minus->click();
     }
 
-    qint64 Diff=Time->restart();
-    if (Diff<Timer_Duration)
-        Diff=Timer_Duration-Diff;
+    if(lastRenderedFrame == -1)
+    {
+        lastRenderedFrame = startFrame;
+        lastRenderedFrameTimeStamp = QTime::currentTime();
+        setCurrentFrame(startFrame);
+    }
     else
-        Diff=0;
-    if (Diff<=Timer->interval()-3 || Diff>=Timer->interval()+3 || !Timer->isActive())
-        Timer->start(Diff);
+    {
+        if(playAllFrames)
+        {
+			if (SelectedSpeed == Speed_M2 || SelectedSpeed == Speed_M1 || SelectedSpeed == Speed_M0)
+				setCurrentFrame(--lastRenderedFrame);
+			else if (SelectedSpeed == Speed_P2 || SelectedSpeed == Speed_P1|| SelectedSpeed == Speed_P0)
+				setCurrentFrame(++lastRenderedFrame);
+        } else {
+
+            auto currentTime = QTime::currentTime();
+            auto timeFromStartFrame = startFrameTimeStamp.msecsTo(currentTime);
+
+            auto framesFromStartFrame = floor(qreal(timeFromStartFrame) / averageFrameDuration);
+            if(SelectedSpeed == Speed_M0 || SelectedSpeed == Speed_P0) {
+                framesFromStartFrame /= 2;
+            } else if(SelectedSpeed == Speed_M2 || SelectedSpeed == Speed_P2) {
+                framesFromStartFrame *= 2;
+            }
+
+            size_t expectedFrame = startFrame + (Time_MinusPlus ? framesFromStartFrame : -framesFromStartFrame);
+
+            if(expectedFrame != getCurrentFrame())
+                setCurrentFrame(expectedFrame);
+
+            lastRenderedFrame = expectedFrame;
+            lastRenderedFrameTimeStamp = currentTime;
+
+        }
+    }
+
 }

@@ -110,6 +110,8 @@ public:
     // Content
     Control*                    ControlArea;
     
+    void InitPicture();
+    
 protected:
     // File information
     FileInformation*            FileInfoData;
@@ -168,6 +170,8 @@ protected:
     void updateSelection(int Pos, ImageLabel* image, options& opts);
 
 public Q_SLOTS:
+    void updateImagesAndSlider(const QImage& image1, const QImage& image2, int sliderPos);
+
     void on_FiltersList1_currentIndexChanged(QAction * action);
     void on_FiltersList2_currentIndexChanged(QAction * action);
     void on_FiltersList1_currentIndexChanged(int Pos);

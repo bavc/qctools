@@ -4,6 +4,7 @@
 #include "Core/FFmpeg_Glue.h"
 #include <QDebug>
 #include <QPainter>
+#include <cmath>
 
 ImageLabel::ImageLabel(FFmpeg_Glue** Picture_, size_t Pos_, QWidget *parent) :
     ui(new Ui::ImageLabel),
@@ -69,7 +70,13 @@ void ImageLabel::Remove ()
     setVisible(false);
 }
 
-bool ImageLabel::UpdatePixmap()
+
+void ImageLabel::setImage(const QImage& image)
+{
+    UpdatePixmap(image);
+}
+
+bool ImageLabel::UpdatePixmap(const QImage& image /*= nullptr*/)
 {
     if(*Picture == nullptr)
     {
@@ -78,14 +85,11 @@ bool ImageLabel::UpdatePixmap()
 
     auto picture = *Picture;
 
-    QImage* Image = nullptr;
-    switch (Pos)
-    {
-        case 1 : Image = picture->Image_Get(0); break;
-        case 2 : Image = picture->Image_Get(1); break;
-        default: return false;
-    }
-    if (!Image)
+    QImage Image = image;
+    if (Image.isNull())
+        Image = picture->Image_Get(Pos - 1);
+
+    if (Image.isNull())
     {
         Pixmap = QPixmap(Pixmap.width(), Pixmap.height());
         ui->label->setPixmap(Pixmap);
@@ -101,6 +105,9 @@ bool ImageLabel::UpdatePixmap()
     int expectedWidth = 0;
     int expectedHeight = 0;
 
+    if (std::isnan(dar))
+        return true;
+
     if(dar > iar) {
         expectedWidth = Size.width();
         expectedHeight = Size.width() / dar;
@@ -115,14 +122,9 @@ bool ImageLabel::UpdatePixmap()
     if (dw > 1 && dh > 1)
     {
         picture->Scale_Change(Size.width(), Size.height());
+        Image = picture->Image_Get(Pos - 1);
 
-        switch (Pos)
-        {
-            case 1 : Image = picture->Image_Get(0); break;
-            case 2 : Image = picture->Image_Get(1); break;
-            default: return false;
-        }
-        if (!Image)
+        if (Image.isNull())
         {
             Pixmap = QPixmap(Pixmap.width(), Pixmap.height());
             ui->label->setPixmap(Pixmap);
@@ -130,7 +132,7 @@ bool ImageLabel::UpdatePixmap()
         }
     }
 
-    Pixmap.convertFromImage(*Image);
+    Pixmap.convertFromImage(Image);
     ui->label->setPixmap(Pixmap);
 
     if(dw > 1 && dh > 1)

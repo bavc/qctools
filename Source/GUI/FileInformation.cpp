@@ -18,6 +18,8 @@
 #include <QProcess>
 #include <QFileInfo>
 #include <QDesktopServices>
+#include <QApplication>
+#include <QDebug>
 #include <QUrl>
 #include <zlib.h>
 #include <zconf.h>
@@ -379,8 +381,10 @@ void FileInformation::Export_CSV (const QString &ExportFileName)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-QPixmap* FileInformation::Picture_Get (size_t Pos)
+QPixmap FileInformation::Picture_Get (size_t Pos)
 {
+    QPixmap Pixmap;
+
     if (!Glue || Pos>=ReferenceStat()->x_Current || Pos>=Glue->Thumbnails_Size(0))
     {
         Pixmap.load(":/icon/logo.png");
@@ -388,16 +392,16 @@ QPixmap* FileInformation::Picture_Get (size_t Pos)
     }
     else
     {
-        FFmpeg_Glue::bytes* Thumbnail=Glue->Thumbnail_Get(0, Pos);
-        if (Thumbnail)
-            Pixmap.loadFromData(Thumbnail->Data, Thumbnail->Size);
+        auto Thumbnail = Glue->Thumbnail_Get(0, Pos);
+        if (!Thumbnail.isEmpty())
+            Pixmap.loadFromData(Thumbnail);
         else
         {
             Pixmap.load(":/icon/logo.png");
             Pixmap=Pixmap.scaled(72, 72);
         }
     }
-    return &Pixmap;
+    return Pixmap;
 }
 
 //---------------------------------------------------------------------------
@@ -475,6 +479,11 @@ void FileInformation::Frames_Pos_Set (int Pos, size_t Stats_Pos)
         return;
     Frames_Pos=Pos;
 
+    if(QApplication::instance()->thread() != QThread::currentThread())
+    {
+        qDebug() << "Frames_Pos_Set: called from non-UI thread";
+    }
+
     if (Main)
         Main->Update();
 }
@@ -507,6 +516,15 @@ void FileInformation::Frames_Pos_Plus ()
 bool FileInformation::PlayBackFilters_Available ()
 {
     return Glue;
+}
+
+qreal FileInformation::averageFrameRate() const
+{
+    auto splitted = QString::fromStdString(Glue->AvgVideoFrameRate_Get()).split("/");
+    if(splitted.length() == 1)
+        return splitted[0].toDouble();
+
+    return splitted[0].toDouble() / splitted[1].toDouble();
 }
 
 int FileInformation::BitsPerRawSample() const

@@ -41,7 +41,7 @@ public:
     void                        Export_CSV                  (const QString &ExportFileName);
 
     // Infos
-    QPixmap*                    Picture_Get                 (size_t Pos);
+    QPixmap                     Picture_Get                 (size_t Pos);
     QString                     FileName;
     activefilters               ActiveFilters;
     activealltracks             ActiveAllTracks;
@@ -53,6 +53,8 @@ public:
     void                        Frames_Pos_Plus             ();
     bool                        PlayBackFilters_Available   ();
 
+    qreal                       averageFrameRate        () const;
+
     // Deck control information
     BlackmagicDeckLink_Glue*    blackmagicDeckLink_Glue;
 
@@ -63,8 +65,6 @@ public:
 
     int                         BitsPerRawSample            () const;
 private:
-    // Info
-    QPixmap                     Pixmap;
     size_t                      ReferenceStream_Pos;
     int                         Frames_Pos;
     MainWindow*                 Main;

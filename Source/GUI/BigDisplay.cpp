@@ -2027,18 +2027,8 @@ void BigDisplay::FiltersList2_currentOptionChanged(size_t Picture_Current)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void BigDisplay::ShowPicture ()
+void BigDisplay::InitPicture()
 {
-    if (!isVisible())
-        return;
-
-    if ((!ShouldUpate && Frames_Pos==FileInfoData->Frames_Pos_Get())
-     || ( ShouldUpate && false)) // ToDo: try to optimize
-        return;
-    Frames_Pos=FileInfoData->Frames_Pos_Get();
-    ShouldUpate=false;
-
-    // Picture
     if (!Picture)
     {
         string FileName_string=FileInfoData->FileName.toUtf8().data();
@@ -2059,18 +2049,34 @@ void BigDisplay::ShowPicture ()
         FiltersList1_currentIndexChanged(Picture_Current1);
         FiltersList2_currentIndexChanged(Picture_Current2);
     }
+}
+
+void BigDisplay::ShowPicture ()
+{
+    if (!isVisible())
+        return;
+
+	if (!Picture)
+		return;
+
+    if ((!ShouldUpate && Frames_Pos==FileInfoData->Frames_Pos_Get())
+     || ( ShouldUpate && false)) // ToDo: try to optimize
+        return;
+    Frames_Pos=FileInfoData->Frames_Pos_Get();
+    ShouldUpate=false;
+
     Picture->FrameAtPosition(Frames_Pos);
-    if (Picture->Image_Get(0))
+    auto image = Picture->Image_Get(0);
+    if (!image.isNull())
     {
-        Image_Width=Picture->Image_Get(0)->width();
-        Image_Height=Picture->Image_Get(0)->height();
+        Image_Width = image.width();
+        Image_Height = image.height();
     }
 
-    if (Slider->sliderPosition()!=Frames_Pos)
-        Slider->setSliderPosition(Frames_Pos);
-
-    Image1->UpdatePixmap();
-    Image2->UpdatePixmap();
+    QMetaObject::invokeMethod(this, "updateImagesAndSlider",
+                              Q_ARG(const QImage&, Picture->Image_Get(0)),
+                              Q_ARG(const QImage&, Picture->Image_Get(1)),
+                              Q_ARG(const int, Frames_Pos));
 
     // Stats
     if (ControlArea)
@@ -2334,6 +2340,15 @@ void BigDisplay::updateSelection(int Pos, ImageLabel* image, options& opts)
     {
         image->setSelectionArea(0, 0, 0, 0);
     }
+}
+
+void BigDisplay::updateImagesAndSlider(const QImage &image1, const QImage &image2, int sliderPos)
+{
+    if (Slider->sliderPosition() != sliderPos)
+        Slider->setSliderPosition(sliderPos);
+
+    Image1->setImage(image1);
+    Image2->setImage(image2);
 }
 
 void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)

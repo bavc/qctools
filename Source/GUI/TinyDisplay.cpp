@@ -126,8 +126,10 @@ void TinyDisplay::thumbsLayoutResized()
 // Actions
 //***************************************************************************
 
-void TinyDisplay::Update()
+void TinyDisplay::Update(bool updateBigDisplay)
 {
+    Q_ASSERT(QThread::currentThread() == thread());
+
     // start upto stop are the current movie frames that need to made into thumbs
     unsigned long currentFrame = FileInfoData->Frames_Pos_Get();
 
@@ -154,8 +156,8 @@ void TinyDisplay::Update()
                     if (!needsUpdate && (diff < total_thumbs && i < total_thumbs - diff)) {
                         thumbnails[i]->setIcon(thumbnails[i+diff]->icon());
                     } else {
-                        QPixmap *pixmap = FileInfoData->Picture_Get(framePos - center + i);
-                        thumbnails[i]->setIcon(pixmap->copy(0, 0, 72, 72));
+                        QPixmap pixmap = FileInfoData->Picture_Get(framePos - center + i);
+                        thumbnails[i]->setIcon(pixmap.copy(0, 0, 72, 72));
                     }
                 } else {
                     thumbnails[i]->setIcon(emptyPixmap);
@@ -170,13 +172,13 @@ void TinyDisplay::Update()
                 if (framePos + ui >= center && framePos - center + ui < current) {
                     if (diff < total_thumbs && i - (int) diff >= 0) {
                         thumbnails[ui]->setIcon(thumbnails[ui-diff]->icon());
-                    } else {
-                        QPixmap *pixmap = FileInfoData->Picture_Get(framePos - center + ui);
-                        thumbnails[ui]->setIcon(pixmap->copy(0, 0, 72, 72));
-                    }
+					} else {
+                        QPixmap pixmap = FileInfoData->Picture_Get(framePos - center + ui);
+                        thumbnails[ui]->setIcon(pixmap.copy(0, 0, 72, 72));
+					}
                 } else {
                     thumbnails[ui]->setIcon(emptyPixmap);
-                }
+				}
             }
         }
 
@@ -187,7 +189,7 @@ void TinyDisplay::Update()
         if (framePos - center + total_thumbs < current)
             needsUpdate = false;
 
-        if (BigDisplayArea) {
+        if (updateBigDisplay && BigDisplayArea) {
             BigDisplayArea->ShowPicture();
         }
     }
@@ -249,5 +251,7 @@ void TinyDisplay::LoadBigDisplay()
 
     BigDisplayArea->hide();
     BigDisplayArea->show();
+
+    BigDisplayArea->InitPicture();
     BigDisplayArea->ShowPicture();
 }
