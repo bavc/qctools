@@ -481,7 +481,7 @@ void FileInformation::Frames_Pos_Set (int Pos, size_t Stats_Pos)
 
     if(QApplication::instance()->thread() != QThread::currentThread())
     {
-        qDebug() << "Frames_Pos_Set: called from non-UI thread";
+        // qDebug() << "Frames_Pos_Set: called from non-UI thread";
     }
 
     if (Main)

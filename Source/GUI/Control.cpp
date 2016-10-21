@@ -240,12 +240,12 @@ void Control::Update()
 {
     if(this->thread() != QThread::currentThread())
     {
-        qDebug() << "Control::Update: called from non-UI thread";
+        // qDebug() << "Control::Update: called from non-UI thread";
         QMetaObject::invokeMethod(this, "Update");
         return;
 
     } else {
-        qDebug() << "Control::Update: called from UI thread";
+        // qDebug() << "Control::Update: called from UI thread";
     }
 
     if ((!ShouldUpate && Frames_Pos==FileInfoData->Frames_Pos_Get())
@@ -599,15 +599,6 @@ void Control::on_M0_clicked(bool checked)
 void Control::on_PlayPause_clicked(bool checked)
 {
     qDebug() << "total frames: " << FileInfoData->ReferenceStat()->x_Current_Max;
-    qDebug() << "frame durations: ";
-
-    for(auto i = 0; i < FileInfoData->ReferenceStat()->x_Current_Max; ++i)
-    {
-        auto duration = FileInfoData->ReferenceStat()->durations[i];
-        if(i == 0 || !qFuzzyCompare(duration, FileInfoData->ReferenceStat()->durations[0]))
-            qDebug() << duration;
-    }
-
 
     if (SelectedSpeed==Control::Speed_O)
         on_P1_clicked(checked);
@@ -843,7 +834,7 @@ void Control::TimeOut_Init()
 //---------------------------------------------------------------------------
 void Control::TimeOut ()
 {
-	qDebug() << "threadId: " << QThread::currentThreadId();
+    // qDebug() << "threadId: " << QThread::currentThreadId();
 
     if (Time_MinusPlus)
     {
