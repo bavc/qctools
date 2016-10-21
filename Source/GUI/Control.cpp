@@ -822,9 +822,19 @@ void Control::TimeOut_Init()
         connect(Timer, SIGNAL(timeout()), this, SLOT(TimeOut()), Qt::DirectConnection);
 
         if (playAllFrames)
+        {
+            if(SelectedSpeed == Speed_P0 || SelectedSpeed == Speed_M0)
+                Timer_Duration = ceil(averageFrameRate * 2);
+            else if(SelectedSpeed == Speed_P1 || SelectedSpeed == Speed_M1)
+                Timer_Duration = ceil(averageFrameRate);
+            else if(SelectedSpeed == Speed_P2 || SelectedSpeed == Speed_M2)
+                Timer_Duration = ceil(averageFrameRate / 2);
+
             Timer->setInterval(Timer_Duration);
-        else
+        } else
+        {
             Timer->setInterval(averageFrameDuration / 3);
+        }
 
         Timer->moveToThread(Thread);
         Thread->start();
