@@ -2075,10 +2075,17 @@ void BigDisplay::ShowPicture ()
         Image_Height = image.height();
     }
 
-    QMetaObject::invokeMethod(this, "updateImagesAndSlider",
-                              Q_ARG(const QImage&, Picture->Image_Get(0)),
-                              Q_ARG(const QImage&, Picture->Image_Get(1)),
-                              Q_ARG(const int, Frames_Pos));
+	if (QThread::currentThread() == thread())
+	{
+		updateImagesAndSlider(Picture->Image_Get(0), Picture->Image_Get(1), Frames_Pos);
+	}
+	else 
+	{
+		QMetaObject::invokeMethod(this, "updateImagesAndSlider",
+			Q_ARG(const QImage&, Picture->Image_Get(0)),
+			Q_ARG(const QImage&, Picture->Image_Get(1)),
+			Q_ARG(const int, Frames_Pos));
+	}
 
     // Stats
     if (ControlArea)
