@@ -137,8 +137,9 @@ public:
     void*                       InputData_Get() { return InputDatas[0]; }
     void                        InputData_Set(void* InputData) {InputDatas.push_back((inputdata*)InputData); InputDatas_Copy=true;}
 
+    void setThreadSafe(bool enable);
 private:
-    QMutex mutex;
+    QMutex* mutex;
 
     // Stream information
     struct inputdata

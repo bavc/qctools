@@ -250,8 +250,9 @@ void TinyDisplay::LoadBigDisplay()
     }
 
     BigDisplayArea->hide();
-    BigDisplayArea->show();
 
     BigDisplayArea->InitPicture();
     BigDisplayArea->ShowPicture();
+
+    BigDisplayArea->show();
 }

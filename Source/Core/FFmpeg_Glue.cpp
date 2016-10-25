@@ -770,7 +770,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, activealltracks ActiveAllTrac
     WithStats(WithStats_),
     FileName(FileName_),
     InputDatas_Copy(false),
-
+    mutex(nullptr),
     // Encode
     Encode_FormatContext(NULL)
 {
@@ -899,7 +899,7 @@ FFmpeg_Glue::~FFmpeg_Glue()
 
 QImage FFmpeg_Glue::Image_Get(size_t Pos)
 {
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(mutex);
 
     if (Pos>=OutputDatas.size() || !OutputDatas[Pos] || !OutputDatas[Pos]->Enabled)
         return QImage();
@@ -912,7 +912,7 @@ QImage FFmpeg_Glue::Image_Get(size_t Pos)
 
 QByteArray FFmpeg_Glue::Thumbnail_Get(size_t Pos, size_t FramePos)
 {
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(mutex);
 
     if (Pos>=OutputDatas.size() || !OutputDatas[Pos] || !OutputDatas[Pos]->Enabled)
         return NULL;
@@ -923,7 +923,7 @@ QByteArray FFmpeg_Glue::Thumbnail_Get(size_t Pos, size_t FramePos)
 
 size_t FFmpeg_Glue::Thumbnails_Size(size_t Pos)
 {
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(mutex);
 
     if (Pos>=OutputDatas.size() || !OutputDatas[Pos] || !OutputDatas[Pos]->Enabled)
         return 0;
@@ -1091,7 +1091,7 @@ void FFmpeg_Glue::ModifyOutput(size_t InputPos, size_t OutputPos, size_t FilterP
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::Seek(size_t FramePos)
 {
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(mutex);
 
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
     {
@@ -1158,7 +1158,7 @@ void FFmpeg_Glue::FrameAtPosition(size_t FramePos)
 //---------------------------------------------------------------------------
 bool FFmpeg_Glue::NextFrame()
 {
-	QMutexLocker locker(&mutex);
+    QMutexLocker locker(mutex);
 
 	if (FileName.empty())
     {
@@ -1400,7 +1400,7 @@ void FFmpeg_Glue::CloseEncode()
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::Filter_Change(size_t FilterPos, int FilterType, const string &Filter)
 {
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(mutex);
 
     for (size_t InputPos=0; InputPos<InputDatas.size(); InputPos++)
     {
@@ -1434,7 +1434,7 @@ void FFmpeg_Glue::Disable(const size_t Pos)
 //---------------------------------------------------------------------------
 double FFmpeg_Glue::TimeStampOfCurrentFrame(const size_t OutputPos)
 {
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(mutex);
 
     if (OutputPos >= OutputDatas.size())
         return DBL_MAX;
@@ -1453,7 +1453,7 @@ double FFmpeg_Glue::TimeStampOfCurrentFrame(const size_t OutputPos)
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::Scale_Change(int Scale_Width_, int Scale_Height_)
 {
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(mutex);
 
     bool MustOutput=false;
 
@@ -1484,7 +1484,7 @@ void FFmpeg_Glue::Scale_Change(int Scale_Width_, int Scale_Height_)
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::Thumbnails_Modulo_Change(size_t Modulo)
 {
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(mutex);
 
     for (size_t Pos=0; Pos<OutputDatas.size(); Pos++)
     {
@@ -1502,6 +1502,23 @@ void FFmpeg_Glue::Thumbnails_Modulo_Change(size_t Modulo)
                 OutputData->Thumbnails[Pos]=NULL;
                 delete OldThumbnail; // pointer is deleted after deferencing it in order to avoid a race condition (e.g. vector is read during the deletion)
             }
+        }
+    }
+}
+
+void FFmpeg_Glue::setThreadSafe(bool enable)
+{
+    if(enable)
+    {
+        if(!mutex)
+            mutex = new QMutex();
+    }
+    else
+    {
+        if(mutex)
+        {
+            delete mutex;
+            mutex = nullptr;
         }
     }
 }
