@@ -101,7 +101,11 @@ protected:
             info += i?", ":": ";
             info += itemInfo.Name;
             info += "=";
-            info += QString::number( (*m_curves)[i]->sample(index).ry(), 'f',  itemInfo.DigitsAfterComma);
+
+            if ((*m_curves)[i]->dataSize() != 0)
+                info += QString::number((*m_curves)[i]->sample(index).ry(), 'f', itemInfo.DigitsAfterComma);
+            else
+                info += QString("n/a");
         }
 
         return info;
