@@ -429,6 +429,12 @@ void MainWindow::Update()
     if(TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
         TinyDisplayArea->BigDisplayArea->ShowPicture();
 
-	QMetaObject::invokeMethod(ControlArea, "Update");
-	QMetaObject::invokeMethod(InfoArea, "Update");
+	if(ControlArea)
+		ControlArea->Update();
+
+	if(InfoArea)
+		InfoArea->Update();
+
+	// QMetaObject::invokeMethod(ControlArea, "Update");
+	// QMetaObject::invokeMethod(InfoArea, "Update");
 }
