@@ -2075,17 +2075,17 @@ void BigDisplay::ShowPicture ()
         Image_Height = image.height();
     }
 
-	if (QThread::currentThread() == thread())
-	{
-		updateImagesAndSlider(Picture->Image_Get(0), Picture->Image_Get(1), Frames_Pos);
-	}
-	else 
-	{
-		QMetaObject::invokeMethod(this, "updateImagesAndSlider",
-			Q_ARG(const QImage&, Picture->Image_Get(0)),
-			Q_ARG(const QImage&, Picture->Image_Get(1)),
-			Q_ARG(const int, Frames_Pos));
-	}
+    if (QThread::currentThread() == thread())
+    {
+        updateImagesAndSlider(QPixmap::fromImage(Picture->Image_Get(0)), QPixmap::fromImage(Picture->Image_Get(1)), Frames_Pos);
+    }
+    else
+    {
+        QMetaObject::invokeMethod(this, "updateImagesAndSlider",
+                                  Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(0))),
+                                  Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(1))),
+                                  Q_ARG(const int, Frames_Pos));
+    }
 
     // Stats
     if (ControlArea)
@@ -2351,13 +2351,13 @@ void BigDisplay::updateSelection(int Pos, ImageLabel* image, options& opts)
     }
 }
 
-void BigDisplay::updateImagesAndSlider(const QImage &image1, const QImage &image2, int sliderPos)
+void BigDisplay::updateImagesAndSlider(const QPixmap &image1, const QPixmap &image2, int sliderPos)
 {
     if (Slider->sliderPosition() != sliderPos)
         Slider->setSliderPosition(sliderPos);
 
-    Image1->setImage(image1);
-    Image2->setImage(image2);
+    Image1->setPixmap(image1);
+    Image2->setPixmap(image2);
 }
 
 void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)

@@ -141,6 +141,12 @@ bool ImageLabel::UpdatePixmap(const QImage& image /*= nullptr*/)
     return true;
 }
 
+void ImageLabel::setPixmap(const QPixmap &pixmap)
+{
+    Pixmap = pixmap;
+    ui->label->setPixmap(pixmap);
+}
+
 size_t ImageLabel::GetPos() const
 {
     return Pos;

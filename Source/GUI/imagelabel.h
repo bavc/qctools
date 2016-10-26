@@ -20,6 +20,8 @@ public:
 
     void                        Remove ();
     bool                        UpdatePixmap(const QImage& image = QImage());
+    void						setPixmap(const QPixmap& pixmap);
+
     size_t                      GetPos() const;
 
 public Q_SLOTS:

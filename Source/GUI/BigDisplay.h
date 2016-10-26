@@ -170,7 +170,7 @@ protected:
     void updateSelection(int Pos, ImageLabel* image, options& opts);
 
 public Q_SLOTS:
-    void updateImagesAndSlider(const QImage& image1, const QImage& image2, int sliderPos);
+    void updateImagesAndSlider(const QPixmap& pixmap1, const QPixmap& pixmap2, int sliderPos);
 
     void on_FiltersList1_currentIndexChanged(QAction * action);
     void on_FiltersList2_currentIndexChanged(QAction * action);
