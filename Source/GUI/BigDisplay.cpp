@@ -2081,10 +2081,19 @@ void BigDisplay::ShowPicture ()
     }
     else
     {
-        QMetaObject::invokeMethod(this, "updateImagesAndSlider",
-                                  Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(0))),
-                                  Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(1))),
-                                  Q_ARG(const int, Frames_Pos));
+        if (QThread::currentThread()->isInterruptionRequested())
+        {
+            QMetaObject::invokeMethod(this, "updateImagesAndSlider", Qt::QueuedConnection,
+                                      Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(0))),
+                                      Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(1))),
+                                      Q_ARG(const int, Frames_Pos));
+        }
+        else {
+            QMetaObject::invokeMethod(this, "updateImagesAndSlider", Qt::BlockingQueuedConnection,
+                                      Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(0))),
+                                      Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(1))),
+                                      Q_ARG(const int, Frames_Pos));
+        }
     }
 
     // Stats

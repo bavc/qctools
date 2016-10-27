@@ -219,8 +219,13 @@ void Control::stop()
 {
     if(Thread)
     {
+        qDebug() << "Thread->requestInterruption()";
+        Thread->requestInterruption();
+        qDebug() << "Thread->quit()";
         Thread->quit();
+        qDebug() << "Thread->wait()";
         Thread->wait();
+        qDebug() << "after Thread->wait()";
         Thread = nullptr;
         Timer = nullptr;
     }
