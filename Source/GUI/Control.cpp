@@ -221,8 +221,13 @@ void Control::stop()
     {
         qDebug() << "Thread->requestInterruption()";
         Thread->requestInterruption();
+
+        qDebug() << "qApp->processEvents()";
+        qApp->processEvents();
+
         qDebug() << "Thread->quit()";
         Thread->quit();
+
         qDebug() << "Thread->wait()";
         Thread->wait();
         qDebug() << "after Thread->wait()";
