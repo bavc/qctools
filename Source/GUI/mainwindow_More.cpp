@@ -423,8 +423,8 @@ void MainWindow::selectDisplayFiltersFile(int NewFilePos)
 //---------------------------------------------------------------------------
 void MainWindow::Update()
 {
-    if(TinyDisplayArea)
-        QMetaObject::invokeMethod(TinyDisplayArea, "Update", Q_ARG(bool, false));
+	if (TinyDisplayArea)
+        TinyDisplayArea->Update(false);
 
     if(TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
         TinyDisplayArea->BigDisplayArea->ShowPicture();
@@ -434,7 +434,4 @@ void MainWindow::Update()
 
 	if(InfoArea)
 		InfoArea->Update();
-
-	// QMetaObject::invokeMethod(ControlArea, "Update");
-	// QMetaObject::invokeMethod(InfoArea, "Update");
 }

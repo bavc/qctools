@@ -128,6 +128,13 @@ void TinyDisplay::thumbsLayoutResized()
 
 void TinyDisplay::Update(bool updateBigDisplay)
 {
+    if(thread() != QThread::currentThread())
+    {
+        // qDebug() << "TinyDisplay::Update: called from non-UI thread";
+        QMetaObject::invokeMethod(this, "Update", Q_ARG(bool, updateBigDisplay));
+        return;
+    }
+
     Q_ASSERT(QThread::currentThread() == thread());
 
     // start upto stop are the current movie frames that need to made into thumbs
@@ -250,9 +257,8 @@ void TinyDisplay::LoadBigDisplay()
     }
 
     BigDisplayArea->hide();
-
     BigDisplayArea->InitPicture();
-    BigDisplayArea->ShowPicture();
 
     BigDisplayArea->show();
+    BigDisplayArea->ShowPicture();
 }
