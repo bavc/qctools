@@ -159,7 +159,6 @@ protected:
     size_t                      FiltersListDefault_Count;
 
     // Events
-    void                        resizeEvent (QResizeEvent * event);
     void                        FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, QGridLayout* Layout0);
     void                        FiltersList1_currentIndexChanged(size_t FilterPos);
     void                        FiltersList2_currentIndexChanged(size_t FilterPos);

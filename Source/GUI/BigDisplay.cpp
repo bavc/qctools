@@ -2467,42 +2467,6 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(QAction * action)
 }
 
 //---------------------------------------------------------------------------
-void BigDisplay::resizeEvent(QResizeEvent* Event)
-{
-    if (Event->oldSize().width()<0 || Event->oldSize().height()<0)
-        return;
-
-    /*int DiffX=(Event->size().width()-Event->oldSize().width())/2;
-    int DiffY=(Event->size().width()-Event->oldSize().width())/2;
-    Picture->Scale_Change(Image_Width+DiffX, Image_Height+DiffY);
-
-    Frames_Pos=(size_t)-1;
-    ShowPicture ();*/
-    int SizeX=(Event->size().width()-(InfoArea?InfoArea->width():0))/2-25;
-    int SizeY=(Event->size().height()-Slider->height())-50;
-
-    /*if (InfoArea->height()+FiltersList1->height()+Slider->height()+ControlArea->height()+50>=Event->size().height())
-    {
-        InfoArea->hide();
-        Layout->removeWidget(InfoArea);
-    }
-    else
-    {
-        Layout->addWidget(InfoArea, 0, 1, 1, 3, Qt::AlignLeft);
-        InfoArea->show();
-    }*/
-
-    //adjust();
-    //Picture->Scale_Change(Image1->width(), Image1->height());
-
-    //Frames_Pos=(size_t)-1;
-    //ShowPicture ();
-
-    Image1->UpdatePixmap();
-    Image2->UpdatePixmap();
-}
-
-//---------------------------------------------------------------------------
 void BigDisplay::on_Full_triggered()
 {
     if (isMaximized())
