@@ -73,14 +73,14 @@ void ImageLabel::Remove ()
 
 void ImageLabel::setImage(const QImage& image)
 {
-    UpdatePixmap(image);
+    updatePixmap(image);
 }
 
-bool ImageLabel::UpdatePixmap(const QImage& image /*= nullptr*/)
+void ImageLabel::updatePixmap(const QImage& image /*= nullptr*/)
 {
     if(*Picture == nullptr)
     {
-        return false;
+        return;
     }
 
     auto picture = *Picture;
@@ -93,58 +93,32 @@ bool ImageLabel::UpdatePixmap(const QImage& image /*= nullptr*/)
     {
         Pixmap = QPixmap(Pixmap.width(), Pixmap.height());
         ui->label->setPixmap(Pixmap);
-        return true;
+        return;
     }
 
-    QSize Size = size();
-    QSize pixmapSize = Pixmap.size();
-
-    auto dar = picture->OutputDAR_Get(Pos - 1);
-    auto iar = qreal(Size.width()) / Size.height();
-
-    int expectedWidth = 0;
-    int expectedHeight = 0;
-
-    if (std::isnan(dar))
-        return true;
-
-    if(dar > iar) {
-        expectedWidth = Size.width();
-        expectedHeight = Size.width() / dar;
-    } else {
-        expectedHeight = Size.height();
-        expectedWidth = Size.height() * dar;
-    }
-
-    int dw = abs(expectedWidth - pixmapSize.width());
-    int dh = abs(expectedHeight - pixmapSize.height());
-
-    if (dw > 1 && dh > 1)
+    if (needRescale())
     {
-        picture->Scale_Change(Size.width(), Size.height());
-        Image = picture->Image_Get(Pos - 1);
-
-        if (Image.isNull())
-        {
-            Pixmap = QPixmap(Pixmap.width(), Pixmap.height());
-            ui->label->setPixmap(Pixmap);
-            return true;
-        }
+		rescale();
     }
-
-    Pixmap.convertFromImage(Image);
-    ui->label->setPixmap(Pixmap);
-
-    if(dw > 1 && dh > 1)
-        setSelectionArea(selectionPos.x(), selectionPos.y(), selectionSize.width(), selectionSize.height());
-
-    return true;
+    else
+    {
+        Pixmap.convertFromImage(Image);
+        ui->label->setPixmap(Pixmap);
+    }
 }
 
 void ImageLabel::setPixmap(const QPixmap &pixmap)
 {
     Pixmap = pixmap;
-    ui->label->setPixmap(pixmap);
+
+	if (needRescale())
+	{
+		rescale();
+	} 
+	else
+	{
+		ui->label->setPixmap(pixmap);
+	}
 }
 
 size_t ImageLabel::GetPos() const
@@ -317,7 +291,7 @@ void ImageLabel::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
 
-    UpdatePixmap();
+    updatePixmap();
 }
 
 bool ImageLabel::eventFilter(QObject *object, QEvent *event)
@@ -378,4 +352,64 @@ bool ImageLabel::eventFilter(QObject *object, QEvent *event)
     }
 
     return false;
+}
+
+bool ImageLabel::needRescale()
+{
+    if(*Picture == nullptr)
+    {
+        return false;
+    }
+
+    auto picture = *Picture;
+    QSize Size = size();
+    QSize pixmapSize = Pixmap.size();
+
+    auto dar = picture->OutputDAR_Get(Pos - 1);
+    auto iar = qreal(Size.width()) / Size.height();
+
+    int expectedWidth = 0;
+    int expectedHeight = 0;
+
+    if (std::isnan(dar))
+        return false;
+
+    if(dar > iar) {
+        expectedWidth = Size.width();
+        expectedHeight = Size.width() / dar;
+    } else {
+        expectedHeight = Size.height();
+        expectedWidth = Size.height() * dar;
+    }
+
+    int dw = abs(expectedWidth - pixmapSize.width());
+    int dh = abs(expectedHeight - pixmapSize.height());
+
+    bool needRescale = dw > 1 && dh > 1;
+
+    return needRescale;
+}
+
+void ImageLabel::rescale()
+{
+    if(*Picture == nullptr)
+    {
+        return;
+    }
+
+    auto picture = *Picture;
+    picture->Scale_Change(size().width(), size().height());
+    auto Image = picture->Image_Get(Pos - 1);
+
+    if (Image.isNull())
+    {
+        Pixmap = QPixmap(Pixmap.width(), Pixmap.height());
+        ui->label->setPixmap(Pixmap);
+        return;
+    }
+
+    Pixmap.convertFromImage(Image);
+    ui->label->setPixmap(Pixmap);
+
+    setSelectionArea(selectionPos.x(), selectionPos.y(), selectionSize.width(), selectionSize.height());
 }

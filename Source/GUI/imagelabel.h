@@ -19,8 +19,8 @@ public:
     ~ImageLabel();
 
     void                        Remove ();
-    bool                        UpdatePixmap(const QImage& image = QImage());
-    void						setPixmap(const QPixmap& pixmap);
+    void                        updatePixmap(const QImage& image = QImage());
+    void                        setPixmap(const QPixmap& pixmap);
 
     size_t                      GetPos() const;
 
@@ -50,6 +50,8 @@ protected:
     void resizeEvent(QResizeEvent* event);
     bool eventFilter(QObject* object, QEvent* event);
 
+    bool needRescale();
+    void rescale();
 private:
     Ui::ImageLabel *ui;
     SelectionArea* selectionArea;
