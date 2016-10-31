@@ -377,7 +377,7 @@ void Plots::adjustGroupMax(int group, int bitsPerRawSample)
     if(bitsPerRawSample == 0)
         bitsPerRawSample = defaultBitesPerRawSample;
 
-    if(group == Group_Y || group == Group_U || group == Group_V)
+    if(group == Group_Y || group == Group_U || group == Group_V || group == Group_YDiff || group == Group_UDiff || group == Group_VDiff)
     {
         PerStreamType[Type_Video].GetPerGroup(group)->setMax((1 << bitsPerRawSample) - 1);
     }
