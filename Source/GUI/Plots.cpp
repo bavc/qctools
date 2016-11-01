@@ -373,9 +373,9 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
 
 void Plots::adjustGroupMax(int group, int bitsPerRawSample)
 {
-    int defaultBitesPerRawSample = 8;
+    int defaultBitsPerRawSample = 8;
     if(bitsPerRawSample == 0)
-        bitsPerRawSample = defaultBitesPerRawSample;
+        bitsPerRawSample = defaultBitsPerRawSample;
 
     if(group == Group_Y || group == Group_U || group == Group_V || group == Group_YDiff || group == Group_UDiff || group == Group_VDiff)
     {
