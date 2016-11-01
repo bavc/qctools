@@ -860,8 +860,6 @@ void Control::TimeOut ()
     {
         if (Frames_Pos+1==FileInfoData->ReferenceStat()->x_Current_Max)
         {
-            stop();
-
             SelectedSpeed=Speed_O;
             if(TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
                 TinyDisplayArea->BigDisplayArea->ControlArea->SelectedSpeed=SelectedSpeed;
@@ -872,8 +870,6 @@ void Control::TimeOut ()
     {
         if (Frames_Pos==0)
         {
-            stop();
-
 			SelectedSpeed=Speed_O;
             if(TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
                 TinyDisplayArea->BigDisplayArea->ControlArea->SelectedSpeed=SelectedSpeed;
