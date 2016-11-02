@@ -168,6 +168,7 @@ void TinyDisplay::Update(bool updateBigDisplay)
                     }
                 } else {
                     thumbnails[i]->setIcon(emptyPixmap);
+                    needsUpdate = true;
                 }
             }
 
@@ -185,7 +186,8 @@ void TinyDisplay::Update(bool updateBigDisplay)
 					}
                 } else {
                     thumbnails[ui]->setIcon(emptyPixmap);
-				}
+                    needsUpdate = true;
+                }
             }
         }
 
