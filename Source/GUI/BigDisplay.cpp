@@ -1256,18 +1256,18 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     }
 
     //Image1
-    Image1=new ImageLabel(&Picture, 1, this);
-    Image1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    Image1->setMinimumSize(20, 20);
-    Image1->showDebugOverlay(Config::instance().getDebug());
+    imageLabel1=new ImageLabel(&Picture, 1, this);
+    imageLabel1->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    imageLabel1->setMinimumSize(20, 20);
+    imageLabel1->showDebugOverlay(Config::instance().getDebug());
     //Layout->addWidget(Image1, 1, 0, 1, 1);
     //Layout->setColumnStretch(0, 1);
 
     //Image2
-    Image2=new ImageLabel(&Picture, 2, this);
-    Image2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    Image2->setMinimumSize(20, 20);
-    Image2->showDebugOverlay(Config::instance().getDebug());
+    imageLabel2=new ImageLabel(&Picture, 2, this);
+    imageLabel2->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    imageLabel2->setMinimumSize(20, 20);
+    imageLabel2->showDebugOverlay(Config::instance().getDebug());
     //Layout->addWidget(Image2, 1, 2, 1, 1);
     //Layout->setColumnStretch(2, 1);
 
@@ -1275,8 +1275,8 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     QHBoxLayout* ImageLayout=new QHBoxLayout();
     ImageLayout->setContentsMargins(0, -1, 0, 0);
     ImageLayout->setSpacing(0);
-    ImageLayout->addWidget(Image1);
-    ImageLayout->addWidget(Image2);
+    ImageLayout->addWidget(imageLabel1);
+    ImageLayout->addWidget(imageLabel2);
     Layout->addLayout(ImageLayout, 1, 0, 1, 3);
 
     // Info
@@ -1636,14 +1636,14 @@ void BigDisplay::FiltersList1_currentIndexChanged(size_t FilterPos)
 
     if (Picture_Current1<2)
     {
-        Image1->setVisible(true);
+        imageLabel1->setVisible(true);
         Layout->setColumnStretch(0, 1);
         //resize(width()+Image_Width, height());
     }
     Picture_Current1=FilterPos;
     FiltersList1_currentOptionChanged(Picture_Current1);
 
-    updateSelection(FilterPos, Image1, Options[0]);
+    updateSelection(FilterPos, imageLabel1, Options[0]);
 }
 
 //---------------------------------------------------------------------------
@@ -1662,14 +1662,14 @@ void BigDisplay::FiltersList2_currentIndexChanged(size_t FilterPos)
 
     if (Picture_Current2<2)
     {
-        Image2->setVisible(true);
+        imageLabel2->setVisible(true);
         Layout->setColumnStretch(2, 1);
         //resize(width()+Image_Width, height());
     }
     Picture_Current2=FilterPos;
     FiltersList2_currentOptionChanged(Picture_Current2);
 
-    updateSelection(FilterPos, Image2, Options[1]);
+    updateSelection(FilterPos, imageLabel2, Options[1]);
 }
 
 //---------------------------------------------------------------------------
@@ -2276,7 +2276,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
     if (action->text()=="No display")
     {
         Picture->Disable(0);
-        Image1->Remove();
+        imageLabel1->Remove();
         Layout->setColumnStretch(0, 0);
         //move(pos().x()+Image_Width, pos().y());
         //adjustSize();
@@ -2293,7 +2293,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
         {
             if (Picture_Current1<2)
             {
-                Image1->setVisible(true);
+                imageLabel1->setVisible(true);
                 Layout->setColumnStretch(0, 1);
                 //move(pos().x()-Image_Width, pos().y());
                 //resize(width()+Image_Width, height());
@@ -2304,7 +2304,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
 
             Frames_Pos=(size_t)-1;
             ShowPicture ();
-            updateSelection(Pos, Image1, Options[0]);
+            updateSelection(Pos, imageLabel1, Options[0]);
             return;
         }
     }
@@ -2362,13 +2362,16 @@ void BigDisplay::updateSelection(int Pos, ImageLabel* image, options& opts)
     }
 }
 
-void BigDisplay::updateImagesAndSlider(const QPixmap &image1, const QPixmap &image2, int sliderPos)
+void BigDisplay::updateImagesAndSlider(const QPixmap &pixmap1, const QPixmap &pixmap2, int sliderPos)
 {
     if (Slider->sliderPosition() != sliderPos)
         Slider->setSliderPosition(sliderPos);
 
-    Image1->setPixmap(image1);
-    Image2->setPixmap(image2);
+    if(!pixmap1.isNull())
+        imageLabel1->setPixmap(pixmap1);
+
+    if(!pixmap2.isNull())
+        imageLabel2->setPixmap(pixmap2);
 }
 
 void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
@@ -2385,7 +2388,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
     if (Pos==1)
     {
         Picture->Disable(0);
-        Image1->Remove();
+        imageLabel1->Remove();
         Layout->setColumnStretch(0, 0);
         //move(pos().x()+Image_Width, pos().y());
         //adjustSize();
@@ -2394,7 +2397,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
 
     if (Picture_Current1<2)
     {
-        Image1->setVisible(true);
+        imageLabel1->setVisible(true);
         Layout->setColumnStretch(0, 1);
         //move(pos().x()-Image_Width, pos().y());
         //resize(width()+Image_Width, height());
@@ -2404,7 +2407,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
     Frames_Pos=(size_t)-1;
     ShowPicture ();
 
-    updateSelection(Pos, Image1, Options[0]);
+    updateSelection(Pos, imageLabel1, Options[0]);
 }
 
 //---------------------------------------------------------------------------
@@ -2422,14 +2425,14 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(int Pos)
     if (Pos==1)
     {
         Picture->Disable(1);
-        Image2->Remove();
+        imageLabel2->Remove();
         Layout->setColumnStretch(2, 0);
         //adjustSize();
         repaint();
     }
 
     FiltersList2_currentIndexChanged(Pos);
-    updateSelection(Pos, Image2, Options[1]);
+    updateSelection(Pos, imageLabel2, Options[1]);
 }
 
 //---------------------------------------------------------------------------
@@ -2447,7 +2450,7 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(QAction * action)
     if (action->text()=="No display")
     {
         Picture->Disable(1);
-        Image2->Remove();
+        imageLabel2->Remove();
         Layout->setColumnStretch(2, 0);
         //adjustSize();
         Picture_Current2=1;
@@ -2462,7 +2465,7 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(QAction * action)
         if (action->text()==Filters[Pos].Name)
         {
             FiltersList2_currentIndexChanged(Pos);
-            updateSelection(Pos, Image2, Options[1]);
+            updateSelection(Pos, imageLabel2, Options[1]);
             return;
         }
     }

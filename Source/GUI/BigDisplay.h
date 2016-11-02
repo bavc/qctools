@@ -148,8 +148,8 @@ protected:
     };
     std::vector<previous_values>PreviousValues[2];
     Info*                       InfoArea;
-    ImageLabel*                 Image1;
-    ImageLabel*                 Image2;
+    ImageLabel*                 imageLabel1;
+    ImageLabel*                 imageLabel2;
     QSlider*                    Slider;
 
     // Temp
