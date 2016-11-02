@@ -231,11 +231,11 @@ void Plot_AddHLine(QwtPlot* plot, double value , double r , double g, double b)
 //---------------------------------------------------------------------------
 void Plot::addGuidelines(int bitsPerRawSample)
 {
-    int defaultBitesPerRawSample = 8;
+    int defaultBitsPerRawSample = 8;
     if(bitsPerRawSample == 0)
-        bitsPerRawSample = defaultBitesPerRawSample;
+        bitsPerRawSample = defaultBitsPerRawSample;
 
-    int multiplier = pow(2, (bitsPerRawSample - defaultBitesPerRawSample));
+    int multiplier = pow(2, (bitsPerRawSample - defaultBitsPerRawSample));
 
     if ( m_type == Type_Video )
     switch (m_group)
