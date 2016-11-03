@@ -981,6 +981,8 @@ DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Other
     //Popup->setFocusPolicy(Qt::NoFocus);
     //Popup->setLayout(Layout);
     connect(this, SIGNAL(valueChanged(double)), this, SLOT(on_valueChanged(double)));
+	
+    Slider->hide();
 }
 
 //---------------------------------------------------------------------------
@@ -1254,18 +1256,18 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     }
 
     //Image1
-    Image1=new ImageLabel(&Picture, 1, this);
-    Image1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    Image1->setMinimumSize(20, 20);
-    Image1->showDebugOverlay(Config::instance().getDebug());
+    imageLabel1=new ImageLabel(&Picture, 1, this);
+    imageLabel1->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    imageLabel1->setMinimumSize(20, 20);
+    imageLabel1->showDebugOverlay(Config::instance().getDebug());
     //Layout->addWidget(Image1, 1, 0, 1, 1);
     //Layout->setColumnStretch(0, 1);
 
     //Image2
-    Image2=new ImageLabel(&Picture, 2, this);
-    Image2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    Image2->setMinimumSize(20, 20);
-    Image2->showDebugOverlay(Config::instance().getDebug());
+    imageLabel2=new ImageLabel(&Picture, 2, this);
+    imageLabel2->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    imageLabel2->setMinimumSize(20, 20);
+    imageLabel2->showDebugOverlay(Config::instance().getDebug());
     //Layout->addWidget(Image2, 1, 2, 1, 1);
     //Layout->setColumnStretch(2, 1);
 
@@ -1273,8 +1275,8 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     QHBoxLayout* ImageLayout=new QHBoxLayout();
     ImageLayout->setContentsMargins(0, -1, 0, 0);
     ImageLayout->setSpacing(0);
-    ImageLayout->addWidget(Image1);
-    ImageLayout->addWidget(Image2);
+    ImageLayout->addWidget(imageLabel1);
+    ImageLayout->addWidget(imageLabel2);
     Layout->addLayout(ImageLayout, 1, 0, 1, 3);
 
     // Info
@@ -1634,14 +1636,14 @@ void BigDisplay::FiltersList1_currentIndexChanged(size_t FilterPos)
 
     if (Picture_Current1<2)
     {
-        Image1->setVisible(true);
+        imageLabel1->setVisible(true);
         Layout->setColumnStretch(0, 1);
         //resize(width()+Image_Width, height());
     }
     Picture_Current1=FilterPos;
     FiltersList1_currentOptionChanged(Picture_Current1);
 
-    updateSelection(FilterPos, Image1, Options[0]);
+    updateSelection(FilterPos, imageLabel1, Options[0]);
 }
 
 //---------------------------------------------------------------------------
@@ -1660,14 +1662,14 @@ void BigDisplay::FiltersList2_currentIndexChanged(size_t FilterPos)
 
     if (Picture_Current2<2)
     {
-        Image2->setVisible(true);
+        imageLabel2->setVisible(true);
         Layout->setColumnStretch(2, 1);
         //resize(width()+Image_Width, height());
     }
     Picture_Current2=FilterPos;
     FiltersList2_currentOptionChanged(Picture_Current2);
 
-    updateSelection(FilterPos, Image2, Options[1]);
+    updateSelection(FilterPos, imageLabel2, Options[1]);
 }
 
 //---------------------------------------------------------------------------
@@ -2027,18 +2029,8 @@ void BigDisplay::FiltersList2_currentOptionChanged(size_t Picture_Current)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void BigDisplay::ShowPicture ()
+void BigDisplay::InitPicture()
 {
-    if (!isVisible())
-        return;
-
-    if ((!ShouldUpate && Frames_Pos==FileInfoData->Frames_Pos_Get())
-     || ( ShouldUpate && false)) // ToDo: try to optimize
-        return;
-    Frames_Pos=FileInfoData->Frames_Pos_Get();
-    ShouldUpate=false;
-
-    // Picture
     if (!Picture)
     {
         string FileName_string=FileInfoData->FileName.toUtf8().data();
@@ -2052,6 +2044,8 @@ void BigDisplay::ShowPicture ()
         if (height%2)
             height--; //odd number is wanted for filters
         Picture=new FFmpeg_Glue(FileName_string.c_str(), FileInfoData->ActiveAllTracks, &FileInfoData->Stats);
+        Picture->setThreadSafe(true);
+
         if (FileName_string.empty())
             Picture->InputData_Set(FileInfoData->Glue->InputData_Get()); // Using data from the analyzed file
         Picture->AddOutput(0, width, height, FFmpeg_Glue::Output_QImage);
@@ -2059,18 +2053,50 @@ void BigDisplay::ShowPicture ()
         FiltersList1_currentIndexChanged(Picture_Current1);
         FiltersList2_currentIndexChanged(Picture_Current2);
     }
+}
+
+void BigDisplay::ShowPicture ()
+{
+    if (!isVisible())
+        return;
+
+	if (!Picture)
+		return;
+
+    if ((!ShouldUpate && Frames_Pos==FileInfoData->Frames_Pos_Get())
+     || ( ShouldUpate && false)) // ToDo: try to optimize
+        return;
+    Frames_Pos=FileInfoData->Frames_Pos_Get();
+    ShouldUpate=false;
+
     Picture->FrameAtPosition(Frames_Pos);
-    if (Picture->Image_Get(0))
+    auto image = Picture->Image_Get(0);
+    if (!image.isNull())
     {
-        Image_Width=Picture->Image_Get(0)->width();
-        Image_Height=Picture->Image_Get(0)->height();
+        Image_Width = image.width();
+        Image_Height = image.height();
     }
 
-    if (Slider->sliderPosition()!=Frames_Pos)
-        Slider->setSliderPosition(Frames_Pos);
-
-    Image1->UpdatePixmap();
-    Image2->UpdatePixmap();
+    if (QThread::currentThread() == thread())
+    {
+        updateImagesAndSlider(QPixmap::fromImage(Picture->Image_Get(0)), QPixmap::fromImage(Picture->Image_Get(1)), Frames_Pos);
+    }
+    else
+    {
+        if (QThread::currentThread()->isInterruptionRequested())
+        {
+            QMetaObject::invokeMethod(this, "updateImagesAndSlider", Qt::QueuedConnection,
+                                      Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(0))),
+                                      Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(1))),
+                                      Q_ARG(const int, Frames_Pos));
+        }
+        else {
+            QMetaObject::invokeMethod(this, "updateImagesAndSlider", Qt::BlockingQueuedConnection,
+                                      Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(0))),
+                                      Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(1))),
+                                      Q_ARG(const int, Frames_Pos));
+        }
+    }
 
     // Stats
     if (ControlArea)
@@ -2250,7 +2276,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
     if (action->text()=="No display")
     {
         Picture->Disable(0);
-        Image1->Remove();
+        imageLabel1->Remove();
         Layout->setColumnStretch(0, 0);
         //move(pos().x()+Image_Width, pos().y());
         //adjustSize();
@@ -2267,7 +2293,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
         {
             if (Picture_Current1<2)
             {
-                Image1->setVisible(true);
+                imageLabel1->setVisible(true);
                 Layout->setColumnStretch(0, 1);
                 //move(pos().x()-Image_Width, pos().y());
                 //resize(width()+Image_Width, height());
@@ -2278,7 +2304,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
 
             Frames_Pos=(size_t)-1;
             ShowPicture ();
-            updateSelection(Pos, Image1, Options[0]);
+            updateSelection(Pos, imageLabel1, Options[0]);
             return;
         }
     }
@@ -2287,6 +2313,8 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
 //---------------------------------------------------------------------------
 void BigDisplay::updateSelection(int Pos, ImageLabel* image, options& opts)
 {
+    image->disconnect();
+
     if(strcmp(Filters[Pos].Name, "Waveform Target") == 0 ||
             strcmp(Filters[Pos].Name, "Vectorscope Target") ==  0 ||
             strcmp(Filters[Pos].Name, "Zoom") ==  0)
@@ -2336,6 +2364,18 @@ void BigDisplay::updateSelection(int Pos, ImageLabel* image, options& opts)
     }
 }
 
+void BigDisplay::updateImagesAndSlider(const QPixmap &pixmap1, const QPixmap &pixmap2, int sliderPos)
+{
+    if (Slider->sliderPosition() != sliderPos)
+        Slider->setSliderPosition(sliderPos);
+
+    if(!pixmap1.isNull())
+        imageLabel1->setPixmap(pixmap1);
+
+    if(!pixmap2.isNull())
+        imageLabel2->setPixmap(pixmap2);
+}
+
 void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
 {
     // Help
@@ -2350,7 +2390,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
     if (Pos==1)
     {
         Picture->Disable(0);
-        Image1->Remove();
+        imageLabel1->Remove();
         Layout->setColumnStretch(0, 0);
         //move(pos().x()+Image_Width, pos().y());
         //adjustSize();
@@ -2359,7 +2399,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
 
     if (Picture_Current1<2)
     {
-        Image1->setVisible(true);
+        imageLabel1->setVisible(true);
         Layout->setColumnStretch(0, 1);
         //move(pos().x()-Image_Width, pos().y());
         //resize(width()+Image_Width, height());
@@ -2369,7 +2409,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
     Frames_Pos=(size_t)-1;
     ShowPicture ();
 
-    updateSelection(Pos, Image1, Options[0]);
+    updateSelection(Pos, imageLabel1, Options[0]);
 }
 
 //---------------------------------------------------------------------------
@@ -2387,14 +2427,14 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(int Pos)
     if (Pos==1)
     {
         Picture->Disable(1);
-        Image2->Remove();
+        imageLabel2->Remove();
         Layout->setColumnStretch(2, 0);
         //adjustSize();
         repaint();
     }
 
     FiltersList2_currentIndexChanged(Pos);
-    updateSelection(Pos, Image2, Options[1]);
+    updateSelection(Pos, imageLabel2, Options[1]);
 }
 
 //---------------------------------------------------------------------------
@@ -2412,7 +2452,7 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(QAction * action)
     if (action->text()=="No display")
     {
         Picture->Disable(1);
-        Image2->Remove();
+        imageLabel2->Remove();
         Layout->setColumnStretch(2, 0);
         //adjustSize();
         Picture_Current2=1;
@@ -2427,46 +2467,10 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(QAction * action)
         if (action->text()==Filters[Pos].Name)
         {
             FiltersList2_currentIndexChanged(Pos);
-            updateSelection(Pos, Image2, Options[1]);
+            updateSelection(Pos, imageLabel2, Options[1]);
             return;
         }
     }
-}
-
-//---------------------------------------------------------------------------
-void BigDisplay::resizeEvent(QResizeEvent* Event)
-{
-    if (Event->oldSize().width()<0 || Event->oldSize().height()<0)
-        return;
-
-    /*int DiffX=(Event->size().width()-Event->oldSize().width())/2;
-    int DiffY=(Event->size().width()-Event->oldSize().width())/2;
-    Picture->Scale_Change(Image_Width+DiffX, Image_Height+DiffY);
-
-    Frames_Pos=(size_t)-1;
-    ShowPicture ();*/
-    int SizeX=(Event->size().width()-(InfoArea?InfoArea->width():0))/2-25;
-    int SizeY=(Event->size().height()-Slider->height())-50;
-
-    /*if (InfoArea->height()+FiltersList1->height()+Slider->height()+ControlArea->height()+50>=Event->size().height())
-    {
-        InfoArea->hide();
-        Layout->removeWidget(InfoArea);
-    }
-    else
-    {
-        Layout->addWidget(InfoArea, 0, 1, 1, 3, Qt::AlignLeft);
-        InfoArea->show();
-    }*/
-
-    //adjust();
-    //Picture->Scale_Change(Image1->width(), Image1->height());
-
-    //Frames_Pos=(size_t)-1;
-    //ShowPicture ();
-
-    Image1->UpdatePixmap();
-    Image2->UpdatePixmap();
 }
 
 //---------------------------------------------------------------------------

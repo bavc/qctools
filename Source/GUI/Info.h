@@ -36,8 +36,9 @@ public:
     explicit Info(QWidget *parent, const struct per_group* plotGroup, const struct per_item* plotItem, size_t CountOfGroups, size_t CountOfItems, FileInformation* FileInfoData, style Style);
     ~Info();
 
-    // Commands
-    void                        Update                      ();
+public Q_SLOT:
+	// Commands
+	void                        Update();
 
 protected:
     // File information

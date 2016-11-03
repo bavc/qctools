@@ -21,6 +21,8 @@
 #include "GUI/draggablechildrenbehaviour.h"
 #include "GUI/blackmagicdecklink_userinput.h"
 #include "GUI/preferences.h"
+#include "GUI/BigDisplay.h"
+
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -174,6 +176,9 @@ void MainWindow::processFile(const QString &FileName)
 //---------------------------------------------------------------------------
 void MainWindow::clearFiles()
 {
+    if (ControlArea)
+        ControlArea->stop();
+
     // Files (must be deleted first in order to stop ffmpeg processes)
     for (size_t Pos=0; Pos<Files.size(); Pos++)
         delete Files[Pos];
@@ -333,6 +338,8 @@ void MainWindow::createGraphsLayout()
     ui->verticalLayout->addWidget(TinyDisplayArea);
 
     ControlArea=new Control(this, Files[Files_CurrentPos], Control::Style_Cols);
+    ControlArea->setPlayAllFrames(ui->actionPlay_All_Frames->isChecked());
+
     connect( ControlArea, SIGNAL( currentFrameChanged() ), 
         this, SLOT( on_CurrentFrameChanged() ) );
 
@@ -416,10 +423,15 @@ void MainWindow::selectDisplayFiltersFile(int NewFilePos)
 //---------------------------------------------------------------------------
 void MainWindow::Update()
 {
-    if (TinyDisplayArea)
-        TinyDisplayArea->Update();
-    if (ControlArea)
-        ControlArea->Update();
-    if (InfoArea)
-        InfoArea->Update();
+	if (TinyDisplayArea)
+        TinyDisplayArea->Update(false);
+
+    if(TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
+        TinyDisplayArea->BigDisplayArea->ShowPicture();
+
+	if(ControlArea)
+		ControlArea->Update();
+
+	if(InfoArea)
+		InfoArea->Update();
 }

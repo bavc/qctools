@@ -112,6 +112,9 @@ MainWindow::~MainWindow()
 {
     Prefs->saveFilterSelectorsOrder(getFilterSelectorsOrder());
 
+    // Controls
+    delete ControlArea;
+
     // Files (must be deleted first in order to stop ffmpeg processes)
     for (size_t Pos=0; Pos<Files.size(); Pos++)
         delete Files[Pos];
@@ -121,9 +124,6 @@ MainWindow::~MainWindow()
 
     // Pictures
     delete TinyDisplayArea;
-
-    // Controls
-    delete ControlArea;
 
     // Info
     delete InfoArea;
@@ -535,4 +535,16 @@ void MainWindow::dropEvent(QDropEvent *Event)
 
     clearDragDrop();
     addFile_finish();
+}
+
+void MainWindow::on_actionPlay_at_Frame_Rate_triggered()
+{
+    if(ControlArea)
+        ControlArea->setPlayAllFrames(false);
+}
+
+void MainWindow::on_actionPlay_All_Frames_triggered()
+{
+    if(ControlArea)
+        ControlArea->setPlayAllFrames(true);
 }

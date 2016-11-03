@@ -142,6 +142,10 @@ void MainWindow::Ui_Init()
     alignmentGroup->addAction(ui->actionGraphsLayout);
     alignmentGroup->addAction(ui->actionFiltersLayout);
 
+    QActionGroup* playModesGroup = new QActionGroup(this);
+    playModesGroup->addAction(ui->actionPlay_All_Frames);
+    playModesGroup->addAction(ui->actionPlay_at_Frame_Rate);
+
     createDragDrop();
     ui->actionFilesList->setChecked(false);
     ui->actionGraphsLayout->setChecked(false);

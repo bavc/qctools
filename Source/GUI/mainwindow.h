@@ -76,7 +76,6 @@ public:
     void                        Help_About                  ();
 
     // Helpers
-    void                        Update                      ();
     void                        processFile                 (const QString &FileName);
     void                        clearFiles                  ();
     void                        clearDragDrop               ();
@@ -116,7 +115,9 @@ public:
     Preferences*                Prefs;
     
     QList<std::tuple<int, int>> getFilterSelectorsOrder(int start, int end);
-    
+public Q_SLOTS:
+	void Update();
+
 private Q_SLOTS:
 
     void TimeOut();
@@ -200,6 +201,10 @@ private Q_SLOTS:
 
 
     void on_actionZoomOne_triggered();
+
+    void on_actionPlay_at_Frame_Rate_triggered();
+
+    void on_actionPlay_All_Frames_triggered();
 
 private:
     void updateScrollBar( bool blockSignals = false );

@@ -32,9 +32,11 @@ public:
     BigDisplay                 *BigDisplayArea;
 
     // Commands
-    void                        Update();
     void                        Filters_Show(); //Quick hack for showing filters
     void                        LoadBigDisplay();
+
+public Q_SLOTS:
+    void                        Update(bool updateBigDisplay = true);
 
 private:
     static const int            TOTAL_THUMBS = 9;

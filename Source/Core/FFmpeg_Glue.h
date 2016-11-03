@@ -13,6 +13,8 @@
 #include <string>
 #include <vector>
 #include <stdint.h>
+#include <QByteArray>
+#include <QMutex>
 using namespace std;
 
 struct AVFormatContext;
@@ -47,7 +49,7 @@ public:
     ~FFmpeg_Glue();
 
     // Images
-    QImage*                     Image_Get(size_t Pos)                                                                   {if (Pos>=OutputDatas.size() || !OutputDatas[Pos] || !OutputDatas[Pos]->Enabled) return NULL; return OutputDatas[Pos]->Image;}
+    QImage                     Image_Get(size_t Pos);
     struct bytes
     {
         unsigned char* Data;
@@ -65,8 +67,9 @@ public:
             delete[] Data;
         }
     };
-    bytes*                      Thumbnail_Get(size_t Pos, size_t FramePos)                                              {if (Pos>=OutputDatas.size() || !OutputDatas[Pos] || !OutputDatas[Pos]->Enabled) return NULL; return OutputDatas[Pos]->Thumbnails[FramePos];}
-    size_t                      Thumbnails_Size(size_t Pos)                                                             {if (Pos>=OutputDatas.size() || !OutputDatas[Pos] || !OutputDatas[Pos]->Enabled) return 0; return OutputDatas[Pos]->Thumbnails.size();}
+
+    QByteArray                  Thumbnail_Get(size_t Pos, size_t FramePos);
+    size_t                      Thumbnails_Size(size_t Pos);
     
     // Status
     size_t                      VideoFramePos_Get();
@@ -134,7 +137,10 @@ public:
     void*                       InputData_Get() { return InputDatas[0]; }
     void                        InputData_Set(void* InputData) {InputDatas.push_back((inputdata*)InputData); InputDatas_Copy=true;}
 
+    void setThreadSafe(bool enable);
 private:
+    QMutex* mutex;
+
     // Stream information
     struct inputdata
     {
@@ -258,6 +264,9 @@ private:
 
     // Seek
     int64_t                     Seek_TimeStamp;
+
+	friend int DecodeVideo(FFmpeg_Glue::inputdata* InputData, AVFrame* Frame, int & got_frame, AVPacket* TempPacket);
+
 };
 
 #endif // FFmpeg_Glue_H

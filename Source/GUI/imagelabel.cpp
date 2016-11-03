@@ -4,6 +4,7 @@
 #include "Core/FFmpeg_Glue.h"
 #include <QDebug>
 #include <QPainter>
+#include <cmath>
 
 ImageLabel::ImageLabel(FFmpeg_Glue** Picture_, size_t Pos_, QWidget *parent) :
     ui(new Ui::ImageLabel),
@@ -69,74 +70,55 @@ void ImageLabel::Remove ()
     setVisible(false);
 }
 
-bool ImageLabel::UpdatePixmap()
+
+void ImageLabel::setImage(const QImage& image)
+{
+    updatePixmap(image);
+}
+
+void ImageLabel::updatePixmap(const QImage& image /*= nullptr*/)
 {
     if(*Picture == nullptr)
     {
-        return false;
+        return;
     }
 
     auto picture = *Picture;
 
-    QImage* Image = nullptr;
-    switch (Pos)
-    {
-        case 1 : Image = picture->Image_Get(0); break;
-        case 2 : Image = picture->Image_Get(1); break;
-        default: return false;
-    }
-    if (!Image)
+    QImage Image = image;
+    if (Image.isNull())
+        Image = picture->Image_Get(Pos - 1);
+
+    if (Image.isNull())
     {
         Pixmap = QPixmap(Pixmap.width(), Pixmap.height());
         ui->label->setPixmap(Pixmap);
-        return true;
+        return;
     }
 
-    QSize Size = size();
-    QSize pixmapSize = Pixmap.size();
-
-    auto dar = picture->OutputDAR_Get(Pos - 1);
-    auto iar = qreal(Size.width()) / Size.height();
-
-    int expectedWidth = 0;
-    int expectedHeight = 0;
-
-    if(dar > iar) {
-        expectedWidth = Size.width();
-        expectedHeight = Size.width() / dar;
-    } else {
-        expectedHeight = Size.height();
-        expectedWidth = Size.height() * dar;
-    }
-
-    int dw = abs(expectedWidth - pixmapSize.width());
-    int dh = abs(expectedHeight - pixmapSize.height());
-
-    if (dw > 1 && dh > 1)
+    if (needRescale())
     {
-        picture->Scale_Change(Size.width(), Size.height());
-
-        switch (Pos)
-        {
-            case 1 : Image = picture->Image_Get(0); break;
-            case 2 : Image = picture->Image_Get(1); break;
-            default: return false;
-        }
-        if (!Image)
-        {
-            Pixmap = QPixmap(Pixmap.width(), Pixmap.height());
-            ui->label->setPixmap(Pixmap);
-            return true;
-        }
+		rescale();
     }
+    else
+    {
+        Pixmap.convertFromImage(Image);
+        ui->label->setPixmap(Pixmap);
+    }
+}
 
-    Pixmap.convertFromImage(*Image);
-    ui->label->setPixmap(Pixmap);
+void ImageLabel::setPixmap(const QPixmap &pixmap)
+{
+    Pixmap = pixmap;
 
-    if(dw > 1 && dh > 1)
-        setSelectionArea(selectionPos.x(), selectionPos.y(), selectionSize.width(), selectionSize.height());
-
-    return true;
+	if (needRescale())
+	{
+		rescale();
+	} 
+	else
+	{
+		ui->label->setPixmap(pixmap);
+	}
 }
 
 size_t ImageLabel::GetPos() const
@@ -309,7 +291,7 @@ void ImageLabel::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
 
-    UpdatePixmap();
+    updatePixmap();
 }
 
 bool ImageLabel::eventFilter(QObject *object, QEvent *event)
@@ -370,4 +352,64 @@ bool ImageLabel::eventFilter(QObject *object, QEvent *event)
     }
 
     return false;
+}
+
+bool ImageLabel::needRescale()
+{
+    if(*Picture == nullptr)
+    {
+        return false;
+    }
+
+    auto picture = *Picture;
+    QSize Size = size();
+    QSize pixmapSize = Pixmap.size();
+
+    auto dar = picture->OutputDAR_Get(Pos - 1);
+    auto iar = qreal(Size.width()) / Size.height();
+
+    int expectedWidth = 0;
+    int expectedHeight = 0;
+
+    if (std::isnan(dar))
+        return false;
+
+    if(dar > iar) {
+        expectedWidth = Size.width();
+        expectedHeight = Size.width() / dar;
+    } else {
+        expectedHeight = Size.height();
+        expectedWidth = Size.height() * dar;
+    }
+
+    int dw = abs(expectedWidth - pixmapSize.width());
+    int dh = abs(expectedHeight - pixmapSize.height());
+
+    bool needRescale = dw > 1 && dh > 1;
+
+    return needRescale;
+}
+
+void ImageLabel::rescale()
+{
+    if(*Picture == nullptr)
+    {
+        return;
+    }
+
+    auto picture = *Picture;
+    picture->Scale_Change(size().width(), size().height());
+    auto Image = picture->Image_Get(Pos - 1);
+
+    if (Image.isNull())
+    {
+        Pixmap = QPixmap(Pixmap.width(), Pixmap.height());
+        ui->label->setPixmap(Pixmap);
+        return;
+    }
+
+    Pixmap.convertFromImage(Image);
+    ui->label->setPixmap(Pixmap);
+
+    setSelectionArea(selectionPos.x(), selectionPos.y(), selectionSize.width(), selectionSize.height());
 }

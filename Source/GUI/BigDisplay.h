@@ -110,6 +110,8 @@ public:
     // Content
     Control*                    ControlArea;
     
+    void InitPicture();
+    
 protected:
     // File information
     FileInformation*            FileInfoData;
@@ -146,8 +148,8 @@ protected:
     };
     std::vector<previous_values>PreviousValues[2];
     Info*                       InfoArea;
-    ImageLabel*                 Image1;
-    ImageLabel*                 Image2;
+    ImageLabel*                 imageLabel1;
+    ImageLabel*                 imageLabel2;
     QSlider*                    Slider;
 
     // Temp
@@ -157,7 +159,6 @@ protected:
     size_t                      FiltersListDefault_Count;
 
     // Events
-    void                        resizeEvent (QResizeEvent * event);
     void                        FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, QGridLayout* Layout0);
     void                        FiltersList1_currentIndexChanged(size_t FilterPos);
     void                        FiltersList2_currentIndexChanged(size_t FilterPos);
@@ -168,6 +169,8 @@ protected:
     void updateSelection(int Pos, ImageLabel* image, options& opts);
 
 public Q_SLOTS:
+    void updateImagesAndSlider(const QPixmap& pixmap1, const QPixmap& pixmap2, int sliderPos);
+
     void on_FiltersList1_currentIndexChanged(QAction * action);
     void on_FiltersList2_currentIndexChanged(QAction * action);
     void on_FiltersList1_currentIndexChanged(int Pos);
