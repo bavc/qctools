@@ -121,7 +121,48 @@ percolumn PerColumn[Col_Max]=
     { StatsType_None,       Item_AudioMax,          Item_AudioMax,          "Audio Bit depth",  NULL, },
 };
 
+// purely for sorting purpose
+class TableWidgetItem : public QTableWidgetItem {
+public:
+	TableWidgetItem(QString value) : QTableWidgetItem(value) {
+	}
+	TableWidgetItem() : QTableWidgetItem() {
+	}
 
+	virtual bool operator<(const QTableWidgetItem & other) const {
+
+		// check if both are integers
+		{
+			bool ok = false;
+			auto intValue = text().toInt(&ok);
+			if (ok)
+			{
+				auto otherIntValue = other.text().toInt(&ok);
+				if (ok) {
+					return intValue < otherIntValue;
+				}
+			}
+		}
+
+		// check if both are doubles
+		{
+			bool ok = false;
+			auto doubleValue = text().toDouble(&ok);
+			if (ok)
+			{
+				auto otherDoubleValue = other.text().toDouble(&ok);
+				if (ok) {
+					return doubleValue < otherDoubleValue;
+				}
+			}
+		}
+
+		// otherwise compare as strings
+		return this->text() < other.text();
+	}
+private:
+
+};
 //***************************************************************************
 // Constructor / Desructor
 //***************************************************************************
@@ -132,6 +173,7 @@ FilesList::FilesList(MainWindow* Main_) :
     Main(Main_)
 {
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    setSortingEnabled(true);
 }
 
 //---------------------------------------------------------------------------
@@ -273,29 +315,29 @@ void FilesList::UpdateAll()
         VerticalHeaderItem->setToolTip(Main->Files[Files_Pos]->FileName);
         setVerticalHeaderItem((int)Files_Pos, VerticalHeaderItem);
 
-        setItem((int)Files_Pos, Col_Format,         new QTableWidgetItem(Format));
-        setItem((int)Files_Pos, Col_StreamCount,    new QTableWidgetItem(StreamCount));
-        setItem((int)Files_Pos, Col_BitRate,        new QTableWidgetItem(BitRate));
-        setItem((int)Files_Pos, Col_Duration,       new QTableWidgetItem(Duration.c_str()));
-        setItem((int)Files_Pos, Col_FileSize,       new QTableWidgetItem(FileSize));
-      //setItem((int)Files_Pos, Col_Encoder,        new QTableWidgetItem("(TODO)"));
-        setItem((int)Files_Pos, Col_VideoFormat,    new QTableWidgetItem(VideoFormat));
-        setItem((int)Files_Pos, Col_Width,          new QTableWidgetItem(Width));
-        setItem((int)Files_Pos, Col_Height,         new QTableWidgetItem(Height));
-        setItem((int)Files_Pos, Col_FieldOrder,     new QTableWidgetItem(FieldOrder));
-        setItem((int)Files_Pos, Col_DAR,            new QTableWidgetItem(DAR_String));
-        setItem((int)Files_Pos, Col_SAR,            new QTableWidgetItem(SAR));
-        setItem((int)Files_Pos, Col_PixFormat,      new QTableWidgetItem(PixFormat));
-        setItem((int)Files_Pos, Col_ColorSpace,     new QTableWidgetItem(ColorSpace));
-        setItem((int)Files_Pos, Col_ColorRange,     new QTableWidgetItem(ColorRange));
-        setItem((int)Files_Pos, Col_FramesDivDuration, new QTableWidgetItem(FramesDivDuration));
-        setItem((int)Files_Pos, Col_RFrameRate,     new QTableWidgetItem(RFrameRate));
-        setItem((int)Files_Pos, Col_AvgFrameRate,   new QTableWidgetItem(AvgFrameRate));
-        setItem((int)Files_Pos, Col_AudioFormat,    new QTableWidgetItem(AudioFormat));
-      //setItem((int)Files_Pos, Col_SampleFormat,   new QTableWidgetItem(SampleFormat));
-        setItem((int)Files_Pos, Col_SamplingRate,   new QTableWidgetItem(SamplingRate_String));
-        setItem((int)Files_Pos, Col_ChannelLayout,  new QTableWidgetItem(ChannelLayout));
-        setItem((int)Files_Pos, Col_ABitDepth,      new QTableWidgetItem(ABitDepth_String));
+        setItem((int)Files_Pos, Col_Format,         new TableWidgetItem(Format));
+        setItem((int)Files_Pos, Col_StreamCount,    new TableWidgetItem(StreamCount));
+        setItem((int)Files_Pos, Col_BitRate,        new TableWidgetItem(BitRate));
+        setItem((int)Files_Pos, Col_Duration,       new TableWidgetItem(Duration.c_str()));
+        setItem((int)Files_Pos, Col_FileSize,       new TableWidgetItem(FileSize));
+      //setItem((int)Files_Pos, Col_Encoder,        new TableWidgetItem("(TODO)"));
+        setItem((int)Files_Pos, Col_VideoFormat,    new TableWidgetItem(VideoFormat));
+        setItem((int)Files_Pos, Col_Width,          new TableWidgetItem(Width));
+        setItem((int)Files_Pos, Col_Height,         new TableWidgetItem(Height));
+        setItem((int)Files_Pos, Col_FieldOrder,     new TableWidgetItem(FieldOrder));
+        setItem((int)Files_Pos, Col_DAR,            new TableWidgetItem(DAR_String));
+        setItem((int)Files_Pos, Col_SAR,            new TableWidgetItem(SAR));
+        setItem((int)Files_Pos, Col_PixFormat,      new TableWidgetItem(PixFormat));
+        setItem((int)Files_Pos, Col_ColorSpace,     new TableWidgetItem(ColorSpace));
+        setItem((int)Files_Pos, Col_ColorRange,     new TableWidgetItem(ColorRange));
+        setItem((int)Files_Pos, Col_FramesDivDuration, new TableWidgetItem(FramesDivDuration));
+        setItem((int)Files_Pos, Col_RFrameRate,     new TableWidgetItem(RFrameRate));
+        setItem((int)Files_Pos, Col_AvgFrameRate,   new TableWidgetItem(AvgFrameRate));
+        setItem((int)Files_Pos, Col_AudioFormat,    new TableWidgetItem(AudioFormat));
+      //setItem((int)Files_Pos, Col_SampleFormat,   new TableWidgetItem(SampleFormat));
+        setItem((int)Files_Pos, Col_SamplingRate,   new TableWidgetItem(SamplingRate_String));
+        setItem((int)Files_Pos, Col_ChannelLayout,  new TableWidgetItem(ChannelLayout));
+        setItem((int)Files_Pos, Col_ABitDepth,      new TableWidgetItem(ABitDepth_String));
 
         for (int Pos=0; Pos<Col_Max; Pos++)
         {
@@ -345,7 +387,7 @@ void FilesList::Update(size_t Files_Pos)
     for (size_t Col=0; Col<Col_Max; Col++)
         if (PerColumn[Col].Stats_Type!=StatsType_None)
         {
-            QTableWidgetItem* Item=new QTableWidgetItem();
+            QTableWidgetItem* Item=new TableWidgetItem();
             switch (PerColumn[Col].Stats_Type)
             {
                 case StatsType_Average : 
