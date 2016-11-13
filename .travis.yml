@@ -13,6 +13,15 @@ compiler:
   - clang
   - gcc
 
+env: 
+  - QCTOOLS_USE_BREW=true
+  - QCTOOLS_USE_BREW=false
+
+matrix:
+  exclude:
+    - os: linux
+      env: USE_BREW=true
+
 before_install:
   - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install qt5 && export PATH=/usr/local/opt/qt5/bin:$PATH; fi
   
