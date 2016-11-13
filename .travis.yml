@@ -6,23 +6,40 @@ language: cpp
 os:
   - osx
   - linux
-  
-osx_image: xcode7.3
 
 compiler:
   - clang
   - gcc
 
-env: 
-  - QCTOOLS_USE_BREW=true
-  - QCTOOLS_USE_BREW=false
-
-matrix:
-  exclude:
+matrix: 
+  exclude: 
     - os: linux
-      env: USE_BREW=true
+    - os: osx
+      
+  include:
+    - os: linux
+      compiler: clang
+    - os: linux
+      compiler: gcc
+    - os: osx
+      osx_image: xcode7.3
+      compiler: clang
+      env: QCTOOLS_USE_BREW=true 
+    - os: osx
+      osx_image: xcode7.3
+      compiler: gcc
+      env: QCTOOLS_USE_BREW=true 
+    - os: osx
+      osx_image: xcode7.3
+      compiler: clang
+      env: QCTOOLS_USE_BREW=false 
+    - os: osx
+      osx_image: xcode7.3
+      compiler: gcc
+      env: QCTOOLS_USE_BREW=false 
 
 before_install:
+  - echo QCTOOLS_USE_BREW = $QCTOOLS_USE_BREW
   - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install qt5 && export PATH=/usr/local/opt/qt5/bin:$PATH; fi
   
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo add-apt-repository --yes ppa:beineri/opt-qt551-trusty; fi
