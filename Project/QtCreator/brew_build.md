@@ -12,6 +12,10 @@ require not having a homebrew installation of qt (aka qt4):
     $ brew uninstall qwt
     $ brew install qwt-qt5.rb
 
+set QCTOOLS_USE_BREW environment variable:
+
+    $ export QCTOOLS_USE_BREW=true
+
 Build the main application
 
     $ qmake

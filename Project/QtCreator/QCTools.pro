@@ -1,14 +1,34 @@
-QWT_ROOT = $${PWD}/../../../qwt
-
 QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 TARGET = QCTools
 TEMPLATE = app
 
-CONFIG += c++11
-CONFIG += qt debug_and_release
-CONFIG += no_keywords
+CONFIG += c++11 qt no_keywords
+
+!isEmpty(QCTOOLS_USE_BREW) {
+    DEFINES += USE_BREW
+}
+
+macx:contains(DEFINES, USE_BREW) {
+
+    message("use brew")
+    CONFIG += qwt release
+
+    QMAKE_TARGET_BUNDLE_PREFIX = org.bavc
+    QT_CONFIG -= no-pkg-config
+
+    include ( $$system(brew --prefix qwt-qt5)/features/qwt.prf )
+
+    PKGCONFIG += libavdevice libavcodec libavfilter libavformat libpostproc
+    PKGCONFIG += libswresample libswscale libavcodec libavutil
+
+    CONFIG += link_pkgconfig
+
+} else {
+    CONFIG += debug_and_release
+}
+
 QMAKE_CXXFLAGS += -DBLACKMAGICDECKLINK_NO -DWITH_SYSTEM_FFMPEG=1
 
 HEADERS = \
@@ -78,7 +98,7 @@ SOURCES = \
     ../../Source/GUI/draggablechildrenbehaviour.cpp
 
 linux:SOURCES += "../../../Blackmagic DeckLink SDK/Linux/include/DeckLinkAPIDispatch.cpp"
-macx:SOURCES += "../../../Blackmagic DeckLink SDK/Mac/include/DeckLinkAPIDispatch.cpp"
+macx:!contains(DEFINES, USE_BREW) SOURCES += "../../../Blackmagic DeckLink SDK/Mac/include/DeckLinkAPIDispatch.cpp"
 
 win32 {
     INCLUDEPATH += $$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib
@@ -93,43 +113,59 @@ FORMS += \
 RESOURCES += \
     ../../Source/Resource/Resources.qrc
 
-include( $${QWT_ROOT}/qwtconfig.pri )
-!win32 {
-    include( $${QWT_ROOT}/qwtbuild.pri )
-}
-include( $${QWT_ROOT}/qwtfunctions.pri )
+macx:contains(DEFINES, USE_BREW) {
+    message("use qwt from brew")
+} else {
+    QWT_ROOT = $${PWD}/../../../qwt
 
+    include( $${QWT_ROOT}/qwtconfig.pri )
+    !win32 {
+        include( $${QWT_ROOT}/qwtbuild.pri )
+    }
+    include( $${QWT_ROOT}/qwtfunctions.pri )
+
+    !win32 {
+            LIBS      += -L$${QWT_ROOT}/lib -lqwt
+    }
+
+    win32 {
+        CONFIG(debug, debug|release) {
+            LIBS += -L$${QWT_ROOT}/lib -lqwtd
+        } else:CONFIG(release, debug|release) {
+            LIBS += -L$${QWT_ROOT}/lib -lqwt
+        }
+    }
+
+    INCLUDEPATH += $$QWT_ROOT/src
+}
 INCLUDEPATH += $$PWD/../../Source
 INCLUDEPATH += $$PWD/../../Source/ThirdParty/tinyxml2
-INCLUDEPATH += $$QWT_ROOT/src
-INCLUDEPATH += $$PWD/../../../ffmpeg
-INCLUDEPATH += "$$PWD/../../../Blackmagic DeckLink SDK"
 
-!win32 {
-    LIBS      += -L$${QWT_ROOT}/lib -lqwt
+macx:contains(DEFINES, USE_BREW) {
+    message("use ffmpeg from brew")
+} else {
+    INCLUDEPATH += $$PWD/../../../ffmpeg
+
+    LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
+                 -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
+                 -L$${PWD}/../../../ffmpeg/libavfilter -lavfilter \
+                 -L$${PWD}/../../../ffmpeg/libavformat -lavformat \
+                 -L$${PWD}/../../../ffmpeg/libpostproc -lpostproc \
+                 -L$${PWD}/../../../ffmpeg/libswresample -lswresample \
+                 -L$${PWD}/../../../ffmpeg/libswscale -lswscale \
+                 -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
+                 -L$${PWD}/../../../ffmpeg/libavutil -lavutil
 }
 
-win32 {
-    CONFIG(debug, debug|release) {
-        LIBS += -L$${QWT_ROOT}/lib -lqwtd
-    } else:CONFIG(release, debug|release) {
-        LIBS += -L$${QWT_ROOT}/lib -lqwt
-    }
+macx:contains(DEFINES, USE_BREW) {
+    message("don't use Blackmagic DeckLink SDK for brew build")
+} else {
+    INCLUDEPATH += "$$PWD/../../../Blackmagic DeckLink SDK"
 }
 
 !win32 {
     LIBS += -lz
 }
-
-LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
-             -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
-             -L$${PWD}/../../../ffmpeg/libavfilter -lavfilter \
-             -L$${PWD}/../../../ffmpeg/libavformat -lavformat \
-             -L$${PWD}/../../../ffmpeg/libpostproc -lpostproc \
-             -L$${PWD}/../../../ffmpeg/libswresample -lswresample \
-             -L$${PWD}/../../../ffmpeg/libswscale -lswscale \
-             -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
-             -L$${PWD}/../../../ffmpeg/libavutil -lavutil
 
 !win32 {
     LIBS      += -lbz2
