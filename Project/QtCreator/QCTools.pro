@@ -196,5 +196,14 @@ linux {
 }
 
 macx:ICON = ../../Source/Resource/Logo.icns
-macx:QMAKE_LFLAGS += -framework CoreFoundation -framework CoreVideo -framework VideoDecodeAcceleration
-macx:LIBS += -liconv
+macx:LIBS += -liconv \
+	     -framework CoreFoundation \
+             -framework Foundation \
+             -framework AppKit \
+             -framework AudioToolBox \
+             -framework CoreImage \
+             -framework CoreGraphics \
+             -framework CoreAudio \
+             -framework CoreVideo \
+             -framework VideoDecodeAcceleration
+
