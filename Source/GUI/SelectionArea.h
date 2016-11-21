@@ -2,6 +2,7 @@
 #define AIRUBBERBAND_H
 
 #include <QRubberBand>
+#include <QtGlobal>
 
 class SelectionArea : public QWidget
 {
@@ -22,7 +23,7 @@ public:
 		hitLeft = 7, 
 		hitMiddle = 8
 	};
-    Q_ENUM(TrackerHit);
+    Q_ENUMS(TrackerHit);
 
 public Q_SLOTS:
     void setMaxSize(int width, int height);

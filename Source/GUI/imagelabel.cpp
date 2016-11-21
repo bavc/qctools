@@ -21,38 +21,8 @@ ImageLabel::ImageLabel(FFmpeg_Glue** Picture_, size_t Pos_, QWidget *parent) :
 
     selectionArea = new SelectionArea(ui->label);
 
-    connect(selectionArea, &SelectionArea::geometryChangeFinished, this, [&]() {
-        Q_EMIT selectionChangeFinished(QRectF(selectionPos, selectionSize));
-    });
-
-    connect(selectionArea, &SelectionArea::geometryChanged, this, [&](const QRect& geometry) {
-        int scaledWidth = Pixmap.width();
-        int scaledHeight = Pixmap.height();
-
-        QRectF originalGeometry(geometry);
-
-        auto originalWidth = (*Picture)->Width_Get();
-        auto originalHeight = (*Picture)->Height_Get();
-
-        if(originalWidth > originalHeight)
-            originalHeight = originalWidth / (*Picture)->OutputDAR_Get(Pos - 1);
-        else
-            originalWidth = originalHeight * (*Picture)->OutputDAR_Get(Pos - 1);
-
-        QSizeF size(originalGeometry.width() * originalWidth / scaledWidth,
-                    originalGeometry.height() * originalHeight / scaledHeight);
-
-        QPointF topLeft(originalGeometry.topLeft().x() * originalWidth / scaledWidth,
-                        originalGeometry.topLeft().y() * originalHeight / scaledHeight);
-
-        originalGeometry.setSize(size);
-        originalGeometry.moveTopLeft(topLeft);
-
-        selectionPos = originalGeometry.topLeft();
-        selectionSize = originalGeometry.size();
-
-        Q_EMIT selectionChanged(originalGeometry);
-    });
+    connect(selectionArea, SIGNAL(geometryChangeFinished()), this, SLOT(geometryChangeFinished()));
+    connect(selectionArea, SIGNAL(geometryChanged(const QRect&)), this, SLOT(geometryChanged(const QRect&)));
 
     ui->label->installEventFilter(this);
 }
@@ -76,14 +46,14 @@ void ImageLabel::setImage(const QImage& image)
     updatePixmap(image);
 }
 
-void ImageLabel::updatePixmap(const QImage& image /*= nullptr*/)
+void ImageLabel::updatePixmap(const QImage& image /*= NULL*/)
 {
-    if(*Picture == nullptr)
+    if(*Picture == NULL)
     {
         return;
     }
 
-    auto picture = *Picture;
+    FFmpeg_Glue* picture = *Picture;
 
     QImage Image = image;
     if (Image.isNull())
@@ -174,8 +144,8 @@ void ImageLabel::changeSelectionWidth(double value)
 {
     selectionSize.setWidth(value);
 
-    auto originalWidth = (*Picture)->Width_Get();
-    auto scaledWidth = Pixmap.width();
+    int originalWidth = (*Picture)->Width_Get();
+    int scaledWidth = Pixmap.width();
 
     int width = (value * scaledWidth / originalWidth);
 
@@ -200,8 +170,8 @@ void ImageLabel::changeSelectionHeight(double value)
 {
     selectionSize.setHeight(value);
 
-    auto originalHeight = (*Picture)->Height_Get();
-    auto scaledHeight = Pixmap.height();
+    int originalHeight = (*Picture)->Height_Get();
+    int scaledHeight = Pixmap.height();
 
     int height = (value * scaledHeight / originalHeight);
 
@@ -248,19 +218,19 @@ void ImageLabel::setSelectionArea(double x, double y, double w, double h)
 
     // x, y - top left of box
 
-    auto originalWidth = (*Picture)->Width_Get();
-    auto originalHeight = (*Picture)->Height_Get();
+    int originalWidth = (*Picture)->Width_Get();
+    int originalHeight = (*Picture)->Height_Get();
 
     if(originalWidth > originalHeight)
         originalHeight = originalWidth / (*Picture)->OutputDAR_Get(Pos - 1);
     else
         originalWidth = originalHeight * (*Picture)->OutputDAR_Get(Pos - 1);
 
-    auto scaledWidth = Pixmap.width();
-    auto scaledHeight = Pixmap.height();
+    int scaledWidth = Pixmap.width();
+    int scaledHeight = Pixmap.height();
 
-    auto scaledX = x * scaledWidth / originalWidth;
-    auto scaledY = y * scaledHeight / originalHeight;
+    double scaledX = x * scaledWidth / originalWidth;
+    double scaledY = y * scaledHeight / originalHeight;
 
     int width = (w * scaledWidth / originalWidth);
     int height = (h * scaledHeight / originalHeight);
@@ -301,12 +271,12 @@ bool ImageLabel::eventFilter(QObject *object, QEvent *event)
 
     if(event->type() == QEvent::Paint)
     {
-        if(*Picture == nullptr)
+        if(*Picture == NULL)
         {
             return false;
         }
 
-        auto picture = *Picture;
+        FFmpeg_Glue* picture = *Picture;
 
         QWidget* widget = static_cast<QWidget*> (object);
 
@@ -317,14 +287,14 @@ bool ImageLabel::eventFilter(QObject *object, QEvent *event)
         QPainter p(widget);
         p.setPen(Qt::green);
 
-        auto originalWidth = (*Picture)->Width_Get();
-        auto originalHeight = (*Picture)->Height_Get();
+        int originalWidth = (*Picture)->Width_Get();
+        int originalHeight = (*Picture)->Height_Get();
 
-        auto scaledWidth = selectionArea->width();
-        auto scaledHeight = selectionArea->height();
+        int scaledWidth = selectionArea->width();
+        int scaledHeight = selectionArea->height();
 
-        auto scaledX = selectionPos.x() * scaledWidth / originalWidth;
-        auto scaledY = selectionPos.y() * scaledHeight / originalHeight;
+        double scaledX = selectionPos.x() * scaledWidth / originalWidth;
+        double scaledY = selectionPos.y() * scaledHeight / originalHeight;
 
         p.fillRect(QRect(0, 0, size().width(), 50), QColor(128, 128, 128, 128));
         p.drawText(20, 20, QString("frameWidth: %1, frameHeight: %2, fw/fh: %3, imageWidth: %4, imageHeigh: %5, iw/ih: %6")
@@ -356,17 +326,17 @@ bool ImageLabel::eventFilter(QObject *object, QEvent *event)
 
 bool ImageLabel::needRescale()
 {
-    if(*Picture == nullptr)
+    if(*Picture == NULL)
     {
         return false;
     }
 
-    auto picture = *Picture;
+    FFmpeg_Glue* picture = *Picture;
     QSize Size = size();
     QSize pixmapSize = Pixmap.size();
 
-    auto dar = picture->OutputDAR_Get(Pos - 1);
-    auto iar = qreal(Size.width()) / Size.height();
+    double dar = picture->OutputDAR_Get(Pos - 1);
+    double iar = qreal(Size.width()) / Size.height();
 
     int expectedWidth = 0;
     int expectedHeight = 0;
@@ -392,14 +362,14 @@ bool ImageLabel::needRescale()
 
 void ImageLabel::rescale()
 {
-    if(*Picture == nullptr)
+    if(*Picture == NULL)
     {
         return;
     }
 
-    auto picture = *Picture;
+    FFmpeg_Glue* picture = *Picture;
     picture->Scale_Change(size().width(), size().height());
-    auto Image = picture->Image_Get(Pos - 1);
+    QImage Image = picture->Image_Get(Pos - 1);
 
     if (Image.isNull())
     {
@@ -412,4 +382,39 @@ void ImageLabel::rescale()
     ui->label->setPixmap(Pixmap);
 
     setSelectionArea(selectionPos.x(), selectionPos.y(), selectionSize.width(), selectionSize.height());
+}
+
+void ImageLabel::geometryChangeFinished()
+{
+    Q_EMIT selectionChangeFinished(QRectF(selectionPos, selectionSize));
+}
+
+void ImageLabel::geometryChanged(const QRect& geometry)
+{
+    int scaledWidth = Pixmap.width();
+    int scaledHeight = Pixmap.height();
+
+    QRectF originalGeometry(geometry);
+
+    int originalWidth = (*Picture)->Width_Get();
+    int originalHeight = (*Picture)->Height_Get();
+
+    if(originalWidth > originalHeight)
+        originalHeight = originalWidth / (*Picture)->OutputDAR_Get(Pos - 1);
+    else
+        originalWidth = originalHeight * (*Picture)->OutputDAR_Get(Pos - 1);
+
+    QSizeF size(originalGeometry.width() * originalWidth / scaledWidth,
+                originalGeometry.height() * originalHeight / scaledHeight);
+
+    QPointF topLeft(originalGeometry.topLeft().x() * originalWidth / scaledWidth,
+                    originalGeometry.topLeft().y() * originalHeight / scaledHeight);
+
+    originalGeometry.setSize(size);
+    originalGeometry.moveTopLeft(topLeft);
+
+    selectionPos = originalGeometry.topLeft();
+    selectionSize = originalGeometry.size();
+
+    Q_EMIT selectionChanged(originalGeometry);
 }

@@ -58,16 +58,16 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     // plots and legends
     m_plots = new Plot**[m_fileInfoData->Stats.size()];
     m_plotsCount = 0;
-    
+
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
     {
         if (m_fileInfoData->Stats[streamPos])
         {
             size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
             size_t countOfGroups = PerStreamType[type].CountOfGroups;
-        
+
             m_plots[streamPos] = new Plot*[countOfGroups + 1]; //+1 for axix
-    
+
             for ( size_t group = 0; group < countOfGroups; group++ )
             {
                 if (m_fileInfoData->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
@@ -192,7 +192,7 @@ FrameInterval Plots::visibleFrames() const
 //---------------------------------------------------------------------------
 void Plots::onCurrentFrameChanged()
 {
-    // position of the current frame has changed 
+    // position of the current frame has changed
 
     if ( isZoomed() )
     {
@@ -268,13 +268,13 @@ void Plots::updateSamples( Plot* plot )
     const size_t plotGroup = plot->group();
     const CommonStats* stat = stats( plot->streamPos() );
 
-    auto streamInfo = PerStreamType[plotType];
+    stream_info streamInfo = PerStreamType[plotType];
 
-    for(auto j = 0; j < streamInfo.PerGroup[plotGroup].Count; ++j)
+    for(size_t j = 0; j < streamInfo.PerGroup[plotGroup].Count; ++j)
     {
-        auto xData = stat->x[m_dataTypeIndex];
-        auto yIndex = streamInfo.PerGroup[plotGroup].Start + j;
-        auto yData = stat->y[yIndex];
+        double* xData = stat->x[m_dataTypeIndex];
+        unsigned yIndex = streamInfo.PerGroup[plotGroup].Start + j;
+        double* yData = stat->y[yIndex];
 
         plot->setCurveSamples( j, xData, yData, stat->x_Current );
     }
@@ -318,7 +318,7 @@ void Plots::alignYAxes()
         if ( m_fileInfoData->Stats[streamPos] && m_plots[streamPos] )
         {
             size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
-        
+
             for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
                 if (m_plots[streamPos][group] && m_plots[streamPos] )
             {
@@ -340,7 +340,7 @@ void Plots::alignYAxes()
         if ( m_fileInfoData->Stats[streamPos] && m_plots[streamPos] )
         {
             size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
-        
+
             for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
                 if (m_plots[streamPos][group])
             {
@@ -358,7 +358,7 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
             if ( m_fileInfoData->Stats[streamPos] && m_plots[streamPos] )
             {
                 size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
-        
+
                 for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
                 {
                     if ( m_plots[streamPos][group] && m_plots[streamPos][group]->isVisibleTo( this ) )
@@ -391,7 +391,7 @@ void Plots::adjustGroupMax(int group, int bitsPerRawSample)
     }
 }
 
-void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
+void Plots::changeOrder(QList<std::tr1::tuple<int, int> > orderedFilterInfo)
 {
     if(orderedFilterInfo.empty())
     {
@@ -401,37 +401,40 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
 
     qDebug() << "changeOrder: items = " << orderedFilterInfo.count();
 
-    auto gridLayout = static_cast<QGridLayout*> (layout());
-    auto rowsCount = gridLayout->rowCount();
+    QGridLayout* gridLayout = static_cast<QGridLayout*> (layout());
+    int rowsCount = gridLayout->rowCount();
 
     Q_ASSERT(m_plotsCount <= rowsCount);
 
     qDebug() << "plotsCount: " << m_plotsCount;
 
-    QList <std::tuple<size_t, size_t, size_t>> currentOrderedPlotsInfo;
-    QList <std::tuple<size_t, size_t, size_t>> expectedOrderedPlotsInfo;
+    QList <std::tr1::tuple<size_t, size_t, size_t> > currentOrderedPlotsInfo;
+    QList <std::tr1::tuple<size_t, size_t, size_t> > expectedOrderedPlotsInfo;
 
-    for(auto row = 0; row < m_plotsCount; ++row)
+    for(int row = 0; row < m_plotsCount; ++row)
     {
-        auto plotItem = gridLayout->itemAtPosition(row, 0);
-        auto legendItem = gridLayout->itemAtPosition(row, 1);
+        QLayoutItem* plotItem = gridLayout->itemAtPosition(row, 0);
+        QLayoutItem* legendItem = gridLayout->itemAtPosition(row, 1);
 
         Q_ASSERT(plotItem);
         Q_ASSERT(legendItem);
 
-        auto plot = qobject_cast<Plot*> (plotItem->widget());
+        Plot* plot = qobject_cast<Plot*> (plotItem->widget());
         Q_ASSERT(plot);
 
-        currentOrderedPlotsInfo.push_back(std::make_tuple(plot->group(), plot->type(), plot->streamPos()));
+        currentOrderedPlotsInfo.push_back(std::tr1::make_tuple(plot->group(), plot->type(), plot->streamPos()));
     }
 
-    for(auto filterInfo : orderedFilterInfo)
+
+    QList<std::tr1::tuple<int, int> >::iterator filterInfo;
+    for(filterInfo = orderedFilterInfo.begin(); filterInfo != orderedFilterInfo.end(); ++filterInfo)
     {
-        for(auto plotInfo : currentOrderedPlotsInfo)
+        QList <std::tr1::tuple<size_t, size_t, size_t> >::iterator plotInfo;
+        for(plotInfo = currentOrderedPlotsInfo.begin(); plotInfo != currentOrderedPlotsInfo.end(); ++plotInfo)
         {
-            if(std::get<0>(plotInfo) == std::get<0>(filterInfo) && std::get<1>(plotInfo) == std::get<1>(filterInfo))
+            if(std::tr1::get<0>(*plotInfo) == std::tr1::get<0>(*filterInfo) && std::tr1::get<1>(*plotInfo) == std::tr1::get<1>(*filterInfo))
             {
-                expectedOrderedPlotsInfo.push_back(plotInfo);
+                expectedOrderedPlotsInfo.push_back(*plotInfo);
             }
         }
     }
@@ -440,45 +443,45 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
     if(currentOrderedPlotsInfo.length() != expectedOrderedPlotsInfo.length())
         return;
 
-    for(auto i = 0; i < expectedOrderedPlotsInfo.length(); ++i)
+    for(int i = 0; i < expectedOrderedPlotsInfo.length(); ++i)
     {
-        qDebug() << "cg: " << std::get<0>(currentOrderedPlotsInfo[i])
+        qDebug() << "cg: " << std::tr1::get<0>(currentOrderedPlotsInfo[i])
                  << ", "
-                 << "ct: " << std::get<1>(currentOrderedPlotsInfo[i])
+                 << "ct: " << std::tr1::get<1>(currentOrderedPlotsInfo[i])
                  << ", "
-                 << "cp: " << std::get<2>(currentOrderedPlotsInfo[i])
+                 << "cp: " << std::tr1::get<2>(currentOrderedPlotsInfo[i])
                  << ", "
-                 << "eg: " << std::get<0>(expectedOrderedPlotsInfo[i])
+                 << "eg: " << std::tr1::get<0>(expectedOrderedPlotsInfo[i])
                  << ", "
-                 << "et: " << std::get<1>(expectedOrderedPlotsInfo[i])
+                 << "et: " << std::tr1::get<1>(expectedOrderedPlotsInfo[i])
                  << ", "
-                 << "ep: " << std::get<2>(expectedOrderedPlotsInfo[i]);
+                 << "ep: " << std::tr1::get<2>(expectedOrderedPlotsInfo[i]);
     }
 
-    for(auto i = 0; i < expectedOrderedPlotsInfo.length(); ++i)
+    for(int i = 0; i < expectedOrderedPlotsInfo.length(); ++i)
     {
         if(expectedOrderedPlotsInfo[i] != currentOrderedPlotsInfo[i])
         {
             // search current item which we should put at expected position
-            for(auto j = 0; j < expectedOrderedPlotsInfo.length(); ++j)
+            for(int j = 0; j < expectedOrderedPlotsInfo.length(); ++j)
             {
                 if(expectedOrderedPlotsInfo[i] == currentOrderedPlotsInfo[j])
                 {
                     qDebug() << "i: " << i << ", j: " << j;
 
-                    auto plotWidget = gridLayout->itemAtPosition(j, 0)->widget();
-                    auto legendWidget = gridLayout->itemAtPosition(j, 1)->widget();
+                    QWidget* plotWidget = gridLayout->itemAtPosition(j, 0)->widget();
+                    QWidget* legendWidget = gridLayout->itemAtPosition(j, 1)->widget();
 
                     {
-                        auto plot = qobject_cast<Plot*> (plotWidget);
+                        Plot* plot = qobject_cast<Plot*> (plotWidget);
                         qDebug() << "jg: " << plot->group() << ", t: " << plot->type() << ", p: " << plot->streamPos() << ", ptr = " << plot;
                     }
 
-                    auto swapPlotWidget = gridLayout->itemAtPosition(i, 0)->widget();
-                    auto swapLegendWidget = gridLayout->itemAtPosition(i, 1)->widget();
+                    QWidget* swapPlotWidget = gridLayout->itemAtPosition(i, 0)->widget();
+                    QWidget* swapLegendWidget = gridLayout->itemAtPosition(i, 1)->widget();
 
                     {
-                        auto plot = qobject_cast<Plot*> (swapPlotWidget);
+                        Plot* plot = qobject_cast<Plot*> (swapPlotWidget);
                         qDebug() << "ig: " << plot->group() << ", t: " << plot->type() << ", p: " << plot->streamPos() << ", ptr = " << plot;
                     }
 
@@ -505,19 +508,19 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
 
     Q_ASSERT(rowsCount == gridLayout->rowCount());
 
-    for(auto row = 0; row < m_plotsCount; ++row)
+    for(int row = 0; row < m_plotsCount; ++row)
     {
-        auto plotItem = gridLayout->itemAtPosition(row, 0);
-        auto legendItem = gridLayout->itemAtPosition(row, 1);
+        QLayoutItem* plotItem = gridLayout->itemAtPosition(row, 0);
+        QLayoutItem* legendItem = gridLayout->itemAtPosition(row, 1);
 
         Q_ASSERT(plotItem);
         Q_ASSERT(legendItem);
 
-        auto plot = qobject_cast<Plot*> (plotItem->widget());
+        Plot* plot = qobject_cast<Plot*> (plotItem->widget());
         Q_ASSERT(plot);
 
-        Q_ASSERT(plot->group() == std::get<0>(expectedOrderedPlotsInfo[row]) &&
-                 plot->type() == std::get<1>(expectedOrderedPlotsInfo[row]));
+        Q_ASSERT(plot->group() == std::tr1::get<0>(expectedOrderedPlotsInfo[row]) &&
+                 plot->type() == std::tr1::get<1>(expectedOrderedPlotsInfo[row]));
     }
 }
 
@@ -525,7 +528,7 @@ void Plots::alignXAxis( const Plot* plot )
 {
     const QWidget* canvas = plot->canvas();
 
-    QRect r = canvas->geometry(); 
+    QRect r = canvas->geometry();
     r.moveTopLeft( mapFromGlobal( plot->mapToGlobal( r.topLeft() ) ) );
 
     int left = r.left();
@@ -608,7 +611,7 @@ void Plots::zoomXAxis( ZoomTypes zoomType )
         m_zoomFactor--;
     else if ( zoomType == ZoomOneToOne)
         m_zoomFactor = 0;
-        
+
     qDebug() << "m_zoomFactor: " << m_zoomFactor;
     int numVisibleFrames = m_fileInfoData->Frames_Count_Get() >> m_zoomFactor;
 

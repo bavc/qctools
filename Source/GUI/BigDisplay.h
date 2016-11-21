@@ -83,6 +83,14 @@ private:
 public Q_SLOTS:
     void on_valueChanged(double);
     void on_sliderMoved(int);
+    void selectionChangedX(const QRectF& geometry);
+    void selectionChangedY(const QRectF& geometry);
+    void selectionChangedWidth(const QRectF& geometry);
+    void selectionChangedHeight(const QRectF& geometry);
+    void selectionChangeFinishedX(const QRectF& geometry);
+    void selectionChangeFinishedY(const QRectF& geometry);
+    void selectionChangeFinishedWidth(const QRectF& geometry);
+    void selectionChangeFinishedHeight(const QRectF& geometry);
 
 Q_SIGNALS:
     void controlValueChanged(double);

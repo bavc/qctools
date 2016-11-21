@@ -40,7 +40,7 @@ void FileInformation::run()
     if (blackmagicDeckLink_Glue)
     {
         blackmagicDeckLink_Glue->Glue=Glue;
-            
+
         for (;;)
         {
             switch (blackmagicDeckLink_Glue->Config_Out.Status)
@@ -48,12 +48,12 @@ void FileInformation::run()
                 case BlackmagicDeckLink_Glue::instancied:
                                                         blackmagicDeckLink_Glue->Start();
                                                         break;
-                case BlackmagicDeckLink_Glue::finished: 
+                case BlackmagicDeckLink_Glue::finished:
                                                         WantToStop=true;
                                                         break;
                 default : ;
             }
-                
+
             if (WantToStop)
                 break;
             yieldCurrentThread();
@@ -463,7 +463,7 @@ QPixmap FileInformation::Picture_Get (size_t Pos)
     }
     else
     {
-        auto Thumbnail = Glue->Thumbnail_Get(0, Pos);
+        QByteArray Thumbnail = Glue->Thumbnail_Get(0, Pos);
         if (!Thumbnail.isEmpty())
             Pixmap.loadFromData(Thumbnail);
         else
@@ -480,7 +480,7 @@ int FileInformation::Frames_Count_Get (size_t Stats_Pos)
 {
     if (Stats_Pos==(size_t)-1)
         Stats_Pos=ReferenceStream_Pos_Get();
-    
+
     if (Stats_Pos>=Stats.size())
         return -1;
     return Stats[Stats_Pos]->x_Max[0];
@@ -514,7 +514,7 @@ int FileInformation::Frames_Pos_Get (size_t Stats_Pos)
     }
     else
         Pos=Frames_Pos;
-    
+
     return Pos;
 }
 
@@ -579,7 +579,7 @@ void FileInformation::Frames_Pos_Set (int Pos, size_t Stats_Pos)
                 break;
             }
     }
-    
+
     if (Pos<0)
         Pos=0;
     if (Pos>=ReferenceStat()->x_Current_Max)
@@ -628,7 +628,7 @@ qreal FileInformation::averageFrameRate() const
     if(!Glue)
         return 0;
 
-    auto splitted = QString::fromStdString(Glue->AvgVideoFrameRate_Get()).split("/");
+    QStringList splitted = QString::fromStdString(Glue->AvgVideoFrameRate_Get()).split("/");
     if(splitted.length() == 1)
         return splitted[0].toDouble();
 

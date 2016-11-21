@@ -15,6 +15,10 @@
 
 #include <QWidget>
 
+#ifndef _WIN32
+#include <tr1/tuple>
+#endif
+
 class QwtPlot;
 class Plot;
 class PlotScaleWidget;
@@ -97,7 +101,7 @@ public:
 
     virtual bool                eventFilter( QObject *, QEvent * );
     void                        adjustGroupMax(int group, int bitsPerRawSample);
-    void                        changeOrder(QList<std::tuple<int, int>> filterSelectorsInfo);
+    void                        changeOrder(QList<std::tr1::tuple<int, int> > filterSelectorsInfo);
 
 public Q_SLOTS:
     void                        onCurrentFrameChanged();
