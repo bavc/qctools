@@ -14,7 +14,7 @@ if [ ! -d ffmpeg ] ; then
 fi
 
     cd ffmpeg
-    FFMPEG_CONFIGURE_OPTS=(--enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --disable-lzma --disable-iconv)
+    FFMPEG_CONFIGURE_OPTS=(--enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --disable-lzma --disable-iconv --enable-pic)
     if sw_vers >/dev/null 2>&1 ; then
         FFMPEG_CONFIGURE_OPTS+=(--extra-cflags="-mmacosx-version-min=10.5" --extra-ldflags="-mmacosx-version-min=10.5")
     fi
@@ -30,6 +30,7 @@ fi
             cd yasm/
             ./configure --prefix=`pwd`/usr
             make
+            make install
             cd "${INSTALL_DIR}/ffmpeg"
             FFMPEG_CONFIGURE_OPTS+=(--yasmexe=../yasm/usr/bin/yasm)
             ./configure "${FFMPEG_CONFIGURE_OPTS[@]}"

@@ -191,8 +191,9 @@ macx:contains(DEFINES, USE_BREW) {
     LIBS      += -lbz2
 }
 
-linux {
-    LIBS      += -ldl -lrt
+unix {
+    LIBS       += -ldl
+    !macx:LIBS += -lrt
 }
 
 macx:ICON = ../../Source/Resource/Logo.icns
@@ -206,4 +207,3 @@ macx:LIBS += -liconv \
              -framework CoreAudio \
              -framework CoreVideo \
              -framework VideoDecodeAcceleration
-

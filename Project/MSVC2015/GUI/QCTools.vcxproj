@@ -1,0 +1,309 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="13.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="StaticRelease|Win32">
+      <Configuration>StaticRelease</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="StaticRelease|x64">
+      <Configuration>StaticRelease</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F4F4FAF7-25A4-4BAC-8BEA-C88661D1180D}</ProjectGuid>
+    <RootNamespace>VideoAnalyzer</RootNamespace>
+    <ProjectName>QCTools</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='StaticRelease|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='StaticRelease|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='StaticRelease|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='StaticRelease|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../../../Source;../../../Source/ThirdParty/tinyxml2;../../../../ffmpeg;../../../../Qt/include/QtGui;../../../../Qt/include/QtWidgets;../../../../Qt/include/QtCore;../../../../Qt/include;./;../../../../qwt/src;./_Automated;../../../../Qt/include/QtPrintSupport;../../../../zlib;../../../../Blackmagic DeckLink SDK\Win\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <DisableSpecificWarnings>4018</DisableSpecificWarnings>
+      <MinimalRebuild>false</MinimalRebuild>
+      <PreprocessorDefinitions>BLACKMAGICDECKLINK_NO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../../../Qt/lib;../../../../qwt/lib;../../../../ffmpeg/libavformat;../../../../ffmpeg/libavcodec;../../../../ffmpeg/libavfilter;../../../../ffmpeg/libswscale;../../../../ffmpeg/libavutil;../../../../zlib/contrib/vstudio/vc14/x86/ZlibStat$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>qwtd.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;qtmaind.lib;avformat.lib;avcodec.lib;avfilter.lib;swscale.lib;avutil.lib;winmm.lib;ws2_32.lib;imm32.lib;zlibstat.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WIN32;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../../../Source;../../../Source/ThirdParty/tinyxml2;../../../../ffmpeg;../../../../Qt/include/QtGui;../../../../Qt/include/QtWidgets;../../../../Qt/include/QtCore;../../../../Qt/include;./;../../../../qwt/src;./_Automated;../../../../Qt/include/QtPrintSupport;../../../../zlib;../../../../Blackmagic DeckLink SDK\Win\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <DisableSpecificWarnings>4018</DisableSpecificWarnings>
+      <MinimalRebuild>false</MinimalRebuild>
+      <PreprocessorDefinitions>BLACKMAGICDECKLINK_NO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../../../Qt/lib;../../../../qwt/lib;../../../../ffmpeg/libavformat;../../../../ffmpeg/libavcodec;../../../../ffmpeg/libavfilter;../../../../ffmpeg/libswscale;../../../../ffmpeg/libavutil;../../../../zlib/contrib/vstudio/vc14/x86/ZlibStat$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>qwtd.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;qtmaind.lib;avformat.lib;avcodec.lib;avfilter.lib;swscale.lib;avutil.lib;winmm.lib;ws2_32.lib;imm32.lib;zlibstat.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WIN32;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../Source;../../../Source/ThirdParty/tinyxml2;../../../../ffmpeg;../../../../Qt/include/QtGui;../../../../Qt/include/QtWidgets;../../../../Qt/include/QtCore;../../../../Qt/include;./;../../../../qwt/src;./_Automated;../../../../Qt/include/QtPrintSupport;../../../../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>../../../../Qt/lib;../../../../Qt/plugins/platforms;../../../../qwt/lib;../../../../ffmpeg/bin;../../../../zlib/contrib/vstudio/vc14/x86/ZlibStatRelease;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>qwt.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;qtmain.lib;avformat.lib;avcodec.lib;avfilter.lib;swscale.lib;avutil.lib ;winmm.lib;ws2_32.lib;secur32.lib;imm32.lib;zlibstat.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../Source;../../../Source/ThirdParty/tinyxml2;../../../../ffmpeg;../../../../Qt/include/QtGui;../../../../Qt/include/QtWidgets;../../../../Qt/include/QtCore;../../../../Qt/include;./;../../../../qwt/src;./_Automated;../../../../Qt/include/QtPrintSupport;../../../../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>../../../../Qt/lib;../../../../Qt/plugins/platforms;../../../../qwt/lib;../../../../ffmpeg/bin;../../../../zlib/contrib/vstudio/vc14/x64/ZlibStatRelease;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>qwt.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;qtmain.lib;avformat.lib;avcodec.lib;avfilter.lib;swscale.lib;avutil.lib ;winmm.lib;ws2_32.lib;secur32.lib;imm32.lib;zlibstat.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='StaticRelease|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../Source;../../../Source/ThirdParty/tinyxml2;../../../../ffmpeg;../../../../Qt/include/QtGui;../../../../Qt/include/QtWidgets;../../../../Qt/include/QtCore;../../../../Qt/include;./;../../../../qwt/src;./_Automated;../../../../Qt/include/QtPrintSupport;../../../../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>../../../../Qt/lib;../../../../Qt/plugins/platforms;../../../../qwt/lib;../../../../ffmpeg/lib;../../../../zlib/contrib/vstudio/vc14/x86/ZlibStatRelease;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>qwt.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;qtmain.lib;qwindows.lib;qtpcre.lib;qtfreetype.lib;qtharfbuzzng.lib;libavformat.a;libavcodec.a;libavfilter.a;libswscale.a;libswresample.a;libpostproc.a;libavutil.a;winmm.lib;ws2_32.lib;secur32.lib;imm32.lib;zlibstat.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='StaticRelease|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../Source;../../../Source/ThirdParty/tinyxml2;../../../../ffmpeg;../../../../Qt/include/QtGui;../../../../Qt/include/QtWidgets;../../../../Qt/include/QtCore;../../../../Qt/include;./;../../../../qwt/src;./_Automated;../../../../Qt/include/QtPrintSupport;../../../../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>../../../../Qt/lib;../../../../Qt/plugins/platforms;../../../../qwt/lib;../../../../ffmpeg/lib;../../../../zlib/contrib/vstudio/vc14/x64/ZlibStatRelease;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>qwt.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;qtmain.lib;qwindows.lib;qtpcre.lib;qtfreetype.lib;qtharfbuzzng.lib;libavformat.a;libavcodec.a;libavfilter.a;libswscale.a;libswresample.a;libpostproc.a;libavutil.a;winmm.lib;ws2_32.lib;secur32.lib;imm32.lib;zlibstat.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Source\Core\AudioCore.cpp" />
+    <ClCompile Include="..\..\..\Source\Core\AudioStats.cpp" />
+    <ClCompile Include="..\..\..\Source\Core\BlackmagicDeckLink.cpp" />
+    <ClCompile Include="..\..\..\Source\Core\BlackmagicDeckLink_Glue.cpp" />
+    <ClCompile Include="..\..\..\Source\Core\CommonStats.cpp" />
+    <ClCompile Include="..\..\..\Source\Core\Core.cpp" />
+    <ClCompile Include="..\..\..\Source\Core\FFmpeg_Glue.cpp" />
+    <ClCompile Include="..\..\..\Source\Core\TimeCode.cpp" />
+    <ClCompile Include="..\..\..\Source\Core\VideoCore.cpp" />
+    <ClCompile Include="..\..\..\Source\Core\VideoStats.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\config.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Control.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\blackmagicdecklink_userinput.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\draggablechildrenbehaviour.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\FileInformation.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\FilesList.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Help.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Imagelabel.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Info.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\main.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\mainwindow.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\mainwindow_Callbacks.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\mainwindow_More.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\mainwindow_Ui.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\BigDisplay.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Plot.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\PlotLegend.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\PlotScaleWidget.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\preferences.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\TinyDisplay.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\SelectionArea.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Plots.cpp" />
+    <ClCompile Include="..\..\..\Source\ThirdParty\tinyxml2\tinyxml2.cpp" />
+    <ClCompile Include="DeckLinkAPI_i.c" />
+    <ClCompile Include="_Automated\moc_Control.cpp" />
+    <ClCompile Include="_Automated\moc_blackmagicdecklink_userinput.cpp" />
+    <ClCompile Include="_Automated\moc_draggablechildrenbehaviour.cpp" />
+    <ClCompile Include="_Automated\moc_FileInformation.cpp" />
+    <ClCompile Include="_Automated\moc_FilesList.cpp" />
+    <ClCompile Include="_Automated\moc_Help.cpp" />
+    <ClCompile Include="_Automated\moc_Info.cpp" />
+    <ClCompile Include="_Automated\moc_mainwindow.cpp" />
+    <ClCompile Include="_Automated\moc_BigDisplay.cpp" />
+    <ClCompile Include="_Automated\moc_Plot.cpp" />
+    <ClCompile Include="_Automated\moc_PlotLegend.cpp" />
+    <ClCompile Include="_Automated\moc_Plots.cpp" />
+    <ClCompile Include="_Automated\moc_PlotScaleWidget.cpp" />
+    <ClCompile Include="_Automated\moc_preferences.cpp" />
+    <ClCompile Include="_Automated\moc_Imagelabel.cpp" />
+    <ClCompile Include="_Automated\moc_TinyDisplay.cpp" />
+    <ClCompile Include="_Automated\moc_SelectionArea.cpp" />
+    <ClCompile Include="_Automated\qrc_Resources.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Source\Core\AudioCore.h" />
+    <ClInclude Include="..\..\..\Source\Core\AudioStats.h" />
+    <ClInclude Include="..\..\..\Source\Core\BlackmagicDeckLink.h" />
+    <ClInclude Include="..\..\..\Source\Core\BlackmagicDeckLink_Glue.h" />
+    <ClInclude Include="..\..\..\Source\Core\CommonStats.h" />
+    <ClInclude Include="..\..\..\Source\Core\Core.h" />
+    <ClInclude Include="..\..\..\Source\Core\FFmpeg_Glue.h" />
+    <ClInclude Include="..\..\..\Source\Core\TimeCode.h" />
+    <ClInclude Include="..\..\..\Source\Core\VideoCore.h" />
+    <ClInclude Include="..\..\..\Source\Core\VideoStats.h" />
+    <ClInclude Include="..\..\..\Source\GUI\config.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Control.h" />
+    <ClInclude Include="..\..\..\Source\GUI\blackmagicdecklink_userinput.h" />
+    <ClInclude Include="..\..\..\Source\GUI\draggablechildrenbehaviour.h" />
+    <ClInclude Include="..\..\..\Source\GUI\FileInformation.h" />
+    <ClInclude Include="..\..\..\Source\GUI\FilesList.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Help.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Imagelabel.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Info.h" />
+    <ClInclude Include="..\..\..\Source\GUI\mainwindow.h" />
+    <ClInclude Include="..\..\..\Source\GUI\BigDisplay.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Plot.h" />
+    <ClInclude Include="..\..\..\Source\GUI\PlotLegend.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Plots.h" />
+    <ClInclude Include="..\..\..\Source\GUI\PlotScaleWidget.h" />
+    <ClInclude Include="..\..\..\Source\GUI\preferences.h" />
+    <ClInclude Include="..\..\..\Source\GUI\TinyDisplay.h" />
+    <ClInclude Include="..\..\..\Source\GUI\SelectionArea.h" />
+    <ClInclude Include="..\..\..\Source\ThirdParty\tinyxml2\tinyxml2.h" />
+    <ClInclude Include="DeckLinkAPI_h.h" />
+    <ClInclude Include="_Automated\ui_blackmagicdecklink_userinput.h" />
+    <ClInclude Include="_Automated\ui_mainwindow.h" />
+    <ClInclude Include="_Automated\ui_preferences.h" />
+    <ClInclude Include="_Automated\ui_imagelabel.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="QCTools.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="..\..\..\..\Blackmagic DeckLink SDK\Win\include\DeckLinkAPI.idl" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

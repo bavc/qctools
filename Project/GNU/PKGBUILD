@@ -1,0 +1,29 @@
+# $Id$
+# Maintainer: MediaArea.net SARL <info@mediaarea.net>
+
+pkgname=qctools
+pkgver=0.7.3
+pkgrel=1
+pkgdesc="QCTools (Quality Control Tools for Video Preservation)"
+url="http://mediaarea.net"
+license=('GPL')
+source=(${pkgname}_${pkgver}-1.tar.gz)
+md5sums=('00000000000000000000000000000000')
+arch=('i686' 'x86_64')
+
+depends=('qt5-base' 'bzip2' 'zlib' 'cmake' 'yasm')
+
+build() {
+    cd "${srcdir}/qctools/qctools"
+    ./Project/BuildAllFromSource/build
+}
+
+package() {
+    install -D -m 0755 "${srcdir}"/qctools/qctools/Project/QtCreator/QCTools "${pkgdir}"/usr/bin/QCTools
+    install -D -m 0644 "${srcdir}"/qctools/qctools/Source/Resource/Logo.png "${pkgdir}"/usr/share/icons/hicolor/256x256/apps/qctools.png
+    install -D -m 0644 "${srcdir}"/qctools/qctools/Source/Resource/Logo.png "${pkgdir}"/usr/share/pixmaps/qctools.png
+    install -D -m 0644 "${srcdir}"/qctools/qctools/Project/GNU/GUI/qctools.desktop "${pkgdir}"/usr/share/applications/qctools.desktop
+    install -D -m 0644 "${srcdir}"/qctools/qctools/Project/GNU/GUI/qctools.kde3.desktop "${pkgdir}"/usr/share/apps/konqueror/servicemenus/qctools.desktop
+    install -D -m 0644 "${srcdir}"/qctools/qctools/Project/GNU/GUI/qctools.kde4.desktop "${pkgdir}"/usr/share/kde4/services/ServiceMenus/qctools.desktop
+}
+
