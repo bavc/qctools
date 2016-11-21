@@ -9,8 +9,11 @@
 #include <QtPlugin>
 #include <iostream>
 
+#if defined(_WIN32) && !defined(_DLL)
+    #include <QtPlugin>
+    Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+#endif
 
-#include <QtCore/QtPlugin>
 #ifdef __MACOSX__
     #include <ApplicationServices/ApplicationServices.h>
 #endif //__MACOSX__

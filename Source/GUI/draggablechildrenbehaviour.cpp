@@ -27,7 +27,11 @@ DraggableChildrenBehaviour::DraggableChildrenBehaviour(QBoxLayout *layout) : QOb
 
 void DraggableChildrenBehaviour::newDrag(QWidget *watched)
 {
+#if QT_VERSION >= 0x050000
     QDrag *drag = new QDrag(this);
+#else
+    QDrag *drag = new QDrag(watched);
+#endif
 
     auto mimeData = new QMimeData();
     const QByteArray data = QByteArray::number((quintptr)watched);

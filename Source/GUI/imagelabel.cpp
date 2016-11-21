@@ -21,38 +21,8 @@ ImageLabel::ImageLabel(FFmpeg_Glue** Picture_, size_t Pos_, QWidget *parent) :
 
     selectionArea = new SelectionArea(ui->label);
 
-    connect(selectionArea, &SelectionArea::geometryChangeFinished, this, [&]() {
-        Q_EMIT selectionChangeFinished(QRectF(selectionPos, selectionSize));
-    });
-
-    connect(selectionArea, &SelectionArea::geometryChanged, this, [&](const QRect& geometry) {
-        int scaledWidth = Pixmap.width();
-        int scaledHeight = Pixmap.height();
-
-        QRectF originalGeometry(geometry);
-
-        auto originalWidth = (*Picture)->Width_Get();
-        auto originalHeight = (*Picture)->Height_Get();
-
-        if(originalWidth > originalHeight)
-            originalHeight = originalWidth / (*Picture)->OutputDAR_Get(Pos - 1);
-        else
-            originalWidth = originalHeight * (*Picture)->OutputDAR_Get(Pos - 1);
-
-        QSizeF size(originalGeometry.width() * originalWidth / scaledWidth,
-                    originalGeometry.height() * originalHeight / scaledHeight);
-
-        QPointF topLeft(originalGeometry.topLeft().x() * originalWidth / scaledWidth,
-                        originalGeometry.topLeft().y() * originalHeight / scaledHeight);
-
-        originalGeometry.setSize(size);
-        originalGeometry.moveTopLeft(topLeft);
-
-        selectionPos = originalGeometry.topLeft();
-        selectionSize = originalGeometry.size();
-
-        Q_EMIT selectionChanged(originalGeometry);
-    });
+    connect(selectionArea, SIGNAL(geometryChangeFinished()), this, SLOT(geometryChangeFinished()));
+    connect(selectionArea, SIGNAL(geometryChanged(const QRect&)), this, SLOT(geometryChanged(const QRect&)));
 
     ui->label->installEventFilter(this);
 }
@@ -98,11 +68,11 @@ void ImageLabel::updatePixmap(const QImage& image /*= nullptr*/)
 
     if (needRescale())
     {
-		rescale();
+        rescale();
     }
     else
     {
-        Pixmap.convertFromImage(Image);
+        Pixmap = QPixmap::fromImage(Image);
         ui->label->setPixmap(Pixmap);
     }
 }
@@ -111,14 +81,14 @@ void ImageLabel::setPixmap(const QPixmap &pixmap)
 {
     Pixmap = pixmap;
 
-	if (needRescale())
-	{
-		rescale();
-	} 
-	else
-	{
-		ui->label->setPixmap(pixmap);
-	}
+    if (needRescale())
+    {
+        rescale();
+    }
+    else
+    {
+        ui->label->setPixmap(pixmap);
+    }
 }
 
 size_t ImageLabel::GetPos() const
@@ -143,9 +113,10 @@ void ImageLabel::moveSelectionX(double value)
         return;
     }
 
-    QSignalBlocker blocker(selectionArea);
+    selectionArea->blockSignals(true);
     geometry.moveTopLeft(QPoint(scaledX, geometry.topLeft().y()));
     selectionArea->setGeometry(geometry);
+    selectionArea->blockSignals(false);
 }
 
 void ImageLabel::moveSelectionY(double value)
@@ -165,9 +136,10 @@ void ImageLabel::moveSelectionY(double value)
         return;
     }
 
-    QSignalBlocker blocker(selectionArea);
+    selectionArea->blockSignals(true);
     geometry.moveTopLeft(QPoint(geometry.topLeft().x(), scaledY));
     selectionArea->setGeometry(geometry);
+    selectionArea->blockSignals(false);
 }
 
 void ImageLabel::changeSelectionWidth(double value)
@@ -188,12 +160,13 @@ void ImageLabel::changeSelectionWidth(double value)
         return;
     }
 
-    QSignalBlocker blocker(selectionArea);
+    selectionArea->blockSignals(true);
 
     qDebug() << "width changed: value = " << value << ", old width = " << geometry.width() << ", new width = " << width;
 
     geometry.setWidth(width);
     selectionArea->setGeometry(geometry);
+    selectionArea->blockSignals(false);
 }
 
 void ImageLabel::changeSelectionHeight(double value)
@@ -214,12 +187,13 @@ void ImageLabel::changeSelectionHeight(double value)
         return;
     }
 
-    QSignalBlocker blocker(selectionArea);
+    selectionArea->blockSignals(true);
 
     qDebug() << "height changed: value = " << value << ", old height = " << geometry.height() << ", new height = " << height;
 
     geometry.setHeight(height);
     selectionArea->setGeometry(geometry);
+    selectionArea->blockSignals(false);
 }
 
 void ImageLabel::setMaxSelectionWidth(double w)
@@ -265,7 +239,7 @@ void ImageLabel::setSelectionArea(double x, double y, double w, double h)
     int width = (w * scaledWidth / originalWidth);
     int height = (h * scaledHeight / originalHeight);
 
-    QSignalBlocker blocker(selectionArea);
+    selectionArea->blockSignals(true);
 
     int maxScaledSelectionWidth = maxSelectionAreaSize.width() * scaledWidth / originalWidth;
     int maxScaledSelectionHeight = maxSelectionAreaSize.height() * scaledHeight / originalHeight;
@@ -279,6 +253,7 @@ void ImageLabel::setSelectionArea(double x, double y, double w, double h)
 
     QRect geometry(scaledX, scaledY, width, height);
     selectionArea->setGeometry(geometry);
+    selectionArea->blockSignals(false);
 }
 
 void ImageLabel::showDebugOverlay(bool enable)
@@ -408,8 +383,43 @@ void ImageLabel::rescale()
         return;
     }
 
-    Pixmap.convertFromImage(Image);
+    Pixmap = QPixmap::fromImage(Image);
     ui->label->setPixmap(Pixmap);
 
     setSelectionArea(selectionPos.x(), selectionPos.y(), selectionSize.width(), selectionSize.height());
+}
+
+void ImageLabel::geometryChangeFinished()
+{
+    Q_EMIT selectionChangeFinished(QRectF(selectionPos, selectionSize));
+}
+
+void ImageLabel::geometryChanged(const QRect& geometry)
+{
+    int scaledWidth = Pixmap.width();
+    int scaledHeight = Pixmap.height();
+
+    QRectF originalGeometry(geometry);
+
+    int originalWidth = (*Picture)->Width_Get();
+    int originalHeight = (*Picture)->Height_Get();
+
+    if(originalWidth > originalHeight)
+        originalHeight = originalWidth / (*Picture)->OutputDAR_Get(Pos - 1);
+    else
+        originalWidth = originalHeight * (*Picture)->OutputDAR_Get(Pos - 1);
+
+    QSizeF size(originalGeometry.width() * originalWidth / scaledWidth,
+                originalGeometry.height() * originalHeight / scaledHeight);
+
+    QPointF topLeft(originalGeometry.topLeft().x() * originalWidth / scaledWidth,
+                    originalGeometry.topLeft().y() * originalHeight / scaledHeight);
+
+    originalGeometry.setSize(size);
+    originalGeometry.moveTopLeft(topLeft);
+
+    selectionPos = originalGeometry.topLeft();
+    selectionSize = originalGeometry.size();
+
+    Q_EMIT selectionChanged(originalGeometry);
 }

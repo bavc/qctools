@@ -369,7 +369,7 @@ const filter Filters[]=
             "drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=32:height=4,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=4:height=32",
             "il=l=d:c=d,datascope=x=${2}:y=${3}:mode=${5}:axis=${4}",
             "il=l=d:c=d,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=32:height=4,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=4:height=32",
-            
+
         },
     },
     {
@@ -981,7 +981,7 @@ DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Other
     //Popup->setFocusPolicy(Qt::NoFocus);
     //Popup->setLayout(Layout);
     connect(this, SIGNAL(valueChanged(double)), this, SLOT(on_valueChanged(double)));
-	
+
     Slider->hide();
 }
 
@@ -1326,6 +1326,10 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     QObject::connect(shortcutSpace, SIGNAL(activated()), ControlArea->PlayPause, SLOT(click()));
     QShortcut *shortcutF = new QShortcut(QKeySequence(Qt::Key_F), this);
     QObject::connect(shortcutF, SIGNAL(activated()), this, SLOT(on_Full_triggered()));
+
+#if QT_VERSION < 0x050200
+    Stop = false;
+#endif
 }
 
 //---------------------------------------------------------------------------
@@ -2062,8 +2066,8 @@ void BigDisplay::ShowPicture ()
     if (!isVisible())
         return;
 
-	if (!Picture)
-		return;
+    if (!Picture)
+        return;
 
     if ((!ShouldUpate && Frames_Pos==FileInfoData->Frames_Pos_Get())
      || ( ShouldUpate && false)) // ToDo: try to optimize
@@ -2085,8 +2089,14 @@ void BigDisplay::ShowPicture ()
     }
     else
     {
+#if QT_VERSION >= 0x050200
         if (QThread::currentThread()->isInterruptionRequested())
         {
+#else
+        if (Stop)
+        {
+            Stop = false;
+#endif
             QMetaObject::invokeMethod(this, "updateImagesAndSlider", Qt::QueuedConnection,
                                       Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(0))),
                                       Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(1))),
@@ -2321,44 +2331,30 @@ void BigDisplay::updateSelection(int Pos, ImageLabel* image, options& opts)
             strcmp(Filters[Pos].Name, "Vectorscope Target") ==  0 ||
             strcmp(Filters[Pos].Name, "Zoom") ==  0)
     {
-        auto& xSpinBox = opts.Sliders_SpinBox[0];
-        auto& ySpinBox = opts.Sliders_SpinBox[1];
-        auto& wSpinBox = opts.Sliders_SpinBox[2];
-        auto& hSpinBox = opts.Sliders_SpinBox[3];
+        DoubleSpinBoxWithSlider* xSpinBox = opts.Sliders_SpinBox[0];
+        DoubleSpinBoxWithSlider* ySpinBox = opts.Sliders_SpinBox[1];
+        DoubleSpinBoxWithSlider* wSpinBox = opts.Sliders_SpinBox[2];
+        DoubleSpinBoxWithSlider* hSpinBox = opts.Sliders_SpinBox[3];
 
         image->setSelectionArea(xSpinBox->value(), ySpinBox->value(), wSpinBox->value(), hSpinBox->value());
 
         image->setMinSelectionSize(QSizeF(wSpinBox->minimum(), hSpinBox->minimum()));
         image->setMaxSelectionSize(QSizeF(wSpinBox->maximum(), hSpinBox->maximum()));
 
-        connect(xSpinBox, &DoubleSpinBoxWithSlider::controlValueChanged, image, &ImageLabel::moveSelectionX);
-        connect(ySpinBox, &DoubleSpinBoxWithSlider::controlValueChanged, image, &ImageLabel::moveSelectionY);
-        connect(wSpinBox, &DoubleSpinBoxWithSlider::controlValueChanged, image, &ImageLabel::changeSelectionWidth);
-        connect(hSpinBox, &DoubleSpinBoxWithSlider::controlValueChanged, image, &ImageLabel::changeSelectionHeight);
+        connect(xSpinBox, SIGNAL(controlValueChanged(double)), image, SLOT(moveSelectionX(double)));
+        connect(ySpinBox, SIGNAL(controlValueChanged(double)), image, SLOT(moveSelectionY(double)));
+        connect(wSpinBox, SIGNAL(controlValueChanged(double)), image, SLOT(changeSelectionWidth(double)));
+        connect(hSpinBox, SIGNAL(controlValueChanged(double)), image, SLOT(changeSelectionHeight(double)));
 
-        connect(image, &ImageLabel::selectionChangeFinished, [&](const QRectF& geometry) {
-            qDebug() << "x: " << geometry.x();
-            qDebug() << "y: " << geometry.y();
+        connect(image, SIGNAL(selectionChangeFinished(const QRectF&)), xSpinBox, SLOT(selectionChangeFinishedX(const QRectF&)));
+        connect(image, SIGNAL(selectionChangeFinished(const QRectF&)), ySpinBox, SLOT(selectionChangeFinishedY(const QRectF&)));
+        connect(image, SIGNAL(selectionChangeFinished(const QRectF&)), wSpinBox, SLOT(selectionChangeFinishedWidth(const QRectF&)));
+        connect(image, SIGNAL(selectionChangeFinished(const QRectF&)), hSpinBox, SLOT(selectionChangeFinishedHeight(const QRectF&)));
 
-            xSpinBox->applyValue(geometry.topLeft().x(), true);
-            ySpinBox->applyValue(geometry.topLeft().y(), true);
-            wSpinBox->applyValue(geometry.width(), true);
-            hSpinBox->applyValue(geometry.height(), true);
-
-        });
-
-        connect(image, &ImageLabel::selectionChanged, [&](const QRectF& geometry) {
-            qDebug() << "x: " << geometry.x();
-            qDebug() << "y: " << geometry.y();
-
-            qDebug() << "width: " << geometry.width();
-            qDebug() << "height: " << geometry.height();
-
-            xSpinBox->applyValue(geometry.x(), false);
-            ySpinBox->applyValue(geometry.y(), false);
-            wSpinBox->applyValue(geometry.width(), false);
-            hSpinBox->applyValue(geometry.height(), false);
-        });
+        connect(image, SIGNAL(selectionChanged(const QRectF&)), xSpinBox, SLOT(selectionChangedX(const QRectF&)));
+        connect(image, SIGNAL(selectionChanged(const QRectF&)), ySpinBox, SLOT(selectionChangedY(const QRectF&)));
+        connect(image, SIGNAL(selectionChanged(const QRectF&)), wSpinBox, SLOT(selectionChangedWidth(const QRectF&)));
+        connect(image, SIGNAL(selectionChanged(const QRectF&)), hSpinBox, SLOT(selectionChangedHeight(const QRectF&)));
     }
     else
     {
@@ -2482,4 +2478,59 @@ void BigDisplay::on_Full_triggered()
         setWindowState(Qt::WindowActive);
     else
         setWindowState(Qt::WindowMaximized);
+}
+
+//---------------------------------------------------------------------------
+#if QT_VERSION < 0x050200
+void BigDisplay::interruptionRequested()
+{
+    Stop = true;
+}
+#endif
+
+//---------------------------------------------------------------------------
+void DoubleSpinBoxWithSlider::selectionChangedX(const QRectF& geometry)
+{
+    applyValue(geometry.x(), false);
+}
+
+//---------------------------------------------------------------------------
+void DoubleSpinBoxWithSlider::selectionChangedY(const QRectF& geometry)
+{
+    applyValue(geometry.y(), false);
+}
+
+//---------------------------------------------------------------------------
+void DoubleSpinBoxWithSlider::selectionChangedWidth(const QRectF& geometry)
+{
+    applyValue(geometry.width(), false);
+}
+
+//---------------------------------------------------------------------------
+void DoubleSpinBoxWithSlider::selectionChangedHeight(const QRectF& geometry){
+    applyValue(geometry.height(), false);
+}
+
+//---------------------------------------------------------------------------
+void DoubleSpinBoxWithSlider::selectionChangeFinishedX(const QRectF& geometry)
+{
+    applyValue(geometry.topLeft().x(), true);
+}
+
+//---------------------------------------------------------------------------
+void DoubleSpinBoxWithSlider::selectionChangeFinishedY(const QRectF& geometry)
+{
+    applyValue(geometry.topLeft().y(), true);
+}
+
+//---------------------------------------------------------------------------
+void DoubleSpinBoxWithSlider::selectionChangeFinishedWidth(const QRectF& geometry)
+{
+    applyValue(geometry.width(), true);
+}
+
+//---------------------------------------------------------------------------
+void DoubleSpinBoxWithSlider::selectionChangeFinishedHeight(const QRectF& geometry)
+{
+    applyValue(geometry.height(), true);
 }

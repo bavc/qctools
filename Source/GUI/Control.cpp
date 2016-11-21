@@ -219,9 +219,15 @@ void Control::stop()
 {
     if(Thread)
     {
+#if QT_VERSION >= 0x050200
         qDebug() << "Thread->requestInterruption()";
         Thread->requestInterruption();
-
+#else
+        if (TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
+        {
+            QMetaObject::invokeMethod(TinyDisplayArea->BigDisplayArea, "interruptionRequested", Qt::QueuedConnection);
+        }
+#endif
         qDebug() << "qApp->processEvents()";
         qApp->processEvents();
 
