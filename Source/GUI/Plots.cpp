@@ -275,9 +275,6 @@ void Plots::updateSamples( Plot* plot )
             auto streamInfo = PerStreamType[plotType];
             auto yIndex = streamInfo.PerGroup[plotGroup].Start + j;
 
-            if (yIndex >= streamInfo.PerGroup[plotGroup].Count)
-                yIndex = streamInfo.PerGroup[plotGroup].Count - 1;
-
             auto yData = stat->y[yIndex];
             plot->setCurveSamples( j, xData, yData, stat->x_Current );
         }
