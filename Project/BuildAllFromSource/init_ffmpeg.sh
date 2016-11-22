@@ -14,7 +14,7 @@ if [ ! -d ffmpeg ] ; then
 fi
 
     cd ffmpeg
-    FFMPEG_CONFIGURE_OPTS=(--enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --disable-lzma)
+    FFMPEG_CONFIGURE_OPTS=(--enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --disable-lzma --disable-iconv)
     if sw_vers >/dev/null 2>&1 ; then
         FFMPEG_CONFIGURE_OPTS+=(--extra-cflags="-mmacosx-version-min=10.5" --extra-ldflags="-mmacosx-version-min=10.5")
     fi
