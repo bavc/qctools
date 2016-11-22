@@ -326,11 +326,14 @@ void MainWindow::createGraphsLayout()
 
     auto filtersInfo = Prefs->loadFilterSelectorsOrder();
     changeFilterSelectorsOrder(filtersInfo);
-    PlotsArea->changeOrder(filtersInfo);
+    if (PlotsArea)
+    {
+        PlotsArea->changeOrder(filtersInfo);
+        if (!ui->actionGraphsLayout->isChecked())
+            PlotsArea->hide();
 
-    if (!ui->actionGraphsLayout->isChecked())
-        PlotsArea->hide();
-    ui->verticalLayout->addWidget(PlotsArea);
+        ui->verticalLayout->addWidget(PlotsArea);
+    }
 
     TinyDisplayArea=new TinyDisplay(this, Files[Files_CurrentPos]);
     if (!ui->actionGraphsLayout->isChecked())
