@@ -128,6 +128,9 @@ void TinyDisplay::thumbsLayoutResized()
 
 void TinyDisplay::Update(bool updateBigDisplay)
 {
+    if (!FileInfoData->ReferenceStat())
+        return;
+
     if(thread() != QThread::currentThread())
     {
         // qDebug() << "TinyDisplay::Update: called from non-UI thread";
