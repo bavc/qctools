@@ -268,16 +268,16 @@ void Plots::updateSamples( Plot* plot )
     const size_t plotGroup = plot->group();
     const CommonStats* stat = stats( plot->streamPos() );
 
-    for (size_t type = 0; type < Type_Max; type++)
-        for( unsigned j = 0; j < PerStreamType[type].CountOfGroups; ++j )
-        {
-            auto xData = stat->x[m_dataTypeIndex];
-            auto streamInfo = PerStreamType[plotType];
-            auto yIndex = streamInfo.PerGroup[plotGroup].Start + j;
+    auto streamInfo = PerStreamType[plotType];
 
-            auto yData = stat->y[yIndex];
-            plot->setCurveSamples( j, xData, yData, stat->x_Current );
-        }
+    for(auto j = 0; j < streamInfo.PerGroup[plotGroup].Count; ++j)
+    {
+        auto xData = stat->x[m_dataTypeIndex];
+        auto yIndex = streamInfo.PerGroup[plotGroup].Start + j;
+        auto yData = stat->y[yIndex];
+
+        plot->setCurveSamples( j, xData, yData, stat->x_Current );
+    }
 }
 
 //---------------------------------------------------------------------------
