@@ -14,19 +14,21 @@
 using namespace std;
 
 struct AVFrame;
+struct AVStream;
 struct per_item;
 
 class CommonStats
 {
 public:
     // Constructor / Destructor
-    CommonStats(const struct per_item* PerItem, int Type, size_t CountOfGroups, size_t CountOfItems, size_t FrameCount=0, double Duration=0, double Frequency=0);
+    CommonStats(const struct per_item* PerItem, int Type, size_t CountOfGroups, size_t CountOfItems, size_t FrameCount=0, double Duration=0, AVStream* stream = nullptr);
     virtual ~CommonStats();
 
     // Data
     double**                    x;                          // Time information, per frame (0=frame number, 1=seconds, 2=minutes, 3=hours)
     double**                    y;                          // Data (Group_xxxMax size)
     double*                     durations;                  // Duration of a frame, per frame
+    int*                        pict_type;                  //
     bool*                       key_frames;                 // Key frame status, per frame
     size_t                      x_Current;                  // Data is filled up to
     size_t                      x_Current_Max;              // Data will be filled up to

@@ -8,6 +8,7 @@
 
 #include "GUI/Plot.h"
 #include "GUI/PlotLegend.h"
+#include "GUI/FileInformation.h"
 #include <qwt_plot_grid.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_picker.h>
@@ -54,11 +55,12 @@ static int indexLower( double x, const QwtSeriesData<QPointF> &data )
 class PlotPicker: public QwtPlotPicker
 {
 public:
-    PlotPicker( QWidget *canvas , const struct stream_info* streamInfo, const size_t group, const QVector<QwtPlotCurve*>* curves):
+    PlotPicker( QWidget *canvas , const struct stream_info* streamInfo, const size_t group, const QVector<QwtPlotCurve*>* curves, const FileInformation* fileInformation):
         m_streamInfo( streamInfo ),
         m_group( group ),
         m_curves( curves ),
-        QwtPlotPicker( canvas )
+        QwtPlotPicker( canvas ),
+        m_fileInformation(fileInformation)
     {
         setAxis( QwtPlot::xBottom, QwtPlot::yLeft );
         setRubberBand( QwtPlotPicker::CrossRubberBand );
@@ -92,12 +94,11 @@ public:
 protected:
     virtual QString infoText( int index ) const
     {
-        QString info( "Frame " );
-        info += QString::number(index);
+        QString info = QString( "Frame %1 [%2]" ).arg(index).arg(m_fileInformation ? m_fileInformation->Frame_Type_Get(-1, index) : "");
         for( unsigned i = 0; i < m_streamInfo->PerGroup[m_group].Count; ++i )
-       {
+        {
             const per_item &itemInfo = m_streamInfo->PerItem[m_streamInfo->PerGroup[m_group].Start + i];
-        
+
             info += i?", ":": ";
             info += itemInfo.Name;
             info += "=";
@@ -114,6 +115,7 @@ protected:
     const struct stream_info*       m_streamInfo; 
     const size_t                    m_group;
     const QVector<QwtPlotCurve*>*   m_curves;
+    const FileInformation*          m_fileInformation;
 };
 
 class PlotCursor: public QwtWidgetOverlay
@@ -261,11 +263,12 @@ void Plot::addGuidelines(int bitsPerRawSample)
     }
 }
 
-Plot::Plot( size_t streamPos, size_t Type, size_t Group, QWidget *parent ) :
+Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* fileInformation, QWidget *parent ) :
     QwtPlot( parent ),
     m_streamPos( streamPos ),
     m_type( Type ),
-    m_group( Group )
+    m_group( Group ),
+    m_fileInformation( fileInformation )
 {
     setAutoReplot( false );
 
@@ -322,7 +325,7 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, QWidget *parent ) :
         m_curves += curve;
     }
 
-    PlotPicker* picker = new PlotPicker( canvas, &PerStreamType[m_type], m_group, &m_curves );
+    PlotPicker* picker = new PlotPicker( canvas, &PerStreamType[m_type], m_group, &m_curves, fileInformation );
     connect( picker, SIGNAL( moved( const QPointF& ) ), SLOT( onPickerMoved( const QPointF& ) ) );
     connect( picker, SIGNAL( selected( const QPointF& ) ), SLOT( onPickerMoved( const QPointF& ) ) );
 

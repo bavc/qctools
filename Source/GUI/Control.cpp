@@ -277,7 +277,7 @@ void Control::Update()
     }
 
     if (Frames_Pos!=(int)-1)
-        Info_Frames->setText("Frame "+QString::number(Frames_Pos));
+        Info_Frames->setText(QString("Frame %1 [%2]").arg(Frames_Pos).arg(FileInfoData->Frame_Type_Get()));
     else
         Info_Frames->setText(QString());
     if (Milliseconds!=(int)-1)

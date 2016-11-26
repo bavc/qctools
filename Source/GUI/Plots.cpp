@@ -72,7 +72,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
             {
                 if (m_fileInfoData->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
                 {
-                    Plot* plot = new Plot( streamPos, type, group, this );
+                    Plot* plot = new Plot( streamPos, type, group, fileInformation, this );
                     plot->addGuidelines(m_fileInfoData->BitsPerRawSample());
 
                     if(type == Type_Video)

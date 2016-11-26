@@ -17,12 +17,13 @@
 using namespace std;
 
 struct AVFrame;
+struct AVStream;
 
 class AudioStats : public CommonStats
 {
 public:
     // Constructor / Destructor
-    AudioStats(size_t FrameCount=0, double Duration=0, double Frequency=0);
+    AudioStats(size_t FrameCount=0, double Duration=0, AVStream* stream = nullptr);
     ~AudioStats();
 
     // External data

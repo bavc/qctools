@@ -15,6 +15,7 @@
 class QwtPlotCurve;
 class PlotCursor;
 class PlotLegend;
+class FileInformation;
 
 //***************************************************************************
 // Class
@@ -25,7 +26,7 @@ class Plot : public QwtPlot
     Q_OBJECT
 
 public:
-    explicit Plot( size_t streamPos, size_t Type, size_t Group, QWidget *parent );
+    explicit Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* fileInformation, QWidget *parent );
     virtual ~Plot();
 
     virtual QSize sizeHint() const;
@@ -65,6 +66,7 @@ private:
     PlotCursor*             m_cursor;
 
     PlotLegend*             m_legend;
+    const FileInformation*  m_fileInformation;
 };
 
 #endif // GUI_Plot_H

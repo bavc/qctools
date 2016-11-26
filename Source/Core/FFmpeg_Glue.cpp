@@ -857,12 +857,12 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, activealltracks ActiveAllTrac
                 {
                     case AVMEDIA_TYPE_VIDEO:
                                                 if (!VideoPos || ActiveAllTracks[Type_Video])
-                                                    Stat=new VideoStats(InputData->FrameCount, InputData->Duration, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0);
+                                                    Stat=new VideoStats(InputData->FrameCount, InputData->Duration, InputData->Stream);
                                                 VideoPos++;
                                                 break;
                     case AVMEDIA_TYPE_AUDIO:
                                                 if (!AudioPos || ActiveAllTracks[Type_Audio])
-                                                    Stat=new AudioStats(InputData->FrameCount, InputData->Duration, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0); AudioPos++; break;
+                                                    Stat=new AudioStats(InputData->FrameCount, InputData->Duration, InputData->Stream); AudioPos++; break;
                                                 AudioPos++;
                                                 break;
                 }
@@ -973,7 +973,7 @@ void FFmpeg_Glue::AddInput_Video(size_t FrameCount, int time_base_num, int time_
 
     // Stats
     if (WithStats)
-        Stats->push_back(new VideoStats(InputData->FrameCount, InputData->Duration, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0));
+        Stats->push_back(new VideoStats(InputData->FrameCount, InputData->Duration, InputData->Stream));
 
     //
     InputDatas.push_back(InputData);
@@ -1017,7 +1017,7 @@ void FFmpeg_Glue::AddInput_Audio(size_t FrameCount, int time_base_num, int time_
 
     // Stats
     if (WithStats)
-        Stats->push_back(new AudioStats(InputData->FrameCount, InputData->Duration, InputData->Stream?(((double)InputData->Stream->time_base.den)/InputData->Stream->time_base.num):0));
+        Stats->push_back(new AudioStats(InputData->FrameCount, InputData->Duration, InputData->Stream));
 
     //
     InputDatas.push_back(InputData);
@@ -1523,6 +1523,31 @@ void FFmpeg_Glue::setThreadSafe(bool enable)
     }
 }
 
+QString FFmpeg_Glue::frameTypeToString(int frameType)
+{
+    switch(frameType)
+    {
+    case AV_PICTURE_TYPE_NONE:
+        return "";
+    case AV_PICTURE_TYPE_I:
+        return "I";
+    case AV_PICTURE_TYPE_P:
+        return "P";
+    case AV_PICTURE_TYPE_B:
+        return "B";
+    case AV_PICTURE_TYPE_S:
+        return "S";
+    case AV_PICTURE_TYPE_SI:
+        return "SI";
+    case AV_PICTURE_TYPE_SP:
+        return "SP";
+    case AV_PICTURE_TYPE_BI:
+        return "BI";
+    default:
+        return "";
+    }
+}
+
 //***************************************************************************
 // Export
 //***************************************************************************
@@ -2009,6 +2034,22 @@ string FFmpeg_Glue::PixFormat_Get()
         case AV_PIX_FMT_BAYER_GRBG16BE: return "bayer, GRGR..(odd line), BGBG..(even line), 16-bit samples, big-endian";
         default: return string();
     }
+}
+
+QString FFmpeg_Glue::FrameType_Get() const
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->DecodedFrame==NULL)
+        return QString();
+
+    return frameTypeToString(InputData->DecodedFrame->pict_type);
 }
 
 //---------------------------------------------------------------------------
