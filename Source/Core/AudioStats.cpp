@@ -279,7 +279,7 @@ void AudioStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
         x[3][FramePos]=x[2][FramePos]/60;
     }
     if (Frame->pkt_duration != AV_NOPTS_VALUE)
-        durations[FramePos] = (double) Frame->pkt_duration / Frequency;
+        durations[FramePos]=((double)Frame->pkt_duration)/Frequency;
 }
 
 //---------------------------------------------------------------------------
