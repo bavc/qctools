@@ -96,6 +96,7 @@ public:
     string                      SAR_Get();
 
     double                      OutputDAR_Get(int Pos);
+    QString                     FrameType_Get() const;
     string                      PixFormat_Get();
     string                      ColorSpace_Get();
     string                      ColorRange_Get();
@@ -138,6 +139,8 @@ public:
     void                        InputData_Set(void* InputData) {InputDatas.push_back((inputdata*)InputData); InputDatas_Copy=true;}
 
     void setThreadSafe(bool enable);
+
+    static QString frameTypeToString(int frameType);
 private:
     QMutex* mutex;
 

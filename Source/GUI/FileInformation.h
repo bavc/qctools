@@ -45,9 +45,10 @@ public:
     QString                     FileName;
     activefilters               ActiveFilters;
     activealltracks             ActiveAllTracks;
-    size_t                      ReferenceStream_Pos_Get     () {return ReferenceStream_Pos;}
+    size_t                      ReferenceStream_Pos_Get     () const {return ReferenceStream_Pos;}
     int                         Frames_Count_Get            (size_t Stats_Pos=(size_t)-1);
     int                         Frames_Pos_Get              (size_t Stats_Pos=(size_t)-1);
+    QString                     Frame_Type_Get              (size_t Stats_Pos=(size_t)-1, size_t frameIndex = (size_t)-1) const;
     void                        Frames_Pos_Set              (int Frames_Pos, size_t Stats_Pos=(size_t)-1);
     void                        Frames_Pos_Minus            ();
     void                        Frames_Pos_Plus             ();
@@ -61,7 +62,7 @@ public:
     // FFmpeg glue
     FFmpeg_Glue*                Glue;
     std::vector<CommonStats*>   Stats;
-    CommonStats*                ReferenceStat               () {if (ReferenceStream_Pos<Stats.size()) return Stats[ReferenceStream_Pos]; else return NULL;}
+    CommonStats*                ReferenceStat               () const {if (ReferenceStream_Pos<Stats.size()) return Stats[ReferenceStream_Pos]; else return NULL;}
 
     int                         BitsPerRawSample            () const;
 private:

@@ -17,6 +17,7 @@ extern "C"
 #endif
 
 #include <libavutil/frame.h>
+#include <libavformat/avformat.h>
 }
 
 #include "Core/Core.h"
@@ -33,9 +34,9 @@ using namespace tinyxml2;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t CountOfGroups_, size_t CountOfItems_, size_t FrameCount, double Duration, double Frequency_)
+CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t CountOfGroups_, size_t CountOfItems_, size_t FrameCount, double Duration, AVStream* stream)
     :
-    Frequency(Frequency_),
+    Frequency(stream ? (((double)stream->time_base.den) / stream->time_base.num) : 0),
     PerItem(PerItem_),
     Type(Type_),
     CountOfGroups(CountOfGroups_),
@@ -88,6 +89,8 @@ CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t Cou
     memset(durations, 0x00, Data_Reserved*sizeof(double));
     key_frames=new bool[Data_Reserved];
     memset(key_frames, 0x00, Data_Reserved*sizeof(bool));
+    pict_type = new int[Data_Reserved];
+    memset(pict_type, 0x00, Data_Reserved * sizeof(bool));
 
     // Data - Maximums
     x_Current=0;
@@ -125,6 +128,7 @@ CommonStats::~CommonStats()
     delete[] key_frames;
     delete[] y_Min;
     delete[] y_Max;
+    delete[] pict_type;
 }
 
 //***************************************************************************
@@ -262,6 +266,7 @@ void CommonStats::Data_Reserve(size_t NewValue)
     double**                    y_Old = y;
     double*                     durations_Old = durations;
     bool*                       key_frames_Old = key_frames;
+    int*                        pict_type_Old = pict_type;
 
     // Computing new value
     while (Data_Reserved < NewValue + (1 << 18)) //We reserve extra space, minimum 2^18 frames added
@@ -297,8 +302,13 @@ void CommonStats::Data_Reserve(size_t NewValue)
     memcpy(key_frames, key_frames_Old, Data_Reserved_Old * sizeof(bool));
     memset(&key_frames[Data_Reserved_Old], 0x00, diff * sizeof(bool));
 
+    pict_type = new int[Data_Reserved];
+    memcpy(pict_type, pict_type_Old, Data_Reserved_Old * sizeof(int));
+    memset(&pict_type[Data_Reserved_Old], 0x00, diff * sizeof(int));
+
     delete[] x_Old;
     delete[] y_Old;
     delete[] durations_Old;
     delete[] key_frames_Old;
+    delete[] pict_type_Old;
 }

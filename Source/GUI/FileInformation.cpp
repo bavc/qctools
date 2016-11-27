@@ -447,6 +447,45 @@ int FileInformation::Frames_Pos_Get (size_t Stats_Pos)
     return Pos;
 }
 
+QString FileInformation::Frame_Type_Get(size_t Stats_Pos, size_t frameIndex) const
+{
+    // Looking for the first video stream
+    if (Stats_Pos==(size_t)-1)
+        Stats_Pos=ReferenceStream_Pos_Get();
+    if (Stats_Pos>=Stats.size())
+        return QString();
+
+    QString frameType;
+
+    if(frameIndex == -1)
+    {
+        if (Stats_Pos!=ReferenceStream_Pos_Get())
+        {
+            // Computing frame pos based on the first stream
+            double TimeStamp=ReferenceStat()->x[1][Frames_Pos];
+            int Pos=0;
+            for (; Pos<Stats[Stats_Pos]->x_Current_Max; Pos++)
+            {
+                if (Stats[Stats_Pos]->x[1][Pos]>=TimeStamp)
+                {
+                    if (Pos && Stats[Stats_Pos]->x[1][Pos]!=TimeStamp)
+                        Pos--;
+
+                    frameType = FFmpeg_Glue::frameTypeToString(Stats[Stats_Pos]->pict_type[Pos]);
+                    break;
+                }
+            }
+        }
+        else
+            frameType = FFmpeg_Glue::frameTypeToString(Stats[Stats_Pos]->pict_type[Frames_Pos]);
+    } else {
+        if(frameIndex <= Stats[Stats_Pos]->x_Current_Max)
+            frameType = FFmpeg_Glue::frameTypeToString(Stats[Stats_Pos]->pict_type[frameIndex]);
+    }
+
+    return frameType;
+}
+
 //---------------------------------------------------------------------------
 void FileInformation::Frames_Pos_Set (int Pos, size_t Stats_Pos)
 {

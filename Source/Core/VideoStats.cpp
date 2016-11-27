@@ -33,9 +33,9 @@ using namespace tinyxml2;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-VideoStats::VideoStats (size_t FrameCount, double Duration, double Frequency_)
+VideoStats::VideoStats (size_t FrameCount, double Duration, AVStream* stream)
     :
-    CommonStats(VideoPerItem, Type_Video, Group_VideoMax, Item_VideoMax, FrameCount, Duration, Frequency_)
+    CommonStats(VideoPerItem, Type_Video, Group_VideoMax, Item_VideoMax, FrameCount, Duration, stream)
 {
 }
 
@@ -271,6 +271,7 @@ void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
     }
 
     key_frames[x_Current]=Frame->key_frame?true:false;
+    pict_type[x_Current] = Frame->pict_type;
 
     if (x_Max[0]<=x[0][x_Current])
     {
