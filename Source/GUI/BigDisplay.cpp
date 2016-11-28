@@ -1390,19 +1390,21 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                     {
                                     // Special case: "Line", max is source width or height
                                     int Max;
-                                    string MaxTemp(Filters[FilterPos].Args[OptionPos].Name);
-                                    if (MaxTemp=="Line")
+                                    QString MaxTemp(Filters[FilterPos].Args[OptionPos].Name);
+                                    if (MaxTemp == "Line")
                                     {
-                                        bool SelectWidth=false;
-                                        for (size_t OptionPos2=0; OptionPos2<Args_Max; OptionPos2++)
-                                            if (Filters[FilterPos].Args[OptionPos2].Type!=Args_Type_None && string(Filters[FilterPos].Args[OptionPos2].Name)=="Vertical")
-                                                SelectWidth=Filters[FilterPos].Args[OptionPos2].Default?true:false;
-                                        Max=SelectWidth?FileInfoData->Glue->Width_Get():FileInfoData->Glue->Height_Get();
+                                        bool SelectWidth = false;
+                                        for (size_t OptionPos2 = 0; OptionPos2 < Args_Max; OptionPos2++)
+                                            if (Filters[FilterPos].Args[OptionPos2].Type != Args_Type_None && string(Filters[FilterPos].Args[OptionPos2].Name) == "Vertical")
+                                                SelectWidth = Filters[FilterPos].Args[OptionPos2].Default ? true : false;
+                                        Max = SelectWidth ? FileInfoData->Glue->Width_Get() : FileInfoData->Glue->Height_Get();
                                     }
-                                    else if (MaxTemp=="x" || MaxTemp=="Reveal" )
-                                        Max=FileInfoData->Glue->Width_Get();
-                                    else if (MaxTemp=="y" || MaxTemp=="s" || MaxTemp=="w" || MaxTemp=="h")
-                                        Max=FileInfoData->Glue->Height_Get();
+                                    else if (MaxTemp == "x" || MaxTemp == "Reveal")
+                                        Max = FileInfoData->Glue->Width_Get();
+                                    else if (MaxTemp == "y" || MaxTemp == "s" || MaxTemp == "w" || MaxTemp == "h")
+                                        Max = FileInfoData->Glue->Height_Get();
+                                    else if (MaxTemp.contains("bit position", Qt::CaseInsensitive) && FileInfoData->Glue->BitsPerRawSample_Get() != 0)
+                                        Max = FileInfoData->Glue->BitsPerRawSample_Get();
                                     else
                                         Max=Filters[FilterPos].Args[OptionPos].Max;
 
