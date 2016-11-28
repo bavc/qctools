@@ -202,7 +202,7 @@ macx:LIBS += -liconv \
              -framework Foundation \
              -framework AppKit \
              -framework AudioToolBox \
-             -framework CoreImage \
+             -framework QuartzCore \
              -framework CoreGraphics \
              -framework CoreAudio \
              -framework CoreVideo \
