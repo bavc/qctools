@@ -295,7 +295,9 @@ void FileInformation::Parse ()
     if (!isRunning() && ActiveParsing_Count<Max)
     {
         ActiveParsing_Count++;
-        start();
+
+        if(Glue)
+            start();
     }
 }
 
