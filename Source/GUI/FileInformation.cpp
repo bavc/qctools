@@ -554,6 +554,9 @@ bool FileInformation::PlayBackFilters_Available ()
 
 qreal FileInformation::averageFrameRate() const
 {
+    if(!Glue)
+        return 0;
+
     auto splitted = QString::fromStdString(Glue->AvgVideoFrameRate_Get()).split("/");
     if(splitted.length() == 1)
         return splitted[0].toDouble();
@@ -563,6 +566,9 @@ qreal FileInformation::averageFrameRate() const
 
 int FileInformation::BitsPerRawSample() const
 {
+    if(!Glue)
+        return 0;
+
     return Glue->BitsPerRawSample_Get();
 }
 
