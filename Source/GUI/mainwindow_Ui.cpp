@@ -242,7 +242,7 @@ void MainWindow::Zoom( bool on )
     configureZoom();
 }
 
-void MainWindow::changeFilterSelectorsOrder(QList<std::tr1::tuple<int, int> > filtersInfo)
+void MainWindow::changeFilterSelectorsOrder(QList<QPair<int, int> > filtersInfo)
 {
     QSignalBlocker blocker(draggableBehaviour);
 
@@ -250,11 +250,11 @@ void MainWindow::changeFilterSelectorsOrder(QList<std::tr1::tuple<int, int> > fi
 
     QList<QLayoutItem*> items;
 
-    QList<std::tr1::tuple<int, int> >::iterator groupAndType;
+    QList<QPair<int, int> >::iterator groupAndType;
     for(groupAndType = filtersInfo.begin(); groupAndType != filtersInfo.end(); ++groupAndType)
     {
-        int group = std::tr1::get<0>(*groupAndType);
-        int type = std::tr1::get<1>(*groupAndType);
+        int group = groupAndType->first;
+        int type = groupAndType->second;
 
         int rowsCount = boxlayout->count();
         for(int row = 0; row < rowsCount; ++row)

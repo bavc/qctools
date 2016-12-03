@@ -5,10 +5,6 @@
 #include <QDialog>
 #include <QList>
 
-#ifndef _WIN32
-#include <tr1/tuple>
-#endif
-
 namespace Ui {
 class Preferences;
 }
@@ -25,8 +21,8 @@ public:
     activefilters ActiveFilters;
     activealltracks ActiveAllTracks;
 
-    QList<std::tr1::tuple<int, int> > loadFilterSelectorsOrder();
-    void saveFilterSelectorsOrder(const QList<std::tr1::tuple<int, int> >& order);
+    QList<QPair<int, int> > loadFilterSelectorsOrder();
+    void saveFilterSelectorsOrder(const QList<QPair<int, int> >& order);
 
 private:
     Ui::Preferences *ui;

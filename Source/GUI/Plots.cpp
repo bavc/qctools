@@ -391,7 +391,7 @@ void Plots::adjustGroupMax(int group, int bitsPerRawSample)
     }
 }
 
-void Plots::changeOrder(QList<std::tr1::tuple<int, int> > orderedFilterInfo)
+void Plots::changeOrder(QList<QPair<int, int> > orderedFilterInfo)
 {
     if(orderedFilterInfo.empty())
     {
@@ -408,8 +408,8 @@ void Plots::changeOrder(QList<std::tr1::tuple<int, int> > orderedFilterInfo)
 
     qDebug() << "plotsCount: " << m_plotsCount;
 
-    QList <std::tr1::tuple<size_t, size_t, size_t> > currentOrderedPlotsInfo;
-    QList <std::tr1::tuple<size_t, size_t, size_t> > expectedOrderedPlotsInfo;
+    QList<QList<size_t> > currentOrderedPlotsInfo;
+    QList<QList<size_t> > expectedOrderedPlotsInfo;
 
     for(int row = 0; row < m_plotsCount; ++row)
     {
@@ -422,17 +422,17 @@ void Plots::changeOrder(QList<std::tr1::tuple<int, int> > orderedFilterInfo)
         Plot* plot = qobject_cast<Plot*> (plotItem->widget());
         Q_ASSERT(plot);
 
-        currentOrderedPlotsInfo.push_back(std::tr1::make_tuple(plot->group(), plot->type(), plot->streamPos()));
+        currentOrderedPlotsInfo.push_back(QList<size_t>() << plot->group() << plot->type() << plot->streamPos());
     }
 
 
-    QList<std::tr1::tuple<int, int> >::iterator filterInfo;
+    QList<QPair<int, int> >::iterator filterInfo;
     for(filterInfo = orderedFilterInfo.begin(); filterInfo != orderedFilterInfo.end(); ++filterInfo)
     {
-        QList <std::tr1::tuple<size_t, size_t, size_t> >::iterator plotInfo;
+        QList<QList<size_t> >::iterator plotInfo;
         for(plotInfo = currentOrderedPlotsInfo.begin(); plotInfo != currentOrderedPlotsInfo.end(); ++plotInfo)
         {
-            if(std::tr1::get<0>(*plotInfo) == std::tr1::get<0>(*filterInfo) && std::tr1::get<1>(*plotInfo) == std::tr1::get<1>(*filterInfo))
+            if(plotInfo->at(0) == filterInfo->first && plotInfo->at(1) == filterInfo->second)
             {
                 expectedOrderedPlotsInfo.push_back(*plotInfo);
             }
@@ -445,17 +445,17 @@ void Plots::changeOrder(QList<std::tr1::tuple<int, int> > orderedFilterInfo)
 
     for(int i = 0; i < expectedOrderedPlotsInfo.length(); ++i)
     {
-        qDebug() << "cg: " << std::tr1::get<0>(currentOrderedPlotsInfo[i])
+        qDebug() << "cg: " << currentOrderedPlotsInfo[i].at(0)
                  << ", "
-                 << "ct: " << std::tr1::get<1>(currentOrderedPlotsInfo[i])
+                 << "ct: " << currentOrderedPlotsInfo[i].at(1)
                  << ", "
-                 << "cp: " << std::tr1::get<2>(currentOrderedPlotsInfo[i])
+                 << "cp: " << currentOrderedPlotsInfo[i].at(2)
                  << ", "
-                 << "eg: " << std::tr1::get<0>(expectedOrderedPlotsInfo[i])
+                 << "eg: " << expectedOrderedPlotsInfo[i].at(0)
                  << ", "
-                 << "et: " << std::tr1::get<1>(expectedOrderedPlotsInfo[i])
+                 << "et: " << expectedOrderedPlotsInfo[i].at(1)
                  << ", "
-                 << "ep: " << std::tr1::get<2>(expectedOrderedPlotsInfo[i]);
+                 << "ep: " << expectedOrderedPlotsInfo[i].at(2);
     }
 
     for(int i = 0; i < expectedOrderedPlotsInfo.length(); ++i)
@@ -519,8 +519,8 @@ void Plots::changeOrder(QList<std::tr1::tuple<int, int> > orderedFilterInfo)
         Plot* plot = qobject_cast<Plot*> (plotItem->widget());
         Q_ASSERT(plot);
 
-        Q_ASSERT(plot->group() == std::tr1::get<0>(expectedOrderedPlotsInfo[row]) &&
-                 plot->type() == std::tr1::get<1>(expectedOrderedPlotsInfo[row]));
+        Q_ASSERT(plot->group() == expectedOrderedPlotsInfo[row].at(0) &&
+                 plot->type() == expectedOrderedPlotsInfo[row].at(1));
     }
 }
 

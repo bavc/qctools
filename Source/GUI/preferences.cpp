@@ -13,7 +13,7 @@
 #include <QDebug>
 //---------------------------------------------------------------------------
 
-typedef std::tr1::tuple<int, int> GroupAndType;
+typedef QPair<int, int> GroupAndType;
 Q_DECLARE_METATYPE(GroupAndType)
 
 typedef QList<GroupAndType> FilterSelectorsOrder;
@@ -58,12 +58,12 @@ QDataStream &operator<<(QDataStream &out, const FilterSelectorsOrder &order) {
 
     FilterSelectorsOrder::const_iterator item;
     for(item = order.begin(); item != order.end(); ++item) {
-        qDebug() << "g: " << std::tr1::get<0>(*item) << ", t: " << std::tr1::get<1>(*item);
+        qDebug() << "g: " << item->first << ", t: " << item->second;
     }
 
     FilterSelectorsOrder::const_iterator filterInfo;
     for(filterInfo = order.begin(); filterInfo != order.end(); ++filterInfo) {
-        out << std::tr1::get<0>(*filterInfo) << std::tr1::get<1>(*filterInfo);
+        out << filterInfo->first << filterInfo->second;
     }
 
     return out;
@@ -76,7 +76,7 @@ QDataStream &operator>>(QDataStream &in, FilterSelectorsOrder &order) {
         in >> group;
         in >> type;
 
-        std::tr1::tuple<int, int> entry = std::tr1::make_tuple(group, type);
+        QPair<int, int> entry = qMakePair(group, type);
         if(!order.contains(entry))
             order.push_back(entry);
     }
@@ -85,22 +85,22 @@ QDataStream &operator>>(QDataStream &in, FilterSelectorsOrder &order) {
 
     FilterSelectorsOrder::iterator item;
     for(item = order.begin(); item != order.end(); ++item) {
-        qDebug() << "g: " << std::tr1::get<0>(*item) << ", t: " << std::tr1::get<1>(*item);
+        qDebug() << "g: " << item->first << ", t: " << item->second;
     }
 
     return in;
 }
 
-QList<std::tr1::tuple<int, int> > Preferences::loadFilterSelectorsOrder()
+QList<QPair<int, int> > Preferences::loadFilterSelectorsOrder()
 {
     QSettings Settings;
 
-    QList<std::tr1::tuple<int, int> > order = Settings.value("filterSelectorsOrder", QVariant::fromValue(FilterSelectorsOrder())).value<FilterSelectorsOrder>();
+    QList<QPair<int, int> > order = Settings.value("filterSelectorsOrder", QVariant::fromValue(FilterSelectorsOrder())).value<FilterSelectorsOrder>();
 
     return order;
 }
 
-void Preferences::saveFilterSelectorsOrder(const QList<std::tr1::tuple<int, int> > &order)
+void Preferences::saveFilterSelectorsOrder(const QList<QPair<int, int> > &order)
 {
     QSettings Settings;
 

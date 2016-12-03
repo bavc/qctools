@@ -15,10 +15,6 @@
 
 #include <vector>
 
-#ifndef _WIN32
-#include <tr1/tuple>
-#endif
-
 using namespace std;
 
 #include "Core/Core.h"
@@ -119,7 +115,7 @@ public:
     //Preferences
     Preferences*                Prefs;
 
-    QList<std::tr1::tuple<int, int> > getFilterSelectorsOrder(int start, int end);
+    QList<QPair<int, int> > getFilterSelectorsOrder(int start, int end);
 public Q_SLOTS:
 	void Update();
 
@@ -217,7 +213,7 @@ private:
     void updateScrollBar( bool blockSignals = false );
     bool isPlotZoomable() const;
     void Zoom( bool );
-    void changeFilterSelectorsOrder(QList<std::tr1::tuple<int, int> > filtersInfo);
+    void changeFilterSelectorsOrder(QList<QPair<int, int> > filtersInfo);
 
     DraggableChildrenBehaviour* draggableBehaviour;
 

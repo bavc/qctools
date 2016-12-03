@@ -35,9 +35,9 @@
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-QList<std::tr1::tuple<int, int> > MainWindow::getFilterSelectorsOrder(int start = 0, int end = -1)
+QList<QPair<int, int> > MainWindow::getFilterSelectorsOrder(int start = 0, int end = -1)
 {
-    QList<std::tr1::tuple<int, int> > filtersInfo;
+    QList<QPair<int, int> > filtersInfo;
     if(end == -1)
         end = ui->horizontalLayout->count() - 1;
 
@@ -47,7 +47,7 @@ QList<std::tr1::tuple<int, int> > MainWindow::getFilterSelectorsOrder(int start 
         int group = o->property("group").toInt();
         int type = o->property("type").toInt();
 
-        filtersInfo.push_back(std::tr1::make_tuple(group, type));
+        filtersInfo.push_back(qMakePair(group, type));
     }
 
     return filtersInfo;
@@ -545,7 +545,7 @@ void MainWindow::positionChanged(QWidget* child, int oldPos, int newPos)
         end = oldPos;
     }
 
-    QList<std::tr1::tuple<int, int> > filtersSelectors = getFilterSelectorsOrder();
+    QList<QPair<int, int> > filtersSelectors = getFilterSelectorsOrder();
 
     if(PlotsArea)
         PlotsArea->changeOrder(filtersSelectors);
