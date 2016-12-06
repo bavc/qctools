@@ -19,6 +19,7 @@
 #include <QFileInfo>
 #include <QDesktopServices>
 #include <QApplication>
+#include <QMessageBox>
 #include <QDebug>
 #include <QUrl>
 #include <zlib.h>
@@ -91,182 +92,193 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
     ActiveFilters(ActiveFilters_),
     ActiveAllTracks(ActiveAllTracks_),
     Main(Main_),
-    blackmagicDeckLink_Glue(blackmagicDeckLink_Glue_)
+    blackmagicDeckLink_Glue(blackmagicDeckLink_Glue_),
+    Glue(NULL)
 {
-    QString StatsFromExternalData_FileName;
-    bool StatsFromExternalData_FileName_IsCompressed=false;
+    try
+    {
+        QString StatsFromExternalData_FileName;
+        bool StatsFromExternalData_FileName_IsCompressed=false;
 
-    // Finding the right file names (both media file and stats file)
-    if (FileName.indexOf(".qctools.xml.gz")==FileName.length()-15)
-    {
-        StatsFromExternalData_FileName=FileName;
-        FileName.resize(FileName.length()-15);
-        StatsFromExternalData_FileName_IsCompressed=true;
-    }
-    else if (FileName.indexOf(".qctools.xml")==FileName.length()-12)
-    {
-        StatsFromExternalData_FileName=FileName;
-        FileName.resize(FileName.length()-12);
-    }
-    else if (FileName.indexOf(".xml.gz")==FileName.length()-7)
-    {
-        StatsFromExternalData_FileName=FileName;
-        FileName.resize(FileName.length()-7);
-        StatsFromExternalData_FileName_IsCompressed=true;
-    }
-    else if (FileName.indexOf(".xml")==FileName.length()-4)
-    {
-        StatsFromExternalData_FileName=FileName;
-        FileName.resize(FileName.length()-4);
-    }
-    if (StatsFromExternalData_FileName.size()==0)
-    {
-        if (QFile::exists(FileName+".qctools.xml.gz"))
+        // Finding the right file names (both media file and stats file)
+        if (FileName.indexOf(".qctools.xml.gz")==FileName.length()-15)
         {
-            StatsFromExternalData_FileName=FileName+".qctools.xml.gz";
+            StatsFromExternalData_FileName=FileName;
+            FileName.resize(FileName.length()-15);
             StatsFromExternalData_FileName_IsCompressed=true;
         }
-        else if (QFile::exists(FileName+".qctools.xml"))
+        else if (FileName.indexOf(".qctools.xml")==FileName.length()-12)
         {
-            StatsFromExternalData_FileName=FileName+".qctools.xml";
+            StatsFromExternalData_FileName=FileName;
+            FileName.resize(FileName.length()-12);
         }
-        else if (QFile::exists(FileName+".xml.gz"))
+        else if (FileName.indexOf(".xml.gz")==FileName.length()-7)
         {
-            StatsFromExternalData_FileName=FileName+".xml.gz";
+            StatsFromExternalData_FileName=FileName;
+            FileName.resize(FileName.length()-7);
             StatsFromExternalData_FileName_IsCompressed=true;
         }
-        else if (QFile::exists(FileName+".xml"))
+        else if (FileName.indexOf(".xml")==FileName.length()-4)
         {
-            StatsFromExternalData_FileName=FileName+".xml";
+            StatsFromExternalData_FileName=FileName;
+            FileName.resize(FileName.length()-4);
         }
-    }
-
-    // External data optional input
-    string StatsFromExternalData;
-    if (!StatsFromExternalData_FileName.size()==0)
-    {
-        if (StatsFromExternalData_FileName_IsCompressed)
+        if (StatsFromExternalData_FileName.size()==0)
         {
-            QFile F(StatsFromExternalData_FileName);
-            if (F.open(QIODevice::ReadOnly))
+            if (QFile::exists(FileName+".qctools.xml.gz"))
             {
-                QByteArray Compressed=F.readAll();
-                uLongf Buffer_Size=0;
-                Buffer_Size|=((unsigned char)Compressed[Compressed.size()-1])<<24;
-                Buffer_Size|=((unsigned char)Compressed[Compressed.size()-2])<<16;
-                Buffer_Size|=((unsigned char)Compressed[Compressed.size()-3])<<8;
-                Buffer_Size|=((unsigned char)Compressed[Compressed.size()-4]);
-                char* Buffer=new char[Buffer_Size];
-                z_stream strm;
-                strm.next_in = (Bytef *) Compressed.data();
-                strm.avail_in = Compressed.size() ;
-                strm.next_out = (unsigned char*) Buffer;
-                strm.avail_out = Buffer_Size;
-                strm.total_out = 0;
-                strm.zalloc = Z_NULL;
-                strm.zfree = Z_NULL;
-                if (inflateInit2(&strm, 15 + 16)>=0) // 15 + 16 are magic values for gzip
+                StatsFromExternalData_FileName=FileName+".qctools.xml.gz";
+                StatsFromExternalData_FileName_IsCompressed=true;
+            }
+            else if (QFile::exists(FileName+".qctools.xml"))
+            {
+                StatsFromExternalData_FileName=FileName+".qctools.xml";
+            }
+            else if (QFile::exists(FileName+".xml.gz"))
+            {
+                StatsFromExternalData_FileName=FileName+".xml.gz";
+                StatsFromExternalData_FileName_IsCompressed=true;
+            }
+            else if (QFile::exists(FileName+".xml"))
+            {
+                StatsFromExternalData_FileName=FileName+".xml";
+            }
+        }
+
+        // External data optional input
+        string StatsFromExternalData;
+        if (!StatsFromExternalData_FileName.size()==0)
+        {
+            if (StatsFromExternalData_FileName_IsCompressed)
+            {
+                QFile F(StatsFromExternalData_FileName);
+                if (F.open(QIODevice::ReadOnly))
                 {
-                    if (inflate(&strm, Z_SYNC_FLUSH)>=0)
+                    QByteArray Compressed=F.readAll();
+                    uLongf Buffer_Size=0;
+                    Buffer_Size|=((unsigned char)Compressed[Compressed.size()-1])<<24;
+                    Buffer_Size|=((unsigned char)Compressed[Compressed.size()-2])<<16;
+                    Buffer_Size|=((unsigned char)Compressed[Compressed.size()-3])<<8;
+                    Buffer_Size|=((unsigned char)Compressed[Compressed.size()-4]);
+                    char* Buffer=new char[Buffer_Size];
+                    z_stream strm;
+                    strm.next_in = (Bytef *) Compressed.data();
+                    strm.avail_in = Compressed.size() ;
+                    strm.next_out = (unsigned char*) Buffer;
+                    strm.avail_out = Buffer_Size;
+                    strm.total_out = 0;
+                    strm.zalloc = Z_NULL;
+                    strm.zfree = Z_NULL;
+                    if (inflateInit2(&strm, 15 + 16)>=0) // 15 + 16 are magic values for gzip
                     {
-                        inflateEnd (&strm);
-                        StatsFromExternalData.assign(Buffer, Buffer_Size);
+                        if (inflate(&strm, Z_SYNC_FLUSH)>=0)
+                        {
+                            inflateEnd (&strm);
+                            StatsFromExternalData.assign(Buffer, Buffer_Size);
+                        }
                     }
+                    delete[] Buffer;
                 }
-                delete[] Buffer;
             }
-        }
-        else
-        {
-            QFile F(StatsFromExternalData_FileName);
-            if (F.open(QIODevice::ReadOnly))
+            else
             {
-                QByteArray Data=F.readAll();
+                QFile F(StatsFromExternalData_FileName);
+                if (F.open(QIODevice::ReadOnly))
+                {
+                    QByteArray Data=F.readAll();
 
-                StatsFromExternalData.assign(Data.data(), Data.size());
+                    StatsFromExternalData.assign(Data.data(), Data.size());
+                }
             }
         }
-    }
 
-    // Running FFmpeg
-    string FileName_string=FileName.toUtf8().data();
-    #ifdef _WIN32
-        replace(FileName_string.begin(), FileName_string.end(), '/', '\\' );
-    #endif
-    string Filters[Type_Max];
-    if (StatsFromExternalData.empty())
-    {
-        if (ActiveFilters[ActiveFilter_Video_signalstats])
-            Filters[0]+=",signalstats=stat=tout+vrep+brng";
-        if (ActiveFilters[ActiveFilter_Video_cropdetect])
-            Filters[0]+=",cropdetect=reset=1:round=1";
-        if (ActiveFilters[ActiveFilter_Video_Idet])
-            Filters[0]+=",idet=half_life=1";
-        if (ActiveFilters[ActiveFilter_Video_Psnr] && ActiveFilters[ActiveFilter_Video_Ssim])
+        // Running FFmpeg
+        string FileName_string=FileName.toUtf8().data();
+        #ifdef _WIN32
+            replace(FileName_string.begin(), FileName_string.end(), '/', '\\' );
+        #endif
+        string Filters[Type_Max];
+        if (StatsFromExternalData.empty())
         {
-            Filters[0]+=",split[a][b];[a]field=top[a1];[b]field=bottom,split[b1][b2];[a1][b1]psnr[c1];[c1][b2]ssim";
+            if (ActiveFilters[ActiveFilter_Video_signalstats])
+                Filters[0]+=",signalstats=stat=tout+vrep+brng";
+            if (ActiveFilters[ActiveFilter_Video_cropdetect])
+                Filters[0]+=",cropdetect=reset=1:round=1";
+            if (ActiveFilters[ActiveFilter_Video_Idet])
+                Filters[0]+=",idet=half_life=1";
+            if (ActiveFilters[ActiveFilter_Video_Psnr] && ActiveFilters[ActiveFilter_Video_Ssim])
+            {
+                Filters[0]+=",split[a][b];[a]field=top[a1];[b]field=bottom,split[b1][b2];[a1][b1]psnr[c1];[c1][b2]ssim";
+            }
+            else
+            {
+                if (ActiveFilters[ActiveFilter_Video_Psnr])
+                    Filters[0]+=",split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1][b1]psnr";
+                if (ActiveFilters[ActiveFilter_Video_Ssim])
+                    Filters[0]+=",split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1][b1]ssim";
+            }
+            Filters[0].erase(0, 1); // remove first comma
+            if (ActiveFilters[ActiveFilter_Audio_EbuR128])
+                Filters[1]+=",ebur128=metadata=1";
+            if (ActiveFilters[ActiveFilter_Audio_astats])
+                Filters[1]+=",astats=metadata=1:reset=1:length=0.4";
+            Filters[1].erase(0, 1); // remove first comma
         }
         else
         {
-            if (ActiveFilters[ActiveFilter_Video_Psnr])
-                Filters[0]+=",split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1][b1]psnr";
-            if (ActiveFilters[ActiveFilter_Video_Ssim])
-                Filters[0]+=",split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1][b1]ssim";
+            VideoStats* Video=new VideoStats();
+            Stats.push_back(Video);
+            Video->StatsFromExternalData(StatsFromExternalData);
+
+            AudioStats* Audio=new AudioStats();
+            Stats.push_back(Audio);
+            Audio->StatsFromExternalData(StatsFromExternalData);
         }
-        Filters[0].erase(0, 1); // remove first comma
-        if (ActiveFilters[ActiveFilter_Audio_EbuR128])
-            Filters[1]+=",ebur128=metadata=1";
-        if (ActiveFilters[ActiveFilter_Audio_astats])
-            Filters[1]+=",astats=metadata=1:reset=1:length=0.4";
-        Filters[1].erase(0, 1); // remove first comma
-    }
-    else
-    {
-        VideoStats* Video=new VideoStats();
-        Stats.push_back(Video);
-        Video->StatsFromExternalData(StatsFromExternalData);
-
-        AudioStats* Audio=new AudioStats();
-        Stats.push_back(Audio);
-        Audio->StatsFromExternalData(StatsFromExternalData);
-    }
-    Glue=new FFmpeg_Glue(FileName_string.c_str(), ActiveAllTracks, &Stats, Stats.empty());
-    if (FileName_string.empty())
-    {
-        Glue->AddInput_Video(FrameCount, 1001, 30000, 720, 486, blackmagicDeckLink_Glue->Config_In.VideoBitDepth, blackmagicDeckLink_Glue->Config_In.VideoCompression, blackmagicDeckLink_Glue->Config_In.TC_in);
-        Glue->AddInput_Audio(FrameCount, 1001, 30000, 48000, blackmagicDeckLink_Glue->Config_In.AudioBitDepth, blackmagicDeckLink_Glue->Config_In.AudioTargetBitDepth, blackmagicDeckLink_Glue->Config_In.ChannelsCount);
-    }
-    else if (Glue->ContainerFormat_Get().empty())
-    {
-        delete Glue;
-        Glue=NULL;
-        for (size_t Pos=0; Pos<Stats.size(); Pos++)
-            Stats[Pos]->StatsFinish();
-    }
-
-    if (Glue)
-    {
-        Glue->AddOutput(0, 72, 72, FFmpeg_Glue::Output_Jpeg);
-        if (!Encoding_FileName.empty())
+        Glue=new FFmpeg_Glue(FileName_string.c_str(), ActiveAllTracks, &Stats, Stats.empty());
+        if (FileName_string.empty())
         {
-            Glue->AddOutput(Encoding_FileName, Encoding_Format);
-            FileName=QString::fromUtf8(Encoding_FileName.c_str());
+            Glue->AddInput_Video(FrameCount, 1001, 30000, 720, 486, blackmagicDeckLink_Glue->Config_In.VideoBitDepth, blackmagicDeckLink_Glue->Config_In.VideoCompression, blackmagicDeckLink_Glue->Config_In.TC_in);
+            Glue->AddInput_Audio(FrameCount, 1001, 30000, 48000, blackmagicDeckLink_Glue->Config_In.AudioBitDepth, blackmagicDeckLink_Glue->Config_In.AudioTargetBitDepth, blackmagicDeckLink_Glue->Config_In.ChannelsCount);
         }
-        Glue->AddOutput(1, 0, 0, FFmpeg_Glue::Output_Stats, 0, Filters[0]);
-        Glue->AddOutput(0, 0, 0, FFmpeg_Glue::Output_Stats, 1, Filters[1]);
+        else if (Glue->ContainerFormat_Get().empty())
+        {
+            delete Glue;
+            Glue=NULL;
+            for (size_t Pos=0; Pos<Stats.size(); Pos++)
+                Stats[Pos]->StatsFinish();
+        }
+
+        if (Glue)
+        {
+            Glue->AddOutput(0, 72, 72, FFmpeg_Glue::Output_Jpeg);
+            if (!Encoding_FileName.empty())
+            {
+                Glue->AddOutput(Encoding_FileName, Encoding_Format);
+                FileName=QString::fromUtf8(Encoding_FileName.c_str());
+            }
+            Glue->AddOutput(1, 0, 0, FFmpeg_Glue::Output_Stats, 0, Filters[0]);
+            Glue->AddOutput(0, 0, 0, FFmpeg_Glue::Output_Stats, 1, Filters[1]);
+        }
+
+        // Looking for the first video stream
+        ReferenceStream_Pos=0;
+        for (; ReferenceStream_Pos<Stats.size(); ReferenceStream_Pos++)
+            if (Stats[ReferenceStream_Pos] && Stats[ReferenceStream_Pos]->Type_Get()==0)
+                break;
+        if (ReferenceStream_Pos>=Stats.size())
+            ReferenceStream_Pos=0;
+
+        Frames_Pos=0;
+        WantToStop=false;
+        Parse();
+
     }
 
-    // Looking for the first video stream
-    ReferenceStream_Pos=0;
-    for (; ReferenceStream_Pos<Stats.size(); ReferenceStream_Pos++)
-        if (Stats[ReferenceStream_Pos] && Stats[ReferenceStream_Pos]->Type_Get()==0)
-            break;
-    if (ReferenceStream_Pos>=Stats.size())
-        ReferenceStream_Pos=0;
-
-    Frames_Pos=0;
-    WantToStop=false;
-    Parse();
+    catch(const std::bad_alloc&)
+    {
+        QMessageBox::critical(NULL, "Out of memory!", "Please try 64bit build.");
+        QApplication::instance()->quit();
+    }
 }
 
 //---------------------------------------------------------------------------
