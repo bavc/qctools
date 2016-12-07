@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>609</width>
-    <height>337</height>
+    <height>409</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="Filters">
       <attribute name="title">
@@ -260,6 +260,93 @@
           </size>
          </property>
         </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="Signalserver">
+      <attribute name="title">
+       <string>Signalserver</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="4" column="0">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>221</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="4" column="3">
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>220</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="0" colspan="4">
+        <widget class="QLineEdit" name="signalServerUrl_lineEdit">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="placeholderText">
+          <string>Signalserver URL (http://example.com)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="4">
+        <widget class="QLineEdit" name="signalServerPassword_lineEdit">
+         <property name="placeholderText">
+          <string>Password</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="4">
+        <widget class="QLineEdit" name="signalServerLogin_lineEdit">
+         <property name="placeholderText">
+          <string>User name</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QCheckBox" name="signalServerEnableUpload_checkBox">
+         <property name="text">
+          <string>Enable signalserver upload</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" colspan="4">
+        <widget class="QLabel" name="connectionTest_label">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1" colspan="2">
+        <widget class="QPushButton" name="testConnection_pushButton">
+         <property name="text">
+          <string>Test connection</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

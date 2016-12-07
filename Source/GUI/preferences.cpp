@@ -11,6 +11,10 @@
 #include <QStandardPaths>
 #include <QMetaType>
 #include <QDebug>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QTimer>
 //---------------------------------------------------------------------------
 
 typedef std::tuple<int, int> GroupAndType;
@@ -103,6 +107,34 @@ void Preferences::saveFilterSelectorsOrder(const QList<std::tuple<int, int> > &o
     Settings.setValue("filterSelectorsOrder", QVariant::fromValue(order));
 }
 
+bool Preferences::signalServerUploadEnabled() const
+{
+    QSettings Settings;
+
+    return Settings.value("SignalServerEnableUpload", false).toBool();
+}
+
+QUrl Preferences::signalServerUrl() const
+{
+    QSettings Settings;
+
+    return Settings.value("SignalServerUrl").toUrl();
+}
+
+QString Preferences::signalServerLogin() const
+{
+    QSettings Settings;
+
+    return Settings.value("SignalServerLogin").toString();
+}
+
+QString Preferences::signalServerPassword() const
+{
+    QSettings Settings;
+
+    return Settings.value("SignalServerPassword").toString();
+}
+
 //***************************************************************************
 // Helpers
 //***************************************************************************
@@ -127,6 +159,11 @@ void Preferences::Load()
     ui->Tracks_Video_All->setChecked(ActiveAllTracks[Type_Video]);
     ui->Tracks_Audio_First->setChecked(!ActiveAllTracks[Type_Audio]);
     ui->Tracks_Audio_All->setChecked(ActiveAllTracks[Type_Audio]);
+
+    ui->signalServerUrl_lineEdit->setText(signalServerUrl().toString());
+    ui->signalServerLogin_lineEdit->setText(signalServerLogin());
+    ui->signalServerPassword_lineEdit->setText(signalServerPassword());
+    ui->signalServerEnableUpload_checkBox->setChecked(signalServerUploadEnabled());
 }
 
 //---------------------------------------------------------------------------
@@ -135,6 +172,12 @@ void Preferences::Save()
     QSettings Settings;
     Settings.setValue("ActiveFilters", (uint)ActiveFilters.to_ulong());
     Settings.setValue("ActiveAllTracks", (uint)ActiveAllTracks.to_ulong());
+
+    Settings.setValue("SignalServerUrl", ui->signalServerUrl_lineEdit->text());
+    Settings.setValue("SignalServerLogin", ui->signalServerLogin_lineEdit->text());
+    Settings.setValue("SignalServerPassword", ui->signalServerPassword_lineEdit->text());
+    Settings.setValue("SignalServerEnableUpload", ui->signalServerEnableUpload_checkBox->isChecked());
+
     Settings.sync();
 }
 
@@ -178,3 +221,76 @@ void Preferences::OnRejected()
     Load();
 }
 
+void Preferences::on_testConnection_pushButton_clicked()
+{
+    struct UI {
+        static void setSuccess(QLabel* label, QPushButton* button) {
+            label->setStyleSheet("color: green");
+            label->setText("Success!");
+            button->setEnabled(true);
+        }
+        static void setError(QLabel* label, const QString& error, QPushButton* button) {
+            label->setStyleSheet("color: red");
+            label->setText(error);
+            button->setEnabled(true);
+        }
+        static void setChecking(QLabel* label, QPushButton* button) {
+            label->setStyleSheet("");
+            label->setText("Checking..");
+            button->setEnabled(false);
+        }
+    };
+
+    UI::setChecking(ui->connectionTest_label, ui->testConnection_pushButton);
+
+    QNetworkAccessManager manager;
+    QNetworkRequest request(ui->signalServerUrl_lineEdit->text() + "/fileuploads/upload/test");
+    request.setRawHeader("Authorization", "Basic " + QByteArray(QString("%1:%2")
+							 .arg(ui->signalServerLogin_lineEdit->text())
+							 .arg(ui->signalServerPassword_lineEdit->text()).toLocal8Bit().toBase64()));
+
+    QByteArray test(1, 0);
+    QNetworkReply* reply = manager.put(request, test);
+
+    QEventLoop loop;
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+
+    QTimer timer;
+    timer.setSingleShot(true);
+    connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+
+    timer.start(5000);
+    loop.exec();
+
+    if(!timer.isActive())
+    {
+        disconnect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+        reply->abort();
+
+        // still not connected or failed?
+        UI::setError(ui->connectionTest_label, "Connection timeout", ui->testConnection_pushButton);
+    }
+    else
+    {
+        if(reply->error() == QNetworkReply::NoError)
+        {
+            int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+            if (statusCode == 204)
+            {
+                UI::setSuccess(ui->connectionTest_label, ui->testConnection_pushButton);
+            }
+            else
+            {
+                UI::setError(ui->connectionTest_label, QString("Failure: statusCode = %0").arg(statusCode), ui->testConnection_pushButton);
+                qDebug() << reply->readAll() << ", status: " << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString();
+            }
+        }
+        else
+        {
+            UI::setError(ui->connectionTest_label, QString("%0").arg(reply->errorString()), ui->testConnection_pushButton);
+            qDebug() << "error: " << reply->errorString();
+        }
+    }
+
+    reply->deleteLater();
+}
