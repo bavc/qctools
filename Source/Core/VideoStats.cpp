@@ -49,12 +49,12 @@ VideoStats::~VideoStats()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void VideoStats::StatsFromExternalData (const string &Data)
+void VideoStats::StatsFromExternalData (const char* Data, size_t Size)
 {
     // VideoStats from external data
     // XML input
     XMLDocument Document;
-    if (Document.Parse(Data.c_str()))
+    if (Document.Parse(Data, Size))
        return;
 
     XMLElement* Root=Document.FirstChildElement("ffprobe:ffprobe");
@@ -203,9 +203,6 @@ void VideoStats::StatsFromExternalData (const string &Data)
             }
         }
     }
-
-    Frequency=1;
-    StatsFinish();
 }
 
 //---------------------------------------------------------------------------

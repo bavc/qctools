@@ -49,12 +49,12 @@ AudioStats::~AudioStats()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void AudioStats::StatsFromExternalData (const string &Data)
+void AudioStats::StatsFromExternalData(const char* Data, size_t Size)
 {
     // AudioStats from external data
     // XML input
     XMLDocument Document;
-    if (Document.Parse(Data.c_str()))
+    if (Document.Parse(Data, Size))
        return;
 
     XMLElement* Root=Document.FirstChildElement("ffprobe:ffprobe");
@@ -178,9 +178,6 @@ void AudioStats::StatsFromExternalData (const string &Data)
             }
         }
     }
-
-    Frequency=1;
-    StatsFinish();
 }
 
 //---------------------------------------------------------------------------
