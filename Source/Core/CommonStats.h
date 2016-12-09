@@ -21,7 +21,7 @@ class CommonStats
 {
 public:
     // Constructor / Destructor
-    CommonStats(const struct per_item* PerItem, int Type, size_t CountOfGroups, size_t CountOfItems, size_t FrameCount=0, double Duration=0, AVStream* stream = nullptr);
+    CommonStats(const struct per_item* PerItem, int Type, size_t CountOfGroups, size_t CountOfItems, size_t FrameCount=0, double Duration=0, AVStream* stream = NULL);
     virtual ~CommonStats();
 
     // Data
@@ -49,7 +49,8 @@ public:
     string                      Percent_Get(size_t Pos);
 
     // External data
-    virtual void                StatsFromExternalData(const string &Data) = 0;
+    virtual void                StatsFromExternalData(const char* Data, size_t Size) = 0;
+            void                StatsFromExternalData_Finish() {Frequency=1; StatsFinish();}
     virtual void                StatsFromFrame(struct AVFrame* Frame, int Width, int Height) = 0;
     virtual void                TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos) = 0;
     virtual void                StatsFinish();
