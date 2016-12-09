@@ -28,7 +28,10 @@ public:
     double**                    x;                          // Time information, per frame (0=frame number, 1=seconds, 2=minutes, 3=hours)
     double**                    y;                          // Data (Group_xxxMax size)
     double*                     durations;                  // Duration of a frame, per frame
-    int*                        pict_type;                  //
+    int64_t*					pkt_pos;                    // Frame offsets
+    int*                        pkt_size;                   // Frame size
+    int*                        pix_fmt;                    //
+    char*                       pict_type_char;             //
     bool*                       key_frames;                 // Key frame status, per frame
     size_t                      x_Current;                  // Data is filled up to
     size_t                      x_Current_Max;              // Data will be filled up to
@@ -67,6 +70,7 @@ protected:
 
     // Info
     double                      Frequency;
+    int							streamIndex;
 
     // Memory management
     size_t                      Data_Reserved; // Count of frames reserved in memory;
