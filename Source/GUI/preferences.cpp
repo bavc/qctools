@@ -7,6 +7,7 @@
 //---------------------------------------------------------------------------
 #include "preferences.h"
 #include "ui_preferences.h"
+#include "SignalServerConnectionChecker.h"
 #include <QSettings>
 #include <QStandardPaths>
 #include <QMetaType>
@@ -28,7 +29,8 @@ Q_DECLARE_METATYPE(FilterSelectorsOrder)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Preferences::Preferences(QWidget *parent) :
+Preferences::Preferences(SignalServerConnectionChecker* connectionChecker, QWidget *parent) :
+    connectionChecker(connectionChecker),
     QDialog(parent),
     ui(new Ui::Preferences)
 {
@@ -213,6 +215,11 @@ void Preferences::OnAccepted()
         ActiveAllTracks.set(Type_Audio);
 
     Save();
+
+    if(signalServerUploadEnabled())
+        connectionChecker->start(signalServerUrl().toString(), signalServerLogin(), signalServerPassword());
+    else
+        connectionChecker->stop();
 }
 
 //---------------------------------------------------------------------------
@@ -243,54 +250,20 @@ void Preferences::on_testConnection_pushButton_clicked()
 
     UI::setChecking(ui->connectionTest_label, ui->testConnection_pushButton);
 
-    QNetworkAccessManager manager;
-    QNetworkRequest request(ui->signalServerUrl_lineEdit->text() + "/fileuploads/upload/test");
-    request.setRawHeader("Authorization", "Basic " + QByteArray(QString("%1:%2")
-							 .arg(ui->signalServerLogin_lineEdit->text())
-							 .arg(ui->signalServerPassword_lineEdit->text()).toLocal8Bit().toBase64()));
-
-    QByteArray test(1, 0);
-    QNetworkReply* reply = manager.put(request, test);
+    connectionChecker->checkConnection(ui->signalServerUrl_lineEdit->text(), ui->signalServerLogin_lineEdit->text(), ui->signalServerPassword_lineEdit->text());
 
     QEventLoop loop;
-    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-
-    QTimer timer;
-    timer.setSingleShot(true);
-    connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
-
-    timer.start(5000);
+    connect(connectionChecker, SIGNAL(done()), &loop, SLOT(quit()));
     loop.exec();
 
-    if(!timer.isActive())
+    if(connectionChecker->state() == SignalServerConnectionChecker::Online)
     {
-        disconnect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-        reply->abort();
-
-        // still not connected or failed?
-        UI::setError(ui->connectionTest_label, "Connection timeout", ui->testConnection_pushButton);
-    }
-    else
+        UI::setSuccess(ui->connectionTest_label, ui->testConnection_pushButton);
+    } else if(connectionChecker->state() == SignalServerConnectionChecker::Timeout)
     {
-        if(reply->error() == QNetworkReply::NoError)
-        {
-            int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-            if (statusCode == 204)
-            {
-                UI::setSuccess(ui->connectionTest_label, ui->testConnection_pushButton);
-            }
-            else
-            {
-                UI::setError(ui->connectionTest_label, QString("Failure: statusCode = %0").arg(statusCode), ui->testConnection_pushButton);
-                qDebug() << reply->readAll() << ", status: " << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString();
-            }
-        }
-        else
-        {
-            UI::setError(ui->connectionTest_label, QString("%0").arg(reply->errorString()), ui->testConnection_pushButton);
-            qDebug() << "error: " << reply->errorString();
-        }
+       UI::setError(ui->connectionTest_label, "Connection timeout", ui->testConnection_pushButton);
+    } else if(connectionChecker->state() == SignalServerConnectionChecker::Error)
+    {
+       UI::setError(ui->connectionTest_label, QString("%0").arg(connectionChecker->errorString()), ui->testConnection_pushButton);
     }
-
-    reply->deleteLater();
 }

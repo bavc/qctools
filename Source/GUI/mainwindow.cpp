@@ -27,6 +27,7 @@
 #include <QInputDialog>
 #include <QCheckBox>
 #include <QTimer>
+#include <QDebug>
 
 #include "GUI/draggablechildrenbehaviour.h"
 
@@ -547,4 +548,23 @@ void MainWindow::on_actionPlay_All_Frames_triggered()
 {
     if(ControlArea)
         ControlArea->setPlayAllFrames(true);
+}
+void MainWindow::onSignalServerConnectionChanged(SignalServerConnectionChecker::State state)
+{
+    qDebug() << "signalserver connection: " << state;
+    updateConnectionIndicator();
+}
+
+void MainWindow::updateConnectionIndicator()
+{
+    if(connectionChecker->state() == SignalServerConnectionChecker::NotChecked)
+    {
+        connectionIndicator->setStyleSheet("background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.621827, fy:0.359, stop:0 rgba(255, 255, 255, 255), stop:0.901015 rgba(155, 155, 155, 255), stop:1 rgba(255, 255, 255, 0));");
+    } else if(connectionChecker->state() == SignalServerConnectionChecker::Online)
+    {
+        connectionIndicator->setStyleSheet("background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.621827, fy:0.359, stop:0 rgba(0, 255, 0, 255), stop:0.901015 rgba(0, 155, 0, 255), stop:1 rgba(255, 255, 255, 0));");
+    } else if(connectionChecker->state() == SignalServerConnectionChecker::Error || connectionChecker->state() == SignalServerConnectionChecker::Timeout)
+    {
+        connectionIndicator->setStyleSheet("background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.621827, fy:0.359, stop:0 rgba(255, 0, 0, 255), stop:0.901015 rgba(155, 0, 0, 255), stop:1 rgba(255, 255, 255, 0));");
+    }
 }

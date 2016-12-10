@@ -150,8 +150,21 @@ void MainWindow::Ui_Init()
     ui->actionFilesList->setChecked(false);
     ui->actionGraphsLayout->setChecked(false);
 
+    connectionIndicator = new QWidget;
+    connectionIndicator->setMinimumSize(24, 24);
+    ui->statusBar->addPermanentWidget(connectionIndicator);
+
+	connectionChecker = new SignalServerConnectionChecker();
+	connect(connectionChecker, SIGNAL(connectionStateChanged(SignalServerConnectionChecker::State)),
+		this, SLOT(onSignalServerConnectionChanged(SignalServerConnectionChecker::State)));
+
     //Preferences
-    Prefs=new Preferences(this);
+    Prefs=new Preferences(connectionChecker, this);
+
+    if (Prefs->signalServerUploadEnabled())
+        connectionChecker->start(Prefs->signalServerUrl(), Prefs->signalServerLogin(), Prefs->signalServerPassword());
+
+	updateConnectionIndicator();
 
     //Temp
     ui->actionWindowOut->setVisible(false);

@@ -48,6 +48,7 @@ void MainWindow::TimeOut ()
     refreshDisplay();
     Update();
 
+    /*
     // Simultaneous parsing
     for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
     {
@@ -55,6 +56,7 @@ void MainWindow::TimeOut ()
         if (Stats && Stats->State_Get()==0)
             Files[Files_Pos]->Parse();
     }
+    */
 
     bool DeckRunning_New=false;
 

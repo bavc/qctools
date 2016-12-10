@@ -11,12 +11,13 @@ namespace Ui {
 class Preferences;
 }
 
+class SignalServerConnectionChecker;
 class Preferences : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit Preferences(QWidget *parent = 0);
+    explicit Preferences(SignalServerConnectionChecker* connectionChecker, QWidget *parent = 0);
     ~Preferences();
 
     //Preferences
@@ -33,6 +34,7 @@ public:
 
 private:
     Ui::Preferences *ui;
+    SignalServerConnectionChecker* connectionChecker;
 
     void Load();
     void Save();

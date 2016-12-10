@@ -22,6 +22,7 @@ using namespace std;
 #include "GUI/Control.h"
 #include "GUI/Info.h"
 #include "GUI/FilesList.h"
+#include "GUI/SignalServerConnectionChecker.h"
 
 namespace Ui {
 class MainWindow;
@@ -206,6 +207,9 @@ private Q_SLOTS:
 
     void on_actionPlay_All_Frames_triggered();
 
+    void onSignalServerConnectionChanged(SignalServerConnectionChecker::State state);
+    void updateConnectionIndicator();
+
 private:
     void updateScrollBar( bool blockSignals = false );
     bool isPlotZoomable() const;
@@ -213,6 +217,8 @@ private:
     void changeFilterSelectorsOrder(QList<std::tuple<int, int> > filtersInfo);
 
     DraggableChildrenBehaviour* draggableBehaviour;
+    SignalServerConnectionChecker* connectionChecker;
+    QWidget*                    connectionIndicator;
 
     Ui::MainWindow *ui;
 };
