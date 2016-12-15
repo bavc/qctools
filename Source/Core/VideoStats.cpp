@@ -284,10 +284,36 @@ void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
         */
     }
 
+    y[Item_pkt_duration_time][x_Current] = durations[x_Current];
+
+    {
+        double& group1Max = y_Max[PerItem[Item_pkt_duration_time].Group1];
+        double& group1Min = y_Min[PerItem[Item_pkt_duration_time].Group1];
+        double& current = durations[x_Current];
+
+        if(group1Max < current)
+            group1Max = current;
+        if(group1Min > current)
+            group1Min = current;
+    }
+
     key_frames[x_Current]=Frame->key_frame?true:false;
 
     pkt_pos[x_Current] = Frame->pkt_pos;
     pkt_size[x_Current] = Frame->pkt_size;
+
+    y[Item_pkt_size][x_Current] = pkt_size[x_Current];
+
+    {
+        double& group1Max = y_Max[PerItem[Item_pkt_size].Group1];
+        double& group1Min = y_Min[PerItem[Item_pkt_size].Group1];
+        int& current = pkt_size[x_Current];
+
+        if(group1Max < current)
+            group1Max = current;
+        if(group1Min > current)
+            group1Min = current;
+    }
     pix_fmt[x_Current] = Frame->format;
     pict_type_char[x_Current] = av_get_picture_type_char(Frame->pict_type);
 
