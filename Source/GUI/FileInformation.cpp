@@ -542,16 +542,16 @@ QString FileInformation::Frame_Type_Get(size_t Stats_Pos, size_t frameIndex) con
                     if (Pos && Stats[Stats_Pos]->x[1][Pos]!=TimeStamp)
                         Pos--;
 
-                    frameType = FFmpeg_Glue::frameTypeToString(Stats[Stats_Pos]->pict_type[Pos]);
+                    frameType = QString("%1").arg(Stats[Stats_Pos]->pict_type_char[Pos]);
                     break;
                 }
             }
         }
         else
-            frameType = FFmpeg_Glue::frameTypeToString(Stats[Stats_Pos]->pict_type[Frames_Pos]);
+            frameType = QString("%1").arg(Stats[Stats_Pos]->pict_type_char[Frames_Pos]);
     } else {
         if(frameIndex <= Stats[Stats_Pos]->x_Current_Max)
-            frameType = FFmpeg_Glue::frameTypeToString(Stats[Stats_Pos]->pict_type[frameIndex]);
+            frameType = QString("%1").arg(Stats[Stats_Pos]->pict_type_char[frameIndex]);
     }
 
     return frameType;

@@ -140,7 +140,6 @@ public:
 
     void setThreadSafe(bool enable);
 
-    static QString frameTypeToString(int frameType);
 private:
     QMutex* mutex;
 

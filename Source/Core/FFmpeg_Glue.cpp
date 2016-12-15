@@ -1523,31 +1523,6 @@ void FFmpeg_Glue::setThreadSafe(bool enable)
     }
 }
 
-QString FFmpeg_Glue::frameTypeToString(int frameType)
-{
-    switch(frameType)
-    {
-    case AV_PICTURE_TYPE_NONE:
-        return "";
-    case AV_PICTURE_TYPE_I:
-        return "I";
-    case AV_PICTURE_TYPE_P:
-        return "P";
-    case AV_PICTURE_TYPE_B:
-        return "B";
-    case AV_PICTURE_TYPE_S:
-        return "S";
-    case AV_PICTURE_TYPE_SI:
-        return "SI";
-    case AV_PICTURE_TYPE_SP:
-        return "SP";
-    case AV_PICTURE_TYPE_BI:
-        return "BI";
-    default:
-        return "";
-    }
-}
-
 //***************************************************************************
 // Export
 //***************************************************************************
@@ -2049,7 +2024,7 @@ QString FFmpeg_Glue::FrameType_Get() const
     if (InputData==NULL || InputData->DecodedFrame==NULL)
         return QString();
 
-    return frameTypeToString(InputData->DecodedFrame->pict_type);
+    return QString("%1").arg(av_get_picture_type_char(InputData->DecodedFrame->pict_type));
 }
 
 //---------------------------------------------------------------------------
