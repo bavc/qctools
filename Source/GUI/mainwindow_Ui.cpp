@@ -40,6 +40,8 @@
 
 #include <qwt_plot_renderer.h>
 #include <QDebug>
+
+#include "GUI/SignalServer.h"
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -154,15 +156,23 @@ void MainWindow::Ui_Init()
     connectionIndicator->setMinimumSize(24, 24);
     ui->statusBar->addPermanentWidget(connectionIndicator);
 
-	connectionChecker = new SignalServerConnectionChecker();
+    signalServer = new SignalServer(this);
+    connectionChecker = new SignalServerConnectionChecker(this);
 	connect(connectionChecker, SIGNAL(connectionStateChanged(SignalServerConnectionChecker::State)),
 		this, SLOT(onSignalServerConnectionChanged(SignalServerConnectionChecker::State)));
 
     //Preferences
     Prefs=new Preferences(connectionChecker, this);
+    connect(Prefs, SIGNAL(saved()), this, SLOT(preferencesUpdated()));
 
-    if (Prefs->signalServerUploadEnabled())
+    if (Prefs->isSignalServerEnabled())
+    {
         connectionChecker->start(Prefs->signalServerUrl(), Prefs->signalServerLogin(), Prefs->signalServerPassword());
+
+        signalServer->setUrl(Prefs->signalServerUrl());
+        signalServer->setLogin(Prefs->signalServerLogin());
+        signalServer->setPassword(Prefs->signalServerPassword());
+    }
 
 	updateConnectionIndicator();
 
@@ -317,7 +327,7 @@ void MainWindow::Export_CSV()
     if (Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
         return;
 
-    Files[Files_CurrentPos]->Export_CSV(QFileDialog::getSaveFileName(this, "Export to CSV", Files[Files_CurrentPos]->FileName+".qctools.csv", "Statistic files (*.csv)", 0, QFileDialog::DontUseNativeDialog));
+    Files[Files_CurrentPos]->Export_CSV(QFileDialog::getSaveFileName(this, "Export to CSV", Files[Files_CurrentPos]->fileName() + ".qctools.csv", "Statistic files (*.csv)", 0, QFileDialog::DontUseNativeDialog));
 }
 
 //---------------------------------------------------------------------------
@@ -326,7 +336,7 @@ void MainWindow::Export_PDF()
     if (Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
         return;
 
-    QString SaveFileName=QFileDialog::getSaveFileName(this, "Acrobat Reader file (PDF)", Files[Files_CurrentPos]->FileName+".qctools.pdf", "PDF (*.pdf)", 0, QFileDialog::DontUseNativeDialog);
+    QString SaveFileName=QFileDialog::getSaveFileName(this, "Acrobat Reader file (PDF)", Files[Files_CurrentPos]->fileName() + ".qctools.pdf", "PDF (*.pdf)", 0, QFileDialog::DontUseNativeDialog);
 
     if (SaveFileName.isEmpty())
         return;

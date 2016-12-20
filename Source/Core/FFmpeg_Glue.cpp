@@ -1672,6 +1672,11 @@ size_t FFmpeg_Glue::VideoFramePos_Get()
     return InputData->FramePos;
 }
 
+bool FFmpeg_Glue::withStats() const
+{
+    return WithStats;
+}
+
 //---------------------------------------------------------------------------
 size_t FFmpeg_Glue::VideoFrameCount_Get()
 {

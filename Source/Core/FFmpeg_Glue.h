@@ -77,6 +77,7 @@ public:
     // Data
     std::vector<CommonStats*>*  Stats;
 
+    bool                        withStats() const;
     // Container information
     string                      ContainerFormat_Get();
     int                         StreamCount_Get();

@@ -20,6 +20,7 @@
 #include <QMenu>
 #include <QContextMenuEvent>
 #include <sstream>
+#include <cassert>
 //---------------------------------------------------------------------------
 
 enum statstype
@@ -43,6 +44,7 @@ struct percolumn
 enum col_names
 {
     Col_Processed,
+    Col_SignalServer,
     Col_Yav,
     Col_Yrang,
     Col_Uav,
@@ -84,6 +86,7 @@ enum col_names
 percolumn PerColumn[Col_Max]=
 {
     { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "Processed",        "Percentage of frames processed by QCTools", },
+    { StatsType_None,       Item_VideoMax,          Item_VideoMax,          "SignalServer",     "Signalserver status", },
     { StatsType_Average,    Item_YAVG,              Item_VideoMax,          "Yav",              "average of Y values", },
     { StatsType_Average,    Item_YHIGH,             Item_YLOW,              "Yrang",            "average of ( YHIGH - YLOW ), indicative of contrast range", },
     { StatsType_Average,    Item_UAVG,              Item_VideoMax,          "Uav",              "average of U values", },
@@ -222,6 +225,11 @@ void FilesList::UpdateAll()
     setRowCount(Main->Files.size());
     for (size_t Files_Pos=0; Files_Pos<Main->Files.size(); Files_Pos++)
     {
+        FileInformation* file = Main->Files[Files_Pos];
+        connect(file, SIGNAL(signalServerCheckUploadedStatusChanged()), this, SLOT(updateSignalServerCheckUploadedStatus()), Qt::UniqueConnection);
+        connect(file, SIGNAL(signalServerUploadStatusChanged()), this, SLOT(updateSignalServerUploadStatus()), Qt::UniqueConnection);
+        connect(file, SIGNAL(signalServerUploadProgressChanged(qint64, qint64)), this, SLOT(updateSignalServerUploadProgress(qint64, qint64)), Qt::UniqueConnection);
+
         QString     Format;
         QString     StreamCount;
         QString     BitRate;
@@ -246,7 +254,7 @@ void FilesList::UpdateAll()
         QString     ChannelLayout;
         QString     ABitDepth_String;
 
-        QFileInfo   FileInfo(Main->Files[Files_Pos]->FileName);
+        QFileInfo   FileInfo(Main->Files[Files_Pos]->fileName());
 
         if (Main->Files[Files_Pos]->Glue)
         {
@@ -312,9 +320,10 @@ void FilesList::UpdateAll()
 
 
         QTableWidgetItem* VerticalHeaderItem=new QTableWidgetItem(FileInfo.fileName());
-        VerticalHeaderItem->setToolTip(Main->Files[Files_Pos]->FileName);
+        VerticalHeaderItem->setToolTip(Main->Files[Files_Pos]->fileName());
         setVerticalHeaderItem((int)Files_Pos, VerticalHeaderItem);
 
+        setItem((int)Files_Pos, Col_SignalServer,   new TableWidgetItem());
         setItem((int)Files_Pos, Col_Format,         new TableWidgetItem(Format));
         setItem((int)Files_Pos, Col_StreamCount,    new TableWidgetItem(StreamCount));
         setItem((int)Files_Pos, Col_BitRate,        new TableWidgetItem(BitRate));
@@ -429,6 +438,9 @@ void FilesList::contextMenuEvent (QContextMenuEvent* Event)
     menu.addAction(new QAction("Show graphs", this)); //If you change this, change the test text too
     menu.addAction(new QAction("Show filters", this)); //If you change this, change the test text too
     menu.addSeparator();
+    menu.addAction(Main->uploadAction());
+    menu.addAction(Main->uploadAllAction());
+    menu.addSeparator();
     menu.addAction(new QAction("Close", this)); //If you change this, change the test text too
 
     //Displaying
@@ -485,4 +497,28 @@ void FilesList::on_verticalHeaderClicked(int logicalIndex)
 void FilesList::on_verticalHeaderDoubleClicked(int logicalIndex)
 {
     Main->selectDisplayFile(logicalIndex);
+}
+
+void FilesList::updateSignalServerCheckUploadedStatus()
+{
+    FileInformation* file = qobject_cast<FileInformation*>(sender());
+    assert(file);
+
+    item(file->index(), Col_SignalServer)->setText(file->signalServerCheckUploadedStatusString());
+}
+
+void FilesList::updateSignalServerUploadStatus()
+{
+    FileInformation* file = qobject_cast<FileInformation*>(sender());
+    assert(file);
+
+    item(file->index(), Col_SignalServer)->setText(file->signalServerUploadStatusString());
+}
+
+void FilesList::updateSignalServerUploadProgress(qint64 value, qint64 total)
+{
+    FileInformation* file = qobject_cast<FileInformation*>(sender());
+    assert(file);
+
+    item(file->index(), Col_SignalServer)->setText(QString("Uploading: %1 / %2").arg(value).arg(total));
 }

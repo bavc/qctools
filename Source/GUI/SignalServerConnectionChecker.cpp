@@ -10,7 +10,7 @@ SignalServerConnectionChecker::SignalServerConnectionChecker(QObject *parent) : 
     m_timeoutTimer.setSingleShot(true);
     connect(&m_timeoutTimer, SIGNAL(timeout()), this, SLOT(checkConnectionDone()));
 
-    m_retryTimer.setInterval(5 * 100);
+    m_retryTimer.setInterval(5 * 1000);
     m_retryTimer.setSingleShot(true);
     connect(&m_retryTimer, SIGNAL(timeout()), this, SLOT(checkConnection()));
 }
@@ -32,9 +32,9 @@ bool SignalServerConnectionChecker::isRunning() const
 
 void SignalServerConnectionChecker::start(const QUrl &url, const QString &login, const QString &password)
 {
-	m_url = url;
-	m_login = login;
-	m_password = password;
+    m_url = url;
+    m_login = login;
+    m_password = password;
 
     if(m_running)
         return;
@@ -59,18 +59,18 @@ void SignalServerConnectionChecker::stop()
 
 void SignalServerConnectionChecker::checkConnection(const QUrl &url, const QString &login, const QString &password, bool abortPendingCheck /* true */)
 {
-	if (abortPendingCheck)
-		abortCheckConnection();
-	else if (m_reply != NULL) /* check pending, do nothing for now */
-		return;
+    if (abortPendingCheck)
+        abortCheckConnection();
+    else if (m_reply != NULL) /* check pending, do nothing for now */
+        return;
 
-	QString checkConnectionUrl = url.toString() + "/fileuploads/upload/test";
-	qDebug() << "checkConnectionUrl: " << checkConnectionUrl;
+    QString checkConnectionUrl = url.toString() + "/fileuploads/upload/test";
+    qDebug() << "checkConnectionUrl: " << checkConnectionUrl;
 
     QNetworkRequest request(checkConnectionUrl);
     request.setRawHeader("Authorization", "Basic " + QByteArray(QString("%1:%2")
-                             .arg(login)
-                             .arg(password).toLocal8Bit().toBase64()));
+                                                                .arg(login)
+                                                                .arg(password).toLocal8Bit().toBase64()));
 
     QByteArray test(1, 0);
     m_reply = m_networkManager.put(request, test);
@@ -88,13 +88,13 @@ void SignalServerConnectionChecker::abortCheckConnection()
 {
     if (m_reply)
     {
-		m_timeoutTimer.stop();
+        m_timeoutTimer.stop();
 
-		disconnect(m_reply, SIGNAL(finished()), this, SLOT(checkConnectionDone()));
+        disconnect(m_reply, SIGNAL(finished()), this, SLOT(checkConnectionDone()));
         m_reply->abort();
         m_reply->deleteLater();
 
-		qDebug() << "aborted!";
+        qDebug() << "aborted!";
     }
 
     m_reply = NULL;
@@ -117,16 +117,16 @@ void SignalServerConnectionChecker::checkConnectionDone()
     if(!m_timeoutTimer.isActive())
     {
         changeState(Timeout);
-		qDebug() << Timeout;
+        qDebug() << Timeout;
 
         disconnect(m_reply, SIGNAL(finished()), this, SLOT(checkConnectionDone()));
         m_reply->abort();
     }
     else
     {
-		m_timeoutTimer.stop();
-		
-		if(m_reply->error() == QNetworkReply::NoError)
+        m_timeoutTimer.stop();
+
+        if(m_reply->error() == QNetworkReply::NoError)
         {
             int statusCode = m_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
             if (statusCode == 204) // at the moment that's what backend replies if upload successfull
@@ -135,7 +135,7 @@ void SignalServerConnectionChecker::checkConnectionDone()
             }
             else
             {
-                m_errorString = QString("Failure: statusCode = %0").arg(statusCode);
+                m_errorString = QString("Failure: statusCode = %1").arg(statusCode);
                 changeState(Error);
 
                 qDebug() << m_reply->readAll() << ", status: " << m_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString();
@@ -143,7 +143,7 @@ void SignalServerConnectionChecker::checkConnectionDone()
         }
         else
         {
-            m_errorString = QString("%0").arg(m_reply->errorString());
+            m_errorString = m_reply->errorString();
             changeState(Error);
 
             qDebug() << "error: " << m_reply->errorString();

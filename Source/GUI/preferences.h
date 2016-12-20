@@ -27,10 +27,15 @@ public:
     QList<std::tuple<int, int>> loadFilterSelectorsOrder();
     void saveFilterSelectorsOrder(const QList<std::tuple<int, int>>& order);
 
-    bool signalServerUploadEnabled() const;
+    bool isSignalServerEnabled() const;
+    bool isSignalServerAutoUploadEnabled() const;
+
     QUrl signalServerUrl() const;
     QString signalServerLogin() const;
     QString signalServerPassword() const;
+
+Q_SIGNALS:
+    void saved();
 
 private:
     Ui::Preferences *ui;

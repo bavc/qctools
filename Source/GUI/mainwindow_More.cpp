@@ -166,7 +166,10 @@ void MainWindow::processFile(const QString &FileName)
     statusBar()->showMessage("Scanning "+QFileInfo(FileName).fileName()+"...");
 
     // Launch analysis
-    Files.push_back(new FileInformation(this, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks));
+    FileInformation* file = new FileInformation(this, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks);
+    file->setIndex(Files.size());
+
+    Files.push_back(file);
     Files_CurrentPos=0;
     ui->fileNamesBox->addItem(FileName);
 
@@ -370,9 +373,10 @@ void MainWindow::addFile(const QString &FileName)
 
     // Launch analysis
     FileInformation* Temp=new FileInformation(this, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks);
+    Temp->setIndex(Files.size());
 
     Files.push_back(Temp);
-    ui->fileNamesBox->addItem(Temp->FileName);
+    ui->fileNamesBox->addItem(Temp->fileName());
 }
 
 //---------------------------------------------------------------------------
@@ -380,9 +384,10 @@ void MainWindow::addFile(BlackmagicDeckLink_Glue* BlackmagicDeckLink_Glue, int F
 {
     // Launch analysis
     FileInformation* Temp=new FileInformation(this, QString(), Prefs->ActiveFilters, Prefs->ActiveAllTracks, BlackmagicDeckLink_Glue, FrameCount, Encoding_FileName, Encoding_Format);
+    Temp->setIndex(Files.size());
 
     Files.push_back(Temp);
-    ui->fileNamesBox->addItem(Temp->FileName);
+    ui->fileNamesBox->addItem(Temp->fileName());
 }
 
 //---------------------------------------------------------------------------
@@ -394,17 +399,44 @@ void MainWindow::addFile_finish()
         FilesListArea->show();
     }
     if (Files.size()>1)
+    {
         ui->actionFilesList->trigger();
+    }
     else
+    {
+        if(!Files.empty())
+            selectFile(0);
+
         ui->actionGraphsLayout->trigger();
+    }
 
     TimeOut();
+
+    ui->actionUploadToSignalServer->setEnabled(true);
+    ui->actionUploadToSignalServerAll->setEnabled(true);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::selectFile(int NewFilePos)
 {
     Files_CurrentPos=NewFilePos;
+
+    for(int i = 0; i < Files.size(); ++i)
+    {
+        FileInformation* file = Files[i];
+
+        if(i == Files_CurrentPos) {
+            connect(file, SIGNAL(signalServerCheckUploadedStatusChanged()), this, SLOT(updateSignalServerCheckUploadedStatus()));
+            connect(file, SIGNAL(signalServerUploadStatusChanged()), this, SLOT(updateSignalServerUploadStatus()));
+            connect(file, SIGNAL(signalServerUploadProgressChanged(qint64, qint64)), this, SLOT(updateSignalServerUploadProgress(qint64, qint64)));
+        } else {
+            disconnect(file, SIGNAL(signalServerCheckUploadedStatusChanged()), this, SLOT(updateSignalServerCheckUploadedStatus()));
+            disconnect(file, SIGNAL(signalServerUploadStatusChanged()), this, SLOT(updateSignalServerUploadStatus()));
+            disconnect(file, SIGNAL(signalServerUploadProgressChanged(qint64, qint64)), this, SLOT(updateSignalServerUploadProgress(qint64, qint64)));
+        }
+    }
+
+    updateSignalServerCheckUploadedStatus();
 }
 
 //---------------------------------------------------------------------------
@@ -421,6 +453,11 @@ void MainWindow::selectDisplayFiltersFile(int NewFilePos)
     selectDisplayFile(NewFilePos);
     if (TinyDisplayArea)
         TinyDisplayArea->Filters_Show();
+}
+
+SignalServer *MainWindow::getSignalServer()
+{
+    return signalServer;
 }
 
 //---------------------------------------------------------------------------

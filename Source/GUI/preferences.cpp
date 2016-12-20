@@ -24,6 +24,12 @@ Q_DECLARE_METATYPE(GroupAndType)
 typedef QList<GroupAndType> FilterSelectorsOrder;
 Q_DECLARE_METATYPE(FilterSelectorsOrder)
 
+QString KeySignalServerUrl = "SignalServerUrl";
+QString KeySignalServerEnable = "SignalServerEnable";
+QString KeySignalServerEnableAutoUpload = "SignalServerEnableAutoUpload";
+QString KeySignalServerLogin = "SignalServerLogin";
+QString KeySignalServerPassword = "SignalServerPassword";
+
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -109,32 +115,39 @@ void Preferences::saveFilterSelectorsOrder(const QList<std::tuple<int, int> > &o
     Settings.setValue("filterSelectorsOrder", QVariant::fromValue(order));
 }
 
-bool Preferences::signalServerUploadEnabled() const
+bool Preferences::isSignalServerEnabled() const
 {
     QSettings Settings;
 
-    return Settings.value("SignalServerEnableUpload", false).toBool();
+    return Settings.value(KeySignalServerEnable, false).toBool();
+}
+
+bool Preferences::isSignalServerAutoUploadEnabled() const
+{
+    QSettings Settings;
+
+    return Settings.value(KeySignalServerEnableAutoUpload, false).toBool();
 }
 
 QUrl Preferences::signalServerUrl() const
 {
     QSettings Settings;
 
-    return Settings.value("SignalServerUrl").toUrl();
+    return Settings.value(KeySignalServerUrl).toUrl();
 }
 
 QString Preferences::signalServerLogin() const
 {
     QSettings Settings;
 
-    return Settings.value("SignalServerLogin").toString();
+    return Settings.value(KeySignalServerLogin).toString();
 }
 
 QString Preferences::signalServerPassword() const
 {
     QSettings Settings;
 
-    return Settings.value("SignalServerPassword").toString();
+    return Settings.value(KeySignalServerPassword ).toString();
 }
 
 //***************************************************************************
@@ -165,7 +178,7 @@ void Preferences::Load()
     ui->signalServerUrl_lineEdit->setText(signalServerUrl().toString());
     ui->signalServerLogin_lineEdit->setText(signalServerLogin());
     ui->signalServerPassword_lineEdit->setText(signalServerPassword());
-    ui->signalServerEnableUpload_checkBox->setChecked(signalServerUploadEnabled());
+    ui->signalServerEnable_checkBox->setChecked(isSignalServerEnabled());
 }
 
 //---------------------------------------------------------------------------
@@ -175,10 +188,11 @@ void Preferences::Save()
     Settings.setValue("ActiveFilters", (uint)ActiveFilters.to_ulong());
     Settings.setValue("ActiveAllTracks", (uint)ActiveAllTracks.to_ulong());
 
-    Settings.setValue("SignalServerUrl", ui->signalServerUrl_lineEdit->text());
-    Settings.setValue("SignalServerLogin", ui->signalServerLogin_lineEdit->text());
-    Settings.setValue("SignalServerPassword", ui->signalServerPassword_lineEdit->text());
-    Settings.setValue("SignalServerEnableUpload", ui->signalServerEnableUpload_checkBox->isChecked());
+    Settings.setValue(KeySignalServerUrl, ui->signalServerUrl_lineEdit->text());
+    Settings.setValue(KeySignalServerLogin, ui->signalServerLogin_lineEdit->text());
+    Settings.setValue(KeySignalServerPassword , ui->signalServerPassword_lineEdit->text());
+    Settings.setValue(KeySignalServerEnable, ui->signalServerEnable_checkBox->isChecked());
+    Settings.setValue(KeySignalServerEnableAutoUpload, ui->signalServerEnableAutoUpload_checkBox->isChecked());
 
     Settings.sync();
 }
@@ -216,10 +230,7 @@ void Preferences::OnAccepted()
 
     Save();
 
-    if(signalServerUploadEnabled())
-        connectionChecker->start(signalServerUrl().toString(), signalServerLogin(), signalServerPassword());
-    else
-        connectionChecker->stop();
+    Q_EMIT saved();
 }
 
 //---------------------------------------------------------------------------

@@ -10,6 +10,9 @@
 
 //---------------------------------------------------------------------------
 #include "GUI/mainwindow.h"
+#include "GUI/preferences.h"
+#include "GUI/SignalServer.h"
+
 #include "Core/FFmpeg_Glue.h"
 #include "Core/BlackmagicDeckLink_Glue.h"
 #include "Core/VideoStats.h"
@@ -20,12 +23,14 @@
 #include <QDesktopServices>
 #include <QApplication>
 #include <QDebug>
+#include <QTemporaryFile>
 #include <QUrl>
 #include <zlib.h>
 #include <zconf.h>
 
 #include <string>
 #include <sstream>
+#include <cassert>
 #ifdef _WIN32
     #include <algorithm>
 #endif
@@ -37,10 +42,31 @@ static int ActiveParsing_Count=0;
 
 void FileInformation::run()
 {
+    if(m_jobType == FileInformation::Parsing)
+    {
+        runParse();
+    }
+    else if(m_jobType == FileInformation::Exporting)
+    {
+        runExport();
+    }
+}
+
+void FileInformation::runParse()
+{
+    if(Main->Prefs->isSignalServerEnabled())
+    {
+        QString statsFileName = fileName() + ".qctools.xml.gz";
+        QFileInfo fileInfo(statsFileName);
+
+        checkFileUploaded(fileInfo.fileName());
+    }
+
     if (blackmagicDeckLink_Glue)
     {
         blackmagicDeckLink_Glue->Glue=Glue;
-            
+
+        bool completed = false;
         for (;;)
         {
             switch (blackmagicDeckLink_Glue->Config_Out.Status)
@@ -48,13 +74,13 @@ void FileInformation::run()
                 case BlackmagicDeckLink_Glue::instancied:
                                                         blackmagicDeckLink_Glue->Start();
                                                         break;
-                case BlackmagicDeckLink_Glue::finished: 
-                                                        WantToStop=true;
+                case BlackmagicDeckLink_Glue::finished:
+                                                        completed=true;
                                                         break;
                 default : ;
             }
-                
-            if (WantToStop)
+
+            if (WantToStop || completed)
                 break;
             yieldCurrentThread();
         }
@@ -63,12 +89,16 @@ void FileInformation::run()
     }
     else
     {
+        int frameNumber = 1;
+
         for (;;)
         {
             if (Glue)
             {
                 if (!Glue->NextFrame())
                     break;
+
+                ++frameNumber;
             }
             if (WantToStop)
                 break;
@@ -77,9 +107,15 @@ void FileInformation::run()
     }
 
     ActiveParsing_Count--;
+    m_parsed = !WantToStop;
+
+    Q_EMIT parsingCompleted(WantToStop == false);
 }
 
-
+void FileInformation::runExport()
+{
+    Export_XmlGz(QString());
+}
 
 //***************************************************************************
 // Constructor/Destructor
@@ -91,8 +127,11 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
     ActiveFilters(ActiveFilters_),
     ActiveAllTracks(ActiveAllTracks_),
     Main(Main_),
-    blackmagicDeckLink_Glue(blackmagicDeckLink_Glue_)
+    blackmagicDeckLink_Glue(blackmagicDeckLink_Glue_),
+    m_jobType(Parsing)
 {
+    connect(this, SIGNAL(parsingCompleted(bool)), this, SLOT(parsingDone(bool)));
+
     QString StatsFromExternalData_FileName;
     bool StatsFromExternalData_FileName_IsCompressed=false;
 
@@ -300,6 +339,12 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
             inflateEnd(&strm);
         delete[] Compressed;
         delete[] Xml;
+
+        if(Main->Prefs->isSignalServerEnabled())
+        {
+            QFileInfo fileInfo(StatsFromExternalData_FileName);
+            checkFileUploaded(fileInfo.fileName());
+        }
     }
     Glue=new FFmpeg_Glue(FileName_string.c_str(), ActiveAllTracks, &Stats, Stats.empty());
     if (FileName_string.empty())
@@ -337,14 +382,15 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
 
     Frames_Pos=0;
     WantToStop=false;
-    Parse();
+    startParse();
 }
 
 //---------------------------------------------------------------------------
 FileInformation::~FileInformation ()
 {
     WantToStop=true;
-    wait();
+    bool result = wait();
+    assert(result);
 
     for (size_t Pos=0; Pos<Stats.size(); Pos++)
         delete Stats[Pos];
@@ -356,8 +402,10 @@ FileInformation::~FileInformation ()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void FileInformation::Parse ()
+void FileInformation::startParse ()
 {
+    m_jobType = Parsing;
+
     int Max=QThread::idealThreadCount();
     if (Max>2)
         Max-=2;
@@ -365,10 +413,23 @@ void FileInformation::Parse ()
         Max=1;
     if (!isRunning() && ActiveParsing_Count<Max)
     {
-        ActiveParsing_Count++;
-
         if(Glue)
+        {
             start();
+            ActiveParsing_Count++;
+        }
+    }
+}
+
+void FileInformation::startExport()
+{
+    m_jobType = Exporting;
+    if (!isRunning())
+    {
+        if(Glue)
+        {
+            start();
+        }
     }
 }
 
@@ -405,11 +466,23 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
     Data<<"    </frames>\n";
     Data<<"</ffprobe:ffprobe>";
 
-    QFile F(ExportFileName);
-    if (F.open(QIODevice::WriteOnly))
+    SharedFile file;
+    QString name;
+
+    if(ExportFileName.isEmpty())
+    {
+        file = SharedFile(new QTemporaryFile());
+        QFileInfo info(fileName() + ".qctools.xml.gz");
+        name = info.fileName();
+    } else {
+        file = SharedFile(new QFile(ExportFileName));
+        QFileInfo info(ExportFileName);
+        name = info.fileName();
+    }
+
+    if (file->open(QIODevice::ReadWrite))
     {
         string DataS=Data.str();
-        QByteArray Compressed=F.readAll();
         uLongf Buffer_Size=65536;
         char* Buffer=new char[Buffer_Size];
         z_stream strm;
@@ -426,13 +499,18 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
                 strm.avail_out = Buffer_Size;
                 if (deflate(&strm, Z_FINISH)<0)
                     break;
-                F.write(Buffer, Buffer_Size-strm.avail_out);
+                file->write(Buffer, Buffer_Size-strm.avail_out);
             }
             while (strm.avail_out == 0);
             deflateEnd (&strm);
         }
         delete[] Buffer;
+
+        file->flush();
+        file->seek(0);
     }
+
+    Q_EMIT statsFileGenerated(file, name);
 }
 
 //---------------------------------------------------------------------------
@@ -475,6 +553,11 @@ QPixmap FileInformation::Picture_Get (size_t Pos)
         }
     }
     return Pixmap;
+}
+
+QString FileInformation::fileName() const
+{
+    return FileName;
 }
 
 //---------------------------------------------------------------------------
@@ -645,3 +728,187 @@ int FileInformation::BitsPerRawSample() const
     return Glue->BitsPerRawSample_Get();
 }
 
+FileInformation::SignalServerCheckUploadedStatus FileInformation::signalServerCheckUploadedStatus() const
+{
+    if(checkFileUploadedOperation)
+    {
+        switch(checkFileUploadedOperation->state())
+        {
+        case CheckFileUploadedOperation::Unknown:
+            return SignalServerCheckUploadedStatus::Checking;
+        case CheckFileUploadedOperation::Uploaded:
+            return SignalServerCheckUploadedStatus::Uploaded;
+        case CheckFileUploadedOperation::NotUploaded:
+            return SignalServerCheckUploadedStatus::NotUploaded;
+        case CheckFileUploadedOperation::Error:
+            return SignalServerCheckUploadedStatus::CheckError;
+        }
+    }
+
+    return NotChecked;
+}
+
+QString FileInformation::signalServerCheckUploadedStatusString() const
+{
+    switch(signalServerCheckUploadedStatus())
+    {
+    case NotChecked:
+        return "Not Checked";
+    case Checking:
+        return "Checking";
+    case Uploaded:
+        return "Uploaded";
+    case NotUploaded:
+        return "Not Uploaded";
+    case CheckError:
+        return "Check Error";
+    default:
+        return "Unknown";
+    }
+}
+
+QString FileInformation::signalServerCheckUploadedStatusErrorString() const
+{
+    return checkFileUploadedOperation ? checkFileUploadedOperation->errorString() : QString();
+}
+
+FileInformation::SignalServerUploadStatus FileInformation::signalServerUploadStatus() const
+{
+    if(uploadOperation)
+    {
+        switch(uploadOperation->state())
+        {
+        case UploadFileOperation::Uploading:
+            return SignalServerUploadStatus::Uploading;
+        case UploadFileOperation::Uploaded:
+            return SignalServerUploadStatus::Done;
+        case UploadFileOperation::Error:
+            return SignalServerUploadStatus::UploadError;
+        }
+    }
+
+    return Idle;
+}
+
+QString FileInformation::signalServerUploadStatusString() const
+{
+    switch(signalServerUploadStatus())
+    {
+    case Idle:
+        return "Idle";
+    case Uploading:
+        return "Uploading";
+    case Done:
+        return "Upload Done";
+    case UploadError:
+        return "Upload Error";
+    default:
+        return "Unknown";
+    }
+}
+
+QString FileInformation::signalServerUploadStatusErrorString() const
+{
+    return uploadOperation ? uploadOperation->errorString() : QString();
+}
+
+int FileInformation::index() const
+{
+    return m_index;
+}
+
+void FileInformation::setIndex(int value)
+{
+    m_index = value;
+}
+
+void FileInformation::checkFileUploaded(const QString &fileName)
+{
+    if(thread() != QThread::currentThread())
+    {
+        QMetaObject::invokeMethod(this, "checkFileUploaded", Q_ARG(const QString&, fileName));
+        return;
+    }
+
+    // on UI thread
+    checkFileUploadedOperation = Main->getSignalServer()->checkFileUploaded(fileName);
+    connect(checkFileUploadedOperation.data(), SIGNAL(finished()), this, SLOT(checkFileUploadedDone()));
+}
+
+void FileInformation::checkFileUploadedDone()
+{
+    if(checkFileUploadedOperation->state() == CheckFileUploadedOperation::NotUploaded)
+    {
+        qDebug() << "file not uploaded: " << checkFileUploadedOperation->fileName();
+
+        if(Main->Prefs->isSignalServerAutoUploadEnabled() && m_parsed)
+            handleAutoUpload();
+    }
+    else if(checkFileUploadedOperation->state() == CheckFileUploadedOperation::Uploaded)
+    {
+        qDebug() << "file is already uploaded: " << checkFileUploadedOperation->fileName();
+    }
+    else if(checkFileUploadedOperation->state() == CheckFileUploadedOperation::Error)
+    {
+        qDebug() << "file not uploaded: " << checkFileUploadedOperation->fileName() << ", error: " << checkFileUploadedOperation->errorString();
+    }
+
+    Q_EMIT signalServerCheckUploadedStatusChanged();
+}
+
+void FileInformation::upload(const QFileInfo& fileInfo)
+{
+    QString fullName = fileInfo.filePath();
+    QSharedPointer<QFile> file = QSharedPointer<QFile>::create(fullName);
+    if(file->open(QIODevice::ReadOnly))
+    {
+        upload(file, fileInfo.fileName());
+    }
+}
+
+void FileInformation::upload(SharedFile file, const QString &fileName)
+{
+    uploadOperation = Main->getSignalServer()->uploadFile(fileName, file);
+    connect(uploadOperation.data(), SIGNAL(finished()), this, SLOT(uploadDone()));
+    connect(uploadOperation.data(), SIGNAL(uploadProgress(qint64, qint64)), this, SIGNAL(signalServerUploadProgressChanged(qint64, qint64)));
+
+    Q_EMIT signalServerUploadStatusChanged();
+}
+
+void FileInformation::cancelUpload()
+{
+    if(uploadOperation)
+        uploadOperation->cancel();
+}
+
+void FileInformation::uploadDone()
+{
+    Q_EMIT signalServerUploadStatusChanged();
+}
+
+void FileInformation::parsingDone(bool success)
+{
+    if(signalServerCheckUploadedStatus() == SignalServerCheckUploadedStatus::NotUploaded)
+    {
+        qDebug() << "parsing done: " << success;
+
+        if(Main->Prefs->isSignalServerAutoUploadEnabled() && m_parsed)
+            handleAutoUpload();
+    }
+}
+
+void FileInformation::handleAutoUpload()
+{
+    QString statsFileName = fileName() + ".qctools.xml.gz";
+    QFileInfo fileInfo(statsFileName);
+
+    if(!fileInfo.exists())
+    {
+        connect(this, SIGNAL(statsFileGenerated(SharedFile, QString)), this, SLOT(upload(SharedFile,QString)), Qt::UniqueConnection);
+        startExport();
+    } else {
+        SharedFile file = SharedFile(new QFile(statsFileName));
+        if(file->open(QFile::ReadOnly))
+            upload(file, fileInfo.fileName());
+    }
+}

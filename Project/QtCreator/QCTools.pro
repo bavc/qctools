@@ -81,7 +81,8 @@ HEADERS = \
     ../../Source/GUI/Imagelabel.h \
     ../../Source/GUI/config.h \
     ../../Source/GUI/draggablechildrenbehaviour.h \
-    ../../Source/GUI/SignalServerConnectionChecker.h
+    ../../Source/GUI/SignalServerConnectionChecker.h \
+    ../../Source/GUI/SignalServer.h
 
 SOURCES = \
     ../../Source/Core/AudioCore.cpp \
@@ -117,7 +118,8 @@ SOURCES = \
     ../../Source/GUI/Imagelabel.cpp \
     ../../Source/GUI/config.cpp \
     ../../Source/GUI/draggablechildrenbehaviour.cpp \
-    ../../Source/GUI/SignalServerConnectionChecker.cpp
+    ../../Source/GUI/SignalServerConnectionChecker.cpp \
+    ../../Source/GUI/SignalServer.cpp
 
 linux:SOURCES += "../../../Blackmagic DeckLink SDK/Linux/include/DeckLinkAPIDispatch.cpp"
 macx:!contains(DEFINES, USE_BREW) SOURCES += "../../../Blackmagic DeckLink SDK/Mac/include/DeckLinkAPIDispatch.cpp"

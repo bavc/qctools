@@ -43,6 +43,7 @@ class Preferences;
 
 class BlackmagicDeckLink_Glue;
 class DraggableChildrenBehaviour;
+class SignalServer;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -115,7 +116,12 @@ public:
     //Preferences
     Preferences*                Prefs;
     
+    SignalServer*               getSignalServer();
     QList<std::tuple<int, int>> getFilterSelectorsOrder(int start, int end);
+
+    QAction* uploadAction() const;
+    QAction* uploadAllAction() const;
+
 public Q_SLOTS:
 	void Update();
 
@@ -207,8 +213,16 @@ private Q_SLOTS:
 
     void on_actionPlay_All_Frames_triggered();
 
+    void on_actionUploadToSignalServer_triggered();
+    void on_actionUploadToSignalServerAll_triggered();
+
     void onSignalServerConnectionChanged(SignalServerConnectionChecker::State state);
     void updateConnectionIndicator();
+    void preferencesUpdated();
+
+    void updateSignalServerCheckUploadedStatus();
+    void updateSignalServerUploadStatus();
+    void updateSignalServerUploadProgress(qint64, qint64);
 
 private:
     void updateScrollBar( bool blockSignals = false );
@@ -217,6 +231,7 @@ private:
     void changeFilterSelectorsOrder(QList<std::tuple<int, int> > filtersInfo);
 
     DraggableChildrenBehaviour* draggableBehaviour;
+    SignalServer* signalServer;
     SignalServerConnectionChecker* connectionChecker;
     QWidget*                    connectionIndicator;
 
