@@ -21,6 +21,14 @@ struct per_group AudioPerGroup [Group_AudioMax]=
         "tolerance levels as perceived by an audience.\n",
         ActiveFilter_Audio_EbuR128,
     },
+    //aphasemeter
+    {
+        Item_aphasemeter,       1,  -1,    1,  3,  "Audio Phase",  false,
+        "The audio phase value represents the mean phase of current audio frame. Value is\n"
+        "in range [-1, 1]. The -1 means left and right channels are completely out of\n"
+        "phase and 1 means channels are in phase.",
+        ActiveFilter_Audio_aphasemeter,
+    },
     //astats levels
     {
         Item_DC_offset,             3,   -1,    1,  3,  "Levels",  true,
@@ -62,6 +70,7 @@ const struct per_item AudioPerItem [Item_AudioMax]=
 {
     //Y
     { Group_R128,         Group_AudioMax,   "R128.M",     "lavfi.r128.M",                         3,   false,  DBL_MAX, DBL_MAX },
+    { Group_aphasemeter,  Group_AudioMax,   "Phase",      "lavfi.aphasemeter.phase",              3,   false,  DBL_MAX, DBL_MAX },
     { Group_astats_levels,Group_AudioMax,   "DC Offset",  "lavfi.astats.Overall.DC_offset",       3,   false,  DBL_MAX, DBL_MAX },
     { Group_astats_levels,Group_AudioMax,   "Min Level",  "lavfi.astats.Overall.Min_level",       3,   false,  DBL_MAX, DBL_MAX },
     { Group_astats_levels,Group_AudioMax,   "Max Level",  "lavfi.astats.Overall.Max_level",       3,   false,  DBL_MAX, DBL_MAX },

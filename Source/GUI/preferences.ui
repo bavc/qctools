@@ -96,6 +96,13 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QCheckBox" name="Filters_Audio_aphasemeter">
+                <property name="text">
+                 <string>Audio Phase Meter (detect audio phase)</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
            </layout>

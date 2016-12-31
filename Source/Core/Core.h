@@ -23,6 +23,7 @@ enum activefilter
     ActiveFilter_Video_cropdetect,
     ActiveFilter_Video_Psnr,
     ActiveFilter_Audio_EbuR128,
+    ActiveFilter_Audio_aphasemeter,
     ActiveFilter_Audio_astats,
     ActiveFilter_Video_Ssim,
     ActiveFilter_Video_Idet,

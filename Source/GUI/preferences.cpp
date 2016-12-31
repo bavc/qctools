@@ -120,6 +120,7 @@ void Preferences::Load()
     ui->Filters_Video_Ssim->setChecked(ActiveFilters[ActiveFilter_Video_Ssim]);
     ui->Filters_Video_Idet->setChecked(ActiveFilters[ActiveFilter_Video_Idet]);
     ui->Filters_Audio_EbuR128->setChecked(ActiveFilters[ActiveFilter_Audio_EbuR128]);
+    ui->Filters_Audio_aphasemeter->setChecked(ActiveFilters[ActiveFilter_Audio_aphasemeter]);
     ui->Filters_Audio_astats->setChecked(ActiveFilters[ActiveFilter_Audio_astats]);
 
     ui->Tracks_Video_First->setChecked(!ActiveAllTracks[Type_Video]);
@@ -157,6 +158,8 @@ void Preferences::OnAccepted()
         ActiveFilters.set(ActiveFilter_Video_Idet);
     if (ui->Filters_Audio_EbuR128->isChecked())
         ActiveFilters.set(ActiveFilter_Audio_EbuR128);
+    if (ui->Filters_Audio_aphasemeter->isChecked())
+        ActiveFilters.set(ActiveFilter_Audio_aphasemeter);
     if (ui->Filters_Audio_astats->isChecked())
         ActiveFilters.set(ActiveFilter_Audio_astats);
 

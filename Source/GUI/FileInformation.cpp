@@ -173,6 +173,8 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
         Filters[0].erase(0, 1); // remove first comma
         if (ActiveFilters[ActiveFilter_Audio_astats])
             Filters[1]+=",astats=metadata=1:reset=1:length=0.4";
+        if (ActiveFilters[ActiveFilter_Audio_aphasemeter])
+            Filters[1]+=",aphasemeter=video=0";
         if (ActiveFilters[ActiveFilter_Audio_EbuR128])
             Filters[1]+=",ebur128=metadata=1";
         Filters[1].erase(0, 1); // remove first comma

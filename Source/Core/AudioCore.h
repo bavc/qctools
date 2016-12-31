@@ -22,6 +22,7 @@ enum AudioItem
     //Item_LRAL,
     //Item_LRA,
     //Item_LRAH,
+    Item_aphasemeter,
     //astats
     Item_DC_offset,
     Item_Min_level,
@@ -39,6 +40,7 @@ enum AudioItem
 enum AudioGroup
 {
     Group_R128,
+    Group_aphasemeter,
     Group_astats_levels,
     Group_adif,
     Group_astats_RMS,
