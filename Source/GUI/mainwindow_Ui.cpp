@@ -11,6 +11,7 @@
 #include "GUI/preferences.h"
 #include "GUI/Help.h"
 #include "GUI/Plots.h"
+#include "GUI/draggablechildrenbehaviour.h"
 #include "Core/Core.h"
 #include "Core/VideoCore.h"
 #include "Core/BlackmagicDeckLink_Glue.h"
@@ -38,6 +39,7 @@
 #include <QActionGroup>
 
 #include <qwt_plot_renderer.h>
+#include <QDebug>
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -82,6 +84,7 @@ void MainWindow::Ui_Init()
     ui->actionExport_XmlGz_Prompt->setIcon(QIcon(":/icon/export_xml.png"));
     ui->actionPrint->setIcon(QIcon(":/icon/document-print.png"));
     ui->actionZoomIn->setIcon(QIcon(":/icon/zoom-in.png"));
+    ui->actionZoomOne->setIcon(QIcon(":/icon/zoom-one.png"));
     ui->actionZoomOut->setIcon(QIcon(":/icon/zoom-out.png"));
     ui->actionFilesList->setIcon(QIcon(":/icon/multifile_layout.png"));
     ui->actionGraphsLayout->setIcon(QIcon(":/icon/graph_layout.png"));
@@ -115,6 +118,10 @@ void MainWindow::Ui_Init()
         for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ ) // Group_Axis
         {
             QCheckBox* CheckBox=new QCheckBox(PerStreamType[type].PerGroup[group].Name);
+
+            CheckBox->setProperty("type", (quint64) type); // unfortunately QVariant doesn't support size_t
+            CheckBox->setProperty("group", (quint64) group);
+
             CheckBox->setToolTip(PerStreamType[type].PerGroup[group].Description);
             CheckBox->setCheckable(true);
             CheckBox->setChecked(PerStreamType[type].PerGroup[group].CheckedByDefault);
@@ -125,6 +132,8 @@ void MainWindow::Ui_Init()
             CheckBoxes[type].push_back(CheckBox);
         }
 
+    qDebug() << "checkboxes in layout: " << ui->horizontalLayout->count();
+
     configureZoom();
 
     //Groups
@@ -132,6 +141,10 @@ void MainWindow::Ui_Init()
     alignmentGroup->addAction(ui->actionFilesList);
     alignmentGroup->addAction(ui->actionGraphsLayout);
     alignmentGroup->addAction(ui->actionFiltersLayout);
+
+    QActionGroup* playModesGroup = new QActionGroup(this);
+    playModesGroup->addAction(ui->actionPlay_All_Frames);
+    playModesGroup->addAction(ui->actionPlay_at_Frame_Rate);
 
     createDragDrop();
     ui->actionFilesList->setChecked(false);
@@ -141,7 +154,6 @@ void MainWindow::Ui_Init()
     Prefs=new Preferences(this);
 
     //Temp
-    ui->actionFiltersLayout->setVisible(false);
     ui->actionWindowOut->setVisible(false);
     ui->actionPrint->setVisible(false);
 
@@ -173,10 +185,16 @@ void MainWindow::configureZoom()
     if (Files.empty() || PlotsArea==NULL || !PlotsArea->isZoomed() )
     {
         ui->actionZoomOut->setEnabled(false);
+        ui->actionZoomOne->setEnabled(false);
         if (Files_CurrentPos<Files.size() && isPlotZoomable())
+        {
             ui->actionZoomIn->setEnabled(true);
+            ui->actionZoomOne->setEnabled(true);
+        }
         else
+        {
             ui->actionZoomIn->setEnabled(false);
+        }
 
         ui->actionGoTo->setEnabled(!Files.empty());
         ui->actionExport_XmlGz_Prompt->setEnabled(!Files.empty());
@@ -187,6 +205,7 @@ void MainWindow::configureZoom()
         return;
     }
 
+    ui->actionZoomOne->setEnabled(true);
     ui->actionZoomOut->setEnabled(true);
     ui->actionZoomIn->setEnabled( isPlotZoomable() );
     ui->actionGoTo->setEnabled(true);
@@ -219,8 +238,39 @@ void MainWindow::Zoom_Out()
 
 void MainWindow::Zoom( bool on )
 {
-    PlotsArea->zoomXAxis( on );
+    PlotsArea->zoomXAxis( on ? Plots::ZoomIn : Plots::ZoomOut );
     configureZoom();
+}
+
+void MainWindow::changeFilterSelectorsOrder(QList<std::tuple<int, int> > filtersInfo)
+{
+    QSignalBlocker blocker(draggableBehaviour);
+
+    auto boxlayout = static_cast<QHBoxLayout*> (ui->horizontalLayout);
+
+    QList<QLayoutItem*> items;
+
+    for(std::tuple<int, int> groupAndType : filtersInfo)
+    {
+        int group = std::get<0>(groupAndType);
+        int type = std::get<1>(groupAndType);
+
+        auto rowsCount = boxlayout->count();
+        for(auto row = 0; row < rowsCount; ++row)
+        {
+            auto checkboxItem = boxlayout->itemAt(row);
+            if(checkboxItem->widget()->property("group") == group && checkboxItem->widget()->property("type") == type)
+            {
+                items.append(boxlayout->takeAt(row));
+                break;
+            }
+        }
+    };
+
+    for(auto item : items)
+    {
+        boxlayout->addItem(item);
+    }
 }
 
 void MainWindow::updateScrollBar( bool blockSignals )

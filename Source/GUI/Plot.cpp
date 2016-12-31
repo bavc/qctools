@@ -8,6 +8,7 @@
 
 #include "GUI/Plot.h"
 #include "GUI/PlotLegend.h"
+#include "GUI/FileInformation.h"
 #include <qwt_plot_grid.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_picker.h>
@@ -54,11 +55,12 @@ static int indexLower( double x, const QwtSeriesData<QPointF> &data )
 class PlotPicker: public QwtPlotPicker
 {
 public:
-    PlotPicker( QWidget *canvas , const struct stream_info* streamInfo, const size_t group, const QVector<QwtPlotCurve*>* curves):
+    PlotPicker( QWidget *canvas , const struct stream_info* streamInfo, const size_t group, const QVector<QwtPlotCurve*>* curves, const FileInformation* fileInformation):
         m_streamInfo( streamInfo ),
         m_group( group ),
         m_curves( curves ),
-        QwtPlotPicker( canvas )
+        QwtPlotPicker( canvas ),
+        m_fileInformation(fileInformation)
     {
         setAxis( QwtPlot::xBottom, QwtPlot::yLeft );
         setRubberBand( QwtPlotPicker::CrossRubberBand );
@@ -92,16 +94,19 @@ public:
 protected:
     virtual QString infoText( int index ) const
     {
-        QString info( "Frame " );
-        info += QString::number(index);
+        QString info = QString( "Frame %1 [%2]" ).arg(index).arg(m_fileInformation ? m_fileInformation->Frame_Type_Get(-1, index) : "");
         for( unsigned i = 0; i < m_streamInfo->PerGroup[m_group].Count; ++i )
-       {
+        {
             const per_item &itemInfo = m_streamInfo->PerItem[m_streamInfo->PerGroup[m_group].Start + i];
-        
+
             info += i?", ":": ";
             info += itemInfo.Name;
             info += "=";
-            info += QString::number( (*m_curves)[i]->sample(index).ry(), 'f',  itemInfo.DigitsAfterComma);
+
+            if ((*m_curves)[i]->dataSize() != 0)
+                info += QString::number((*m_curves)[i]->sample(index).ry(), 'f', itemInfo.DigitsAfterComma);
+            else
+                info += QString("n/a");
         }
 
         return info;
@@ -110,6 +115,7 @@ protected:
     const struct stream_info*       m_streamInfo; 
     const size_t                    m_group;
     const QVector<QwtPlotCurve*>*   m_curves;
+    const FileInformation*          m_fileInformation;
 };
 
 class PlotCursor: public QwtWidgetOverlay
@@ -229,11 +235,40 @@ void Plot_AddHLine(QwtPlot* plot, double value , double r , double g, double b)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Plot::Plot( size_t streamPos, size_t Type, size_t Group, QWidget *parent ) :
+void Plot::addGuidelines(int bitsPerRawSample)
+{
+    int defaultBitsPerRawSample = 8;
+    if(bitsPerRawSample == 0)
+        bitsPerRawSample = defaultBitsPerRawSample;
+
+    int multiplier = pow(2, (bitsPerRawSample - defaultBitsPerRawSample));
+
+    if ( m_type == Type_Video )
+    switch (m_group)
+    {
+        case Group_Y :
+                        Plot_AddHLine( this,  16 * multiplier,  61,  89, 171);
+                        Plot_AddHLine( this, 235 * multiplier, 220,  20,  60);
+                        break;
+        case Group_U :
+        case Group_V :
+                        Plot_AddHLine( this,  16 * multiplier,  61,  89, 171);
+                        Plot_AddHLine( this, 240 * multiplier, 220,  20,  60);
+                        break;
+        case Group_Sat :
+                        Plot_AddHLine( this,  88 * multiplier, 255,   0, 255);
+                        Plot_AddHLine( this, 118 * multiplier, 220,  20,  60);
+                        break;
+        default      :  ;
+    }
+}
+
+Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* fileInformation, QWidget *parent ) :
     QwtPlot( parent ),
     m_streamPos( streamPos ),
     m_type( Type ),
-    m_group( Group )
+    m_group( Group ),
+    m_fileInformation( fileInformation )
 {
     setAutoReplot( false );
 
@@ -273,8 +308,16 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, QWidget *parent ) :
     for( unsigned j = 0; j < PerStreamType[m_type].PerGroup[m_group].Count; ++j )
     {
         QwtPlotCurve* curve = new QwtPlotCurve( PerStreamType[m_type].PerItem[PerStreamType[m_type].PerGroup[m_group].Start + j].Name );
-
-        curve->setPen( curveColor( j ) );
+        switch (m_group)
+        {
+            case Group_IDET_S :
+            case Group_IDET_M :
+            case Group_IDET_R :
+                curve->setPen( curveColor( j ), 2 );
+                break;
+            default :
+                curve->setPen( curveColor( j ) );
+        }
         curve->setRenderHint( QwtPlotItem::RenderAntialiased );
         curve->setZ( curve->z() - j ); //Invert data order (e.g. MAX before MIN)
         curve->attach( this );
@@ -282,27 +325,7 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, QWidget *parent ) :
         m_curves += curve;
     }
 
-    // visual helpers
-    if ( m_type == Type_Video )
-    switch (m_group)
-    {
-        case Group_Y :
-                        Plot_AddHLine( this,  16,  61,  89, 171);
-                        Plot_AddHLine( this, 235, 220,  20,  60);
-                        break;
-        case Group_U :
-        case Group_V :
-                        Plot_AddHLine( this,  16,  61,  89, 171);
-                        Plot_AddHLine( this, 240, 220,  20,  60);
-                        break;
-        case Group_Sat :
-                        Plot_AddHLine( this,  88, 255,   0, 255);
-                        Plot_AddHLine( this, 118, 220,  20,  60);
-                        break;
-        default      :  ;  
-    }
-
-    PlotPicker* picker = new PlotPicker( canvas, &PerStreamType[m_type], m_group, &m_curves );
+    PlotPicker* picker = new PlotPicker( canvas, &PerStreamType[m_type], m_group, &m_curves, fileInformation );
     connect( picker, SIGNAL( moved( const QPointF& ) ), SLOT( onPickerMoved( const QPointF& ) ) );
     connect( picker, SIGNAL( selected( const QPointF& ) ), SLOT( onPickerMoved( const QPointF& ) ) );
 
@@ -396,12 +419,62 @@ QColor Plot::curveColor( int index ) const
         }
         case 3 :
         {
-            switch ( index )
+            switch ( m_group )
             {
-                case 0: c = Qt::darkRed; break;
-                case 1: c = Qt::darkBlue; break;
-                case 2: c = Qt::darkGreen; break;
-                default: c = Qt::black;
+                case Group_IDET_R:
+                {
+                    switch ( index )
+                    {
+                        case 0: c = Qt::red; break;
+                        case 1: c = Qt::blue; break;
+                        case 2: c = Qt::magenta; break;
+                        default: c = Qt::black;
+                    }
+                    break;
+                }
+                default:
+                {
+                    switch ( index )
+                    {
+                        case 0: c = Qt::darkRed; break;
+                        case 1: c = Qt::darkBlue; break;
+                        case 2: c = Qt::darkGreen; break;
+                        default: c = Qt::black;
+                    }
+                    break;
+                }
+            }
+            break;
+        }
+        case 4 :
+        {
+            switch ( m_group )
+            {
+                case Group_IDET_S:
+                case Group_IDET_M:
+                {
+                    switch ( index )
+                    {
+                        case 0: c = Qt::red; break;
+                        case 1: c = Qt::blue; break;
+                        case 2: c = Qt::darkGreen; break;
+                        case 3: c = Qt::magenta; break;
+                        default: c = Qt::black;
+                    }
+                    break;
+                }
+                default:
+                {
+                    switch ( index )
+                    {
+                        case 0: c = Qt::darkRed; break;
+                        case 1: c = Qt::darkBlue; break;
+                        case 2: c = Qt::darkGreen; break;
+                        case 3: c = Qt::black; break;
+                        default: c = Qt::black;
+                    }
+                    break;
+                }
             }
             break;
         }

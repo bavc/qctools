@@ -68,6 +68,28 @@ enum VideoItem
     Item_PSNR_v,
     Item_PSNR_u,
     Item_PSNR_y,
+    //SSIMf
+    Item_SSIM_Y,
+    Item_SSIM_U,
+    Item_SSIM_V,
+    Item_SSIM_All,
+    //idet.single
+    Item_IDET_S_BFF,
+    Item_IDET_S_TFF,
+    Item_IDET_S_PROG,
+    Item_IDET_S_UND,
+    //idet.multiple
+    Item_IDET_M_BFF,
+    Item_IDET_M_TFF,
+    Item_IDET_M_PROG,
+    Item_IDET_M_UND,
+    //idet.repeat
+    Item_IDET_R_B,
+    Item_IDET_R_T,
+    Item_IDET_R_N,
+    //pkt_duration_time & pkt_size
+    Item_pkt_duration_time,
+    Item_pkt_size,
     //Internal
     Item_VideoMax
 };
@@ -93,10 +115,16 @@ enum VideoGroup
     Group_CropF,
     Group_MSE,
     Group_PSNR,
+    Group_SSIM,
+    Group_IDET_S,
+    Group_IDET_M,
+    Group_IDET_R,
+    Group_pkt_duration_time,
+    Group_pkt_size,
     Group_VideoMax
 };
 
-extern const struct per_group  VideoPerGroup    [Group_VideoMax];
+extern struct per_group  VideoPerGroup    [Group_VideoMax];
 extern const struct per_item   VideoPerItem     [Item_VideoMax];
 
 #endif // Core_H

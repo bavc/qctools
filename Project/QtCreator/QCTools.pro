@@ -1,13 +1,55 @@
-QWT_ROOT = $${PWD}/../../../qwt
-
 QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 TARGET = QCTools
 TEMPLATE = app
 
-CONFIG += qt release
-CONFIG += no_keywords
+CONFIG += c++11 qt no_keywords
+
+USE_BREW = $$(QCTOOLS_USE_BREW)
+
+QCTOOLS_USE_BREW_NOT_EMPTY = false
+
+!isEmpty(USE_BREW) {
+    message("USE_BREW not empty")
+    QCTOOLS_USE_BREW_NOT_EMPTY = true
+}
+
+QCTOOLS_USE_BREW_EQUALS_TRUE = false
+
+equals(USE_BREW, true) {
+    message("USE_BREW equals true")
+    QCTOOLS_USE_BREW_EQUALS_TRUE = true
+}
+
+message("QCTOOLS_USE_BREW_NOT_EMPTY = " $$QCTOOLS_USE_BREW_NOT_EMPTY )
+message("QCTOOLS_USE_BREW_EQUALS_TRUE = " $$QCTOOLS_USE_BREW_EQUALS_TRUE )
+
+!isEmpty(USE_BREW):equals(USE_BREW, true) {
+    message("DEFINES += USE_BREW")
+    DEFINES += USE_BREW
+}
+
+macx:contains(DEFINES, USE_BREW) {
+
+    message("use brew")
+    CONFIG += qwt release
+
+    QMAKE_TARGET_BUNDLE_PREFIX = org.bavc
+    QT_CONFIG -= no-pkg-config
+
+    include ( $$system(brew --prefix qwt-qt5)/features/qwt.prf )
+
+    PKGCONFIG += libavdevice libavcodec libavfilter libavformat libpostproc
+    PKGCONFIG += libswresample libswscale libavcodec libavutil
+
+    CONFIG += link_pkgconfig
+
+} else {
+    CONFIG += debug_and_release
+}
+
+QMAKE_CXXFLAGS += -DBLACKMAGICDECKLINK_NO -DWITH_SYSTEM_FFMPEG=1
 
 HEADERS = \
     ../../Source/Core/AudioCore.h \
@@ -34,7 +76,11 @@ HEADERS = \
     ../../Source/GUI/PlotLegend.h \
     ../../Source/GUI/PlotScaleWidget.h \
     ../../Source/GUI/TinyDisplay.h \
-    ../../Source/ThirdParty/tinyxml2/tinyxml2.h
+    ../../Source/GUI/SelectionArea.h \
+    ../../Source/ThirdParty/tinyxml2/tinyxml2.h \
+    ../../Source/GUI/Imagelabel.h \
+    ../../Source/GUI/config.h \
+    ../../Source/GUI/draggablechildrenbehaviour.h
 
 SOURCES = \
     ../../Source/Core/AudioCore.cpp \
@@ -65,44 +111,99 @@ SOURCES = \
     ../../Source/GUI/PlotScaleWidget.cpp \
     ../../Source/GUI/preferences.cpp \
     ../../Source/GUI/TinyDisplay.cpp \
-    ../../Source/ThirdParty/tinyxml2/tinyxml2.cpp
+    ../../Source/GUI/SelectionArea.cpp \
+    ../../Source/ThirdParty/tinyxml2/tinyxml2.cpp \
+    ../../Source/GUI/Imagelabel.cpp \
+    ../../Source/GUI/config.cpp \
+    ../../Source/GUI/draggablechildrenbehaviour.cpp
 
-!macx:SOURCES += "../../../Blackmagic DeckLink SDK/Linux/include/DeckLinkAPIDispatch.cpp"
-macx:SOURCES += "../../../Blackmagic DeckLink SDK/Mac/include/DeckLinkAPIDispatch.cpp"
+linux:SOURCES += "../../../Blackmagic DeckLink SDK/Linux/include/DeckLinkAPIDispatch.cpp"
+macx:!contains(DEFINES, USE_BREW) SOURCES += "../../../Blackmagic DeckLink SDK/Mac/include/DeckLinkAPIDispatch.cpp"
+
+win32 {
+    INCLUDEPATH += $$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib
+}
 
 FORMS += \
     ../../Source/GUI/mainwindow.ui \
     ../../Source/GUI/preferences.ui \
-    ../../Source/GUI/blackmagicdecklink_userinput.ui
+    ../../Source/GUI/blackmagicdecklink_userinput.ui \
+    ../../Source/GUI/imagelabel.ui
 
 RESOURCES += \
     ../../Source/Resource/Resources.qrc
 
-include( $${QWT_ROOT}/qwtconfig.pri )
-include( $${QWT_ROOT}/qwtbuild.pri )
-include( $${QWT_ROOT}/qwtfunctions.pri )
+macx:contains(DEFINES, USE_BREW) {
+    message("use qwt from brew")
+} else {
+    QWT_ROOT = $${PWD}/../../../qwt
 
+    include( $${QWT_ROOT}/qwtconfig.pri )
+    !win32 {
+        include( $${QWT_ROOT}/qwtbuild.pri )
+    }
+    include( $${QWT_ROOT}/qwtfunctions.pri )
+
+    !win32 {
+            LIBS      += -L$${QWT_ROOT}/lib -lqwt
+    }
+
+    win32 {
+        CONFIG(debug, debug|release) {
+            LIBS += -L$${QWT_ROOT}/lib -lqwtd
+        } else:CONFIG(release, debug|release) {
+            LIBS += -L$${QWT_ROOT}/lib -lqwt
+        }
+    }
+
+    INCLUDEPATH += $$QWT_ROOT/src
+}
 INCLUDEPATH += $$PWD/../../Source
 INCLUDEPATH += $$PWD/../../Source/ThirdParty/tinyxml2
-INCLUDEPATH += $$QWT_ROOT/src
-INCLUDEPATH += $$PWD/../../../ffmpeg
-INCLUDEPATH += "$$PWD/../../../Blackmagic DeckLink SDK"
 
-LIBS      += -L$${QWT_ROOT}/lib -lqwt -l lzma
-LIBS      += -lz
-LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
-             -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
-             -L$${PWD}/../../../ffmpeg/libavfilter -lavfilter \
-             -L$${PWD}/../../../ffmpeg/libavformat -lavformat \
-             -L$${PWD}/../../../ffmpeg/libpostproc -lpostproc \
-             -L$${PWD}/../../../ffmpeg/libswresample -lswresample \
-             -L$${PWD}/../../../ffmpeg/libswscale -lswscale \
-             -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
-             -L$${PWD}/../../../ffmpeg/libavutil -lavutil
-LIBS      += -lbz2
+macx:contains(DEFINES, USE_BREW) {
+    message("use ffmpeg from brew")
+} else {
+    INCLUDEPATH += $$PWD/../../../ffmpeg
 
-!macx:LIBS      += -ldl -lrt
+    LIBS      += -L$${PWD}/../../../ffmpeg/libavdevice -lavdevice \
+                 -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
+                 -L$${PWD}/../../../ffmpeg/libavfilter -lavfilter \
+                 -L$${PWD}/../../../ffmpeg/libavformat -lavformat \
+                 -L$${PWD}/../../../ffmpeg/libpostproc -lpostproc \
+                 -L$${PWD}/../../../ffmpeg/libswresample -lswresample \
+                 -L$${PWD}/../../../ffmpeg/libswscale -lswscale \
+                 -L$${PWD}/../../../ffmpeg/libavcodec -lavcodec \
+                 -L$${PWD}/../../../ffmpeg/libavutil -lavutil
+}
+
+macx:contains(DEFINES, USE_BREW) {
+    message("don't use Blackmagic DeckLink SDK for brew build")
+} else {
+    INCLUDEPATH += "$$PWD/../../../Blackmagic DeckLink SDK"
+}
+
+!win32 {
+    LIBS += -lz
+}
+
+!win32 {
+    LIBS      += -lbz2
+}
+
+linux {
+    LIBS      += -ldl -lrt
+}
 
 macx:ICON = ../../Source/Resource/Logo.icns
-macx:QMAKE_LFLAGS += -framework CoreFoundation -framework CoreVideo -framework VideoDecodeAcceleration
-macx:LIBS += -liconv
+macx:LIBS += -liconv \
+	     -framework CoreFoundation \
+             -framework Foundation \
+             -framework AppKit \
+             -framework AudioToolBox \
+             -framework CoreImage \
+             -framework CoreGraphics \
+             -framework CoreAudio \
+             -framework CoreVideo \
+             -framework VideoDecodeAcceleration
+

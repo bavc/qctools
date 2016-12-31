@@ -28,11 +28,31 @@
 #include <QCheckBox>
 #include <QTimer>
 
+#include "GUI/draggablechildrenbehaviour.h"
+
 //***************************************************************************
 // Constructor / Desructor
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+QList<std::tuple<int, int>> MainWindow::getFilterSelectorsOrder(int start = 0, int end = -1)
+{
+    QList<std::tuple<int, int>> filtersInfo;
+    if(end == -1)
+        end = ui->horizontalLayout->count() - 1;
+
+    for(int i = start; i <= end; ++i)
+    {
+        auto o = ui->horizontalLayout->itemAt(i)->widget();
+        auto group = o->property("group").toInt();
+        auto type = o->property("type").toInt();
+
+        filtersInfo.push_back(std::make_tuple(group, type));
+    }
+
+    return filtersInfo;
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     Thumbnails_Modulo(1),
@@ -65,11 +85,36 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Deck
     DeckRunning=false;
+
+    draggableBehaviour = new DraggableChildrenBehaviour(ui->horizontalLayout);
+    connect(draggableBehaviour, &DraggableChildrenBehaviour::childPositionChanged, [&](QWidget* child, int oldPos, int newPos) {
+
+        Q_UNUSED(child);
+
+        int start = oldPos;
+        int end = newPos;
+
+        if(oldPos > newPos)
+        {
+            start = newPos;
+            end = oldPos;
+        }
+
+        QList<std::tuple<int, int>> filtersSelectors = getFilterSelectorsOrder();
+
+        if(PlotsArea)
+            PlotsArea->changeOrder(filtersSelectors);
+    });
 }
 
 //---------------------------------------------------------------------------
 MainWindow::~MainWindow()
 {
+    Prefs->saveFilterSelectorsOrder(getFilterSelectorsOrder());
+
+    // Controls
+    delete ControlArea;
+
     // Files (must be deleted first in order to stop ffmpeg processes)
     for (size_t Pos=0; Pos<Files.size(); Pos++)
         delete Files[Pos];
@@ -79,9 +124,6 @@ MainWindow::~MainWindow()
 
     // Pictures
     delete TinyDisplayArea;
-
-    // Controls
-    delete ControlArea;
 
     // Info
     delete InfoArea;
@@ -136,6 +178,15 @@ void MainWindow::on_horizontalScrollBar_valueChanged(int value)
 void MainWindow::on_actionZoomIn_triggered()
 {
     Zoom_In();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionZoomOne_triggered()
+{
+    PlotsArea->zoomXAxis( Plots::ZoomOneToOne );
+    configureZoom();
+
+    updateScrollBar();
 }
 
 //---------------------------------------------------------------------------
@@ -267,6 +318,8 @@ void MainWindow::on_actionFilesList_triggered()
         ui->actionPrint->setVisible(false);
     if (ui->actionZoomIn)
         ui->actionZoomIn->setVisible(false);
+    if (ui->actionZoomOne)
+        ui->actionZoomOne->setVisible(false);
     if (ui->actionZoomOut)
         ui->actionZoomOut->setVisible(false);
     if (ui->actionWindowOut)
@@ -307,6 +360,8 @@ void MainWindow::on_actionGraphsLayout_triggered()
     //    ui->actionPrint->setVisible(true);
     if (ui->actionZoomIn)
         ui->actionZoomIn->setVisible(true);
+    if (ui->actionZoomOne)
+        ui->actionZoomOne->setVisible(true);
     if (ui->actionZoomOut)
         ui->actionZoomOut->setVisible(true);
     if (ui->actionWindowOut)
@@ -341,6 +396,8 @@ void MainWindow::on_actionPreferences_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionFiltersLayout_triggered()
 {
+    if (TinyDisplayArea)
+        TinyDisplayArea->LoadBigDisplay();
 }
 
 //---------------------------------------------------------------------------
@@ -480,3 +537,14 @@ void MainWindow::dropEvent(QDropEvent *Event)
     addFile_finish();
 }
 
+void MainWindow::on_actionPlay_at_Frame_Rate_triggered()
+{
+    if(ControlArea)
+        ControlArea->setPlayAllFrames(false);
+}
+
+void MainWindow::on_actionPlay_All_Frames_triggered()
+{
+    if(ControlArea)
+        ControlArea->setPlayAllFrames(true);
+}

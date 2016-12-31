@@ -18,8 +18,11 @@
 
 #include "Core/Core.h"
 #include "GUI/Plots.h"
+#include "GUI/draggablechildrenbehaviour.h"
 #include "GUI/blackmagicdecklink_userinput.h"
 #include "GUI/preferences.h"
+#include "GUI/BigDisplay.h"
+
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -34,12 +37,15 @@
 //---------------------------------------------------------------------------
 void MainWindow::openFile()
 {
-    clearFiles();
-    addFile("");
-    addFile_finish();
-    return;
-    
-    QStringList List=QFileDialog::getOpenFileNames(this, "Open file", "", "Video files (*.avi *.mkv *.mov *.mxf *.mp4);;Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
+    QFileDialog::Option options = QFileDialog::Option(0);
+
+#ifdef _WIN32
+    // for Windows use the Qt builtin dialog which displays files,
+    // other platforms should use the native dialog.
+    options = QFileDialog::DontUseNativeDialog;
+#endif
+
+    QStringList List=QFileDialog::getOpenFileNames(this, "Open file", "", "Video files (*.avi *.mkv *.mov *.mxf *.mp4);;Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml);;All (*.*)", 0, options);
     if (List.empty())
         return;
 
@@ -170,6 +176,9 @@ void MainWindow::processFile(const QString &FileName)
 //---------------------------------------------------------------------------
 void MainWindow::clearFiles()
 {
+    if (ControlArea)
+        ControlArea->stop();
+
     // Files (must be deleted first in order to stop ffmpeg processes)
     for (size_t Pos=0; Pos<Files.size(); Pos++)
         delete Files[Pos];
@@ -281,6 +290,8 @@ void MainWindow::clearGraphsLayout()
         ui->verticalLayout->removeWidget(InfoArea);
         delete InfoArea; InfoArea=NULL;
     }
+
+    configureZoom();
 }
 
 //---------------------------------------------------------------------------
@@ -312,9 +323,17 @@ void MainWindow::createGraphsLayout()
         ui->fileNamesBox->show();
 
     PlotsArea=Files[Files_CurrentPos]->Stats.empty()?NULL:new Plots(this, Files[Files_CurrentPos]);
-    if (!ui->actionGraphsLayout->isChecked())
-        PlotsArea->hide();
-    ui->verticalLayout->addWidget(PlotsArea);
+
+    auto filtersInfo = Prefs->loadFilterSelectorsOrder();
+    changeFilterSelectorsOrder(filtersInfo);
+    if (PlotsArea)
+    {
+        PlotsArea->changeOrder(filtersInfo);
+        if (!ui->actionGraphsLayout->isChecked())
+            PlotsArea->hide();
+
+        ui->verticalLayout->addWidget(PlotsArea);
+    }
 
     TinyDisplayArea=new TinyDisplay(this, Files[Files_CurrentPos]);
     if (!ui->actionGraphsLayout->isChecked())
@@ -322,6 +341,8 @@ void MainWindow::createGraphsLayout()
     ui->verticalLayout->addWidget(TinyDisplayArea);
 
     ControlArea=new Control(this, Files[Files_CurrentPos], Control::Style_Cols);
+    ControlArea->setPlayAllFrames(ui->actionPlay_All_Frames->isChecked());
+
     connect( ControlArea, SIGNAL( currentFrameChanged() ), 
         this, SLOT( on_CurrentFrameChanged() ) );
 
@@ -405,10 +426,15 @@ void MainWindow::selectDisplayFiltersFile(int NewFilePos)
 //---------------------------------------------------------------------------
 void MainWindow::Update()
 {
-    if (TinyDisplayArea)
-        TinyDisplayArea->Update();
-    if (ControlArea)
-        ControlArea->Update();
-    if (InfoArea)
-        InfoArea->Update();
+	if (TinyDisplayArea)
+        TinyDisplayArea->Update(false);
+
+    if(TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
+        TinyDisplayArea->BigDisplayArea->ShowPicture();
+
+	if(ControlArea)
+		ControlArea->Update();
+
+	if(InfoArea)
+		InfoArea->Update();
 }

@@ -4,13 +4,12 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
-//---------------------------------------------------------------------------
 #ifndef GUI_TinyDisplay_H
 #define GUI_TinyDisplay_H
-//---------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------
 #include <QWidget>
+#include <QVector>
+#include <QResizeEvent>
 
 class FileInformation;
 class Control;
@@ -18,11 +17,7 @@ class BigDisplay;
 
 class QLabel;
 class QToolButton;
-//---------------------------------------------------------------------------
-
-//***************************************************************************
-// Class
-//***************************************************************************
+class QHBoxLayout;
 
 class TinyDisplay : public QWidget
 {
@@ -33,29 +28,44 @@ public:
     ~TinyDisplay();
 
     // To update
-    Control*                    ControlArea;
-    BigDisplay*                 BigDisplayArea;
+    Control                    *ControlArea;
+    BigDisplay                 *BigDisplayArea;
 
     // Commands
-    void                        Update                      ();
-    void                        Filters_Show                (); //Quick hack for showing filters
+    void                        Filters_Show(); //Quick hack for showing filters
+    void                        LoadBigDisplay();
 
-    // Info
-    bool                        ShouldUpate;
+public Q_SLOTS:
+    void                        Update(bool updateBigDisplay = true);
+
+private:
+    static const int            TOTAL_THUMBS = 9;
+    static const int            THUMB_WIDTH = 84;
+    static const int            THUMB_HEIGHT = 84;
+
+    QPixmap                     emptyPixmap;
+    QPixmap                     scaledLogo;
+
+    int                         lastWidth;
+
+    QHBoxLayout*                Layout;
 
 protected:
-    // File information
     FileInformation*            FileInfoData;
-    int                         Frames_Pos;
-    int                         Labels_MustUpdateFrom;
-    int                         Labels_MustUpdateTo;
 
-    // Widgets
-    QToolButton*                Labels[9];
-    QPixmap                     Labels_Temp[9];
+    bool                        needsUpdate;
+    unsigned long               lastFramePos;
+
+    QVector<QToolButton*>       thumbnails;
+
+    virtual void                resizeEvent(QResizeEvent *);
+
+Q_SIGNALS:
+    void                        resized();
 
 private Q_SLOTS:
-    void on_Labels_Middle_clicked(bool checked);
+    void                        thumbsLayoutResized();
+    void                        on_thumbnails_clicked(bool checked);
 };
 
-#endif // GUI_TinyDisplay_H
+#endif

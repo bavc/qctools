@@ -1,6 +1,8 @@
 qctools
 =======
 
+[![Join the chat at https://gitter.im/bavc/qctools](https://badges.gitter.im/bavc/qctools.svg)](https://gitter.im/bavc/qctools?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 QCTools (Quality Control Tools for Video Preservation) is a free and open source software tool that helps users analyze and understand their digitized video files through use of audiovisual analytics and filtering. QCTools is funded by the National Endowment for the Humanities and the Knight Foundation, and developed by the Bay Area Video Coalition.
 
 Our (in progress) wiki is starting to develop [here](https://github.com/bavc/qctools/wiki).
@@ -9,13 +11,29 @@ general info
 =======
 QCTools allows archivists, curators, preservationists and other moving image professionals to identify, filter, and asssess all manner of video errors and anomalies. The tool is flexible, providing a variety of viewing options, as well the ability to create and export reports (gzip, or .gz files, formatted according to the ffprobe xml standard).
 
-For more information about the project, or to download the latest Mac/Winddows/Ubuntu release, please visit [BAVC's QCTools homepage](http://www.bavc.org/qctools)
+For more information about the project, or to download the latest Mac/Windows/Ubuntu release, please visit [BAVC's QCTools homepage](http://www.bavc.org/qctools)
 
 An overview of QCTools and how to use it can be found [here.] (http://htmlpreview.github.io/?https://github.com/bavc/qctools/blob/master/Source/Resource/Help/How%20To%20Use/How%20To%20Use.html)
 
 installation
 =======
 Go to http://bavc.org/qctools or [Releases](https://github.com/bavc/qctools/releases) and download QCTools for your operating system. Initiate the install by double-clicking the icon, and follow the steps. New releases of QCTools will be periodically available at the QCTools Project website.
+
+Of if you have homebrew, get the latest by running:
+```
+brew install --HEAD amiaopensource/amiaos/qctools
+brew linkapps qctools
+```
+
+Note that occasionally QCTools uses features from git-master of FFmpeg, thus you may need to update FFmpeg to git-master as well to try the newest pre-release QCTools features.
+
+```
+brew reinstall --HEAD ffmpeg
+brew install --HEAD amiaopensource/amiaos/qctools
+brew linkapps qctools
+```
+
+Or grab one of the [QCTools daily builds](https://mediaarea.net/download/snapshots/binary/qctools/) provided by MediaArea. These builds will reflect git-master and are not tied to any particular release.
 
 getting started
 =======

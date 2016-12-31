@@ -19,8 +19,9 @@
         <file alias="pause.png">pause.png</file>
         <file alias="backward.png">backward.png</file>
         <file alias="forward.png">forward.png</file>
+        <file>zoom-one.png</file>
     </qresource>
-    <qresource>
+    <qresource prefix="/">
         <file alias="Help/About.html">../../License.html</file>
         <file>Help/Getting Started/Getting Started.html</file>
         <file>Help/How To Use/How To Use.html</file>

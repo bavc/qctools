@@ -73,6 +73,13 @@ public:
         AxisTime
     };
 
+    enum ZoomTypes
+    {
+        ZoomIn,
+        ZoomOut,
+        ZoomOneToOne
+    };
+
     explicit                    Plots( QWidget *parent, FileInformation* );
     virtual                     ~Plots();
 
@@ -83,12 +90,14 @@ public:
     void                        Zoom_Move( int Begin );
     void                        refresh();
 
-    void                        zoomXAxis( bool up );
+    void                        zoomXAxis( ZoomTypes type );
     bool                        isZoomed() const;
     FrameInterval               visibleFrames() const;
     int                         numFrames() const { return stats()->x_Current_Max; }
 
     virtual bool                eventFilter( QObject *, QEvent * );
+    void                        adjustGroupMax(int group, int bitsPerRawSample);
+    void                        changeOrder(QList<std::tuple<int, int>> filterSelectorsInfo);
 
 public Q_SLOTS:
     void                        onCurrentFrameChanged();
@@ -119,10 +128,12 @@ private:
 private:
     PlotScaleWidget*            m_scaleWidget;
     Plot***                     m_plots; // pointer on an array of streams and groups per stream and Plot* per group
+    int                         m_plotsCount;
 
     FrameInterval               m_frameInterval;
     TimeInterval                m_timeInterval;
     int                         m_zoomFactor;
+    ZoomTypes                   m_zoomType;
 
     // X axis info
     int                         m_dataTypeIndex;

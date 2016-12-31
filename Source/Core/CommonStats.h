@@ -14,19 +14,24 @@
 using namespace std;
 
 struct AVFrame;
+struct AVStream;
 struct per_item;
 
 class CommonStats
 {
 public:
     // Constructor / Destructor
-    CommonStats(const struct per_item* PerItem, int Type, size_t CountOfGroups, size_t CountOfItems, size_t FrameCount=0, double Duration=0, double Frequency=0);
+    CommonStats(const struct per_item* PerItem, int Type, size_t CountOfGroups, size_t CountOfItems, size_t FrameCount=0, double Duration=0, AVStream* stream = NULL);
     virtual ~CommonStats();
 
     // Data
     double**                    x;                          // Time information, per frame (0=frame number, 1=seconds, 2=minutes, 3=hours)
     double**                    y;                          // Data (Group_xxxMax size)
     double*                     durations;                  // Duration of a frame, per frame
+    int64_t*					pkt_pos;                    // Frame offsets
+    int*                        pkt_size;                   // Frame size
+    int*                        pix_fmt;                    //
+    char*                       pict_type_char;             //
     bool*                       key_frames;                 // Key frame status, per frame
     size_t                      x_Current;                  // Data is filled up to
     size_t                      x_Current_Max;              // Data will be filled up to
@@ -45,14 +50,15 @@ public:
     string                      Count_Get(size_t Pos);
     string                      Count2_Get(size_t Pos);
     string                      Percent_Get(size_t Pos);
-    
+
     // External data
-    virtual void                StatsFromExternalData(const string &Data) = 0;
+    virtual void                StatsFromExternalData(const char* Data, size_t Size) = 0;
+            void                StatsFromExternalData_Finish() {Frequency=1; StatsFinish();}
     virtual void                StatsFromFrame(struct AVFrame* Frame, int Width, int Height) = 0;
     virtual void                TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos) = 0;
     virtual void                StatsFinish();
     virtual string              StatsToCSV() {return string();};
-    virtual string              StatsToXML(int Width, int Height) {return string();};
+    virtual string              StatsToXML(int, int) {return string();};
 
 protected:
     // Status
@@ -65,6 +71,7 @@ protected:
 
     // Info
     double                      Frequency;
+    int							streamIndex;
 
     // Memory management
     size_t                      Data_Reserved; // Count of frames reserved in memory;

@@ -4,162 +4,248 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
-//---------------------------------------------------------------------------
 #include "GUI/TinyDisplay.h"
-//---------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------
 #include "GUI/BigDisplay.h"
 #include "GUI/Control.h"
 #include "GUI/FileInformation.h"
 #include "Core/CommonStats.h"
-//---------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------
 #include <QBoxLayout>
 #include <QPushButton>
 #include <QToolButton>
 #include <QLabel>
 #include <QApplication>
 #include <QDesktopWidget>
-//---------------------------------------------------------------------------
+#include <QVector>
 
-//***************************************************************************
-// Constructor / Desructor
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-TinyDisplay::TinyDisplay(QWidget *parent, FileInformation* FileInformationData_):
-    QWidget(parent),
-    // File information
-    FileInfoData(FileInformationData_)
+TinyDisplay::TinyDisplay(QWidget *parent, FileInformation* FileInformationData_)
+    : QWidget(parent),
+      lastWidth(0),
+      FileInfoData(FileInformationData_)
 {
     // To update
-    ControlArea=NULL;
+    ControlArea = NULL;
 
-    // Positioning info
-    Frames_Pos=0;
-    Labels_MustUpdateFrom=(int)-1;
-    Labels_MustUpdateTo=(int)-1;
+    BigDisplayArea = NULL;
 
-    BigDisplayArea=NULL;
+    needsUpdate = true;
+    lastFramePos = 0;
 
-    //
-    QHBoxLayout* Layout=new QHBoxLayout();
+    emptyPixmap = QPixmap();
+
+    Layout = new QHBoxLayout();
     Layout->setSpacing(1);
     Layout->setMargin(1);
-    Layout->setContentsMargins(1,0,1,0);
-    for (size_t Pos=0; Pos<9; Pos++)
-    {
-        Labels[Pos] = new QToolButton(this);
-        connect(Labels[Pos], SIGNAL(clicked(bool)), this, SLOT(on_Labels_Middle_clicked(bool)));
-        Labels[Pos]->setIconSize(QSize(72, 72));
-        Labels[Pos]->setMinimumHeight(84);
-        Labels[Pos]->setMinimumWidth(84);
-        Labels[Pos]->setIcon(QPixmap(":/icon/logo.jpg").scaled(72, 72));
-        //Labels[Pos]->setStyleSheet("border: 5px;");
-        Layout->addWidget(Labels[Pos]);
-        if (Pos!=4)
-            Labels[Pos]->setStyleSheet("background-color: grey;");
-    }
+    Layout->setContentsMargins(1, 0, 1, 0);
+
+    scaledLogo = QPixmap(":/icon/logo.jpg").scaled(72, 72);
+    thumbnails = QVector<QToolButton*>();
+
     setLayout(Layout);
 
-    // Info
-    Frames_Pos=-1;
-    ShouldUpate=false;
-
-    // Disable PlayBackFilters if the source file is not available
-    if (!FileInfoData->PlayBackFilters_Available())
-    {
-        for (size_t Pos=0; Pos<9; Pos++)
-            Labels[Pos]->setEnabled(false);
-    }
+    connect(this, SIGNAL(resized()), this, SLOT(thumbsLayoutResized()));
 }
 
-//---------------------------------------------------------------------------
 TinyDisplay::~TinyDisplay()
 {
+    while (!thumbnails.empty()) {
+        QToolButton *t = thumbnails.takeLast();
+        delete t;
+    }
+
+    delete Layout;
+}
+
+void TinyDisplay::resizeEvent(QResizeEvent *e)
+{
+    QWidget::resizeEvent(e);
+    Q_EMIT resized();
+}
+
+void TinyDisplay::thumbsLayoutResized()
+{
+    const int width = QWidget::width();
+    const int THUMB_WANTED_WIDTH = 120;
+
+    if (lastWidth != width) {
+        int total_thumbs = width / THUMB_WANTED_WIDTH;
+        if (total_thumbs % 2 == 0) total_thumbs--;
+
+        if (total_thumbs > thumbnails.size()) {
+            int diff = total_thumbs - thumbnails.size();
+            for (int i = 0; i < diff; ++i) {
+                QToolButton *tool_button = new QToolButton(this);
+                tool_button->setIconSize(QSize(72, 72));
+                tool_button->setMinimumHeight(THUMB_HEIGHT);
+                tool_button->setMinimumWidth(THUMB_WIDTH);
+                tool_button->setIcon(scaledLogo);
+
+                connect(tool_button, SIGNAL(clicked(bool)),
+                        this, SLOT(on_thumbnails_clicked(bool)));
+
+                thumbnails.append(tool_button);
+
+                Layout->addWidget(tool_button);
+            }
+
+            needsUpdate = true;
+        }
+        else if (total_thumbs < thumbnails.size()) {
+            int diff = thumbnails.size() - total_thumbs;
+            for (int i = 0; i < diff; ++i) {
+                QToolButton *tool_button = thumbnails.takeLast();
+                disconnect(tool_button, 0, 0, 0);
+                Layout->removeWidget(tool_button);
+                delete tool_button;
+            }
+
+            needsUpdate = true;
+        }
+
+        if (needsUpdate) {
+            int middle = thumbnails.size() / 2;
+            for (int i = 0; i < thumbnails.size(); ++i) {
+                if (i == middle)
+                    thumbnails[i]->setStyleSheet("");
+                else
+                    thumbnails[i]->setStyleSheet("background-color: grey;");
+
+                if (!FileInfoData->PlayBackFilters_Available())
+                    thumbnails[i]->setEnabled(false);
+            }
+
+            Update();
+        }
+
+        lastWidth = width;
+    }
 }
 
 //***************************************************************************
 // Actions
 //***************************************************************************
 
-//---------------------------------------------------------------------------
-void TinyDisplay::Update()
+void TinyDisplay::Update(bool updateBigDisplay)
 {
-    for (; Labels_MustUpdateFrom<Labels_MustUpdateTo; Labels_MustUpdateFrom++)
+    if (!FileInfoData->ReferenceStat())
+        return;
+
+    if(thread() != QThread::currentThread())
     {
-        if (Frames_Pos-4+Labels_MustUpdateFrom>=FileInfoData->ReferenceStat()->x_Current)
-            break;
-        Labels[Labels_MustUpdateFrom]->setIcon(FileInfoData->Picture_Get(Frames_Pos-4+Labels_MustUpdateFrom)->copy(0, 0, 72, 72));
+        // qDebug() << "TinyDisplay::Update: called from non-UI thread";
+        QMetaObject::invokeMethod(this, "Update", Q_ARG(bool, updateBigDisplay));
+        return;
     }
 
-    if (Frames_Pos!=FileInfoData->Frames_Pos_Get())
-    {
-        Frames_Pos=FileInfoData->Frames_Pos_Get();
+    Q_ASSERT(QThread::currentThread() == thread());
 
-        if (Frames_Pos>=FileInfoData->ReferenceStat()->x_Current_Max)
-            Frames_Pos=FileInfoData->ReferenceStat()->x_Current_Max-1;
+    // start upto stop are the current movie frames that need to made into thumbs
+    unsigned long currentFrame = FileInfoData->Frames_Pos_Get();
 
-        Labels_MustUpdateFrom=(int)-1;
-        Labels_MustUpdateTo=(int)-1;
-        for (size_t Pos=0; Pos<9; Pos++)
-        {
-            if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->ReferenceStat()->x_Current)
-                Labels[Pos]->setIcon(FileInfoData->Picture_Get(Frames_Pos-4+Pos)->copy(0, 0, 72, 72));
-            else if (Frames_Pos+Pos>=4 && Frames_Pos-4+Pos<FileInfoData->ReferenceStat()->x_Current_Max)
-            {
-                Labels[Pos]->setIcon(QPixmap());
-                if (Labels_MustUpdateFrom==(int)-1)
-                    Labels_MustUpdateFrom=Pos;
-                Labels_MustUpdateTo=Pos+1;
+    // current frame positions in the movie
+    unsigned long current = FileInfoData->ReferenceStat()->x_Current;
+    unsigned long current_max = FileInfoData->ReferenceStat()->x_Current_Max;
+
+    // do we need to update thumbnails?
+    if (needsUpdate || lastFramePos != currentFrame) {
+        unsigned long framePos = currentFrame;
+
+        // NOTE: current frame should never be bigger the current max!
+        if (framePos >= current_max)
+            framePos = current_max - 1;
+
+        unsigned long total_thumbs = thumbnails.size();
+        unsigned int center = total_thumbs / 2;
+
+        if (needsUpdate || framePos > lastFramePos) {
+            // movie is moving forward
+            unsigned long diff = framePos - lastFramePos;
+            for (unsigned i = 0; i < total_thumbs; ++i) {
+                if (framePos + i >= center && framePos - center + i < current) {
+                    if (!needsUpdate && (diff < total_thumbs && i < total_thumbs - diff)) {
+                        thumbnails[i]->setIcon(thumbnails[i+diff]->icon());
+                    } else {
+                        QPixmap pixmap = FileInfoData->Picture_Get(framePos - center + i);
+                        thumbnails[i]->setIcon(pixmap.copy(0, 0, 72, 72));
+                    }
+                } else {
+                    thumbnails[i]->setIcon(emptyPixmap);
+                    needsUpdate = true;
+                }
             }
-            else
-                Labels[Pos]->setIcon(QPixmap());
+
+        } else {
+            // movie is moving backward
+            unsigned long diff = lastFramePos - framePos;
+            for (int i = total_thumbs - 1; i >= 0; --i) {
+                unsigned ui = (unsigned) i;
+                if (framePos + ui >= center && framePos - center + ui < current) {
+                    if (diff < total_thumbs && i - (int) diff >= 0) {
+                        thumbnails[ui]->setIcon(thumbnails[ui-diff]->icon());
+					} else {
+                        QPixmap pixmap = FileInfoData->Picture_Get(framePos - center + ui);
+                        thumbnails[ui]->setIcon(pixmap.copy(0, 0, 72, 72));
+					}
+                } else {
+                    thumbnails[ui]->setIcon(emptyPixmap);
+                    needsUpdate = true;
+                }
+            }
         }
 
-        // BigDisplayArea
-        if (BigDisplayArea)
+        lastFramePos = framePos;
+
+        // This assures that if the thumbs are not yet available due to pre-processing,
+        // we update thumbs again (till all thumbs for current frames are available)
+        if (framePos - center + total_thumbs < current)
+            needsUpdate = false;
+
+        if (updateBigDisplay && BigDisplayArea) {
             BigDisplayArea->ShowPicture();
+        }
     }
 }
 
-//---------------------------------------------------------------------------
 void TinyDisplay::Filters_Show()
 {
-    on_Labels_Middle_clicked(true);
+    on_thumbnails_clicked(true);
 }
 
 //***************************************************************************
 // Events
 //***************************************************************************
 
-//---------------------------------------------------------------------------
-void TinyDisplay::on_Labels_Middle_clicked(bool checked)
+void TinyDisplay::on_thumbnails_clicked(bool)
 {
+    int total_thumbs = thumbnails.size();
+
     // Positioning the current frame if any button but the center button is clicked
-    QObject* Sender=sender();
-    if (Sender!=Labels[4])
-    {
-        size_t Pos=0;
-        while (Pos<10)
-        {
-            if (Sender==Labels[Pos])
+    if (sender() != thumbnails[total_thumbs / 2]) {
+        for (int i = 0; i < total_thumbs; ++i) {
+            if (sender() == thumbnails[i]) {
+                unsigned long framePos = FileInfoData->Frames_Pos_Get();
+                FileInfoData->Frames_Pos_Set(framePos + i - total_thumbs / 2);
                 break;
-            Pos++;
+            }
         }
-        if (Pos<10)
-            FileInfoData->Frames_Pos_Set(FileInfoData->Frames_Pos_Get()+Pos-4);
     }
 
-    if (BigDisplayArea==NULL)
-    {
-        BigDisplayArea=new BigDisplay(this, FileInfoData);
-        BigDisplayArea->resize(QApplication::desktop()->screenGeometry().width()-300, QApplication::desktop()->screenGeometry().height()-300);
-        BigDisplayArea->move(150, 150); //BigDisplayArea->move(geometry().left()+geometry().width(), geometry().top());
-        if (ControlArea)
-        {
+    LoadBigDisplay();
+}
+
+void TinyDisplay::LoadBigDisplay()
+{
+    if (BigDisplayArea == NULL) {
+        BigDisplayArea = new BigDisplay(this, FileInfoData);
+
+        unsigned long width = QApplication::desktop()->screenGeometry().width();
+        unsigned long height = QApplication::desktop()->screenGeometry().height();
+        BigDisplayArea->resize(width - 300, height - 300);
+
+        //FIXME: BigDisplayArea->move(geometry().left()+geometry().width(), geometry().top());
+        BigDisplayArea->move(150, 150);
+        if (ControlArea) {
             BigDisplayArea->connect(BigDisplayArea->ControlArea->M9         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_M9_clicked        (bool)));
             BigDisplayArea->connect(BigDisplayArea->ControlArea->M2         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_M2_clicked        (bool)));
             BigDisplayArea->connect(BigDisplayArea->ControlArea->M1         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_M1_clicked        (bool)));
@@ -174,7 +260,10 @@ void TinyDisplay::on_Labels_Middle_clicked(bool checked)
             BigDisplayArea->connect(BigDisplayArea->ControlArea->P9         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_P9_clicked        (bool)));
         }
     }
+
     BigDisplayArea->hide();
+    BigDisplayArea->InitPicture();
+
     BigDisplayArea->show();
     BigDisplayArea->ShowPicture();
 }

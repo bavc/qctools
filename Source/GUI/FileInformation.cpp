@@ -18,6 +18,8 @@
 #include <QProcess>
 #include <QFileInfo>
 #include <QDesktopServices>
+#include <QApplication>
+#include <QDebug>
 #include <QUrl>
 #include <zlib.h>
 #include <zconf.h>
@@ -140,51 +142,8 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
     }
 
     // External data optional input
-    string StatsFromExternalData;
-    if (!StatsFromExternalData_FileName.size()==0)
-    {
-        if (StatsFromExternalData_FileName_IsCompressed)
-        {
-            QFile F(StatsFromExternalData_FileName);
-            if (F.open(QIODevice::ReadOnly))
-            {
-                QByteArray Compressed=F.readAll();
-                uLongf Buffer_Size=0;
-                Buffer_Size|=((unsigned char)Compressed[Compressed.size()-1])<<24;
-                Buffer_Size|=((unsigned char)Compressed[Compressed.size()-2])<<16;
-                Buffer_Size|=((unsigned char)Compressed[Compressed.size()-3])<<8;
-                Buffer_Size|=((unsigned char)Compressed[Compressed.size()-4]);
-                char* Buffer=new char[Buffer_Size];
-                z_stream strm;
-                strm.next_in = (Bytef *) Compressed.data();
-                strm.avail_in = Compressed.size() ;
-                strm.next_out = (unsigned char*) Buffer;
-                strm.avail_out = Buffer_Size;
-                strm.total_out = 0;
-                strm.zalloc = Z_NULL;
-                strm.zfree = Z_NULL;
-                if (inflateInit2(&strm, 15 + 16)>=0) // 15 + 16 are magic values for gzip
-                {
-                    if (inflate(&strm, Z_SYNC_FLUSH)>=0)
-                    {
-                        inflateEnd (&strm);
-                        StatsFromExternalData.assign(Buffer, Buffer_Size);
-                    }
-                }
-                delete[] Buffer;
-            }
-        }
-        else
-        {
-            QFile F(StatsFromExternalData_FileName);
-            if (F.open(QIODevice::ReadOnly))
-            {
-                QByteArray Data=F.readAll();
-
-                StatsFromExternalData.assign(Data.data(), Data.size());
-            }
-        }
-    }
+    QFile StatsFromExternalData_File(StatsFromExternalData_FileName);
+    bool StatsFromExternalData_IsOpen=StatsFromExternalData_File.open(QIODevice::ReadOnly);
 
     // Running FFmpeg
     string FileName_string=FileName.toUtf8().data();
@@ -192,32 +151,155 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
         replace(FileName_string.begin(), FileName_string.end(), '/', '\\' );
     #endif
     string Filters[Type_Max];
-    if (StatsFromExternalData.empty())
+    if (!StatsFromExternalData_IsOpen)
     {
         if (ActiveFilters[ActiveFilter_Video_signalstats])
             Filters[0]+=",signalstats=stat=tout+vrep+brng";
         if (ActiveFilters[ActiveFilter_Video_cropdetect])
             Filters[0]+=",cropdetect=reset=1:round=1";
-        if (ActiveFilters[ActiveFilter_Video_Psnr])
-            Filters[0]+=",split[a][b];[a]field=top[a1];[b]field=bottom[b1],[a1][b1]psnr";
+        if (ActiveFilters[ActiveFilter_Video_Idet])
+            Filters[0]+=",idet=half_life=1";
+        if (ActiveFilters[ActiveFilter_Video_Psnr] && ActiveFilters[ActiveFilter_Video_Ssim])
+        {
+            Filters[0]+=",split[a][b];[a]field=top[a1];[b]field=bottom,split[b1][b2];[a1][b1]psnr[c1];[c1][b2]ssim";
+        }
+        else
+        {
+            if (ActiveFilters[ActiveFilter_Video_Psnr])
+                Filters[0]+=",split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1][b1]psnr";
+            if (ActiveFilters[ActiveFilter_Video_Ssim])
+                Filters[0]+=",split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1][b1]ssim";
+        }
         Filters[0].erase(0, 1); // remove first comma
-        if (ActiveFilters[ActiveFilter_Audio_EbuR128])
-            Filters[1]+=",ebur128=metadata=1";
-        if (ActiveFilters[ActiveFilter_Audio_aphasemeter])
-            Filters[1]+=",aphasemeter=video=0";
         if (ActiveFilters[ActiveFilter_Audio_astats])
             Filters[1]+=",astats=metadata=1:reset=1:length=0.4";
+        if (ActiveFilters[ActiveFilter_Audio_aphasemeter])
+            Filters[1]+=",aphasemeter=video=0";
+        if (ActiveFilters[ActiveFilter_Audio_EbuR128])
+            Filters[1]+=",ebur128=metadata=1";
         Filters[1].erase(0, 1); // remove first comma
     }
     else
     {
+        //Stats init
         VideoStats* Video=new VideoStats();
         Stats.push_back(Video);
-        Video->StatsFromExternalData(StatsFromExternalData);
-
         AudioStats* Audio=new AudioStats();
         Stats.push_back(Audio);
-        Audio->StatsFromExternalData(StatsFromExternalData);
+
+        //XML init
+        const char*  Xml_HeaderFooter="</frames></ffprobe:ffprobe><ffprobe:ffprobe><frames>";
+        const size_t Xml_HeaderSize=25;
+        const size_t Xml_FooterSize=27;
+        const size_t Xml_MaxSize=0x1000000; //Blocks of 16 MiB, arbitrary chosen
+        char* Xml=new char[Xml_MaxSize+Xml_HeaderSize+Xml_FooterSize];
+
+        //Read init
+        const size_t Compressed_MaxSize=0x100000; //Blocks of 1 MiB, arbitrary chosen
+        char* Compressed=new char[Compressed_MaxSize];
+
+        //Uncompress init
+        z_stream strm;
+        if (StatsFromExternalData_FileName_IsCompressed)
+        {
+            strm.next_in = NULL;
+            strm.avail_in = 0;
+            strm.next_out = NULL;
+            strm.avail_out = 0;
+            strm.total_out = 0;
+            strm.zalloc = Z_NULL;
+            strm.zfree = Z_NULL;
+            inflateInit2(&strm, 15 + 16); // 15 + 16 are magic values for gzip
+        }
+
+        //Load and parse compressed data chunk by chunk
+        char* Xml_Pointer=Xml;
+        int inflate_Result;
+        int TEMP = 0;
+        for (;;)
+        {
+            //Load
+            qint64 ReadSize;
+            size_t avail_out=Xml_MaxSize-(Xml_Pointer-Xml);
+            if (StatsFromExternalData_FileName_IsCompressed)
+                ReadSize=StatsFromExternalData_File.read(Compressed, Compressed_MaxSize); //Load in an intermediate buffer for decompression
+            else
+                ReadSize=StatsFromExternalData_File.read(Xml_Pointer, avail_out); //Load directly in the XML buffer
+            if (!ReadSize)
+                break;
+            TEMP += ReadSize;
+
+            //Parse compressed data, with handling of the case the output buffer is not big enough
+            strm.next_in=(Bytef*)Compressed;
+            strm.avail_in=ReadSize;
+            for (;;)
+            {
+                size_t Xml_Size=Xml_Pointer-Xml;
+                if (StatsFromExternalData_FileName_IsCompressed)
+                {
+                    //inflate
+                    strm.next_out=(Bytef*)Xml_Pointer;
+                    strm.avail_out=avail_out;
+                    if ((inflate_Result=inflate(&strm, Z_NO_FLUSH))<0)
+                        break;
+                    Xml_Size+=avail_out-strm.avail_out;
+                }
+                else
+                    Xml_Size+=ReadSize;
+
+                //Cut the XML after the last XML frame footer, and keep the remaining data for the next turn
+                size_t Xml_SizeForParsing=Xml_Size;
+                //Look for XML frame footer
+                while (Xml_SizeForParsing>Xml_HeaderSize &&
+                        ( Xml[Xml_SizeForParsing-1]!='>' //"</frame>"
+                    || Xml[Xml_SizeForParsing-2]!='e'
+                    || Xml[Xml_SizeForParsing-3]!='m'
+                    || Xml[Xml_SizeForParsing-4]!='a'
+                    || Xml[Xml_SizeForParsing-5]!='r'
+                    || Xml[Xml_SizeForParsing-6]!='f'
+                    || Xml[Xml_SizeForParsing-7]!='/'
+                    || Xml[Xml_SizeForParsing-8]!='<'))
+                    Xml_SizeForParsing--;
+                if (Xml_SizeForParsing<=Xml_HeaderSize)
+                {
+                    //The block does not contain any complete frame, looping in order to get more data from the file
+                    Xml_Pointer=Xml+Xml_Size;
+                    break;
+                }
+
+                //Insert Xml_HeaderFooter inside the XML content
+                memmove(Xml+Xml_SizeForParsing+Xml_HeaderSize+Xml_FooterSize, Xml+Xml_SizeForParsing, Xml_Size-Xml_SizeForParsing);
+                memcpy(Xml+Xml_SizeForParsing, Xml_HeaderFooter, Xml_HeaderSize+Xml_FooterSize);
+                Xml_Size+=Xml_HeaderSize+Xml_FooterSize;
+                Xml_SizeForParsing+=Xml_FooterSize;
+
+                //Parse
+                Video->StatsFromExternalData(Xml, Xml_SizeForParsing);
+                Audio->StatsFromExternalData(Xml, Xml_SizeForParsing);
+
+                //Cut the parsed content
+                memmove(Xml, Xml+Xml_SizeForParsing, Xml_Size-Xml_SizeForParsing);
+                Xml_Pointer=Xml+Xml_Size-Xml_SizeForParsing;
+
+                //Check if we need to stop
+                if (!StatsFromExternalData_FileName_IsCompressed || strm.avail_out || inflate_Result == Z_STREAM_END)
+                    break;
+            }
+
+            //Coherency checks
+            if (Xml_Pointer>=Xml+Xml_MaxSize+Xml_HeaderSize)
+                break;
+        }
+
+        //Inform the parser that parsing is finished
+        Video->StatsFromExternalData_Finish();
+        Audio->StatsFromExternalData_Finish();
+
+        //Cleanup
+        if (StatsFromExternalData_FileName_IsCompressed)
+            inflateEnd(&strm);
+        delete[] Compressed;
+        delete[] Xml;
     }
     Glue=new FFmpeg_Glue(FileName_string.c_str(), ActiveAllTracks, &Stats, Stats.empty());
     if (FileName_string.empty())
@@ -284,7 +366,9 @@ void FileInformation::Parse ()
     if (!isRunning() && ActiveParsing_Count<Max)
     {
         ActiveParsing_Count++;
-        start();
+
+        if(Glue)
+            start();
     }
 }
 
@@ -304,7 +388,7 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
     Data<<"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
     Data<<"<!-- Created by QCTools " << Version << " -->\n";
     Data<<"<ffprobe:ffprobe xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:ffprobe='http://www.ffmpeg.org/schema/ffprobe' xsi:schemaLocation='http://www.ffmpeg.org/schema/ffprobe ffprobe.xsd'>\n";
-    Data<<"    <program_version version=\"" << Glue->FFmpeg_Version() << "\" copyright=\"Copyright (c) 2007-" << Glue->FFmpeg_Year() << " the FFmpeg developers\" build_date=\""__DATE__"\" build_time=\""__TIME__"\" compiler_ident=\"" << Glue->FFmpeg_Compiler() << "\" configuration=\"" << Glue->FFmpeg_Configuration() << "\"/>\n";
+    Data<<"    <program_version version=\"" << Glue->FFmpeg_Version() << "\" copyright=\"Copyright (c) 2007-" << Glue->FFmpeg_Year() << " the FFmpeg developers\" build_date=\"" __DATE__ "\" build_time=\"" __TIME__ "\" compiler_ident=\"" << Glue->FFmpeg_Compiler() << "\" configuration=\"" << Glue->FFmpeg_Configuration() << "\"/>\n";
     Data<<"\n";
     Data<<"    <library_versions>\n";
     Data<<Glue->FFmpeg_LibsVersion();
@@ -370,8 +454,10 @@ void FileInformation::Export_CSV (const QString &ExportFileName)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-QPixmap* FileInformation::Picture_Get (size_t Pos)
+QPixmap FileInformation::Picture_Get (size_t Pos)
 {
+    QPixmap Pixmap;
+
     if (!Glue || Pos>=ReferenceStat()->x_Current || Pos>=Glue->Thumbnails_Size(0))
     {
         Pixmap.load(":/icon/logo.png");
@@ -379,16 +465,16 @@ QPixmap* FileInformation::Picture_Get (size_t Pos)
     }
     else
     {
-        FFmpeg_Glue::bytes* Thumbnail=Glue->Thumbnail_Get(0, Pos);
-        if (Thumbnail)
-            Pixmap.loadFromData(Thumbnail->Data, Thumbnail->Size);
+        auto Thumbnail = Glue->Thumbnail_Get(0, Pos);
+        if (!Thumbnail.isEmpty())
+            Pixmap.loadFromData(Thumbnail);
         else
         {
             Pixmap.load(":/icon/logo.png");
             Pixmap=Pixmap.scaled(72, 72);
         }
     }
-    return &Pixmap;
+    return Pixmap;
 }
 
 //---------------------------------------------------------------------------
@@ -432,6 +518,45 @@ int FileInformation::Frames_Pos_Get (size_t Stats_Pos)
         Pos=Frames_Pos;
     
     return Pos;
+}
+
+QString FileInformation::Frame_Type_Get(size_t Stats_Pos, size_t frameIndex) const
+{
+    // Looking for the first video stream
+    if (Stats_Pos==(size_t)-1)
+        Stats_Pos=ReferenceStream_Pos_Get();
+    if (Stats_Pos>=Stats.size())
+        return QString();
+
+    QString frameType;
+
+    if(frameIndex == -1)
+    {
+        if (Stats_Pos!=ReferenceStream_Pos_Get())
+        {
+            // Computing frame pos based on the first stream
+            double TimeStamp=ReferenceStat()->x[1][Frames_Pos];
+            int Pos=0;
+            for (; Pos<Stats[Stats_Pos]->x_Current_Max; Pos++)
+            {
+                if (Stats[Stats_Pos]->x[1][Pos]>=TimeStamp)
+                {
+                    if (Pos && Stats[Stats_Pos]->x[1][Pos]!=TimeStamp)
+                        Pos--;
+
+                    frameType = QString("%1").arg(Stats[Stats_Pos]->pict_type_char[Pos]);
+                    break;
+                }
+            }
+        }
+        else
+            frameType = QString("%1").arg(Stats[Stats_Pos]->pict_type_char[Frames_Pos]);
+    } else {
+        if(frameIndex <= Stats[Stats_Pos]->x_Current_Max)
+            frameType = QString("%1").arg(Stats[Stats_Pos]->pict_type_char[frameIndex]);
+    }
+
+    return frameType;
 }
 
 //---------------------------------------------------------------------------
@@ -498,5 +623,25 @@ void FileInformation::Frames_Pos_Plus ()
 bool FileInformation::PlayBackFilters_Available ()
 {
     return Glue;
+}
+
+qreal FileInformation::averageFrameRate() const
+{
+    if(!Glue)
+        return 0;
+
+    auto splitted = QString::fromStdString(Glue->AvgVideoFrameRate_Get()).split("/");
+    if(splitted.length() == 1)
+        return splitted[0].toDouble();
+
+    return splitted[0].toDouble() / splitted[1].toDouble();
+}
+
+int FileInformation::BitsPerRawSample() const
+{
+    if(!Glue)
+        return 0;
+
+    return Glue->BitsPerRawSample_Get();
 }
 

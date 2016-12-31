@@ -11,12 +11,14 @@
 #include "GUI/PlotLegend.h"
 #include "GUI/PlotScaleWidget.h"
 #include "Core/Core.h"
+#include "Core/VideoCore.h"
 #include <QComboBox>
 #include <QGridLayout>
 #include <QEvent>
 #include <qwt_plot_layout.h>
 #include <qwt_plot_canvas.h>
 #include <cmath>
+#include <clocale>
 
 //---------------------------------------------------------------------------
 
@@ -43,6 +45,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     m_fileInfoData( fileInformation ),
     m_dataTypeIndex( Plots::AxisSeconds )
 {
+    setlocale(LC_NUMERIC, "C");
     QGridLayout* layout = new QGridLayout( this );
     layout->setSpacing( 1 );
     layout->setContentsMargins( 0, 0, 0, 0 );
@@ -54,7 +57,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
 
     // plots and legends
     m_plots = new Plot**[m_fileInfoData->Stats.size()];
-    size_t layout_y=0;
+    m_plotsCount = 0;
     
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
     {
@@ -68,26 +71,32 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
             for ( size_t group = 0; group < countOfGroups; group++ )
             {
                 if (m_fileInfoData->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
-            {
-                Plot* plot = new Plot( streamPos, type, group, this );
+                {
+                    Plot* plot = new Plot( streamPos, type, group, fileInformation, this );
+                    plot->addGuidelines(m_fileInfoData->BitsPerRawSample());
 
-                // we allow to shrink the plot below height of the size hint
-                plot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
-                plot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
-                initYAxis( plot );
-                updateSamples( plot );
+                    if(type == Type_Video)
+                        adjustGroupMax(group, m_fileInfoData->BitsPerRawSample());
 
-                connect( plot, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
+                    // we allow to shrink the plot below height of the size hint
+                    plot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
+                    plot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
+                    initYAxis( plot );
+                    updateSamples( plot );
 
-                plot->canvas()->installEventFilter( this );
+                    connect( plot, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
 
-                layout->addWidget( plot, layout_y, 0 );
-                layout->addWidget( plot->legend(), layout_y, 1 );
+                    plot->canvas()->installEventFilter( this );
 
-                m_plots[streamPos][group] = plot;
+                    layout->addWidget( plot, m_plotsCount, 0 );
+                    layout->addWidget( plot->legend(), m_plotsCount, 1 );
 
-                layout_y++;
-            }
+                    m_plots[streamPos][group] = plot;
+
+                    m_plotsCount++;
+
+                    qDebug() << "g: " << plot->group() << ", t: " << plot->type() << ", m_plotsCount: " << m_plotsCount;
+                }
                 else
                 {
                     m_plots[streamPos][group] = NULL;
@@ -100,7 +109,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
         }
     }
 
-    layout->addWidget( m_scaleWidget, layout_y, 0, 1, 2 );
+    layout->addWidget( m_scaleWidget, m_plotsCount, 0, 1, 2 );
 
     // combo box for the axis format
     XAxisFormatBox* xAxisBox = new XAxisFormatBox();
@@ -111,7 +120,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     int axisBoxRow = layout->rowCount() - 1;
 #if 1
     // one row below to have space enough for bottom scale tick labels
-    layout->addWidget( xAxisBox, layout_y + 1, 1 );
+    layout->addWidget( xAxisBox, m_plotsCount + 1, 1 );
 #else
     layout->addWidget( xAxisBox, layout_y, 1 );
 #endif
@@ -236,6 +245,7 @@ void Plots::initYAxis( Plot* plot )
 
     double yMin = stat->y_Min[plotGroup];
     double yMax = stat->y_Max[plotGroup];
+
     if ( ( group.Min != group.Max ) && ( yMax - yMin >= ( group.Max - group.Min) / 2 ) )
         yMax = group.Max;
 
@@ -258,12 +268,16 @@ void Plots::updateSamples( Plot* plot )
     const size_t plotGroup = plot->group();
     const CommonStats* stat = stats( plot->streamPos() );
 
-    for (size_t type = 0; type < Type_Max; type++)
-        for( unsigned j = 0; j < PerStreamType[type].CountOfGroups; ++j )
-        {
-            plot->setCurveSamples( j, stat->x[m_dataTypeIndex],
-                stat->y[PerStreamType[plotType].PerGroup[plotGroup].Start + j], stat->x_Current );
-        }
+    auto streamInfo = PerStreamType[plotType];
+
+    for(auto j = 0; j < streamInfo.PerGroup[plotGroup].Count; ++j)
+    {
+        auto xData = stat->x[m_dataTypeIndex];
+        auto yIndex = streamInfo.PerGroup[plotGroup].Start + j;
+        auto yData = stat->y[yIndex];
+
+        plot->setCurveSamples( j, xData, yData, stat->x_Current );
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -361,6 +375,152 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
     return QWidget::eventFilter( object, event );
 }
 
+void Plots::adjustGroupMax(int group, int bitsPerRawSample)
+{
+    int defaultBitsPerRawSample = 8;
+    if(bitsPerRawSample == 0)
+        bitsPerRawSample = defaultBitsPerRawSample;
+
+    if(group == Group_Y || group == Group_U || group == Group_V || group == Group_YDiff || group == Group_UDiff || group == Group_VDiff)
+    {
+        PerStreamType[Type_Video].GetPerGroup(group)->setMax((1 << bitsPerRawSample) - 1);
+    }
+    if(group == Group_Sat)
+    {
+        PerStreamType[Type_Video].GetPerGroup(group)->setMax(sqrt(2) * (1 << bitsPerRawSample) / 2);
+    }
+}
+
+void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
+{
+    if(orderedFilterInfo.empty())
+    {
+        qDebug() << "orderedFilterInfo is empty, do not reorder..";
+        return;
+    }
+
+    qDebug() << "changeOrder: items = " << orderedFilterInfo.count();
+
+    auto gridLayout = static_cast<QGridLayout*> (layout());
+    auto rowsCount = gridLayout->rowCount();
+
+    Q_ASSERT(m_plotsCount <= rowsCount);
+
+    qDebug() << "plotsCount: " << m_plotsCount;
+
+    QList <std::tuple<size_t, size_t, size_t>> currentOrderedPlotsInfo;
+    QList <std::tuple<size_t, size_t, size_t>> expectedOrderedPlotsInfo;
+
+    for(auto row = 0; row < m_plotsCount; ++row)
+    {
+        auto plotItem = gridLayout->itemAtPosition(row, 0);
+        auto legendItem = gridLayout->itemAtPosition(row, 1);
+
+        Q_ASSERT(plotItem);
+        Q_ASSERT(legendItem);
+
+        auto plot = qobject_cast<Plot*> (plotItem->widget());
+        Q_ASSERT(plot);
+
+        currentOrderedPlotsInfo.push_back(std::make_tuple(plot->group(), plot->type(), plot->streamPos()));
+    }
+
+    for(auto filterInfo : orderedFilterInfo)
+    {
+        for(auto plotInfo : currentOrderedPlotsInfo)
+        {
+            if(std::get<0>(plotInfo) == std::get<0>(filterInfo) && std::get<1>(plotInfo) == std::get<1>(filterInfo))
+            {
+                expectedOrderedPlotsInfo.push_back(plotInfo);
+            }
+        }
+    }
+
+    Q_ASSERT(currentOrderedPlotsInfo.length() == expectedOrderedPlotsInfo.length());
+    if(currentOrderedPlotsInfo.length() != expectedOrderedPlotsInfo.length())
+        return;
+
+    for(auto i = 0; i < expectedOrderedPlotsInfo.length(); ++i)
+    {
+        qDebug() << "cg: " << std::get<0>(currentOrderedPlotsInfo[i])
+                 << ", "
+                 << "ct: " << std::get<1>(currentOrderedPlotsInfo[i])
+                 << ", "
+                 << "cp: " << std::get<2>(currentOrderedPlotsInfo[i])
+                 << ", "
+                 << "eg: " << std::get<0>(expectedOrderedPlotsInfo[i])
+                 << ", "
+                 << "et: " << std::get<1>(expectedOrderedPlotsInfo[i])
+                 << ", "
+                 << "ep: " << std::get<2>(expectedOrderedPlotsInfo[i]);
+    }
+
+    for(auto i = 0; i < expectedOrderedPlotsInfo.length(); ++i)
+    {
+        if(expectedOrderedPlotsInfo[i] != currentOrderedPlotsInfo[i])
+        {
+            // search current item which we should put at expected position
+            for(auto j = 0; j < expectedOrderedPlotsInfo.length(); ++j)
+            {
+                if(expectedOrderedPlotsInfo[i] == currentOrderedPlotsInfo[j])
+                {
+                    qDebug() << "i: " << i << ", j: " << j;
+
+                    auto plotWidget = gridLayout->itemAtPosition(j, 0)->widget();
+                    auto legendWidget = gridLayout->itemAtPosition(j, 1)->widget();
+
+                    {
+                        auto plot = qobject_cast<Plot*> (plotWidget);
+                        qDebug() << "jg: " << plot->group() << ", t: " << plot->type() << ", p: " << plot->streamPos() << ", ptr = " << plot;
+                    }
+
+                    auto swapPlotWidget = gridLayout->itemAtPosition(i, 0)->widget();
+                    auto swapLegendWidget = gridLayout->itemAtPosition(i, 1)->widget();
+
+                    {
+                        auto plot = qobject_cast<Plot*> (swapPlotWidget);
+                        qDebug() << "ig: " << plot->group() << ", t: " << plot->type() << ", p: " << plot->streamPos() << ", ptr = " << plot;
+                    }
+
+                    gridLayout->removeWidget(plotWidget);
+                    gridLayout->removeWidget(legendWidget);
+
+                    gridLayout->removeWidget(swapPlotWidget);
+                    gridLayout->removeWidget(swapLegendWidget);
+
+                    gridLayout->addWidget(plotWidget, i, 0);
+                    gridLayout->addWidget(legendWidget, i, 1);
+
+                    gridLayout->addWidget(swapPlotWidget, j, 0);
+                    gridLayout->addWidget(swapLegendWidget, j, 1);
+
+                    currentOrderedPlotsInfo[j] = currentOrderedPlotsInfo[i];
+                    currentOrderedPlotsInfo[i] = expectedOrderedPlotsInfo[i];
+
+                    break;
+                }
+            }
+        }
+    }
+
+    Q_ASSERT(rowsCount == gridLayout->rowCount());
+
+    for(auto row = 0; row < m_plotsCount; ++row)
+    {
+        auto plotItem = gridLayout->itemAtPosition(row, 0);
+        auto legendItem = gridLayout->itemAtPosition(row, 1);
+
+        Q_ASSERT(plotItem);
+        Q_ASSERT(legendItem);
+
+        auto plot = qobject_cast<Plot*> (plotItem->widget());
+        Q_ASSERT(plot);
+
+        Q_ASSERT(plot->group() == std::get<0>(expectedOrderedPlotsInfo[row]) &&
+                 plot->type() == std::get<1>(expectedOrderedPlotsInfo[row]));
+    }
+}
+
 void Plots::alignXAxis( const Plot* plot )
 {
     const QWidget* canvas = plot->canvas();
@@ -438,14 +598,25 @@ void Plots::setPlotVisible( size_t type, size_t group, bool on )
 }
 
 //---------------------------------------------------------------------------
-void Plots::zoomXAxis( bool up )
+void Plots::zoomXAxis( ZoomTypes zoomType )
 {
-    if ( up )
+    m_zoomType = zoomType;
+
+    if ( zoomType == ZoomIn )
         m_zoomFactor++;
-    else if ( m_zoomFactor )
+    else if ( zoomType == ZoomOut && m_zoomFactor )
         m_zoomFactor--;
+    else if ( zoomType == ZoomOneToOne)
+        m_zoomFactor = 0;
         
+    qDebug() << "m_zoomFactor: " << m_zoomFactor;
     int numVisibleFrames = m_fileInfoData->Frames_Count_Get() >> m_zoomFactor;
+
+    if(m_zoomType == ZoomOneToOne)
+    {
+        numVisibleFrames = plot(0, 0)->canvas()->contentsRect().width();
+        m_zoomFactor = log(m_fileInfoData->Frames_Count_Get() / numVisibleFrames) / log(2);
+    }
 
     int to = qMin( framePos() + numVisibleFrames / 2, numFrames() );
     int from = qMax( 0, to - numVisibleFrames );

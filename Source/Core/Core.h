@@ -25,7 +25,9 @@ enum activefilter
     ActiveFilter_Audio_EbuR128,
     ActiveFilter_Audio_aphasemeter,
     ActiveFilter_Audio_astats,
-    ActiveFilter_Max
+    ActiveFilter_Video_Ssim,
+    ActiveFilter_Video_Idet,
+    ActiveFilter_Max //Note: always add a new ActiveFilter element before ActiveFilter_Max, never before any other element, else preferences of people already having the tool will be shifted when preferences are read from the profile
 };
 typedef std::bitset<ActiveFilter_Max> activefilters;
 
@@ -40,6 +42,10 @@ struct per_group
     const   bool        CheckedByDefault;
     const   char*       Description;
     activefilter        ActiveFilterGroup;
+
+    void    setMax(double value) {
+        (const_cast<double&> (Max)) = value;
+    }
 };
 struct per_item
 {
@@ -59,6 +65,10 @@ struct stream_info
     size_t                      CountOfItems;
     const struct per_group*     PerGroup;
     const struct per_item*      PerItem;
+
+    struct per_group*           GetPerGroup(int group) const {
+        return const_cast<struct per_group*> (PerGroup) + group;
+    }
 };
 enum Types
 {

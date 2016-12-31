@@ -8,7 +8,7 @@
 #include <Core/AudioCore.h>
 #include <cfloat>
 
-const struct per_group AudioPerGroup [Group_AudioMax]=
+struct per_group AudioPerGroup [Group_AudioMax]=
 {
     //R128
     {

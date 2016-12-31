@@ -1,111 +1,44 @@
-#! /bin/sh
+#! /bin/bash
 
-if qmake --version >/dev/null 2>&1
-then
+# if on Ubuntu start with this setup
+# sudo apt-get install git qt5-default cmake g++ yasm libbz2-dev
+
+# could be also required (Ubuntu 14.04 LTS): 
+# sudo apt-get install zlib1g-dev
+# sudo apt-get install libgl1-mesa-dev
+# sudo apt-get install pkg-config
+
+if qmake --version >/dev/null 2>&1 ; then
     BINQMAKE=qmake
-elif qmake-qt5 --version >/dev/null 2>&1
-then
+elif qmake-qt5 --version >/dev/null 2>&1 ; then
     BINQMAKE=qmake-qt5
-elif qmake5 --version >/dev/null 2>&1
-then
+elif qmake5 --version >/dev/null 2>&1 ; then
     BINQMAKE=qmake5
-elif qmake-qt4 --version >/dev/null 2>&1
-then
+elif qmake-qt4 --version >/dev/null 2>&1 ; then
     BINQMAKE=qmake-qt4
-elif qmake4 --version >/dev/null 2>&1
-then
+elif qmake4 --version >/dev/null 2>&1 ; then
     BINQMAKE=qmake4
-elif $HOME/Qt/5.3/clang_64/bin/qmake --version >/dev/null 2>&1
-then
-	BINQMAKE=$HOME/Qt/5.3/clang_64/bin/qmake
-elif $HOME/Qt/5.4/clang_64/bin/qmake --version >/dev/null 2>&1
-then
-	BINQMAKE=$HOME/Qt/5.3/clang_64/bin/qmake
+elif $HOME/Qt/5.3/clang_64/bin/qmake --version >/dev/null 2>&1 ; then
+    BINQMAKE=$HOME/Qt/5.3/clang_64/bin/qmake
+elif $HOME/Qt/5.4/clang_64/bin/qmake --version >/dev/null 2>&1 ; then
+    BINQMAKE=$HOME/Qt/5.3/clang_64/bin/qmake
 else
     echo qmake not found
-	exit
+    exit
 fi
 
 if [ ! $(which cmake) ] ; then
     echo cmake not found
-	exit
+    exit
 fi
 
-cd openjpeg
-cmake -DBUILD_SHARED_LIBS:BOOL=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=usr .
-make
-make install
-cd ..
+SCRIPT_DIR=$(cd $(dirname "$0") && pwd)
+echo "SCRIPT_DIR: " + $SCRIPT_DIR
 
-# freetype
-if [ ! -d freetype ] ; then
-	wget https://downloads.sf.net/project/freetype/freetype2/2.5.3/freetype-2.5.3.tar.bz2
-	tar jxf freetype-2.5.3.tar.bz2
-	mv freetype-2.5.3 freetype
-fi
-cd freetype
-chmod u+x configure
-./configure --prefix="`pwd`/usr" --without-harfbuzz
-make
-make install
-cd ..
+INSTALL_DIR=$(cd $(dirname "$0") && cd ../../.. && pwd)
+cd "$INSTALL_DIR"
 
-# decklink
-#if [ ! -d decklinksdk ] ; then
-#	wget http://software.blackmagicdesign.com/SDK/Blackmagic_DeckLink_SDK_10.1.4.zip
-#	unzip Blackmagic_DeckLink_SDK_10.1.4.zip
-#	mv "Blackmagic DeckLink SDK 10.1.4" decklinksdk
-#fi
-
-cd ffmpeg
-if sw_vers >/dev/null 2>&1
-then
-	FFMPEG_EXTRA= --extra-cflags="-mmacosx-version-min=10.5" --extra-ldflags="-mmacosx-version-min=10.5"
-	FFMPEG_EXTRA+= --enable-libfreetype --extra-cflags="-I../freetype/usr/include" --extra-ldflags="-L../freetype/usr/lib"
-fi
-chmod u+x configure
-chmod u+x version.sh
-if yasm --version >/dev/null 2>&1
-then
-    ./configure --enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug $FFMPEG_EXTRA
-    if [$? -ne 0 ]
-    then #on some distro, yasm version is too old
-      cd ../yasm/
-      ./configure --prefix=`pwd`/usr
-      make
-      make install
-
-      cd ../ffmpeg
-      ./configure --enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --yasmexe=../yasm/usr/bin/yasm $FFMPEG_EXTRA
-    fi
-else
-    cd ../yasm/
-    ./configure --prefix=`pwd`/usr
-    make
-    make install
-
-    cd ../ffmpeg
-    ./configure --enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --disable-shared --enable-static --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --yasmexe=../yasm/usr/bin/yasm $FFMPEG_EXTRA
-fi
-
-make
-cd ..
-
-cd qwt
-$BINQMAKE
-make
-cd ..
-
-cd qctools/Project/QtCreator
-if sw_vers >/dev/null 2>&1
-then
-	#Qt 5.2 can not well detect the platform version for 10.9 then FFmpeg static link fails
-	MAJOR_MAC_VERSION=$(sw_vers -productVersion | awk -F '.' '{print $1 "." $2}')
-	$BINQMAKE QMAKE_MAC_SDK=macosx$MAJOR_MAC_VERSION
-else
-	$BINQMAKE
-fi
-make
-cd ../../..
-
-echo QCTools binary is in qctools/Project/QtCreator
+source $SCRIPT_DIR/init_blackmagic.sh
+source $SCRIPT_DIR/init_ffmpeg.sh
+source $SCRIPT_DIR/init_qwt.sh
+source $SCRIPT_DIR/build_qctools.sh

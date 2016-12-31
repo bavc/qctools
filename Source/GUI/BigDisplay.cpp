@@ -6,6 +6,7 @@
 
 //---------------------------------------------------------------------------
 #include "BigDisplay.h"
+#include "SelectionArea.h"
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -14,6 +15,8 @@
 #include "GUI/Info.h"
 #include "GUI/Help.h"
 #include "GUI/FileInformation.h"
+#include "GUI/imagelabel.h"
+#include "GUI/config.h"
 #include "Core/FFmpeg_Glue.h"
 
 #include <QDesktopWidget>
@@ -39,6 +42,7 @@
 #include <QColorDialog>
 #include <QShortcut>
 #include <QApplication>
+#include <QDebug>
 
 #include <sstream>
 //---------------------------------------------------------------------------
@@ -71,6 +75,7 @@ enum args_type
     Args_Type_ColorMatrix, // bt601, bt709, smpte240m, fcc
     Args_Type_SampleRange, // broadcast, full, auto
     Args_Type_ClrPck, // Color picker
+    Args_Type_LogLin,  // Logarithmic and linear
 };
 
 struct args
@@ -166,20 +171,28 @@ const filter Filters[]=
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_Toggle,   0,   0,   0,   0, "RGB" },
             { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_LogLin,   0,   0,   0,   0, "Levels" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "extractplanes=${3},histogram",
-            "histogram",
-            "format=rgb48,extractplanes=${3},histogram",
-            "format=rgb48,histogram",
-            "extractplanes=${3},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack",
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack",
-            "format=rgb48,extractplanes=${3},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack",
-            "format=rgb48,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram[a2];[b1]histogram[b2];[a2][b2]framepack",
+            // field N, rgb, N, all planes N
+            "histogram=level_height=${height}-12:components=${3}:levels_mode=${4}",
+            // field N, rgb, N, all planes Y
+            "histogram=level_height=${height}:levels_mode=${4}",
+            // field N, rgb, Y, all planes N
+            "format=rgb24,histogram=level_height=${height}:components=${3}:levels_mode=${4}",
+            // field N, rgb, Y, all planes Y
+            "format=rgb24,histogram=level_height=${height}:levels_mode=${4}",
+            // field Y, rgb, N, all planes N
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram=components=${3}:levels_mode=${4}[a2];[b1]histogram=components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
+            // field Y, rgb, N, all planes Y
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram=levels_mode=${4}[a2];[b1]histogram=levels_mode=${4}[b2];[a2][b2]hstack",
+            // field Y, rgb, Y, all planes N
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=rgb24,histogram=components=${3}:levels_mode=${4}[a2];[b1]format=rgb24,histogram=components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
+            // field Y, rgb, Y, all planes Y
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=rgb24,histogram=levels_mode=${4}[a2];[b1]format=rgb24,histogram=levels_mode=${4}[b2];[a2][b2]hstack",
         },
     },
     {
@@ -191,26 +204,49 @@ const filter Filters[]=
             { Args_Type_YuvA,     0,   0,   0,   0, "Plane" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Vertical" },
             { Args_Type_Slider,   0,   0,   5,   1, "Filter" },
-            { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
+            { Args_Type_Slider,   0,   0,   2,   1, "Scale" },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
             // field N, all planes N, vertical N
-            "waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:e=${6},drawbox=y=(ih-(16*(ih/256))):w=iw:h=16*(ih/256):color=aqua@0.3:t=16*(ih/256),drawbox=w=iw:h=ih-(235*(ih/256)):color=crimson@0.3:t=16*(ih/256)",
+            "waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}",
             // field N, all planes N, vertical Y
-            "waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:e=${6},drawbox=x=(iw-(16*(iw/256))):h=ih:w=16*(iw/256):color=aqua@0.3:t=16*(iw/256),drawbox=h=ih:w=iw-(235*(iw/256)):color=crimson@0.3:t=16*(iw/256)",
+            "waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}",
             // field N, all planes Y, vertical N
-            "waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:e=${6}",
+            "waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay",
             // field N, all planes Y, vertical Y
-            "waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:e=${6}",
+            "waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay",
             // field Y, all planes N, vertical N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:e=${6},drawbox=y=(ih-(16*(ih/256))):w=iw:h=16*(ih/256):color=aqua@0.3:t=16*(ih/256),drawbox=w=iw:h=ih-(235*(ih/256)):color=crimson@0.3:t=16*(ih/256)[a2];[b1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:e=${6},drawbox=y=(ih-(16*(ih/256))):w=iw:h=16*(ih/256):color=aqua@0.3:t=16*(ih/256),drawbox=w=iw:h=ih-(235*(ih/256)):color=crimson@0.3:t=16*(ih/256)[b2];[a2][b2]vstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[a2];[b1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b2];[a2][b2]vstack",
             // field Y, all planes N, vertical Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:e=${6},drawbox=x=(iw-(16*(iw/256))):h=ih:w=16*(iw/256):color=aqua@0.3:t=16*(iw/256),drawbox=h=ih:w=iw-(235*(iw/256)):color=crimson@0.3:t=16*(iw/256)[a2];[b1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:e=${6},drawbox=x=(iw-(16*(iw/256))):h=ih:w=16*(iw/256):color=aqua@0.3:t=16*(iw/256),drawbox=h=ih:w=iw-(235*(iw/256)):color=crimson@0.3:t=16*(iw/256)[b2];[a2][b2]hstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[a2];[b1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b2];[a2][b2]hstack",
             // field Y, all planes Y, vertical N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:e=${6}[a2];[b1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:e=${6}[b2];[a2][b2]hstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[a2];[b1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[b2];[a2][b2]vstack",
             // field Y, all planes Y, vertical Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:e=${6}[a2];[b1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:e=${6}[b2];[b2][a2]hstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[a2];[b1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[b2];[b2][a2]hstack",
+        },
+    },
+    {
+        "Waveform Target",
+        0,
+        {
+            { Args_Type_Slider,  20,   0,   0,   1, "x" },
+            { Args_Type_Slider,  20,   0,   0,   1, "y" },
+            { Args_Type_Slider, 121,  16,   0,   1, "w" },
+            { Args_Type_Slider, 121,  16,   0,   1, "h" },
+            //{ Args_Type_Slider,   8,   0,  10,  10, "Intensity" },
+            { Args_Type_Slider,   0,   0,   5,   1, "Filter" },
+            { Args_Type_Slider,   0,   0,   2,   1, "Scale" },
+            { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
+        },
+        {
+            "crop=${3}:${4}:${1}:${2},\
+            waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1",
+            "split[a][b];\
+            [a]lutyuv=y=val/4,scale=${width}:${height},setsar=1/1,format=yuv444p|yuv444p10le[a1];\
+            [b]crop=${3}:${4}:${1}:${2},\
+            waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1[b1];\
+            [a1][b1]blend=addition",
         },
     },
     {
@@ -221,15 +257,15 @@ const filter Filters[]=
             { Args_Type_Slider,  10,   0,  10,  10, "Intensity" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Vertical"},
             { Args_Type_Toggle,   0,   0,   0,   0, "Background"},
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Slider,   0,   0,   2,   1, "Scale" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "               format=yuv444p|yuva444p10be|rgb24,crop=iw:1:0:${1},waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay,drawbox=y=(ih-(16*(ih/256))):w=iw:h=16*(ih/256):color=aqua@0.3:t=16*(ih/256),drawbox=w=iw:h=ih-(235*(ih/256)):color=crimson@0.3:t=16*(ih/256)",
-            "split[a][b];[a]format=yuv444p|yuva444p10be|rgb24,crop=iw:1:0:${1},waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay,drawbox=y=(ih-(16*(ih/256))):w=iw:h=16*(ih/256):color=aqua@0.3:t=16*(ih/256),drawbox=w=iw:h=ih-(235*(ih/256)):color=crimson@0.3:t=16*(ih/256),drawbox=w=iw:h=(256-235):color=crimson@0.3:t=16,scale=iw:${height},drawbox=y=${1}:w=iw:h=1:color=yellow,setsar=1/1[a1];[b]setsar=1/1[b1];[a1][b1]blend=addition",
-            "               format=yuv444p|yuva444p10be|rgb24,crop=1:ih:${1}:0,waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay,drawbox=x=(iw-(16*(iw/256))):h=ih:w=16*(iw/256):color=aqua@0.3:t=16*(iw/256),drawbox=h=ih:w=iw-(235*(iw/256)):color=crimson@0.3:t=16*(iw/256)",
-            "split[a][b];[a]format=yuv444p|yuva444p10be|rgb24,crop=1:ih:${1}:0,waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay,drawbox=x=(iw-(16*(iw/256))):h=ih:w=16*(iw/256):color=aqua@0.3:t=16*(iw/256),drawbox=h=ih:w=iw-(235*(iw/256)):color=crimson@0.3:t=16*(iw/256),scale=${width}:${height},drawbox=x=${1}:w=1:h=ih:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
+            "               crop=iw:1:0:${1}:0:1,waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
+            "split[a][b];[a]crop=iw:1:0:${1}:0:1,waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=iw:${height},drawbox=y=${1}:w=iw:h=1:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
+            "               crop=1:ih:${1}:0:0:1,waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
+            "split[a][b];[a]crop=1:ih:${1}:0:0:1,waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=${width}:${height},drawbox=x=${1}:w=1:h=ih:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
         },
     },
     {
@@ -238,36 +274,46 @@ const filter Filters[]=
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
-            { Args_Type_Slider,   3,   0,   4,   1, "Mode" },
+            { Args_Type_Slider,   3,   0,   5,   1, "Mode" },
             { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Slider,   1,   0,   2,   1, "Colorspace" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "vectorscope=i=${2}:mode=${3}:envelope=${4},vflip,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
-            "format=yuv444p,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]vectorscope=i=${2}:mode=${3}:envelope=${4},vflip,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8[a2];[b1]vectorscope=i=${2}:mode=${3}:envelope=${4},vflip,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8[b2];[a2][b2]vstack,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            "vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            "format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name[a2];[b1]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name[b2];[a2][b2]hstack,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            // draft version with a low, med, high, and full vectorscope
+            //"split=4[v1][v2][v3][v4];\
+            [v1]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=0:h=.33[V1];\
+            [v2]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=.33:h=.66[V2];\
+            [v3]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=.66:h=1[V3];\
+            [v4]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name[V4];\
+            [V1][V2]hstack[W1];\
+            [V3][V4]hstack[W2];\
+            [W1][W2]vstack,scale=ih:ih,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
         },
     },
     {
         "Vectorscope Target",
         0,
         {
-            { Args_Type_Slider,   0,   0,   0,   1, "x" },
-            { Args_Type_Slider,   0,   0,   0,   1, "y" },
-            { Args_Type_Slider,  60,  16,   0,   1, "s" },
-            { Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
+            { Args_Type_Slider,  20,   0,   0,   1, "x" },
+            { Args_Type_Slider,  20,   0,   0,   1, "y" },
+            { Args_Type_Slider, 120,  16,   0,   1, "w" },
+            { Args_Type_Slider, 120,  16,   0,   1, "h" },
+            //{ Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
             { Args_Type_Slider,   3,   0,   4,   1, "Mode" },
             { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
             { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
         },
         {
-            "crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,\
-            vectorscope=i=${4}:mode=${5}:envelope=${6},vflip,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            "crop=${3}:${4}:${1}:${2},\
+            format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
             "split[a][b];\
-            [a]lutyuv=y=val/4,drawbox=w=${3}:h=${3}/dar:x=${1}-${3}/2:y=${2}-${3}/dar/2:t=1:c=yellow,scale=720:512,setsar=1/1[a1];\
-            [b]crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,\
-            vectorscope=i=${4}:mode=${5}:envelope=${6},vflip,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=720:512,setsar=1/1[b1];\
+            [a]lutyuv=y=val/4,scale=${width}:${height},setsar=1/1,format=yuv444p|yuv444p10le[a1];\
+            [b]crop=${3}:${4}:${1}:${2},\
+            format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height},setsar=1/1[b1];\
             [a1][b1]blend=addition",
         },
     },
@@ -284,7 +330,46 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "split[a][b];[a]vectorscope=i=${2}:mode=4,vflip,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=720:512,setsar=1/1[a1];[b]waveform=intensity=${1}:mode=column:mirror=1:c=1,drawbox=y=(ih-(16*(ih/256))):w=iw:h=16*(ih/256):color=aqua@0.3:t=16*(ih/256),drawbox=w=iw:h=ih-(235*(ih/256)):color=crimson@0.3:t=16*(ih/256),scale=720:512,setsar=1/1[b1];[b1][a1]blend=c0_mode=addition:c1_mode=average:c2_mode=average,hue=s=2",
+            "split[a][b];[a]format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,\
+            vectorscope=intensity=${2}:mode=4,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=720:512,setsar=1/1[a1];\
+            [b]waveform=intensity=${1}:mode=column:mirror=1:c=1,scale=720:512,setsar=1/1[b1];\
+            [b1][a1]blend=c0_mode=addition:c1_mode=average:c2_mode=average,hue=s=2",
+        },
+    },
+    {
+        "CIE Scope",
+        0,
+        {
+            { Args_Type_Slider,   1,   0,   8,   1, "System"},
+            { Args_Type_Slider,   1,   0,   8,   1, "Gamut"},
+            { Args_Type_Slider,   7,   0,  10,  10, "Contrast" },
+            { Args_Type_Slider,   1,   0, 100, 100, "Intensity" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "ciescope=system=${1}:gamuts=pow(2\\,${2}):contrast=${3}:intensity=${4}",
+        },
+    },
+    {
+        "Datascope",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Slider,   0,   0,   0,   1, "x" },
+            { Args_Type_Slider,   0,   0,   0,   1, "y" },
+            { Args_Type_Slider,   1,   0,   1,   1, "Axis"},
+            { Args_Type_Slider,   1,   0,   2,   1, "DataMode" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Show" },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "datascope=x=${2}:y=${3}:mode=${5}:axis=${4}",
+            "drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=32:height=4,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=4:height=32",
+            "il=l=d:c=d,datascope=x=${2}:y=${3}:mode=${5}:axis=${4}",
+            "il=l=d:c=d,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=32:height=4,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=4:height=32",
+            
         },
     },
     {
@@ -317,32 +402,63 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:intensity=${3}",
-            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,framepack,histeq=strength=${2}:strength=${3}",
+            "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,hstack,histeq=strength=${2}:intensity=${3}",
+            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,hstack,histeq=strength=${2}:strength=${3}",
         },
     },
     {
         "Bit Plane",
         0,
         {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_Slider,   1,  -1,   10,   1, "Y bit position" },
             { Args_Type_Slider,   -1, -1,   10,   1, "U bit position" },
             { Args_Type_Slider,   -1, -1,   10,   1, "V bit position" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,lutyuv=y=if(eq(${1}\\,-1)\\,512\\,if(eq(${1}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${1}))*pow(2\\,${1}))):u=if(eq(${2}\\,-1)\\,512\\,if(eq(${2}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${2}))*pow(2\\,${2}))):v=if(eq(${3}\\,-1)\\,512\\,if(eq(${3}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${3}))*pow(2\\,${3}))),format=yuv444p",
+            "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,\
+            lutyuv=\
+                y=if(eq(${2}\\,-1)\\,512\\,if(eq(${2}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${2}))*pow(2\\,${2}))):\
+                u=if(eq(${3}\\,-1)\\,512\\,if(eq(${3}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${3}))*pow(2\\,${3}))):\
+                v=if(eq(${4}\\,-1)\\,512\\,if(eq(${4}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${4}))*pow(2\\,${4}))),format=yuv444p",
+            "il=l=d:c=d,format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,\
+            lutyuv=\
+                y=if(eq(${2}\\,-1)\\,512\\,if(eq(${2}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${2}))*pow(2\\,${2}))):\
+                u=if(eq(${3}\\,-1)\\,512\\,if(eq(${3}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${3}))*pow(2\\,${3}))):\
+                v=if(eq(${4}\\,-1)\\,512\\,if(eq(${4}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${4}))*pow(2\\,${4}))),format=yuv444p",
         },
     },
     {
         "Bit Plane Noise",
         0,
         {
-            { Args_Type_Slider,   1,   1,  10,   1, "Bit position" },
-            { Args_Type_Yuv,      0,   0,   0,   0, "Plane"},
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            // TODO: Adjust slider max to bit depth.
+            { Args_Type_Slider,   1,   1,  16,   1, "Bit position" },
+            { Args_Type_YuvA,     0,   0,   0,   0, "Plane"},
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "bitplanenoise=bitplane=${2}:filter=1,format=yuv444p,extractplanes=${3}",
+            "bitplanenoise=bitplane=${2}:filter=1",
+            "il=l=d:c=d,bitplanenoise=bitplane=${2}:filter=1,format=yuv444p,extractplanes=${3}",
+            "il=l=d:c=d,bitplanenoise=bitplane=${2}:filter=1",
+
+        },
+    },
+    {
+        "Bit Plane Noise Graph",
+        0,
+        {
+            // TODO: Adjust slider max to bit depth.
+            { Args_Type_Slider,   1,   1,  16,   1, "Bit position" },
+            { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
@@ -350,9 +466,7 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,lutyuv=y=512:u=512:v=512:\
-                ${2}=bitand(val\\,pow(2\\,10-${1}))*pow(2\\,${1}),format=yuv444p,extractplanes=${2},format=yuv444p,geq=lum=128:cb=if(gte(eq(lum(X\\,Y)\\,lum(X-1\\,Y))+eq(lum(X\\,Y)\\,lum(X\\,Y-1))+eq(lum(X\\,Y)\\,lum(X-1\\,Y-1))\\,2)\\,0\\,255)"
-
+            "bitplanenoise=${1},drawgraph=fg1=0x006400:fg2=0x00008B:fg3=0x8B0000:m1=lavfi.bitplanenoise.0.${1}:m2=lavfi.bitplanenoise.1.${1}:m3=lavfi.bitplanenoise.2.${1}:min=0:max=1:slide=rscroll:s=${width}x${height}",
         },
     },
     /*
@@ -417,15 +531,19 @@ const filter Filters[]=
             { Args_Type_Toggle,   0,   0,   0,   0, "Vectorscope" },
             { Args_Type_Slider,   0,-180, 180,   1, "Hue"},
             { Args_Type_Slider,  10,   0,  30,  10, "Saturation"},
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Slider,   1,   0,   2,   1, "Colorspace" },
+            { Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
             "hue=h=${3}:s=${4}",
-            "hue=h=${3}:s=${4},split[a][b];[a]histogram=mode=color2,transpose=dir=2,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height},setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
+            "hue=h=${3}:s=${4},split[a][b];[a]vectorscope=intensity=${6}:mode=color2:colorspace=${5}:graticule=green:flags=name,\
+            scale=512:512,pad=720:512:(ow-iw)/2:(oh-ih)/2,setsar=1/1[a1];\
+            [b]lutyuv=y=val/2,scale=720:512,setsar=1/1[b1];[a1][b1]blend=addition",
             "il=l=d:c=d,hue=h=${3}:s=${4}",
-            "hue=h=${3}:s=${4},split[a][b];[a]histogram=mode=color2,transpose=dir=2,scale=512:512,drawgrid=w=32:h=32:t=1:c=white@0.1,drawgrid=w=256:h=256:t=1:c=white@0.2,drawbox=w=9:h=9:t=1:x=180-3:y=512-480-5:c=red@0.6,drawbox=w=9:h=9:t=1:x=108-3:y=512-68-5:c=green@0.6,drawbox=w=9:h=9:t=1:x=480-3:y=512-220-5:c=blue@0.6,drawbox=w=9:h=9:t=1:x=332-3:y=512-32-5:c=cyan@0.6,drawbox=w=9:h=9:t=1:x=404-3:y=512-444-5:c=magenta@0.6,drawbox=w=9:h=9:t=1:x=32-3:y=512-292-5:c=yellow@0.6,drawbox=w=9:h=9:t=1:x=199-3:y=512-424-5:c=red@0.8,drawbox=w=9:h=9:t=1:x=145-3:y=512-115-5:c=green@0.8,drawbox=w=9:h=9:t=1:x=424-3:y=512-229-5:c=blue@0.8,drawbox=w=9:h=9:t=1:x=313-3:y=512-88-5:c=cyan@0.8,drawbox=w=9:h=9:t=1:x=367-3:y=512-397-5:c=magenta@0.8,drawbox=w=9:h=9:t=1:x=88-3:y=512-283-5:c=yellow@0.8,drawbox=w=9:h=9:t=1:x=128-3:y=512-452-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=160-3:y=512-404-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=192-3:y=512-354-5:c=sienna@0.8,drawbox=w=9:h=9:t=1:x=224-3:y=512-304-5:c=sienna@0.8,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height},setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
+            "il=l=d:c=d,hue=h=${3}:s=${4},split[a][b];[a]vectorscope=intensity=${6}:mode=color2:colorspace=${5}:graticule=green:flags=name,\
+            scale=512:512,pad=720:512:(ow-iw)/2:(oh-ih)/2,setsar=1/1[a1];\
+            [b]lutyuv=y=val/2,scale=720:512,setsar=1/1[b1];[a1][b1]blend=addition",
         },
     },
     {
@@ -465,8 +583,8 @@ const filter Filters[]=
         0,
         {
             { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
-            { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
-            { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
+            { Args_Type_Slider,   0,   0,  10,  10, "Strength" },
+            { Args_Type_Slider,   0,   0,  10,  10, "Intensity" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Columns" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
@@ -603,17 +721,20 @@ const filter Filters[]=
         "Zoom",
         0,
         {
-            { Args_Type_Slider,   0,   0,   0,   1, "x" },
-            { Args_Type_Slider,   0,   0,   0,   1, "y" },
-            { Args_Type_Slider,  60,  16,   0,   1, "s" },
+            { Args_Type_Slider,  20,   0,   0,   1, "x" },
+            { Args_Type_Slider,  20,   0,   0,   1, "y" },
+            { Args_Type_Slider, 120,  16,   0,   1, "w" },
+            { Args_Type_Slider, 120,  16,   0,   1, "h" },
             { Args_Type_Slider,   0,   0,  10,  10, "Strength" },
-            { Args_Type_Slider,   0,   0,  10,  10, "Intensity" },
+            //{ Args_Type_Slider,   0,   0,  10,  10, "Intensity" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Toggle,   1,   0,   0,   0, "Zoom"},
         },
         {
-            "setsar=1/1,crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,scale=${width}:${height}:flags=neighbor,histeq=strength=${4}:intensity=${5}",
-            "il=l=d:c=d,setsar=1/1,crop=${3}:${3}/dar:${1}-${3}/2:${2}-${3}/dar/2,scale=${width}:${height}:flags=neighbor,histeq=strength=${4}:intensity=${5}",
+            "setsar=1/1,scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
+            "setsar=1/1,crop=x=${1}:y=${2}:w=${3}:h=${4},scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
+            "il=l=d:c=d,setsar=1/1,scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
+            "il=l=d:c=d,setsar=1/1,crop=x=${1}:y=${2}:w=${3}:h=${4},scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
         },
     },
     {
@@ -781,98 +902,14 @@ const filter Filters[]=
     },
 };
 
-//***************************************************************************
-// Helper
-//***************************************************************************
-
 //---------------------------------------------------------------------------
-ImageLabel::ImageLabel(FFmpeg_Glue** Picture_, size_t Pos_, QWidget *parent) :
-    QWidget(parent),
-    Picture(Picture_),
-    Pos(Pos_)
-{
-    Pixmap_MustRedraw=false;
-    IsMain=true;
-}
-
-//---------------------------------------------------------------------------
-void ImageLabel::paintEvent(QPaintEvent *event)
-{
-    //QWidget::paintEvent(event);
-
-    QPainter painter(this);
-    if (!*Picture)
-    {
-        painter.drawPixmap(0, 0, QPixmap().scaled(event->rect().width(), event->rect().height()));
-        return;
-    }
-
-    /*
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    QSize pixSize = Pixmap.size();
-    pixSize.scale(event->rect().size(), Qt::KeepAspectRatio);
-
-    QPixmap scaledPix = Pixmap.scaled(pixSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    */
-
-    QImage* Image;
-    switch (Pos)
-    {
-        case 1 : Image=(*Picture)->Image_Get(0); break;
-        case 2 : Image=(*Picture)->Image_Get(1); break;
-        default: return;
-    }
-    if (!Image)
-    {
-        painter.drawPixmap(0, 0, QPixmap().scaled(event->rect().width(), event->rect().height()));
-        return;
-    }
-
-    QSize Size = event->rect().size();
-    if (Pixmap_MustRedraw || Size.width()!=Pixmap.width() || Size.height()!=Pixmap.height())
-    {
-        if (IsMain && (Size.width()!=Pixmap.width() || Size.height()!=Pixmap.height()))
-        {
-            (*Picture)->Scale_Change(Size.width(), Size.height());
-            switch (Pos)
-            {
-                case 1 : Image=(*Picture)->Image_Get(0); break;
-                case 2 : Image=(*Picture)->Image_Get(1); break;
-                default: return;
-            }
-            if (!Image)
-            {
-                painter.drawPixmap(0, 0, QPixmap().scaled(event->rect().width(), event->rect().height()));
-                return;
-            }
-        }
-        #if QT_VERSION>0x040700
-            Pixmap.convertFromImage(*Image);
-        #else //QT_VERSION>0x040700
-            Pixmap=QPixmap::fromImage(*Image);
-        #endif //QT_VERSION>0x040700
-        Pixmap_MustRedraw=false;
-    }
-
-    painter.drawPixmap((event->rect().width()-Pixmap.size().width())/2, (event->rect().height()-Pixmap.size().height())/2, Pixmap);
-}
-
-//---------------------------------------------------------------------------
-void ImageLabel::Remove ()
-{
-    Pixmap=QPixmap();
-    resize(0, 0);
-    repaint();
-    setVisible(false);
-}
 
 //***************************************************************************
 // Helper
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Others_, int Min_, int Max_, int Divisor_, int Current, const char* Name, BigDisplay* Display_, size_t Pos_, bool IsBitSlice_, bool IsFilter_, bool IsPeak_, bool IsMode_, QWidget *parent) :
+DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Others_, int Min_, int Max_, int Divisor_, int Current, const char* Name, BigDisplay* Display_, size_t Pos_, bool IsBitSlice_, bool IsFilter_, bool IsPeak_, bool IsMode_, bool IsScale_, bool IsColorspace_, bool IsDmode_, bool IsSystem_, QWidget *parent) :
     Others(Others_),
     Divisor(Divisor_),
     Min(Min_),
@@ -883,6 +920,10 @@ DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Other
     IsFilter(IsFilter_),
     IsPeak(IsPeak_),
     IsMode(IsMode_),
+    IsScale(IsScale_),
+    IsColorspace(IsColorspace_),
+    IsDmode(IsDmode_),
+    IsSystem(IsSystem_),
     QDoubleSpinBox(parent)
 {
     Popup=NULL;
@@ -914,6 +955,34 @@ DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Other
     setFont(Font);
 
     setFocusPolicy(Qt::NoFocus);
+
+    //Popup=new QWidget((QWidget*)parent(), Qt::Popup | Qt::Window);
+    //Popup=new QWidget((QWidget*)parent(), Qt::FramelessWindowHint);
+    //Popup->setGeometry(((QWidget*)parent())->geometry().x()+x()+width()-(255+30), ((QWidget*)parent())->geometry().y()+y()+height(), 255+30, height());
+    //Popup->setGeometry(x()+width()-(255+30), y()+height(), 255+30, height());
+    //Popup->setWindowModality(Qt::NonModal);
+    //Popup->setFocusPolicy(Qt::NoFocus);
+    //QLayout* Layout=new QGridLayout();
+    //Layout->setContentsMargins(0, 0, 0, 0);
+    //Layout->setSpacing(0);
+    Slider=new QSlider(Qt::Horizontal, parentWidget());
+    Slider->setFocusPolicy(Qt::NoFocus);
+    Slider->setMinimum(Min);
+    Slider->setMaximum(Max);
+    Slider->setToolTip(toolTip());
+    int slider_width = 255 + 30;
+    // Assure that the initial position is always inside the window
+    int initial_x = max(x() + width() - slider_width, 5);
+    Slider->setGeometry(initial_x, y() + height(), slider_width, height());
+    connect(Slider, SIGNAL(valueChanged(int)), this, SLOT(on_sliderMoved(int)));
+    connect(Slider, SIGNAL(sliderMoved(int)), this, SLOT(on_sliderMoved(int)));
+    Slider->setFocusPolicy(Qt::NoFocus);
+    //Layout->addWidget(Slider);
+    //Popup->setFocusPolicy(Qt::NoFocus);
+    //Popup->setLayout(Layout);
+    connect(this, SIGNAL(valueChanged(double)), this, SLOT(on_valueChanged(double)));
+	
+    Slider->hide();
 }
 
 //---------------------------------------------------------------------------
@@ -928,28 +997,7 @@ void DoubleSpinBoxWithSlider::enterEvent (QEvent* event)
 {
     if (Slider==NULL)
     {
-        //Popup=new QWidget((QWidget*)parent(), Qt::Popup | Qt::Window);
-        //Popup=new QWidget((QWidget*)parent(), Qt::FramelessWindowHint);
-        //Popup->setGeometry(((QWidget*)parent())->geometry().x()+x()+width()-(255+30), ((QWidget*)parent())->geometry().y()+y()+height(), 255+30, height());
-        //Popup->setGeometry(x()+width()-(255+30), y()+height(), 255+30, height());
-        //Popup->setWindowModality(Qt::NonModal);
-        //Popup->setFocusPolicy(Qt::NoFocus);
-        //QLayout* Layout=new QGridLayout();
-        //Layout->setContentsMargins(0, 0, 0, 0);
-        //Layout->setSpacing(0);
-        Slider=new QSlider(Qt::Horizontal, (QWidget*)parent());
-        Slider->setFocusPolicy(Qt::NoFocus);
-        Slider->setMinimum(Min);
-        Slider->setMaximum(Max);
-        Slider->setToolTip(toolTip());
-        Slider->setGeometry(x()+width()-(255+30), y()+height(), 255+30, height());
-        connect(Slider, SIGNAL(valueChanged(int)), this, SLOT(on_sliderMoved(int)));
-        connect(Slider, SIGNAL(sliderMoved(int)), this, SLOT(on_sliderMoved(int)));
-        Slider->setFocusPolicy(Qt::NoFocus);
-        //Layout->addWidget(Slider);
-        //Popup->setFocusPolicy(Qt::NoFocus);
-        //Popup->setLayout(Layout);
-        connect(this, SIGNAL(valueChanged(double)), this, SLOT(on_valueChanged(double)));
+        Slider->show();
     }
     for (size_t Pos=0; Pos<Args_Max; Pos++)
         if (Others[Pos] && Others[Pos]!=this)
@@ -970,6 +1018,29 @@ void DoubleSpinBoxWithSlider::ChangeMax(int Max_)
     setMaximum(Max);
     if (Slider)
         Slider->setMaximum(Max);
+}
+
+void DoubleSpinBoxWithSlider::applyValue(double value, bool notify)
+{
+    if (IsBitSlice)
+    {
+        if (value<1)
+            setPrefix(QString());
+        else
+            setPrefix("Bit ");
+    }
+
+    if (Slider)
+    {
+        double Value=value*Divisor;
+        int ValueInt=(int)Value;
+        if(Value-0.5>=ValueInt)
+            ValueInt++;
+        Slider->setValue(Value);
+
+        if(notify)
+            Q_EMIT controlValueChanged(Value);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -1010,22 +1081,7 @@ void DoubleSpinBoxWithSlider::hidePopup ()
 //---------------------------------------------------------------------------
 void DoubleSpinBoxWithSlider::on_valueChanged (double value)
 {
-    if (IsBitSlice)
-    {
-        if (value<1)
-            setPrefix(QString());
-        else
-            setPrefix("Bit ");
-    }
-
-    if (Slider)
-    {
-        double Value=value*Divisor;
-        int ValueInt=(int)Value;
-        if(Value-0.5>=ValueInt)
-            ValueInt++;
-        Slider->setValue(Value);
-    }
+    applyValue(value, false);
 }
 
 //---------------------------------------------------------------------------
@@ -1064,9 +1120,9 @@ QString DoubleSpinBoxWithSlider::textFromValue (double value) const
     else if (IsFilter && value==3)
         return "chroma";
     else if (IsFilter && value==4)
-        return "achroma";
-    else if (IsFilter && value==5)
         return "color";
+    else if (IsFilter && value==5)
+        return "acolor";
     else if (IsPeak && value==0)
         return "none";
     else if (IsPeak && value==1)
@@ -1085,6 +1141,44 @@ QString DoubleSpinBoxWithSlider::textFromValue (double value) const
         return "color3";
     else if (IsMode && value==4)
         return "color4";
+    else if (IsMode && value==5)
+        return "color5";
+    else if (IsScale && value==0)
+        return "digital";
+    else if (IsScale && value==1)
+        return "millivolts";
+    else if (IsScale && value==2)
+        return "ire";
+    else if (IsColorspace && value==0)
+        return "auto";
+    else if (IsColorspace && value==1)
+        return "601";
+    else if (IsColorspace && value==2)
+        return "709";
+    else if (IsDmode && value==0)
+        return "mono";
+    else if (IsDmode && value==1)
+        return "color";
+    else if (IsDmode && value==2)
+        return "color2";
+    else if (IsSystem && value==0)
+        return "NTSC 1953 Y'I'O' (ITU-R BT.470 System M)";
+    else if (IsSystem && value==1)
+        return "EBU Y'U'V' (PAL/SECAM) (ITU-R BT.470 System B, G)";
+    else if (IsSystem && value==2)
+        return "SMPTE-C RGB";
+    else if (IsSystem && value==3)
+        return "SMPTE-240M Y'PbPr";
+    else if (IsSystem && value==4)
+        return "Apple RGB";
+    else if (IsSystem && value==5)
+        return "Adobe Wide Gamut RGB";
+    else if (IsSystem && value==6)
+        return "CIE 1931 RGB";
+    else if (IsSystem && value==7)
+        return "ITU.BT-709 Y'CbCr";
+    else if (IsSystem && value==8)
+        return "ITU-R.BT-2020";
     else
         return QDoubleSpinBox::textFromValue(value);
 }
@@ -1109,6 +1203,7 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     QDialog(parent),
     FileInfoData(FileInformationData_)
 {
+    setlocale(LC_NUMERIC, "C");
     setWindowTitle("QCTools - "+FileInfoData->FileName);
     setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
     setWindowFlags(windowFlags() &(0xFFFFFFFF-Qt::WindowContextHelpButtonHint));
@@ -1161,18 +1256,18 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     }
 
     //Image1
-    Image1=new ImageLabel(&Picture, 1, this);
-    Image1->IsMain=true;
-    Image1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    Image1->setMinimumSize(20, 20);
+    imageLabel1=new ImageLabel(&Picture, 1, this);
+    imageLabel1->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    imageLabel1->setMinimumSize(20, 20);
+    imageLabel1->showDebugOverlay(Config::instance().getDebug());
     //Layout->addWidget(Image1, 1, 0, 1, 1);
     //Layout->setColumnStretch(0, 1);
 
     //Image2
-    Image2=new ImageLabel(&Picture, 2, this);
-    Image2->IsMain=false;
-    Image2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    Image2->setMinimumSize(20, 20);
+    imageLabel2=new ImageLabel(&Picture, 2, this);
+    imageLabel2->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    imageLabel2->setMinimumSize(20, 20);
+    imageLabel2->showDebugOverlay(Config::instance().getDebug());
     //Layout->addWidget(Image2, 1, 2, 1, 1);
     //Layout->setColumnStretch(2, 1);
 
@@ -1180,8 +1275,8 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     QHBoxLayout* ImageLayout=new QHBoxLayout();
     ImageLayout->setContentsMargins(0, -1, 0, 0);
     ImageLayout->setSpacing(0);
-    ImageLayout->addWidget(Image1);
-    ImageLayout->addWidget(Image2);
+    ImageLayout->addWidget(imageLabel1);
+    ImageLayout->addWidget(imageLabel2);
     Layout->addLayout(ImageLayout, 1, 0, 1, 3);
 
     // Info
@@ -1295,24 +1390,26 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                     {
                                     // Special case: "Line", max is source width or height
                                     int Max;
-                                    string MaxTemp(Filters[FilterPos].Args[OptionPos].Name);
-                                    if (MaxTemp=="Line")
+                                    QString MaxTemp(Filters[FilterPos].Args[OptionPos].Name);
+                                    if (MaxTemp == "Line")
                                     {
-                                        bool SelectWidth=false;
-                                        for (size_t OptionPos2=0; OptionPos2<Args_Max; OptionPos2++)
-                                            if (Filters[FilterPos].Args[OptionPos2].Type!=Args_Type_None && string(Filters[FilterPos].Args[OptionPos2].Name)=="Vertical")
-                                                SelectWidth=Filters[FilterPos].Args[OptionPos2].Default?true:false;
-                                        Max=SelectWidth?FileInfoData->Glue->Width_Get():FileInfoData->Glue->Height_Get();
+                                        bool SelectWidth = false;
+                                        for (size_t OptionPos2 = 0; OptionPos2 < Args_Max; OptionPos2++)
+                                            if (Filters[FilterPos].Args[OptionPos2].Type != Args_Type_None && string(Filters[FilterPos].Args[OptionPos2].Name) == "Vertical")
+                                                SelectWidth = Filters[FilterPos].Args[OptionPos2].Default ? true : false;
+                                        Max = SelectWidth ? FileInfoData->Glue->Width_Get() : FileInfoData->Glue->Height_Get();
                                     }
-                                    else if (MaxTemp=="x" || MaxTemp=="s" || MaxTemp=="Reveal" )
-                                        Max=FileInfoData->Glue->Width_Get();
-                                    else if (MaxTemp=="y")
-                                        Max=FileInfoData->Glue->Height_Get();
+                                    else if (MaxTemp == "x" || MaxTemp == "Reveal")
+                                        Max = FileInfoData->Glue->Width_Get();
+                                    else if (MaxTemp == "y" || MaxTemp == "s" || MaxTemp == "w" || MaxTemp == "h")
+                                        Max = FileInfoData->Glue->Height_Get();
+                                    else if (MaxTemp.contains("bit position", Qt::CaseInsensitive) && FileInfoData->Glue->BitsPerRawSample_Get() != 0)
+                                        Max = FileInfoData->Glue->BitsPerRawSample_Get();
                                     else
                                         Max=Filters[FilterPos].Args[OptionPos].Max;
 
                                     Options[Pos].Sliders_Label[OptionPos]=new QLabel(Filters[FilterPos].Args[OptionPos].Name+QString(": "));
-                                    Options[Pos].Sliders_SpinBox[OptionPos]=new DoubleSpinBoxWithSlider(Options[Pos].Sliders_SpinBox, Filters[FilterPos].Args[OptionPos].Min, Max, Filters[FilterPos].Args[OptionPos].Divisor, PreviousValues[Pos][FilterPos].Values[OptionPos], Filters[FilterPos].Args[OptionPos].Name, this, Pos, QString(Filters[FilterPos].Args[OptionPos].Name).contains(" bit position"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Filter"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Peak"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Mode"), this);
+                                    Options[Pos].Sliders_SpinBox[OptionPos]=new DoubleSpinBoxWithSlider(Options[Pos].Sliders_SpinBox, Filters[FilterPos].Args[OptionPos].Min, Max, Filters[FilterPos].Args[OptionPos].Divisor, PreviousValues[Pos][FilterPos].Values[OptionPos], Filters[FilterPos].Args[OptionPos].Name, this, Pos, QString(Filters[FilterPos].Args[OptionPos].Name).contains(" bit position"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Filter"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Peak"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Mode"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Scale"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("Colorspace"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("DataMode"), QString(Filters[FilterPos].Args[OptionPos].Name).contains("System") || QString(Filters[FilterPos].Args[OptionPos].Name).contains("Gamut"), this);
                                     connect(Options[Pos].Sliders_SpinBox[OptionPos], SIGNAL(valueChanged(double)), this, Pos==0?(SLOT(on_FiltersSpinBox1_click())):SLOT(on_FiltersSpinBox2_click()));
                                     Options[Pos].Sliders_Label[OptionPos]->setFont(Font);
                                     if (Options[Pos].Sliders_SpinBox[OptionPos])
@@ -1470,6 +1567,28 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                     Widget_XPox++;
                                     }
                                     break;
+            case Args_Type_LogLin:
+                                    //Options[Pos].Sliders_Label[OptionPos]=new QLabel(Filters[FilterPos].Args[OptionPos].Name+QString(": "));
+                                    Layout0->addWidget(Options[Pos].Sliders_Label[OptionPos], 0, Widget_XPox);
+                                    Options[Pos].Radios_Group[OptionPos]=new QButtonGroup();
+                                    for (size_t OptionPos2=0; OptionPos2<2; OptionPos2++)
+                                    {
+                                        Options[Pos].Radios[OptionPos][OptionPos2]=new QRadioButton();
+                                        Options[Pos].Radios[OptionPos][OptionPos2]->setFont(Font);
+                                        switch (OptionPos2)
+                                        {
+                                            case 0: Options[Pos].Radios[OptionPos][OptionPos2]->setText("linear"); break;
+                                            case 1: Options[Pos].Radios[OptionPos][OptionPos2]->setText("log"); break;
+                                            default:;
+                                        }
+                                        if (OptionPos2==PreviousValues[Pos][FilterPos].Values[OptionPos])
+                                            Options[Pos].Radios[OptionPos][OptionPos2]->setChecked(true);
+                                        connect(Options[Pos].Radios[OptionPos][OptionPos2], SIGNAL(toggled(bool)), this, Pos==0?(SLOT(on_FiltersOptions1_toggle(bool))):SLOT(on_FiltersOptions2_toggle(bool)));
+                                        Layout0->addWidget(Options[Pos].Radios[OptionPos][OptionPos2], 0, Widget_XPox+1+OptionPos2);
+                                        Options[Pos].Radios_Group[OptionPos]->addButton(Options[Pos].Radios[OptionPos][OptionPos2]);
+                                    }
+                                    Widget_XPox++;
+                                    break;
             default:                ;
         }
     }
@@ -1519,12 +1638,14 @@ void BigDisplay::FiltersList1_currentIndexChanged(size_t FilterPos)
 
     if (Picture_Current1<2)
     {
-        Image1->setVisible(true);
+        imageLabel1->setVisible(true);
         Layout->setColumnStretch(0, 1);
         //resize(width()+Image_Width, height());
     }
     Picture_Current1=FilterPos;
     FiltersList1_currentOptionChanged(Picture_Current1);
+
+    updateSelection(FilterPos, imageLabel1, Options[0]);
 }
 
 //---------------------------------------------------------------------------
@@ -1543,12 +1664,14 @@ void BigDisplay::FiltersList2_currentIndexChanged(size_t FilterPos)
 
     if (Picture_Current2<2)
     {
-        Image2->setVisible(true);
+        imageLabel2->setVisible(true);
         Layout->setColumnStretch(2, 1);
         //resize(width()+Image_Width, height());
     }
     Picture_Current2=FilterPos;
     FiltersList2_currentOptionChanged(Picture_Current2);
+
+    updateSelection(FilterPos, imageLabel2, Options[1]);
 }
 
 //---------------------------------------------------------------------------
@@ -1603,10 +1726,14 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
 
                                     break;
             case Args_Type_Slider:
-                                    Modified=true;
-                                    WithSliders[OptionPos]=Options[Pos].Sliders_SpinBox[OptionPos]->value();
-                                    PreviousValues[Pos][Picture_Current].Values[OptionPos]=Options[Pos].Sliders_SpinBox[OptionPos]->value();
-                                    break;
+                {
+                    Modified = true;
+                    double value = Options[Pos].Sliders_SpinBox[OptionPos]->value();
+                    double divisor = Filters[Picture_Current].Args[OptionPos].Divisor;
+                    WithSliders[OptionPos] = value;
+                    PreviousValues[Pos][Picture_Current].Values[OptionPos] = value * divisor;
+                }
+                break;
             case Args_Type_Win_Func:
             case Args_Type_Wave_Mode:
                 Modified=true;
@@ -1633,7 +1760,18 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                     {
                                         if (Options[Pos].Radios[OptionPos][OptionPos2] && Options[Pos].Radios[OptionPos][OptionPos2]->isChecked())
                                         {
-                                            if (string(Filters[Picture_Current].Name)=="Waveform" || string(Filters[Picture_Current].Name)=="Waveform 2.8")
+                                            if (string(Filters[Picture_Current].Name)=="Extract Planes Equalized" || string(Filters[Picture_Current].Name)=="Bit Plane Noise" || string(Filters[Picture_Current].Name)=="Value Highlight" || string(Filters[Picture_Current].Name)=="Field Difference" || string(Filters[Picture_Current].Name)=="Temporal Difference")
+                                            {
+                                                switch (OptionPos2)
+                                                {
+                                                    case 0: WithRadios[OptionPos]="y"; break;
+                                                    case 1: WithRadios[OptionPos]="u"; break;
+                                                    case 2: WithRadios[OptionPos]="v"; break;
+                                                    default:;
+                                                }
+                                            }
+                                            else
+                                            {
                                                 switch (OptionPos2)
                                                 {
                                                     case 0: WithRadios[OptionPos]="1"; break;
@@ -1642,24 +1780,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                                     case 3: WithRadios[OptionPos]="7"; break; //Special case: remove plane
                                                     default:;
                                                 }
-                                            else if (string(Filters[Picture_Current].Name)=="Histogram" && Options[Pos].Checks[1] && Options[Pos].Checks[1]->isChecked()) //RGB
-                                                switch (OptionPos2)
-                                                {
-                                                    case 0: WithRadios[OptionPos]="r"; break;
-                                                    case 1: WithRadios[OptionPos]="g"; break;
-                                                    case 2: WithRadios[OptionPos]="b"; break;
-                                                    case 3: WithRadios[OptionPos]="all"; break; //Special case: remove plane
-                                                    default:;
-                                                }
-                                            else
-                                                switch (OptionPos2)
-                                                {
-                                                    case 0: WithRadios[OptionPos]="y"; break;
-                                                    case 1: WithRadios[OptionPos]="u"; break;
-                                                    case 2: WithRadios[OptionPos]="v"; break;
-                                                    case 3: WithRadios[OptionPos]="all"; break; //Special case: remove plane
-                                                    default:;
-                                                }
+                                            }
                                             PreviousValues[Pos][Picture_Current].Values[OptionPos]=OptionPos2;
                                             break;
                                         }
@@ -1704,6 +1825,23 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                                                 case 0: WithRadios[OptionPos]="auto"; break;
                                                 case 1: WithRadios[OptionPos]="full"; break;
                                                 case 2: WithRadios[OptionPos]="tv"; break;
+                                                default:;
+                                            }
+                                            PreviousValues[Pos][Picture_Current].Values[OptionPos]=OptionPos2;
+                                            break;
+                                        }
+                                    }
+                                    break;
+            case Args_Type_LogLin:
+                                    Modified=true;
+                                    for (size_t OptionPos2=0; OptionPos2<(Filters[Picture_Current].Args[OptionPos].Type?4:3); OptionPos2++)
+                                    {
+                                        if (Options[Pos].Radios[OptionPos][OptionPos2] && Options[Pos].Radios[OptionPos][OptionPos2]->isChecked())
+                                        {
+                                            switch (OptionPos2)
+                                            {
+                                                case 0: WithRadios[OptionPos]="linear"; break;
+                                                case 1: WithRadios[OptionPos]="logarithmic"; break;
                                                 default:;
                                             }
                                             PreviousValues[Pos][Picture_Current].Values[OptionPos]=OptionPos2;
@@ -1757,6 +1895,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
                 case Args_Type_ClrPck:
                 case Args_Type_ColorMatrix:
                 case Args_Type_SampleRange:
+                case Args_Type_LogLin:
                                         {
                                         char ToFind1[3];
                                         ToFind1[0]='$';
@@ -1829,6 +1968,15 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
     }
 
     // Variables
+    QString str = QString::fromStdString(Modified_String);
+
+    str.replace(QString("${width}"), QString::number(FileInfoData->Glue->Width_Get()));
+    str.replace(QString("${height}"), QString::number(FileInfoData->Glue->Height_Get()));
+    str.replace(QString("${dar}"), QString::number(FileInfoData->Glue->DAR_Get()));
+
+    Modified_String = str.toStdString();
+
+    /*
     Pos=Modified_String.find("${width}");
     if (Pos!=string::npos)
     {
@@ -1853,6 +2001,7 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
         ss<<FileInfoData->Glue->DAR_Get();
         Modified_String.insert(Pos, ss.str());
     }
+    */
 
     return Modified_String;
 }
@@ -1882,18 +2031,8 @@ void BigDisplay::FiltersList2_currentOptionChanged(size_t Picture_Current)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void BigDisplay::ShowPicture ()
+void BigDisplay::InitPicture()
 {
-    if (!isVisible())
-        return;
-
-    if ((!ShouldUpate && Frames_Pos==FileInfoData->Frames_Pos_Get())
-     || ( ShouldUpate && false)) // ToDo: try to optimize
-        return;
-    Frames_Pos=FileInfoData->Frames_Pos_Get();
-    ShouldUpate=false;
-
-    // Picture
     if (!Picture)
     {
         string FileName_string=FileInfoData->FileName.toUtf8().data();
@@ -1907,6 +2046,8 @@ void BigDisplay::ShowPicture ()
         if (height%2)
             height--; //odd number is wanted for filters
         Picture=new FFmpeg_Glue(FileName_string.c_str(), FileInfoData->ActiveAllTracks, &FileInfoData->Stats);
+        Picture->setThreadSafe(true);
+
         if (FileName_string.empty())
             Picture->InputData_Set(FileInfoData->Glue->InputData_Get()); // Using data from the analyzed file
         Picture->AddOutput(0, width, height, FFmpeg_Glue::Output_QImage);
@@ -1914,20 +2055,50 @@ void BigDisplay::ShowPicture ()
         FiltersList1_currentIndexChanged(Picture_Current1);
         FiltersList2_currentIndexChanged(Picture_Current2);
     }
+}
+
+void BigDisplay::ShowPicture ()
+{
+    if (!isVisible())
+        return;
+
+	if (!Picture)
+		return;
+
+    if ((!ShouldUpate && Frames_Pos==FileInfoData->Frames_Pos_Get())
+     || ( ShouldUpate && false)) // ToDo: try to optimize
+        return;
+    Frames_Pos=FileInfoData->Frames_Pos_Get();
+    ShouldUpate=false;
+
     Picture->FrameAtPosition(Frames_Pos);
-    if (Picture->Image_Get(0))
+    auto image = Picture->Image_Get(0);
+    if (!image.isNull())
     {
-        Image_Width=Picture->Image_Get(0)->width();
-        Image_Height=Picture->Image_Get(0)->height();
+        Image_Width = image.width();
+        Image_Height = image.height();
     }
 
-    if (Slider->sliderPosition()!=Frames_Pos)
-        Slider->setSliderPosition(Frames_Pos);
-
-    Image1->Pixmap_MustRedraw=true;
-    Image1->repaint();
-    Image2->Pixmap_MustRedraw=true;
-    Image2->repaint();
+    if (QThread::currentThread() == thread())
+    {
+        updateImagesAndSlider(QPixmap::fromImage(Picture->Image_Get(0)), QPixmap::fromImage(Picture->Image_Get(1)), Frames_Pos);
+    }
+    else
+    {
+        if (QThread::currentThread()->isInterruptionRequested())
+        {
+            QMetaObject::invokeMethod(this, "updateImagesAndSlider", Qt::QueuedConnection,
+                                      Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(0))),
+                                      Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(1))),
+                                      Q_ARG(const int, Frames_Pos));
+        }
+        else {
+            QMetaObject::invokeMethod(this, "updateImagesAndSlider", Qt::BlockingQueuedConnection,
+                                      Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(0))),
+                                      Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(1))),
+                                      Q_ARG(const int, Frames_Pos));
+        }
+    }
 
     // Stats
     if (ControlArea)
@@ -2107,13 +2278,11 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
     if (action->text()=="No display")
     {
         Picture->Disable(0);
-        Image1->Remove();
+        imageLabel1->Remove();
         Layout->setColumnStretch(0, 0);
         //move(pos().x()+Image_Width, pos().y());
         //adjustSize();
         Picture_Current1=1;
-        Image1->IsMain=false;
-        Image2->IsMain=true;
         repaint();
         return;
     }
@@ -2126,9 +2295,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
         {
             if (Picture_Current1<2)
             {
-                Image1->setVisible(true);
-                Image1->IsMain=true;
-                Image2->IsMain=false;
+                imageLabel1->setVisible(true);
                 Layout->setColumnStretch(0, 1);
                 //move(pos().x()-Image_Width, pos().y());
                 //resize(width()+Image_Width, height());
@@ -2139,12 +2306,78 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
 
             Frames_Pos=(size_t)-1;
             ShowPicture ();
+            updateSelection(Pos, imageLabel1, Options[0]);
             return;
         }
     }
 }
 
 //---------------------------------------------------------------------------
+void BigDisplay::updateSelection(int Pos, ImageLabel* image, options& opts)
+{
+    image->disconnect();
+
+    if(strcmp(Filters[Pos].Name, "Waveform Target") == 0 ||
+            strcmp(Filters[Pos].Name, "Vectorscope Target") ==  0 ||
+            strcmp(Filters[Pos].Name, "Zoom") ==  0)
+    {
+        auto& xSpinBox = opts.Sliders_SpinBox[0];
+        auto& ySpinBox = opts.Sliders_SpinBox[1];
+        auto& wSpinBox = opts.Sliders_SpinBox[2];
+        auto& hSpinBox = opts.Sliders_SpinBox[3];
+
+        image->setSelectionArea(xSpinBox->value(), ySpinBox->value(), wSpinBox->value(), hSpinBox->value());
+
+        image->setMinSelectionSize(QSizeF(wSpinBox->minimum(), hSpinBox->minimum()));
+        image->setMaxSelectionSize(QSizeF(wSpinBox->maximum(), hSpinBox->maximum()));
+
+        connect(xSpinBox, &DoubleSpinBoxWithSlider::controlValueChanged, image, &ImageLabel::moveSelectionX);
+        connect(ySpinBox, &DoubleSpinBoxWithSlider::controlValueChanged, image, &ImageLabel::moveSelectionY);
+        connect(wSpinBox, &DoubleSpinBoxWithSlider::controlValueChanged, image, &ImageLabel::changeSelectionWidth);
+        connect(hSpinBox, &DoubleSpinBoxWithSlider::controlValueChanged, image, &ImageLabel::changeSelectionHeight);
+
+        connect(image, &ImageLabel::selectionChangeFinished, [&](const QRectF& geometry) {
+            qDebug() << "x: " << geometry.x();
+            qDebug() << "y: " << geometry.y();
+
+            xSpinBox->applyValue(geometry.topLeft().x(), true);
+            ySpinBox->applyValue(geometry.topLeft().y(), true);
+            wSpinBox->applyValue(geometry.width(), true);
+            hSpinBox->applyValue(geometry.height(), true);
+
+        });
+
+        connect(image, &ImageLabel::selectionChanged, [&](const QRectF& geometry) {
+            qDebug() << "x: " << geometry.x();
+            qDebug() << "y: " << geometry.y();
+
+            qDebug() << "width: " << geometry.width();
+            qDebug() << "height: " << geometry.height();
+
+            xSpinBox->applyValue(geometry.x(), false);
+            ySpinBox->applyValue(geometry.y(), false);
+            wSpinBox->applyValue(geometry.width(), false);
+            hSpinBox->applyValue(geometry.height(), false);
+        });
+    }
+    else
+    {
+        image->setSelectionArea(0, 0, 0, 0);
+    }
+}
+
+void BigDisplay::updateImagesAndSlider(const QPixmap &pixmap1, const QPixmap &pixmap2, int sliderPos)
+{
+    if (Slider->sliderPosition() != sliderPos)
+        Slider->setSliderPosition(sliderPos);
+
+    if(!pixmap1.isNull())
+        imageLabel1->setPixmap(pixmap1);
+
+    if(!pixmap2.isNull())
+        imageLabel2->setPixmap(pixmap2);
+}
+
 void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
 {
     // Help
@@ -2159,20 +2392,16 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
     if (Pos==1)
     {
         Picture->Disable(0);
-        Image1->Remove();
+        imageLabel1->Remove();
         Layout->setColumnStretch(0, 0);
         //move(pos().x()+Image_Width, pos().y());
         //adjustSize();
-        Image1->IsMain=false;
-        Image2->IsMain=true;
         repaint();
     }
 
     if (Picture_Current1<2)
     {
-        Image1->setVisible(true);
-        Image1->IsMain=true;
-        Image2->IsMain=false;
+        imageLabel1->setVisible(true);
         Layout->setColumnStretch(0, 1);
         //move(pos().x()-Image_Width, pos().y());
         //resize(width()+Image_Width, height());
@@ -2181,6 +2410,8 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
 
     Frames_Pos=(size_t)-1;
     ShowPicture ();
+
+    updateSelection(Pos, imageLabel1, Options[0]);
 }
 
 //---------------------------------------------------------------------------
@@ -2198,13 +2429,14 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(int Pos)
     if (Pos==1)
     {
         Picture->Disable(1);
-        Image2->Remove();
+        imageLabel2->Remove();
         Layout->setColumnStretch(2, 0);
         //adjustSize();
         repaint();
     }
 
     FiltersList2_currentIndexChanged(Pos);
+    updateSelection(Pos, imageLabel2, Options[1]);
 }
 
 //---------------------------------------------------------------------------
@@ -2222,7 +2454,7 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(QAction * action)
     if (action->text()=="No display")
     {
         Picture->Disable(1);
-        Image2->Remove();
+        imageLabel2->Remove();
         Layout->setColumnStretch(2, 0);
         //adjustSize();
         Picture_Current2=1;
@@ -2237,44 +2469,10 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(QAction * action)
         if (action->text()==Filters[Pos].Name)
         {
             FiltersList2_currentIndexChanged(Pos);
+            updateSelection(Pos, imageLabel2, Options[1]);
             return;
         }
     }
-}
-
-//---------------------------------------------------------------------------
-void BigDisplay::resizeEvent(QResizeEvent* Event)
-{
-    if (Event->oldSize().width()<0 || Event->oldSize().height()<0)
-        return;
-
-    /*int DiffX=(Event->size().width()-Event->oldSize().width())/2;
-    int DiffY=(Event->size().width()-Event->oldSize().width())/2;
-    Picture->Scale_Change(Image_Width+DiffX, Image_Height+DiffY);
-
-    Frames_Pos=(size_t)-1;
-    ShowPicture ();*/
-    int SizeX=(Event->size().width()-(InfoArea?InfoArea->width():0))/2-25;
-    int SizeY=(Event->size().height()-Slider->height())-50;
-
-    /*if (InfoArea->height()+FiltersList1->height()+Slider->height()+ControlArea->height()+50>=Event->size().height())
-    {
-        InfoArea->hide();
-        Layout->removeWidget(InfoArea);
-    }
-    else
-    {
-        Layout->addWidget(InfoArea, 0, 1, 1, 3, Qt::AlignLeft);
-        InfoArea->show();
-    }*/
-
-    //adjust();
-    //Picture->Scale_Change(Image1->width(), Image1->height());
-
-    //Frames_Pos=(size_t)-1;
-    //ShowPicture ();
-    Image1->Pixmap_MustRedraw=true;
-    Image2->Pixmap_MustRedraw=true;
 }
 
 //---------------------------------------------------------------------------

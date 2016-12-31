@@ -18,6 +18,7 @@ class FFmpeg_Glue;
 class Control;
 class Info;
 class FileInformation;
+class ImageLabel;
 
 class QLabel;
 class QToolButton;
@@ -36,43 +37,26 @@ class QPushButton;
 const size_t Args_Max=7;
 //---------------------------------------------------------------------------
 
-//***************************************************************************
-// Helper
-//***************************************************************************
-
-class ImageLabel : public QWidget
-{
-    Q_OBJECT
-
-public:
-    explicit ImageLabel (FFmpeg_Glue** Picture, size_t Pos, QWidget *parent=NULL);
-    void                        Remove ();
-    bool                        Pixmap_MustRedraw;
-    bool                        IsMain;
-
-protected:
-    void paintEvent (QPaintEvent*);
-
-private:
-    QPixmap                     Pixmap;
-    FFmpeg_Glue**               Picture;
-    size_t                      Pos;
-};
-
 class BigDisplay;
 class DoubleSpinBoxWithSlider : public QDoubleSpinBox
 {
     Q_OBJECT
 
 public:
-    explicit DoubleSpinBoxWithSlider (DoubleSpinBoxWithSlider** Others, int Min, int Max, int Divisor, int Current, const char* Name, BigDisplay* Display, size_t Pos, bool IsBitSlice, bool IsFilter, bool IsPeak, bool IsMode, QWidget *parent=NULL);
+    explicit DoubleSpinBoxWithSlider (DoubleSpinBoxWithSlider** Others, int Min, int Max, int Divisor, int Current, const char* Name, BigDisplay* Display, size_t Pos, bool IsBitSlice, bool IsFilter, bool IsPeak, bool IsMode, bool IsScale, bool IsColorspace, bool IsDmode, bool IsSystem, QWidget *parent=NULL);
     ~DoubleSpinBoxWithSlider();
 
     bool IsBitSlice;
     bool IsFilter;
     bool IsPeak;
     bool IsMode;
+    bool IsScale;
+    bool IsColorspace;
+    bool IsDmode;
+    bool IsSystem;
     void ChangeMax(int Max);
+
+    void applyValue(double value, bool notify);
 
 protected:
     void enterEvent (QEvent* event);
@@ -99,6 +83,9 @@ private:
 public Q_SLOTS:
     void on_valueChanged(double);
     void on_sliderMoved(int);
+
+Q_SIGNALS:
+    void controlValueChanged(double);
 };
 
 //***************************************************************************
@@ -122,7 +109,9 @@ public:
 
     // Content
     Control*                    ControlArea;
-
+    
+    void InitPicture();
+    
 protected:
     // File information
     FileInformation*            FileInfoData;
@@ -159,8 +148,8 @@ protected:
     };
     std::vector<previous_values>PreviousValues[2];
     Info*                       InfoArea;
-    ImageLabel*                 Image1;
-    ImageLabel*                 Image2;
+    ImageLabel*                 imageLabel1;
+    ImageLabel*                 imageLabel2;
     QSlider*                    Slider;
 
     // Temp
@@ -170,7 +159,6 @@ protected:
     size_t                      FiltersListDefault_Count;
 
     // Events
-    void                        resizeEvent (QResizeEvent * event);
     void                        FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, QGridLayout* Layout0);
     void                        FiltersList1_currentIndexChanged(size_t FilterPos);
     void                        FiltersList2_currentIndexChanged(size_t FilterPos);
@@ -178,7 +166,11 @@ protected:
     void                        FiltersList1_currentOptionChanged(size_t Picture_Current);
     void                        FiltersList2_currentOptionChanged(size_t Picture_Current);
 
+    void updateSelection(int Pos, ImageLabel* image, options& opts);
+
 public Q_SLOTS:
+    void updateImagesAndSlider(const QPixmap& pixmap1, const QPixmap& pixmap2, int sliderPos);
+
     void on_FiltersList1_currentIndexChanged(QAction * action);
     void on_FiltersList2_currentIndexChanged(QAction * action);
     void on_FiltersList1_currentIndexChanged(int Pos);

@@ -1,6 +1,15 @@
 Makefile
+Project/Homebrew/.qmake.stash
+Project/Homebrew/Makefile
+Project/Homebrew/moc
+Project/Homebrew/moc_*
+Project/Homebrew/QCTools.app
+Project/Homebrew/qrc_Resources.cpp
+Project/Homebrew/*.h
 Project/QtCreator/.qmake.stash
 Project/QtCreator/Makefile
+Project/QtCreator/Makefile.Debug
+Project/QtCreator/Makefile.Release
 Project/QtCreator/moc
 Project/QtCreator/QCTools.app
 Project/QtCreator/resources/qrc_Resources.cpp
@@ -9,3 +18,8 @@ Source/Makefile
 Source/Source.pro
 Source/build
 *.o
+
+Docs/qctools.html
+Docs/qctools.pdf
+
+.DS_Store

@@ -11,6 +11,7 @@
 
 //---------------------------------------------------------------------------
 #include <QWidget>
+#include <QTime>
 
 class FileInformation;
 class PerPicture;
@@ -22,6 +23,7 @@ class QToolButton;
 class QPushButton;
 class QTimer;
 class QTime;
+class QCheckBox;
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -43,13 +45,18 @@ public:
 
     virtual ~Control();
 
-    // Commands
-    void                        Update                      ();
+    size_t getCurrentFrame() const;
+
+    void setPlayAllFrames(bool value);
+    bool getPlayAllFrames() const;
 
 Q_SIGNALS:
     void currentFrameChanged();
 
 public Q_SLOTS:
+    // Commands
+    void                        Update();
+
     void TimeOut();
     void on_M9_clicked(bool checked);
     void on_M2_clicked(bool checked);
@@ -63,6 +70,8 @@ public Q_SLOTS:
     void on_P1_clicked(bool checked);
     void on_P2_clicked(bool checked);
     void on_P9_clicked(bool checked);
+
+    void setCurrentFrame(size_t frame);
 
 public:
     // To update
@@ -85,7 +94,11 @@ public:
     QToolButton*                P2;
     QToolButton*                P9;
 
+    void stop();
+
 private:
+    bool playAllFrames;
+
     void TimeOut_Init();
 
     enum selectedspeed
@@ -107,12 +120,19 @@ private:
     int                         Frames_Pos;
     style                       Style;
 
-    // For speed
-    int                         Frames_Total;
-
     // Time
     QTimer* Timer;
-    QTime*  Time;
+    QThread* Thread;
+    QTime   Time;
+
+    size_t  startFrame;
+    QTime   startFrameTimeStamp;
+
+    size_t  lastRenderedFrame;
+    QTime   lastRenderedFrameTimeStamp;
+
+    double  averageFrameDuration;
+
     bool    Time_MinusPlus;
     int     Timer_Duration;
 };

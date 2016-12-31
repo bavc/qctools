@@ -18,6 +18,7 @@ extern "C"
 #endif
 
 #include <libavutil/frame.h>
+#include <libavutil/pixdesc.h>
 }
 
 #include "tinyxml2.h"
@@ -33,9 +34,9 @@ using namespace tinyxml2;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-VideoStats::VideoStats (size_t FrameCount, double Duration, double Frequency_)
+VideoStats::VideoStats (size_t FrameCount, double Duration, AVStream* stream)
     :
-    CommonStats(VideoPerItem, Type_Video, Group_VideoMax, Item_VideoMax, FrameCount, Duration, Frequency_)
+    CommonStats(VideoPerItem, Type_Video, Group_VideoMax, Item_VideoMax, FrameCount, Duration, stream)
 {
 }
 
@@ -49,12 +50,12 @@ VideoStats::~VideoStats()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void VideoStats::StatsFromExternalData (const string &Data)
+void VideoStats::StatsFromExternalData (const char* Data, size_t Size)
 {
     // VideoStats from external data
     // XML input
     XMLDocument Document;
-    if (Document.Parse(Data.c_str()))
+    if (Document.Parse(Data, Size))
        return;
 
     XMLElement* Root=Document.FirstChildElement("ffprobe:ffprobe");
@@ -85,6 +86,22 @@ void VideoStats::StatsFromExternalData (const string &Data)
                         Attribute=Frame->Attribute("key_frame");
                         if (Attribute)
                             key_frames[x_Current]=std::atof(Attribute)?true:false;
+
+                        Attribute = Frame->Attribute("pkt_pos");
+                        if(Attribute)
+                            pkt_pos[x_Current] = std::atoll(Attribute);
+
+                        Attribute = Frame->Attribute("pkt_size");
+                        if (Attribute)
+                            pkt_size[x_Current] = std::atoi(Attribute);
+
+                        Attribute = Frame->Attribute("pix_fmt");
+                        if (Attribute)
+                            pix_fmt[x_Current] = av_get_pix_fmt(Attribute);
+
+                        Attribute = Frame->Attribute("pict_type");
+                        if (Attribute)
+                            pict_type_char[x_Current] = *Attribute;
 
                         Attribute=Frame->Attribute("pkt_pts_time");
                         if (!Attribute || !strcmp(Attribute, "N/A"))
@@ -146,7 +163,7 @@ void VideoStats::StatsFromExternalData (const string &Data)
                                         value=std::atof(Attribute);
                                     else
                                         value=0;
-                                            
+
                                     // Special cases: crop: x2, y2
                                     if (Width && !strcmp(key, "lavfi.cropdetect.x2"))
                                         y[j][x_Current]=Width-value;
@@ -203,9 +220,6 @@ void VideoStats::StatsFromExternalData (const string &Data)
             }
         }
     }
-
-    Frequency=1;
-    StatsFinish();
 }
 
 //---------------------------------------------------------------------------
@@ -229,7 +243,7 @@ void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
         if (j<Item_VideoMax)
         {
             double value=std::atof(e->value);
-                                            
+
             // Special cases: crop: x2, y2
             if (string(e->key)=="lavfi.cropdetect.x2")
                 y[j][x_Current]=Width-value;
@@ -270,7 +284,38 @@ void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
         */
     }
 
+    y[Item_pkt_duration_time][x_Current] = durations[x_Current];
+
+    {
+        double& group1Max = y_Max[PerItem[Item_pkt_duration_time].Group1];
+        double& group1Min = y_Min[PerItem[Item_pkt_duration_time].Group1];
+        double& current = durations[x_Current];
+
+        if(group1Max < current)
+            group1Max = current;
+        if(group1Min > current)
+            group1Min = current;
+    }
+
     key_frames[x_Current]=Frame->key_frame?true:false;
+
+    pkt_pos[x_Current] = Frame->pkt_pos;
+    pkt_size[x_Current] = Frame->pkt_size;
+
+    y[Item_pkt_size][x_Current] = pkt_size[x_Current];
+
+    {
+        double& group1Max = y_Max[PerItem[Item_pkt_size].Group1];
+        double& group1Min = y_Min[PerItem[Item_pkt_size].Group1];
+        int& current = pkt_size[x_Current];
+
+        if(group1Max < current)
+            group1Max = current;
+        if(group1Min > current)
+            group1Min = current;
+    }
+    pix_fmt[x_Current] = Frame->format;
+    pict_type_char[x_Current] = av_get_picture_type_char(Frame->pict_type);
 
     if (x_Max[0]<=x[0][x_Current])
     {
@@ -375,10 +420,21 @@ string VideoStats::StatsToXML (int Width, int Height)
         stringstream pkt_pts_time; pkt_pts_time<<fixed<<setprecision(7)<<(x[1][x_Pos]+FirstTimeStamp);
         stringstream pkt_duration_time; pkt_duration_time<<fixed<<setprecision(7)<<durations[x_Pos];
         stringstream key_frame; key_frame<<key_frames[x_Pos]?'1':'0';
-        Data<<"        <frame media_type=\"video\" key_frame=\"" << key_frame.str() << "\" pkt_pts_time=\"" << pkt_pts_time.str() << "\"";
+        Data<<"        <frame media_type=\"video\"";
+        Data << " stream_index=\"" << streamIndex << "\"";
+
+        Data<<" key_frame=\"" << key_frame.str() << "\"";
+        Data << " pkt_pts=\"" << 1000 * (x[1][x_Pos] + FirstTimeStamp) << "\"";
+        Data<<" pkt_pts_time=\"" << pkt_pts_time.str() << "\"";
         if (pkt_duration_time)
             Data<<" pkt_duration_time=\"" << pkt_duration_time.str() << "\"";
-        Data<<" width=\"" << width.str() << "\" height=\"" << height.str() <<"\">\n";
+        Data << " pkt_pos=\"" << pkt_pos[x_Pos] << "\"";
+        Data << " pkt_size=\"" << pkt_size[x_Pos] << "\"";
+        Data<<" width=\"" << width.str() << "\" height=\"" << height.str() <<"\"";
+        Data << " pix_fmt=\"" << av_get_pix_fmt_name((AVPixelFormat) pix_fmt[x_Pos]) << "\"";
+        Data << " pict_type=\"" << pict_type_char[x_Pos] << "\"";
+
+        Data << ">\n";
 
         for (size_t Plot_Pos=0; Plot_Pos<Item_VideoMax; Plot_Pos++)
         {
@@ -387,18 +443,18 @@ string VideoStats::StatsToXML (int Width, int Height)
             stringstream value;
             switch (Plot_Pos)
             {
-                case Item_Crop_x2 :
-                case Item_Crop_w :
-                                        // Special case, values are from width
-                                        value<<Width-y[Plot_Pos][x_Pos];
-                                        break;
-                case Item_Crop_y2 :
-                case Item_Crop_h :
-                                        // Special case, values are from height
-                                        value<<Height-y[Plot_Pos][x_Pos];
-                                        break;
-                default:
-                                        value<<y[Plot_Pos][x_Pos];
+            case Item_Crop_x2 :
+            case Item_Crop_w :
+                // Special case, values are from width
+                value<<Width-y[Plot_Pos][x_Pos];
+                break;
+            case Item_Crop_y2 :
+            case Item_Crop_h :
+                // Special case, values are from height
+                value<<Height-y[Plot_Pos][x_Pos];
+                break;
+            default:
+                value<<y[Plot_Pos][x_Pos];
             }
 
             Data<<"            <tag key=\""+key+"\" value=\""+value.str()+"\"/>\n";
@@ -407,5 +463,5 @@ string VideoStats::StatsToXML (int Width, int Height)
         Data<<"        </frame>\n";
     }
 
-   return Data.str();
+    return Data.str();
 }

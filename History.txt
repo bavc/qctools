@@ -1,9 +1,28 @@
-0.7.2, 
+0.7.3, 2016-10-10
+-----
++ Added graphing the SSIM (Structural SImilarity Metric) between the two fields
++ Added graphing interlacement detection data
++ Added graphing audio metric data via astats filter
++ Draggable/resizeable selection area in Waveform Target, Vectorscope Target, and Zoom
++ Support for plotting data in 10 bit when revelant (affects graphs for Y, U, V, Diffs, and SAT)
++ Add shortcut to zoom in on the graphs to show one sample per display pixel
++ Update waveform and vectorscope to show graticules
++ Sortable graph order
++ Improve playback filter for bitplanenoise
++ Add playback filter for bitplanenoisegraph
++ Add playback filter for waveform target
++ Improve playback filter for waveforms, datascope, line select, ciescope, histogram
+x Fixes error when opening files on external hard drives
+x Fixed many crashes
+x Fix on sliders when they increment in steps smaller than 1
+
+0.7.2, 2015-11-17
 -----
 + Add plotlines for reference black and white in YUV graphs (GitHub issue #96)
 + Add plotlines for broadcast illegal and yuv illegal saturation levels
 + Update waveform and vectorscope filters to new waveform and vectorscope filters in FFmpeg 2.8
 + Add field modes to Tile and Zoom
++ Add astats-based audio data
 + Preferences
 x Fixed crash with some big MOV files having count of audio samples of the count of audio blocks in the track header instead
 

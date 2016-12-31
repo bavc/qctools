@@ -46,7 +46,19 @@
                 <a href="#PSNRf">Peak Signal to Noise Ratio (PSNRf)</a>
             </li>
             <li>
+                <a href="#SSIMf">Structural SImilarity Metric (SSIMf)</a>
+            </li>
+            <li>
                 <a href="#MSEf">Mean Square Error (MSEf)</a>
+            </li>
+            <li>
+                <a href="#idetS">Interlacement Detection (single frame)</a>
+            </li>
+            <li>
+                <a href="#idetM">Interlacement Detection (multiple frames)</a>
+            </li>
+            <li>
+                <a href="#idetR">Interlacement Detection (repeated fields)</a>
             </li>
         </ol>
         <h3>
@@ -531,7 +543,31 @@
             <img src="NGA000006_msef.jpg" alt="MSEf" />
         </p>
         <h2 style="color:blue">
-            <a id="R128" name="R128">12. R.128</a>
+            <a id="SSIMf" name="SSIMf">12. Structural SImilarity Metric (SSIMf)</a>
+        </h2>
+        <p>
+            This filter plots the Structural SImilarity Metric between the video in field 1 (odd lines) versus the video in field 2 (even lines). Lower values indicate that field 1 and field 2 are becoming more different as would happen during a playback error such as a head clog. See <a href="http://ffmpeg.org/ffmpeg-filters.html#psnr">http://ffmpeg.org/ffmpeg-filters.html#ssim</a> for more information.
+        </p>
+        <h2 style="color:blue">
+            <a id="idetS" name="idetS">13. Interlacement Detection (single frame)</a>
+        </h2>
+        <p>
+            This filter plots a determined on if the frame appears to be bottom field first (bff), top first field (tff), progressive (prog), or undetermined (und). This assessment uses only adjacent frames to determine the interlacement characteristic. The value is plotted with a half-life of 1, so each frame's interlacement characteric is halved (i.e., it contributes only 0.5 to it's classification) and then plotted. See <a href="http://ffmpeg.org/ffmpeg-filters.html#psnr">http://ffmpeg.org/ffmpeg-filters.html#idet</a> for more information.
+        </p>
+        <h2 style="color:blue">
+            <a id="idetM" name="idetM">14. Interlacement Detection (multiple frames)</a>
+        </h2>
+        <p>
+            Similar to single-frame interlaced detection, but incorporates the classification history of previous frames. See <a href="http://ffmpeg.org/ffmpeg-filters.html#idet">http://ffmpeg.org/ffmpeg-filters.html#idet</a> for more information.
+        </p>
+        <h2 style="color:blue">
+            <a id="idetR" name="idetR">15. Interlacement Detection (repeated fields)</a>
+        </h2>
+        <p>
+             This plots uses an assessment that tries and detects fields that are repeated between adjacent frames (a sign of telecine).  See <a href="http://ffmpeg.org/ffmpeg-filters.html#idet">http://ffmpeg.org/ffmpeg-filters.html#idet</a> for more information.
+        </p>
+        <h2 style="color:blue">
+            <a id="R128" name="R128">16. R.128</a>
         </h2>
         <p>
             R 128 refers to a European Broadcasting Union (EBU) <a href="https://tech.ebu.ch/docs/r/r128.pdf">specification document</a> governing several loudness parameters, including momentary, integrated, and short-term loudness. QCTools specifically examines momentary loudness, or sudden changes in volume over brief intervals of time (up to 400ms). This can be helpful in identifying areas where volume may exceed upper loudness tolerance levels as perceived by an audience.

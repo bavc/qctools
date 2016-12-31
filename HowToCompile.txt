@@ -2,14 +2,14 @@ Qt
 --
 You can download directly the binaries or compile yourself.
 http://qt-project.org/downloads
-My config (Qt 5.4.0):
+My config (Qt 5.5.0):
 Mac:
-Download and install qt-opensource-mac-x64-clang-5.4.0.dmg or
+Download and install qt-opensource-mac-x64-clang-5.5.0.dmg or
 ./configure -release -opensource -confirm-license -static -no-sql-sqlite -no-sql-odbc -no-qml-debug -no-gif -no-nis -no-dbus -no-audio-backend -no-framework -nomake examples
 Windows:
 Edit qtbase\mkspecs\win32-msvc2013 and replace -MD by -MT in order to have  static build of the C++ library
 Launch VS Tools Command Prompt 
-configure -opensource -confirm-license -static -ltcg -no-sql-sqlite -no-sql-odbc -no-qml-debug -no-gif -no-dbus -no-opengl -no-audio-backend -nomake examples -mp
+configure -opensource -confirm-license -static -ltcg -no-sql-sqlite -no-sql-odbc -no-qml-debug -no-gif -no-dbus -no-opengl -no-audio-backend -no-freetype -nomake examples -mp
 nmake
 
 Qwt
@@ -19,6 +19,7 @@ Launch VS Tools Command Prompt
 Add QT bin folder to your PATH e.g. set "PATH=%PATH%;C:\Qt\qtbase\bin"
 Edit qwtconfig.pri, comment QwtDll, QwtSvg and QwtOpenGL lines
 qmake
+nmake
 
 YASM
 ----
@@ -64,9 +65,7 @@ Look at http://ffmpeg.org/platform.html#Windows
 Launch VS Tools Command Prompt 
 msys.bat
 cd ffmpeg
-./configure --enable-gpl --enable-version3 --enable-shared --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --enable-libopenjpeg --disable-decoder=jpeg2000 --extra-cflags="-I../openjpeg/libopenjpeg" --extra-ldflags="-L../openjpeg/bin/Release" --toolchain=msvc
-Note: not working with openjpeg for the moment, using
-./configure --enable-gpl --enable-version3 --enable-shared --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --toolchain=msvc
+./configure --enable-gpl --enable-version3 --enable-shared --disable-securetransport --disable-videotoolbox --disable-swscale-alpha --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug --toolchain=msvc
 make
 Copy *.lib in Project\MSVC2013\GUI\Lib
 Mac:

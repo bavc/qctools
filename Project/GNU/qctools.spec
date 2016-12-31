@@ -1,4 +1,4 @@
-%define qctools_version           0.7.1
+%define qctools_version           0.7.3
 
 Name:           qctools
 Version:        %{qctools_version}
@@ -22,7 +22,7 @@ BuildRequires:  cmake
 %if %{undefined rhel_version} && %{undefined centos_version}
 BuildRequires:  yasm
 %endif
-BuildRequires:  libqt4-devel
+BuildRequires:  libqt5-devel
 %if 0%{?suse_version}
 BuildRequires:  update-desktop-files
 %endif

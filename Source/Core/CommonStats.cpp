@@ -17,6 +17,7 @@ extern "C"
 #endif
 
 #include <libavutil/frame.h>
+#include <libavformat/avformat.h>
 }
 
 #include "Core/Core.h"
@@ -33,9 +34,10 @@ using namespace tinyxml2;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t CountOfGroups_, size_t CountOfItems_, size_t FrameCount, double Duration, double Frequency_)
+CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t CountOfGroups_, size_t CountOfItems_, size_t FrameCount, double Duration, AVStream* stream)
     :
-    Frequency(Frequency_),
+    Frequency(stream ? (((double)stream->time_base.den) / stream->time_base.num) : 0),
+	streamIndex(stream ? stream->index : -1),
     PerItem(PerItem_),
     Type(Type_),
     CountOfGroups(CountOfGroups_),
@@ -86,8 +88,21 @@ CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t Cou
     // Data - Extra
     durations=new double[Data_Reserved];
     memset(durations, 0x00, Data_Reserved*sizeof(double));
+
     key_frames=new bool[Data_Reserved];
     memset(key_frames, 0x00, Data_Reserved*sizeof(bool));
+
+    pkt_pos = new int64_t[Data_Reserved];
+    memset(pkt_pos, 0x00, Data_Reserved * sizeof(int64_t));
+
+    pkt_size = new int[Data_Reserved];
+    memset(pkt_size, 0x00, Data_Reserved * sizeof(int));
+
+    pix_fmt = new int[Data_Reserved];
+    memset(pix_fmt, 0x00, Data_Reserved * sizeof(int));
+
+    pict_type_char = new char[Data_Reserved];
+    memset(pict_type_char, 0x00, Data_Reserved * sizeof(char));
 
     // Data - Maximums
     x_Current=0;
@@ -125,6 +140,11 @@ CommonStats::~CommonStats()
     delete[] key_frames;
     delete[] y_Min;
     delete[] y_Max;
+
+    delete[] pkt_pos;
+    delete[] pkt_size;
+    delete[] pix_fmt;
+    delete[] pict_type_char;
 }
 
 //***************************************************************************
@@ -188,24 +208,30 @@ void CommonStats::StatsFinish ()
 //---------------------------------------------------------------------------
 string CommonStats::Average_Get(size_t Pos)
 {
-    if (x_Current==0)
+    if (x_Current == 0 || Pos >= CountOfItems) {
         return string();
+    }
 
-    double Value=Stats_Totals[Pos]/x_Current;
+    double Value = Stats_Totals[Pos] / x_Current;
     stringstream str;
-    str<<fixed<<setprecision(PerItem[Pos].DigitsAfterComma)<<Value;
+    str << fixed;
+    str << setprecision(PerItem[Pos].DigitsAfterComma);
+    str << Value;
     return str.str();
 }
 
 //---------------------------------------------------------------------------
 string CommonStats::Average_Get(size_t Pos, size_t Pos2)
 {
-    if (x_Current==0)
+    if (x_Current == 0 || Pos >= CountOfItems) {
         return string();
+    }
 
-    double Value=(Stats_Totals[Pos]-Stats_Totals[Pos2])/x_Current;
+    double Value = (Stats_Totals[Pos] - Stats_Totals[Pos2]) / x_Current;
     stringstream str;
-    str<<fixed<<setprecision(PerItem[Pos].DigitsAfterComma)<<Value;
+    str << fixed;
+    str << setprecision(PerItem[Pos].DigitsAfterComma);
+    str << Value;
     return str.str();
 }
 
@@ -252,38 +278,71 @@ void CommonStats::Data_Reserve(size_t NewValue)
 {
     // Saving old data
     size_t                      Data_Reserved_Old = Data_Reserved;
-    double**                    x_Old = new double*[4];
-    memcpy (x_Old, x, sizeof(double*)*4);
-    double**                    y_Old = new double*[CountOfItems];
-    memcpy (y_Old, y, sizeof(double*)*CountOfItems);
-    double*                     durations_Old=durations;
-    bool*                       key_frames_Old=key_frames;
+    double**                    x_Old = x;
+    double**                    y_Old = y;
+    double*                     durations_Old = durations;
+    bool*                       key_frames_Old = key_frames;
+    int64_t*                    pkt_pos_Old = pkt_pos;
+    int*                        pkt_size_Old = pkt_size;
+    int*                        pix_fmt_Old = pix_fmt;
+    char*                       pict_type_char_Old = pict_type_char;
 
     // Computing new value
-    while (Data_Reserved<NewValue+(1<<18)) //We reserve extra space, minimum 2^18 frames added
-        Data_Reserved<<=1;
+    while (Data_Reserved < NewValue + (1 << 18)) //We reserve extra space, minimum 2^18 frames added
+        Data_Reserved <<= 1;
+
+    size_t diff = Data_Reserved - Data_Reserved_Old;
 
     // Creating new data - x and y
     x = new double*[4];
-    for (size_t j=0; j<4; ++j)
+    for (size_t j = 0; j < 4; ++j)
     {
-        x[j]=new double[Data_Reserved];
-        memset(x[j], 0x00, Data_Reserved*sizeof(double));
-        memcpy(x[j], x_Old[j], Data_Reserved_Old*sizeof(double));
+        x[j] = new double[Data_Reserved];
+        memcpy(x[j], x_Old[j], Data_Reserved_Old * sizeof(double));
+        memset(&x[j][Data_Reserved_Old], 0x00, diff * sizeof(double));
+        delete[] x_Old[j];
     }
+
     y = new double*[CountOfItems];
-    for (size_t j=0; j<CountOfItems; ++j)
+    for (size_t j = 0; j < CountOfItems; ++j)
     {
         y[j] = new double[Data_Reserved];
-        memset(y[j], 0x00, Data_Reserved*sizeof(double));
-        memcpy(y[j], y_Old[j], Data_Reserved_Old*sizeof(double));
+        memcpy(y[j], y_Old[j], Data_Reserved_Old * sizeof(double));
+        memset(&y[j][Data_Reserved_Old], 0x00, diff * sizeof(double));
+        delete[] y_Old[j];
     }
 
     // Creating new data - Extra
     durations = new double[Data_Reserved];
-    memset(durations, 0x00, Data_Reserved*sizeof(double));
-    memcpy(durations, durations_Old, Data_Reserved_Old*sizeof(double));
+    memcpy(durations, durations_Old, Data_Reserved_Old * sizeof(double));
+    memset(&durations[Data_Reserved_Old], 0x00, diff * sizeof(double));
+
     key_frames = new bool[Data_Reserved];
-    memset(key_frames, 0x00, Data_Reserved*sizeof(bool));
-    memcpy(key_frames, key_frames_Old, Data_Reserved_Old*sizeof(bool));
+    memcpy(key_frames, key_frames_Old, Data_Reserved_Old * sizeof(bool));
+    memset(&key_frames[Data_Reserved_Old], 0x00, diff * sizeof(bool));
+
+    pkt_pos = new int64_t[Data_Reserved];
+    memcpy(pkt_pos, pkt_pos_Old, Data_Reserved_Old * sizeof(int64_t));
+    memset(&pkt_pos[Data_Reserved_Old], 0x00, diff * sizeof(int64_t));
+
+    pkt_size = new int[Data_Reserved];
+    memcpy(pkt_size, pkt_size_Old, Data_Reserved_Old * sizeof(int));
+    memset(&pkt_size[Data_Reserved_Old], 0x00, diff * sizeof(int));
+
+    pix_fmt = new int[Data_Reserved];
+    memcpy(pix_fmt, pix_fmt_Old, Data_Reserved_Old * sizeof(int));
+    memset(&pix_fmt[Data_Reserved_Old], 0x00, diff * sizeof(int));
+
+    pict_type_char = new char[Data_Reserved];
+    memcpy(pict_type_char, pict_type_char_Old, Data_Reserved_Old * sizeof(char));
+    memset(&pict_type_char[Data_Reserved_Old], 0x00, diff * sizeof(char));
+
+    delete[] x_Old;
+    delete[] y_Old;
+    delete[] durations_Old;
+    delete[] key_frames_Old;
+    delete[] pkt_pos_Old;
+    delete[] pkt_size_Old;
+    delete[] pix_fmt_Old;
+    delete[] pict_type_char_Old;
 }
