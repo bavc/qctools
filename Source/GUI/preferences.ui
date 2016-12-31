@@ -69,6 +69,13 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QCheckBox" name="Filters_Video_Palettegen">
+                <property name="text">
+                 <string>palettegen (generate palettes per frame)</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
            </layout>
