@@ -531,17 +531,17 @@ const filter Filters[]=
             { Args_Type_Toggle,   0,   0,   0,   0, "Vectorscope" },
             { Args_Type_Slider,   0,-180, 180,   1, "Hue"},
             { Args_Type_Slider,  10,   0,  30,  10, "Saturation"},
+            { Args_Type_Slider,   0,-128, 128,   1, "Cb Shift"},
+            { Args_Type_Slider,   0,-128, 128,   1, "Cr Shift"},
             { Args_Type_Slider,   1,   0,   2,   1, "Colorspace" },
-            { Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
-            { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "hue=h=${3}:s=${4}",
-            "hue=h=${3}:s=${4},split[a][b];[a]vectorscope=intensity=${6}:mode=color2:colorspace=${5}:graticule=green:flags=name,\
+            "format=yuv444p|yuvj444p,lutyuv=y=val:u=mod(val+${5}\\,256):v=mod(val+${6}\\,256),hue=h=${3}:s=${4}",
+            "format=yuv444p|yuvj444p,lutyuv=y=val:u=mod(val+${5}\\,256):v=mod(val+${6}\\,256),hue=h=${3}:s=${4},split[a][b];[a]vectorscope=mode=color2:colorspace=${7}:graticule=green:flags=name,\
             scale=512:512,pad=720:512:(ow-iw)/2:(oh-ih)/2,setsar=1/1[a1];\
             [b]lutyuv=y=val/2,scale=720:512,setsar=1/1[b1];[a1][b1]blend=addition",
-            "il=l=d:c=d,hue=h=${3}:s=${4}",
-            "il=l=d:c=d,hue=h=${3}:s=${4},split[a][b];[a]vectorscope=intensity=${6}:mode=color2:colorspace=${5}:graticule=green:flags=name,\
+            "il=l=d:c=d,format=yuv444p|yuvj444p,lutyuv=y=val:u=mod(val+${5}\\,256):v=mod(val+${6}\\,256),hue=h=${3}:s=${4}",
+            "il=l=d:c=d,format=yuv444p|yuvj444p,lutyuv=y=val:u=mod(val+${5}\\,256):v=mod(val+${6}\\,256),hue=h=${3}:s=${4},split[a][b];[a]vectorscope=mode=color2:colorspace=${7}:graticule=green:flags=name,\
             scale=512:512,pad=720:512:(ow-iw)/2:(oh-ih)/2,setsar=1/1[a1];\
             [b]lutyuv=y=val/2,scale=720:512,setsar=1/1[b1];[a1][b1]blend=addition",
         },
