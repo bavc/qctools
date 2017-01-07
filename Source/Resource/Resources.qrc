@@ -20,6 +20,11 @@
         <file alias="backward.png">backward.png</file>
         <file alias="forward.png">forward.png</file>
         <file>zoom-one.png</file>
+        <file>signalserver_error.png</file>
+        <file>signalserver_not_uploaded.png</file>
+        <file>signalserver_success.png</file>
+        <file>signalserver_upload.png</file>
+        <file>signalserver_uploading.png</file>
     </qresource>
     <qresource prefix="/">
         <file alias="Help/About.html">../../License.html</file>

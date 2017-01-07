@@ -767,6 +767,25 @@ QString FileInformation::signalServerCheckUploadedStatusString() const
     }
 }
 
+QPixmap FileInformation::signalServerCheckUploadedStatusPixmap() const
+{
+    switch(signalServerCheckUploadedStatus())
+    {
+    case NotChecked:
+        return QPixmap();
+    case Checking:
+        return QPixmap();
+    case Uploaded:
+        return QPixmap(":/icon/signalserver_success.png");
+    case NotUploaded:
+        return QPixmap(":/icon/signalserver_not_uploaded.png");
+    case CheckError:
+        return QPixmap(":/icon/signalserver_error.png");
+    default:
+        return QPixmap();
+    }
+}
+
 QString FileInformation::signalServerCheckUploadedStatusErrorString() const
 {
     return checkFileUploadedOperation ? checkFileUploadedOperation->errorString() : QString();
@@ -804,6 +823,23 @@ QString FileInformation::signalServerUploadStatusString() const
         return "Upload Error";
     default:
         return "Unknown";
+    }
+}
+
+QPixmap FileInformation::signalServerUploadStatusPixmap() const
+{
+    switch(signalServerUploadStatus())
+    {
+    case Idle:
+        return QPixmap();
+    case Uploading:
+        return QPixmap(":/icon/signalserver_uploading.png");
+    case Done:
+        return QPixmap(":/icon/signalserver_success.png");
+    case UploadError:
+        return QPixmap(":/icon/signalserver_error.png");
+    default:
+        return QPixmap();
     }
 }
 

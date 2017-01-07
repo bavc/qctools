@@ -673,6 +673,7 @@ void MainWindow::updateSignalServerCheckUploadedStatus()
     FileInformation::SignalServerCheckUploadedStatus checkUploadedStatus = file->signalServerCheckUploadedStatus();
     QString key = convertEnumToQString<FileInformation>("SignalServerCheckUploadedStatus", checkUploadedStatus);
     ui->actionSignalServer_status->setText(QString("Signalserver: %1").arg(key));
+    ui->actionSignalServer_status->setIcon(file->signalServerCheckUploadedStatusPixmap());
 
     ui->actionSignalServer_status->setToolTip("");
 
@@ -690,6 +691,7 @@ void MainWindow::updateSignalServerUploadStatus()
     FileInformation::SignalServerUploadStatus uploadStatus = file->signalServerUploadStatus();
 
     ui->actionSignalServer_status->setToolTip("");
+    ui->actionSignalServer_status->setIcon(file->signalServerUploadStatusPixmap());
 
     if(uploadStatus == FileInformation::Idle || uploadStatus == FileInformation::Done || uploadStatus == FileInformation::UploadError)
     {
@@ -702,11 +704,14 @@ void MainWindow::updateSignalServerUploadStatus()
             ui->actionSignalServer_status->setToolTip(file->signalServerUploadStatusErrorString());
         }
 
+        ui->actionUploadToSignalServer->setToolTip("Upload current stats to signalserver");
         ui->actionUploadToSignalServer->setText("Upload to Signalserver");
         ui->actionUploadToSignalServerAll->setText("Upload to Signalserver (All files)");
     }
     else if(uploadStatus == FileInformation::Uploading)
     {
+        ui->actionSignalServer_status->setText("Uploading");
+        ui->actionUploadToSignalServer->setToolTip("Cancel Upload to Signalserver");
         ui->actionUploadToSignalServer->setText("Cancel Upload to Signalserver");
         ui->actionUploadToSignalServerAll->setText("Cancel Upload to Signalserver (All files)");
     }

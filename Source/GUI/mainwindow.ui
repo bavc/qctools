@@ -482,12 +482,17 @@
     <enum>QAction::NoRole</enum>
    </property>
    <property name="iconVisibleInMenu">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionUploadToSignalServer">
    <property name="enabled">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normalon>:/icon/signalserver_upload.png</normalon>
+    </iconset>
    </property>
    <property name="text">
     <string>Upload to Signalserver</string>
@@ -499,6 +504,11 @@
   <action name="actionUploadToSignalServerAll">
    <property name="enabled">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normalon>:/icon/signalserver_upload.png</normalon>
+    </iconset>
    </property>
    <property name="text">
     <string>Upload to Signalserver (All files)</string>

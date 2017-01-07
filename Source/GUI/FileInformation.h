@@ -96,6 +96,7 @@ public:
 
     SignalServerCheckUploadedStatus signalServerCheckUploadedStatus() const;
     QString signalServerCheckUploadedStatusString() const;
+    QPixmap signalServerCheckUploadedStatusPixmap() const;
     QString signalServerCheckUploadedStatusErrorString() const;
 
     enum SignalServerUploadStatus {
@@ -109,6 +110,7 @@ public:
 
     SignalServerUploadStatus signalServerUploadStatus() const;
     QString signalServerUploadStatusString() const;
+    QPixmap signalServerUploadStatusPixmap() const;
     QString signalServerUploadStatusErrorString() const;
 
     // index in FileList
