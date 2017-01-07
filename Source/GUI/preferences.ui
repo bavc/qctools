@@ -306,6 +306,9 @@
        </item>
        <item row="2" column="0" colspan="4">
         <widget class="QLineEdit" name="signalServerPassword_lineEdit">
+         <property name="echoMode">
+          <enum>QLineEdit::Password</enum>
+         </property>
          <property name="placeholderText">
           <string>Password</string>
          </property>
