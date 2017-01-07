@@ -153,6 +153,7 @@ void MainWindow::Ui_Init()
     ui->actionGraphsLayout->setChecked(false);
 
     connectionIndicator = new QWidget;
+    connectionIndicator->setToolTip("signalserver status: not checked");
     connectionIndicator->setMinimumSize(24, 24);
     ui->statusBar->addPermanentWidget(connectionIndicator);
 
