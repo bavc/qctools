@@ -707,6 +707,9 @@ void MainWindow::updateSignalServerUploadStatus()
         ui->actionUploadToSignalServer->setToolTip("Upload current stats to signalserver");
         ui->actionUploadToSignalServer->setText("Upload to Signalserver");
         ui->actionUploadToSignalServerAll->setText("Upload to Signalserver (All files)");
+
+        ui->actionUploadToSignalServer->setIcon(FileInformation::signalServerUploadStatusPixmap(FileInformation::Idle));
+        ui->actionUploadToSignalServerAll->setIcon(FileInformation::signalServerUploadStatusPixmap(FileInformation::Idle));
     }
     else if(uploadStatus == FileInformation::Uploading)
     {
@@ -714,6 +717,9 @@ void MainWindow::updateSignalServerUploadStatus()
         ui->actionUploadToSignalServer->setToolTip("Cancel Upload to Signalserver");
         ui->actionUploadToSignalServer->setText("Cancel Upload to Signalserver");
         ui->actionUploadToSignalServerAll->setText("Cancel Upload to Signalserver (All files)");
+
+        ui->actionUploadToSignalServer->setIcon(FileInformation::signalServerUploadStatusPixmap(FileInformation::Uploading));
+        ui->actionUploadToSignalServerAll->setIcon(FileInformation::signalServerUploadStatusPixmap(FileInformation::Uploading));
     }
 }
 

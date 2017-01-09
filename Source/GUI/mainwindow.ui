@@ -472,6 +472,11 @@
    <property name="enabled">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset>
+     <normalon>:/icon/signalserver_not_uploaded.png</normalon>
+    </iconset>
+   </property>
    <property name="text">
     <string>Signalserver status: not uploaded</string>
    </property>

@@ -828,10 +828,15 @@ QString FileInformation::signalServerUploadStatusString() const
 
 QPixmap FileInformation::signalServerUploadStatusPixmap() const
 {
-    switch(signalServerUploadStatus())
+    return signalServerUploadStatusPixmap(signalServerUploadStatus());
+}
+
+QPixmap FileInformation::signalServerUploadStatusPixmap(FileInformation::SignalServerUploadStatus status)
+{
+    switch(status)
     {
     case Idle:
-        return QPixmap();
+        return QPixmap(":/icon/signalserver_upload.png");
     case Uploading:
         return QPixmap(":/icon/signalserver_uploading.png");
     case Done:
