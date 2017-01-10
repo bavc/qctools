@@ -218,7 +218,7 @@ private Q_SLOTS:
 
     void onSignalServerConnectionChanged(SignalServerConnectionChecker::State state);
     void updateConnectionIndicator();
-    void preferencesUpdated();
+    void updateSignalServerSettings();
 
     void updateSignalServerCheckUploadedStatus();
     void updateSignalServerUploadStatus();

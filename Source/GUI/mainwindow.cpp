@@ -641,7 +641,7 @@ void MainWindow::updateConnectionIndicator()
     }
 }
 
-void MainWindow::preferencesUpdated()
+void MainWindow::updateSignalServerSettings()
 {
     if(Prefs->isSignalServerEnabled())
     {
@@ -650,9 +650,14 @@ void MainWindow::preferencesUpdated()
         signalServer->setUrl(Prefs->signalServerUrl());
         signalServer->setLogin(Prefs->signalServerLogin());
         signalServer->setPassword(Prefs->signalServerPassword());
+
     } else {
         connectionChecker->stop();
     }
+
+    uploadAction()->setVisible(Prefs->isSignalServerEnabled());
+    uploadAllAction()->setVisible(Prefs->isSignalServerEnabled());
+    ui->actionSignalServer_status->setVisible(Prefs->isSignalServerEnabled());
 }
 
 template <typename T> QString convertEnumToQString(const char* typeName, int value)

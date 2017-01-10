@@ -164,18 +164,10 @@ void MainWindow::Ui_Init()
 
     //Preferences
     Prefs=new Preferences(connectionChecker, this);
-    connect(Prefs, SIGNAL(saved()), this, SLOT(preferencesUpdated()));
+    connect(Prefs, SIGNAL(saved()), this, SLOT(updateSignalServerSettings()));
 
-    if (Prefs->isSignalServerEnabled())
-    {
-        connectionChecker->start(Prefs->signalServerUrl(), Prefs->signalServerLogin(), Prefs->signalServerPassword());
-
-        signalServer->setUrl(Prefs->signalServerUrl());
-        signalServer->setLogin(Prefs->signalServerLogin());
-        signalServer->setPassword(Prefs->signalServerPassword());
-    }
-
-	updateConnectionIndicator();
+    updateSignalServerSettings();
+    updateConnectionIndicator();
 
     //Temp
     ui->actionWindowOut->setVisible(false);
