@@ -129,11 +129,11 @@ bool Preferences::isSignalServerAutoUploadEnabled() const
     return Settings.value(KeySignalServerEnableAutoUpload, false).toBool();
 }
 
-QUrl Preferences::signalServerUrl() const
+QString Preferences::signalServerUrlString() const
 {
     QSettings Settings;
 
-    return Settings.value(KeySignalServerUrl).toUrl();
+    return Settings.value(KeySignalServerUrl).toString();
 }
 
 QString Preferences::signalServerLogin() const
@@ -175,7 +175,7 @@ void Preferences::Load()
     ui->Tracks_Audio_First->setChecked(!ActiveAllTracks[Type_Audio]);
     ui->Tracks_Audio_All->setChecked(ActiveAllTracks[Type_Audio]);
 
-    ui->signalServerUrl_lineEdit->setText(signalServerUrl().toString());
+    ui->signalServerUrl_lineEdit->setText(signalServerUrlString());
     ui->signalServerLogin_lineEdit->setText(signalServerLogin());
     ui->signalServerPassword_lineEdit->setText(signalServerPassword());
     ui->signalServerEnable_checkBox->setChecked(isSignalServerEnabled());
@@ -261,7 +261,11 @@ void Preferences::on_testConnection_pushButton_clicked()
 
     UI::setChecking(ui->connectionTest_label, ui->testConnection_pushButton);
 
-    connectionChecker->checkConnection(ui->signalServerUrl_lineEdit->text(), ui->signalServerLogin_lineEdit->text(), ui->signalServerPassword_lineEdit->text());
+    QString url = ui->signalServerUrl_lineEdit->text();
+    if(!url.startsWith("http", Qt::CaseInsensitive))
+        url.prepend("http://");
+
+    connectionChecker->checkConnection(url, ui->signalServerLogin_lineEdit->text(), ui->signalServerPassword_lineEdit->text());
 
     QEventLoop loop;
     connect(connectionChecker, SIGNAL(done()), &loop, SLOT(quit()));

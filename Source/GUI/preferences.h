@@ -30,7 +30,7 @@ public:
     bool isSignalServerEnabled() const;
     bool isSignalServerAutoUploadEnabled() const;
 
-    QUrl signalServerUrl() const;
+    QString signalServerUrlString() const;
     QString signalServerLogin() const;
     QString signalServerPassword() const;
 

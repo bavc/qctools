@@ -645,9 +645,15 @@ void MainWindow::updateSignalServerSettings()
 {
     if(Prefs->isSignalServerEnabled())
     {
-        connectionChecker->start(Prefs->signalServerUrl(), Prefs->signalServerLogin(), Prefs->signalServerPassword());
+        QString urlString = Prefs->signalServerUrlString();
+        if(!urlString.startsWith("http", Qt::CaseInsensitive))
+            urlString.prepend("http://");
 
-        signalServer->setUrl(Prefs->signalServerUrl());
+        QUrl url(urlString);
+
+        connectionChecker->start(url, Prefs->signalServerLogin(), Prefs->signalServerPassword());
+
+        signalServer->setUrl(url);
         signalServer->setLogin(Prefs->signalServerLogin());
         signalServer->setPassword(Prefs->signalServerPassword());
 
