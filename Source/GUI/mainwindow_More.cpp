@@ -436,7 +436,18 @@ void MainWindow::selectFile(int NewFilePos)
         }
     }
 
-    updateSignalServerCheckUploadedStatus();
+    if(!Files.empty())
+    {
+        FileInformation* file = Files[Files_CurrentPos];
+        if(file->signalServerUploadStatus() == FileInformation::Idle)
+        {
+            updateSignalServerCheckUploadedStatus();
+        }
+        else
+        {
+            updateSignalServerUploadStatus();
+        }
+    }
 }
 
 //---------------------------------------------------------------------------
