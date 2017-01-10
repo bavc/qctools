@@ -377,6 +377,31 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>Filters_Video_signalstats</tabstop>
+  <tabstop>Filters_Video_cropdetect</tabstop>
+  <tabstop>Filters_Video_Psnr</tabstop>
+  <tabstop>Filters_Video_Ssim</tabstop>
+  <tabstop>Filters_Video_Idet</tabstop>
+  <tabstop>Filters_Audio_astats</tabstop>
+  <tabstop>Filters_Audio_EbuR128</tabstop>
+  <tabstop>Filters_Audio_aphasemeter</tabstop>
+  <tabstop>Tracks_Video_First</tabstop>
+  <tabstop>Tracks_Video_All</tabstop>
+  <tabstop>Tracks_Audio_First</tabstop>
+  <tabstop>Tracks_Audio_All</tabstop>
+  <tabstop>XmlGz_Prompt</tabstop>
+  <tabstop>XmlGz_Sidecar</tabstop>
+  <tabstop>XmlGz_Directory</tabstop>
+  <tabstop>XmlGz_Directory_Name</tabstop>
+  <tabstop>signalServerUrl_lineEdit</tabstop>
+  <tabstop>signalServerLogin_lineEdit</tabstop>
+  <tabstop>signalServerPassword_lineEdit</tabstop>
+  <tabstop>signalServerEnable_checkBox</tabstop>
+  <tabstop>signalServerEnableAutoUpload_checkBox</tabstop>
+  <tabstop>testConnection_pushButton</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
