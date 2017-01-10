@@ -18,6 +18,12 @@
 #include <QTimer>
 //---------------------------------------------------------------------------
 
+#include "qblowfish.h"
+
+// Random key generated at http://www.random.org/bytes/
+#define KEY_HEX "911dae7a4ce9a24300efe3b8a4534301"
+QByteArray BlowfishKey = QByteArray::fromHex(KEY_HEX);
+
 typedef std::tuple<int, int> GroupAndType;
 Q_DECLARE_METATYPE(GroupAndType)
 
@@ -146,8 +152,24 @@ QString Preferences::signalServerLogin() const
 QString Preferences::signalServerPassword() const
 {
     QSettings Settings;
+    QString pwd;
 
-    return Settings.value(KeySignalServerPassword ).toString();
+    QBlowfish bf(BlowfishKey);
+    QByteArray cipherText = Settings.value(KeySignalServerPassword).toByteArray();
+    if(cipherText.startsWith(BlowfishKey))
+    {
+        cipherText.remove(0, BlowfishKey.length());
+        bf.setPaddingEnabled(true);
+        QByteArray decryptedBa = bf.decrypted(cipherText);
+
+        pwd = QString::fromUtf8(decryptedBa.constData(), decryptedBa.size());
+    }
+    else
+    {
+        pwd = Settings.value(KeySignalServerPassword ).toString();
+    }
+
+    return pwd;
 }
 
 //***************************************************************************
@@ -190,7 +212,14 @@ void Preferences::Save()
 
     Settings.setValue(KeySignalServerUrl, ui->signalServerUrl_lineEdit->text());
     Settings.setValue(KeySignalServerLogin, ui->signalServerLogin_lineEdit->text());
-    Settings.setValue(KeySignalServerPassword , ui->signalServerPassword_lineEdit->text());
+
+
+    QBlowfish bf(BlowfishKey);
+    bf.setPaddingEnabled(true); // Enable padding to be able to encrypt an arbitrary length of bytes
+    QByteArray cipherText = bf.encrypted(ui->signalServerPassword_lineEdit->text().toUtf8());
+
+    QVariant pwdValue(BlowfishKey + cipherText);
+    Settings.setValue(KeySignalServerPassword, pwdValue);
     Settings.setValue(KeySignalServerEnable, ui->signalServerEnable_checkBox->isChecked());
     Settings.setValue(KeySignalServerEnableAutoUpload, ui->signalServerEnableAutoUpload_checkBox->isChecked());
 

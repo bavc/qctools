@@ -165,6 +165,8 @@ macx:contains(DEFINES, USE_BREW) {
 INCLUDEPATH += $$PWD/../../Source
 INCLUDEPATH += $$PWD/../../Source/ThirdParty/tinyxml2
 
+include($$PWD/../../Source/ThirdParty/qblowfish/qblowfish.pri)
+
 macx:contains(DEFINES, USE_BREW) {
     message("use ffmpeg from brew")
 } else {
