@@ -9,8 +9,6 @@ configure-stamp:
 	dh_testdir
 	# Add here commands to configure the package.
 
-	chmod u+x 	build
-
 	touch $@
 
 
@@ -19,7 +17,7 @@ build-stamp: configure-stamp
 	dh_testdir
 
 	# Add here commands to compile the package.
-	./build
+	cd qctools && ./Project/BuildAllFromSource/build
 
 	touch $@
 
@@ -85,7 +83,7 @@ binary-arch: build install
 #	dh_installinfo
 	dh_installman
 	dh_link
-	dh_strip
+	dh_strip --dbg-package=qctools-dbg
 	dh_compress
 	dh_fixperms
 #	dh_perl

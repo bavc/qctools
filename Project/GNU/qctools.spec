@@ -15,20 +15,47 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires:  gcc-c++
 BuildRequires:  pkgconfig
 BuildRequires:  zlib-devel
-%if %{undefined mandriva_version}
+%if 0%{?fedora_version} >= 24
+BuildRequires: bzip2-devel
+%else
+%if ! 0%{?mageia}
 BuildRequires:  libbz2-devel
 %endif
-BuildRequires:  cmake
-%if %{undefined rhel_version} && %{undefined centos_version}
+%endif
+%if ! 0%{?rhel}
 BuildRequires:  yasm
 %endif
-BuildRequires:  libqt5-devel
+BuildRequires:  cmake
 %if 0%{?suse_version}
 BuildRequires:  update-desktop-files
 %endif
-%if 0%{?fedora_version}
-BuildRequires:  qt-devel
+
+%if 0%{?suse_version} || 0%{?rhel}
+%if 0%{?suse_version} >= 1200
+BuildRequires:  pkgconfig(Qt5Core)
+BuildRequires:  pkgconfig(Qt5Widgets)
+BuildRequires:  pkgconfig(Qt5Concurrent)
+BuildRequires:  pkgconfig(Qt5PrintSupport)
+%else
+BuildRequires:  libqt4-devel
+%endif
+%endif
+
+%if 0%{?fedora}
+BuildRequires:  pkgconfig(Qt5)
 BuildRequires:  desktop-file-utils
+%endif
+
+%if 0%{?mageia}
+%ifarch x86_64
+BuildRequires:  lib64qt5base5-devel
+BuildRequires:  lib64bzip2-devel
+%else
+BuildRequires:  libqt5base5-devel
+BuildRequires:  libbzip2-devel
+%endif
+BuildRequires:  sane-backends-iscan
+BuildRequires:  libuuid-devel
 %endif
 
 %description
@@ -46,18 +73,14 @@ for reformatting and capturing metadata that enables the long-term preservation 
 the digital object, and the associated catalog record.
 
 %prep
-%setup -q -n QCTools
-
-%build
-export CFLAGS="%{optflags}"
-export CXXFLAGS="%{optflags}"
+%setup -q -n qctools
 
 # build
-    chmod u+x build
-    chmod 644 qctools/History.txt
-    chmod 644 qctools/License.html
-	./build
-
+pushd qctools
+	chmod 644 History.txt
+	chmod 644 License.html
+	./Project/BuildAllFromSource/build
+popd
 
 %install
 pushd qctools/Project/QtCreator
@@ -76,9 +99,6 @@ install -dm 755 %{buildroot}/%{_datadir}/applications
 install -m 644 qctools/Project/GNU/GUI/qctools.desktop %{buildroot}/%{_datadir}/applications
 %if 0%{?suse_version}
   %suse_update_desktop_file -n qctools AudioVideo AudioVideoEditing
-%endif
-%if 0%{?fedora_version}
-  desktop-file-install --dir="%{buildroot}%{_datadir}/applications" -m 644 qctools/Project/GNU/GUI/qctools.desktop
 %endif
 install -dm 755 %{buildroot}/%{_datadir}/apps/konqueror/servicemenus
 install -m 644 qctools/Project/GNU/GUI/qctools.kde3.desktop %{buildroot}/%{_datadir}/apps/konqueror/servicemenus/qctools.desktop

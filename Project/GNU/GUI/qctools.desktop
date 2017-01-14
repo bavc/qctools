@@ -2,9 +2,10 @@
 Type=Application
 Version=1.0
 Name=QCTools
+GenericName=QCTools
 Comment=QCTools
 Icon=qctools
-Exec=QCTools %f 
+Exec=QCTools %f
 Terminal=false
 MimeType=
 Categories=AudioVideo;AudioVideoEditing;

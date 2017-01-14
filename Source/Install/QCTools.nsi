@@ -17,6 +17,9 @@ RequestExecutionLevel admin
 ; Compression
 SetCompressor /FINAL /SOLID lzma
 
+; Conditional
+!include LogicLib.nsh
+
 ; x64 stuff
 !include "x64.nsh"
 
@@ -79,18 +82,34 @@ Section "SectionPrincipale" SEC01
   SetOutPath "$SMPROGRAMS"
   CreateShortCut "$SMPROGRAMS\QCTools.lnk" "$INSTDIR\QCTools.exe" "" "$INSTDIR\QCTools.exe" 0 "" "" "QCTools"
   SetOutPath "$INSTDIR"
-  File "..\..\Project\MSVC2013\Release\QCTools.exe"
-  File "..\..\Project\MSVC2013\Release\avcodec-56.dll"
-  File "..\..\Project\MSVC2013\Release\avdevice-56.dll"
-  File "..\..\Project\MSVC2013\Release\avfilter-5.dll"
-  File "..\..\Project\MSVC2013\Release\avformat-56.dll"
-  File "..\..\Project\MSVC2013\Release\avutil-54.dll"
-  File "..\..\Project\MSVC2013\Release\postproc-53.dll"
-  File "..\..\Project\MSVC2013\Release\swresample-1.dll"
-  File "..\..\Project\MSVC2013\Release\swscale-3.dll"
+  !ifndef STATIC
+    File "..\..\Project\MSVC2015\Release\QCTools.exe"
+  !else
+    File "..\..\Project\MSVC2015\StaticRelease\QCTools.exe"
+  !endif
   File "..\..\History.txt"
   File "..\..\License.html"
-
+  !ifndef STATIC
+    File "..\..\..\ffmpeg\libavcodec\avcodec-*.dll"
+    File "..\..\..\ffmpeg\libavdevice\avdevice-*.dll"
+    File "..\..\..\ffmpeg\libavfilter\avfilter-*.dll"
+    File "..\..\..\ffmpeg\libavformat\avformat-*.dll"
+    File "..\..\..\ffmpeg\libavutil\avutil-*.dll"
+    File "..\..\..\ffmpeg\libpostproc\postproc-*.dll"
+    File "..\..\..\ffmpeg\libswresample\swresample-*.dll"
+    File "..\..\..\ffmpeg\libswscale\swscale-*.dll"
+    File "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\x86\Microsoft.VC140.CRT\concrt140.dll"
+    File "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\x86\Microsoft.VC140.CRT\msvcp140.dll"
+    File "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\x86\Microsoft.VC140.CRT\vccorlib140.dll"
+    File "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\x86\Microsoft.VC140.CRT\vcruntime140.dll"
+    File "..\..\..\Qt\bin\Qt5Core.dll"
+    File "..\..\..\Qt\bin\Qt5Gui.dll"
+    File "..\..\..\Qt\bin\Qt5Widgets.dll"
+    SetOutPath "$INSTDIR\imageformats"
+    File "..\..\..\Qt\plugins\imageformats\qjpeg.dll"
+    SetOutPath "$INSTDIR\platforms"
+    File "..\..\..\Qt\plugins\platforms\qwindows.dll"
+  !endif
   # Create files
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
 SectionEnd
@@ -119,16 +138,29 @@ Section Uninstall
   Delete "$INSTDIR\${PRODUCT_NAME}.url"
   Delete "$INSTDIR\uninst.exe"
   Delete "$INSTDIR\QCTools.exe"
-  Delete "$INSTDIR\avcodec-*.dll"
-  Delete "$INSTDIR\avdevice-*.dll"
-  Delete "$INSTDIR\avfilter-*.dll"
-  Delete "$INSTDIR\avformat-*.dll"
-  Delete "$INSTDIR\avutil-*.dll"
-  Delete "$INSTDIR\postproc-*.dll"
-  Delete "$INSTDIR\swresample-*.dll"
-  Delete "$INSTDIR\swscale-*.dll"
   Delete "$INSTDIR\History.txt"
   Delete "$INSTDIR\License.html"
+  !ifndef STATIC
+    Delete "$INSTDIR\avcodec-*.dll"
+    Delete "$INSTDIR\avdevice-*.dll"
+    Delete "$INSTDIR\avfilter-*.dll"
+    Delete "$INSTDIR\avformat-*.dll"
+    Delete "$INSTDIR\avutil-*.dll"
+    Delete "$INSTDIR\postproc-*.dll"
+    Delete "$INSTDIR\swresample-*.dll"
+    Delete "$INSTDIR\swscale-*.dll"
+    Delete "$INSTDIR\imageformats\qjpeg.dll"
+    Delete "$INSTDIR\platforms\qwindows.dll"
+    Delete "$INSTDIR\Qt5Core.dll"
+    Delete "$INSTDIR\Qt5Gui.dll"
+    Delete "$INSTDIR\Qt5Widgets.dll"
+    Delete "$INSTDIR\concrt140.dll"
+    Delete "$INSTDIR\msvcp140.dll"
+    Delete "$INSTDIR\vccorlib140.dll"
+    Delete "$INSTDIR\vcruntime140.dll"
+    RMDir "$INSTDIR\imageformats"
+    RMDir "$INSTDIR\platforms"
+  !endif
   RMDir  "$INSTDIR"
   Delete "$SMPROGRAMS\QCTools.lnk"
 
