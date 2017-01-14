@@ -233,7 +233,7 @@ private:
     DraggableChildrenBehaviour* draggableBehaviour;
     SignalServer* signalServer;
     SignalServerConnectionChecker* connectionChecker;
-    QWidget*                    connectionIndicator;
+    QWidget* connectionIndicator;
 
     Ui::MainWindow *ui;
 };
