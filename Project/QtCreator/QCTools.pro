@@ -83,7 +83,7 @@ HEADERS = \
     ../../Source/GUI/draggablechildrenbehaviour.h \
     ../../Source/GUI/SignalServerConnectionChecker.h \
     ../../Source/GUI/SignalServer.h
-
+    ../../Source/ThirdParty/cqmarkdown/CMarkdown.h
 SOURCES = \
     ../../Source/Core/AudioCore.cpp \
     ../../Source/Core/AudioStats.cpp \
@@ -120,7 +120,7 @@ SOURCES = \
     ../../Source/GUI/draggablechildrenbehaviour.cpp \
     ../../Source/GUI/SignalServerConnectionChecker.cpp \
     ../../Source/GUI/SignalServer.cpp
-
+    ../../Source/ThirdParty/cqmarkdown/CMarkdown.cpp
 linux:SOURCES += "../../../Blackmagic DeckLink SDK/Linux/include/DeckLinkAPIDispatch.cpp"
 macx:!contains(DEFINES, USE_BREW) SOURCES += "../../../Blackmagic DeckLink SDK/Mac/include/DeckLinkAPIDispatch.cpp"
 
@@ -164,7 +164,7 @@ macx:contains(DEFINES, USE_BREW) {
 }
 INCLUDEPATH += $$PWD/../../Source
 INCLUDEPATH += $$PWD/../../Source/ThirdParty/tinyxml2
-
+INCLUDEPATH += $$PWD/../../Source/ThirdParty/cqmarkdown
 include($$PWD/../../Source/ThirdParty/qblowfish/qblowfish.pri)
 
 macx:contains(DEFINES, USE_BREW) {
