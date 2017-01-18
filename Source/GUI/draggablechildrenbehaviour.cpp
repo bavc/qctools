@@ -19,9 +19,10 @@ DraggableChildrenBehaviour::DraggableChildrenBehaviour(QBoxLayout *layout) : QOb
     dropIndicator->setFrameShape(isHorizontalLayout() ? QFrame::VLine : QFrame::HLine);
     dropIndicator->hide();
 
-    for(auto child : parent->children())
+    QObjectList::const_iterator child;
+    for(child = parent->children().begin(); child != parent->children().end(); ++child)
     {
-        child->installEventFilter(this);
+        (*child)->installEventFilter(this);
     }
 }
 
@@ -29,7 +30,7 @@ void DraggableChildrenBehaviour::newDrag(QWidget *watched)
 {
     QDrag *drag = new QDrag(this);
 
-    auto mimeData = new QMimeData();
+    QMimeData* mimeData = new QMimeData();
     const QByteArray data = QByteArray::number((quintptr)watched);
 
     mimeData->setData(draggableMimeType, data);
@@ -45,21 +46,21 @@ bool DraggableChildrenBehaviour::eventFilter(QObject *watched, QEvent *event)
     {
         if(event->type() == QEvent::ChildAdded)
         {
-            auto addedChild = static_cast<QChildEvent*> (event)->child();
-            auto addedChildWidget = qobject_cast<QWidget*>(addedChild);
+            QObject* addedChild = static_cast<QChildEvent*> (event)->child();
+            QWidget* addedChildWidget = qobject_cast<QWidget*>(addedChild);
 
             if(addedChildWidget)
                 addedChildWidget->installEventFilter(this);
         }
         else if(event->type() == QEvent::DragEnter)
         {
-            auto dragEnterEvent = static_cast<QDragEnterEvent*> (event);
+            QDragEnterEvent* dragEnterEvent = static_cast<QDragEnterEvent*> (event);
             if(dragEnterEvent->mimeData()->hasFormat(draggableMimeType))
                 dragEnterEvent->accept();
         }
         else if(event->type() == QEvent::DragMove)
         {
-            auto dragMoveEvent = static_cast<QDragMoveEvent*> (event);
+            QDragMoveEvent* dragMoveEvent = static_cast<QDragMoveEvent*> (event);
 
             QWidget *child = parent->childAt(dragMoveEvent->pos());
             while(child && layout->indexOf(child) == -1)
@@ -70,7 +71,7 @@ bool DraggableChildrenBehaviour::eventFilter(QObject *watched, QEvent *event)
             if(child)
             {
                 int newDropIndex = layout->indexOf(child);
-                auto centerOfChild = child->geometry().center();
+                QPoint centerOfChild = child->geometry().center();
 
                 qDebug() << "pos: " << dragMoveEvent->pos() << ", child.center: " << centerOfChild << ", newDropIndex: " << newDropIndex;
 
@@ -104,7 +105,7 @@ bool DraggableChildrenBehaviour::eventFilter(QObject *watched, QEvent *event)
             }
         } else if(event->type() == QEvent::DragLeave)
         {
-            auto dragLeaveEvent = static_cast<QDragLeaveEvent*> (event);
+            QDragLeaveEvent* dragLeaveEvent = static_cast<QDragLeaveEvent*> (event);
 
             layout->removeWidget(dropIndicator);
             dropIndicator->hide();
@@ -112,7 +113,7 @@ bool DraggableChildrenBehaviour::eventFilter(QObject *watched, QEvent *event)
 
         } else if(event->type() == QEvent::Drop)
         {
-            auto dropEvent = static_cast<QDropEvent*> (event);
+            QDropEvent* dropEvent = static_cast<QDropEvent*> (event);
 
             const QByteArray data = dropEvent->mimeData()->data(draggableMimeType);
             QWidget* draggingWidget = reinterpret_cast<QWidget*> (data.toULongLong());

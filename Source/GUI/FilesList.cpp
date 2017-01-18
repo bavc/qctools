@@ -134,10 +134,10 @@ public:
 		// check if both are integers
 		{
 			bool ok = false;
-			auto intValue = text().toInt(&ok);
+			int intValue = text().toInt(&ok);
 			if (ok)
 			{
-				auto otherIntValue = other.text().toInt(&ok);
+				int otherIntValue = other.text().toInt(&ok);
 				if (ok) {
 					return intValue < otherIntValue;
 				}
@@ -147,10 +147,10 @@ public:
 		// check if both are doubles
 		{
 			bool ok = false;
-			auto doubleValue = text().toDouble(&ok);
+			double doubleValue = text().toDouble(&ok);
 			if (ok)
 			{
-				auto otherDoubleValue = other.text().toDouble(&ok);
+				double otherDoubleValue = other.text().toDouble(&ok);
 				if (ok) {
 					return doubleValue < otherDoubleValue;
 				}

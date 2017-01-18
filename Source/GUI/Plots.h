@@ -97,7 +97,7 @@ public:
 
     virtual bool                eventFilter( QObject *, QEvent * );
     void                        adjustGroupMax(int group, int bitsPerRawSample);
-    void                        changeOrder(QList<std::tuple<int, int>> filterSelectorsInfo);
+    void                        changeOrder(QList<QPair<int, int> > filterSelectorsInfo);
 
 public Q_SLOTS:
     void                        onCurrentFrameChanged();

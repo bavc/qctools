@@ -4,7 +4,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 TARGET = QCTools
 TEMPLATE = app
 
-CONFIG += c++11 qt no_keywords
+CONFIG += qt no_keywords
 
 USE_BREW = $$(QCTOOLS_USE_BREW)
 

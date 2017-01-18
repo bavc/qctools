@@ -74,11 +74,11 @@ void MainWindow::openCapture()
         DeckRunning=false;
         return;
     }
-        
+
     BlackmagicDeckLink_UserInput* blackmagicDeckLink_UserInput=new BlackmagicDeckLink_UserInput();
     if (!blackmagicDeckLink_UserInput->exec())
         return;
-    
+
     clearFiles();
     addFile(blackmagicDeckLink_UserInput->Card, blackmagicDeckLink_UserInput->Card->Config_In.FrameCount, blackmagicDeckLink_UserInput->Encoding_FileName.toUtf8().data(), blackmagicDeckLink_UserInput->Encoding_Format.toUtf8().data());
     addFile_finish();
@@ -324,7 +324,7 @@ void MainWindow::createGraphsLayout()
 
     PlotsArea=Files[Files_CurrentPos]->Stats.empty()?NULL:new Plots(this, Files[Files_CurrentPos]);
 
-    auto filtersInfo = Prefs->loadFilterSelectorsOrder();
+    QList<QPair<int, int> > filtersInfo = Prefs->loadFilterSelectorsOrder();
     changeFilterSelectorsOrder(filtersInfo);
     if (PlotsArea)
     {
@@ -343,7 +343,7 @@ void MainWindow::createGraphsLayout()
     ControlArea=new Control(this, Files[Files_CurrentPos], Control::Style_Cols);
     ControlArea->setPlayAllFrames(ui->actionPlay_All_Frames->isChecked());
 
-    connect( ControlArea, SIGNAL( currentFrameChanged() ), 
+    connect( ControlArea, SIGNAL( currentFrameChanged() ),
         this, SLOT( on_CurrentFrameChanged() ) );
 
     if (!ui->actionGraphsLayout->isChecked())
