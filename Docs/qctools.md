@@ -1012,7 +1012,7 @@ how to solve it.
 
 **1. High Video Level (Video Gain Error)**
 
-**What You See During Playback –** Areas with a lot of light or white
+**What You See During Playback** Areas with a lot of light or white
 (notice the sky and the shirt in the image below) will appear washed out
 or overly bright and detail will be lost.
 
@@ -1057,7 +1057,7 @@ for more than a few frames, high video level is most likely the cause.
 Occasional peaks can be created by a brief burst of light or a white
 fade-out.
 
-**How to Check in QCTools (Filter) –** Double click on the thumbnail (at
+**How to Check in QCTools (Filter)** Double click on the thumbnail (at
 the bottom of the QCTools window) that corresponds to the problematic
 area. The **Video Analysis Window** will pop-up. On the right side,
 select the **TOUT** filter and note the amount of pixels that are
@@ -1106,7 +1106,7 @@ video level and troubleshoot fixing the image quality:
 \
 **2. UnderSaturation**
 
-**What Do You See During Playback –** The video signal is undersaturated
+**What Do You See During Playback** The video signal is undersaturated
 when chrominance amplitude is restricted to values under reference
 standard level (i.e., 75% SMPTE color bars), causing colors to appear
 washed out and unnaturally pale. Undersaturation can be difficult to
@@ -1128,18 +1128,18 @@ manifestation of this problem.
 
 *Before* *After*
 
-**First Check –** Before making adjustments, check to make sure this is
+**First Check** Before making adjustments, check to make sure this is
 not a Field error (see **Mechanical Problems, 3. Video Head Clog,
 Additional**)
 
-**How to Check in QCTools (Graph) –** Select the **Sat** and **Hue. Hue
+**How to Check in QCTools (Graph)** Select the **Sat** and **Hue. Hue
 AVG** should be *at* **147** and **Sat** should be *at or below*
 **88.7** and *above* **0**. Select the **V** and **U** graphs. The lines
 should all be relatively smooth (straight/flat) and should be between
 **0-88.7**. Undersaturated images will be way below 88.7. The Hue may
 also be too high or low (above or below 147).
 
-**Can You Fix It? –** Yes, this is correctable through adjustment of the
+**Can You Fix It?** Yes, this is correctable through adjustment of the
 **Chroma** and **Hue** levels.
 
 **How to Fix It** – The following steps will allow you to adjust the
@@ -1190,7 +1190,7 @@ video level and troubleshoot fixing the image quality:
 
 **3. OverSaturation (Chroma Error)**
 
-**What Do You See During Playback –** Oversaturation refers to high
+**What Do You See During Playback** Oversaturation refers to high
 chrominance amplitude in a video signal, creating the appearance of very
 intense color in the image. Depending on severity of oversaturation,
 color in the image may appear to bleed into areas outside of an object’s
@@ -1207,18 +1207,18 @@ Saturation values.
 
 *Before* *After*
 
-**What You See on BlackMagic Design –** the trace within the Vectorscope
+**What You See on BlackMagic Design** the trace within the Vectorscope
 will be extending beyond the color markers (the small squares by the
 letters).
 
-**How to Check in QCTools (Graph) –** Select the **Sat** and **Hue. Hue
+**How to Check in QCTools (Graph)** Select the **Sat** and **Hue. Hue
 AVG** should be *at* **147** and **Sat** should be at or *below*
 **88.7**. Select the **V** and **U** graphs. The lines should all be
 relatively smooth (straight/flat) and should be between **100**-
 **120**. Oversaturated images will be way above 120. The Hue may also be
 too high or low.
 
-**Can You Fix It? –** Yes, oversaturation is correctable through
+**Can You Fix It?** Yes, oversaturation is correctable through
 retransfer and adjustment of the VTR output using the TBC controls.
 
 **How to Fix It** – The following steps will allow you to adjust the
@@ -1278,32 +1278,32 @@ chrominance in the video signal, or the use of poor video processors.
 Multi-generation composite dubs may suffer from high levels of
 chrominance noise.
 
-**What You See on BlackMagic Design –** On the Vectorscope, the specks
+**What You See on BlackMagic Design** On the Vectorscope, the specks
 of trace with appear to bounce or reverberate outward from the
 concentration of trace at the center. This movement is similar that of
 ripples, but happen in odd bursts, There may also be a constant presence
 of speckled trace that extend out much further than the concentration of
 trace pattern.
 
-**How to Check in QCTools (Graph) –** Select the **U** and **V** graphs.
+**How to Check in QCTools (Graph)** Select the **U** and **V** graphs.
 Look for any areas with abrupt spikes or plummets (particularly in the
 MIN and MAX).
 
 ![](media/image17.jpeg)
 
 
-**How to Check in QCTools (Filter) –** double-click a frame with Chroma
+**How to Check in QCTools (Filter)** double-click a frame with Chroma
 noise (corresponding to the same time signature as a spike in the graph)
 and select the **Histogram** filter in the right hand view. Check the
 **U** and **V** boxes to view just these two graphs. If the plots are
 climb the edges of the display or do not extend to both edges, the
 Chroma levels are most likely off.
 
-**Can You Fix It? –** Maybe**.** If the video output has been properly
+**Can You Fix It?** Maybe**.** If the video output has been properly
 adjusted for playback, there is not an acceptable fix for this problem
 in preservation workflows.
 
-**How to Fix It –** If the Chroma levels (U and V) were off, you can try
+**How to Fix It** If the Chroma levels (U and V) were off, you can try
 the following steps to reduce the noise:
 
 -   Start playback in **BlackMagic Media Express** and begin capturing.
@@ -1329,16 +1329,16 @@ the following steps to reduce the noise:
 **5. Luminance Noise **
 
 ![](media/image59.jpeg)
-**What Do You See During Playback –** Luminance noise
+**What Do You See During Playback** Luminance noise
 is noise where only the brightness of a colored pixels is affected (but
 the color as such is fine). This appears as a bright layer of white
 noise (a translucent layer of snow) over the image.
 
-**What You See on BlackMagic Design –** The **Waveform** monitor will
+**What You See on BlackMagic Design** The **Waveform** monitor will
 show an uneven trace spread, with trace that is consistently out of
 ideal range.
 
-**How to Check in QCTools (Graph) –** On the **Y graph**, look for any
+**How to Check in QCTools (Graph)** On the **Y graph**, look for any
 plots that are not within the 16-235 range or where the peaks and valley
 are noticeably erratic. On the **YUV Diffs graph**, see if there is a
 significant different between the Y plot and the U/V plots. Also, look
@@ -1347,7 +1347,7 @@ trigger this filer, but noise occurring outside of these parameters
 would read as spikes in the graph. Typically anything with a value over
 0.01 will read as an artifact.
 
-**How to Check in QCTools (Filter) –** Double click on a frame that
+**How to Check in QCTools (Filter)** Double click on a frame that
 contains Luma noise. On the right hand view, compare the **Broadcast
 Range Pixels filter** with the **TOUT filter**. Both will possibly
 present spots (specks) highlighted in yellow. Notice the spread of the
@@ -1357,11 +1357,11 @@ even, the noise is probably caused by tape damage. If it is concentrated
 in certain areas, this is most likely a Luma level artifact that is can
 be fixed through adjustment or was recorded into the original image.
 
-**Can You Fix It? –**Maybe. If the video output has been properly
+**Can You Fix It?**Maybe. If the video output has been properly
 adjusted for playback, there is not an acceptable fix for this problem
 in preservation workflows.
 
-**How to Fix It –** If the Luma levels (Y) were off, you can try the
+**How to Fix It** If the Luma levels (Y) were off, you can try the
 following steps to reduce the noise:
 
 -   Start playback in **BlackMagic Media Express** and begin capturing.
@@ -1386,11 +1386,11 @@ following steps to reduce the noise:
 
 **6. Hue**
 
-**What Do You See During Playback –** The colors will immediately appear
+**What Do You See During Playback** The colors will immediately appear
 **“**off” and most noticeably, the majority of featured skin tones will
 look unnatural (too orange, red, yellow, etc.)
 
-**What You See on BlackMagic/Vrecord Design –** on the **Vectorscope**
+**What You See on BlackMagic/Vrecord Design** on the **Vectorscope**
 the concentration of trace will not point exactly at the 147⁰ point
 (skintone line marked on Vrecord vectorscope) and the color
 concentration will be significantly uneven. The Hue measurement on the
@@ -1407,14 +1407,14 @@ reflect onto the person’s and cause his/her skin to appear pink or
 yellow/green, even when the hue is in balance. This is most problematic
 with Umatic video.
 
-**How to Check in QCTools (Graph) –** The Hue measurement on the will be
+**How to Check in QCTools (Graph)** The Hue measurement on the will be
 significantly above or below 147⁰.
 
-**How to Check in QCTools (Filter) –** Hue, Saturation, Diffs, & U/V
+**How to Check in QCTools (Filter)** Hue, Saturation, Diffs, & U/V
 
-**Can You Fix It? –** Yes (most likely)
+**Can You Fix It?** Yes (most likely)
 
-**How to Fix It –** Using the TBC that corresponds with the Mac you are
+**How to Fix It** Using the TBC that corresponds with the Mac you are
 using, do the following:
 
 -   Push the **Hue** button
@@ -1435,7 +1435,7 @@ using, do the following:
 
 **7. Y/C Delay Error**
 
-**What Do You See During Playback –** When video suffers from Y/C delay
+**What Do You See During Playback** When video suffers from Y/C delay
 error, there will be a mismatch in the timing among the luminance and/or
 color channels, with resulting visible misalignment in how colors appear
 in the monitor. A misalignment of Y/C shows a blurry edge around areas
@@ -1455,11 +1455,11 @@ image (image on the right).
 
 *Before* *After*
 
-**What You See on BlackMagic Design –**
+**What You See on BlackMagic Design**
 
 **How to Check in QCTools (Filter) – **
 
-**Can You Fix It? –** Yes, some time base correctors (VTR integrated or
+**Can You Fix It?** Yes, some time base correctors (VTR integrated or
 stand-alone) have Y/C adjustment capability.
 
 **How to Fix It** – The following steps will allow you to adjust the
@@ -1494,7 +1494,7 @@ video level and troubleshoot fixing the image quality:
 
 **8. TBC Processing Artifact**
 
-**What Do You See During Playback –** An artifact which is generated by
+**What Do You See During Playback** An artifact which is generated by
 maladjustment or circuitry failure in an integrated or stand-alone time
 base corrector (TBC) can be categorized as a processing artifact.
 Depending on the type of TBC used, these have a diverse set of
@@ -1517,18 +1517,18 @@ signal was sent through the TBC.
 
 *Correct Incorrect*
 
-**What You See on BlackMagic Design –**
+**What You See on BlackMagic Design**
 
-**How to Check in QCTools (Graph) –**
+**How to Check in QCTools (Graph)**
 
 **How to Check in QCTools (Filter) – **
 
-**Can You Fix It? –** This artifact may be correctable by readjustment
+**Can You Fix It?** This artifact may be correctable by readjustment
 or calibration of the TBC. If the TBC cannot process video output due to
 poor playback signal from the VTR, the media must be treated to improve
 playback or a different and more effective TBC must be used.
 
-**How to Fix It –**
+**How to Fix It**
 
 ![](media/image63.jpeg)
 **Mechanical Problems**
@@ -1551,7 +1551,7 @@ how to solve it.
 ![](media/image64.jpeg)
 **1. Tracking Error**
 
-**What Do You See During Playback –** Tracking error is visible as a
+**What Do You See During Playback** Tracking error is visible as a
 distortion produced during playback caused by the inability of video
 heads to correctly follow the video tracks recorded on a tape. The
 tracking control adjustment corrects for this error. It delays the
@@ -1559,10 +1559,10 @@ control track signal during playback so its position approximates the
 position of the control track head that was used on the recording
 machine.
 
-**What You See on BlackMagic Design –** See **Waveform** filter (same as
+**What You See on BlackMagic Design** See **Waveform** filter (same as
 BlackMagic Design display) below.
 
-**How to Check in QCTools (Graph) –** Large tracking errors in a video
+**How to Check in QCTools (Graph)** Large tracking errors in a video
 file will be clearly evident as significant spikes in the Temporal
 Outliers (TOUT) graph. Check the boxes to generate graphs for both
 **TOUT** and **VREP**. Examples of TOUT graph and playback images with
@@ -1570,7 +1570,7 @@ tracking errors below.
 
 ![](media/image65.png)
 ![](media/image66.png)
-**How to Check in QCTools (Filter) –**
+**How to Check in QCTools (Filter)**
 Double click on the thumbnail (at the bottom of the QCTools window) that
 corresponds to the problematic area. The **Video Analysis Window** will
 pop-up. On the right side, select the **Temporal Outlier Pixels**
@@ -1605,11 +1605,11 @@ significantly and quickly.
 Next, select the **Vertical Line Repetitions** filter. This will help to
 separate damage or tracking errors from color errors.
 
-**Can You Fix It? –** Yes, a tracking error can be corrected by careful
+**Can You Fix It?** Yes, a tracking error can be corrected by careful
 tracking adjustment. Severe tracking errors with a particular piece of
 media may require a custom tape path alignment.
 
-**How to Fix It –** On the front of the **U-matic** player, just to the
+**How to Fix It** On the front of the **U-matic** player, just to the
 right of the **Audio Level** knobs, is the **Tracking** knob. While in
 playback mode, slowly twist the knob back and forth and notice if the
 problem increases or decreases. Make sure to try going all the way to
@@ -1623,7 +1623,7 @@ damage to the tape.
 **2. Skew Error**
 
 ![](media/image69.jpeg)
-**What Do You See During Playback –** Tape
+**What Do You See During Playback** Tape
 is susceptible to expansion and shrinkage, see Lengthwise Tape Expansion
 or Shrinkage These dimensional changes impact the length and angle of
 the recorded tracks. On playback, the loss of correspondence between the
@@ -1639,7 +1639,7 @@ displacement immediately below the head switching point. If the symptom
 is very pronounced, the skewing will also appear along the top edge of
 the image, where it becomes visible as a disruptive skew error."
 
-**Can You Fix It? –** Maybe**.** Some VTRs have skew controls that allow
+**Can You Fix It?** Maybe**.** Some VTRs have skew controls that allow
 for minor adjustments in tape tension, most notably, several models of
 U-matic machines and some 1/2" open reel models. Otherwise, skew error
 may be minimized through the use of a good time base corrector (TBC). It
@@ -1648,7 +1648,7 @@ the player equipment, but be careful: this kind of tinkering should be
 done by a trained technician and not performed on equipment used for
 recording.
 
-**How to Fix It –** The **U-matic** players have a horizontal **Skew**
+**How to Fix It** The **U-matic** players have a horizontal **Skew**
 switch to the right of the analog time counter. While the video is in
 playback, slowly move the switch from side to side and notice if the
 edges of the frame bend or straighten. Not all bends can be fixed this
@@ -1661,7 +1661,7 @@ be able to completely fix this error.
 **3. Video Head Clog**
 
 ![](media/image70.jpeg)
-**What Do You See During Playback –** When
+**What Do You See During Playback** When
 loose oxide builds up in the tape path, it can travel with the tape to
 the drum assembly and prevent the video head from making contact with
 the tape. The result is a heavily obscured image or a complete loss of
@@ -1671,17 +1671,17 @@ severe head clog cannot be removed by playing a cleaning tape through
 the VTR. The head and drum assembly must be manually cleaned using a
 cleaning solution.
 
-**How to Check in QCTools (Graph) –** Select the **PSNRf** and **MSEf**
+**How to Check in QCTools (Graph)** Select the **PSNRf** and **MSEf**
 graphs (click check box) and the **Diffs** graph. Often, head problems
 with corrupted frames will result in large YUV Difference values/graph
 spikes. The PSNR graph will be too high and the MSE will be too low.
 Both graphs will be uneven.
 
-**How to Check in QCTools (Filter) –** Waveform
+**How to Check in QCTools (Filter)** Waveform
 
-**Can You Fix It? –** Yes.
+**Can You Fix It?** Yes.
 
-**How to Fix It –** Stop playback and clean the video heads on the
+**How to Fix It** Stop playback and clean the video heads on the
 player using an appropriate solvent and cotton swab. While you are at
 it, clean the tape path to prevent possible recontamination.
 
@@ -1706,14 +1706,14 @@ right image has **Field** enabled. By viewed the Fields separated on the
 right, it is easily clear that while Field 1 was read correctly from the
 tape, there was no color data was read for Field 2.
 
-**Can You Fix It? –** Yes.
+**Can You Fix It?** Yes.
 
 **How to Fix It -** This error can be fixed by cleaning the video player
 and re-digitizing the content.
 
 **4. Head Switching Noise**
 
-**What Do You See During Playback –** a horizontal line or section along
+**What Do You See During Playback** a horizontal line or section along
 the bottom of the frame that is consistently out of alignment from the
 rest of the picture. This is a result of the video heads being switched
 on and off and occurs as a result of the different positions that each
@@ -1757,14 +1757,14 @@ TBC.)
 > switching point after the end of active video, so you do not see the
 > problem on recordings made on BVU-series machines.
 
-**How to Check in QCTools (Graph) –** TOUT and VREP
+**How to Check in QCTools (Graph)** TOUT and VREP
 
-**How to Check in QCTools (Filter) –** TOUT and VREP
+**How to Check in QCTools (Filter)** TOUT and VREP
 
-**Can You Fix It? –** Yes, but only under certain circumstances. It must
+**Can You Fix It?** Yes, but only under certain circumstances. It must
 not have been recorded as part of the signal on the tape.
 
-**How to Fix It –** Adjust skew and tracking. Since the problem is one
+**How to Fix It** Adjust skew and tracking. Since the problem is one
 of recording and not playback, not a lot can be done to remove the
 artifact, but by making these adjustments, you may be able to minimize
 its presence.
@@ -1803,7 +1803,7 @@ its presence.
 
 **5. timecode Error**
 
-**What Do You See During Playback –** Timecode error is visible as a
+**What Do You See During Playback** Timecode error is visible as a
 line or section of rainbow distortion produced along the bottom or top
 of the picture.
 
@@ -1845,7 +1845,7 @@ how to solve it.
 **1. Dropout**
 
 ![](media/image76.jpeg)
-**What Do You See During Playback –**
+**What Do You See During Playback**
 Brief signal loss caused by a tape head clog, defect in the tape,
 debris, or other feature that causes an increase in the head-to-tape
 spacing. A dropout can also be caused by missing magnetic material. A
@@ -1861,12 +1861,12 @@ that the tape binder is deteriorating.
 **How to Check in QCTools (Filter) –
 VREP**
 
-**Can You Fix It? –**Maybe. If media is scratched so that oxide is
+**Can You Fix It?**Maybe. If media is scratched so that oxide is
 missing, the material cannot be replaced so the dropout is permanent.
 Dropout may also be recorded into the original content. This can be
 confirmed by "stepping through" the tape in a slow playback mode.
 
-**How to Fix It –** Environmental dirt or loose oxide can be removed by
+**How to Fix It** Environmental dirt or loose oxide can be removed by
 machine or hand-cleaning. If cleaning, it makes sense to rehouse and/or
 clean the cassette shell at the same
 time.![](media/image78.gif)
@@ -1875,7 +1875,7 @@ time.![](media/image78.gif)
 **2. Tape Crease**
 
 ![](media/image79.jpeg)
-**What Do You See During Playback –** A
+**What Do You See During Playback** A
 tape crease is a fold or a wrinkle that can be created by a variety of
 circumstances, most of which involve VTR transport problems, damaged or
 misaligned tape guides, capstan/pinch roller malfunction, tape cinching,
@@ -1884,7 +1884,7 @@ It results in video dropout during playback (usually horizontal and
 rolling) which is due to the wrinkle in the media surface which cannot
 be read entirely by the video head.
 
-**Can You Fix It? –**No**.** Tape creases are common and not easily
+**Can You Fix It?**No**.** Tape creases are common and not easily
 treatable. Standard practices for safe "straightening" of videotape have
 not been developed.
 
