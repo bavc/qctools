@@ -23,13 +23,13 @@
     </qresource>
     <qresource prefix="/">
         <file alias="Help/About.html">../../License.html</file>
-        <file>Help/Getting Started/Getting Started.html</file>
-        <file>Help/How To Use/How To Use.html</file>
-        <file>Help/How To Use/metadatascreen.jpg</file>
-        <file>Help/How To Use/Slide1.jpg</file>
-        <file>Help/How To Use/Slide2.jpg</file>
-        <file>Help/How To Use/Slide3.jpg</file>
-        <file>Help/How To Use/Slide4.jpg</file>
+        <file alias="Help/getting_started.md">../../Docs/getting_started.md</file>
+        <file alias="Help/how_to_use.md">../../Docs/how_to_use.md</file>
+        <file alias="Help/metadatascreen.jpg">../../Docs/media/how_to_use/metadatascreen.jpg</file>
+        <file alias="Help/Slide1.jpg">../../Docs/media/how_to_use/Slide1.jpg</file>
+        <file alias="Help/Slide2.jpg">../../Docs/media/how_to_use/Slide2.jpg</file>
+        <file alias="Help/Slide3.jpg">../../Docs/media/how_to_use/Slide3.jpg</file>
+        <file alias="Help/Slide4.jpg">../../Docs/media/how_to_use/Slide4.jpg</file>
         <file>Help/Filter Descriptions/Filter Descriptions.html</file>
         <file>Help/Filter Descriptions/13_DHC0177_TOUT.jpg</file>
         <file>Help/Filter Descriptions/DAN_Rogers2_umatic_error-vrep.jpg</file>

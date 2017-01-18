@@ -54,17 +54,30 @@ Help::Help(QWidget * parent)
     TextMd->setHtml(html);
     Central->addTab(TextMd, tr("Markdown"));
 
-    QTextBrowser* Text1=new QTextBrowser(this);
+
+    QTextBrowser* Text1 =new QTextBrowser(this);
     Text1->setReadOnly(true);
     Text1->setOpenExternalLinks(true);
-    Text1->setSource(QUrl("qrc:/Help/Getting Started/Getting Started.html"));
+
+    CMarkdown getting_started;
+    QString html1 = getting_started.processFile(":/Help/getting_started.md");
+    html1.replace("src=\"media/", "src=\"qrc:/Help/");
+
+    Text1->setHtml(html1);
     Central->addTab(Text1, tr("Getting Started"));
 
-    QTextBrowser* Text2=new QTextBrowser(this);
+
+    QTextBrowser* Text2 =new QTextBrowser(this);
     Text2->setReadOnly(true);
     Text2->setOpenExternalLinks(true);
-    Text2->setSource(QUrl("qrc:/Help/How To Use/How To Use.html"));
+
+    CMarkdown how_to_use;
+    QString html2 = how_to_use.processFile(":/Help/how_to_use.md");
+    html2.replace("src=\"media/", "src=\"qrc:/Help/");
+
+    Text2->setHtml(html2);
     Central->addTab(Text2, tr("How To Use"));
+
 
     QTextBrowser* Text3=new QTextBrowser(this);
     Text3->setReadOnly(true);
