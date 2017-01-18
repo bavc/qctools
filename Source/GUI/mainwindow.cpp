@@ -87,24 +87,7 @@ MainWindow::MainWindow(QWidget *parent) :
     DeckRunning=false;
 
     draggableBehaviour = new DraggableChildrenBehaviour(ui->horizontalLayout);
-    connect(draggableBehaviour, &DraggableChildrenBehaviour::childPositionChanged, [&](QWidget* child, int oldPos, int newPos) {
-
-        Q_UNUSED(child);
-
-        int start = oldPos;
-        int end = newPos;
-
-        if(oldPos > newPos)
-        {
-            start = newPos;
-            end = oldPos;
-        }
-
-        QList<std::tuple<int, int>> filtersSelectors = getFilterSelectorsOrder();
-
-        if(PlotsArea)
-            PlotsArea->changeOrder(filtersSelectors);
-    });
+    connect(draggableBehaviour, SIGNAL(childPositionChanged(QWidget*, int, int)), this, SLOT(positionChanged(QWidget*, int, int)));
 }
 
 //---------------------------------------------------------------------------
@@ -547,4 +530,23 @@ void MainWindow::on_actionPlay_All_Frames_triggered()
 {
     if(ControlArea)
         ControlArea->setPlayAllFrames(true);
+}
+
+void MainWindow::positionChanged(QWidget* child, int oldPos, int newPos)
+{
+    Q_UNUSED(child);
+
+    int start = oldPos;
+    int end = newPos;
+
+    if(oldPos > newPos)
+    {
+        start = newPos;
+        end = oldPos;
+    }
+
+    QList<std::tuple<int, int> > filtersSelectors = getFilterSelectorsOrder();
+
+    if(PlotsArea)
+        PlotsArea->changeOrder(filtersSelectors);
 }

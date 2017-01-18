@@ -83,6 +83,14 @@ private:
 public Q_SLOTS:
     void on_valueChanged(double);
     void on_sliderMoved(int);
+    void selectionChangedX(const QRectF& geometry);
+    void selectionChangedY(const QRectF& geometry);
+    void selectionChangedWidth(const QRectF& geometry);
+    void selectionChangedHeight(const QRectF& geometry);
+    void selectionChangeFinishedX(const QRectF& geometry);
+    void selectionChangeFinishedY(const QRectF& geometry);
+    void selectionChangeFinishedWidth(const QRectF& geometry);
+    void selectionChangeFinishedHeight(const QRectF& geometry);
 
 Q_SIGNALS:
     void controlValueChanged(double);
@@ -95,6 +103,11 @@ Q_SIGNALS:
 class BigDisplay : public QDialog
 {
     Q_OBJECT
+
+#if QT_VERSION < 0x050200
+private:
+    bool                        Stop;
+#endif
 
 public:
     // Constructor/Destructor
@@ -190,6 +203,9 @@ public Q_SLOTS:
     void on_Color2_click(bool checked);
 
     void on_Full_triggered();
+#if QT_VERSION < 0x050200
+    void interruptionRequested();
+#endif
 };
 
 #endif // GUI_BigDisplay_H

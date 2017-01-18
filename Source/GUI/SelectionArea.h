@@ -12,17 +12,21 @@ public:
 
     enum TrackerHit {
 		hitNothing = -1,
-		hitTopLeft = 0, 
-		hitTopRight = 1, 
-		hitBottomRight = 2, 
+		hitTopLeft = 0,
+		hitTopRight = 1,
+		hitBottomRight = 2,
 		hitBottomLeft = 3,
-		hitTop = 4, 
-		hitRight = 5, 
-		hitBottom = 6, 
-		hitLeft = 7, 
+		hitTop = 4,
+		hitRight = 5,
+		hitBottom = 6,
+		hitLeft = 7,
 		hitMiddle = 8
 	};
+#if QT_VERSION >= QT_VERSION_CHECK(5, 5, 0)
     Q_ENUM(TrackerHit);
+#else
+    Q_ENUMS(TrackerHit);
+#endif
 
 public Q_SLOTS:
     void setMaxSize(int width, int height);

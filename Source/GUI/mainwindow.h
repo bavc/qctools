@@ -113,8 +113,8 @@ public:
 
     //Preferences
     Preferences*                Prefs;
-    
-    QList<std::tuple<int, int>> getFilterSelectorsOrder(int start, int end);
+
+    QList<std::tuple<int, int> > getFilterSelectorsOrder(int start, int end);
 public Q_SLOTS:
 	void Update();
 
@@ -205,6 +205,8 @@ private Q_SLOTS:
     void on_actionPlay_at_Frame_Rate_triggered();
 
     void on_actionPlay_All_Frames_triggered();
+
+    void positionChanged(QWidget* child, int oldPos, int newPos);
 
 private:
     void updateScrollBar( bool blockSignals = false );

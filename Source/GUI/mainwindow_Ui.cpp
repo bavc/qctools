@@ -244,7 +244,7 @@ void MainWindow::Zoom( bool on )
 
 void MainWindow::changeFilterSelectorsOrder(QList<std::tuple<int, int> > filtersInfo)
 {
-    QSignalBlocker blocker(draggableBehaviour);
+    draggableBehaviour->blockSignals(true);
 
     auto boxlayout = static_cast<QHBoxLayout*> (ui->horizontalLayout);
 
@@ -271,6 +271,8 @@ void MainWindow::changeFilterSelectorsOrder(QList<std::tuple<int, int> > filters
     {
         boxlayout->addItem(item);
     }
+
+    draggableBehaviour->blockSignals(false);
 }
 
 void MainWindow::updateScrollBar( bool blockSignals )

@@ -50,7 +50,8 @@ TinyDisplay::TinyDisplay(QWidget *parent, FileInformation* FileInformationData_)
 TinyDisplay::~TinyDisplay()
 {
     while (!thumbnails.empty()) {
-        QToolButton *t = thumbnails.takeLast();
+        QToolButton *t = thumbnails.last();
+        thumbnails.pop_back();
         delete t;
     }
 
@@ -94,7 +95,8 @@ void TinyDisplay::thumbsLayoutResized()
         else if (total_thumbs < thumbnails.size()) {
             int diff = thumbnails.size() - total_thumbs;
             for (int i = 0; i < diff; ++i) {
-                QToolButton *tool_button = thumbnails.takeLast();
+                QToolButton *tool_button = thumbnails.last();
+                thumbnails.pop_back();
                 disconnect(tool_button, 0, 0, 0);
                 Layout->removeWidget(tool_button);
                 delete tool_button;
