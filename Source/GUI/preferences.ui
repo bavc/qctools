@@ -268,7 +268,7 @@
        <string>Signalserver</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="4" column="0">
+       <item row="5" column="0">
         <widget class="QCheckBox" name="signalServerEnableAutoUpload_checkBox">
          <property name="enabled">
           <bool>false</bool>
@@ -278,7 +278,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
+       <item row="6" column="0">
         <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -314,7 +314,21 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="3">
+       <item row="1" column="0" colspan="4">
+        <widget class="QLineEdit" name="signalServerLogin_lineEdit">
+         <property name="placeholderText">
+          <string>User name</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1" colspan="2">
+        <widget class="QPushButton" name="testConnection_pushButton">
+         <property name="text">
+          <string>Test connection</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="3">
         <spacer name="horizontalSpacer_2">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -327,21 +341,7 @@
          </property>
         </spacer>
        </item>
-       <item row="1" column="0" colspan="4">
-        <widget class="QLineEdit" name="signalServerLogin_lineEdit">
-         <property name="placeholderText">
-          <string>User name</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1" colspan="2">
-        <widget class="QPushButton" name="testConnection_pushButton">
-         <property name="text">
-          <string>Test connection</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0" colspan="4">
+       <item row="8" column="0" colspan="4">
         <widget class="QLabel" name="connectionTest_label">
          <property name="text">
           <string/>
@@ -354,12 +354,40 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="4" column="0">
         <widget class="QCheckBox" name="signalServerEnable_checkBox">
          <property name="text">
           <string>Enable signalserver</string>
          </property>
         </widget>
+       </item>
+       <item row="3" column="0" colspan="4">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <pointsize>7</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Warning: passwords are stored insecurely and transmit in plain text!</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0" colspan="4">
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
