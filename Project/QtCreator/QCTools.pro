@@ -81,11 +81,8 @@ HEADERS = \
     ../../Source/GUI/Imagelabel.h \
     ../../Source/GUI/config.h \
     ../../Source/GUI/draggablechildrenbehaviour.h \
-<<<<<<< HEAD
-=======
     ../../Source/GUI/SignalServerConnectionChecker.h \
     ../../Source/GUI/SignalServer.h \
->>>>>>> ElderOrb/markdown
     ../../Source/ThirdParty/cqmarkdown/CMarkdown.h
 
 SOURCES = \
@@ -246,10 +243,7 @@ macx:contains(DEFINES, USE_BREW) {
 INCLUDEPATH += $$PWD/../../Source
 INCLUDEPATH += $$PWD/../../Source/ThirdParty/tinyxml2
 INCLUDEPATH += $$PWD/../../Source/ThirdParty/cqmarkdown
-<<<<<<< HEAD
-=======
 include($$PWD/../../Source/ThirdParty/qblowfish/qblowfish.pri)
->>>>>>> ElderOrb/markdown
 
 macx:contains(DEFINES, USE_BREW) {
     message("use ffmpeg from brew")
