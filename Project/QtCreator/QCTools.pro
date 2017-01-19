@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 TARGET = QCTools
@@ -80,7 +80,9 @@ HEADERS = \
     ../../Source/ThirdParty/tinyxml2/tinyxml2.h \
     ../../Source/GUI/Imagelabel.h \
     ../../Source/GUI/config.h \
-    ../../Source/GUI/draggablechildrenbehaviour.h
+    ../../Source/GUI/draggablechildrenbehaviour.h \
+    ../../Source/GUI/SignalServerConnectionChecker.h \
+    ../../Source/GUI/SignalServer.h
 
 SOURCES = \
     ../../Source/Core/AudioCore.cpp \
@@ -115,7 +117,9 @@ SOURCES = \
     ../../Source/ThirdParty/tinyxml2/tinyxml2.cpp \
     ../../Source/GUI/Imagelabel.cpp \
     ../../Source/GUI/config.cpp \
-    ../../Source/GUI/draggablechildrenbehaviour.cpp
+    ../../Source/GUI/draggablechildrenbehaviour.cpp \
+    ../../Source/GUI/SignalServerConnectionChecker.cpp \
+    ../../Source/GUI/SignalServer.cpp
 
 linux:SOURCES += "../../../Blackmagic DeckLink SDK/Linux/include/DeckLinkAPIDispatch.cpp"
 macx:!contains(DEFINES, USE_BREW) SOURCES += "../../../Blackmagic DeckLink SDK/Mac/include/DeckLinkAPIDispatch.cpp"
@@ -160,6 +164,8 @@ macx:contains(DEFINES, USE_BREW) {
 }
 INCLUDEPATH += $$PWD/../../Source
 INCLUDEPATH += $$PWD/../../Source/ThirdParty/tinyxml2
+
+include($$PWD/../../Source/ThirdParty/qblowfish/qblowfish.pri)
 
 macx:contains(DEFINES, USE_BREW) {
     message("use ffmpeg from brew")

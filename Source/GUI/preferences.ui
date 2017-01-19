@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>609</width>
-    <height>337</height>
+    <height>409</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="Filters">
       <attribute name="title">
@@ -263,6 +263,134 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="Signalserver">
+      <attribute name="title">
+       <string>Signalserver</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="5" column="0">
+        <widget class="QCheckBox" name="signalServerEnableAutoUpload_checkBox">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Upload to signalserver automatically</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>221</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="0" colspan="4">
+        <widget class="QLineEdit" name="signalServerUrl_lineEdit">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="placeholderText">
+          <string>Signalserver URL (http://example.com)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="4">
+        <widget class="QLineEdit" name="signalServerPassword_lineEdit">
+         <property name="echoMode">
+          <enum>QLineEdit::Password</enum>
+         </property>
+         <property name="placeholderText">
+          <string>Password</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="4">
+        <widget class="QLineEdit" name="signalServerLogin_lineEdit">
+         <property name="placeholderText">
+          <string>User name</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1" colspan="2">
+        <widget class="QPushButton" name="testConnection_pushButton">
+         <property name="text">
+          <string>Test connection</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="3">
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>220</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="8" column="0" colspan="4">
+        <widget class="QLabel" name="connectionTest_label">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QCheckBox" name="signalServerEnable_checkBox">
+         <property name="text">
+          <string>Enable signalserver</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="4">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <pointsize>7</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Warning: passwords are stored insecurely and transmit in plain text!</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0" colspan="4">
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
@@ -277,6 +405,31 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>Filters_Video_signalstats</tabstop>
+  <tabstop>Filters_Video_cropdetect</tabstop>
+  <tabstop>Filters_Video_Psnr</tabstop>
+  <tabstop>Filters_Video_Ssim</tabstop>
+  <tabstop>Filters_Video_Idet</tabstop>
+  <tabstop>Filters_Audio_astats</tabstop>
+  <tabstop>Filters_Audio_EbuR128</tabstop>
+  <tabstop>Filters_Audio_aphasemeter</tabstop>
+  <tabstop>Tracks_Video_First</tabstop>
+  <tabstop>Tracks_Video_All</tabstop>
+  <tabstop>Tracks_Audio_First</tabstop>
+  <tabstop>Tracks_Audio_All</tabstop>
+  <tabstop>XmlGz_Prompt</tabstop>
+  <tabstop>XmlGz_Sidecar</tabstop>
+  <tabstop>XmlGz_Directory</tabstop>
+  <tabstop>XmlGz_Directory_Name</tabstop>
+  <tabstop>signalServerUrl_lineEdit</tabstop>
+  <tabstop>signalServerLogin_lineEdit</tabstop>
+  <tabstop>signalServerPassword_lineEdit</tabstop>
+  <tabstop>signalServerEnable_checkBox</tabstop>
+  <tabstop>signalServerEnableAutoUpload_checkBox</tabstop>
+  <tabstop>testConnection_pushButton</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -286,8 +439,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>259</x>
+     <y>397</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -302,12 +455,28 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>327</x>
+     <y>397</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>signalServerEnable_checkBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>signalServerEnableAutoUpload_checkBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>166</x>
+     <y>140</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>214</x>
+     <y>177</y>
     </hint>
    </hints>
   </connection>

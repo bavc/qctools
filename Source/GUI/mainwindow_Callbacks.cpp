@@ -48,12 +48,15 @@ void MainWindow::TimeOut ()
     refreshDisplay();
     Update();
 
+    // this code seems to launch more parsings tasks
+    // 2do: move it to proper place (introduce parsingDone signal, initiate more parsers in slot if required)
+
     // Simultaneous parsing
     for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
     {
         CommonStats* Stats=Files[Files_Pos]->ReferenceStat();
         if (Stats && Stats->State_Get()==0)
-            Files[Files_Pos]->Parse();
+            Files[Files_Pos]->startParse();
     }
 
     bool DeckRunning_New=false;
