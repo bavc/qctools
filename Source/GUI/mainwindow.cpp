@@ -27,6 +27,9 @@
 #include <QInputDialog>
 #include <QCheckBox>
 #include <QTimer>
+#include <QDebug>
+#include <QMetaEnum>
+#include <QMessageBox>
 
 #include "GUI/draggablechildrenbehaviour.h"
 
@@ -53,11 +56,23 @@ QList<std::tuple<int, int>> MainWindow::getFilterSelectorsOrder(int start = 0, i
     return filtersInfo;
 }
 
+QAction *MainWindow::uploadAction() const
+{
+    return ui->actionUploadToSignalServer;
+}
+
+QAction *MainWindow::uploadAllAction() const
+{
+    return ui->actionUploadToSignalServerAll;
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     Thumbnails_Modulo(1),
     ui(new Ui::MainWindow)
 {
+    qRegisterMetaType<SharedFile>("SharedFile");
+
     // FilesList
     FilesListArea=NULL;
 
@@ -242,7 +257,7 @@ void MainWindow::on_actionExport_XmlGz_Prompt_triggered()
     if (Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
         return;
 
-    QString FileName=QFileDialog::getSaveFileName(this, "Export to .qctools.xml.gz", Files[Files_CurrentPos]->FileName+".qctools.xml.gz", "Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml)", 0, QFileDialog::DontUseNativeDialog);
+    QString FileName=QFileDialog::getSaveFileName(this, "Export to .qctools.xml.gz", Files[Files_CurrentPos]->fileName() + ".qctools.xml.gz", "Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml)", 0, QFileDialog::DontUseNativeDialog);
     if (FileName.size()==0)
         return;
 
@@ -256,7 +271,7 @@ void MainWindow::on_actionExport_XmlGz_Sidecar_triggered()
     if (Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
         return;
 
-    QString FileName=Files[Files_CurrentPos]->FileName+".qctools.xml.gz";
+    QString FileName=Files[Files_CurrentPos]->fileName() + ".qctools.xml.gz";
 
     Files[Files_CurrentPos]->Export_XmlGz(FileName);
     statusBar()->showMessage("Exported to "+FileName);
@@ -268,7 +283,7 @@ void MainWindow::on_actionExport_XmlGz_SidecarAll_triggered()
 {
     for (size_t Pos=0; Pos<Files.size(); ++Pos)
     {
-        QString FileName=Files[Pos]->FileName+".qctools.xml.gz";
+        QString FileName=Files[Pos]->fileName() + ".qctools.xml.gz";
 
         Files[Pos]->Export_XmlGz(FileName);
     }
@@ -284,7 +299,7 @@ void MainWindow::on_actionExport_XmlGz_Custom_triggered()
 
     // TODO
     // Temp
-    QString Name=Files[Files_CurrentPos]->FileName;
+    QString Name=Files[Files_CurrentPos]->fileName();
     Name.replace(":", "");
     statusBar()->showMessage("(Not implemeted) Export to ~/.qctools"+Name+".qctools.xml.gz");
 }
@@ -547,4 +562,179 @@ void MainWindow::on_actionPlay_All_Frames_triggered()
 {
     if(ControlArea)
         ControlArea->setPlayAllFrames(true);
+}
+
+void MainWindow::on_actionUploadToSignalServer_triggered()
+{
+    if(!Files.empty())
+    {
+        FileInformation* file = Files[Files_CurrentPos];
+        if(file->signalServerUploadStatus() == FileInformation::Uploading)
+        {
+            file->cancelUpload();
+        }
+        else
+        {
+            QString statsFileName = file->fileName() + ".qctools.xml.gz";
+            QFileInfo info(statsFileName);
+            if(info.exists(statsFileName))
+            {
+                file->upload(info);
+            }
+            else
+            {
+                QMessageBox::warning(this, "Nothing to upload", QString("File %1 not found").arg(info.fileName()));
+            }
+        }
+    }
+}
+
+void MainWindow::on_actionUploadToSignalServerAll_triggered()
+{
+    bool canCancel = false;
+    Q_FOREACH(FileInformation* file, Files) {
+        if(file->signalServerCheckUploadedStatus() == FileInformation::Uploading)
+            canCancel = true;
+    }
+
+    Q_FOREACH(FileInformation* file, Files) {
+
+        if(canCancel)
+        {
+            file->cancelUpload();
+        } else
+        {
+            QString statsFileName = file->fileName() + ".qctools.xml.gz";
+            QFileInfo info(statsFileName);
+            if(info.exists(statsFileName))
+            {
+                file->upload(statsFileName);
+            }
+            else
+            {
+                QMessageBox::warning(this, "Nothing to upload", QString("File %1 not found").arg(info.fileName()));
+            }
+        }
+    }
+}
+
+void MainWindow::onSignalServerConnectionChanged(SignalServerConnectionChecker::State state)
+{
+    qDebug() << "signalserver connection: " << state;
+    updateConnectionIndicator();
+}
+
+void MainWindow::updateConnectionIndicator()
+{
+    if(connectionChecker->state() == SignalServerConnectionChecker::NotChecked)
+    {
+        connectionIndicator->setToolTip("signalserver status: not checked");
+        connectionIndicator->setStyleSheet("background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.621827, fy:0.359, stop:0 rgba(255, 255, 255, 255), stop:0.901015 rgba(155, 155, 155, 255), stop:1 rgba(255, 255, 255, 0));");
+    } else if(connectionChecker->state() == SignalServerConnectionChecker::Online)
+    {
+        connectionIndicator->setToolTip("signalserver status: online");
+        connectionIndicator->setStyleSheet("background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.621827, fy:0.359, stop:0 rgba(0, 255, 0, 255), stop:0.901015 rgba(0, 155, 0, 255), stop:1 rgba(255, 255, 255, 0));");
+    } else if(connectionChecker->state() == SignalServerConnectionChecker::Error || connectionChecker->state() == SignalServerConnectionChecker::Timeout)
+    {
+        connectionIndicator->setToolTip("signalserver status: error");
+        connectionIndicator->setStyleSheet("background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.621827, fy:0.359, stop:0 rgba(255, 0, 0, 255), stop:0.901015 rgba(155, 0, 0, 255), stop:1 rgba(255, 255, 255, 0));");
+    }
+}
+
+void MainWindow::updateSignalServerSettings()
+{
+    if(Prefs->isSignalServerEnabled())
+    {
+        QString urlString = Prefs->signalServerUrlString();
+        if(!urlString.startsWith("http", Qt::CaseInsensitive))
+            urlString.prepend("http://");
+
+        QUrl url(urlString);
+
+        connectionChecker->start(url, Prefs->signalServerLogin(), Prefs->signalServerPassword());
+
+        signalServer->setUrl(url);
+        signalServer->setLogin(Prefs->signalServerLogin());
+        signalServer->setPassword(Prefs->signalServerPassword());
+
+    } else {
+        connectionChecker->stop();
+    }
+
+    uploadAction()->setVisible(Prefs->isSignalServerEnabled());
+    uploadAllAction()->setVisible(Prefs->isSignalServerEnabled());
+    ui->actionSignalServer_status->setVisible(Prefs->isSignalServerEnabled());
+}
+
+template <typename T> QString convertEnumToQString(const char* typeName, int value)
+{
+    const QMetaObject &mo = T::staticMetaObject;
+    int index = mo.indexOfEnumerator(typeName);
+    QMetaEnum metaEnum = mo.enumerator(index);
+    return metaEnum.valueToKey(value);
+}
+
+void MainWindow::updateSignalServerCheckUploadedStatus()
+{
+    const QMetaObject &mo = FileInformation::staticMetaObject;
+    int index = mo.indexOfEnumerator("SignalServerCheckUploadedStatus");
+    QMetaEnum metaEnum = mo.enumerator(index);
+
+    FileInformation* file = Files[Files_CurrentPos];
+    FileInformation::SignalServerCheckUploadedStatus checkUploadedStatus = file->signalServerCheckUploadedStatus();
+    QString key = convertEnumToQString<FileInformation>("SignalServerCheckUploadedStatus", checkUploadedStatus);
+    ui->actionSignalServer_status->setText(QString("Signalserver: %1").arg(key));
+    ui->actionSignalServer_status->setIcon(file->signalServerCheckUploadedStatusPixmap());
+
+    ui->actionSignalServer_status->setToolTip("");
+
+    if(checkUploadedStatus == FileInformation::CheckError)
+        ui->actionSignalServer_status->setToolTip(file->signalServerCheckUploadedStatusErrorString());
+}
+
+void MainWindow::updateSignalServerUploadStatus()
+{
+    const QMetaObject &mo = FileInformation::staticMetaObject;
+    int index = mo.indexOfEnumerator("SignalServerUploadStatus");
+    QMetaEnum metaEnum = mo.enumerator(index);
+
+    FileInformation* file = Files[Files_CurrentPos];
+    FileInformation::SignalServerUploadStatus uploadStatus = file->signalServerUploadStatus();
+
+    ui->actionSignalServer_status->setToolTip("");
+    ui->actionSignalServer_status->setIcon(file->signalServerUploadStatusPixmap());
+
+    if(uploadStatus == FileInformation::Idle || uploadStatus == FileInformation::Done || uploadStatus == FileInformation::UploadError)
+    {
+        if(uploadStatus == FileInformation::Done)
+        {
+            ui->actionSignalServer_status->setText("Uploaded");
+        } else if(uploadStatus == FileInformation::UploadError)
+        {
+            ui->actionSignalServer_status->setText("Upload Error");
+            ui->actionSignalServer_status->setToolTip(file->signalServerUploadStatusErrorString());
+        }
+
+        ui->actionUploadToSignalServer->setToolTip("Upload current stats to signalserver");
+        ui->actionUploadToSignalServer->setText("Upload to Signalserver");
+        ui->actionUploadToSignalServerAll->setText("Upload to Signalserver (All files)");
+
+        ui->actionUploadToSignalServer->setIcon(FileInformation::signalServerUploadStatusPixmap(FileInformation::Idle));
+        ui->actionUploadToSignalServerAll->setIcon(FileInformation::signalServerUploadStatusPixmap(FileInformation::Idle));
+    }
+    else if(uploadStatus == FileInformation::Uploading)
+    {
+        ui->actionSignalServer_status->setText("Uploading");
+        ui->actionUploadToSignalServer->setToolTip("Cancel Upload to Signalserver");
+        ui->actionUploadToSignalServer->setText("Cancel Upload to Signalserver");
+        ui->actionUploadToSignalServerAll->setText("Cancel Upload to Signalserver (All files)");
+
+        ui->actionUploadToSignalServer->setIcon(FileInformation::signalServerUploadStatusPixmap(FileInformation::Uploading));
+        ui->actionUploadToSignalServerAll->setIcon(FileInformation::signalServerUploadStatusPixmap(FileInformation::Uploading));
+    }
+}
+
+void MainWindow::updateSignalServerUploadProgress(qint64 value, qint64 total)
+{
+    ui->actionSignalServer_status->setText(QString("Uploading: %1 / %2").arg(value).arg(total));
 }

@@ -55,7 +55,7 @@ Help::Help(QWidget * parent)
     Central->addTab(TextMd, tr("Markdown"));
 
 
-    QTextBrowser* Text1 =new QTextBrowser(this);
+    QTextBrowser* Text1=new QTextBrowser(this);
     Text1->setReadOnly(true);
     Text1->setOpenExternalLinks(true);
 

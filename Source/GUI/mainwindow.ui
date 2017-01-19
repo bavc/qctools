@@ -70,12 +70,15 @@
      <x>0</x>
      <y>0</y>
      <width>1003</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>false</bool>
     </property>
     <addaction name="actionOpen"/>
     <addaction name="actionClose"/>
@@ -128,10 +131,17 @@
     <property name="title">
      <string>Export</string>
     </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
     <addaction name="actionExport_XmlGz_Prompt"/>
     <addaction name="actionExport_XmlGz_Sidecar"/>
     <addaction name="actionExport_XmlGz_SidecarAll"/>
     <addaction name="actionExport_XmlGz_Custom"/>
+    <addaction name="separator"/>
+    <addaction name="actionSignalServer_status"/>
+    <addaction name="actionUploadToSignalServer"/>
+    <addaction name="actionUploadToSignalServerAll"/>
     <addaction name="separator"/>
     <addaction name="actionCSV"/>
     <addaction name="separator"/>
@@ -153,8 +163,8 @@
    <addaction name="menuBlackmagicDeckLink"/>
    <addaction name="menuView"/>
    <addaction name="menuImport"/>
-   <addaction name="menuExport"/>
    <addaction name="menuOptions"/>
+   <addaction name="menuExport"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
@@ -194,6 +204,8 @@
    <addaction name="separator"/>
    <addaction name="actionFiltersLayout"/>
    <addaction name="actionWindowOut"/>
+   <addaction name="actionUploadToSignalServer"/>
+   <addaction name="actionSignalServer_status"/>
    <addaction name="actionFilesList"/>
    <addaction name="actionGraphsLayout"/>
    <addaction name="separator"/>
@@ -362,6 +374,9 @@
    <property name="text">
     <string>To .qctools.xml.gz...</string>
    </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
+   </property>
   </action>
   <action name="actionImport_XmlGz_Prompt">
    <property name="text">
@@ -451,6 +466,60 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Alt+.</string>
+   </property>
+  </action>
+  <action name="actionSignalServer_status">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normalon>:/icon/signalserver_not_uploaded.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Signalserver status: not uploaded</string>
+   </property>
+   <property name="toolTip">
+    <string>Signalserver status: not uploaded</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionUploadToSignalServer">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normalon>:/icon/signalserver_upload.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Upload to Signalserver</string>
+   </property>
+   <property name="toolTip">
+    <string>Upload current stats to signalserver</string>
+   </property>
+  </action>
+  <action name="actionUploadToSignalServerAll">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normalon>:/icon/signalserver_upload.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Upload to Signalserver (All files)</string>
+   </property>
+   <property name="toolTip">
+    <string>Upload all stats to signalserver</string>
    </property>
   </action>
  </widget>

@@ -1204,7 +1204,7 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     FileInfoData(FileInformationData_)
 {
     setlocale(LC_NUMERIC, "C");
-    setWindowTitle("QCTools - "+FileInfoData->FileName);
+    setWindowTitle("QCTools - "+FileInfoData->fileName());
     setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
     setWindowFlags(windowFlags() &(0xFFFFFFFF-Qt::WindowContextHelpButtonHint));
     resize(QDesktopWidget().screenGeometry().width()*2/5, QDesktopWidget().screenGeometry().height()*2/5);
@@ -2035,7 +2035,7 @@ void BigDisplay::InitPicture()
 {
     if (!Picture)
     {
-        string FileName_string=FileInfoData->FileName.toUtf8().data();
+        string FileName_string=FileInfoData->fileName().toUtf8().data();
         #ifdef _WIN32
             replace(FileName_string.begin(), FileName_string.end(), '/', '\\' );
         #endif
