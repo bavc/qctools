@@ -291,4 +291,3 @@ macx:LIBS += -liconv \
              -framework CoreAudio \
              -framework CoreVideo \
              -framework VideoDecodeAcceleration
-

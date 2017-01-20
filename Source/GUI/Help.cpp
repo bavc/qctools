@@ -54,41 +54,66 @@ Help::Help(QWidget * parent)
     TextMd->setHtml(html);
     Central->addTab(TextMd, tr("Markdown"));
 
+
     QTextBrowser* Text1=new QTextBrowser(this);
     Text1->setReadOnly(true);
     Text1->setOpenExternalLinks(true);
-    Text1->setSource(QUrl("qrc:/Help/Getting Started/Getting Started.html"));
+    CMarkdown getting_started;
+    QString html1 = getting_started.processFile(":/Help/getting_started.md");
+    html1.replace("src=\"media/", "src=\"qrc:/Help/");
+    Text1->setHtml(html1);
     Central->addTab(Text1, tr("Getting Started"));
 
-    QTextBrowser* Text2=new QTextBrowser(this);
+
+    QTextBrowser* Text2 =new QTextBrowser(this);
     Text2->setReadOnly(true);
     Text2->setOpenExternalLinks(true);
-    Text2->setSource(QUrl("qrc:/Help/How To Use/How To Use.html"));
+    CMarkdown how_to_use;
+    QString html2 = how_to_use.processFile(":/Help/how_to_use.md");
+    html2.replace("src=\"media/", "src=\"qrc:/Help/");
+    Text2->setHtml(html2);
     Central->addTab(Text2, tr("How To Use"));
 
-    QTextBrowser* Text3=new QTextBrowser(this);
+
+    QTextBrowser* Text3 =new QTextBrowser(this);
     Text3->setReadOnly(true);
     Text3->setOpenExternalLinks(true);
-    Text3->setSource(QUrl("qrc:/Help/Filter Descriptions/Filter Descriptions.html"));
+    CMarkdown filter_descriptions;
+    QString html3 = filter_descriptions.processFile(":/Help/filter_descriptions.md");
+    html3.replace("src=\"media/", "src=\"qrc:/Help/");
+    Text3->setHtml(html3);
     Central->addTab(Text3, tr("Filter Descriptions"));
 
-    QTextBrowser* Text4=new QTextBrowser(this);
+
+    QTextBrowser* Text4 =new QTextBrowser(this);
     Text4->setReadOnly(true);
     Text4->setOpenExternalLinks(true);
-    Text4->setSource(QUrl("qrc:/Help/Playback Filters/Playback Filters.html"));
+    CMarkdown playback_filters;
+    QString html4 = playback_filters.processFile(":/Help/playback_filters.md");
+    html4.replace("src=\"media/", "src=\"qrc:/Help/");
+    Text4->setHtml(html4);
     Central->addTab(Text4, tr("Playback Filters"));
 
-    QTextBrowser* Text5=new QTextBrowser(this);
+
+    QTextBrowser* Text5 =new QTextBrowser(this);
     Text5->setReadOnly(true);
     Text5->setOpenExternalLinks(true);
-    Text5->setSource(QUrl("qrc:/Help/Data Format/Data Format.html"));
+    CMarkdown data_format;
+    QString html5 = data_format.processFile(":/Help/data_format.md");
+    html5.replace("src=\"media/", "src=\"qrc:/Help/");
+    Text5->setHtml(html5);
     Central->addTab(Text5, tr("Data Format"));
 
-    QTextBrowser* Text6=new QTextBrowser(this);
+    QTextBrowser* Text6 =new QTextBrowser(this);
     Text6->setReadOnly(true);
     Text6->setOpenExternalLinks(true);
-    Text6->setSource(QUrl("qrc:/Help/Recording/Recording.html"));
+    CMarkdown recording;
+    QString html6 = recording.processFile(":/Help/recording.md");
+    html6.replace("src=\"media/", "src=\"qrc:/Help/");
+    Text6->setHtml(html6);
     Central->addTab(Text6, tr("Recording"));
+
+
 
     QTextBrowser* Text7=new QTextBrowser(this);
     Text7->setReadOnly(true);
