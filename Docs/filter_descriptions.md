@@ -2,31 +2,31 @@
 
 ### Video
 
-1.  [YUV Values/ MIN, AVG, MAX, LOW, HIGH](#MinMaxAvgLowHigh)
-2.  [YUV Values/ Difference](#Diff)
-3.  [Saturation](#Sat)
-4.  [Hue](#Hue)
-5.  [Temporal Outliers](#Temp)
-6.  [Vertical Line Repetitions](#VREP)
-7.  [Broadcast Range](#Range)
-8.  [Crop Width (CropW)](#CropW)
-9.  [Crop Height (CropH)](#CropH)
-10.  [Peak Signal to Noise Ratio (PSNRf)](#PSNRf)
-11.  [Structural SImilarity Metric (SSIMf)](#SSIMf)
-12.  [Mean Square Error (MSEf)](#MSEf)
-13.  [Interlacement Detection (single frame)](#idetS)
-14.  [Interlacement Detection (multiple frames)](#idetM)
-15.  [Interlacement Detection (repeated fields)](#idetR)
+1.  YUV Values/ MIN, AVG, MAX, LOW, HIGH
+2.  YUV Values/ Difference
+3.  Saturation
+4.  Hue
+5.  Temporal Outliers
+6.  Vertical Line Repetitions
+7.  Broadcast Range
+8.  Crop Width (CropW)
+9.  Crop Height (CropH)
+10.  Peak Signal to Noise Ratio (PSNRf)
+11.  Structural SImilarity Metric (SSIMf)
+12.  Mean Square Error (MSEf)
+13.  Interlacement Detection (single frame)
+14.  Interlacement Detection (multiple frames)
+15.  Interlacement Detection (repeated fields)
 
 ### Audio
 
-1.  [R.128](#R128)
-2.  [Audio Phase Meter](#aphasemeter)
-3.  [DC Offset](#dcoffset)
-4.  [Audio Diffs](#auddiffs)
-5.  [RMS](#rms)
+1.  R.128
+2.  Audio Phase Meter
+3.  DC Offset
+4.  Audio Diffs
+5.  RMS
 
-## <a id="MinMaxAvgLowHigh" name="MinMaxAvgLowHigh">1\. YUV Values/ MIN, AVG, MAX, LOW, HIGH</a>
+## 1\. YUV Values/ MIN, AVG, MAX, LOW, HIGH
 
 YUV refers to a particular a way of encoding color information in analog video where Y channels carry <q>luma</q>, or brightness information ([wikipedia.org/wiki/Luma](http://en.wikipedia.org/wiki/Luma_(video))), and U and V channels carry information about color, or <q>chrominance</q> ([wikipedia.org/wiki/Chrominance](http://en.wikipedia.org/wiki/Chrominance)). QCTools can analyze the YUV Values of a particular encoded video file in order to provide information about the appearance of the video. These filters examine every pixel in a given channel and records the Maximum, Minimum, and Average values.
 
@@ -63,9 +63,9 @@ The graph below illustrates a reading with many luma spikes in the Y LOW, Y AVG,
 | U Channel | U LOW, U HIGH | 16-235 |
 | V Channel | V LOW, V HIGH | 0-255 |
 
-### <a id="LowHigh" name="LowHigh">Y Value Filters: Y LOW, Y HIGH</a>
+### Y Value Filters: Y LOW, Y HIGH
 
-This filter works in a similar fashion as the YUV *MIN and *MAX filters, but instead of looking at the absolute minimum and maximum value for these channels, it looks at the 10th percentile (LOW, or 16 pixels) and 90th percentile (HIGH, or 235 pixels) which present the outside limits or 'headroom' of the [legal broadcast range](http://en.wikipedia.org/wiki/Broadcast_range). An extreme minimum or maximum value could dramatically skew the graph but because they may be outside the viewable broadcast image (or the range of human perception), they may not necessarily be meaningful indicators of a problematic visual image that can be human-detectable. This is why Low/High measurements are so useful-- they ignore the extreme outliers (Min/ Max) in favor of those abnormalities which fall in the range of human perception.
+This filter works in a similar fashion as the YUV \*MIN and \*MAX filters, but instead of looking at the absolute minimum and maximum value for these channels, it looks at the 10th percentile (LOW, or 16 pixels) and 90th percentile (HIGH, or 235 pixels) which present the outside limits or 'headroom' of the [legal broadcast range](http://en.wikipedia.org/wiki/Broadcast_range). An extreme minimum or maximum value could dramatically skew the graph but because they may be outside the viewable broadcast image (or the range of human perception), they may not necessarily be meaningful indicators of a problematic visual image that can be human-detectable. This is why Low/High measurements are so useful-- they ignore the extreme outliers (Min/ Max) in favor of those abnormalities which fall in the range of human perception.
 
 #### Samples which demonstrate YUV LOW/HIGH anomalies:
 
@@ -101,7 +101,7 @@ Notice U noise in the graph below from approximately 2.86s to 4.37s. Also seen i
 
 ![U Noise](media/UNoise_293_0047_JITTERS_ffv1.jpg)
 
-## <a id="Diff" name="Diff">2\. YUV Values/ Difference</a>
+## 2\. YUV Values/ Difference
 
 | Filter Domain | Filter Name(s) |
 | Y Channel | Y DIF |
@@ -118,7 +118,7 @@ V DIF = Difference of V Channel between two frames
 
 ![YUV Differences](media/seattle_parade_yuvdiffs.jpg)
 
-## <a id="Sat" name="Sat">3\. Saturation</a>
+## 3\. Saturation
 
 | Filter Domain | Filter Name(s) | Range |
 | Saturation | Sat | 0-181.02 |
@@ -127,14 +127,14 @@ V DIF = Difference of V Channel between two frames
 
 The saturation graph offers two plot lines to denote specific ranges of saturation levels. The purple dash-dot line near 89 represents the approximate limit of broadcast-safe saturation. Color bars at 75% should plot at this level. At 118 is a red dash-dot line to mark the limit of the YUV colorspace in bt601 to properly convert back to RBG. Saturation levels that exceed the red dash-dot line would result in either negative or overflow numbers when converted back to RGB and thus need to be clipped.
 
-## <a id="Hue" name="Hue">4\. Hue</a>
+## 4\. Hue
 
 | Filter Domain | Filter Name(s) | Range |
 | Hue | Hue | 0-360 |
 
 'Hue' is a term used to describe color; "Blue" or "Red" can be thought of as Hues (see also 'Saturation'). In analyzing video, skin tone is often a good baseline against which to measure appropriate color representation. Skin tone should fall in the 147 range; if skin tone registers significantly above or below that number, it's likely an indication that your video isn't accurately storing or displaying color data accurately. For reference the hue filter measures green at 38 degrees, yellow at 99 degrees, red at 161 degrees, magenta at 218 degrees, blue at 279 degrees, and cyan at 341 degrees.
 
-## <a id="Temp" name="Temp">5\. Temporal Outliers (TOUT)</a>
+## 5\. Temporal Outliers (TOUT)
 
 | Filter Domain | Filter Name(s) | Range |
 | Temporal Outliers | TOUT | 0-1 |
@@ -147,7 +147,7 @@ You can see several blips in the graph reading, especially around 7.5s, 15s, and
 
 ![Temp Outliers](media/TOUT_DHC0177_trackingerror_ffv1_h264.jpg)
 
-## <a id="VREP" name="VREP">6\. Vertical Line Repetitions (VREP)</a>
+## 6\. Vertical Line Repetitions (VREP)
 
 | Filter Domain | Filter Name(s) | Range |
 | Vertical Line Repetitions | VREP | 0-1 |
@@ -159,7 +159,7 @@ Vertical Line Repetitions, or the VREP filter, is useful in analyzing U-Matic ta
 ![Vertical Repetitions 1](media/VREP_293_0047_JITTER.jpg)
 ![Vertical Repetitions 2](media/DAN_Rogers2_umatic_error-vrep.jpg)
 
-## <a id="Range" name="Range">7\. Broadcast Range (BRNG)</a>
+## 7\. Broadcast Range (BRNG)
 
 | Filter Domain | Filter Name(s) | Range |
 | Broadcast Range | BRNG | 0-1 |
@@ -172,15 +172,15 @@ BRNG = Broadcast Range
 
 ![Broadcast Range Anomaly 1](media/RANG_293_0046_syncloss2.jpg) ![Broadcast Range Anomaly 2](media/brng_seattleparade.jpg)
 
-## <a id="CropW" name="CropW">8\. Crop Width (CropW)</a>
+## 8\. Crop Width (CropW)
 
 This filter detects portions on either side of your video which may contain not contain any picture data. In the case of pillarboxing, for example, you'll have black bars on the left and right sides of your video. This filter will detect and present that information in the graph reading.
 
-## <a id="CropH" name="CropH">9\. Crop Height (CropH)</a>
+## 9\. Crop Height (CropH)
 
 This filter enables you to view which parts, if any, of your video which contain no picture data. In the case of letterboxing, for example, you'll have black bars both above and below your picture. This filter would detect and present that in the graph reading.
 
-## <a id="PSNRf" name="PSNRf">10\. Peak Signal to Noise Ratio (PSNRf)</a>
+## 10\. Peak Signal to Noise Ratio (PSNRf)
 
 This filter plots the Peak Signal to Noise Ratio between the video in field 1 (odd lines) versus the video in field 2 (even lines). Lower values indicate that field 1 and field 2 are becoming more different as would happen during a playback error such as a head clog. See [http://ffmpeg.org/ffmpeg-filters.html#psnr](http://ffmpeg.org/ffmpeg-filters.html#psnr) for more information.
 
@@ -188,7 +188,7 @@ This filter plots the Peak Signal to Noise Ratio between the video in field 1 (o
 
 ![PSNRf](media/NGA000006_psnrf.jpg)
 
-## <a id="MSEf" name="MSEf">11\. Mean Square Error (MSEf)</a>
+## 11\. Mean Square Error (MSEf)
 
 This filter is similar to PSNRf but reports on the Mean Square Error between field 1 and field 2\. Higher values may be indicative of differences between the images of field 1 and field 2.
 
@@ -196,38 +196,38 @@ This filter is similar to PSNRf but reports on the Mean Square Error between fie
 
 ![MSEf](media/NGA000006_msef.jpg)
 
-## <a id="SSIMf" name="SSIMf">12\. Structural SImilarity Metric (SSIMf)</a>
+## 12\. Structural SImilarity Metric (SSIMf)
 
 This filter plots the Structural SImilarity Metric between the video in field 1 (odd lines) versus the video in field 2 (even lines). Lower values indicate that field 1 and field 2 are becoming more different as would happen during a playback error such as a head clog. See [http://ffmpeg.org/ffmpeg-filters.html#ssim](http://ffmpeg.org/ffmpeg-filters.html#psnr) for more information.
 
-## <a id="idetS" name="idetS">13\. Interlacement Detection (single frame)</a>
+## 13\. Interlacement Detection (single frame)
 
 This filter plots a determined on if the frame appears to be bottom field first (bff), top first field (tff), progressive (prog), or undetermined (und). This assessment uses only adjacent frames to determine the interlacement characteristic. The value is plotted with a half-life of 1, so each frame's interlacement characteric is halved (i.e., it contributes only 0.5 to it's classification) and then plotted. See [http://ffmpeg.org/ffmpeg-filters.html#idet](http://ffmpeg.org/ffmpeg-filters.html#psnr) for more information.
 
-## <a id="idetM" name="idetM">14\. Interlacement Detection (multiple frames)</a>
+## 14\. Interlacement Detection (multiple frames)
 
 Similar to single-frame interlaced detection, but incorporates the classification history of previous frames. See [http://ffmpeg.org/ffmpeg-filters.html#idet](http://ffmpeg.org/ffmpeg-filters.html#idet) for more information.
 
-## <a id="idetR" name="idetR">15\. Interlacement Detection (repeated fields)</a>
+## 15\. Interlacement Detection (repeated fields)
 
 This plots uses an assessment that tries and detects fields that are repeated between adjacent frames (a sign of telecine). See [http://ffmpeg.org/ffmpeg-filters.html#idet](http://ffmpeg.org/ffmpeg-filters.html#idet) for more information.
 
-## <a id="R128" name="R128">16\. R.128</a>
+## 16\. R.128
 
 R 128 refers to a European Broadcasting Union (EBU) [specification document](https://tech.ebu.ch/docs/r/r128.pdf) governing several loudness parameters, including momentary, integrated, and short-term loudness. QCTools specifically examines momentary loudness, or sudden changes in volume over brief intervals of time (up to 400ms). This can be helpful in identifying areas where volume may exceed upper loudness tolerance levels as perceived by an audience.
 
-## <a id="aphasemeter" name="aphasemeter">17\. Audio Phase Meter</a>
+## 17\. Audio Phase Meter
 
 Provides a metric to represent the mean phase of each audio frames. Value is in range [-1, 1]. The -1 means left and right channels are completely out of phase and 1 means channels are in phase. See [https://ffmpeg.org/ffmpeg-filters.html#aphasemeter](https://ffmpeg.org/ffmpeg-filters.html#aphasemeter) for more information.
 
-## <a id="dcoffset" name="dcoffset">18\. DC Offset</a>
+## 18\. DC Offset
 
 For selected audio tracks this graph plots the DC offset (mean amplitude displacement from zero), minimal sample level, and maximum sample level. Note that this value is plotted per audio frame and not per audio sample.
 
-## <a id="auddiffs" name="auddiffs">19\. Audio Diffs</a>
+## 19\. Audio Diffs
 
-For selected audio tracks this graph plots the minimal difference between two consecutive samples, maximal difference between two consecutive samples. and the mean difference between two consecutive samples (the average of each difference between two consecutive samples) A sharp spike in the maximum difference between consecuritve samples may be indictative of an interstitial error. Note that this value is plotted per audio frame and not per audio sample.
+For selected audio tracks this graph plots the minimal difference between two consecutive samples, maximal difference between two consecutive samples. and the mean difference between two consecutive samples (the average of each difference between two consecutive samples) A sharp spike in the maximum difference between consecutive samples may be indicative of an interstitial error. Note that this value is plotted per audio frame and not per audio sample.
 
-## <a id="rms" name="rms">20\. RMS</a>
+## 20\. RMS
 
 For selected audio tracks this graph plots the Standard peak and RMS level measured in dBFS and the Peak and trough values for RMS level measured over a short window. Note that this value is plotted per audio frame and not per audio sample.

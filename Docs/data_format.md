@@ -19,7 +19,7 @@ The data format of a QCTools xml export contains two main sections:
 
 ### 1\. Library Versions
 
-QCTools incorporates a set of open-source libraries, developed under the ffmpeg project, that were built to process audiovisual data. This section of the data format calls out the specific libraries referenced by QCTools. They include:
+QCTools incorporates a set of open-source libraries, developed under the FFmpeg project, that were built to process audiovisual data. This section of the data format calls out the specific libraries referenced by QCTools. They include:
 
 *   libavutil
 *   libavcodec

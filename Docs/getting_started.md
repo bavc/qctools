@@ -1,16 +1,16 @@
 # Getting Started with QCTools
 
-*   [What is QCTools?](#QCTools)
-*   [Who can benefit from using QCTools?](#Benefit)
-*   [What video formats does QCTools accept?](#Formats)
-*   [What do the Graphs measure?](#Graphs)
-*   [What Graphs should I chose?](#Choose)
-*   [What is FFmpeg?](#FFmpeg)
-*   [How can I integrate the QCTools export feature into my workflow?](#Workflow)
-*   [What about my audio?](#Audio)
-*   [What is this error called?](#Error)
-*   [Are there additional resources that may be useful to me?](#Resources)
-*   [How can I provide feedback?](#Feedback)
+*   What is QCTools?
+*   Who can benefit from using QCTools?
+*   What video formats does QCTools accept?
+*   What do the Graphs measure?
+*   What Graphs should I chose?
+*   What is FFmpeg?
+*   How can I integrate the QCTools export feature into my workflow?
+*   What about my audio?
+*   What is this error called?
+*   Are there additional resources that may be useful to me?
+*   How can I provide feedback?
 
 ## What is QCTools
 
@@ -108,7 +108,7 @@ FFmpeg is a complete, cross-platform solution to record, convert and stream audi
 
 QCTools currently supports a frame-by-frame analysis/export in XML format (based on the FFprobe metadata standard. Please also see the 'Data Format' tab). These files can be integrated into your preservation metadata.
 
-Since the QCTool's analysis filter, [signalstats](http://ffmpeg.org/ffmpeg-filters.html#signalstats), is now part of FFmpeg and QCTool's reporting format is based on FFmpeg's ffprobe metadata schema, QCTools data reports may be fully generated using a recent version of FFmpeg. This may be preferrable for handling the analysis of large amounts of audiovisual files, so that FFmpeg creates many QCTools reports through FFmpeg which can then later be assessed more closely within the QCTools application. See the Data Format section of the help documentation for more information.
+Since the QCTool's analysis filter, [signalstats](http://ffmpeg.org/ffmpeg-filters.html#signalstats), is now part of FFmpeg and QCTool's reporting format is based on FFmpeg's ffprobe metadata schema, QCTools data reports may be fully generated using a recent version of FFmpeg. This may be preferable for handling the analysis of large amounts of audiovisual files, so that FFmpeg creates many QCTools reports through FFmpeg which can then later be assessed more closely within the QCTools application. See the Data Format section of the help documentation for more information.
 
 ## What about my audio?
 

@@ -1,20 +1,20 @@
 # How to Use
 
-*   [Install](#Install)
-*   [Load Video Files](#Load)
-*   [Preferences](#Preferences)
-*   [Select Graph Filters](#Select)
-*   [View and Navigate Graphs](#View)
-*   [Playback and Visual Analysis](#Play)
-*   [Create/ Export a Report](#Report)
-*   [Parts of the Tool](#Parts)
-*   [Data Analysis Window](#Data)
-*   [List View](#List)
-*   [Video Analysis Window](#Video)
+*   Install
+*   Load Video Files
+*   Preferences
+*   Select Graph Filters
+*   View and Navigate Graphs
+*   Playback and Visual Analysis
+*   Create/ Export a Report
+*   Parts of the Tool
+*   Data Analysis Window
+*   List View
+*   Video Analysis Window
 
 ## Install
 
-Go to [http://bavc.org/qctools](http://bavc.org/qctools) and download QCTools for your operating system (currently Windows, Mac OS X, and many Linux-based operating systems are supported). Initiate the install by double-clicking the icon, and follow the steps. New releases of QCTools will be periodically available at BAVC's [QCTools project website](http://www.bavc.org/qctools) as well as the releases tab on the [QCTools github page](https://github.com/bavc/qctools/releases).
+Go to [http://bavc.org/qctools](http://bavc.org/qctools) and download QCTools for your operating system (currently Windows, Mac OS X, and many Linux-based operating systems are supported). Initiate the install by double-clicking the icon, and follow the steps. New releases of QCTools will be periodically available at BAVC's [QCTools project website](http://www.bavc.org/qctools) as well as the releases tab on the [QCTools Github page](https://github.com/bavc/qctools/releases).
 
 ## Preferences
 
