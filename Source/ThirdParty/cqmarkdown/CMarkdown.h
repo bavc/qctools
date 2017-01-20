@@ -193,6 +193,9 @@ class CMarkdownBlock {
   static bool isSingleLineType(BlockType type);
   static bool isRecurseType   (BlockType type);
 
+  void setId(const QString& id);
+  QString id() const;
+
  private:
   typedef std::vector<CMarkdownBlock *> Blocks;
 
@@ -202,6 +205,7 @@ class CMarkdownBlock {
   Lines           lines_;
   Blocks          blocks_;
   QString         html_;
+  QString         id_;
   bool            processed_ { false };
 
   mutable int currentLine_ { 0 };

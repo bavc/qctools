@@ -1616,10 +1616,23 @@ void
 CMarkdownBlock::
 addBlockLine(const QString &line, bool brk)
 {
-  if (markdown()->isDebug())
-    std::cerr << "add: " << line.toStdString() << std::endl;
+    QString blockLine = line;
+    if(blockLine.endsWith("}"))
+    {
+      int indexOfId = blockLine.lastIndexOf("{#");
+      if(indexOfId != -1)
+      {
+          QString id = blockLine.mid(indexOfId + 2, blockLine.length() - indexOfId - 3);
+          currentBlock_->setId(id);
+          blockLine.truncate(indexOfId);
+      }
+    }
 
-  currentBlock_->addLine(Line(line, brk));
+
+  if (markdown()->isDebug())
+    std::cerr << "add: " << blockLine.toStdString() << std::endl;
+
+  currentBlock_->addLine(Line(blockLine, brk));
 }
 
 void
@@ -1701,13 +1714,13 @@ toHtml() const
   }
 
   if (empty) {
-    html += QString("<%1/>\n").arg(tag);
+    html += id_.isEmpty() ? QString("<%1/>\n").arg(tag) : QString("<%1 id='%2'/>\n").arg(tag).arg(id_);
   }
   else {
     if (single)
-      html += QString("<%1>").arg(tag);
+      html += id_.isEmpty() ? QString("<%1>").arg(tag) : QString("<%1 id='%2'>").arg(tag).arg(id_);
     else
-      html += QString("<%1>\n").arg(tag);
+      html += id_.isEmpty() ? QString("<%1>\n").arg(tag) : QString("<%1 id='%2'>\n").arg(tag).arg(id_);
 
     if (! processed_) {
       int  nl  = 0;
@@ -1815,4 +1828,18 @@ isRecurseType(BlockType type)
   else if (type == BlockType::TABLE     ) return true;
 
   return false;
+}
+
+void
+CMarkdownBlock::
+setId(const QString &id)
+{
+    id_ = id;
+}
+
+QString
+CMarkdownBlock::
+id() const
+{
+    return id_;
 }
