@@ -28,44 +28,12 @@
     </qresource>
     <qresource prefix="/">
         <file alias="Help/About.html">../../License.html</file>
+        <file alias="Help/qctools.md">../../Docs/qctools.md</file>
         <file alias="Help/getting_started.md">../../Docs/getting_started.md</file>
         <file alias="Help/how_to_use.md">../../Docs/how_to_use.md</file>
-        <file alias="Help/metadatascreen.jpg">../../Docs/media/how_to_use/metadatascreen.jpg</file>
-        <file alias="Help/Slide1.jpg">../../Docs/media/how_to_use/Slide1.jpg</file>
-        <file alias="Help/Slide2.jpg">../../Docs/media/how_to_use/Slide2.jpg</file>
-        <file alias="Help/Slide3.jpg">../../Docs/media/how_to_use/Slide3.jpg</file>
-        <file alias="Help/Slide4.jpg">../../Docs/media/how_to_use/Slide4.jpg</file>
-        <file>Help/Filter Descriptions/Filter Descriptions.html</file>
-        <file>Help/Filter Descriptions/13_DHC0177_TOUT.jpg</file>
-        <file>Help/Filter Descriptions/DAN_Rogers2_umatic_error-vrep.jpg</file>
-        <file>Help/Filter Descriptions/digibeta_error_shows-illegal-chroma_extreme_minmax_uv.jpg</file>
-        <file>Help/Filter Descriptions/NGA000006_msef.jpg</file>
-        <file>Help/Filter Descriptions/NGA000006_psnrf.jpg</file>
-        <file>Help/Filter Descriptions/RANG_293_0046_syncloss2.jpg</file>
-        <file>Help/Filter Descriptions/RANG_DHC0024_dropout.jpg</file>
-        <file>Help/Filter Descriptions/seattle_parade_yuvdiffs.jpg</file>
-        <file>Help/Filter Descriptions/TOUT_DHC0177_trackingerror_ffv1_h264.jpg</file>
-        <file>Help/Filter Descriptions/UNoise_293_0047_JITTERS_ffv1.jpg</file>
-        <file>Help/Filter Descriptions/UV_293_0046_syncloss_ffv1_h264.jpg</file>
-        <file>Help/Filter Descriptions/UV_293_0050_chrominancenoise_ffv1_h264.jpg</file>
-        <file>Help/Filter Descriptions/VREP_293_0047_JITTER.jpg</file>
-        <file>Help/Filter Descriptions/VREP_293_0047_SKEW.jpg</file>
-        <file>Help/Filter Descriptions/YMAX_DHC0177_trackingerror_ffv1_h264.jpg</file>
-        <file>Help/Filter Descriptions/YValues_293_0047_SKEW_ffv1_h264.jpg</file>
-        <file>Help/Filter Descriptions/YValues_DHC0267_trackingerror_ffv1_h264.jpg</file>
-        <file>Help/Playback Filters/Playback Filters.html</file>
-        <file>Help/Playback Filters/1A_seattle_parade_transfer_a_messedup-1.jpg</file>
-        <file>Help/Playback Filters/fielddiff.jpg</file>
-        <file>Help/Playback Filters/playback_layout_two_windows.jpg</file>
-        <file>Help/Playback Filters/vectorscope_illegal.jpg</file>
-        <file>Help/Playback Filters/waveform.jpg</file>
-        <file>Help/Playback Filters/lineselect.jpg</file>
-        <file>Help/Playback Filters/fieldsplit.jpg</file>
-        <file>Help/Playback Filters/extractplanes.jpg</file>
-        <file>Help/Data Format/Data Format.html</file>
-        <file>Help/Recording/Recording.html</file>
-        <file>Help/Recording/record_in_toolbar.jpg</file>
-        <file>Help/Recording/record_config.jpg</file>
-        <file alias="Help/qctools.md">../../Docs/qctools.md</file>
+        <file alias="Help/filter_descriptions.md">../../Docs/filter_descriptions.md</file>
+        <file alias="Help/playback_filters.md">../../Docs/playback_filters.md</file>
+        <file alias="Help/data_format.md">../../Docs/data_format.md</file>
+        <file alias="Help/recording.md">../../Docs/recording.md</file>
     </qresource>
 </RCC>
