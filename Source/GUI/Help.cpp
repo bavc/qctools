@@ -43,17 +43,6 @@ Help::Help(QWidget * parent)
     QVBoxLayout* L=new QVBoxLayout();
     Central=new QTabWidget(this);
 
-    QTextBrowser* TextMd =new QTextBrowser(this);
-    TextMd->setReadOnly(true);
-    TextMd->setOpenExternalLinks(true);
-
-    CMarkdown markdown;
-    QString html = markdown.processFile(":/Help/qctools.md");
-    html.replace("src=\"media/", "src=\"qrc:/Help/");
-
-    TextMd->setHtml(html);
-    Central->addTab(TextMd, tr("Markdown"));
-
 
     QTextBrowser* Text1=new QTextBrowser(this);
     Text1->setReadOnly(true);
