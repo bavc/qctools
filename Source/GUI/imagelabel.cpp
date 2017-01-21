@@ -281,6 +281,16 @@ void ImageLabel::setSelectionArea(double x, double y, double w, double h)
     selectionArea->setGeometry(geometry);
 }
 
+void ImageLabel::clearSelectionArea()
+{
+    selectionPos.setX(0); selectionPos.setY(0); selectionSize.setWidth(0); selectionSize.setHeight(0);
+
+    QSignalBlocker blocker(selectionArea);
+
+    selectionArea->setMaxSize(0, 0);
+    selectionArea->setGeometry(QRect(0, 0, 0, 0));
+}
+
 void ImageLabel::showDebugOverlay(bool enable)
 {
     debugOverlay = enable;

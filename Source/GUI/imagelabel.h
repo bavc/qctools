@@ -39,6 +39,8 @@ public Q_SLOTS:
     void setMaxSelectionSize(QSizeF size);
 
     void setSelectionArea(double x, double y, double w, double h);
+    void clearSelectionArea();
+
     void showDebugOverlay(bool enable);
 
 Q_SIGNALS:
