@@ -14,7 +14,10 @@
 #include "GUI/draggablechildrenbehaviour.h"
 #include "Core/Core.h"
 #include "Core/VideoCore.h"
+
+#ifdef BLACKMAGICDECKLINK_YES
 #include "Core/BlackmagicDeckLink_Glue.h"
+#endif
 
 #include <QFileDialog>
 #include <QScrollBar>
@@ -184,7 +187,10 @@ void MainWindow::Ui_Init()
             ui->actionBlackmagicDeckLinkCapture->setVisible(false);
             ui->menuBlackmagicDeckLink->menuAction()->setVisible(false);
         }
-    #endif
+    #else
+        delete ui->actionBlackmagicDeckLinkCapture;
+        delete ui->menuBlackmagicDeckLink;
+    #endif //
 }
 
 //---------------------------------------------------------------------------

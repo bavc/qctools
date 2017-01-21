@@ -49,20 +49,56 @@ macx:contains(DEFINES, USE_BREW) {
     CONFIG += debug_and_release
 }
 
-QMAKE_CXXFLAGS += -DBLACKMAGICDECKLINK_NO -DWITH_SYSTEM_FFMPEG=1
+USE_BLACKMAGIC = $$(QCTOOLS_USE_BLACKMAGIC)
+equals(USE_BLACKMAGIC, true) {
+    message("QCTOOLS_USE_BLACKMAGIC is true, blackmagic integration enabled ")
+    DEFINES += BLACKMAGICDECKLINK_YES
 
-HEADERS = \
+    win32 {
+        IDL = "../../../Blackmagic DeckLink SDK/Win/include/DeckLinkAPI.idl"
+        idl_c.output = ${QMAKE_FILE_IN}.h
+        idl_c.input = IDL
+        idl_c.commands = $${QMAKE_IDL} ${QMAKE_FILE_IN} $${IDLFLAGS} \
+                         /h ${QMAKE_FILE_IN}.h /iid ${QMAKE_FILE_IN}.c
+        idl_c.variable_out = SOURCES
+        idl_c.name = MIDL
+        idl_c.clean = ${QMAKE_FILE_IN}.h ${QMAKE_FILE_IN}.c
+        idl_c.CONFIG = no_link target_predeps
+
+        QMAKE_EXTRA_COMPILERS += idl_c
+
+        LIBS += -lOle32
+    }
+
+    linux:SOURCES += "../../../Blackmagic DeckLink SDK/Linux/include/DeckLinkAPIDispatch.cpp"
+    macx:!contains(DEFINES, USE_BREW) SOURCES += "../../../Blackmagic DeckLink SDK/Mac/include/DeckLinkAPIDispatch.cpp"
+
+    HEADERS += \
+        ../../Source/Core/BlackmagicDeckLink.h \
+        ../../Source/Core/BlackmagicDeckLink_Glue.h \
+        ../../Source/GUI/blackmagicdecklink_userinput.h
+
+
+    SOURCES += \
+        ../../Source/Core/BlackmagicDeckLink.cpp \
+        ../../Source/Core/BlackmagicDeckLink_Glue.cpp \
+        ../../Source/GUI/blackmagicdecklink_userinput.cpp
+
+} else {
+    message("QCTOOLS_USE_BLACKMAGIC is not true, blackmagic integration disabled")
+}
+
+QMAKE_CXXFLAGS += -DWITH_SYSTEM_FFMPEG=1
+
+HEADERS += \
     ../../Source/Core/AudioCore.h \
     ../../Source/Core/AudioStats.h \
     ../../Source/Core/CommonStats.h \
     ../../Source/Core/Core.h \
-    ../../Source/Core/BlackmagicDeckLink.h \
-    ../../Source/Core/BlackmagicDeckLink_Glue.h \
     ../../Source/Core/FFmpeg_Glue.h \
     ../../Source/Core/VideoCore.h \
     ../../Source/Core/VideoStats.h \
     ../../Source/Core/Timecode.h \
-    ../../Source/GUI/blackmagicdecklink_userinput.h \
     ../../Source/GUI/BigDisplay.h \
     ../../Source/GUI/Control.h \
     ../../Source/GUI/FileInformation.h \
@@ -84,18 +120,15 @@ HEADERS = \
     ../../Source/GUI/SignalServerConnectionChecker.h \
     ../../Source/GUI/SignalServer.h
 
-SOURCES = \
+SOURCES += \
     ../../Source/Core/AudioCore.cpp \
     ../../Source/Core/AudioStats.cpp \
     ../../Source/Core/CommonStats.cpp \
     ../../Source/Core/Core.cpp \
-    ../../Source/Core/BlackmagicDeckLink.cpp \
-    ../../Source/Core/BlackmagicDeckLink_Glue.cpp \
     ../../Source/Core/FFmpeg_Glue.cpp \
     ../../Source/Core/VideoCore.cpp \
     ../../Source/Core/VideoStats.cpp \
     ../../Source/Core/Timecode.cpp \
-    ../../Source/GUI/blackmagicdecklink_userinput.cpp \
     ../../Source/GUI/BigDisplay.cpp \
     ../../Source/GUI/Control.cpp \
     ../../Source/GUI/FileInformation.cpp \
@@ -120,9 +153,6 @@ SOURCES = \
     ../../Source/GUI/draggablechildrenbehaviour.cpp \
     ../../Source/GUI/SignalServerConnectionChecker.cpp \
     ../../Source/GUI/SignalServer.cpp
-
-linux:SOURCES += "../../../Blackmagic DeckLink SDK/Linux/include/DeckLinkAPIDispatch.cpp"
-macx:!contains(DEFINES, USE_BREW) SOURCES += "../../../Blackmagic DeckLink SDK/Mac/include/DeckLinkAPIDispatch.cpp"
 
 win32 {
     INCLUDEPATH += $$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib

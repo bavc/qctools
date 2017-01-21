@@ -62,6 +62,7 @@ void FileInformation::runParse()
         checkFileUploaded(fileInfo.fileName());
     }
 
+#ifdef BLACKMAGICDECKLINK_YES
     if (blackmagicDeckLink_Glue)
     {
         blackmagicDeckLink_Glue->Glue=Glue;
@@ -88,6 +89,7 @@ void FileInformation::runParse()
         delete blackmagicDeckLink_Glue; blackmagicDeckLink_Glue=NULL;
     }
     else
+#endif // BLACKMAGICDECKLINK_YES
     {
         int frameNumber = 1;
 
@@ -122,12 +124,18 @@ void FileInformation::runExport()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, activefilters ActiveFilters_, activealltracks ActiveAllTracks_, BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue_, int FrameCount, const string &Encoding_FileName, const std::string &Encoding_Format) :
+FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, activefilters ActiveFilters_, activealltracks ActiveAllTracks_,
+#ifdef BLACKMAGICDECKLINK_YES
+                                  BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue_,
+#endif // BLACKMAGICDECKLINK_YES
+                                  int FrameCount, const string &Encoding_FileName, const std::string &Encoding_Format) :
     FileName(FileName_),
     ActiveFilters(ActiveFilters_),
     ActiveAllTracks(ActiveAllTracks_),
     Main(Main_),
+#ifdef BLACKMAGICDECKLINK_YES
     blackmagicDeckLink_Glue(blackmagicDeckLink_Glue_),
+#endif // BLACKMAGICDECKLINK_YES
     m_jobType(Parsing)
 {
     connect(this, SIGNAL(parsingCompleted(bool)), this, SLOT(parsingDone(bool)));
@@ -349,8 +357,10 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
     Glue=new FFmpeg_Glue(FileName_string.c_str(), ActiveAllTracks, &Stats, Stats.empty());
     if (FileName_string.empty())
     {
+#ifdef BLACKMAGICDECKLINK_YES
         Glue->AddInput_Video(FrameCount, 1001, 30000, 720, 486, blackmagicDeckLink_Glue->Config_In.VideoBitDepth, blackmagicDeckLink_Glue->Config_In.VideoCompression, blackmagicDeckLink_Glue->Config_In.TC_in);
         Glue->AddInput_Audio(FrameCount, 1001, 30000, 48000, blackmagicDeckLink_Glue->Config_In.AudioBitDepth, blackmagicDeckLink_Glue->Config_In.AudioTargetBitDepth, blackmagicDeckLink_Glue->Config_In.ChannelsCount);
+#endif // BLACKMAGICDECKLINK_YES
     }
     else if (Glue->ContainerFormat_Get().empty())
     {
