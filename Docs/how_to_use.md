@@ -1,22 +1,22 @@
 # How to Use
 
-*   Install
-*   Load Video Files
-*   Preferences
-*   Select Graph Filters
-*   View and Navigate Graphs
-*   Playback and Visual Analysis
-*   Create/ Export a Report
-*   Parts of the Tool
-*   Data Analysis Window
-*   List View
-*   Video Analysis Window
+*   [Install](#install)
+*   [Preferences](#preferences)
+*   [Load Video Files](#load)
+*   [Select Graph Filters](#select)
+*   [View and Navigate Graphs](#view)
+*   [Playback and Visual Analysis](#playback)
+*   [Create/Export a Report](#create)
+*   [Parts of the Tool](#parts)
+*   [Data Analysis Window](#data)
+*   [List View](#list)
+*   [Video Analysis Window](#analysis)
 
-## Install
+## Install {#install}
 
 Go to [http://bavc.org/qctools](http://bavc.org/qctools) and download QCTools for your operating system (currently Windows, Mac OS X, and many Linux-based operating systems are supported). Initiate the install by double-clicking the icon, and follow the steps. New releases of QCTools will be periodically available at BAVC's [QCTools project website](http://www.bavc.org/qctools) as well as the releases tab on the [QCTools Github page](https://github.com/bavc/qctools/releases).
 
-## Preferences
+## Preferences {#preferences}
 
 QCTools provides a Preferences window to configure settings for running QCTools.
 
@@ -39,7 +39,7 @@ Enabling all filters naturally provides more data, but results in a slower analy
 
 The 'Tracks' Preference pane allows the user to set if they would like to analyze only the first track or all tracks of video and audio. Setting QCTools to analyze only the first track will result in a faster analyze but the other tracks would be ignored.
 
-## Load Video Files
+## Load Video Files {#load}
 
 QCTools can currently accommodate several video file types including QuickTime, MXF, AVI, Matroska, MP4, and many other audiovisual file formats. Once the QCTools application is open you may identify selected video files for QCTools analysis in three ways:
 
@@ -49,13 +49,13 @@ QCTools can currently accommodate several video file types including QuickTime, 
 
 As files are opened QCTools will begin immediately processing them. This involves creating thumbnails, decoding audiovisual data, and analyzing that data through FFmpeg's signalstats filter.
 
-## Select Graph Filters
+## Select Graph Filters {#select}
 
 By clicking the graph checkboxes you can select particular audiovisual metrics that you wish to analyze and display. You may make these selections before uploading your video or at any time after the QCTools analysis has been done and the graph display will update dynamically. As a default, 'Y values', 'U values', 'V values', 'Diffs', and 'Sat' (saturation) are selected. To begin, you may also want to select the **Temporal Outliers** (tout) Graph Filter. This will detect any large discrepancies between pixels and can provide an initial, high-level overview of potential errors.
 
 For descriptions of each Filter and how to read graph values, please see the Help Section, denoted by the '?' icon in the toolbox portion of the application.
 
-## View and Navigate Graphs
+## View and Navigate Graphs {#view}
 
 Graphs display on the top portion of the screen, corresponding video thumbnails show below. The video frames may be navigated via the next, previous, or playback buttons; the frame and time for the particular selection will be displayed. Clicking and dragging your cursor over a portion of the graph will cause the thumbnails below to update accordingly. You may also double click a specific thumbnail and the playback window will appear displaying the image and with a variety of analytical playback filters.
 
@@ -75,11 +75,11 @@ Some helpful **keyboard shortcuts** you may want to use are:
 *   left - Select the previous frame
 *   right - Select the next frame
 
-## Playback and Visual Analysis
+## Playback and Visual Analysis {#playback}
 
 By clicking on a thumbnail, you can open the preview window. The preview window serves as a playback environment that allows spot checking and manual video analysis. The preview window contains two playback windows that can be set to various selections; the filters allow the video to be processed in one of many ways which may help make particular issues more discernible. See the **Playback Filters** page for more details on these playback filters.
 
-## Create/Export a Report
+## Create/Export a Report {#create}
 
 When an analysis (which may be time consuming, depending on the length of the file) is complete the analysis data may then be exported to a compressed XML file for future use. At a later point, the video may be reviewed again simply by opening the XML file--using the **Import** menu, or dragging and dropping the XML into QCTools--instead of having to reload/ reanalyze the video file itself; this process will take considerably less time. Additionally, this file may be opened in other environments such as standard spreadsheet or database applications.
 QCTools also can export analytical metadata per frame in a [CSV](http://en.wikipedia.org/wiki/Comma-separated_values) document but the compressed [XML](http://en.wikipedia.org/wiki/XML) report is recommended since it can be reloaded into QCTools. Please see 'Data Format' tab for more information on the XML file compression and resulting file.
@@ -94,7 +94,7 @@ To **Import**:
 *   Navigate to: Import --> From .qctools.xml.gz...
 *   Drag and drop file(s) into main QCTools window
 
-## Parts of the Tool
+## Parts of the Tool {#parts}
 
 ### Graph Window:
 
@@ -126,7 +126,7 @@ In addition to technical metadata about the file (duration, frame rate, file siz
 | BRNGc | The number of frames with a BRNG value greater than zero |
 | MSEfY | The number of frames with an MSEfY value over 1000 |
 
-### Video Analysis Window:
+## Video Analysis Window {#analysis}
 
 ![Video Analysis Window](media/Slide2.jpg)
 

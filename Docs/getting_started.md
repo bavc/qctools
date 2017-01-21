@@ -1,22 +1,22 @@
 # Getting Started with QCTools
 
-*   What is QCTools?
-*   Who can benefit from using QCTools?
-*   What video formats does QCTools accept?
-*   What do the Graphs measure?
-*   What Graphs should I chose?
-*   What is FFmpeg?
-*   How can I integrate the QCTools export feature into my workflow?
-*   What about my audio?
-*   What is this error called?
-*   Are there additional resources that may be useful to me?
-*   How can I provide feedback?
+*   [What is QCTools?](#qctools)
+*   [Who can benefit from using QCTools?](#benefits)
+*   [What video formats does QCTools accept?](#formats)
+*   [What do the Graphs measure?](#measure)
+*   [What Graphs should I chose?](#graphs)
+*   [What is FFmpeg?](#ffmpeg)
+*   [How can I integrate the QCTools export feature into my workflow?](#workflow)
+*   [What about my audio?](#audio)
+*   [What is this error called?](#error)
+*   [Are there additional resources that may be useful to me?](#resources)
+*   [How can I provide feedback?](#feedback)
 
-## What is QCTools
+## What is QCTools {#qctools}
 
 QCTools (Quality Control Tools for Video Preservation) is a free and open source software tool that helps users analyze and understand their digitized video files through use of audiovisual analytics and filtering to help users detect corruptions or compromises in the results of analog video digitization or in born-digital video. The goal of the project is to cut down the time it takes to perform high-quality video preservation and direct time towards preservation issues that are solvable - for example, identifying tapes that would benefit from a second transfer, saving not only the precious time of preservationists and institutional resources, but giving collections a necessary advantage in the bigger race against time to preserve their significant cultural artifacts. QCTools incorporates archival standards and best practices for reformatting and capturing metadata that enables the long-term preservation of and access to the original artifact, the digital object, and the associated catalog record.
 
-## Who can benefit from using QCTools (and how)?
+## Who can benefit from using QCTools (and how)? {#benefits}
 
 Potential users of the quality control tools include specialists and non-specialists:
 
@@ -48,11 +48,11 @@ Potential users of the quality control tools include specialists and non-special
 
     For example, a small state historical society may have a collection of tapes, but because they are a small staff and cannot afford to outsource digitization, the tapes have been neglected. If the staff is able to get the equipment to digitize the tapes in-house, QCTools can help them diagnose issues and make the digitization process less intimidating while ensuring high quality digital files.
 
-## What video formats does QCTools accept?
+## What video formats does QCTools accept? {#formats}
 
 QCTools accepts a variety of video formats, including \*.avi, \*.mkv, \*.mov, and \*.mp4, as well as a diverse selection of codecs. Uncompressed video formats are ideal for the most accurate interpretation of the video. QCTools relies on FFmpeg's libavcodec and libformat libraries to analyze and playback video which allows QCTools to support a wide variety of digital audiovisual formats.
 
-## What do the Graphs measure?
+## What do the Graphs measure? {#measure}
 
 The following provides an overview of QCTools graph functionality. For more detailed descriptions, please see the help documentation on Filter Descriptions or the documentation on FFmpeg's [signalstats](http://ffmpeg.org/ffmpeg-filters.html#signalstats) filter.
 
@@ -96,34 +96,34 @@ This filter is similar to Mean Square Error per Field but uses the Peak Signal t
 
 This filter is similar to PSNRf and MSEf but uses the Structural SImilarity Metric (SSIM) algorithm. See FFmpeg's documentation on the[SSIM filter](http://ffmpeg.org/ffmpeg-filters.html#ssim) for more information.
 
-## What Graphs should I chose?
+## What Graphs should I chose? {#graphs}
 
-The graphs dectect a wide array of errors and as you become more familiar with the tool and your video collection, you will likely opt for different graph filters depending on the errors you suspect or anticipate. There are some multipurpose options, however, that may be especially helpful to start with in order to get a high-level sense of where, and what type of errors are present. The YUV and Diffs (Y values, U values, V values, YDiff, YDiffX) are beneficial for detecting light/dark and color issues. The TOUT (Temporal Outliers) filter is targeted to detecting white noise such as white speckle pattern you may find in damaged VHS tape. These graph filters are ideal to start with as a new user.
+The graphs detect a wide array of errors and as you become more familiar with the tool and your video collection, you will likely opt for different graph filters depending on the errors you suspect or anticipate. There are some multipurpose options, however, that may be especially helpful to start with in order to get a high-level sense of where, and what type of errors are present. The YUV and Diffs (Y values, U values, V values, YDiff, YDiffX) are beneficial for detecting light/dark and color issues. The TOUT (Temporal Outliers) filter is targeted to detecting white noise such as white speckle pattern you may find in damaged VHS tape. These graph filters are ideal to start with as a new user.
 
-## What is FFmpeg?
+## What is FFmpeg? {#ffmpeg}
 
 FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. QCTools utilizes FFmpeg to decode video for analysis. The playback filters use FFmpeg's libavfilter in order to process the decoded audiovisual data for different types of displays. More at [FFmpeg.org](ffmpeg.org).
 
-## How can I integrate the QCTools export feature into my workflow?
+## How can I integrate the QCTools export feature into my workflow? {#workflow}
 
 QCTools currently supports a frame-by-frame analysis/export in XML format (based on the FFprobe metadata standard. Please also see the 'Data Format' tab). These files can be integrated into your preservation metadata.
 
 Since the QCTool's analysis filter, [signalstats](http://ffmpeg.org/ffmpeg-filters.html#signalstats), is now part of FFmpeg and QCTool's reporting format is based on FFmpeg's ffprobe metadata schema, QCTools data reports may be fully generated using a recent version of FFmpeg. This may be preferable for handling the analysis of large amounts of audiovisual files, so that FFmpeg creates many QCTools reports through FFmpeg which can then later be assessed more closely within the QCTools application. See the Data Format section of the help documentation for more information.
 
-## What about my audio?
+## What about my audio? {#audio}
 
 Starting in QCTools version 0.7, QCTools has some audio support. This includes plotting EBU R128 loudness measurements over time and providing several audio visualization playback tools (audio vectorscope, audio waveforms, etc) in the player window.
 
-## What is this error called?
+## What is this error called? {#error}
 
 You may be able to find the answer in the [A/V Artifact Atlas](http://preservation.bavc.org/artifactatlas/index.php/A/V_Artifact_Atlas), which is closely associated with QCTools. The AV Artifact Atlas is for use in the identification and definition of the technical issues and anomalies that can afflict audio and video signals.
 
-## Are there additional resources that may be useful to me?
+## Are there additional resources that may be useful to me? {#resources}
 
 The [Glossary of Video Terms](http://en.wikipedia.org/wiki/Glossary_of_video_terms) is helpful for a general primer on common terms.
 
 The [AV Artifact Atlas](http://preservation.bavc.org/artifactatlas/index.php/A/V_Artifact_Atlas) is an especially good resource to find examples of video errors, with accompanying descriptions and visual references.
 
-## How can I provide feedback?
+## How can I provide feedback? {#feedback}
 
 Feedback such as requests for clarifications, suggestions for enhancements, or reports of bugs is important for the project. If you find an issue with QCTools, find something unclear, or have an idea please visit the issue tracker at [QCTool's github account](http://github.com/bavc/qctools/issues) and click [New issue](http://github.com/bavc/qctools/issues/new). Once here please name your issue and fill out a description. Once submitted the issue will be in the public issue tracker and the development team can respond to it or associate improvements to it.
