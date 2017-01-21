@@ -23,7 +23,7 @@ Source/Source.pro
 Source/build
 *.o
 
-Docs/qctools.html
-Docs/qctools.pdf
+docs/qctools.html
+docs/qctools.pdf
 
 .DS_Store

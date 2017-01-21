@@ -28,12 +28,12 @@
     </qresource>
     <qresource prefix="/">
         <file alias="Help/About.html">../../License.html</file>
-        <file alias="Help/qctools.md">../../Docs/qctools.md</file>
-        <file alias="Help/getting_started.md">../../Docs/getting_started.md</file>
-        <file alias="Help/how_to_use.md">../../Docs/how_to_use.md</file>
-        <file alias="Help/filter_descriptions.md">../../Docs/filter_descriptions.md</file>
-        <file alias="Help/playback_filters.md">../../Docs/playback_filters.md</file>
-        <file alias="Help/data_format.md">../../Docs/data_format.md</file>
-        <file alias="Help/recording.md">../../Docs/recording.md</file>
+        <file alias="Help/qctools.md">../../docs/qctools.md</file>
+        <file alias="Help/getting_started.md">../../docs/getting_started.md</file>
+        <file alias="Help/how_to_use.md">../../docs/how_to_use.md</file>
+        <file alias="Help/filter_descriptions.md">../../docs/filter_descriptions.md</file>
+        <file alias="Help/playback_filters.md">../../docs/playback_filters.md</file>
+        <file alias="Help/data_format.md">../../docs/data_format.md</file>
+        <file alias="Help/recording.md">../../docs/recording.md</file>
     </qresource>
 </RCC>
