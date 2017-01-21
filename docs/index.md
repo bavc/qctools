@@ -1,8 +1,8 @@
 # QCTools Documentation
 
-* [How To Use](/how_to_use.html)
-* [Getting Started](/getting_started.html)
-* [Filter Descriptions](/filter_descriptions.html)
-* [Playback Filters](/playback_filters.html)
-* [Recording](/recording.html)
-* [Seattle Municipal Archives User Guide](/qctools.html)
+* [How To Use](/qctools/how_to_use.html)
+* [Getting Started](/qctools/getting_started.html)
+* [Filter Descriptions](/qctools/filter_descriptions.html)
+* [Playback Filters](/qctools/playback_filters.html)
+* [Recording](/qctools/recording.html)
+* [Seattle Municipal Archives User Guide](/qctools/qctools.html)
