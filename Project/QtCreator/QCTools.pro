@@ -82,7 +82,8 @@ HEADERS = \
     ../../Source/GUI/config.h \
     ../../Source/GUI/draggablechildrenbehaviour.h \
     ../../Source/GUI/SignalServerConnectionChecker.h \
-    ../../Source/GUI/SignalServer.h
+    ../../Source/GUI/SignalServer.h \
+    ../../Source/ThirdParty/cqmarkdown/CMarkdown.h
 
 SOURCES = \
     ../../Source/Core/AudioCore.cpp \
@@ -119,7 +120,8 @@ SOURCES = \
     ../../Source/GUI/config.cpp \
     ../../Source/GUI/draggablechildrenbehaviour.cpp \
     ../../Source/GUI/SignalServerConnectionChecker.cpp \
-    ../../Source/GUI/SignalServer.cpp
+    ../../Source/GUI/SignalServer.cpp \
+    ../../Source/ThirdParty/cqmarkdown/CMarkdown.cpp
 
 linux:SOURCES += "../../../Blackmagic DeckLink SDK/Linux/include/DeckLinkAPIDispatch.cpp"
 macx:!contains(DEFINES, USE_BREW) SOURCES += "../../../Blackmagic DeckLink SDK/Mac/include/DeckLinkAPIDispatch.cpp"
@@ -136,6 +138,82 @@ FORMS += \
 
 RESOURCES += \
     ../../Source/Resource/Resources.qrc
+
+help_images_dir="$$PWD/../../Docs/media"
+help_images.files = $$files($$help_images_dir/*, true)
+help_images.prefix = "/Help"
+help_images.alias = "./"
+
+DRESOURCES += help_images
+
+# http://www.w3.org/TR/xml/#syntax
+defineReplace(xml_escape) {
+    1 ~= s,&,&amp;,
+    1 ~= s,\',&apos;,
+    1 ~= s,\",&quot;,
+    1 ~= s,<,&lt;,
+    1 ~= s,>,&gt;,
+    return($$1)
+}
+
+for(resource, DRESOURCES) {
+
+    # Regular case of user qrc file
+    contains(resource, ".*\.qrc$"): \
+        next()
+
+    # Fallback for stand-alone files/directories
+    !defined($${resource}.files, var) {
+        !equals(resource, qmake_immediate) {
+            !exists($$absolute_path($$resource, $$_PRO_FILE_PWD_)): \
+                warning("Failure to find: $$resource")
+            qmake_immediate.files += $$resource
+        }
+        RESOURCES -= $$resource
+        next()
+    }
+
+    resource_alias = $$eval($${resource}.alias)
+    resource_file = $$RCC_DIR/qmake_$${resource}.qrc
+
+    !debug_and_release|build_pass {
+        # Collection of files, generate qrc file
+        prefix = $$eval($${resource}.prefix)
+        isEmpty(prefix): \
+            prefix = "/"
+
+        resource_file_content = \
+            "<!DOCTYPE RCC><RCC version=\"1.0\">" \
+            "<qresource prefix=\"$$xml_escape($$prefix)\">"
+
+        abs_base = $$absolute_path($$eval($${resource}.base), $$_PRO_FILE_PWD_)
+
+        for(file, $${resource}.files) {
+            abs_path = $$absolute_path($$file, $$_PRO_FILE_PWD_)
+
+            isEqual(resource_alias, "") {
+                alias = $$relative_path($$abs_path, $$abs_base)
+            } else {
+                alias = $$resource_alias$$basename(file)
+            }
+
+            #message("alias: " $$alias)
+
+            resource_file_content += \
+                "<file alias=\"$$xml_escape($$alias)\">$$xml_escape($$abs_path)</file>"
+        }
+
+        resource_file_content += \
+            "</qresource>" \
+            "</RCC>"
+
+        !write_file($$OUT_PWD/$$resource_file, resource_file_content): \
+            error("Aborting.")
+    }
+
+    RESOURCES -= $$resource
+    RESOURCES += $$OUT_PWD/$$resource_file
+}
 
 macx:contains(DEFINES, USE_BREW) {
     message("use qwt from brew")
@@ -164,7 +242,7 @@ macx:contains(DEFINES, USE_BREW) {
 }
 INCLUDEPATH += $$PWD/../../Source
 INCLUDEPATH += $$PWD/../../Source/ThirdParty/tinyxml2
-
+INCLUDEPATH += $$PWD/../../Source/ThirdParty/cqmarkdown
 include($$PWD/../../Source/ThirdParty/qblowfish/qblowfish.pri)
 
 macx:contains(DEFINES, USE_BREW) {
