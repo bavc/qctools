@@ -11,6 +11,10 @@ Project/QtCreator/Makefile
 Project/QtCreator/Makefile.Debug
 Project/QtCreator/Makefile.Release
 Project/QtCreator/moc
+Project/QtCreator/moc_*
+Project/QtCreator/qmake_help_images.qrc
+Project/QtCreator/qrc_qmake_help_images.cpp
+Project/QtCreator/qrc_Resources.cpp
 Project/QtCreator/QCTools.app
 Project/QtCreator/resources/qrc_Resources.cpp
 Project/QtCreator/*.h
