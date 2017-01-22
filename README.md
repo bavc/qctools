@@ -5,7 +5,7 @@ qctools
 
 QCTools (Quality Control Tools for Video Preservation) is a free and open source software tool that helps users analyze and understand their digitized video files through use of audiovisual analytics and filtering. QCTools is funded by the National Endowment for the Humanities and the Knight Foundation, and developed by the Bay Area Video Coalition.
 
-Our (in progress) wiki is starting to develop [here](https://github.com/bavc/qctools/wiki).
+Documentation on how to use QCTools is available within the application under the Help tab or online [here](http://bavc.github.io/qctools/).
 
 general info
 =======
@@ -56,6 +56,10 @@ Incorporating a set of open source libraries developed under the ffmpeg project,
 a/v artifact atlas
 =======
 In conjunction with using QCTools, consider using the [A/V Artifacts Atlas](http://avaa.bavc.org/artifactatlas/index.php/A/V_Artifact_Atlas) to gain further clarification and appropriate descriptive terminology for any anomalies or errors you might encounter in your video content.  Users are invited to contribute unidentified errors they come across to the atlas.
+
+contributing
+=======
+Please read our contributing guidelines in [this dedicated document](https://github.com/bavc/qctools/blob/master/CONTRIBUTING.md).
 
 license
 =======
