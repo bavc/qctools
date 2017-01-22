@@ -2362,7 +2362,7 @@ void BigDisplay::updateSelection(int Pos, ImageLabel* image, options& opts)
     }
     else
     {
-        image->setSelectionArea(0, 0, 0, 0);
+        image->clearSelectionArea();
     }
 }
 
