@@ -57,6 +57,10 @@ a/v artifact atlas
 =======
 In conjunction with using QCTools, consider using the [A/V Artifacts Atlas](http://avaa.bavc.org/artifactatlas/index.php/A/V_Artifact_Atlas) to gain further clarification and appropriate descriptive terminology for any anomalies or errors you might encounter in your video content.  Users are invited to contribute unidentified errors they come across to the atlas.
 
+contributing
+=======
+Please read our contributing guidelines in [this dedicated document](https://github.com/bavc/qctools/blob/master/CONTRIBUTING.md).
+
 license
 =======
 QCTools deliverable is licensed under a GPLv3 License.
