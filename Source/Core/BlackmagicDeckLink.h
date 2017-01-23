@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------
 #include "Core/FFmpeg_Glue.h"
 #if defined(_WIN32) || defined(_WIN64)
-    #include "DeckLinkAPI_h.h"
+    #include "Win/include/DeckLinkAPI.idl.h"
     typedef unsigned long bmdl_uint32_t;
 #elif defined(__APPLE__) && defined(__MACH__)
     #include "Mac/include/DeckLinkAPI.h"

@@ -9,9 +9,6 @@
 #define BlackmagicDeckLink_Glue_H
 
 //---------------------------------------------------------------------------
-#if !defined(BLACKMAGICDECKLINK_YES) && !defined(BLACKMAGICDECKLINK_NO)
-    #define BLACKMAGICDECKLINK_YES //Default compilation is YES
-#endif
 #ifndef _WIN32
     #define __stdcall
 #endif
