@@ -13,7 +13,7 @@ QCTools allows archivists, curators, preservationists and other moving image pro
 
 For more information about the project, or to download the latest Mac/Windows/Ubuntu release, please visit [BAVC's QCTools homepage](http://www.bavc.org/qctools)
 
-An overview of QCTools and how to use it can be found [here.] (http://htmlpreview.github.io/?https://github.com/bavc/qctools/blob/master/Source/Resource/Help/How%20To%20Use/How%20To%20Use.html)
+An overview of QCTools and how to use it can be found [here.](http://bavc.github.io/qctools/)
 
 installation
 =======
