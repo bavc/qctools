@@ -102,8 +102,10 @@ void MainWindow::TimeOut ()
         if (Stats && Stats->State_Get()>=1)
             Files_Completed++;
 
+#ifdef BLACKMAGICDECKLINK_YES
         if (Files[Files_Pos]->blackmagicDeckLink_Glue)
             DeckRunning_New=true;
+#endif // BLACKMAGICDECKLINK_YES
     }
 
     if (Files_CurrentPos!=(size_t)-1)

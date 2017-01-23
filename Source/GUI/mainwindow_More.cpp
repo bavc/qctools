@@ -59,6 +59,7 @@ void MainWindow::openFile()
 }
 
 //---------------------------------------------------------------------------
+#ifdef BLACKMAGICDECKLINK_YES
 void MainWindow::openCapture()
 {
     if (DeckRunning)
@@ -85,7 +86,7 @@ void MainWindow::openCapture()
 
     delete blackmagicDeckLink_UserInput;
 }
-
+#endif // BLACKMAGICDECKLINK_YES
 //---------------------------------------------------------------------------
 void MainWindow::closeFile()
 {
@@ -380,10 +381,18 @@ void MainWindow::addFile(const QString &FileName)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::addFile(BlackmagicDeckLink_Glue* BlackmagicDeckLink_Glue, int FrameCount, const string &Encoding_FileName, const string &Encoding_Format)
+void MainWindow::addFile(
+#ifdef BLACKMAGICDECKLINK_YES
+        BlackmagicDeckLink_Glue* BlackmagicDeckLink_Glue,
+#endif // BLACKMAGICDECKLINK_YES
+        int FrameCount, const string &Encoding_FileName, const string &Encoding_Format)
 {
     // Launch analysis
-    FileInformation* Temp=new FileInformation(this, QString(), Prefs->ActiveFilters, Prefs->ActiveAllTracks, BlackmagicDeckLink_Glue, FrameCount, Encoding_FileName, Encoding_Format);
+    FileInformation* Temp=new FileInformation(this, QString(), Prefs->ActiveFilters, Prefs->ActiveAllTracks,
+#ifdef BLACKMAGICDECKLINK_YES
+                                              BlackmagicDeckLink_Glue,
+#endif // BLACKMAGICDECKLINK_YES
+                                              FrameCount, Encoding_FileName, Encoding_Format);
     Temp->setIndex(Files.size());
 
     Files.push_back(Temp);

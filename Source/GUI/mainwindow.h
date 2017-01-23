@@ -60,7 +60,9 @@ public:
     void                        Ui_Init                     ();
     void                        configureZoom               ();
     void                        openFile                    ();
+#ifdef BLACKMAGICDECKLINK_YES
     void                        openCapture                 ();
+#endif // BLACKMAGICDECKLINK_YES
     void                        closeFile                   ();
     void                        closeAllFiles               ();
     void                        Zoom_Move                   (size_t Begin);
@@ -87,7 +89,11 @@ public:
     void                        clearGraphsLayout           ();
     void                        createGraphsLayout          ();
     void                        addFile                     (const QString &FileName);
-    void                        addFile                     (BlackmagicDeckLink_Glue* BlackmagicDeckLink_Glue, int FrameCount, const std::string &Encoding_FileName=std::string(), const std::string &Encoding_Format=std::string());
+    void                        addFile                     (
+#ifdef BLACKMAGICDECKLINK_YES
+                                                            BlackmagicDeckLink_Glue* BlackmagicDeckLink_Glue,
+#endif // BLACKMAGICDECKLINK_YES
+                                                            int FrameCount, const std::string &Encoding_FileName=std::string(), const std::string &Encoding_Format=std::string());
     void                        addFile_finish              ();
     void                        selectFile                  (int newFilePos);
     void                        selectDisplayFile           (int newFilePos);
