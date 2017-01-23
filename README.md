@@ -45,7 +45,7 @@ QCTools offers a variety of [Graphing Options](http://bavc.github.io/qctools/fil
 
 playback filters
 =======
-The QCTools preview window is intended as an analytical playback environent that allows the user to review video through multiple filters simultaneously. The playback window includes two viewing windows which may be set to different combinations of [filters] (http://htmlpreview.github.io/?https://github.com/bavc/qctools/blob/master/Source/Resource/Help/Playback%20Filters/Playback%20Filters.html).
+The QCTools preview window is intended as an analytical playback environent that allows the user to review video through multiple filters simultaneously. The playback window includes two viewing windows which may be set to different combinations of [filters](http://bavc.github.io/qctools/playback_filters.html).
 
 reading a qctools document
 =======
