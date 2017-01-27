@@ -74,8 +74,8 @@ Because of the large volume of data contained in a QCTools document, it is neces
 ### Additional Resources
 
 For further information about FFmpeg, EBU audio specifications, etc., please see:
-**FFmpeg /** [ffmpeg.org](https://ffmpeg.org)
-**FFmpeg Documentation /** [http://ffmpeg.org/documentation.html](http://ffmpeg.org/documentation.html)
-**EBU 3341, Loudness Metering: 'EBU Mode' metering to supplement loudness normalizqation in accordance with EBU R 128 /** [https://tech.ebu.ch/docs/tech/tech3341.pdf](https://tech.ebu.ch/docs/tech/tech3341.pdf)
-**EBU R 128, Loudness Normalisation and permitted maximum level of audio signals /** [https://tech.ebu.ch/docs/r/r128-2014.pdf](https://tech.ebu.ch/docs/r/r128-2014.pdf)
-**GZIP /** [www.gzip.org](http://www.gzip.org/)
+**FFmpeg /** [ffmpeg.org](https://ffmpeg.org)  
+**FFmpeg Documentation /** [http://ffmpeg.org/documentation.html](http://ffmpeg.org/documentation.html)  
+**EBU 3341, Loudness Metering: 'EBU Mode' metering to supplement loudness normalizqation in accordance with EBU R 128 /** [https://tech.ebu.ch/docs/tech/tech3341.pdf](https://tech.ebu.ch/docs/tech/tech3341.pdf)  
+**EBU R 128, Loudness Normalisation and permitted maximum level of audio signals /** [https://tech.ebu.ch/docs/r/r128-2014.pdf](https://tech.ebu.ch/docs/r/r128-2014.pdf)  
+**GZIP /** [www.gzip.org](http://www.gzip.org/)  
