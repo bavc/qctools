@@ -73,7 +73,7 @@ Because of the large volume of data contained in a QCTools document, it is neces
 
 ### Additional Resources
 
-For further information about FFmpeg, EBU audio specifications, etc., please see:
+For further information about FFmpeg, EBU audio specifications, etc., please see:  
 **FFmpeg /** [ffmpeg.org](https://ffmpeg.org)  
 **FFmpeg Documentation /** [http://ffmpeg.org/documentation.html](http://ffmpeg.org/documentation.html)  
 **EBU 3341, Loudness Metering: 'EBU Mode' metering to supplement loudness normalizqation in accordance with EBU R 128 /** [https://tech.ebu.ch/docs/tech/tech3341.pdf](https://tech.ebu.ch/docs/tech/tech3341.pdf)  
