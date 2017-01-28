@@ -168,6 +168,9 @@ protected:
 
     void updateSelection(int Pos, ImageLabel* image, options& opts);
 
+Q_SIGNALS:
+	void rewind(int pos);
+
 public Q_SLOTS:
     void updateImagesAndSlider(const QPixmap& pixmap1, const QPixmap& pixmap2, int sliderPos);
 

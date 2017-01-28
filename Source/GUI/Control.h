@@ -72,6 +72,7 @@ public Q_SLOTS:
     void on_P9_clicked(bool checked);
 
     void setCurrentFrame(size_t frame);
+    void rewind(int frame);
 
 public:
     // To update
