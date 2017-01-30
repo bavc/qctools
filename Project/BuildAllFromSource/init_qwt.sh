@@ -3,10 +3,10 @@
 echo "PWD: " + $PWD
 
 if [ ! -d qwt ] ; then
-    wget http://downloads.sourceforge.net/project/qwt/qwt/6.1.2/qwt-6.1.2.tar.bz2
-    tar jxf qwt-6.1.2.tar.bz2
-    rm qwt-6.1.2.tar.bz2
-    mv qwt-6.1.2 qwt
+    wget https://github.com/osakared/qwt/archive/tags/qwt-6.1.2.zip
+    unzip qwt-6.1.2.zip
+    mv qwt-tags-qwt-6.1.2 qwt
+    rm qwt-6.1.2.zip
     patch qwt/qwtconfig.pri <<EOF
 --- qwtconfig.pri	2016-01-03 15:41:26.000000000 -0500
 +++ qwtconfig.pri copy	2016-01-03 15:41:26.000000000 -0500
