@@ -63,7 +63,7 @@ install:
 
   - if [[ $TRAVIS_OS_NAME == osx && $QCTOOLS_USE_BREW == true ]]; then brew install ffmpeg; fi
   - if [[ $TRAVIS_OS_NAME == osx && $QCTOOLS_USE_BREW == true ]]; then brew tap amiaopensource/homebrew-amiaos; fi
-  - if [[ $TRAVIS_OS_NAME == osx && $QCTOOLS_USE_BREW == true ]]; then brew install amiaopensource/amiaos/qwt-qt5; cd ..; fi
+  - if [[ $TRAVIS_OS_NAME == osx && $QCTOOLS_USE_BREW == true ]]; then brew install amiaopensource/amiaos/qwt-qt5 --without-plugin; cd ..; fi
 
 script:
   - if [[ $TRAVIS_OS_NAME == linux ]]; then cd ./qctools/Project/QtCreator && qmake && make; fi
