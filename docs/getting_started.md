@@ -36,7 +36,7 @@ Potential users of the quality control tools include specialists and non-special
 
     Preservation technicians and moving image digitization specialists need to maintain a high level of quality for all materials they are processing. QCTools assists with these projects. Instead of having to do a full visual check of video files to monitor for errors, technicians can use QCTools to identify problem areas for more efficient spot-checking. When integrated into a digitization workflow, QCTools can reduce time and increase the discovery of errors.
 
-    For example, using QCTools regularly to verify audiovisual artifacts caused by VHS [Head Switching Noise](http://avaa.bavc.org/artifactatlas/index.php/Head_Switching_Noise) or a U-Matic machine's [Video Head Clog](http://avaa.bavc.org/artifactatlas/index.php/Video_Head_Clog) can prevent the need for additional transfers due to a machine that needs cleaning.
+    For example, using QCTools regularly to verify audiovisual artifacts caused by VHS [Head Switching Noise](https://bavc.github.io/avaa/artifacts/head_switching_noise.html) or a U-Matic machine's [Video Head Clog](https://bavc.github.io/avaa/artifacts/video_head_clog.html) can prevent the need for additional transfers due to a machine that needs cleaning.
 
 *   #### Artists and curators
 

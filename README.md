@@ -45,7 +45,7 @@ QCTools offers a variety of [Graphing Options](http://bavc.github.io/qctools/fil
 
 playback filters
 =======
-The QCTools preview window is intended as an analytical playback environent that allows the user to review video through multiple filters simultaneously. The playback window includes two viewing windows which may be set to different combinations of [filters](http://bavc.github.io/qctools/playback_filters.html).
+The QCTools preview window is intended as an analytical playback environment that allows the user to review video through multiple filters simultaneously. The playback window includes two viewing windows which may be set to different combinations of [filters](http://bavc.github.io/qctools/playback_filters.html).
 
 reading a qctools document
 =======
@@ -55,7 +55,7 @@ Incorporating a set of open source libraries developed under the ffmpeg project,
 
 a/v artifact atlas
 =======
-In conjunction with using QCTools, consider using the [A/V Artifacts Atlas](http://avaa.bavc.org/artifactatlas/index.php/A/V_Artifact_Atlas) to gain further clarification and appropriate descriptive terminology for any anomalies or errors you might encounter in your video content.  Users are invited to contribute unidentified errors they come across to the atlas.
+In conjunction with using QCTools, consider using the [A/V Artifacts Atlas](https://bavc.github.io/avaa/index.html) to gain further clarification and appropriate descriptive terminology for any anomalies or errors you might encounter in your video content.  Users are invited to contribute unidentified errors they come across to the atlas.
 
 contributing
 =======
