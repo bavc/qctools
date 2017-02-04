@@ -295,9 +295,9 @@ current file.
   **Graph Domain **   **Graph Name(s) **                   **Values\* **   **Ideal Range**
   ------------------- ------------------------------------ --------------- ------------------
   Y Channel           Y MIN, Y LOW, Y AVG, Y HIGH, Y MAX   0-255 IRE       16 IRE (Y LOW)
-                                                                           
+
                                                                            128 IRE (Y AVG)
-                                                                           
+
                                                                            235 IRE (Y HIGH)
   -------------------------------------------------------------------------------------------
 
@@ -985,7 +985,7 @@ present, the possibility has been noted.
 Please note there are many more errors that can compromise video quality
 than are described here. For more information, visit the **A/V Artifact
 Atlas**
-(http://avaa.bavc.org/artifactatlas/index.php/A/V\_Artifact\_Atlas).
+(https://bavc.github.io/avaa/index.html).
 
 **TBC Problems**
 
@@ -3324,7 +3324,7 @@ track. Can result in
 
 ### **V**
 
-### **Vectorscope** Oscilloscope that reads chrominance portion of a video signal. See[ waveform](http://www.bavc.org/preservation/resources/preservation-glossary#wave). 
+### **Vectorscope** Oscilloscope that reads chrominance portion of a video signal. See[ waveform](http://www.bavc.org/preservation/resources/preservation-glossary#wave).
 
 **Videotape** [See
 image.](http://www.bavc.org/preservation/resources/preservation-glossary#layers)
@@ -3424,7 +3424,7 @@ Video Coalition.
 Bay Area Video Coalition, New York University Digital Library Technology
 Services, & Stanford Media Preservation Lab. *A/V Artifact Atlas* (2015)
 Retrieved from:
-<http://avaa.bavc.org/artifactatlas/index.php/A/V_Artifact_Atlas>
+<https://bavc.github.io/avaa/index.html>
 
 Bay Area Video Coalition. “Help” *BAVC/QCTools* (2015) Retrieved from:
 <https://github.com/bavc/qctools>
