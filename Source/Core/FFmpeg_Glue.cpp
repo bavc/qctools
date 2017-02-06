@@ -11,6 +11,9 @@
 //---------------------------------------------------------------------------
 #include "Core/VideoStats.h"
 #include "Core/AudioStats.h"
+#include "Core/StreamsStats.h"
+#include "Core/FormatStats.h"
+
 #include <QImage>
 #include <QXmlStreamReader>
 
@@ -765,7 +768,7 @@ bool FFmpeg_Glue::outputdata::AdaptDAR()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, activealltracks ActiveAllTracks, std::vector<CommonStats*>* Stats_, bool WithStats_) :
+FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, activealltracks ActiveAllTracks, std::vector<CommonStats*>* Stats_, StreamsStats** streamsStats, FormatStats** formatStats, bool WithStats_) :
     Stats(Stats_),
     WithStats(WithStats_),
     FileName(FileName_),
@@ -843,6 +846,12 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, activealltracks ActiveAllTrac
     // Stats
     if (WithStats)
     {
+        if(streamsStats)
+            *streamsStats = new StreamsStats(FormatContext);
+
+        if(formatStats)
+            *formatStats = new FormatStats(FormatContext);
+
         size_t VideoPos=0;
         size_t AudioPos=0;
 

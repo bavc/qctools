@@ -22,6 +22,8 @@
 #include <QFileInfo>
 class MainWindow;
 class CommonStats;
+class StreamsStats;
+class FormatStats;
 class FFmpeg_Glue;
 
 #ifdef BLACKMAGICDECKLINK_YES
@@ -89,6 +91,9 @@ public:
     // FFmpeg glue
     FFmpeg_Glue*                Glue;
     std::vector<CommonStats*>   Stats;
+
+    StreamsStats*               streamsStats;
+    FormatStats*                formatStats;
     CommonStats*                ReferenceStat               () const {if (ReferenceStream_Pos<Stats.size()) return Stats[ReferenceStream_Pos]; else return NULL;}
 
     int                         BitsPerRawSample            () const;

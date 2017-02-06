@@ -37,7 +37,7 @@ using namespace tinyxml2;
 CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t CountOfGroups_, size_t CountOfItems_, size_t FrameCount, double Duration, AVStream* stream)
     :
     Frequency(stream ? (((double)stream->time_base.den) / stream->time_base.num) : 0),
-	streamIndex(stream ? stream->index : -1),
+    streamIndex(stream ? stream->index : -1),
     PerItem(PerItem_),
     Type(Type_),
     CountOfGroups(CountOfGroups_),

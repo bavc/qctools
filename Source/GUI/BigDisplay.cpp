@@ -2045,7 +2045,7 @@ void BigDisplay::InitPicture()
         int height=QDesktopWidget().screenGeometry().height()*2/5;
         if (height%2)
             height--; //odd number is wanted for filters
-        Picture=new FFmpeg_Glue(FileName_string.c_str(), FileInfoData->ActiveAllTracks, &FileInfoData->Stats);
+        Picture=new FFmpeg_Glue(FileName_string.c_str(), FileInfoData->ActiveAllTracks, &FileInfoData->Stats, NULL, NULL);
         Picture->setThreadSafe(true);
 
         if (FileName_string.empty())

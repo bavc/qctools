@@ -33,6 +33,8 @@ struct AVFilterInOut;
 
 class QImage;
 class CommonStats;
+class StreamsStats;
+class FormatStats;
 
 class FFmpeg_Glue
 {
@@ -45,7 +47,7 @@ public:
         Output_Jpeg,
         Output_Stats,
     };
-    FFmpeg_Glue(const string &FileName, activealltracks ActiveAllTracks, std::vector<CommonStats*>* Stats, bool WithStats=false);
+    FFmpeg_Glue(const string &FileName, activealltracks ActiveAllTracks, std::vector<CommonStats*>* Stats, StreamsStats** streamsStats, FormatStats** formatStats, bool WithStats=false);
     ~FFmpeg_Glue();
 
     // Images

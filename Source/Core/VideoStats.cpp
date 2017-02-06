@@ -72,6 +72,10 @@ void VideoStats::StatsFromExternalData (const char* Data, size_t Size)
                     const char* media_type=Frame->Attribute("media_type");
                     if (media_type && !strcmp(media_type, "video"))
                     {
+                        const char* stream_index_value = Frame->Attribute("stream_index");
+                        if(stream_index_value)
+                            streamIndex = std::stoi(stream_index_value);
+
                         if (x_Current>=Data_Reserved)
                             Data_Reserve(x_Current);
 
