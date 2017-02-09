@@ -258,6 +258,7 @@ void TinyDisplay::LoadBigDisplay()
             BigDisplayArea->connect(BigDisplayArea->ControlArea->P1         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_P1_clicked        (bool)));
             BigDisplayArea->connect(BigDisplayArea->ControlArea->P2         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_P2_clicked        (bool)));
             BigDisplayArea->connect(BigDisplayArea->ControlArea->P9         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_P9_clicked        (bool)));
+            connect(BigDisplayArea, SIGNAL(rewind(int)), ControlArea, SLOT(rewind(int)));
         }
     }
 

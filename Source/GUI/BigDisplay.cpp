@@ -2085,19 +2085,10 @@ void BigDisplay::ShowPicture ()
     }
     else
     {
-        if (QThread::currentThread()->isInterruptionRequested())
-        {
-            QMetaObject::invokeMethod(this, "updateImagesAndSlider", Qt::QueuedConnection,
-                                      Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(0))),
-                                      Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(1))),
-                                      Q_ARG(const int, Frames_Pos));
-        }
-        else {
-            QMetaObject::invokeMethod(this, "updateImagesAndSlider", Qt::BlockingQueuedConnection,
-                                      Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(0))),
-                                      Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(1))),
-                                      Q_ARG(const int, Frames_Pos));
-        }
+        QMetaObject::invokeMethod(this, "updateImagesAndSlider", Qt::BlockingQueuedConnection,
+                                  Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(0))),
+                                  Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(1))),
+                                  Q_ARG(const int, Frames_Pos));
     }
 
     // Stats
@@ -2114,9 +2105,7 @@ void BigDisplay::ShowPicture ()
 //---------------------------------------------------------------------------
 void BigDisplay::on_Slider_sliderMoved(int value)
 {
-    ControlArea->Pause->click();
-
-    FileInfoData->Frames_Pos_Set(value);
+	Q_EMIT rewind(Slider->sliderPosition());
 }
 
 //---------------------------------------------------------------------------
@@ -2125,9 +2114,7 @@ void BigDisplay::on_Slider_actionTriggered(int action )
     if (action==QAbstractSlider::SliderMove)
         return;
 
-    ControlArea->Pause->click();
-
-    FileInfoData->Frames_Pos_Set(Slider->sliderPosition());
+	Q_EMIT rewind(Slider->sliderPosition());
 }
 
 //---------------------------------------------------------------------------

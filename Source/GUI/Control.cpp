@@ -222,15 +222,11 @@ void Control::stop()
         qDebug() << "Thread->requestInterruption()";
         Thread->requestInterruption();
 
-        qDebug() << "qApp->processEvents()";
-        qApp->processEvents();
+        while (Timer->isActive()) {
+            qDebug() << "timer is still active...";
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+        }
 
-        qDebug() << "Thread->quit()";
-        Thread->quit();
-
-        qDebug() << "Thread->wait()";
-        Thread->wait();
-        qDebug() << "after Thread->wait()";
         Thread = nullptr;
         Timer = nullptr;
     }
@@ -801,6 +797,17 @@ void Control::setCurrentFrame(size_t frame)
     Q_EMIT currentFrameChanged();
 }
 
+void Control::rewind(int frame)
+{
+    Time = QTime();
+
+    startFrame = frame;
+    startFrameTimeStamp = QTime::currentTime();
+    lastRenderedFrame = -1;
+
+    setCurrentFrame(frame);
+}
+
 //***************************************************************************
 // Time
 //***************************************************************************
@@ -863,6 +870,8 @@ void Control::TimeOut ()
             SelectedSpeed=Speed_O;
             if(TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
                 TinyDisplayArea->BigDisplayArea->ControlArea->SelectedSpeed=SelectedSpeed;
+
+            Timer->stop();
             return;
         }
     }
@@ -873,6 +882,8 @@ void Control::TimeOut ()
 			SelectedSpeed=Speed_O;
             if(TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
                 TinyDisplayArea->BigDisplayArea->ControlArea->SelectedSpeed=SelectedSpeed;
+
+            Timer->stop();
             return;
         }
     }
@@ -914,4 +925,9 @@ void Control::TimeOut ()
         }
     }
 
+    if (QThread::currentThread()->isInterruptionRequested())
+    {
+        qDebug() << "stopping timer...";
+        Timer->stop();
+    }
 }
