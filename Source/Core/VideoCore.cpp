@@ -191,6 +191,21 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "of telecine). Each frame's classification is plotted with a half-life of 1.",
         ActiveFilter_Video_Idet,
     },
+    //Item_pkt_duration_time
+    {
+        Item_pkt_duration_time,     1,    0,    2,  4,  "pkt_duration_time", false,
+        "Plots the duration in seconds of each frame. If the file is of constant\n"
+        "frame rate than this should be a straight line.",
+        ActiveFilter_Video_signalstats,
+    },
+    //Item_pkt_size
+    {
+        Item_pkt_size,     1,    0,    0,  4,  "pkt_size", false,
+        "Plots the size in bytes of each frame. If the file is of uncompressed\n"
+        "frame rate than this should be a straight line, but a lossless or\n"
+        "lossy file should show the variety of frame sizes.",
+        ActiveFilter_Video_signalstats,
+    },
     //bitplanenoise
     {
         Item_BPN_Y1,       4,    0,    1,  4,  "bpn y", false,
@@ -209,6 +224,16 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "Plots data from bitplanenoise",
         ActiveFilter_Video_BPN4,
     },
+
+    //const   std::size_t Start; //Item
+    //const   std::size_t Count;
+    //const   double      Min;
+    //const   double      Max;
+    //const   double      StepsCount;
+    //const   char*       Name;
+    //const   bool        CheckedByDefault;
+    //const   char*       Description;
+    //activefilter        ActiveFilterGroup;
 };
 
 const struct per_item VideoPerItem [Item_VideoMax]=
@@ -282,6 +307,9 @@ const struct per_item VideoPerItem [Item_VideoMax]=
     { Group_IDET_R,    Group_VideoMax,     "bottom",        "lavfi.idet.repeated.bottom", 2,  false,   DBL_MAX, DBL_MAX },
     { Group_IDET_R,    Group_VideoMax,     "top",           "lavfi.idet.repeated.top",    2,  false,   DBL_MAX, DBL_MAX },
     { Group_IDET_R,    Group_VideoMax,     "neither",       "lavfi.idet.repeated.neither",     2,  false,   DBL_MAX, DBL_MAX },
+    // pkt_duration_time & pkt_size
+    { Group_pkt_duration_time, Group_VideoMax,     "pkt_duration_time",        "pkt_duration_time", 5,  false,   DBL_MAX, DBL_MAX },
+    { Group_pkt_size,  Group_VideoMax,     "pkt_size",      "pkt_size",                  0,  false,   DBL_MAX, DBL_MAX },
     //bitplanenoise.y
     { Group_BPN_Y,     Group_VideoMax,     "y.1",           "lavfi.bitplanenoise.0.1",    2,  false,   DBL_MAX, DBL_MAX },
     { Group_BPN_Y,     Group_VideoMax,     "y.2",           "lavfi.bitplanenoise.0.2",    2,  false,   DBL_MAX, DBL_MAX },
@@ -297,4 +325,13 @@ const struct per_item VideoPerItem [Item_VideoMax]=
     { Group_BPN_V,     Group_VideoMax,     "v.2",           "lavfi.bitplanenoise.2.2",    2,  false,   DBL_MAX, DBL_MAX },
     { Group_BPN_V,     Group_VideoMax,     "v.3",           "lavfi.bitplanenoise.2.3",    2,  false,   DBL_MAX, DBL_MAX },
     { Group_BPN_V,     Group_VideoMax,     "v.4",           "lavfi.bitplanenoise.2.4",    2,  false,   DBL_MAX, DBL_MAX },
+
+    //    const   std::size_t Group1; //Group
+    //    const   std::size_t Group2; //Group
+    //    const   char*       Name;
+    //    const   char*       FFmpeg_Name;
+    //    const   int         DigitsAfterComma;
+    //    const   bool        NewLine;
+    //    const   double      DefaultLimit;
+    //    const   double      DefaultLimit2;
 };

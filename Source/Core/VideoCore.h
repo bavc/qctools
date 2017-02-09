@@ -87,6 +87,9 @@ enum VideoItem
     Item_IDET_R_B,
     Item_IDET_R_T,
     Item_IDET_R_N,
+    //pkt_duration_time & pkt_size
+    Item_pkt_duration_time,
+    Item_pkt_size,
     //bitplanenoisey4
     Item_BPN_Y1,
     Item_BPN_Y2,
@@ -129,6 +132,8 @@ enum VideoGroup
     Group_IDET_S,
     Group_IDET_M,
     Group_IDET_R,
+    Group_pkt_duration_time,
+    Group_pkt_size,
     Group_BPN_Y,
     Group_BPN_U,
     Group_BPN_V,
