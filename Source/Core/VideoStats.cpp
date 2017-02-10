@@ -443,6 +443,8 @@ string VideoStats::StatsToXML (int Width, int Height)
         for (size_t Plot_Pos=0; Plot_Pos<Item_VideoMax; Plot_Pos++)
         {
             string key=PerItem[Plot_Pos].FFmpeg_Name;
+            if(key == "pkt_duration_time" || key == "pkt_size")
+                continue;
 
             stringstream value;
             switch (Plot_Pos)
