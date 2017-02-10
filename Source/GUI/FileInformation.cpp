@@ -272,8 +272,6 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
         char* Xml_Pointer=Xml;
         int inflate_Result;
         int TEMP = 0;
-        bool formatStatsParsed = false;
-		bool streamsStatsParsed = false;
 
         for (;;)
         {
@@ -332,13 +330,6 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
                 Xml_Size+=Xml_HeaderSize+Xml_FooterSize;
                 Xml_SizeForParsing+=Xml_FooterSize;
 
-                //Parse
-                if(!formatStatsParsed && formatStats->readFromXML(Xml, Xml_SizeForParsing))
-                    formatStatsParsed = true;
-
-                if(!streamsStatsParsed && streamsStats->readFromXML(Xml, Xml_SizeForParsing))
-					streamsStatsParsed = true;
-
                 Video->StatsFromExternalData(Xml, Xml_SizeForParsing);
                 Audio->StatsFromExternalData(Xml, Xml_SizeForParsing);
 
@@ -359,6 +350,12 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
         //Inform the parser that parsing is finished
         Video->StatsFromExternalData_Finish();
         Audio->StatsFromExternalData_Finish();
+
+        //Parse formats
+        formatStats->readFromXML(Xml, Xml_Pointer - Xml);
+
+        //Parse streams
+        streamsStats->readFromXML(Xml, Xml_Pointer - Xml);
 
         //Cleanup
         if (StatsFromExternalData_FileName_IsCompressed)
@@ -486,24 +483,6 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
     Data<<Glue->FFmpeg_LibsVersion();
     Data<<"    </library_versions>\n";
 
-    QString frames;
-    QXmlStreamWriter writer(&frames);
-    writer.setAutoFormatting(true);
-    writer.setAutoFormattingIndent(4);
-
-    if(streamsStats)
-        streamsStats->writeToXML(&writer);
-    if(formatStats)
-        formatStats->writeToXML(&writer);
-
-    // add indentation
-    QStringList splitted = frames.split("\n");
-    for(size_t i = 0; i < splitted.length(); ++i)
-        splitted[i] = QString(qAbs(writer.autoFormattingIndent()), writer.autoFormattingIndent() > 0 ? ' ' : '\t') + splitted[i];
-    frames = splitted.join("\n");
-
-    Data<<frames.toStdString() << "\n\n";
-
     Data<<"    <frames>\n";
 
     // From stats
@@ -512,7 +491,27 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
             Data<<Stats[Pos]->StatsToXML(Glue->Width_Get(), Glue->Height_Get());
 
     // Footer
-    Data<<"    </frames>\n";
+    Data<<"    </frames>";
+
+    QString streamsAndFormats;
+    QXmlStreamWriter writer(&streamsAndFormats);
+    writer.setAutoFormatting(true);
+    writer.setAutoFormattingIndent(4);
+
+    if(streamsStats)
+        streamsStats->writeToXML(&writer);
+
+    if(formatStats)
+        formatStats->writeToXML(&writer);
+
+    // add indentation
+    QStringList splitted = streamsAndFormats.split("\n");
+    for(size_t i = 0; i < splitted.length(); ++i)
+        splitted[i] = QString(qAbs(writer.autoFormattingIndent()), writer.autoFormattingIndent() > 0 ? ' ' : '\t') + splitted[i];
+    streamsAndFormats = splitted.join("\n");
+
+    Data<<streamsAndFormats.toStdString() << "\n\n";
+
     Data<<"</ffprobe:ffprobe>";
 
     SharedFile file;
