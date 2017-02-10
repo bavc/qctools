@@ -98,6 +98,10 @@ void AudioStats::StatsFromExternalData(const char* Data, size_t Size)
                         if (Attribute)
                             pkt_size[x_Current] = std::atoi(Attribute);
 
+                        Attribute = Frame->Attribute("pkt_pts");
+                        if (Attribute)
+                            pkt_pts[x_Current] = std::atoi(Attribute);
+
                         Attribute=Frame->Attribute("pkt_pts_time");
                         if (!Attribute || !strcmp(Attribute, "N/A"))
                             Attribute=Frame->Attribute("pkt_dts_time");
@@ -244,6 +248,7 @@ void AudioStats::StatsFromFrame (struct AVFrame* Frame, int, int)
 
     pkt_pos[x_Current] = Frame->pkt_pos;
     pkt_size[x_Current] = Frame->pkt_size;
+    pkt_pts[x_Current] = Frame->pkt_pts;
 
     if (x_Max[0]<=x[0][x_Current])
     {
@@ -346,7 +351,7 @@ string AudioStats::StatsToXML (int Width, int Height)
         Data << " stream_index=\"" << streamIndex << "\"";
 
         Data<<" key_frame=\"" << key_frame.str() << "\"";
-        Data << " pkt_pts=\"" << 1000 * (x[1][x_Pos] + FirstTimeStamp) << "\"";
+        Data << " pkt_pts=\"" << pkt_pts[x_Pos] << "\"";
         Data<<" pkt_pts_time=\"" << pkt_pts_time.str() << "\"";
         if (pkt_duration_time)
             Data<<" pkt_duration_time=\"" << pkt_duration_time.str() << "\"";
