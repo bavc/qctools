@@ -227,6 +227,7 @@ void Control::stop()
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
         }
 
+        Thread->quit();
         Thread = nullptr;
         Timer = nullptr;
     }
