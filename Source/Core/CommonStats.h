@@ -29,6 +29,7 @@ public:
     double**                    y;                          // Data (Group_xxxMax size)
     double*                     durations;                  // Duration of a frame, per frame
     int64_t*					pkt_pos;                    // Frame offsets
+    int64_t*                    pkt_pts;                    // pkt_pts
     int*                        pkt_size;                   // Frame size
     int*                        pix_fmt;                    //
     char*                       pict_type_char;             //

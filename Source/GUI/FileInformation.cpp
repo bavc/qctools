@@ -15,8 +15,11 @@
 
 #include "Core/FFmpeg_Glue.h"
 #include "Core/BlackmagicDeckLink_Glue.h"
+
 #include "Core/VideoStats.h"
 #include "Core/AudioStats.h"
+#include "Core/FormatStats.h"
+#include "Core/StreamsStats.h"
 
 #include <QProcess>
 #include <QFileInfo>
@@ -24,6 +27,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <QTemporaryFile>
+#include <QXmlStreamWriter>
 #include <QUrl>
 #include <zlib.h>
 #include <zconf.h>
@@ -136,7 +140,9 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
 #ifdef BLACKMAGICDECKLINK_YES
     blackmagicDeckLink_Glue(blackmagicDeckLink_Glue_),
 #endif // BLACKMAGICDECKLINK_YES
-    m_jobType(Parsing)
+    m_jobType(Parsing),
+	streamsStats(NULL),
+    formatStats(NULL)
 {
     connect(this, SIGNAL(parsingCompleted(bool)), this, SLOT(parsingDone(bool)));
 
@@ -228,6 +234,9 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
     }
     else
     {
+        streamsStats = new StreamsStats();
+        formatStats = new FormatStats();
+
         //Stats init
         VideoStats* Video=new VideoStats();
         Stats.push_back(Video);
@@ -263,6 +272,7 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
         char* Xml_Pointer=Xml;
         int inflate_Result;
         int TEMP = 0;
+
         for (;;)
         {
             //Load
@@ -320,7 +330,6 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
                 Xml_Size+=Xml_HeaderSize+Xml_FooterSize;
                 Xml_SizeForParsing+=Xml_FooterSize;
 
-                //Parse
                 Video->StatsFromExternalData(Xml, Xml_SizeForParsing);
                 Audio->StatsFromExternalData(Xml, Xml_SizeForParsing);
 
@@ -342,6 +351,12 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
         Video->StatsFromExternalData_Finish();
         Audio->StatsFromExternalData_Finish();
 
+        //Parse formats
+        formatStats->readFromXML(Xml, Xml_Pointer - Xml);
+
+        //Parse streams
+        streamsStats->readFromXML(Xml, Xml_Pointer - Xml);
+
         //Cleanup
         if (StatsFromExternalData_FileName_IsCompressed)
             inflateEnd(&strm);
@@ -354,7 +369,7 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
             checkFileUploaded(fileInfo.fileName());
         }
     }
-    Glue=new FFmpeg_Glue(FileName_string.c_str(), ActiveAllTracks, &Stats, Stats.empty());
+    Glue=new FFmpeg_Glue(FileName_string.c_str(), ActiveAllTracks, &Stats, &streamsStats, &formatStats, Stats.empty());
     if (FileName_string.empty())
     {
 #ifdef BLACKMAGICDECKLINK_YES
@@ -401,6 +416,9 @@ FileInformation::~FileInformation ()
     WantToStop=true;
     bool result = wait();
     assert(result);
+
+	delete streamsStats;
+    delete formatStats;
 
     for (size_t Pos=0; Pos<Stats.size(); Pos++)
         delete Stats[Pos];
@@ -464,7 +482,7 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
     Data<<"    <library_versions>\n";
     Data<<Glue->FFmpeg_LibsVersion();
     Data<<"    </library_versions>\n";
-    Data<<"\n";
+
     Data<<"    <frames>\n";
 
     // From stats
@@ -473,7 +491,27 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
             Data<<Stats[Pos]->StatsToXML(Glue->Width_Get(), Glue->Height_Get());
 
     // Footer
-    Data<<"    </frames>\n";
+    Data<<"    </frames>";
+
+    QString streamsAndFormats;
+    QXmlStreamWriter writer(&streamsAndFormats);
+    writer.setAutoFormatting(true);
+    writer.setAutoFormattingIndent(4);
+
+    if(streamsStats)
+        streamsStats->writeToXML(&writer);
+
+    if(formatStats)
+        formatStats->writeToXML(&writer);
+
+    // add indentation
+    QStringList splitted = streamsAndFormats.split("\n");
+    for(size_t i = 0; i < splitted.length(); ++i)
+        splitted[i] = QString(qAbs(writer.autoFormattingIndent()), writer.autoFormattingIndent() > 0 ? ' ' : '\t') + splitted[i];
+    streamsAndFormats = splitted.join("\n");
+
+    Data<<streamsAndFormats.toStdString() << "\n\n";
+
     Data<<"</ffprobe:ffprobe>";
 
     SharedFile file;

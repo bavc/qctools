@@ -37,7 +37,7 @@ using namespace tinyxml2;
 CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t CountOfGroups_, size_t CountOfItems_, size_t FrameCount, double Duration, AVStream* stream)
     :
     Frequency(stream ? (((double)stream->time_base.den) / stream->time_base.num) : 0),
-	streamIndex(stream ? stream->index : -1),
+    streamIndex(stream ? stream->index : -1),
     PerItem(PerItem_),
     Type(Type_),
     CountOfGroups(CountOfGroups_),
@@ -95,6 +95,9 @@ CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t Cou
     pkt_pos = new int64_t[Data_Reserved];
     memset(pkt_pos, 0x00, Data_Reserved * sizeof(int64_t));
 
+    pkt_pts = new int64_t[Data_Reserved];
+    memset(pkt_pts, 0x00, Data_Reserved * sizeof(int64_t));
+
     pkt_size = new int[Data_Reserved];
     memset(pkt_size, 0x00, Data_Reserved * sizeof(int));
 
@@ -142,6 +145,7 @@ CommonStats::~CommonStats()
     delete[] y_Max;
 
     delete[] pkt_pos;
+    delete[] pkt_pts;
     delete[] pkt_size;
     delete[] pix_fmt;
     delete[] pict_type_char;
@@ -283,6 +287,7 @@ void CommonStats::Data_Reserve(size_t NewValue)
     double*                     durations_Old = durations;
     bool*                       key_frames_Old = key_frames;
     int64_t*                    pkt_pos_Old = pkt_pos;
+    int64_t*                    pkt_pts_Old = pkt_pts;
     int*                        pkt_size_Old = pkt_size;
     int*                        pix_fmt_Old = pix_fmt;
     char*                       pict_type_char_Old = pict_type_char;
@@ -324,6 +329,10 @@ void CommonStats::Data_Reserve(size_t NewValue)
     pkt_pos = new int64_t[Data_Reserved];
     memcpy(pkt_pos, pkt_pos_Old, Data_Reserved_Old * sizeof(int64_t));
     memset(&pkt_pos[Data_Reserved_Old], 0x00, diff * sizeof(int64_t));
+
+    pkt_pts = new int64_t[Data_Reserved];
+    memcpy(pkt_pts, pkt_pts_Old, Data_Reserved_Old * sizeof(int64_t));
+    memset(&pkt_pts[Data_Reserved_Old], 0x00, diff * sizeof(int64_t));
 
     pkt_size = new int[Data_Reserved];
     memcpy(pkt_size, pkt_size_Old, Data_Reserved_Old * sizeof(int));

@@ -98,6 +98,11 @@ HEADERS += \
     ../../Source/Core/FFmpeg_Glue.h \
     ../../Source/Core/VideoCore.h \
     ../../Source/Core/VideoStats.h \
+    ../../Source/Core/FormatStats.h \
+    ../../Source/Core/CommonStreamStats.h \
+    ../../Source/Core/AudioStreamStats.h \
+    ../../Source/Core/VideoStreamStats.h \
+    ../../Source/Core/StreamsStats.h \
     ../../Source/Core/Timecode.h \
     ../../Source/GUI/BigDisplay.h \
     ../../Source/GUI/Control.h \
@@ -129,6 +134,11 @@ SOURCES += \
     ../../Source/Core/FFmpeg_Glue.cpp \
     ../../Source/Core/VideoCore.cpp \
     ../../Source/Core/VideoStats.cpp \
+    ../../Source/Core/FormatStats.cpp \
+    ../../Source/Core/CommonStreamStats.cpp \
+    ../../Source/Core/AudioStreamStats.cpp \
+    ../../Source/Core/VideoStreamStats.cpp \
+    ../../Source/Core/StreamsStats.cpp \
     ../../Source/Core/Timecode.cpp \
     ../../Source/GUI/BigDisplay.cpp \
     ../../Source/GUI/Control.cpp \

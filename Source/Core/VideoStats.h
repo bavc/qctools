@@ -18,6 +18,7 @@ using namespace std;
 
 struct AVFrame;
 struct AVStream;
+struct AVFormatContext;
 
 class VideoStats : public CommonStats
 {
@@ -32,8 +33,6 @@ public:
     void                        TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos);
     string                      StatsToCSV();
     string                      StatsToXML(int Width, int Height);
-
-private:
 };
 
 #endif // Stats_H

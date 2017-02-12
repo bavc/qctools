@@ -72,6 +72,10 @@ void VideoStats::StatsFromExternalData (const char* Data, size_t Size)
                     const char* media_type=Frame->Attribute("media_type");
                     if (media_type && !strcmp(media_type, "video"))
                     {
+                        const char* stream_index_value = Frame->Attribute("stream_index");
+                        if(stream_index_value)
+                            streamIndex = std::stoi(stream_index_value);
+
                         if (x_Current>=Data_Reserved)
                             Data_Reserve(x_Current);
 
@@ -94,6 +98,10 @@ void VideoStats::StatsFromExternalData (const char* Data, size_t Size)
                         Attribute = Frame->Attribute("pkt_size");
                         if (Attribute)
                             pkt_size[x_Current] = std::atoi(Attribute);
+
+                        Attribute = Frame->Attribute("pkt_pts");
+                        if (Attribute)
+                            pkt_pts[x_Current] = std::atoi(Attribute);
 
                         Attribute = Frame->Attribute("pix_fmt");
                         if (Attribute)
@@ -301,6 +309,7 @@ void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
 
     pkt_pos[x_Current] = Frame->pkt_pos;
     pkt_size[x_Current] = Frame->pkt_size;
+    pkt_pts[x_Current] = Frame->pkt_pts;
 
     y[Item_pkt_size][x_Current] = pkt_size[x_Current];
 
@@ -424,7 +433,7 @@ string VideoStats::StatsToXML (int Width, int Height)
         Data << " stream_index=\"" << streamIndex << "\"";
 
         Data<<" key_frame=\"" << key_frame.str() << "\"";
-        Data << " pkt_pts=\"" << 1000 * (x[1][x_Pos] + FirstTimeStamp) << "\"";
+        Data << " pkt_pts=\"" << pkt_pts[x_Pos] << "\"";
         Data<<" pkt_pts_time=\"" << pkt_pts_time.str() << "\"";
         if (pkt_duration_time)
             Data<<" pkt_duration_time=\"" << pkt_duration_time.str() << "\"";
@@ -439,6 +448,8 @@ string VideoStats::StatsToXML (int Width, int Height)
         for (size_t Plot_Pos=0; Plot_Pos<Item_VideoMax; Plot_Pos++)
         {
             string key=PerItem[Plot_Pos].FFmpeg_Name;
+            if(key == "pkt_duration_time" || key == "pkt_size")
+                continue;
 
             stringstream value;
             switch (Plot_Pos)
