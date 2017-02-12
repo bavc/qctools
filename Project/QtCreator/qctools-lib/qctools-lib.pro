@@ -1,4 +1,4 @@
-QT = core gui
+QT = core
 
 TARGET = qctools
 TEMPLATE = lib
