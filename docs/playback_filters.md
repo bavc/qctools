@@ -177,3 +177,7 @@ Shows the output of FFmpeg's [showfreqs](http://ffmpeg.org/ffmpeg-filters.html#s
 ## Audio Volume
 
 Shows the output of FFmpeg's [showvolume](http://ffmpeg.org/ffmpeg-filters.html#showvolume) filter.
+
+## Audio Bit Scope
+
+Shows an audio bit scope visualization of the audio. See FFmpeg's [abitscope](http://ffmpeg.org/ffmpeg-filters.html#abitscope) filter.
