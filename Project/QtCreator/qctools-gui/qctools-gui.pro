@@ -6,30 +6,8 @@ TEMPLATE = app
 
 CONFIG += c++11 qt no_keywords
 
-USE_BREW = $$(QCTOOLS_USE_BREW)
-
-QCTOOLS_USE_BREW_NOT_EMPTY = false
-
-!isEmpty(USE_BREW) {
-    message("USE_BREW not empty")
-    QCTOOLS_USE_BREW_NOT_EMPTY = true
-}
-
-QCTOOLS_USE_BREW_EQUALS_TRUE = false
-
-equals(USE_BREW, true) {
-    message("USE_BREW equals true")
-    QCTOOLS_USE_BREW_EQUALS_TRUE = true
-}
-
+include(../brew.pri)
 message("PWD = " $$PWD)
-message("QCTOOLS_USE_BREW_NOT_EMPTY = " $$QCTOOLS_USE_BREW_NOT_EMPTY )
-message("QCTOOLS_USE_BREW_EQUALS_TRUE = " $$QCTOOLS_USE_BREW_EQUALS_TRUE )
-
-!isEmpty(USE_BREW):equals(USE_BREW, true) {
-    message("DEFINES += USE_BREW")
-    DEFINES += USE_BREW
-}
 
 # link against libqctools
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../qctools-lib/release/ -lqctools
@@ -54,9 +32,6 @@ macx:contains(DEFINES, USE_BREW) {
     QT_CONFIG -= no-pkg-config
 
     include ( $$system(brew --prefix qwt-qt5)/features/qwt.prf )
-
-    PKGCONFIG += libavdevice libavcodec libavfilter libavformat libpostproc
-    PKGCONFIG += libswresample libswscale libavcodec libavutil
 
     CONFIG += link_pkgconfig
 

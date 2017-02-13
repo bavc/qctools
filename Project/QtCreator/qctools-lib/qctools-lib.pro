@@ -5,6 +5,7 @@ TEMPLATE = lib
 CONFIG += c++11
 CONFIG += staticlib
 
+include(../brew.pri)
 include(../ffmpeg.pri)
 
 SOURCES_PATH = $$PWD/../../../Source

@@ -1,5 +1,11 @@
 macx:contains(DEFINES, USE_BREW) {
     message("use ffmpeg from brew")
+
+    PKGCONFIG += libavdevice libavcodec libavfilter libavformat libpostproc
+    PKGCONFIG += libswresample libswscale libavcodec libavutil
+
+    CONFIG += link_pkgconfig
+
 } else {
     FFMPEG_PATH = $$absolute_path($$PWD/../../../ffmpeg)
     message("add external ffmpeg " $$FFMPEG_PATH )
