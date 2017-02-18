@@ -1,6 +1,6 @@
 #include "SignalServer.h"
 
-SignalServer::SignalServer(QObject *parent) : QObject(parent)
+SignalServer::SignalServer(QObject *parent) : QObject(parent), m_autoUpload(false)
 {
 
 }
@@ -33,6 +33,21 @@ QString SignalServer::password() const
 void SignalServer::setPassword(const QString &password)
 {
     m_password = password;
+}
+
+bool SignalServer::enabled() const
+{
+    return !m_login.isEmpty();
+}
+
+void SignalServer::setAutoUpload(bool enable)
+{
+    m_autoUpload = enable;
+}
+
+bool SignalServer::autoUpload() const
+{
+    return m_autoUpload;
 }
 
 QSharedPointer<CheckFileUploadedOperation> SignalServer::checkFileUploaded(const QString &fileName)

@@ -167,7 +167,8 @@ void MainWindow::processFile(const QString &FileName)
     statusBar()->showMessage("Scanning "+QFileInfo(FileName).fileName()+"...");
 
     // Launch analysis
-    FileInformation* file = new FileInformation(this, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks);
+    FileInformation* file = new FileInformation(signalServer, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks);
+    connect(file, SIGNAL(positionChanged()), this, SLOT(Update()));
     file->setIndex(Files.size());
 
     Files.push_back(file);
@@ -373,7 +374,8 @@ void MainWindow::addFile(const QString &FileName)
         return;
 
     // Launch analysis
-    FileInformation* Temp=new FileInformation(this, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks);
+    FileInformation* Temp=new FileInformation(signalServer, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks);
+    connect(Temp, SIGNAL(positionChanged()), this, SLOT(Update()));
     Temp->setIndex(Files.size());
 
     Files.push_back(Temp);
@@ -388,11 +390,12 @@ void MainWindow::addFile(
         int FrameCount, const string &Encoding_FileName, const string &Encoding_Format)
 {
     // Launch analysis
-    FileInformation* Temp=new FileInformation(this, QString(), Prefs->ActiveFilters, Prefs->ActiveAllTracks,
+    FileInformation* Temp=new FileInformation(signalServer, QString(), Prefs->ActiveFilters, Prefs->ActiveAllTracks,
 #ifdef BLACKMAGICDECKLINK_YES
                                               BlackmagicDeckLink_Glue,
 #endif // BLACKMAGICDECKLINK_YES
                                               FrameCount, Encoding_FileName, Encoding_Format);
+    connect(Temp, SIGNAL(positionChanged()), this, SLOT(Update()));
     Temp->setIndex(Files.size());
 
     Files.push_back(Temp);

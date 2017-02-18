@@ -658,9 +658,15 @@ void MainWindow::updateSignalServerSettings()
         signalServer->setUrl(url);
         signalServer->setLogin(Prefs->signalServerLogin());
         signalServer->setPassword(Prefs->signalServerPassword());
+        signalServer->setAutoUpload(Prefs->isSignalServerAutoUploadEnabled());
 
     } else {
         connectionChecker->stop();
+
+        signalServer->setUrl(QUrl());
+        signalServer->setLogin(QString());
+        signalServer->setPassword(QString());
+        signalServer->setAutoUpload(false);
     }
 
     uploadAction()->setVisible(Prefs->isSignalServerEnabled());

@@ -9,8 +9,6 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "GUI/mainwindow.h"
-#include "GUI/preferences.h"
 #include "GUI/SignalServer.h"
 
 #include "Core/FFmpeg_Glue.h"
@@ -23,8 +21,6 @@
 
 #include <QProcess>
 #include <QFileInfo>
-#include <QDesktopServices>
-#include <QApplication>
 #include <QDebug>
 #include <QTemporaryFile>
 #include <QXmlStreamWriter>
@@ -58,7 +54,7 @@ void FileInformation::run()
 
 void FileInformation::runParse()
 {
-    if(Main->Prefs->isSignalServerEnabled())
+    if(signalServer->enabled())
     {
         QString statsFileName = fileName() + ".qctools.xml.gz";
         QFileInfo fileInfo(statsFileName);
@@ -128,7 +124,7 @@ void FileInformation::runExport()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, activefilters ActiveFilters_, activealltracks ActiveAllTracks_,
+FileInformation::FileInformation (SignalServer* signalServer, const QString &FileName_, activefilters ActiveFilters_, activealltracks ActiveAllTracks_,
 #ifdef BLACKMAGICDECKLINK_YES
                                   BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue_,
 #endif // BLACKMAGICDECKLINK_YES
@@ -136,7 +132,7 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
     FileName(FileName_),
     ActiveFilters(ActiveFilters_),
     ActiveAllTracks(ActiveAllTracks_),
-    Main(Main_),
+    signalServer(signalServer),
 #ifdef BLACKMAGICDECKLINK_YES
     blackmagicDeckLink_Glue(blackmagicDeckLink_Glue_),
 #endif // BLACKMAGICDECKLINK_YES
@@ -363,7 +359,7 @@ FileInformation::FileInformation (MainWindow* Main_, const QString &FileName_, a
         delete[] Compressed;
         delete[] Xml;
 
-        if(Main->Prefs->isSignalServerEnabled())
+        if(signalServer->enabled())
         {
             QFileInfo fileInfo(StatsFromExternalData_FileName);
             checkFileUploaded(fileInfo.fileName());
@@ -722,8 +718,7 @@ void FileInformation::Frames_Pos_Set (int Pos, size_t Stats_Pos)
         return;
     Frames_Pos=Pos;
 
-    if (Main)
-        Main->Update();
+    Q_EMIT positionChanged();
 }
 
 //---------------------------------------------------------------------------
@@ -734,8 +729,7 @@ void FileInformation::Frames_Pos_Minus ()
 
     Frames_Pos--;
 
-    if (Main)
-        Main->Update();
+    Q_EMIT positionChanged();
 }
 
 //---------------------------------------------------------------------------
@@ -746,8 +740,7 @@ void FileInformation::Frames_Pos_Plus ()
 
     Frames_Pos++;
 
-    if (Main)
-        Main->Update();
+    Q_EMIT positionChanged();
 }
 
 //---------------------------------------------------------------------------
@@ -920,7 +913,7 @@ void FileInformation::checkFileUploaded(const QString &fileName)
     }
 
     // on UI thread
-    checkFileUploadedOperation = Main->getSignalServer()->checkFileUploaded(fileName);
+    checkFileUploadedOperation = signalServer->checkFileUploaded(fileName);
     connect(checkFileUploadedOperation.data(), SIGNAL(finished()), this, SLOT(checkFileUploadedDone()));
 }
 
@@ -930,7 +923,7 @@ void FileInformation::checkFileUploadedDone()
     {
         qDebug() << "file not uploaded: " << checkFileUploadedOperation->fileName();
 
-        if(Main->Prefs->isSignalServerAutoUploadEnabled() && m_parsed)
+        if(signalServer->autoUpload() && m_parsed)
             handleAutoUpload();
     }
     else if(checkFileUploadedOperation->state() == CheckFileUploadedOperation::Uploaded)
@@ -957,7 +950,7 @@ void FileInformation::upload(const QFileInfo& fileInfo)
 
 void FileInformation::upload(SharedFile file, const QString &fileName)
 {
-    uploadOperation = Main->getSignalServer()->uploadFile(fileName, file);
+    uploadOperation = signalServer->uploadFile(fileName, file);
     connect(uploadOperation.data(), SIGNAL(finished()), this, SLOT(uploadDone()));
     connect(uploadOperation.data(), SIGNAL(uploadProgress(qint64, qint64)), this, SIGNAL(signalServerUploadProgressChanged(qint64, qint64)));
 
@@ -981,7 +974,7 @@ void FileInformation::parsingDone(bool success)
     {
         qDebug() << "parsing done: " << success;
 
-        if(Main->Prefs->isSignalServerAutoUploadEnabled() && m_parsed)
+        if(signalServer->autoUpload() && m_parsed)
             handleAutoUpload();
     }
 }

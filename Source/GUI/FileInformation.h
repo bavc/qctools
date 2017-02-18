@@ -20,7 +20,6 @@
 #include <QFile>
 #include <QSharedPointer>
 #include <QFileInfo>
-class MainWindow;
 class CommonStats;
 class StreamsStats;
 class FormatStats;
@@ -51,7 +50,7 @@ public:
     JobTypes jobType() const;
 
     // Constructor/Destructor
-                                FileInformation             (MainWindow* Main, const QString &FileName, activefilters ActiveFilters, activealltracks ActiveAllTracks,
+                                FileInformation             (SignalServer* signalServer, const QString &FileName, activefilters ActiveFilters, activealltracks ActiveAllTracks,
 #ifdef BLACKMAGICDECKLINK_YES
                                                              BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue=NULL,
 #endif //BLACKMAGICDECKLINK_YES
@@ -141,6 +140,7 @@ public Q_SLOTS:
     void cancelUpload();
 
 Q_SIGNALS:
+    void positionChanged();
     void statsFileGenerated(SharedFile statsFile, const QString& name);
     void statsFileLoaded(SharedFile statsFile);
     void parsingCompleted(bool success);
@@ -161,11 +161,11 @@ private:
     QString                     FileName;
     size_t                      ReferenceStream_Pos;
     int                         Frames_Pos;
-    MainWindow*                 Main;
 
     // FFmpeg part
     bool                        WantToStop;
 
+    SignalServer* signalServer;
     QSharedPointer<CheckFileUploadedOperation> checkFileUploadedOperation;
     QSharedPointer<UploadFileOperation> uploadOperation;
 
