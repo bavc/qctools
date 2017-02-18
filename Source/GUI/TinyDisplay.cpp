@@ -8,7 +8,7 @@
 
 #include "GUI/BigDisplay.h"
 #include "GUI/Control.h"
-#include "GUI/FileInformation.h"
+#include "Core/FileInformation.h"
 #include "Core/CommonStats.h"
 
 #include <QBoxLayout>

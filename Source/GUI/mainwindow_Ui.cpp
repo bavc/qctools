@@ -44,7 +44,7 @@
 #include <qwt_plot_renderer.h>
 #include <QDebug>
 
-#include "GUI/SignalServer.h"
+#include "Core/SignalServer.h"
 //---------------------------------------------------------------------------
 
 //***************************************************************************

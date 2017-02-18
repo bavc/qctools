@@ -1,4 +1,4 @@
-QT = core
+QT = core network
 
 TARGET = qctools
 TEMPLATE = lib
@@ -9,7 +9,10 @@ include(../brew.pri)
 include(../ffmpeg.pri)
 
 SOURCES_PATH = $$PWD/../../../Source
-message("qctools: SOURCES_PATH = " $$absolute_path($$SOURCES_PATH))
+message("qctools-lib: SOURCES_PATH = " $$absolute_path($$SOURCES_PATH))
+
+THIRD_PARTY_PATH = $$absolute_path($$SOURCES_PATH/../..)
+message("qctools-lib: THIRD_PARTY_PATH = " $$absolute_path($$THIRD_PARTY_PATH))
 
 INCLUDEPATH += $$SOURCES_PATH
 INCLUDEPATH += $$SOURCES_PATH/ThirdParty/tinyxml2
@@ -26,6 +29,9 @@ HEADERS = \
     $$SOURCES_PATH/Core/VideoCore.h \
     $$SOURCES_PATH/Core/VideoStats.h \
     $$SOURCES_PATH/Core/Timecode.h \
+    $$SOURCES_PATH/Core/FileInformation.h \
+    $$SOURCES_PATH/Core/SignalServerConnectionChecker.h \
+    $$SOURCES_PATH/Core/SignalServer.h
 
 
 SOURCES = \
@@ -38,3 +44,12 @@ SOURCES = \
     $$SOURCES_PATH/Core/VideoCore.cpp \
     $$SOURCES_PATH/Core/VideoStats.cpp \
     $$SOURCES_PATH/Core/Timecode.cpp \
+    $$SOURCES_PATH/Core/FileInformation.cpp \
+    $$SOURCES_PATH/Core/SignalServerConnectionChecker.cpp \
+    $$SOURCES_PATH/Core/SignalServer.cpp
+
+win32 {
+    INCLUDEPATH += $$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib
+}
+
+include(../blackmagic.pri)

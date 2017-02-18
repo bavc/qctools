@@ -14,9 +14,9 @@
 #include "GUI/Control.h"
 #include "GUI/Info.h"
 #include "GUI/Help.h"
-#include "GUI/FileInformation.h"
 #include "GUI/imagelabel.h"
 #include "GUI/config.h"
+#include "Core/FileInformation.h"
 #include "Core/FFmpeg_Glue.h"
 
 #include <QDesktopWidget>

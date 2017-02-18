@@ -11,7 +11,7 @@
 
 //---------------------------------------------------------------------------
 #include "Core/Core.h"
-#include "GUI/SignalServer.h"
+#include "Core/SignalServer.h"
 
 #include <string>
 

@@ -39,54 +39,15 @@ macx:contains(DEFINES, USE_BREW) {
     CONFIG += debug_and_release
 }
 
-SOURCES_PATH = $$absolute_path($$PWD/../../../Source)
-THIRD_PARTY_PATH = $$absolute_path($$SOURCES_PATH/../..)
-
+SOURCES_PATH = $$PWD/../../../Source
 message("qctools: SOURCES_PATH = " $$absolute_path($$SOURCES_PATH))
 
-USE_BLACKMAGIC = $$(QCTOOLS_USE_BLACKMAGIC)
-equals(USE_BLACKMAGIC, true) {
-    message("QCTOOLS_USE_BLACKMAGIC is true, blackmagic integration enabled ")
-    DEFINES += BLACKMAGICDECKLINK_YES
-
-    win32 {
-        IDL = "$$THIRD_PARTY_PATH/Blackmagic DeckLink SDK/Win/include/DeckLinkAPI.idl"
-        idl_c.output = ${QMAKE_FILE_IN}.h
-        idl_c.input = IDL
-        idl_c.commands = $${QMAKE_IDL} ${QMAKE_FILE_IN} $${IDLFLAGS} \
-                         /h ${QMAKE_FILE_IN}.h /iid ${QMAKE_FILE_IN}.c
-        idl_c.variable_out = SOURCES
-        idl_c.name = MIDL
-        idl_c.clean = ${QMAKE_FILE_IN}.h ${QMAKE_FILE_IN}.c
-        idl_c.CONFIG = no_link target_predeps
-
-        QMAKE_EXTRA_COMPILERS += idl_c
-
-        LIBS += -lOle32
-    }
-
-    linux:SOURCES += "$$THIRD_PARTY_PATH/Blackmagic DeckLink SDK/Linux/include/DeckLinkAPIDispatch.cpp"
-    macx:!contains(DEFINES, USE_BREW) SOURCES += "$$THIRD_PARTY_PATH/Blackmagic DeckLink SDK/Mac/include/DeckLinkAPIDispatch.cpp"
-
-    HEADERS += \
-        $$SOURCES_PATH/Core/BlackmagicDeckLink.h \
-        $$SOURCES_PATH/Core/BlackmagicDeckLink_Glue.h \
-        $$SOURCES_PATH/GUI/blackmagicdecklink_userinput.h
-
-
-    SOURCES += \
-        $$SOURCES_PATH/Core/BlackmagicDeckLink.cpp \
-        $$SOURCES_PATH/Core/BlackmagicDeckLink_Glue.cpp \
-        $$SOURCES_PATH/GUI/blackmagicdecklink_userinput.cpp
-
-} else {
-    message("QCTOOLS_USE_BLACKMAGIC is not true, blackmagic integration disabled")
-}
+THIRD_PARTY_PATH = $$absolute_path($$SOURCES_PATH/../..)
+message("qctools: THIRD_PARTY_PATH = " $$absolute_path($$THIRD_PARTY_PATH))
 
 HEADERS += \
     $$SOURCES_PATH/GUI/BigDisplay.h \
     $$SOURCES_PATH/GUI/Control.h \
-    $$SOURCES_PATH/GUI/FileInformation.h \
     $$SOURCES_PATH/GUI/FilesList.h \
     $$SOURCES_PATH/GUI/Help.h \
     $$SOURCES_PATH/GUI/Info.h \
@@ -101,14 +62,11 @@ HEADERS += \
     $$SOURCES_PATH/GUI/Imagelabel.h \
     $$SOURCES_PATH/GUI/config.h \
     $$SOURCES_PATH/GUI/draggablechildrenbehaviour.h \
-    $$SOURCES_PATH/GUI/SignalServerConnectionChecker.h \
-    $$SOURCES_PATH/GUI/SignalServer.h \
     $$SOURCES_PATH/ThirdParty/cqmarkdown/CMarkdown.h
 
 SOURCES += \
     $$SOURCES_PATH/GUI/BigDisplay.cpp \
     $$SOURCES_PATH/GUI/Control.cpp \
-    $$SOURCES_PATH/GUI/FileInformation.cpp \
     $$SOURCES_PATH/GUI/FilesList.cpp \
     $$SOURCES_PATH/GUI/Help.cpp \
     $$SOURCES_PATH/GUI/Info.cpp \
@@ -127,8 +85,6 @@ SOURCES += \
     $$SOURCES_PATH/GUI/Imagelabel.cpp \
     $$SOURCES_PATH/GUI/config.cpp \
     $$SOURCES_PATH/GUI/draggablechildrenbehaviour.cpp \
-    $$SOURCES_PATH/GUI/SignalServerConnectionChecker.cpp \
-    $$SOURCES_PATH/GUI/SignalServer.cpp \
     $$SOURCES_PATH/ThirdParty/cqmarkdown/CMarkdown.cpp
 
 win32 {
@@ -251,11 +207,15 @@ INCLUDEPATH += $$SOURCES_PATH
 INCLUDEPATH += $$SOURCES_PATH/ThirdParty/cqmarkdown
 include($$SOURCES_PATH/ThirdParty/qblowfish/qblowfish.pri)
 include(../ffmpeg.pri)
+include(../blackmagic.pri)
 
-macx:contains(DEFINES, USE_BREW) {
-    message("don't use Blackmagic DeckLink SDK for brew build")
-} else {
-    INCLUDEPATH += "$$THIRD_PARTY_PATH/Blackmagic DeckLink SDK"
+equals(USE_BLACKMAGIC, true) {
+
+    HEADERS += \
+        $$SOURCES_PATH/GUI/blackmagicdecklink_userinput.h
+
+    SOURCES += \
+        $$SOURCES_PATH/GUI/blackmagicdecklink_userinput.cpp
 }
 
 !win32 {

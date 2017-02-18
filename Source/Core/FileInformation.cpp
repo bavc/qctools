@@ -5,12 +5,8 @@
  */
 
 //---------------------------------------------------------------------------
-#include "GUI/FileInformation.h"
-//---------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------
-#include "GUI/SignalServer.h"
-
+#include "Core/FileInformation.h"
+#include "Core/SignalServer.h"
 #include "Core/FFmpeg_Glue.h"
 #include "Core/BlackmagicDeckLink_Glue.h"
 

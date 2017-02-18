@@ -12,7 +12,7 @@
 #include "GUI/BigDisplay.h"
 #include "GUI/TinyDisplay.h"
 #include "GUI/Info.h"
-#include "GUI/FileInformation.h"
+#include "Core/FileInformation.h"
 #include "Core/CommonStats.h"
 #include "Core/FFmpeg_Glue.h"
 //---------------------------------------------------------------------------

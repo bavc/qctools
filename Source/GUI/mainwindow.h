@@ -17,12 +17,12 @@
 using namespace std;
 
 #include "Core/Core.h"
-#include "GUI/FileInformation.h"
+#include "Core/FileInformation.h"
+#include "Core/SignalServerConnectionChecker.h"
 #include "GUI/TinyDisplay.h"
 #include "GUI/Control.h"
 #include "GUI/Info.h"
 #include "GUI/FilesList.h"
-#include "GUI/SignalServerConnectionChecker.h"
 
 namespace Ui {
 class MainWindow;

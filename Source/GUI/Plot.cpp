@@ -8,7 +8,6 @@
 
 #include "GUI/Plot.h"
 #include "GUI/PlotLegend.h"
-#include "GUI/FileInformation.h"
 #include <qwt_plot_grid.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_picker.h>
@@ -20,6 +19,7 @@
 #include <qwt_series_data.h>
 #include <QResizeEvent>
 
+#include "Core/FileInformation.h"
 #include "Core/VideoCore.h"
 
 static double stepSize( double distance, int numSteps )
