@@ -28,6 +28,11 @@ HEADERS = \
     $$SOURCES_PATH/Core/FFmpeg_Glue.h \
     $$SOURCES_PATH/Core/VideoCore.h \
     $$SOURCES_PATH/Core/VideoStats.h \
+    $$SOURCES_PATH/Core/FormatStats.h \
+    $$SOURCES_PATH/Core/CommonStreamStats.h \
+    $$SOURCES_PATH/Core/AudioStreamStats.h \
+    $$SOURCES_PATH/Core/VideoStreamStats.h \
+    $$SOURCES_PATH/Core/StreamsStats.h \
     $$SOURCES_PATH/Core/Timecode.h \
     $$SOURCES_PATH/Core/FileInformation.h \
     $$SOURCES_PATH/Core/SignalServerConnectionChecker.h \
@@ -44,6 +49,11 @@ SOURCES = \
     $$SOURCES_PATH/Core/FFmpeg_Glue.cpp \
     $$SOURCES_PATH/Core/VideoCore.cpp \
     $$SOURCES_PATH/Core/VideoStats.cpp \
+    $$SOURCES_PATH/Core/FormatStats.cpp \
+    $$SOURCES_PATH/Core/CommonStreamStats.cpp \
+    $$SOURCES_PATH/Core/AudioStreamStats.cpp \
+    $$SOURCES_PATH/Core/VideoStreamStats.cpp \
+    $$SOURCES_PATH/Core/StreamsStats.cpp \
     $$SOURCES_PATH/Core/Timecode.cpp \
     $$SOURCES_PATH/Core/FileInformation.cpp \
     $$SOURCES_PATH/Core/SignalServerConnectionChecker.cpp \

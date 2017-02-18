@@ -58,7 +58,7 @@ public:
 
     // Parsing
     void startParse();
-    void startExport();
+    void startExport(const QString& exportFileName = QString());
 
     // Dumps
     void                        Export_XmlGz                (const QString &ExportFileName);
@@ -126,6 +126,7 @@ public:
     // index in FileList
     int index() const;
     void setIndex(int value);
+    bool parsed() const;
 
 public Q_SLOTS:
 
@@ -165,7 +166,7 @@ private:
     QSharedPointer<UploadFileOperation> uploadOperation;
 
     int m_index;
-
+    QString m_exportFileName;
     bool m_parsed;
 };
 

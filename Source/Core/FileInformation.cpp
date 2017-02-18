@@ -112,7 +112,7 @@ void FileInformation::runParse()
 
 void FileInformation::runExport()
 {
-    Export_XmlGz(QString());
+    Export_XmlGz(m_exportFileName);
 }
 
 //***************************************************************************
@@ -136,6 +136,12 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 	streamsStats(NULL),
     formatStats(NULL)
 {
+    static struct RegisterMetatypes {
+        RegisterMetatypes() {
+            qRegisterMetaType<SharedFile>("SharedFile");
+        }
+    } registerMetatypes;
+
     connect(this, SIGNAL(parsingCompleted(bool)), this, SLOT(parsingDone(bool)));
 
     QString StatsFromExternalData_FileName;
@@ -441,9 +447,11 @@ void FileInformation::startParse ()
     }
 }
 
-void FileInformation::startExport()
+void FileInformation::startExport(const QString &exportFileName)
 {
     m_jobType = Exporting;
+    m_exportFileName = exportFileName;
+
     if (!isRunning())
     {
         if(Glue)
@@ -933,4 +941,9 @@ void FileInformation::handleAutoUpload()
         if(file->open(QFile::ReadOnly))
             upload(file, fileInfo.fileName());
     }
+}
+
+bool FileInformation::parsed() const
+{
+    return m_parsed;
 }

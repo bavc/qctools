@@ -21,3 +21,19 @@ message("QCTOOLS_USE_BREW_EQUALS_TRUE = " $$QCTOOLS_USE_BREW_EQUALS_TRUE )
     message("DEFINES += USE_BREW")
     DEFINES += USE_BREW
 }
+
+macx:contains(DEFINES, USE_BREW) {
+
+    message("use brew")
+    CONFIG += qwt release
+
+    QMAKE_TARGET_BUNDLE_PREFIX = org.bavc
+    QT_CONFIG -= no-pkg-config
+
+    include ( $$system(brew --prefix qwt-qt5)/features/qwt.prf )
+
+    CONFIG += link_pkgconfig
+
+} else {
+    CONFIG += debug_and_release
+}
