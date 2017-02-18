@@ -166,7 +166,7 @@ void MainWindow::Ui_Init()
 		this, SLOT(onSignalServerConnectionChanged(SignalServerConnectionChecker::State)));
 
     //Preferences
-    Prefs=new Preferences(connectionChecker, this);
+    Prefs=new PreferencesDialog(connectionChecker, this);
     connect(Prefs, SIGNAL(saved()), this, SLOT(updateSignalServerSettings()));
 
     updateSignalServerSettings();

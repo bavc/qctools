@@ -31,7 +31,8 @@ HEADERS = \
     $$SOURCES_PATH/Core/Timecode.h \
     $$SOURCES_PATH/Core/FileInformation.h \
     $$SOURCES_PATH/Core/SignalServerConnectionChecker.h \
-    $$SOURCES_PATH/Core/SignalServer.h
+    $$SOURCES_PATH/Core/SignalServer.h \
+    $$SOURCES_PATH/Core/Preferences.h
 
 
 SOURCES = \
@@ -46,10 +47,12 @@ SOURCES = \
     $$SOURCES_PATH/Core/Timecode.cpp \
     $$SOURCES_PATH/Core/FileInformation.cpp \
     $$SOURCES_PATH/Core/SignalServerConnectionChecker.cpp \
-    $$SOURCES_PATH/Core/SignalServer.cpp
+    $$SOURCES_PATH/Core/SignalServer.cpp \
+    $$SOURCES_PATH/Core/Preferences.cpp
 
 win32 {
     INCLUDEPATH += $$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib
 }
 
 include(../blackmagic.pri)
+include($$SOURCES_PATH/ThirdParty/qblowfish/qblowfish.pri)

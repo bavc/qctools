@@ -205,7 +205,6 @@ macx:contains(DEFINES, USE_BREW) {
 
 INCLUDEPATH += $$SOURCES_PATH
 INCLUDEPATH += $$SOURCES_PATH/ThirdParty/cqmarkdown
-include($$SOURCES_PATH/ThirdParty/qblowfish/qblowfish.pri)
 include(../ffmpeg.pri)
 include(../blackmagic.pri)
 

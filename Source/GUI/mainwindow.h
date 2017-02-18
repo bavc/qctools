@@ -39,7 +39,7 @@ class QComboBox;
 class QCheckBox;
 
 class PerPicture;
-class Preferences;
+class PreferencesDialog;
 
 class BlackmagicDeckLink_Glue;
 class DraggableChildrenBehaviour;
@@ -120,7 +120,7 @@ public:
     bool                        DeckRunning;
 
     //Preferences
-    Preferences*                Prefs;
+    PreferencesDialog*          Prefs;
     
     SignalServer*               getSignalServer();
     QList<std::tuple<int, int>> getFilterSelectorsOrder(int start, int end);
