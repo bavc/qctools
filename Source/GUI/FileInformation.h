@@ -16,7 +16,6 @@
 #include <string>
 
 #include <QThread>
-#include <QPixmap>
 #include <QFile>
 #include <QSharedPointer>
 #include <QFileInfo>
@@ -66,8 +65,8 @@ public:
     void                        Export_CSV                  (const QString &ExportFileName);
 
     // Infos
-    QPixmap                     Picture_Get                 (size_t Pos);
-    QString						fileName() const;
+    QByteArray Picture_Get (size_t Pos);
+    QString	fileName() const;
 
     activefilters               ActiveFilters;
     activealltracks             ActiveAllTracks;
@@ -109,7 +108,6 @@ public:
 
     SignalServerCheckUploadedStatus signalServerCheckUploadedStatus() const;
     QString signalServerCheckUploadedStatusString() const;
-    QPixmap signalServerCheckUploadedStatusPixmap() const;
     QString signalServerCheckUploadedStatusErrorString() const;
 
     enum SignalServerUploadStatus {
@@ -123,9 +121,6 @@ public:
 
     SignalServerUploadStatus signalServerUploadStatus() const;
     QString signalServerUploadStatusString() const;
-    QPixmap signalServerUploadStatusPixmap() const;    
-    static QPixmap signalServerUploadStatusPixmap(SignalServerUploadStatus status);
-
     QString signalServerUploadStatusErrorString() const;
 
     // index in FileList

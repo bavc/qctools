@@ -576,27 +576,12 @@ void FileInformation::Export_CSV (const QString &ExportFileName)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-QPixmap FileInformation::Picture_Get (size_t Pos)
+QByteArray FileInformation::Picture_Get (size_t Pos)
 {
-    QPixmap Pixmap;
-
     if (!Glue || Pos>=ReferenceStat()->x_Current || Pos>=Glue->Thumbnails_Size(0))
-    {
-        Pixmap.load(":/icon/logo.png");
-        Pixmap=Pixmap.scaled(72, 72);
-    }
-    else
-    {
-        auto Thumbnail = Glue->Thumbnail_Get(0, Pos);
-        if (!Thumbnail.isEmpty())
-            Pixmap.loadFromData(Thumbnail);
-        else
-        {
-            Pixmap.load(":/icon/logo.png");
-            Pixmap=Pixmap.scaled(72, 72);
-        }
-    }
-    return Pixmap;
+        return QByteArray();
+
+    return Glue->Thumbnail_Get(0, Pos);
 }
 
 QString FileInformation::fileName() const
@@ -808,25 +793,6 @@ QString FileInformation::signalServerCheckUploadedStatusString() const
     }
 }
 
-QPixmap FileInformation::signalServerCheckUploadedStatusPixmap() const
-{
-    switch(signalServerCheckUploadedStatus())
-    {
-    case NotChecked:
-        return QPixmap();
-    case Checking:
-        return QPixmap();
-    case Uploaded:
-        return QPixmap(":/icon/signalserver_success.png");
-    case NotUploaded:
-        return QPixmap(":/icon/signalserver_not_uploaded.png");
-    case CheckError:
-        return QPixmap(":/icon/signalserver_error.png");
-    default:
-        return QPixmap();
-    }
-}
-
 QString FileInformation::signalServerCheckUploadedStatusErrorString() const
 {
     return checkFileUploadedOperation ? checkFileUploadedOperation->errorString() : QString();
@@ -864,28 +830,6 @@ QString FileInformation::signalServerUploadStatusString() const
         return "Upload Error";
     default:
         return "Unknown";
-    }
-}
-
-QPixmap FileInformation::signalServerUploadStatusPixmap() const
-{
-    return signalServerUploadStatusPixmap(signalServerUploadStatus());
-}
-
-QPixmap FileInformation::signalServerUploadStatusPixmap(FileInformation::SignalServerUploadStatus status)
-{
-    switch(status)
-    {
-    case Idle:
-        return QPixmap(":/icon/signalserver_upload.png");
-    case Uploading:
-        return QPixmap(":/icon/signalserver_uploading.png");
-    case Done:
-        return QPixmap(":/icon/signalserver_success.png");
-    case UploadError:
-        return QPixmap(":/icon/signalserver_error.png");
-    default:
-        return QPixmap();
     }
 }
 
