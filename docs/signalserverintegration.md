@@ -8,7 +8,7 @@ Once SignalServer has been properly [installed](https://github.com/bavc/signalse
 
 ### SignalServer Installation
 
-Detailed signalserver installation instructions can be found [here](https://github.com/bavc/signalserver/blob/master/README.md). Installation will vary based upon your specific technical infrastructure. Though designed for a Linux server environment, signalserver can be installed on a local computer.
+Detailed signalserver installation instructions can be found [here](https://github.com/bavc/signalserver/blob/master/README.md). Installation will vary based upon your specific technical infrastructure. Though designed for a Linux server environment, SignalServer can be installed on a local computer.
 
 
 
