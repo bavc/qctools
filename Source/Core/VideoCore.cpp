@@ -191,6 +191,12 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "of telecine). Each frame's classification is plotted with a half-life of 1.",
         ActiveFilter_Video_Idet,
     },
+    //Item_palettegen
+    {
+        Item_palettegen,   1,    0,    0,  4,  "Color Quant Ratio", false,
+        "Plots the degree of color quantization of the frame's palette.",
+        ActiveFilter_Video_Palettegen,
+    },
     //Item_pkt_duration_time
     {
         Item_pkt_duration_time,     1,    0,    2,  4,  "pkt_duration_time", false,
@@ -289,6 +295,8 @@ const struct per_item VideoPerItem [Item_VideoMax]=
     { Group_IDET_R,    Group_VideoMax,     "bottom",        "lavfi.idet.repeated.bottom", 2,  false,   DBL_MAX, DBL_MAX },
     { Group_IDET_R,    Group_VideoMax,     "top",           "lavfi.idet.repeated.top",    2,  false,   DBL_MAX, DBL_MAX },
     { Group_IDET_R,    Group_VideoMax,     "neither",       "lavfi.idet.repeated.neither",     2,  false,   DBL_MAX, DBL_MAX },
+    // Palettegen
+    { Group_palettegen,  Group_VideoMax,   "Color Quant Ratio", "lavfi.color_quant_ratio", 5,  false,   DBL_MAX, DBL_MAX },
     // pkt_duration_time & pkt_size
     { Group_pkt_duration_time, Group_VideoMax,     "pkt_duration_time",        "pkt_duration_time", 5,  false,   DBL_MAX, DBL_MAX },
     { Group_pkt_size,  Group_VideoMax,     "pkt_size",      "pkt_size",                  0,  false,   DBL_MAX, DBL_MAX },
