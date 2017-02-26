@@ -866,6 +866,22 @@ const filter Filters[]=
             "showvolume",
         },
     },
+    {
+        "Audio Bit Scope",
+        1,
+        {
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "abitscope,drawgrid=w=iw:h=ih/8:t=1:c=gray@0.9",
+        },
+    },
     /*
     {
         "EBU r128 Loudness Meter",
