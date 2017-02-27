@@ -50,7 +50,7 @@ void FileInformation::run()
 
 void FileInformation::runParse()
 {
-    if(signalServer->enabled())
+    if(signalServer->enabled() && m_autoCheckFileUploaded)
     {
         QString statsFileName = fileName() + ".qctools.xml.gz";
         QFileInfo fileInfo(statsFileName);
@@ -134,7 +134,9 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 #endif // BLACKMAGICDECKLINK_YES
     m_jobType(Parsing),
 	streamsStats(NULL),
-    formatStats(NULL)
+    formatStats(NULL),
+    m_autoCheckFileUploaded(true),
+    m_autoUpload(true),
 {
     static struct RegisterMetatypes {
         RegisterMetatypes() {
@@ -361,7 +363,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         delete[] Compressed;
         delete[] Xml;
 
-        if(signalServer->enabled())
+        if(signalServer->enabled() && m_autoCheckFileUploaded)
         {
             QFileInfo fileInfo(StatsFromExternalData_FileName);
             checkFileUploaded(fileInfo.fileName());
@@ -847,6 +849,16 @@ QString FileInformation::signalServerUploadStatusErrorString() const
     return uploadOperation ? uploadOperation->errorString() : QString();
 }
 
+void FileInformation::setAutoCheckFileUploaded(bool enable)
+{
+    m_autoCheckFileUploaded = enable;
+}
+
+void FileInformation::setAutoUpload(bool enable)
+{
+    m_autoUpload = enable;
+}
+
 int FileInformation::index() const
 {
     return m_index;
@@ -923,7 +935,7 @@ void FileInformation::uploadDone()
 
 void FileInformation::parsingDone(bool success)
 {
-    if(signalServerCheckUploadedStatus() == SignalServerCheckUploadedStatus::NotUploaded)
+    if(m_autoUpload && signalServerCheckUploadedStatus() == SignalServerCheckUploadedStatus::NotUploaded)
     {
         qDebug() << "parsing done: " << success;
 

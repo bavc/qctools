@@ -126,6 +126,9 @@ public:
     QString signalServerUploadStatusString() const;
     QString signalServerUploadStatusErrorString() const;
 
+    void setAutoCheckFileUploaded(bool enable);
+    void setAutoUpload(bool enable);
+
     // index in FileList
     int index() const;
     void setIndex(int value);
@@ -171,6 +174,9 @@ private:
     int m_index;
     QString m_exportFileName;
     bool m_parsed;
+
+    bool m_autoCheckFileUploaded;
+    bool m_autoUpload;
 };
 
 #endif // GUI_FileInformation_H

@@ -102,6 +102,9 @@ int main(int argc, char *argv[])
     }
 
     std::unique_ptr<FileInformation> info(new FileInformation(signalServer.get(), input, prefs.activeFilters(), prefs.activeAllTracks()));
+    info->setAutoCheckFileUploaded(false);
+    info->setAutoUpload(false);
+
     std::cout << "analyzing input file... " << std::endl;
 
     if(!info->isValid())
