@@ -42,6 +42,11 @@ int main(int argc, char *argv[])
     if(output.isEmpty())
         output = input + ".qctools.xml.gz";
 
+    if(!output.endsWith(".xml.gz"))
+    {
+        std::cout << "warning: non-standard extension (not *.xml.gz) has been specified for output file. ";
+    }
+
     QFile file(output);
     if(file.exists() && !forceOutput)
     {
