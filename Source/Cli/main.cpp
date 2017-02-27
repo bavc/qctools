@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
     QString input;
     QString output;
     bool forceOutput = false;
+    bool showHelp = false;
 
     for(int i = 0; i < a.arguments().length(); ++i)
     {
@@ -33,7 +34,22 @@ int main(int argc, char *argv[])
         } else if(a.arguments().at(i) == "-y")
         {
             forceOutput = true;
+        } else if(a.arguments().at(i) == "-h")
+        {
+            showHelp = true;
         }
+    }
+
+    if(a.arguments().length() == 1)
+        showHelp = true;
+
+    if(showHelp)
+    {
+        std::cout <<
+                     "QCTools $version, $copyright-summary" << std::endl <<
+                     "Usage: qctools-cli -i <qctools-input> -o <qctools-output>" << std::endl << std::endl <<
+                     "If no output file is declared, qctools will create an output named similarly to the input file with suffixed with \".qctools.xml.gz\"." << std::endl <<
+                     "The filters used in qctools-cli may be declared via the qctools-gui (see the Preferences panel)." << std::endl << std::endl;
     }
 
     if(input.isEmpty())
@@ -44,13 +60,13 @@ int main(int argc, char *argv[])
 
     if(!output.endsWith(".xml.gz"))
     {
-        std::cout << "warning: non-standard extension (not *.xml.gz) has been specified for output file. ";
+        std::cout << "warning: non-standard extension (not *.xml.gz) has been specified for output file. " << std::endl;
     }
 
     QFile file(output);
     if(file.exists() && !forceOutput)
     {
-        std::cout << "file " << output.toStdString() << " already exists, exiting.. ";
+        std::cout << "file " << output.toStdString() << " already exists, exiting.. " << std::endl;
         return OutputAlreadyExists;
     }
 
