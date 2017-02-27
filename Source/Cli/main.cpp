@@ -9,7 +9,8 @@ enum Errors {
     Success = 0,
     NoInput = 1,
     ParsingFailure = 2,
-    OutputAlreadyExists = 3
+    OutputAlreadyExists = 3,
+    InvalidInput = 4
 };
 
 int main(int argc, char *argv[])
@@ -92,9 +93,15 @@ int main(int argc, char *argv[])
     }
 
     std::unique_ptr<FileInformation> info(new FileInformation(signalServer.get(), input, prefs.activeFilters(), prefs.activeAllTracks()));
-    info->startParse();
-
     std::cout << "parsing... " << std::endl;
+
+    if(!info->isValid())
+    {
+        std::cout << "invalid input, parsing aborted.. " << std::endl;
+        return InvalidInput;
+    }
+
+    info->startParse();
     QObject::connect(info.get(), SIGNAL(parsingCompleted(bool)), &a, SLOT(quit()));
     a.exec();
 

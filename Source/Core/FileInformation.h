@@ -86,8 +86,11 @@ public:
     BlackmagicDeckLink_Glue*    blackmagicDeckLink_Glue;
 #endif //BLACKMAGICDECKLINK_YES
 
+    bool isValid() const;
+
     // FFmpeg glue
     FFmpeg_Glue*                Glue;
+
     std::vector<CommonStats*>   Stats;
 
     StreamsStats*               streamsStats;

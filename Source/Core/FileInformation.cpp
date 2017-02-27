@@ -750,6 +750,11 @@ qreal FileInformation::averageFrameRate() const
     return splitted[0].toDouble() / splitted[1].toDouble();
 }
 
+bool FileInformation::isValid() const
+{
+    return Glue != 0;
+}
+
 int FileInformation::BitsPerRawSample() const
 {
     if(!Glue)
