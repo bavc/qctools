@@ -8,7 +8,8 @@
 enum Errors {
     Success = 0,
     NoInput = 1,
-    ParsingFailure = 2
+    ParsingFailure = 2,
+    OutputAlreadyExists = 3
 };
 
 int main(int argc, char *argv[])
@@ -17,6 +18,7 @@ int main(int argc, char *argv[])
 
     QString input;
     QString output;
+    bool forceOutput = false;
 
     for(int i = 0; i < a.arguments().length(); ++i)
     {
@@ -28,6 +30,9 @@ int main(int argc, char *argv[])
         {
             output = a.arguments().at(i + 1);
             ++i;
+        } else if(a.arguments().at(i) == "-y")
+        {
+            forceOutput = true;
         }
     }
 
@@ -36,6 +41,13 @@ int main(int argc, char *argv[])
 
     if(output.isEmpty())
         output = input + ".qctools.xml.gz";
+
+    QFile file(output);
+    if(file.exists() && !forceOutput)
+    {
+        std::cout << "file " << output.toStdString() << " already exists, exiting.. ";
+        return OutputAlreadyExists;
+    }
 
     Preferences prefs;
 
@@ -52,6 +64,12 @@ int main(int argc, char *argv[])
     signalServer->setPassword(prefs.signalServerPassword());
     signalServer->setAutoUpload(prefs.isSignalServerAutoUploadEnabled());
 
+    if(file.exists() && forceOutput)
+    {
+        std::cout << "file " << output.toStdString() << " already exists and will be overwritten..." << std::endl;
+        file.remove();
+    }
+
     std::unique_ptr<FileInformation> info(new FileInformation(signalServer.get(), input, prefs.activeFilters(), prefs.activeAllTracks()));
     info->startParse();
 
@@ -64,12 +82,6 @@ int main(int argc, char *argv[])
         return ParsingFailure;
 
     info->startExport(output);
-    QFile file(output);
-    if(file.exists())
-    {
-        std::cout << "file " << output.toStdString() << " already exists and will be overwritten..." << std::endl;
-        file.remove();
-    }
 
     std::cout << "exporting... " << std::endl;
     QObject::connect(info.get(), SIGNAL(statsFileGenerated(SharedFile, const QString&)), &a, SLOT(quit()));
