@@ -102,11 +102,11 @@ int main(int argc, char *argv[])
     }
 
     std::unique_ptr<FileInformation> info(new FileInformation(signalServer.get(), input, prefs.activeFilters(), prefs.activeAllTracks()));
-    std::cout << "parsing... " << std::endl;
+    std::cout << "analyzing input file... " << std::endl;
 
     if(!info->isValid())
     {
-        std::cout << "invalid input, parsing aborted.. " << std::endl;
+        std::cout << "invalid input, analyzing aborted.. " << std::endl;
         return InvalidInput;
     }
 
@@ -114,16 +114,16 @@ int main(int argc, char *argv[])
     QObject::connect(info.get(), SIGNAL(parsingCompleted(bool)), &a, SLOT(quit()));
     a.exec();
 
-    std::cout << "parsing... " << (info->parsed() ? "succeed" : "failed") << std::endl;
+    std::cout << "analyzing... " << (info->parsed() ? "completed" : "failed") << std::endl;
     if(!info->parsed())
         return ParsingFailure;
 
     info->startExport(output);
 
-    std::cout << "exporting... " << std::endl;
+    std::cout << "generating QCTools report... " << std::endl;
     QObject::connect(info.get(), SIGNAL(statsFileGenerated(SharedFile, const QString&)), &a, SLOT(quit()));
     a.exec();
 
-    std::cout << "exporting... done" << std::endl;
+    std::cout << "generating QCTools report... done" << std::endl;
     return 0;
 }
