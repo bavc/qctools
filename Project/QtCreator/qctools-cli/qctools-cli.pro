@@ -36,6 +36,7 @@ INCLUDEPATH += $$SOURCES_PATH
 include(../ffmpeg.pri)
 include(../blackmagic.pri)
 
+HEADERS += $$SOURCES_PATH/Cli/version.h
 SOURCES += $$SOURCES_PATH/Cli/main.cpp
 
 # The following define makes your compiler emit warnings if you use
@@ -73,3 +74,6 @@ macx:LIBS += -liconv \
              -framework CoreVideo \
              -framework OpenGL \
              -framework VideoDecodeAcceleration
+
+HEADERS += \
+    version.h

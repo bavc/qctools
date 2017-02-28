@@ -2,6 +2,7 @@
 #include "Core/SignalServer.h"
 #include "Core/FileInformation.h"
 #include "Core/Preferences.h"
+#include "version.h"
 #include <memory>
 #include <iostream>
 
@@ -56,7 +57,7 @@ int main(int argc, char *argv[])
     if(showHelp)
     {
         std::cout <<
-                     "QCTools $version, $copyright-summary" << std::endl <<
+                     "QCTools " << (VERSION) << ", $copyright-summary" << std::endl <<
                      "Usage: qctools-cli -i <qctools-input> -o <qctools-output>" << std::endl << std::endl <<
                      "If no output file is declared, qctools will create an output named similarly to the input file with suffixed with \".qctools.xml.gz\"." << std::endl <<
                      "The filters used in qctools-cli may be declared via the qctools-gui (see the Preferences panel)." << std::endl << std::endl;
