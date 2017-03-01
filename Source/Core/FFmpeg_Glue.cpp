@@ -1510,6 +1510,76 @@ void FFmpeg_Glue::Thumbnails_Modulo_Change(size_t Modulo)
     }
 }
 
+size_t FFmpeg_Glue::TotalFramesCountPerAllStreams() const
+{
+    QMutexLocker locker(mutex);
+
+    size_t totalFrames = 0;
+    for(size_t i = 0; i < InputDatas.size(); ++i)
+    {
+        totalFrames += InputDatas.at(i)->FrameCount;
+    }
+
+    return totalFrames;
+}
+
+size_t FFmpeg_Glue::TotalFramesProcessedPerAllStreams() const
+{
+    QMutexLocker locker(mutex);
+
+    size_t totalFramesProcessed = 0;
+    for(size_t i = 0; i < InputDatas.size(); ++i)
+    {
+        totalFramesProcessed += InputDatas.at(i)->FramePos;
+    }
+
+    return totalFramesProcessed;
+}
+
+size_t FFmpeg_Glue::FramesCountPerStream(size_t index) const
+{
+    QMutexLocker locker(mutex);
+
+    return InputDatas.at(index)->FrameCount;
+}
+
+size_t FFmpeg_Glue::FramesProcessedPerStream(size_t index) const
+{
+    QMutexLocker locker(mutex);
+
+    return InputDatas.at(index)->FramePos;
+}
+
+std::vector<size_t> FFmpeg_Glue::FramesCountForAllStreams() const
+{
+    QMutexLocker locker(mutex);
+
+    std::vector<size_t> totalFramesCountPerStream;
+    totalFramesCountPerStream.reserve(InputDatas.size());
+
+    for(size_t i = 0; i < InputDatas.size(); ++i)
+    {
+        totalFramesCountPerStream.push_back(InputDatas.at(i)->FrameCount);
+    }
+
+    return totalFramesCountPerStream;
+}
+
+std::vector<size_t> FFmpeg_Glue::FramesProcessedForAllStreams() const
+{
+    QMutexLocker locker(mutex);
+
+    std::vector<size_t> totalFramesProcessedPerStream;
+    totalFramesProcessedPerStream.reserve(InputDatas.size());
+
+    for(size_t i = 0; i < InputDatas.size(); ++i)
+    {
+        totalFramesProcessedPerStream.push_back(InputDatas.at(i)->FramePos);
+    }
+
+    return totalFramesProcessedPerStream;
+}
+
 void FFmpeg_Glue::setThreadSafe(bool enable)
 {
     if(enable)

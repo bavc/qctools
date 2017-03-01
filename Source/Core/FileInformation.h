@@ -144,6 +144,8 @@ public Q_SLOTS:
 Q_SIGNALS:
     void positionChanged();
     void statsFileGenerated(SharedFile statsFile, const QString& name);
+    void statsFileGenerationProgress(int bytesWritten, int totalBytes);
+
     void statsFileLoaded(SharedFile statsFile);
     void parsingCompleted(bool success);
 

@@ -153,6 +153,15 @@ public:
     void                        Scale_Change(int Scale_Width, int Scale_Height);
     void                        Thumbnails_Modulo_Change(size_t Modulo);
 
+    size_t                      TotalFramesCountPerAllStreams() const;
+    size_t                      TotalFramesProcessedPerAllStreams() const;
+
+    size_t                      FramesCountPerStream(size_t index) const;
+    size_t                      FramesProcessedPerStream(size_t index) const;
+
+    std::vector<size_t>         FramesCountForAllStreams() const;
+    std::vector<size_t>         FramesProcessedForAllStreams() const;
+
     // Between different FFmpeg_Glue instances
     void*                       InputData_Get() { return InputDatas[0]; }
     void                        InputData_Set(void* InputData) {InputDatas.push_back((inputdata*)InputData); InputDatas_Copy=true;}

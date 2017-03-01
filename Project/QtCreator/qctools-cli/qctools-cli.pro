@@ -36,8 +36,12 @@ INCLUDEPATH += $$SOURCES_PATH
 include(../ffmpeg.pri)
 include(../blackmagic.pri)
 
-HEADERS += $$SOURCES_PATH/Cli/version.h
-SOURCES += $$SOURCES_PATH/Cli/main.cpp
+HEADERS += $$SOURCES_PATH/Cli/version.h \
+           $$SOURCES_PATH/Cli/cli.h
+
+SOURCES += $$SOURCES_PATH/Cli/main.cpp \
+           $$SOURCES_PATH/Cli/cli.cpp
+
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked deprecated (the exact warnings

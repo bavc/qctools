@@ -550,6 +550,8 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
                 if (deflate(&strm, Z_FINISH)<0)
                     break;
                 file->write(Buffer, Buffer_Size-strm.avail_out);
+
+                Q_EMIT statsFileGenerationProgress((char*) strm.next_in - DataS.c_str(), DataS.size());
             }
             while (strm.avail_out == 0);
             deflateEnd (&strm);
