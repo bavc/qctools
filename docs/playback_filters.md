@@ -25,7 +25,7 @@ The histogram shows the frequency of occurrence of values per channel. Typically
 
 The waveform plots the brightness of the image, each column of the waveform corresponds to a column of pixels in the source video. The pixels of each column are then plotted in an 8-bit scale (0-255) which is equivalent to 0 to 110 IRE. The range from 0-16 (0 to 7.5 IRE) is highlighted in blue and indicates a black value that is below traditional NTSC broadcast range. The range from 235-255 (100 to 110 IRE) is highlighted in red and indicates a white value that is above broadcast range. For most analog media the intended pixel luminosity values should exist between 7.5 and 100 IRE. You may also select **'Field'** option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).
 
-Traditionally a waveform plots the values of each column of video pixels. The QCTools waveform also provides a **'Vertical'** option which plots the video as rows of pixels. The waveform will still show the value range of the whole frame whether **'Vertical'** is enabled or not, but with **'Vertical'** enabled it is often easier to detect video issues that affect rows of pixel data such as dropouts. The waveform player is based on the [waveform filter](http://ffmpeg.org/ffmpeg-filters.html#waveform) from FFmpeg.
+Traditionally a waveform plots the values of each column of video pixels. The QCTools waveform also provides a **'Vertical'** option which plots the video as rows of pixels. The waveform will still show the value range of the whole frame whether **'Vertical'** is enabled or not, but with **'Vertical'** enabled it is often easier to detect video issues that affect rows of pixel data such as dropouts. The waveform player is based on the [waveform filter](https://ffmpeg.org/ffmpeg-filters.html#waveform) from FFmpeg.
 ![Waveform](media/waveform.jpg)
 
 The waveform player provides the following options:
@@ -34,7 +34,7 @@ The waveform player provides the following options:
 *   Intensity: Set intensity. Smaller values are useful to find out how many values of the same luminance are distributed across input rows/columns. Default value is 0.1\. Allowed range is [0, 1].
 *   Y/U/V/A: Select which plane is presented in waveform view ("A" means that all planes are shown).
 *   Vertical: If checked then the waveform will plot on rows rather than columns. It is the equivalent of rotating the video image by 90 degrees and applying a waveform to the result.
-*   Filter: The waveform filter can be adjusted to different displays. The default is 'lowpass'. See [FFmpeg's waveform documentation](http://ffmpeg.org/ffmpeg-filters.html#waveform) for information on each option.
+*   Filter: The waveform filter can be adjusted to different displays. The default is 'lowpass'. See [FFmpeg's waveform documentation](https://ffmpeg.org/ffmpeg-filters.html#waveform) for information on each option.
 *   Peak: If enabled, the waveform will outline the extent of the plotted values to show an envelope around the plotted values. Peak may be adjusted to outline the extent frame-per-frame or over time.
 
 ## Waveform Target
@@ -56,7 +56,7 @@ The vectorscope player provides the following options:
 
 *   Field: If the checkbox is enabled the player will show two waveforms side-by-side that depict field 1 and field 2 separately.
 *   Intensity: Set intensity. Smaller values are useful to find out how many values of the same luminance are distributed across input rows/columns. Default value is 0.1\. Allowed range is [0, 1].
-*   Mode: The vectorscope filter can be adjusted to different displays. The default is 'color3'. See [FFmpeg's vectorscope documentation](http://ffmpeg.org/ffmpeg-filters.html#vectorscope) for information on each option.
+*   Mode: The vectorscope filter can be adjusted to different displays. The default is 'color3'. See [FFmpeg's vectorscope documentation](https://ffmpeg.org/ffmpeg-filters.html#vectorscope) for information on each option.
 *   Peak: If enabled, the vectorscope will outline the extent of the plotted values to show an envelope around the plotted values. Peak may be adjusted to outline the extent frame-per-frame or over time.
 
 ![Vectorscope](media/vectorscope_illegal.jpg)
@@ -86,7 +86,7 @@ This filter selects the bit position of each plane for display. Selecting 'None'
 Generally lossy video codecs will show blocky structured patterns at higher numbered bit positions. See the [bit plane article](https://en.wikipedia.org/wiki/Bit_plane) in Wikipedia for more information about the application of bit plane filtering.
 ![Bit Plane](media/1A_seattle_parade_transfer_a_messedup-1.jpg)
 
-(Video sample and permission to use provided by [seattle.gov](http://www.seattle.gov))
+(Video sample and permission to use provided by [seattle.gov](https://www.seattle.gov))
 
 ## Bit Plane Noise
 
@@ -168,16 +168,16 @@ Plots two channels of audio against each other on different axis. This display c
 
 ## Audio Phase Meter
 
-Shows the output of FFmpeg's [aphasemeter](http://ffmpeg.org/ffmpeg-filters.html#aphasemeter) filter.
+Shows the output of FFmpeg's [aphasemeter](https://ffmpeg.org/ffmpeg-filters.html#aphasemeter) filter.
 
 ## Audio Frequency
 
-Shows the output of FFmpeg's [showfreqs](http://ffmpeg.org/ffmpeg-filters.html#showfreqs) filter.
+Shows the output of FFmpeg's [showfreqs](https://ffmpeg.org/ffmpeg-filters.html#showfreqs) filter.
 
 ## Audio Volume
 
-Shows the output of FFmpeg's [showvolume](http://ffmpeg.org/ffmpeg-filters.html#showvolume) filter.
+Shows the output of FFmpeg's [showvolume](https://ffmpeg.org/ffmpeg-filters.html#showvolume) filter.
 
 ## Audio Bit Scope
 
-Shows an audio bit scope visualization of the audio. See FFmpeg's [abitscope](http://ffmpeg.org/ffmpeg-filters.html#abitscope) filter.
+Shows an audio bit scope visualization of the audio. See FFmpeg's [abitscope](https://ffmpeg.org/ffmpeg-filters.html#abitscope) filter.
