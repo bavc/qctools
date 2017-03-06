@@ -6,3 +6,4 @@
 * [Playback Filters](/qctools/playback_filters.html)
 * [Recording](/qctools/recording.html)
 * [Seattle Municipal Archives User Guide](/qctools/qctools.html)
+* [SignalServer Integration](/qctools/signalserverintegration.md)
