@@ -23,7 +23,8 @@ enum Errors {
     NoInput = 1,
     ParsingFailure = 2,
     OutputAlreadyExists = 3,
-    InvalidInput = 4
+    InvalidInput = 4,
+    CheckFileUploadedError = 5
 };
 
 class ProgressBar
@@ -75,18 +76,22 @@ public:
 
 public slots:
     void updateParsingProgress();
-    void updateExportingProgress();
     void onStatsFileGenerationProgress(int written, int total);
+    void onSignalServerUploadProgressChanged(qint64 written, qint64 total);
 
 private:
     std::unique_ptr<FileInformation> info;
-    QTimer progressTimer;
     std::unique_ptr<ProgressBar> progress;
+    std::unique_ptr<SignalServer> signalServer;
 
+    QTimer progressTimer;
     int indexOfStreamWithKnownFrameCount;
 
     int statsFileBytesWritten;
     int statsFileBytesTotal;
+
+    qint64 statsFileBytesUploaded;
+    qint64 statsFileBytesToUpload;
 };
 
 #endif // 
