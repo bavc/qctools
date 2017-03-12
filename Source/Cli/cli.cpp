@@ -10,6 +10,7 @@ int Cli::exec(QCoreApplication &a)
 {
     QString input;
     QString output;
+    QStringList filterStrings;
     bool forceOutput = false;
     bool showHelp = false;
 
@@ -41,6 +42,9 @@ int Cli::exec(QCoreApplication &a)
         {
             checkUploadFileName = a.arguments().at(i + 1);
             ++i;
+        } else if(a.arguments().at(i) == "-f" && (i + 1) < a.arguments().length())
+        {
+            filterStrings = a.arguments().at(i + 1).split(';');
         } else if(a.arguments().at(i) == "-h")
         {
             showHelp = true;
@@ -59,6 +63,18 @@ int Cli::exec(QCoreApplication &a)
                      "The filters used in qctools-cli may be declared via the qctools-gui (see the Preferences panel)." << std::endl << std::endl;
 
         std::cout << "other options: " << std::endl
+                  << "\t"
+                  << "-f - specify filter list as 'filter1;filter2;...;filterN'. If not specificed default fitlers will be used" << std::endl
+                  << "\t\t" << "filters available: " << std::endl
+                  << "\t\t\t" << "signalstats" << std::endl
+                  << "\t\t\t" << "cropdetect" << std::endl
+                  << "\t\t\t" << "Psnr" << std::endl
+                  << "\t\t\t" << "EbuR128" << std::endl
+                  << "\t\t\t" << "aphasemeter" << std::endl
+                  << "\t\t\t" << "astats" << std::endl
+                  << "\t\t\t" << "Ssim" << std::endl
+                  << "\t\t\t" << "Idet" << std::endl
+                  << std::endl
                   << "\t"
                   << "-y - force creation of <qctools-report> even if it already exists"
                   << std::endl
@@ -153,7 +169,52 @@ int Cli::exec(QCoreApplication &a)
         file.remove();
     }
 
-    info = std::unique_ptr<FileInformation>(new FileInformation(signalServer.get(), input, prefs.activeFilters(), prefs.activeAllTracks()));
+    activefilters filters = prefs.activeFilters();
+    if(!filterStrings.empty())
+    {
+        filters = 0;
+        foreach(QString filterString, filterStrings)
+        {
+            if(filterString == "signalstats")
+                filters |= 1 << ActiveFilter_Video_signalstats;
+            else if(filterString == "cropdetect")
+                filters |= 1 << ActiveFilter_Video_cropdetect;
+            else if(filterString == "Psnr")
+                filters |= 1 << ActiveFilter_Video_Psnr;
+            else if(filterString == "EbuR128")
+                filters |= 1 << ActiveFilter_Audio_EbuR128;
+            else if(filterString == "aphasemeter")
+                filters |= 1 << ActiveFilter_Audio_aphasemeter;
+            else if(filterString == "astats")
+                filters |= 1 << ActiveFilter_Audio_astats;
+            else if(filterString == "Ssim")
+                filters |= 1 << ActiveFilter_Video_Ssim;
+            else if(filterString == "Idet")
+                filters |= 1 << ActiveFilter_Video_Idet;
+        }
+
+        std::cout << "filters selected: ";
+        if(filters.test(ActiveFilter_Video_signalstats))
+            std::cout << "signalstats" << " ";
+        if(filters.test(ActiveFilter_Video_cropdetect))
+            std::cout << "cropdetect" << " ";
+        if(filters.test(ActiveFilter_Video_Psnr))
+            std::cout << "Psnr" << " ";
+        if(filters.test(ActiveFilter_Audio_EbuR128))
+            std::cout << "EbuR128" << " ";
+        if(filters.test(ActiveFilter_Audio_aphasemeter))
+            std::cout << "aphasemeter" << " ";
+        if(filters.test(ActiveFilter_Audio_astats))
+            std::cout << "astats" << " ";
+        if(filters.test(ActiveFilter_Video_Ssim))
+            std::cout << "Ssim" << " ";
+        if(filters.test(ActiveFilter_Video_Idet))
+            std::cout << "Idet" << " ";
+
+        std::cout << std::endl;
+    }
+
+    info = std::unique_ptr<FileInformation>(new FileInformation(signalServer.get(), input, filters, prefs.activeAllTracks()));
     info->setAutoCheckFileUploaded(false);
     info->setAutoUpload(false);
 
