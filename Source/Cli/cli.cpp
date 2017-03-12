@@ -16,6 +16,8 @@ int Cli::exec(QCoreApplication &a)
     bool uploadToSignalServer = false;
     bool forceUploadToSignalServer = false;
 
+    QString checkUploadFileName;
+
     for(int i = 0; i < a.arguments().length(); ++i)
     {
         if(a.arguments().at(i) == "-i" && (i + 1) < a.arguments().length())
@@ -35,6 +37,10 @@ int Cli::exec(QCoreApplication &a)
         } else if(a.arguments().at(i) == "-uf")
         {
             forceUploadToSignalServer = true;
+        } else if(a.arguments().at(i) == "-c" && (i + 1) < a.arguments().length())
+        {
+            checkUploadFileName = a.arguments().at(i + 1);
+            ++i;
         } else if(a.arguments().at(i) == "-h")
         {
             showHelp = true;
@@ -51,24 +57,39 @@ int Cli::exec(QCoreApplication &a)
                      "Usage: qctools-cli -i <qctools-input> -o <qctools-output>" << std::endl << std::endl <<
                      "If no output file is declared, qctools will create an output named similarly to the input file with suffixed with \".qctools.xml.gz\"." << std::endl <<
                      "The filters used in qctools-cli may be declared via the qctools-gui (see the Preferences panel)." << std::endl << std::endl;
-    }
 
-    if(input.isEmpty())
-        return NoInput;
+        std::cout << "other options: " << std::endl
+                  << "\t"
+                  << "-y - force creation of <qctools-report> even if it already exists"
+                  << std::endl
+                  << "\t"
+                  << "-u - upload to signalserver if <qctools-report> not exists here"
+                  << std::endl
+                  << "\t"
+                  << "-uf - force upload <qctools-report> to signalserver (even if file already exists)"
+                  << std::endl
+                  << "\t"
+                  << "-c <qctools-report> - check if uploaded to signalserver"
+                  << std::endl
+                  << std::endl;
 
-    if(output.isEmpty())
-        output = input + ".qctools.xml.gz";
-
-    if(!output.endsWith(".xml.gz"))
-    {
-        std::cout << "warning: non-standard extension (not *.xml.gz) has been specified for output file. " << std::endl;
-    }
-
-    QFile file(output);
-    if(file.exists() && !forceOutput)
-    {
-        std::cout << "file " << output.toStdString() << " already exists, exiting.. " << std::endl;
-        return OutputAlreadyExists;
+        std::cout << "usage example: " << std::endl
+                  << "\t" <<
+                     "qcli -i file.mkv -u - generate stats from file.mkv and upload to signalserver if stats wasn't uploaded previously"
+                  << std::endl
+                  << "\t" <<
+                     "qcli -i file.mkv -uf - generate stats from file.mkv and upload to signalserver unconditionally"
+                  << std::endl
+                  << "\t" <<
+                     "qcli -i file.mkv.qctools.xml.gzip -u - upload stats to signalserver if stats wasn't uploaded"
+                  << std::endl
+                  << "\t" <<
+                     "qcli -i file.mkv.qctools.xml.gzip -uf - upload stats to signalserver unconditionally"
+                  << std::endl
+                  << "\t" <<
+                     "qcli -c file.mkv.qctools.xml.gzip - checks if such a file exists on signalserver"
+                  << std::endl
+                  << std::endl;
     }
 
     Preferences prefs;
@@ -85,6 +106,46 @@ int Cli::exec(QCoreApplication &a)
     signalServer->setLogin(prefs.signalServerLogin());
     signalServer->setPassword(prefs.signalServerPassword());
     signalServer->setAutoUpload(prefs.isSignalServerAutoUploadEnabled());
+
+    if(!checkUploadFileName.isEmpty()) {
+        std::cout << std::endl << "checking if " << QFileInfo(checkUploadFileName).fileName().toStdString() << " exists on signalserver side..." << std::endl;
+
+        QSharedPointer<CheckFileUploadedOperation> op = signalServer->checkFileUploaded(QFileInfo(checkUploadFileName).fileName());
+        QObject::connect(op.data(), SIGNAL(finished()), &a, SLOT(quit()));
+        a.exec();
+
+        if(op->state() == CheckFileUploadedOperation::Error)
+        {
+            std::cout << std::endl << "checking failed: " << op->errorString().toStdString()
+                      << ", exiting... " << std::endl;
+
+            return CheckFileUploadedError;
+        }
+
+        std::cout << (op->state() == CheckFileUploadedOperation::Uploaded ? "exists" : "not exists") << std::endl;
+        return op->state() == CheckFileUploadedOperation::Uploaded ? Uploaded : NotUploaded;
+    }
+
+    if(input.isEmpty())
+        return NoInput;
+
+    if(!input.endsWith(".qctools.xml.gz")) // skip output if input is already .qctools.xml.gz
+    {
+        if(output.isEmpty())
+            output = input + ".qctools.xml.gz";
+    }
+
+    if(!output.isEmpty() && !output.endsWith(".xml.gz"))
+    {
+        std::cout << "warning: non-standard extension (not *.xml.gz) has been specified for output file. " << std::endl;
+    }
+
+    QFile file(output);
+    if(file.exists() && !forceOutput)
+    {
+        std::cout << "file " << output.toStdString() << " already exists, exiting.. " << std::endl;
+        return OutputAlreadyExists;
+    }
 
     if(file.exists() && forceOutput)
     {
@@ -113,38 +174,46 @@ int Cli::exec(QCoreApplication &a)
             indexOfStreamWithKnownTotal = framesCountForAllStreams[i];
     }
 
-    // parse
+    if(!info->hasStats())
+    {
+        // parse
 
-    progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
-    QObject::connect(&progressTimer, SIGNAL(timeout()), this, SLOT(updateParsingProgress()));
-    progressTimer.start(500);
+        progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
+        QObject::connect(&progressTimer, SIGNAL(timeout()), this, SLOT(updateParsingProgress()));
+        progressTimer.start(500);
 
-    QObject::connect(info.get(), SIGNAL(parsingCompleted(bool)), &a, SLOT(quit()));
-    info->startParse();
-    a.exec();
+        QObject::connect(info.get(), SIGNAL(parsingCompleted(bool)), &a, SLOT(quit()));
+        info->startParse();
+        a.exec();
 
-    QObject::disconnect(&progressTimer, SIGNAL(timeout()), this, SLOT(updateParsingProgress()));
-    if(info->parsed())
-        progress->setValue(100);
+        QObject::disconnect(&progressTimer, SIGNAL(timeout()), this, SLOT(updateParsingProgress()));
+        if(info->parsed())
+            progress->setValue(100);
 
-    std::cout << std::endl << "analyzing " << (info->parsed() ? "completed" : "failed") << std::endl;
+        std::cout << std::endl << "analyzing " << (info->parsed() ? "completed" : "failed") << std::endl;
 
-    if(!info->parsed())
-        return ParsingFailure;
+        if(!info->parsed())
+            return ParsingFailure;
 
-    // export
-    std::cout << std::endl << "generating QCTools report... " << std::endl;
+        // export
+        std::cout << std::endl << "generating QCTools report... " << std::endl;
 
-    progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
+        progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
 
-    QObject::connect(info.get(), SIGNAL(statsFileGenerationProgress(int, int)), this, SLOT(onStatsFileGenerationProgress(int, int)));
-    QObject::connect(info.get(), SIGNAL(statsFileGenerated(SharedFile, const QString&)), &a, SLOT(quit()));
-    info->startExport(output);
-    a.exec();
+        QObject::connect(info.get(), SIGNAL(statsFileGenerationProgress(int, int)), this, SLOT(onStatsFileGenerationProgress(int, int)));
+        QObject::connect(info.get(), SIGNAL(statsFileGenerated(SharedFile, const QString&)), &a, SLOT(quit()));
+        info->startExport(output);
+        a.exec();
 
-    QObject::disconnect(info.get(), SIGNAL(statsFileGenerationProgress(int, int)), this, SLOT(onStatsFileGenerationProgress(int, int)));
+        QObject::disconnect(info.get(), SIGNAL(statsFileGenerationProgress(int, int)), this, SLOT(onStatsFileGenerationProgress(int, int)));
 
-    std::cout << std::endl << "generating QCTools report... done" << std::endl;
+        std::cout << std::endl << "generating QCTools report... done" << std::endl;
+    }
+    else
+    {
+        // stats already generated
+        output = input;
+    }
 
     if(uploadToSignalServer || forceUploadToSignalServer)
     {

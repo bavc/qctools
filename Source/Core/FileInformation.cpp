@@ -137,6 +137,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     formatStats(NULL),
     m_autoCheckFileUploaded(true),
     m_autoUpload(true),
+    m_hasStats(false)
 {
     static struct RegisterMetatypes {
         RegisterMetatypes() {
@@ -234,6 +235,8 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     }
     else
     {
+        m_hasStats = true;
+
         streamsStats = new StreamsStats();
         formatStats = new FormatStats();
 
@@ -849,6 +852,11 @@ QString FileInformation::signalServerUploadStatusString() const
 QString FileInformation::signalServerUploadStatusErrorString() const
 {
     return uploadOperation ? uploadOperation->errorString() : QString();
+}
+
+bool FileInformation::hasStats() const
+{
+    return m_hasStats;
 }
 
 void FileInformation::setAutoCheckFileUploaded(bool enable)

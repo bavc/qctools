@@ -126,6 +126,8 @@ public:
     QString signalServerUploadStatusString() const;
     QString signalServerUploadStatusErrorString() const;
 
+    bool hasStats() const;
+
     void setAutoCheckFileUploaded(bool enable);
     void setAutoUpload(bool enable);
 
@@ -179,6 +181,7 @@ private:
 
     bool m_autoCheckFileUploaded;
     bool m_autoUpload;
+    bool m_hasStats;
 };
 
 #endif // GUI_FileInformation_H

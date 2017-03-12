@@ -24,7 +24,9 @@ enum Errors {
     ParsingFailure = 2,
     OutputAlreadyExists = 3,
     InvalidInput = 4,
-    CheckFileUploadedError = 5
+    CheckFileUploadedError = 5,
+    Uploaded = 6,
+    NotUploaded = 7
 };
 
 class ProgressBar
