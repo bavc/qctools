@@ -88,6 +88,10 @@ Generally lossy video codecs will show blocky structured patterns at higher numb
 
 (Video sample and permission to use provided by [seattle.gov](https://www.seattle.gov))
 
+## Bit Plane 10 slices
+
+This filter is similar to Bit Plane, but it shows a section of each of the first 10 bit planes at once in the selected plane. The slices are presented in most-significant to least-significant order as left to right (or top to bottom if 'Rows' is selected). Each of the 10 bit planes is marked by a green border.
+
 ## Bit Plane Noise
 
 This filter is similar to Bit Plane, but instead of showing if the selected bit position of a selected plane is set to 0 or 1, it attempts to predict if that bit represents signal or noise. This filters uses a [method](https://en.wikipedia.org/wiki/Bit_plane) for calculating this by comparing each pixel's selected bit (X,Y) to selected bit of three adjacent pixels (X-1,Y), (X,Y-1) and (X-1,Y-1). If the bit is the same as at least two of the three adjacent bits, it may not be noise. A noisy bit-plane will have 49% to 51% pixels that are noise.
