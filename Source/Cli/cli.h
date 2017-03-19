@@ -32,8 +32,8 @@ enum Errors {
 class ProgressBar
 {
 public:
-    static const char ForegroundChar = char(178);
-    static const char BackgroundChar = char(177);
+    static const char ForegroundChar = char('.');
+    static const char BackgroundChar = char(' ');
 
     ProgressBar(int min, int max, int width, const QString& append) : min(min), max(max), width(width), append(append) {
         setValue(min);
