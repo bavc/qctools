@@ -44,7 +44,7 @@ int Cli::exec(QCoreApplication &a)
             ++i;
         } else if(a.arguments().at(i) == "-f" && (i + 1) < a.arguments().length())
         {
-            filterStrings = a.arguments().at(i + 1).split(';');
+            filterStrings = a.arguments().at(i + 1).split('+');
         } else if(a.arguments().at(i) == "-h")
         {
             showHelp = true;
@@ -68,12 +68,12 @@ int Cli::exec(QCoreApplication &a)
                   << "\t\t" << "filters available: " << std::endl
                   << "\t\t\t" << "signalstats" << std::endl
                   << "\t\t\t" << "cropdetect" << std::endl
-                  << "\t\t\t" << "Psnr" << std::endl
-                  << "\t\t\t" << "EbuR128" << std::endl
+                  << "\t\t\t" << "psnr" << std::endl
+                  << "\t\t\t" << "ebur128" << std::endl
                   << "\t\t\t" << "aphasemeter" << std::endl
                   << "\t\t\t" << "astats" << std::endl
-                  << "\t\t\t" << "Ssim" << std::endl
-                  << "\t\t\t" << "Idet" << std::endl
+                  << "\t\t\t" << "ssim" << std::endl
+                  << "\t\t\t" << "idet" << std::endl
                   << std::endl
                   << "\t"
                   << "-y - force creation of <qctools-report> even if it already exists"
@@ -179,17 +179,17 @@ int Cli::exec(QCoreApplication &a)
                 filters |= 1 << ActiveFilter_Video_signalstats;
             else if(filterString == "cropdetect")
                 filters |= 1 << ActiveFilter_Video_cropdetect;
-            else if(filterString == "Psnr")
+            else if(filterString == "psnr")
                 filters |= 1 << ActiveFilter_Video_Psnr;
-            else if(filterString == "EbuR128")
+            else if(filterString == "ebur128")
                 filters |= 1 << ActiveFilter_Audio_EbuR128;
             else if(filterString == "aphasemeter")
                 filters |= 1 << ActiveFilter_Audio_aphasemeter;
             else if(filterString == "astats")
                 filters |= 1 << ActiveFilter_Audio_astats;
-            else if(filterString == "Ssim")
+            else if(filterString == "ssim")
                 filters |= 1 << ActiveFilter_Video_Ssim;
-            else if(filterString == "Idet")
+            else if(filterString == "idet")
                 filters |= 1 << ActiveFilter_Video_Idet;
         }
 
@@ -199,17 +199,17 @@ int Cli::exec(QCoreApplication &a)
         if(filters.test(ActiveFilter_Video_cropdetect))
             std::cout << "cropdetect" << " ";
         if(filters.test(ActiveFilter_Video_Psnr))
-            std::cout << "Psnr" << " ";
+            std::cout << "psnr" << " ";
         if(filters.test(ActiveFilter_Audio_EbuR128))
-            std::cout << "EbuR128" << " ";
+            std::cout << "ebur128" << " ";
         if(filters.test(ActiveFilter_Audio_aphasemeter))
             std::cout << "aphasemeter" << " ";
         if(filters.test(ActiveFilter_Audio_astats))
             std::cout << "astats" << " ";
         if(filters.test(ActiveFilter_Video_Ssim))
-            std::cout << "Ssim" << " ";
+            std::cout << "ssim" << " ";
         if(filters.test(ActiveFilter_Video_Idet))
-            std::cout << "Idet" << " ";
+            std::cout << "idet" << " ";
 
         std::cout << std::endl;
     }
