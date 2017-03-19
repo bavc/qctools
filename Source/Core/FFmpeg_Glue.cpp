@@ -1517,6 +1517,9 @@ size_t FFmpeg_Glue::TotalFramesCountPerAllStreams() const
     size_t totalFrames = 0;
     for(size_t i = 0; i < InputDatas.size(); ++i)
     {
+        if(!InputDatas.at(i))
+            continue;
+
         totalFrames += InputDatas.at(i)->FrameCount;
     }
 
@@ -1530,6 +1533,9 @@ size_t FFmpeg_Glue::TotalFramesProcessedPerAllStreams() const
     size_t totalFramesProcessed = 0;
     for(size_t i = 0; i < InputDatas.size(); ++i)
     {
+        if(!InputDatas.at(i))
+            continue;
+
         totalFramesProcessed += InputDatas.at(i)->FramePos;
     }
 
@@ -1559,6 +1565,9 @@ std::vector<size_t> FFmpeg_Glue::FramesCountForAllStreams() const
 
     for(size_t i = 0; i < InputDatas.size(); ++i)
     {
+        if(!InputDatas.at(i))
+            continue;
+
         totalFramesCountPerStream.push_back(InputDatas.at(i)->FrameCount);
     }
 
@@ -1574,6 +1583,9 @@ std::vector<size_t> FFmpeg_Glue::FramesProcessedForAllStreams() const
 
     for(size_t i = 0; i < InputDatas.size(); ++i)
     {
+        if(!InputDatas.at(i))
+            continue;
+
         totalFramesProcessedPerStream.push_back(InputDatas.at(i)->FramePos);
     }
 
