@@ -7,7 +7,8 @@
 //---------------------------------------------------------------------------
 #include "preferences.h"
 #include "ui_preferences.h"
-#include "SignalServerConnectionChecker.h"
+#include "Core/SignalServerConnectionChecker.h"
+#include "Core/Preferences.h"
 #include <QSettings>
 #include <QStandardPaths>
 #include <QMetaType>
@@ -18,30 +19,12 @@
 #include <QTimer>
 //---------------------------------------------------------------------------
 
-#include "qblowfish.h"
-
-// Random key generated at http://www.random.org/bytes/
-#define KEY_HEX "911dae7a4ce9a24300efe3b8a4534301"
-QByteArray BlowfishKey = QByteArray::fromHex(KEY_HEX);
-
-typedef std::tuple<int, int> GroupAndType;
-Q_DECLARE_METATYPE(GroupAndType)
-
-typedef QList<GroupAndType> FilterSelectorsOrder;
-Q_DECLARE_METATYPE(FilterSelectorsOrder)
-
-QString KeySignalServerUrl = "SignalServerUrl";
-QString KeySignalServerEnable = "SignalServerEnable";
-QString KeySignalServerEnableAutoUpload = "SignalServerEnableAutoUpload";
-QString KeySignalServerLogin = "SignalServerLogin";
-QString KeySignalServerPassword = "SignalServerPassword";
-
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Preferences::Preferences(SignalServerConnectionChecker* connectionChecker, QWidget *parent) :
+PreferencesDialog::PreferencesDialog(SignalServerConnectionChecker* connectionChecker, QWidget *parent) :
     connectionChecker(connectionChecker),
     QDialog(parent),
     ui(new Ui::Preferences)
@@ -52,124 +35,48 @@ Preferences::Preferences(SignalServerConnectionChecker* connectionChecker, QWidg
     connect(this, SIGNAL(accepted()), this, SLOT(OnAccepted()));
     connect(this, SIGNAL(rejected()), this, SLOT(OnRejected()));
 
-    //Loading preferences
-    QCoreApplication::setOrganizationName("MediaArea");
-    QCoreApplication::setOrganizationDomain("mediaarea.net");
-    QCoreApplication::setApplicationName("QCTools");
-
     Load();
-
-    qRegisterMetaType<GroupAndType>("GroupAndType");
-    qRegisterMetaType<FilterSelectorsOrder>("FilterSelectorsOrder");
-    qRegisterMetaTypeStreamOperators<FilterSelectorsOrder>("FilterSelectorsOrder");
 }
 
 //---------------------------------------------------------------------------
-Preferences::~Preferences()
+PreferencesDialog::~PreferencesDialog()
 {
     delete ui;
 }
 
-QDataStream &operator<<(QDataStream &out, const FilterSelectorsOrder &order) {
-
-    qDebug() << "serializing total " << order.length() << ": \n";
-
-    for(auto item : order) {
-        qDebug() << "g: " << std::get<0>(item) << ", t: " << std::get<1>(item);;
-    }
-
-    for(auto filterInfo : order)
-        out << std::get<0>(filterInfo) << std::get<1>(filterInfo);
-
-    return out;
-}
-QDataStream &operator>>(QDataStream &in, FilterSelectorsOrder &order) {
-    while(!in.atEnd())
-    {
-        int group;
-        int type;
-        in >> group;
-        in >> type;
-
-        auto entry = std::make_tuple(group, type);
-        if(!order.contains(entry))
-            order.push_back(entry);
-    }
-
-    qDebug() << "deserialized: total " << order.length() << "\n";
-
-    for(auto item : order) {
-        qDebug() << "g: " << std::get<0>(item) << ", t: " << std::get<1>(item);
-    }
-
-    return in;
-}
-
-QList<std::tuple<int, int> > Preferences::loadFilterSelectorsOrder()
+QList<std::tuple<int, int> > PreferencesDialog::loadFilterSelectorsOrder()
 {
-    QSettings Settings;
-
-    auto order = Settings.value("filterSelectorsOrder", QVariant::fromValue(FilterSelectorsOrder())).value<FilterSelectorsOrder>();
-
-    return order;
+    return preferences.loadFilterSelectorsOrder();
 }
 
-void Preferences::saveFilterSelectorsOrder(const QList<std::tuple<int, int> > &order)
+void PreferencesDialog::saveFilterSelectorsOrder(const QList<std::tuple<int, int> > &order)
 {
-    QSettings Settings;
-
-    Settings.setValue("filterSelectorsOrder", QVariant::fromValue(order));
+    preferences.saveFilterSelectorsOrder(order);
 }
 
-bool Preferences::isSignalServerEnabled() const
+bool PreferencesDialog::isSignalServerEnabled() const
 {
-    QSettings Settings;
-
-    return Settings.value(KeySignalServerEnable, false).toBool();
+    return preferences.isSignalServerEnabled();
 }
 
-bool Preferences::isSignalServerAutoUploadEnabled() const
+bool PreferencesDialog::isSignalServerAutoUploadEnabled() const
 {
-    QSettings Settings;
-
-    return Settings.value(KeySignalServerEnableAutoUpload, false).toBool();
+    return preferences.isSignalServerAutoUploadEnabled();
 }
 
-QString Preferences::signalServerUrlString() const
+QString PreferencesDialog::signalServerUrlString() const
 {
-    QSettings Settings;
-
-    return Settings.value(KeySignalServerUrl).toString();
+    return preferences.signalServerUrlString();
 }
 
-QString Preferences::signalServerLogin() const
+QString PreferencesDialog::signalServerLogin() const
 {
-    QSettings Settings;
-
-    return Settings.value(KeySignalServerLogin).toString();
+    return preferences.signalServerLogin();
 }
 
-QString Preferences::signalServerPassword() const
+QString PreferencesDialog::signalServerPassword() const
 {
-    QSettings Settings;
-    QString pwd;
-
-    QBlowfish bf(BlowfishKey);
-    QByteArray cipherText = Settings.value(KeySignalServerPassword).toByteArray();
-    if(cipherText.startsWith(BlowfishKey))
-    {
-        cipherText.remove(0, BlowfishKey.length());
-        bf.setPaddingEnabled(true);
-        QByteArray decryptedBa = bf.decrypted(cipherText);
-
-        pwd = QString::fromUtf8(decryptedBa.constData(), decryptedBa.size());
-    }
-    else
-    {
-        pwd = Settings.value(KeySignalServerPassword ).toString();
-    }
-
-    return pwd;
+    return preferences.signalServerPassword();
 }
 
 //***************************************************************************
@@ -177,11 +84,10 @@ QString Preferences::signalServerPassword() const
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void Preferences::Load()
+void PreferencesDialog::Load()
 {
-    QSettings Settings;
-    ActiveFilters=activefilters(Settings.value("ActiveFilters", (1<<ActiveFilter_Video_signalstats)|(1<<ActiveFilter_Video_Psnr)|(1<<ActiveFilter_Audio_astats)).toInt());
-    ActiveAllTracks=activealltracks(Settings.value("ActiveAllTracks", 0).toInt());
+    ActiveFilters = preferences.activeFilters();
+    ActiveAllTracks = preferences.activeAllTracks();
 
     ui->Filters_Video_signalstats->setChecked(ActiveFilters[ActiveFilter_Video_signalstats]);
     ui->Filters_Video_cropdetect->setChecked(ActiveFilters[ActiveFilter_Video_cropdetect]);
@@ -204,26 +110,17 @@ void Preferences::Load()
 }
 
 //---------------------------------------------------------------------------
-void Preferences::Save()
+void PreferencesDialog::Save()
 {
-    QSettings Settings;
-    Settings.setValue("ActiveFilters", (uint)ActiveFilters.to_ulong());
-    Settings.setValue("ActiveAllTracks", (uint)ActiveAllTracks.to_ulong());
+    preferences.setActiveFilters(ActiveFilters);
+    preferences.setActiveAllTracks(ActiveAllTracks);
+    preferences.setSignalServerUrlString(ui->signalServerUrl_lineEdit->text());
+    preferences.setSignalServerLogin(ui->signalServerLogin_lineEdit->text());
+    preferences.setSignalServerPassword(ui->signalServerPassword_lineEdit->text());
+    preferences.setSignalServerEnabled(ui->signalServerEnable_checkBox->isChecked());
+    preferences.setSignalServerAutoUploadEnabled(ui->signalServerEnableAutoUpload_checkBox->isChecked());
 
-    Settings.setValue(KeySignalServerUrl, ui->signalServerUrl_lineEdit->text());
-    Settings.setValue(KeySignalServerLogin, ui->signalServerLogin_lineEdit->text());
-
-
-    QBlowfish bf(BlowfishKey);
-    bf.setPaddingEnabled(true); // Enable padding to be able to encrypt an arbitrary length of bytes
-    QByteArray cipherText = bf.encrypted(ui->signalServerPassword_lineEdit->text().toUtf8());
-
-    QVariant pwdValue(BlowfishKey + cipherText);
-    Settings.setValue(KeySignalServerPassword, pwdValue);
-    Settings.setValue(KeySignalServerEnable, ui->signalServerEnable_checkBox->isChecked());
-    Settings.setValue(KeySignalServerEnableAutoUpload, ui->signalServerEnableAutoUpload_checkBox->isChecked());
-
-    Settings.sync();
+    preferences.sync();
 }
 
 //***************************************************************************
@@ -231,7 +128,7 @@ void Preferences::Save()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void Preferences::OnAccepted()
+void PreferencesDialog::OnAccepted()
 {
     ActiveFilters.reset();
     if (ui->Filters_Video_signalstats->isChecked())
@@ -263,12 +160,12 @@ void Preferences::OnAccepted()
 }
 
 //---------------------------------------------------------------------------
-void Preferences::OnRejected()
+void PreferencesDialog::OnRejected()
 {
     Load();
 }
 
-void Preferences::on_testConnection_pushButton_clicked()
+void PreferencesDialog::on_testConnection_pushButton_clicked()
 {
     struct UI {
         static void setSuccess(QLabel* label, QPushButton* button) {

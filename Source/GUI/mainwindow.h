@@ -17,12 +17,12 @@
 using namespace std;
 
 #include "Core/Core.h"
-#include "GUI/FileInformation.h"
+#include "Core/FileInformation.h"
+#include "Core/SignalServerConnectionChecker.h"
 #include "GUI/TinyDisplay.h"
 #include "GUI/Control.h"
 #include "GUI/Info.h"
 #include "GUI/FilesList.h"
-#include "GUI/SignalServerConnectionChecker.h"
 
 namespace Ui {
 class MainWindow;
@@ -39,7 +39,7 @@ class QComboBox;
 class QCheckBox;
 
 class PerPicture;
-class Preferences;
+class PreferencesDialog;
 
 class BlackmagicDeckLink_Glue;
 class DraggableChildrenBehaviour;
@@ -120,7 +120,7 @@ public:
     bool                        DeckRunning;
 
     //Preferences
-    Preferences*                Prefs;
+    PreferencesDialog*          Prefs;
     
     SignalServer*               getSignalServer();
     QList<std::tuple<int, int>> getFilterSelectorsOrder(int start, int end);

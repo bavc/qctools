@@ -83,25 +83,31 @@ void ImageLabel::updatePixmap(const QImage& image /*= nullptr*/)
         return;
     }
 
-    auto picture = *Picture;
-
-    QImage Image = image;
-    if (Image.isNull())
-        Image = picture->Image_Get(Pos - 1);
-
-    if (Image.isNull())
-    {
-        Pixmap = QPixmap(Pixmap.width(), Pixmap.height());
-        ui->label->setPixmap(Pixmap);
-        return;
-    }
-
     if (needRescale())
     {
-		rescale();
+        rescale();
     }
     else
     {
+        auto picture = *Picture;
+
+        QImage Image = image;
+        if (Image.isNull())
+        {
+            auto frameImage = picture->Image_Get(Pos - 1);
+            if(!frameImage.isNull())
+            {
+                Image = QImage(frameImage.data(), frameImage.width(), frameImage.height(), frameImage.linesize(), QImage::Format_RGB888);
+            }
+        }
+
+        if (Image.isNull())
+        {
+            Pixmap = QPixmap(Pixmap.width(), Pixmap.height());
+            ui->label->setPixmap(Pixmap);
+            return;
+        }
+
         Pixmap.convertFromImage(Image);
         ui->label->setPixmap(Pixmap);
     }
@@ -409,16 +415,16 @@ void ImageLabel::rescale()
 
     auto picture = *Picture;
     picture->Scale_Change(size().width(), size().height());
-    auto Image = picture->Image_Get(Pos - 1);
+    auto image = picture->Image_Get(Pos - 1);
 
-    if (Image.isNull())
+    if (image.isNull())
     {
         Pixmap = QPixmap(Pixmap.width(), Pixmap.height());
         ui->label->setPixmap(Pixmap);
         return;
     }
 
-    Pixmap.convertFromImage(Image);
+    Pixmap.convertFromImage(QImage(image.data(), image.width(), image.height(), image.linesize(), QImage::Format_RGB888));
     ui->label->setPixmap(Pixmap);
 
     setSelectionArea(selectionPos.x(), selectionPos.y(), selectionSize.width(), selectionSize.height());

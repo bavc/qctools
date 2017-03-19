@@ -31,7 +31,6 @@ struct AVFilter;
 struct AVFilterInOut;
 struct AVFilterInOut;
 
-class QImage;
 class CommonStats;
 class StreamsStats;
 class FormatStats;
@@ -50,8 +49,25 @@ public:
     FFmpeg_Glue(const string &FileName, activealltracks ActiveAllTracks, std::vector<CommonStats*>* Stats, StreamsStats** streamsStats, FormatStats** formatStats, bool WithStats=false);
     ~FFmpeg_Glue();
 
+    struct Image {
+        Image();
+
+        bool isNull() const {
+            return frame == NULL;
+        }
+
+        const uchar* data() const;
+        int width() const;
+        int height() const;
+        int linesize() const;
+
+        void free();
+        AVFrame* frame;
+    };
+
     // Images
-    QImage                     Image_Get(size_t Pos);
+    Image Image_Get(size_t Pos) const;
+
     struct bytes
     {
         unsigned char* Data;
@@ -136,6 +152,15 @@ public:
     double                      TimeStampOfCurrentFrame(size_t OutputPos);
     void                        Scale_Change(int Scale_Width, int Scale_Height);
     void                        Thumbnails_Modulo_Change(size_t Modulo);
+
+    size_t                      TotalFramesCountPerAllStreams() const;
+    size_t                      TotalFramesProcessedPerAllStreams() const;
+
+    size_t                      FramesCountPerStream(size_t index) const;
+    size_t                      FramesProcessedPerStream(size_t index) const;
+
+    std::vector<size_t>         FramesCountForAllStreams() const;
+    std::vector<size_t>         FramesProcessedForAllStreams() const;
 
     // Between different FFmpeg_Glue instances
     void*                       InputData_Get() { return InputDatas[0]; }
@@ -227,7 +252,7 @@ private:
 
         // Out
         outputmethod            OutputMethod;
-        QImage*                 Image;
+        Image                   image;
         std::vector<bytes*>     Thumbnails;
         size_t                  Thumbnails_Modulo;
         CommonStats*            Stats;

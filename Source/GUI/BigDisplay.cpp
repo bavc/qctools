@@ -14,9 +14,9 @@
 #include "GUI/Control.h"
 #include "GUI/Info.h"
 #include "GUI/Help.h"
-#include "GUI/FileInformation.h"
 #include "GUI/imagelabel.h"
 #include "GUI/config.h"
+#include "Core/FileInformation.h"
 #include "Core/FFmpeg_Glue.h"
 
 #include <QDesktopWidget>
@@ -2114,6 +2114,14 @@ void BigDisplay::InitPicture()
     }
 }
 
+QPixmap fromImage(const FFmpeg_Glue::Image& image)
+{
+    if(image.isNull())
+        return QPixmap();
+
+    return QPixmap::fromImage(QImage(image.data(), image.width(), image.height(), image.linesize(), QImage::Format_RGB888));
+}
+
 void BigDisplay::ShowPicture ()
 {
     if (!isVisible())
@@ -2138,13 +2146,13 @@ void BigDisplay::ShowPicture ()
 
     if (QThread::currentThread() == thread())
     {
-        updateImagesAndSlider(QPixmap::fromImage(Picture->Image_Get(0)), QPixmap::fromImage(Picture->Image_Get(1)), Frames_Pos);
+        updateImagesAndSlider(fromImage(Picture->Image_Get(0)), fromImage(Picture->Image_Get(1)), Frames_Pos);
     }
     else
     {
         QMetaObject::invokeMethod(this, "updateImagesAndSlider", Qt::BlockingQueuedConnection,
-                                  Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(0))),
-                                  Q_ARG(const QPixmap&, QPixmap::fromImage(Picture->Image_Get(1))),
+                                  Q_ARG(const QPixmap&, fromImage(Picture->Image_Get(0))),
+                                  Q_ARG(const QPixmap&, fromImage(Picture->Image_Get(1))),
                                   Q_ARG(const int, Frames_Pos));
     }
 

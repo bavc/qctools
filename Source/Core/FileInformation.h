@@ -11,16 +11,14 @@
 
 //---------------------------------------------------------------------------
 #include "Core/Core.h"
-#include "GUI/SignalServer.h"
+#include "Core/SignalServer.h"
 
 #include <string>
 
 #include <QThread>
-#include <QPixmap>
 #include <QFile>
 #include <QSharedPointer>
 #include <QFileInfo>
-class MainWindow;
 class CommonStats;
 class StreamsStats;
 class FormatStats;
@@ -51,7 +49,7 @@ public:
     JobTypes jobType() const;
 
     // Constructor/Destructor
-                                FileInformation             (MainWindow* Main, const QString &FileName, activefilters ActiveFilters, activealltracks ActiveAllTracks,
+                                FileInformation             (SignalServer* signalServer, const QString &FileName, activefilters ActiveFilters, activealltracks ActiveAllTracks,
 #ifdef BLACKMAGICDECKLINK_YES
                                                              BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue=NULL,
 #endif //BLACKMAGICDECKLINK_YES
@@ -60,15 +58,15 @@ public:
 
     // Parsing
     void startParse();
-    void startExport();
+    void startExport(const QString& exportFileName = QString());
 
     // Dumps
     void                        Export_XmlGz                (const QString &ExportFileName);
     void                        Export_CSV                  (const QString &ExportFileName);
 
     // Infos
-    QPixmap                     Picture_Get                 (size_t Pos);
-    QString						fileName() const;
+    QByteArray Picture_Get (size_t Pos);
+    QString	fileName() const;
 
     activefilters               ActiveFilters;
     activealltracks             ActiveAllTracks;
@@ -88,8 +86,11 @@ public:
     BlackmagicDeckLink_Glue*    blackmagicDeckLink_Glue;
 #endif //BLACKMAGICDECKLINK_YES
 
+    bool isValid() const;
+
     // FFmpeg glue
     FFmpeg_Glue*                Glue;
+
     std::vector<CommonStats*>   Stats;
 
     StreamsStats*               streamsStats;
@@ -110,7 +111,6 @@ public:
 
     SignalServerCheckUploadedStatus signalServerCheckUploadedStatus() const;
     QString signalServerCheckUploadedStatusString() const;
-    QPixmap signalServerCheckUploadedStatusPixmap() const;
     QString signalServerCheckUploadedStatusErrorString() const;
 
     enum SignalServerUploadStatus {
@@ -124,14 +124,17 @@ public:
 
     SignalServerUploadStatus signalServerUploadStatus() const;
     QString signalServerUploadStatusString() const;
-    QPixmap signalServerUploadStatusPixmap() const;    
-    static QPixmap signalServerUploadStatusPixmap(SignalServerUploadStatus status);
-
     QString signalServerUploadStatusErrorString() const;
+
+    bool hasStats() const;
+
+    void setAutoCheckFileUploaded(bool enable);
+    void setAutoUpload(bool enable);
 
     // index in FileList
     int index() const;
     void setIndex(int value);
+    bool parsed() const;
 
 public Q_SLOTS:
 
@@ -141,7 +144,10 @@ public Q_SLOTS:
     void cancelUpload();
 
 Q_SIGNALS:
+    void positionChanged();
     void statsFileGenerated(SharedFile statsFile, const QString& name);
+    void statsFileGenerationProgress(int bytesWritten, int totalBytes);
+
     void statsFileLoaded(SharedFile statsFile);
     void parsingCompleted(bool success);
 
@@ -161,17 +167,21 @@ private:
     QString                     FileName;
     size_t                      ReferenceStream_Pos;
     int                         Frames_Pos;
-    MainWindow*                 Main;
 
     // FFmpeg part
     bool                        WantToStop;
 
+    SignalServer* signalServer;
     QSharedPointer<CheckFileUploadedOperation> checkFileUploadedOperation;
     QSharedPointer<UploadFileOperation> uploadOperation;
 
     int m_index;
-
+    QString m_exportFileName;
     bool m_parsed;
+
+    bool m_autoCheckFileUploaded;
+    bool m_autoUpload;
+    bool m_hasStats;
 };
 
 #endif // GUI_FileInformation_H

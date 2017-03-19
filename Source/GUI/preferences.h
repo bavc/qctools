@@ -1,7 +1,8 @@
-#ifndef PREFERENCES_H
-#define PREFERENCES_H
+#ifndef PREFERENCES_DIALOG_H
+#define PREFERENCES_DIALOG_H
 
-#include "Core/Core.h"
+#include "Core/Preferences.h"
+
 #include <QDialog>
 #include <QList>
 #include <QUrl>
@@ -12,13 +13,13 @@ class Preferences;
 }
 
 class SignalServerConnectionChecker;
-class Preferences : public QDialog
+class PreferencesDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit Preferences(SignalServerConnectionChecker* connectionChecker, QWidget *parent = 0);
-    ~Preferences();
+    explicit PreferencesDialog(SignalServerConnectionChecker* connectionChecker, QWidget *parent = 0);
+    ~PreferencesDialog();
 
     //Preferences
     activefilters ActiveFilters;
@@ -44,10 +45,12 @@ private:
     void Load();
     void Save();
 
+    Preferences preferences;
+
 private Q_SLOTS:
     void on_testConnection_pushButton_clicked();
     void OnAccepted();
     void OnRejected();
 };
 
-#endif // PREFERENCES_H
+#endif // PREFERENCES_DIALOG_H

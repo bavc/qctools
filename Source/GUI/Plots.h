@@ -11,7 +11,7 @@
 
 #include "Core/Core.h"
 #include "Core/CommonStats.h"
-#include "GUI/FileInformation.h"
+#include "Core/FileInformation.h"
 
 #include <QWidget>
 

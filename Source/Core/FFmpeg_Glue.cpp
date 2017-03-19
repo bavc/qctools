@@ -14,7 +14,6 @@
 #include "Core/StreamsStats.h"
 #include "Core/FormatStats.h"
 
-#include <QImage>
 #include <QXmlStreamReader>
 
 extern "C"
@@ -361,7 +360,6 @@ FFmpeg_Glue::outputdata::outputdata()
 
     // Out
     OutputMethod(Output_None),
-    Image(NULL),
     Thumbnails_Modulo(1),
     Stats(NULL),
     
@@ -378,7 +376,8 @@ FFmpeg_Glue::outputdata::outputdata()
 FFmpeg_Glue::outputdata::~outputdata()
 {
     // Images
-    delete Image;
+    image.free();
+
     for (size_t Pos=0; Pos<Thumbnails.size(); Pos++)
         delete Thumbnails[Pos];
 
@@ -518,12 +517,11 @@ void FFmpeg_Glue::outputdata::ReplaceImage()
 {
     if (!ScaledFrame)
         return;    
-        
-    // Convert the Frame to QImage
-    if (Image==NULL)
-        Image=new QImage(ScaledFrame->width, ScaledFrame->height, QImage::Format_RGB888);
-    for(int y=0;y<ScaledFrame->height;y++)
-        memcpy(Image->scanLine(y), ScaledFrame->data[0]+y*ScaledFrame->linesize[0], ScaledFrame->width*3);
+
+    image.free();
+    image.frame = ScaledFrame;
+
+    ScaledFrame = NULL;
 }
 
 //---------------------------------------------------------------------------
@@ -906,17 +904,14 @@ FFmpeg_Glue::~FFmpeg_Glue()
     avformat_close_input(&FormatContext);
 }
 
-QImage FFmpeg_Glue::Image_Get(size_t Pos)
+FFmpeg_Glue::Image FFmpeg_Glue::Image_Get(size_t Pos) const
 {
     QMutexLocker locker(mutex);
 
     if (Pos>=OutputDatas.size() || !OutputDatas[Pos] || !OutputDatas[Pos]->Enabled)
-        return QImage();
+        return Image();
 
-	if (!OutputDatas[Pos]->Image)
-		return QImage();
-
-	return *OutputDatas[Pos]->Image;
+    return OutputDatas[Pos]->image;
 }
 
 QByteArray FFmpeg_Glue::Thumbnail_Get(size_t Pos, size_t FramePos)
@@ -1480,7 +1475,7 @@ void FFmpeg_Glue::Scale_Change(int Scale_Width_, int Scale_Height_)
             if (ScaleSave_Width!=OutputData->Width || ScaleSave_Height!=OutputData->Height)
             {
                 OutputData->Scale_Free();
-                delete OutputData->Image; OutputData->Image=NULL;
+                OutputData->image.free();
                 MustOutput=true;
             }
         }
@@ -1513,6 +1508,88 @@ void FFmpeg_Glue::Thumbnails_Modulo_Change(size_t Modulo)
             }
         }
     }
+}
+
+size_t FFmpeg_Glue::TotalFramesCountPerAllStreams() const
+{
+    QMutexLocker locker(mutex);
+
+    size_t totalFrames = 0;
+    for(size_t i = 0; i < InputDatas.size(); ++i)
+    {
+        if(!InputDatas.at(i))
+            continue;
+
+        totalFrames += InputDatas.at(i)->FrameCount;
+    }
+
+    return totalFrames;
+}
+
+size_t FFmpeg_Glue::TotalFramesProcessedPerAllStreams() const
+{
+    QMutexLocker locker(mutex);
+
+    size_t totalFramesProcessed = 0;
+    for(size_t i = 0; i < InputDatas.size(); ++i)
+    {
+        if(!InputDatas.at(i))
+            continue;
+
+        totalFramesProcessed += InputDatas.at(i)->FramePos;
+    }
+
+    return totalFramesProcessed;
+}
+
+size_t FFmpeg_Glue::FramesCountPerStream(size_t index) const
+{
+    QMutexLocker locker(mutex);
+
+    return InputDatas.at(index)->FrameCount;
+}
+
+size_t FFmpeg_Glue::FramesProcessedPerStream(size_t index) const
+{
+    QMutexLocker locker(mutex);
+
+    return InputDatas.at(index)->FramePos;
+}
+
+std::vector<size_t> FFmpeg_Glue::FramesCountForAllStreams() const
+{
+    QMutexLocker locker(mutex);
+
+    std::vector<size_t> totalFramesCountPerStream;
+    totalFramesCountPerStream.reserve(InputDatas.size());
+
+    for(size_t i = 0; i < InputDatas.size(); ++i)
+    {
+        if(!InputDatas.at(i))
+            continue;
+
+        totalFramesCountPerStream.push_back(InputDatas.at(i)->FrameCount);
+    }
+
+    return totalFramesCountPerStream;
+}
+
+std::vector<size_t> FFmpeg_Glue::FramesProcessedForAllStreams() const
+{
+    QMutexLocker locker(mutex);
+
+    std::vector<size_t> totalFramesProcessedPerStream;
+    totalFramesProcessedPerStream.reserve(InputDatas.size());
+
+    for(size_t i = 0; i < InputDatas.size(); ++i)
+    {
+        if(!InputDatas.at(i))
+            continue;
+
+        totalFramesProcessedPerStream.push_back(InputDatas.at(i)->FramePos);
+    }
+
+    return totalFramesProcessedPerStream;
 }
 
 void FFmpeg_Glue::setThreadSafe(bool enable)
@@ -2291,4 +2368,42 @@ string FFmpeg_Glue::FFmpeg_LibsVersion()
     LIBSVERSION(swscale,    SWSCALE);
     return LibsVersion.str();
 }
+
+
+FFmpeg_Glue::Image::Image() : frame(NULL)
+{
+
+}
+
+const uchar *FFmpeg_Glue::Image::data() const
+{
+    return *frame->data;
+}
+
+int FFmpeg_Glue::Image::width() const
+{
+    return frame->width;
+}
+
+int FFmpeg_Glue::Image::height() const
+{
+    return frame->height;
+}
+
+int FFmpeg_Glue::Image::linesize() const
+{
+    return *frame->linesize;
+}
+
+void FFmpeg_Glue::Image::free()
+{
+    if(frame)
+    {
+        av_freep(&frame->data[0]);
+        av_frame_free(&frame);
+    }
+
+    frame = NULL;
+}
+
 

@@ -8,7 +8,7 @@
 
 #include "GUI/BigDisplay.h"
 #include "GUI/Control.h"
-#include "GUI/FileInformation.h"
+#include "Core/FileInformation.h"
 #include "Core/CommonStats.h"
 
 #include <QBoxLayout>
@@ -126,6 +126,21 @@ void TinyDisplay::thumbsLayoutResized()
 // Actions
 //***************************************************************************
 
+QPixmap toPixmap(const QByteArray& bytes)
+{
+    QPixmap pixmap;
+
+    if (!bytes.isEmpty())
+        pixmap.loadFromData(bytes);
+    else
+    {
+        pixmap.load(":/icon/logo.png");
+        pixmap = pixmap.scaled(72, 72);
+    }
+
+    return pixmap;
+}
+
 void TinyDisplay::Update(bool updateBigDisplay)
 {
     if (!FileInfoData->ReferenceStat())
@@ -166,7 +181,7 @@ void TinyDisplay::Update(bool updateBigDisplay)
                     if (!needsUpdate && (diff < total_thumbs && i < total_thumbs - diff)) {
                         thumbnails[i]->setIcon(thumbnails[i+diff]->icon());
                     } else {
-                        QPixmap pixmap = FileInfoData->Picture_Get(framePos - center + i);
+                        QPixmap pixmap = toPixmap(FileInfoData->Picture_Get(framePos - center + i));
                         thumbnails[i]->setIcon(pixmap.copy(0, 0, 72, 72));
                     }
                 } else {
@@ -184,7 +199,7 @@ void TinyDisplay::Update(bool updateBigDisplay)
                     if (diff < total_thumbs && i - (int) diff >= 0) {
                         thumbnails[ui]->setIcon(thumbnails[ui-diff]->icon());
 					} else {
-                        QPixmap pixmap = FileInfoData->Picture_Get(framePos - center + ui);
+                        QPixmap pixmap = toPixmap(FileInfoData->Picture_Get(framePos - center + ui));
                         thumbnails[ui]->setIcon(pixmap.copy(0, 0, 72, 72));
 					}
                 } else {

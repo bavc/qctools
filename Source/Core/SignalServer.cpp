@@ -1,6 +1,6 @@
 #include "SignalServer.h"
 
-SignalServer::SignalServer(QObject *parent) : QObject(parent)
+SignalServer::SignalServer(QObject *parent) : QObject(parent), m_autoUpload(false)
 {
 
 }
@@ -35,6 +35,21 @@ void SignalServer::setPassword(const QString &password)
     m_password = password;
 }
 
+bool SignalServer::enabled() const
+{
+    return !m_login.isEmpty();
+}
+
+void SignalServer::setAutoUpload(bool enable)
+{
+    m_autoUpload = enable;
+}
+
+bool SignalServer::autoUpload() const
+{
+    return m_autoUpload;
+}
+
 QSharedPointer<CheckFileUploadedOperation> SignalServer::checkFileUploaded(const QString &fileName)
 {
     QUrl checkFileUploadedUrl = QUrl(m_url.toString() + "/fileuploads/check_exist/" + QUrl::toPercentEncoding(fileName));
@@ -58,7 +73,10 @@ QSharedPointer<QNetworkReply> SignalServer::get(const QUrl& url)
                                                                 .arg(m_login)
                                                                 .arg(m_password).toLocal8Bit().toBase64()));
 
-    return QSharedPointer<QNetworkReply>(m_manager.get(request), &QObject::deleteLater);
+    QSharedPointer<QNetworkReply> reply(m_manager.get(request), &QObject::deleteLater);
+    reply->setParent(0); // ensure QNetworkAccessManager doesn't owns QNetworkReply anymore to avoid possible double-deletion
+
+    return reply;
 }
 
 QSharedPointer<QNetworkReply> SignalServer::put(const QUrl &url, QIODevice* device)
@@ -68,7 +86,10 @@ QSharedPointer<QNetworkReply> SignalServer::put(const QUrl &url, QIODevice* devi
                                                                 .arg(m_login)
                                                                 .arg(m_password).toLocal8Bit().toBase64()));
 
-    return QSharedPointer<QNetworkReply>(m_manager.put(request, device), &QObject::deleteLater);
+    QSharedPointer<QNetworkReply> reply(m_manager.put(request, device), &QObject::deleteLater);
+    reply->setParent(0); // ensure QNetworkAccessManager doesn't owns QNetworkReply anymore to avoid possible double-deletion
+
+    return reply;
 }
 
 SignalServerOperation::SignalServerOperation(const QString &fileName, QSharedPointer<QNetworkReply> reply) : m_fileName(fileName), m_reply(reply)

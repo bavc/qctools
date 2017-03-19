@@ -9,8 +9,8 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "GUI/FileInformation.h"
 #include "GUI/mainwindow.h"
+#include "Core/FileInformation.h"
 #include "Core/CommonStats.h"
 #include "Core/VideoCore.h"
 #include "Core/AudioCore.h"

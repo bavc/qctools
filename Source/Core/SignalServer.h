@@ -94,6 +94,11 @@ public:
     QString password() const;
     void setPassword(const QString &password);
 
+    bool enabled() const;
+
+    void setAutoUpload(bool enable);
+    bool autoUpload() const;
+
     QSharedPointer<CheckFileUploadedOperation> checkFileUploaded(const QString& fileName);
     QSharedPointer<UploadFileOperation> uploadFile(const QString& fileName, QSharedPointer<QIODevice> data);
 
@@ -105,6 +110,7 @@ private:
     QUrl m_url;
     QString m_login;
     QString m_password;
+    bool m_autoUpload;
 
     QNetworkAccessManager m_manager;
 };
