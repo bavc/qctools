@@ -372,7 +372,12 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
             checkFileUploaded(fileInfo.fileName());
         }
     }
-    Glue=new FFmpeg_Glue(FileName_string.c_str(), ActiveAllTracks, &Stats, &streamsStats, &formatStats, Stats.empty());
+
+    std::string fileName = FileName_string;
+    if(fileName == "-")
+        fileName = "pipe:0";
+
+    Glue=new FFmpeg_Glue(fileName, ActiveAllTracks, &Stats, &streamsStats, &formatStats, Stats.empty());
     if (FileName_string.empty())
     {
 #ifdef BLACKMAGICDECKLINK_YES
