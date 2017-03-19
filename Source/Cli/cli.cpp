@@ -51,7 +51,7 @@ int Cli::exec(QCoreApplication &a)
         }
     }
 
-    if(a.arguments().length() == 1)
+    if(a.arguments().length() == 1 || (checkUploadFileName.isEmpty() && input.isEmpty()))
         showHelp = true;
 
     if(showHelp)
