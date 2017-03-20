@@ -64,7 +64,7 @@ int Cli::exec(QCoreApplication &a)
 
         std::cout << "other options: " << std::endl
                   << "\t"
-                  << "-f - specify filter list as 'filter1;filter2;...;filterN'. If not specificed default filters will be used" << std::endl
+                  << "-f - specify filter list as 'filter1+filter2+...+filterN'. If not specificed default filters will be used" << std::endl
                   << "\t\t" << "filters available: " << std::endl
                   << "\t\t\t" << "signalstats" << std::endl
                   << "\t\t\t" << "cropdetect" << std::endl
