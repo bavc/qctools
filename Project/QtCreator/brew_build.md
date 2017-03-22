@@ -10,7 +10,7 @@ Uninstall qwt if already installed and reinstall from provided formula (this mig
 require not having a homebrew installation of qt (aka qt4):
 
     $ brew uninstall qwt
-    $ brew install qwt-qt5.rb
+    $ brew install amiaopensource/amiaos/qwt-qt5
 
 set QCTOOLS_USE_BREW environment variable:
 
