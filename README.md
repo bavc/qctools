@@ -53,6 +53,12 @@ The [QCTools document](http://bavc.github.io/qctools/data_format.html) (built up
 
 Incorporating a set of open source libraries developed under the ffmpeg project, the QCTools document offers metadata values derived from four evaluative filters: [signalstats](https://www.ffmpeg.org/ffmpeg-filters.html#signalstats), [cropdetect](https://www.ffmpeg.org/ffmpeg-filters.html#toc-cropdetect), [psnr](https://www.ffmpeg.org/ffmpeg-filters.html#psnr), and [ebur128](https://www.ffmpeg.org/ffmpeg-filters.html#ebur128).
 
+using qctools-cli
+=======
+
+QCTools files can also be generated via the command line. After installing qctools-cli, you can run `qcli -i [your-file-here]` to generate a qctools report based on your file. By default, this file will be saved to the same directory and named after the file, e.g. `test.qctools.xml.gz` if your file is named `test.mkv`. This can easily be wrapped in a script to create many qctools files during the preservation process.
+
+
 a/v artifact atlas
 =======
 In conjunction with using QCTools, consider using the [A/V Artifacts Atlas](https://bavc.github.io/avaa/index.html) to gain further clarification and appropriate descriptive terminology for any anomalies or errors you might encounter in your video content.  Users are invited to contribute unidentified errors they come across to the atlas.
