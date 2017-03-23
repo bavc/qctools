@@ -43,6 +43,8 @@
 #include <QShortcut>
 #include <QApplication>
 #include <QDebug>
+#include <QStandardPaths>
+#include <QDir>
 
 #include <sstream>
 //---------------------------------------------------------------------------
@@ -2030,6 +2032,30 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
     str.replace(QString("${width}"), QString::number(FileInfoData->Glue->Width_Get()));
     str.replace(QString("${height}"), QString::number(FileInfoData->Glue->Height_Get()));
     str.replace(QString("${dar}"), QString::number(FileInfoData->Glue->DAR_Get()));
+
+    QString tempLocation = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+    QDir tempDir(tempLocation);
+
+    QString qctoolsTmpSubDir = "qctools";
+    QString fontFileName = "Anonymous_Pro_B.ttf";
+
+    if(tempDir.exists())
+    {
+        QDir qctoolsTmpDir(tempLocation + "/" + qctoolsTmpSubDir);
+        if(!qctoolsTmpDir.exists())
+            tempDir.mkdir(qctoolsTmpSubDir);
+
+        QFile fontFile(qctoolsTmpDir.path() + "/" + fontFileName);
+        if(!fontFile.exists())
+        {
+            QFile::copy(":/" + fontFileName, fontFile.fileName());
+        }
+
+        if(fontFile.exists())
+        {
+            str.replace(QString("${fontfile}"), fontFile.fileName());
+        }
+    }
 
     Modified_String = str.toStdString();
 
