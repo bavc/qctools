@@ -35,5 +35,6 @@
         <file alias="Help/playback_filters.md">../../docs/playback_filters.md</file>
         <file alias="Help/data_format.md">../../docs/data_format.md</file>
         <file alias="Help/recording.md">../../docs/recording.md</file>
+        <file>Anonymous_Pro_B.ttf</file>
     </qresource>
 </RCC>
