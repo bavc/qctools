@@ -39,8 +39,8 @@ void MainWindow::openFile()
 {
     QFileDialog::Option options = QFileDialog::Option(0);
 
-#ifdef _WIN32
-    // for Windows use the Qt builtin dialog which displays files,
+#if defined(Q_OS_WIN) || defined(Q_OS_MACX)
+    // for Windows and Mac (to resolve 'gray-out files' issue (https://github.com/bavc/qctools/issues/293) use the Qt builtin dialog which displays files,
     // other platforms should use the native dialog.
     options = QFileDialog::DontUseNativeDialog;
 #endif
