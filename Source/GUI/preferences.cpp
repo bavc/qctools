@@ -167,6 +167,9 @@ void PreferencesDialog::OnRejected()
 
 void PreferencesDialog::on_testConnection_pushButton_clicked()
 {
+    // workaround for focus bug on mac
+    on_signalServerUrl_lineEdit_editingFinished();
+
     struct UI {
         static void setSuccess(QLabel* label, QPushButton* button) {
             label->setStyleSheet("color: green");
