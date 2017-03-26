@@ -151,47 +151,53 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     bool StatsFromExternalData_FileName_IsCompressed=false;
 
     // Finding the right file names (both media file and stats file)
-    if (FileName.indexOf(".qctools.xml.gz")==FileName.length()-15)
+
+    static const QString dotQctoolsDotXmlDotGz = ".qctools.xml.gz";
+    static const QString dotQctoolsDotXml = ".qctools.xml";
+    static const QString dotXmlDotGz = ".xml.gz";
+    static const QString dotXml = ".xml";
+
+    if (FileName.endsWith(dotQctoolsDotXmlDotGz))
     {
         StatsFromExternalData_FileName=FileName;
-        FileName.resize(FileName.length()-15);
+        FileName.resize(FileName.length() - dotQctoolsDotXmlDotGz.length());
         StatsFromExternalData_FileName_IsCompressed=true;
     }
-    else if (FileName.indexOf(".qctools.xml")==FileName.length()-12)
+    else if (FileName.endsWith(dotQctoolsDotXml))
     {
         StatsFromExternalData_FileName=FileName;
-        FileName.resize(FileName.length()-12);
+        FileName.resize(FileName.length() - dotQctoolsDotXml.length());
     }
-    else if (FileName.indexOf(".xml.gz")==FileName.length()-7)
+    else if (FileName.endsWith(dotXmlDotGz))
     {
         StatsFromExternalData_FileName=FileName;
-        FileName.resize(FileName.length()-7);
+        FileName.resize(FileName.length() - dotXmlDotGz.length());
         StatsFromExternalData_FileName_IsCompressed=true;
     }
-    else if (FileName.indexOf(".xml")==FileName.length()-4)
+    else if (FileName.endsWith(dotXml))
     {
         StatsFromExternalData_FileName=FileName;
-        FileName.resize(FileName.length()-4);
+        FileName.resize(FileName.length() - dotXml.length());
     }
     if (StatsFromExternalData_FileName.size()==0)
     {
-        if (QFile::exists(FileName+".qctools.xml.gz"))
+        if (QFile::exists(FileName + dotQctoolsDotXmlDotGz))
         {
-            StatsFromExternalData_FileName=FileName+".qctools.xml.gz";
+            StatsFromExternalData_FileName=FileName + dotQctoolsDotXmlDotGz;
             StatsFromExternalData_FileName_IsCompressed=true;
         }
-        else if (QFile::exists(FileName+".qctools.xml"))
+        else if (QFile::exists(FileName + dotQctoolsDotXml))
         {
-            StatsFromExternalData_FileName=FileName+".qctools.xml";
+            StatsFromExternalData_FileName=FileName + dotQctoolsDotXml;
         }
-        else if (QFile::exists(FileName+".xml.gz"))
+        else if (QFile::exists(FileName + dotXmlDotGz))
         {
-            StatsFromExternalData_FileName=FileName+".xml.gz";
+            StatsFromExternalData_FileName=FileName + dotXmlDotGz;
             StatsFromExternalData_FileName_IsCompressed=true;
         }
-        else if (QFile::exists(FileName+".xml"))
+        else if (QFile::exists(FileName + dotXml))
         {
-            StatsFromExternalData_FileName=FileName+".xml";
+            StatsFromExternalData_FileName=FileName + dotXml;
         }
     }
 
