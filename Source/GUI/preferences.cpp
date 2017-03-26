@@ -208,3 +208,18 @@ void PreferencesDialog::on_testConnection_pushButton_clicked()
        UI::setError(ui->connectionTest_label, QString("%0").arg(connectionChecker->errorString()), ui->testConnection_pushButton);
     }
 }
+
+void PreferencesDialog::on_signalServerUrl_lineEdit_editingFinished()
+{
+    if(ui->signalServerUrl_lineEdit->text().endsWith("/"))
+    {
+        ui->signalServerUrl_lineEdit->blockSignals(true);
+
+        QString url = ui->signalServerUrl_lineEdit->text();
+        while(url.endsWith("/"))
+            url.resize(url.length() - 1);
+
+        ui->signalServerUrl_lineEdit->setText(url);
+        ui->signalServerUrl_lineEdit->blockSignals(false);
+    }
+}
