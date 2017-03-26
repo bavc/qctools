@@ -51,6 +51,7 @@ private Q_SLOTS:
     void on_testConnection_pushButton_clicked();
     void OnAccepted();
     void OnRejected();
+    void on_signalServerUrl_lineEdit_editingFinished();
 };
 
 #endif // PREFERENCES_DIALOG_H
