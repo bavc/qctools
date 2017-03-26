@@ -8,11 +8,14 @@ Cli::Cli() : indexOfStreamWithKnownFrameCount(0), statsFileBytesWritten(0), stat
 
 int Cli::exec(QCoreApplication &a)
 {
+    std::string appName = "qcli";
+
     QString input;
     QString output;
     QStringList filterStrings;
     bool forceOutput = false;
-    bool showHelp = false;
+    bool showLongHelp = false;
+    bool showShortHelp = false;
 
     bool uploadToSignalServer = false;
     bool forceUploadToSignalServer = false;
@@ -47,66 +50,106 @@ int Cli::exec(QCoreApplication &a)
             filterStrings = a.arguments().at(i + 1).split('+');
         } else if(a.arguments().at(i) == "-h")
         {
-            showHelp = true;
+            showLongHelp = true;
         }
     }
 
-    if(a.arguments().length() == 1 || (checkUploadFileName.isEmpty() && input.isEmpty()))
-        showHelp = true;
-
-    if(showHelp)
+    if(!showLongHelp)
     {
-        std::cout <<
-                     "QCTools " << (VERSION) << ", $copyright-summary" << std::endl <<
-                     "Usage: qctools-cli -i <qctools-input> -o <qctools-output>" << std::endl << std::endl <<
-                     "If no output file is declared, qctools will create an output named similarly to the input file with suffixed with \".qctools.xml.gz\"." << std::endl <<
-                     "The filters used in qctools-cli may be declared via the qctools-gui (see the Preferences panel)." << std::endl << std::endl;
-
-        std::cout << "other options: " << std::endl
-                  << "\t"
-                  << "-f - specify filter list as 'filter1+filter2+...+filterN'. If not specificed default filters will be used" << std::endl
-                  << "\t\t" << "filters available: " << std::endl
-                  << "\t\t\t" << "signalstats" << std::endl
-                  << "\t\t\t" << "cropdetect" << std::endl
-                  << "\t\t\t" << "psnr" << std::endl
-                  << "\t\t\t" << "ebur128" << std::endl
-                  << "\t\t\t" << "aphasemeter" << std::endl
-                  << "\t\t\t" << "astats" << std::endl
-                  << "\t\t\t" << "ssim" << std::endl
-                  << "\t\t\t" << "idet" << std::endl
-                  << std::endl
-                  << "\t"
-                  << "-y - force creation of <qctools-report> even if it already exists"
-                  << std::endl
-                  << "\t"
-                  << "-u - upload to signalserver if <qctools-report> not exists here"
-                  << std::endl
-                  << "\t"
-                  << "-uf - force upload <qctools-report> to signalserver (even if file already exists)"
-                  << std::endl
-                  << "\t"
-                  << "-c <qctools-report> - check if uploaded to signalserver"
-                  << std::endl
-                  << std::endl;
-
-        std::cout << "usage example: " << std::endl
-                  << "\t" <<
-                     "qcli -i file.mkv -u - generate stats from file.mkv and upload to signalserver if stats wasn't uploaded previously"
-                  << std::endl
-                  << "\t" <<
-                     "qcli -i file.mkv -uf - generate stats from file.mkv and upload to signalserver unconditionally"
-                  << std::endl
-                  << "\t" <<
-                     "qcli -i file.mkv.qctools.xml.gzip -u - upload stats to signalserver if stats wasn't uploaded"
-                  << std::endl
-                  << "\t" <<
-                     "qcli -i file.mkv.qctools.xml.gzip -uf - upload stats to signalserver unconditionally"
-                  << std::endl
-                  << "\t" <<
-                     "qcli -c file.mkv.qctools.xml.gzip - checks if such a file exists on signalserver"
-                  << std::endl
-                  << std::endl;
+        if(a.arguments().length() == 1 || (checkUploadFileName.isEmpty() && input.isEmpty()))
+            showShortHelp = true;
     }
+
+    if(showLongHelp || showShortHelp)
+    {
+        if(showShortHelp)
+        {
+            std::cout <<
+                 appName << " " << (VERSION) << ", $copyright-summary" << std::endl <<
+                 "Usage: " << appName << " -i <qctools-input> [-o <qctools-output>]" << std::endl << std::endl <<
+                 "Use " << appName << " -h to get detailed help" << std::endl << std::endl;
+        }
+        else
+        {
+            std::cout <<
+                 appName << " " << (VERSION) << ", $copyright-summary" << std::endl <<
+                 "Usage: " << appName << " -i <qctools-input> [-o <qctools-output>]" << std::endl << std::endl
+
+                << "-i <input file>" << std::endl
+                << "\t"
+                    << "Specifies absolute path of input file, including extension." << std::endl
+                << "-o <output file>" << std::endl
+                << "\t"
+                    << "Specifies output file path, including extension. If no output file is declared, qctools will create an output named after the input file, suffixed with \".qctools.xml.gz\"." << std::endl
+                << "-f" << std::endl
+                << "\t"
+                    << "The filters used in " << appName << " may be declared via the qctools-gui (see the Preferences panel)." << std::endl
+                << "\t\t"
+                        << "Available filters: " << std::endl
+                << "\t\t\t"
+                            << "signalstats" << std::endl
+                << "\t\t\t"
+                            << "cropdetect" << std::endl
+                << "\t\t\t"
+                            << "psnr" << std::endl
+                << "\t\t\t"
+                            << "ebur128" << std::endl
+                << "\t\t\t"
+                            << "aphasemeter" << std::endl
+                << "\t\t\t"
+                            << "astats" << std::endl
+                << "\t\t\t"
+                            << "ssim" << std::endl
+                << "\t\t\t"
+                            << "idet" << std::endl
+                << std::endl
+                << "-y" << std::endl
+                << "\t"
+                    << "Force creation of <qctools-report> even if it already exists" << std::endl
+                << std::endl;
+
+            std::cout
+                << "Signal Server flags:" << std::endl
+                << "-u" << std::endl
+                << "\t"
+                    << "Upload to Signal Server if <qctools-report> not exists here" << std::endl
+                << "-uf" << std::endl
+                << "\t"
+                    << "Force upload <qctools-report> to signalserver (even if file already exists)" << std::endl
+                << "-c <qctools-report>" << std::endl
+                << "\t"
+                 << "Check if uploaded to Signal Server" << std::endl
+                << std::endl;
+
+            std::cout << "usage example: " << std::endl
+                << "\t"
+                    << appName << " -i file.mkv - generates qctools file in same directory named file.mkv.qctools.xml.gz"
+                << std::endl
+                << "\t"
+                    << appName << " -i file.mkv -o report.xml.gz - generates qctools file in same directory named report.xml.gz"
+                << std::endl
+                << "\t"
+                    << appName << " -i file.mkv -u - generate stats from file.mkv and upload to Signal Server if stats wasn't uploaded previously"
+                << std::endl
+                << "\t"
+                    << appName << " -i file.mkv -uf - generate stats from file.mkv and upload to Signal Server unconditionally"
+                << std::endl
+                << "\t"
+                    << appName << " -i file.mkv.qctools.xml.gzip -u - upload stats to Signal Server if stats wasn't uploaded"
+                << std::endl
+                << "\t"
+                    << appName << " -i file.mkv.qctools.xml.gzip -uf - upload stats to Signal Server unconditionally"
+                << std::endl
+                << "\t"
+                    << appName << " -c file.mkv.qctools.xml.gzip - checks if such a file exists on Signal Server"
+                << std::endl
+                << std::endl;
+        }
+
+        return Success;
+    }
+
+    std::cout << appName << " " << (VERSION) << std::endl;
 
     Preferences prefs;
 
