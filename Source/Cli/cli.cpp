@@ -305,12 +305,12 @@ int Cli::exec(QCoreApplication &a)
 
         progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
 
-        QObject::connect(info.get(), SIGNAL(statsFileGenerationProgress(int, int)), this, SLOT(onStatsFileGenerationProgress(int, int)));
+        QObject::connect(info.get(), SIGNAL(statsFileGenerationProgress(quint64, quint64)), this, SLOT(onStatsFileGenerationProgress(quint64, quint64)));
         QObject::connect(info.get(), SIGNAL(statsFileGenerated(SharedFile, const QString&)), &a, SLOT(quit()));
         info->startExport(output);
         a.exec();
 
-        QObject::disconnect(info.get(), SIGNAL(statsFileGenerationProgress(int, int)), this, SLOT(onStatsFileGenerationProgress(int, int)));
+        QObject::disconnect(info.get(), SIGNAL(statsFileGenerationProgress(quint64, quint64)), this, SLOT(onStatsFileGenerationProgress(quint64, quint64)));
 
         std::cout << std::endl << "generating QCTools report... done" << std::endl;
     }
@@ -377,7 +377,7 @@ void Cli::updateParsingProgress()
     progress->setValue(value);
 }
 
-void Cli::onStatsFileGenerationProgress(int written, int total)
+void Cli::onStatsFileGenerationProgress(quint64 written, quint64 total)
 {
     statsFileBytesWritten = written;
     statsFileBytesTotal = total;
