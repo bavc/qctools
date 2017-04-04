@@ -12,6 +12,8 @@
 [Crop Width (CropW)](#cropw)
 [Crop Height (CropH)](#croph)
 [Peak Signal to Noise Ratio (PSNRf)](#psnrf)
+[Packet Duration Time](pkt_duration_time)(#pkd)
+[Packet Size](pkt_size)(#ps)
 [Structural SImilarity Metric (SSIMf)](#ssimf)
 [Mean Square Error (MSEf)](#msef)
 [Interlacement Detection (single frame)](#singleframe)
@@ -187,6 +189,12 @@ This filter plots the Peak Signal to Noise Ratio between the video in field 1 (o
 #### Samples which demonstrate Peak Signal to Noise Ratio anomalies:
 
 ![PSNRf](media/NGA000006_psnrf.jpg)
+
+## Packet Duration Time (pkt_duration_time) {#pkd}
+
+## Packet Size (pkt_size) {#ps}
+
+This filter shows the encoded size of the frame.
 
 ## Mean Square Error (MSEf) {#msef}
 
