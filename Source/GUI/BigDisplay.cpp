@@ -57,7 +57,7 @@
 //---------------------------------------------------------------------------
 // Default filters (check Filters order)
 const size_t Filters_Default1 = 2; // 2 = Normal
-const size_t Filters_Default2 = 5; // 5 = Waveform
+const size_t Filters_Default2 = 30; // 30 = Waveform
 
 //***************************************************************************
 // Info
@@ -167,248 +167,6 @@ const filter Filters[]=
         },
     },
     {
-        "Histogram",
-        0,
-        {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Toggle,   0,   0,   0,   0, "RGB" },
-            { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
-            { Args_Type_LogLin,   0,   0,   0,   0, "Levels" },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-        },
-        {
-            // field N, rgb, N, all planes N
-            "histogram=level_height=${height}-12:components=${3}:levels_mode=${4}",
-            // field N, rgb, N, all planes Y
-            "histogram=level_height=${height}:levels_mode=${4}",
-            // field N, rgb, Y, all planes N
-            "format=rgb24,histogram=level_height=${height}:components=${3}:levels_mode=${4}",
-            // field N, rgb, Y, all planes Y
-            "format=rgb24,histogram=level_height=${height}:levels_mode=${4}",
-            // field Y, rgb, N, all planes N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram=components=${3}:levels_mode=${4}[a2];[b1]histogram=components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
-            // field Y, rgb, N, all planes Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram=levels_mode=${4}[a2];[b1]histogram=levels_mode=${4}[b2];[a2][b2]hstack",
-            // field Y, rgb, Y, all planes N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=rgb24,histogram=components=${3}:levels_mode=${4}[a2];[b1]format=rgb24,histogram=components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
-            // field Y, rgb, Y, all planes Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=rgb24,histogram=levels_mode=${4}[a2];[b1]format=rgb24,histogram=levels_mode=${4}[b2];[a2][b2]hstack",
-        },
-    },
-    {
-        "Waveform",
-        0,
-        {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
-            { Args_Type_YuvA,     0,   0,   0,   0, "Plane" },
-            { Args_Type_Toggle,   0,   0,   0,   0, "Vertical" },
-            { Args_Type_Slider,   0,   0,   5,   1, "Filter" },
-            { Args_Type_Slider,   0,   0,   2,   1, "Scale" },
-            { Args_Type_None,     0,   0,   0,   0, },
-        },
-        {
-            // field N, all planes N, vertical N
-            "waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}",
-            // field N, all planes N, vertical Y
-            "waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}",
-            // field N, all planes Y, vertical N
-            "waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay",
-            // field N, all planes Y, vertical Y
-            "waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay",
-            // field Y, all planes N, vertical N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[a2];[b1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b2];[a2][b2]vstack",
-            // field Y, all planes N, vertical Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[a2];[b1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b2];[a2][b2]hstack",
-            // field Y, all planes Y, vertical N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[a2];[b1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[b2];[a2][b2]vstack",
-            // field Y, all planes Y, vertical Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[a2];[b1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[b2];[b2][a2]hstack",
-        },
-    },
-    {
-        "Waveform Target",
-        0,
-        {
-            { Args_Type_Slider,  20,   0,   0,   1, "x" },
-            { Args_Type_Slider,  20,   0,   0,   1, "y" },
-            { Args_Type_Slider, 121,  16,   0,   1, "w" },
-            { Args_Type_Slider, 121,  16,   0,   1, "h" },
-            //{ Args_Type_Slider,   8,   0,  10,  10, "Intensity" },
-            { Args_Type_Slider,   0,   0,   5,   1, "Filter" },
-            { Args_Type_Slider,   0,   0,   2,   1, "Scale" },
-            { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
-        },
-        {
-            "crop=${3}:${4}:${1}:${2},\
-            waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1",
-            "split[a][b];\
-            [a]lutyuv=y=val/4,scale=${width}:${height},setsar=1/1,format=yuv444p|yuv444p10le[a1];\
-            [b]crop=${3}:${4}:${1}:${2},\
-            waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1[b1];\
-            [a1][b1]blend=addition",
-        },
-    },
-    {
-        "Line Select",
-        0,
-        {
-            { Args_Type_Slider,   1,   1,   0,   1, "Line" },
-            { Args_Type_Slider,  10,   0,  10,  10, "Intensity" },
-            { Args_Type_Toggle,   0,   0,   0,   0, "Vertical"},
-            { Args_Type_Toggle,   0,   0,   0,   0, "Background"},
-            { Args_Type_Slider,   0,   0,   2,   1, "Scale" },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-        },
-        {
-            "               crop=iw:1:0:${1}:0:1,waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
-            "split[a][b];[a]crop=iw:1:0:${1}:0:1,waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=iw:${height},drawbox=y=${1}:w=iw:h=1:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
-            "               crop=1:ih:${1}:0:0:1,waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
-            "split[a][b];[a]crop=1:ih:${1}:0:0:1,waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=${width}:${height},drawbox=x=${1}:w=1:h=ih:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
-        },
-    },
-    {
-        "Vectorscope",
-        0,
-        {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
-            { Args_Type_Slider,   3,   0,   5,   1, "Mode" },
-            { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
-            { Args_Type_Slider,   1,   0,   2,   1, "Colorspace" },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-        },
-        {
-            "vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
-            "format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name[a2];[b1]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name[b2];[a2][b2]vstack,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
-            // draft version with a low, med, high, and full vectorscope
-            //"split=4[v1][v2][v3][v4];\
-            [v1]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=0:h=.33[V1];\
-            [v2]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=.33:h=.66[V2];\
-            [v3]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=.66:h=1[V3];\
-            [v4]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name[V4];\
-            [V1][V2]hstack[W1];\
-            [V3][V4]hstack[W2];\
-            [W1][W2]vstack,scale=ih:ih,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
-        },
-    },
-    {
-        "Vectorscope Target",
-        0,
-        {
-            { Args_Type_Slider,  20,   0,   0,   1, "x" },
-            { Args_Type_Slider,  20,   0,   0,   1, "y" },
-            { Args_Type_Slider, 120,  16,   0,   1, "w" },
-            { Args_Type_Slider, 120,  16,   0,   1, "h" },
-            //{ Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
-            { Args_Type_Slider,   3,   0,   4,   1, "Mode" },
-            { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
-            { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
-        },
-        {
-            "crop=${3}:${4}:${1}:${2},\
-            format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
-            "split[a][b];\
-            [a]lutyuv=y=val/4,scale=${width}:${height},setsar=1/1,format=yuv444p|yuv444p10le[a1];\
-            [b]crop=${3}:${4}:${1}:${2},\
-            format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height},setsar=1/1[b1];\
-            [a1][b1]blend=addition",
-        },
-    },
-    {
-        "Waveform / Vectorscope",
-        0,
-        {
-            { Args_Type_Slider,   1,   0,  10,  10, "Waveform" },
-            { Args_Type_Slider,   1,   0,  10,  10, "Vectorscope" },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-        },
-        {
-            "split[a][b];[a]format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,\
-            vectorscope=intensity=${2}:mode=4,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=720:512,setsar=1/1[a1];\
-            [b]waveform=intensity=${1}:mode=column:mirror=1:c=1,scale=720:512,setsar=1/1[b1];\
-            [b1][a1]blend=c0_mode=addition:c1_mode=average:c2_mode=average,hue=s=2",
-        },
-    },
-    {
-        "CIE Scope",
-        0,
-        {
-            { Args_Type_Slider,   1,   0,   8,   1, "System"},
-            { Args_Type_Slider,   1,   0,   8,   1, "Gamut"},
-            { Args_Type_Slider,   7,   0,  10,  10, "Contrast" },
-            { Args_Type_Slider,   1,   0, 100, 100, "Intensity" },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-        },
-        {
-            "ciescope=system=${1}:gamuts=pow(2\\,${2}):contrast=${3}:intensity=${4}",
-        },
-    },
-    {
-        "Datascope",
-        0,
-        {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Slider,   0,   0,   0,   1, "x" },
-            { Args_Type_Slider,   0,   0,   0,   1, "y" },
-            { Args_Type_Slider,   1,   0,   1,   1, "Axis"},
-            { Args_Type_Slider,   1,   0,   2,   1, "DataMode" },
-            { Args_Type_Toggle,   0,   0,   0,   0, "Show" },
-            { Args_Type_None,     0,   0,   0,   0, },
-        },
-        {
-            "datascope=x=${2}:y=${3}:mode=${5}:axis=${4}",
-            "drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=32:height=4,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=4:height=32",
-            "il=l=d:c=d,datascope=x=${2}:y=${3}:mode=${5}:axis=${4}",
-            "il=l=d:c=d,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=32:height=4,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=4:height=32",
-            
-        },
-    },
-    {
-        "Extract Planes Equalized",
-        0,
-        {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Yuv,      2,   0,   0,   0, "Plane"},
-            { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
-            { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-        },
-        {
-            "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:intensity=${4}",
-            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:strength=${4}",
-        },
-    },
-    {
-        "Extract Planes UV Equal.",
-        0,
-        {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
-            { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-        },
-        {
-            "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,hstack,histeq=strength=${2}:intensity=${3}",
-            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,hstack,histeq=strength=${2}:strength=${3}",
-        },
-    },
-    {
         "Bit Plane",
         0,
         {
@@ -512,58 +270,40 @@ const filter Filters[]=
             "bitplanenoise=${1},drawgraph=fg1=0x006400:fg2=0x00008B:fg3=0x8B0000:m1=lavfi.bitplanenoise.0.${1}:m2=lavfi.bitplanenoise.1.${1}:m3=lavfi.bitplanenoise.2.${1}:min=0:max=1:slide=rscroll:s=${width}x${height}",
         },
     },
-    /*
     {
-        "Frame Metadata Play",
-        0,
-        {
-            { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
-            { Args_Type_None,   0, 0, 0, 0, },
-            { Args_Type_None,   0, 0, 0, 0, },
-            { Args_Type_None,   0, 0, 0, 0, },
-            { Args_Type_None,   0, 0, 0, 0, },
-            { Args_Type_None,   0, 0, 0, 0, },
-            { Args_Type_None,   0, 0, 0, 0, },
-        },
-        {
-            "cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,drawtext=fontfile=/Users/rice/Downloads/Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=${1}:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=/Users/rice/Downloads/drawtext.txt",
-        },
-    },
-    */
-    {
-        "Value Highlight",
+        "Broadcast Illegal Focus",
         0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Yuv,      0,   0,   0,   0, "Plane" },
-            { Args_Type_Slider, 235,   0, 255,   1, "Min"},
-            { Args_Type_Slider, 255,   0, 255,   1, "Max"},
-            { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
+            { Args_Type_Ranges,   1,   0,   0,   0, "Outer Range"},
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "extractplanes=${2},lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)",
-            "extractplanes=${2},il=l=d:c=d,lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)",
+                       "geq=lum=if(gt(lum(X\\,Y)\\,235)\\,(lum(X\\,Y)-235)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
+                       "geq=lum=if(lt(lum(X\\,Y)\\,16)\\,(lum(X\\,Y)+1)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
+            "il=l=d:c=d,geq=lum=if(gt(lum(X\\,Y)\\,235)\\,(lum(X\\,Y)-235)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
+            "il=l=d:c=d,geq=lum=if(lt(lum(X\\,Y)\\,16)\\,(lum(X\\,Y)+1)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
         },
     },
     {
-        "Saturation Highlight",
+        "Broadcast Range Pixels",
         0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Toggle,   0,   0,   0,   0, "Sat as Lum" },
-            { Args_Type_Slider,  89,   0, 182,   1, "Min"},
-            { Args_Type_Slider, 182,   0, 182,   1, "Max"},
+            { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "format=yuv444p,geq=lum=lum(X\\,Y):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)",
-            "format=yuv444p,geq=lum=hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)*(256/189):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)",
-            "il=l=d:c=d,format=yuv444p,geq=lum=lum(X\\,Y):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)",
-            "il=l=d:c=d,format=yuv444p,geq=lum=hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)*(256/189):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)"
+            "signalstats=out=brng:c=${2},format=yuv444p|rgb24",
+            "il=l=d:c=d,signalstats=out=brng:c=${2},format=yuv444p|rgb24",
         },
     },
     {
@@ -590,6 +330,22 @@ const filter Filters[]=
         },
     },
     {
+        "CIE Scope",
+        0,
+        {
+            { Args_Type_Slider,   1,   0,   8,   1, "System"},
+            { Args_Type_Slider,   1,   0,   8,   1, "Gamut"},
+            { Args_Type_Slider,   7,   0,  10,  10, "Contrast" },
+            { Args_Type_Slider,   1,   0, 100, 100, "Intensity" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "ciescope=system=${1}:gamuts=pow(2\\,${2}):contrast=${3}:intensity=${4}",
+        },
+    },
+    {
         "Color Matrix",
         0,
         {
@@ -606,19 +362,57 @@ const filter Filters[]=
         },
     },
     {
-        "Sample Range",
+        "Datascope",
         0,
         {
-            { Args_Type_SampleRange,   2,   0,   0,   0, "Src" },
-            { Args_Type_SampleRange,   1,   0,   0,   0, "Dst" },
-            { Args_Type_Slider,        0,   0,   0,   1, "Reveal" },
-            { Args_Type_None,          0,   0,   0,   0, },
-            { Args_Type_None,          0,   0,   0,   0, },
-            { Args_Type_None,          0,   0,   0,   0, },
-            { Args_Type_None,          0,   0,   0,   0, },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Slider,   0,   0,   0,   1, "x" },
+            { Args_Type_Slider,   0,   0,   0,   1, "y" },
+            { Args_Type_Slider,   1,   0,   1,   1, "Axis"},
+            { Args_Type_Slider,   1,   0,   2,   1, "DataMode" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Show" },
+            { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "split[a][b];[a]crop=${3}:${height}:0:0[a1];[b]scale=iw+1:ih:in_range=${1}:out_range=${2},scale=iw-1:ih[b1];[b1][a1]overlay",
+            "datascope=x=${2}:y=${3}:mode=${5}:axis=${4}",
+            "drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=32:height=4,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=4:height=32",
+            "il=l=d:c=d,datascope=x=${2}:y=${3}:mode=${5}:axis=${4}",
+            "il=l=d:c=d,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=32:height=4,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=4:height=32",
+
+        },
+    },
+    {
+        "Extract Planes Equalized",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Yuv,      2,   0,   0,   0, "Plane"},
+            { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
+            { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:intensity=${4}",
+            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:strength=${4}",
+        },
+    },
+    {
+        "Extract Planes UV Equal.",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
+            { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,hstack,histeq=strength=${2}:intensity=${3}",
+            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,hstack,histeq=strength=${2}:strength=${3}",
         },
     },
     {
@@ -641,20 +435,88 @@ const filter Filters[]=
         },
     },
     {
-        "Temporal Difference",
+        "Frame Tiles",
         0,
         {
-            { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
-            { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
-            { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
+            { Args_Type_Slider,   2,   1,   12,   1, "Width"},
+            { Args_Type_Slider,   2,   1,   12,   1, "Height"},
+            { Args_Type_Toggle,   0,   0,    0,   0, "Field" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "extractplanes=${1},tblend=all_mode=difference128,histeq=strength=${2}:intensity=${3}",
-            "tblend=all_mode=difference128,histeq=strength=${2}:intensity=${3}",
+            "scale=iw/${1}:ih/${2},tile=${1}x${2}",
+            "il=l=d:c=d,scale=iw/${1}:ih/${2},tile=${1}x${2}"
+        },
+    },
+    /*
+    {
+        "Frame Metadata Play",
+        0,
+        {
+            { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+            { Args_Type_None,   0, 0, 0, 0, },
+        },
+        {
+            "cropdetect=reset=1:limit=16:round=1,signalstats=stat=brng+vrep+tout,drawtext=fontfile=/Users/rice/Downloads/Anonymous_Pro_B.ttf:x=8:y=8:fontcolor=${1}:shadowx=3:shadowy=2:fontsize=20:tabsize=8:textfile=/Users/rice/Downloads/drawtext.txt",
+        },
+    },
+    */
+    {
+        "Histogram",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "RGB" },
+            { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
+            { Args_Type_LogLin,   0,   0,   0,   0, "Levels" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            // field N, rgb, N, all planes N
+            "histogram=level_height=${height}-12:components=${3}:levels_mode=${4}",
+            // field N, rgb, N, all planes Y
+            "histogram=level_height=${height}:levels_mode=${4}",
+            // field N, rgb, Y, all planes N
+            "format=rgb24,histogram=level_height=${height}:components=${3}:levels_mode=${4}",
+            // field N, rgb, Y, all planes Y
+            "format=rgb24,histogram=level_height=${height}:levels_mode=${4}",
+            // field Y, rgb, N, all planes N
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram=components=${3}:levels_mode=${4}[a2];[b1]histogram=components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
+            // field Y, rgb, N, all planes Y
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram=levels_mode=${4}[a2];[b1]histogram=levels_mode=${4}[b2];[a2][b2]hstack",
+            // field Y, rgb, Y, all planes N
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=rgb24,histogram=components=${3}:levels_mode=${4}[a2];[b1]format=rgb24,histogram=components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
+            // field Y, rgb, Y, all planes Y
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=rgb24,histogram=levels_mode=${4}[a2];[b1]format=rgb24,histogram=levels_mode=${4}[b2];[a2][b2]hstack",
+        },
+    },
+    {
+        "Line Select",
+        0,
+        {
+            { Args_Type_Slider,   1,   1,   0,   1, "Line" },
+            { Args_Type_Slider,  10,   0,  10,  10, "Intensity" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Vertical"},
+            { Args_Type_Toggle,   0,   0,   0,   0, "Background"},
+            { Args_Type_Slider,   0,   0,   2,   1, "Scale" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "               crop=iw:1:0:${1}:0:1,waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
+            "split[a][b];[a]crop=iw:1:0:${1}:0:1,waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=iw:${height},drawbox=y=${1}:w=iw:h=1:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
+            "               crop=1:ih:${1}:0:0:1,waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
+            "split[a][b];[a]crop=1:ih:${1}:0:0:1,waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=${width}:${height},drawbox=x=${1}:w=1:h=ih:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
         },
     },
     {
@@ -674,39 +536,55 @@ const filter Filters[]=
         },
     },
     {
-        "Broadcast Range Pixels",
+        "Sample Range",
         0,
         {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_SampleRange,   2,   0,   0,   0, "Src" },
+            { Args_Type_SampleRange,   1,   0,   0,   0, "Dst" },
+            { Args_Type_Slider,        0,   0,   0,   1, "Reveal" },
+            { Args_Type_None,          0,   0,   0,   0, },
+            { Args_Type_None,          0,   0,   0,   0, },
+            { Args_Type_None,          0,   0,   0,   0, },
+            { Args_Type_None,          0,   0,   0,   0, },
         },
         {
-            "signalstats=out=brng:c=${2},format=yuv444p|rgb24",
-            "il=l=d:c=d,signalstats=out=brng:c=${2},format=yuv444p|rgb24",
+            "split[a][b];[a]crop=${3}:${height}:0:0[a1];[b]scale=iw+1:ih:in_range=${1}:out_range=${2},scale=iw-1:ih[b1];[b1][a1]overlay",
         },
     },
     {
-        "Broadcast Illegal Focus",
+        "Saturation Highlight",
         0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Ranges,   1,   0,   0,   0, "Outer Range"},
+            { Args_Type_Toggle,   0,   0,   0,   0, "Sat as Lum" },
+            { Args_Type_Slider,  89,   0, 182,   1, "Min"},
+            { Args_Type_Slider, 182,   0, 182,   1, "Max"},
             { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "format=yuv444p,geq=lum=lum(X\\,Y):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)",
+            "format=yuv444p,geq=lum=hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)*(256/189):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)",
+            "il=l=d:c=d,format=yuv444p,geq=lum=lum(X\\,Y):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)",
+            "il=l=d:c=d,format=yuv444p,geq=lum=hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)*(256/189):cb=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,32\\,128):cr=if(between(hypot(cb(X\\,Y)-128\\,cr(X\\,Y)-128)\\,${3}\\,${4})\\,220\\,128)"
+        },
+    },
+    {
+        "Temporal Difference",
+        0,
+        {
+            { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
+            { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
+            { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-                       "geq=lum=if(gt(lum(X\\,Y)\\,235)\\,(lum(X\\,Y)-235)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
-                       "geq=lum=if(lt(lum(X\\,Y)\\,16)\\,(lum(X\\,Y)+1)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
-            "il=l=d:c=d,geq=lum=if(gt(lum(X\\,Y)\\,235)\\,(lum(X\\,Y)-235)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
-            "il=l=d:c=d,geq=lum=if(lt(lum(X\\,Y)\\,16)\\,(lum(X\\,Y)+1)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
+            "extractplanes=${1},tblend=all_mode=difference128,histeq=strength=${2}:intensity=${3}",
+            "tblend=all_mode=difference128,histeq=strength=${2}:intensity=${3}",
         },
     },
     {
@@ -727,6 +605,91 @@ const filter Filters[]=
         },
     },
     {
+        "Value Highlight",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Yuv,      0,   0,   0,   0, "Plane" },
+            { Args_Type_Slider, 235,   0, 255,   1, "Min"},
+            { Args_Type_Slider, 255,   0, 255,   1, "Max"},
+            { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "extractplanes=${2},lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)",
+            "extractplanes=${2},il=l=d:c=d,lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)",
+        },
+    },
+    {
+        "Vectorscope",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
+            { Args_Type_Slider,   3,   0,   5,   1, "Mode" },
+            { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
+            { Args_Type_Slider,   1,   0,   2,   1, "Colorspace" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            "format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name[a2];[b1]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name[b2];[a2][b2]vstack,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            // draft version with a low, med, high, and full vectorscope
+            //"split=4[v1][v2][v3][v4];\
+            [v1]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=0:h=.33[V1];\
+            [v2]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=.33:h=.66[V2];\
+            [v3]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=.66:h=1[V3];\
+            [v4]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name[V4];\
+            [V1][V2]hstack[W1];\
+            [V3][V4]hstack[W2];\
+            [W1][W2]vstack,scale=ih:ih,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+        },
+    },
+    {
+        "Vectorscope Target",
+        0,
+        {
+            { Args_Type_Slider,  20,   0,   0,   1, "x" },
+            { Args_Type_Slider,  20,   0,   0,   1, "y" },
+            { Args_Type_Slider, 120,  16,   0,   1, "w" },
+            { Args_Type_Slider, 120,  16,   0,   1, "h" },
+            //{ Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
+            { Args_Type_Slider,   3,   0,   4,   1, "Mode" },
+            { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
+            { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
+        },
+        {
+            "crop=${3}:${4}:${1}:${2},\
+            format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            "split[a][b];\
+            [a]lutyuv=y=val/4,scale=${width}:${height},setsar=1/1,format=yuv444p|yuv444p10le[a1];\
+            [b]crop=${3}:${4}:${1}:${2},\
+            format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height},setsar=1/1[b1];\
+            [a1][b1]blend=addition",
+        },
+    },
+    {
+        "Waveform / Vectorscope",
+        0,
+        {
+            { Args_Type_Slider,   1,   0,  10,  10, "Waveform" },
+            { Args_Type_Slider,   1,   0,  10,  10, "Vectorscope" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "split[a][b];[a]format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,\
+            vectorscope=intensity=${2}:mode=4,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=720:512,setsar=1/1[a1];\
+            [b]waveform=intensity=${1}:mode=column:mirror=1:c=1,scale=720:512,setsar=1/1[b1];\
+            [b1][a1]blend=c0_mode=addition:c1_mode=average:c2_mode=average,hue=s=2",
+        },
+    },
+    {
         "Vertical Repetition Pixels",
         0,
         {
@@ -744,20 +707,57 @@ const filter Filters[]=
         },
     },
     {
-        "Frame Tiles",
+        "Waveform",
         0,
         {
-            { Args_Type_Slider,   2,   1,   12,   1, "Width"},
-            { Args_Type_Slider,   2,   1,   12,   1, "Height"},
-            { Args_Type_Toggle,   0,   0,    0,   0, "Field" },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
+            { Args_Type_YuvA,     0,   0,   0,   0, "Plane" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Vertical" },
+            { Args_Type_Slider,   0,   0,   5,   1, "Filter" },
+            { Args_Type_Slider,   0,   0,   2,   1, "Scale" },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "scale=iw/${1}:ih/${2},tile=${1}x${2}",
-            "il=l=d:c=d,scale=iw/${1}:ih/${2},tile=${1}x${2}"
+            // field N, all planes N, vertical N
+            "waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}",
+            // field N, all planes N, vertical Y
+            "waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}",
+            // field N, all planes Y, vertical N
+            "waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay",
+            // field N, all planes Y, vertical Y
+            "waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay",
+            // field Y, all planes N, vertical N
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[a2];[b1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b2];[a2][b2]vstack",
+            // field Y, all planes N, vertical Y
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[a2];[b1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b2];[a2][b2]hstack",
+            // field Y, all planes Y, vertical N
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[a2];[b1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[b2];[a2][b2]vstack",
+            // field Y, all planes Y, vertical Y
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[a2];[b1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[b2];[b2][a2]hstack",
+        },
+    },
+    {
+        "Waveform Target",
+        0,
+        {
+            { Args_Type_Slider,  20,   0,   0,   1, "x" },
+            { Args_Type_Slider,  20,   0,   0,   1, "y" },
+            { Args_Type_Slider, 121,  16,   0,   1, "w" },
+            { Args_Type_Slider, 121,  16,   0,   1, "h" },
+            //{ Args_Type_Slider,   8,   0,  10,  10, "Intensity" },
+            { Args_Type_Slider,   0,   0,   5,   1, "Filter" },
+            { Args_Type_Slider,   0,   0,   2,   1, "Scale" },
+            { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
+        },
+        {
+            "crop=${3}:${4}:${1}:${2},\
+            waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1",
+            "split[a][b];\
+            [a]lutyuv=y=val/4,scale=${width}:${height},setsar=1/1,format=yuv444p|yuv444p10le[a1];\
+            [b]crop=${3}:${4}:${1}:${2},\
+            waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1[b1];\
+            [a1][b1]blend=addition",
         },
     },
     {
@@ -797,40 +797,7 @@ const filter Filters[]=
         },
     },
     {
-        "Audio Spectrum",
-        1,
-        {
-            { Args_Type_Slider,   1, -10,  10,   1, "Saturation" },
-            { Args_Type_Win_Func, 0,   0,   0,   0, "Win Func" },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-        },
-        {
-            "showspectrum=slide=scroll:mode=separate:color=intensity:saturation=${1}:win_func=${2}",
-        },
-    },
-    {
-        "Audio Waveform",
-        1,
-        {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Split Channels" },
-            { Args_Type_Slider,   2,   1,  20,   1, "Samples per column"},
-            { Args_Type_Wave_Mode,2,   0,   0,   0, "Mode" },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-        },
-        {
-            "showwaves=mode=${3}:n=${2}:s=${width}x${height}:split_channels=0,negate",
-            "showwaves=mode=${3}:n=${2}:s=${width}x${height}:split_channels=1,negate",
-        },
-    },
-    {
-        "Show CQT",
+        "Audio Bit Scope",
         1,
         {
             { Args_Type_None,     0,   0,   0,   0, },
@@ -842,39 +809,7 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "showcqt=fullhd=0",
-        },
-    },
-    {
-        "Audio Vectorscope",
-        1,
-        {
-            { Args_Type_Slider,   1,   1,  10,   1, "Zoom" },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-        },
-        {
-            "avectorscope=m=lissajous:s=512x512:zoom=${1}",
-        },
-    },
-    {
-        "Audio Phase Meter",
-        1,
-        {
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-        },
-        {
-            "aphasemeter=mpc=red",
+            "abitscope,drawgrid=w=iw:h=ih/8:t=1:c=gray@0.9",
         },
     },
     {
@@ -894,6 +829,70 @@ const filter Filters[]=
         },
     },
     {
+        "Audio Phase Meter",
+        1,
+        {
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "aphasemeter=mpc=red",
+        },
+    },
+    {
+        "Audio Show CQT",
+        1,
+        {
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "showcqt=fullhd=0",
+        },
+    },
+    {
+        "Audio Spectrum",
+        1,
+        {
+            { Args_Type_Slider,   1, -10,  10,   1, "Saturation" },
+            { Args_Type_Win_Func, 0,   0,   0,   0, "Win Func" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "showspectrum=slide=scroll:mode=separate:color=intensity:saturation=${1}:win_func=${2}",
+        },
+    },
+    {
+        "Audio Vectorscope",
+        1,
+        {
+            { Args_Type_Slider,   1,   1,  10,   1, "Zoom" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "avectorscope=m=lissajous:s=512x512:zoom=${1}",
+        },
+    },
+    {
         "Audio Volume",
         1,
         {
@@ -910,19 +909,20 @@ const filter Filters[]=
         },
     },
     {
-        "Audio Bit Scope",
+        "Audio Waveform",
         1,
         {
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Split Channels" },
+            { Args_Type_Slider,   2,   1,  20,   1, "Samples per column"},
+            { Args_Type_Wave_Mode,2,   0,   0,   0, "Mode" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "abitscope,drawgrid=w=iw:h=ih/8:t=1:c=gray@0.9",
+            "showwaves=mode=${3}:n=${2}:s=${width}x${height}:split_channels=0,negate",
+            "showwaves=mode=${3}:n=${2}:s=${width}x${height}:split_channels=1,negate",
         },
     },
     /*
@@ -1040,7 +1040,7 @@ DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Other
     //Popup->setFocusPolicy(Qt::NoFocus);
     //Popup->setLayout(Layout);
     connect(this, SIGNAL(valueChanged(double)), this, SLOT(on_valueChanged(double)));
-	
+
     Slider->hide();
 }
 
