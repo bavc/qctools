@@ -12,19 +12,21 @@
 8.  [Crop Width (CropW)](#cropw)
 9.  [Crop Height (CropH)](#croph)
 10.  [Peak Signal to Noise Ratio (PSNRf)](#psnrf)
-11.  [Structural SImilarity Metric (SSIMf)](#ssimf)
-12.  [Mean Square Error (MSEf)](#msef)
-13.  [Interlacement Detection (single frame)](#singleframe)
-14.  [Interlacement Detection (multiple frames)](#multiframe)
-15.  [Interlacement Detection (repeated fields)](#repeated)
+11.  [Packet Duration Time](pkt_duration_time)(#pkd)
+12.  [Packet Size](pkt_size)(#ps)
+13.  [Structural SImilarity Metric (SSIMf)](#ssimf)
+14.  [Mean Square Error (MSEf)](#msef)
+15.  [Interlacement Detection (single frame)](#singleframe)
+16.  [Interlacement Detection (multiple frames)](#multiframe)
+17.  [Interlacement Detection (repeated fields)](#repeated)
 
 ### Audio
 
-16.  [R.128](#r128)
-17.  [Audio Phase Meter](#phase)
-18.  [DC Offset](#dc)
-19.  [Audio Diffs](#audio-diffs)
-20.  [RMS](#rms)
+18.  [R.128](#r128)
+19.  [Audio Phase Meter](#phase)
+20.  [DC Offset](#dc)
+21.  [Audio Diffs](#audio-diffs)
+22.  [RMS](#rms)
 
 ## 1\. YUV Values/ MIN, AVG, MAX, LOW, HIGH {#yuv}
 
@@ -188,7 +190,13 @@ This filter plots the Peak Signal to Noise Ratio between the video in field 1 (o
 
 ![PSNRf](media/NGA000006_psnrf.jpg)
 
-## 11\. Mean Square Error (MSEf) {#msef}
+## 11\. Packet Duration Time (pkt_duration_time) {#pkd}
+
+## 12\. Packet Size (pkt_size) {#ps}
+
+This filter shows the encoded size of the frame.
+
+## 13\. Mean Square Error (MSEf) {#msef}
 
 This filter is similar to PSNRf but reports on the Mean Square Error between field 1 and field 2\. Higher values may be indicative of differences between the images of field 1 and field 2.
 
@@ -196,41 +204,41 @@ This filter is similar to PSNRf but reports on the Mean Square Error between fie
 
 ![MSEf](media/NGA000006_msef.jpg)
 
-## 12\. Structural SImilarity Metric (SSIMf) {#ssimf}
+## 14\. Structural SImilarity Metric (SSIMf) {#ssimf}
 
 This filter plots the Structural SImilarity Metric between the video in field 1 (odd lines) versus the video in field 2 (even lines). Lower values indicate that field 1 and field 2 are becoming more different as would happen during a playback error such as a head clog. See [http://ffmpeg.org/ffmpeg-filters.html#ssim](http://ffmpeg.org/ffmpeg-filters.html#psnr) for more information.
 
-## 13\. Interlacement Detection (single frame) {#singleframe}
+## 15\. Interlacement Detection (single frame) {#singleframe}
 
 This filter plots a determined on if the frame appears to be bottom field first (bff), top first field (tff), progressive (prog), or undetermined (und). This assessment uses only adjacent frames to determine the interlacement characteristic. The value is plotted with a half-life of 1, so each frame's interlacement characteric is halved (i.e., it contributes only 0.5 to it's classification) and then plotted. See [http://ffmpeg.org/ffmpeg-filters.html#idet](http://ffmpeg.org/ffmpeg-filters.html#psnr) for more information.
 
-## 14\. Interlacement Detection (multiple frames) {#multiframe}
+## 16\. Interlacement Detection (multiple frames) {#multiframe}
 
 Similar to single-frame interlaced detection, but incorporates the classification history of previous frames. See [http://ffmpeg.org/ffmpeg-filters.html#idet](http://ffmpeg.org/ffmpeg-filters.html#idet) for more information.
 
-## 15\. Interlacement Detection (repeated fields) {#repeated}
+## 17\. Interlacement Detection (repeated fields) {#repeated}
 
 This plots uses an assessment that tries and detects fields that are repeated between adjacent frames (a sign of telecine). See [http://ffmpeg.org/ffmpeg-filters.html#idet](http://ffmpeg.org/ffmpeg-filters.html#idet) for more information.
 
 ## Audio
 
 
-## 16\. R.128 {#r128}
+## 18\. R.128 {#r128}
 
 R 128 refers to a European Broadcasting Union (EBU) [specification document](https://tech.ebu.ch/docs/r/r128.pdf) governing several loudness parameters, including momentary, integrated, and short-term loudness. QCTools specifically examines momentary loudness, or sudden changes in volume over brief intervals of time (up to 400ms). This can be helpful in identifying areas where volume may exceed upper loudness tolerance levels as perceived by an audience.
 
-## 17\. Audio Phase Meter {#phase}
+## 19\. Audio Phase Meter {#phase}
 
 Provides a metric to represent the mean phase of each audio frames. Value is in range [-1, 1]. The -1 means left and right channels are completely out of phase and 1 means channels are in phase. See [https://ffmpeg.org/ffmpeg-filters.html#aphasemeter](https://ffmpeg.org/ffmpeg-filters.html#aphasemeter) for more information.
 
-## 18\. DC Offset {#dc}
+## 20\. DC Offset {#dc}
 
 For selected audio tracks this graph plots the DC offset (mean amplitude displacement from zero), minimal sample level, and maximum sample level. Note that this value is plotted per audio frame and not per audio sample.
 
-## 19\. Audio Diffs {#audio-diffs}
+## 21\. Audio Diffs {#audio-diffs}
 
 For selected audio tracks this graph plots the minimal difference between two consecutive samples, maximal difference between two consecutive samples. and the mean difference between two consecutive samples (the average of each difference between two consecutive samples) A sharp spike in the maximum difference between consecutive samples may be indicative of an interstitial error. Note that this value is plotted per audio frame and not per audio sample.
 
-## 20\. RMS {#rms}
+## 22\. RMS {#rms}
 
 For selected audio tracks this graph plots the Standard peak and RMS level measured in dBFS and the Peak and trough values for RMS level measured over a short window. Note that this value is plotted per audio frame and not per audio sample.

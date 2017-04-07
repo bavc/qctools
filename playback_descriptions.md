@@ -51,7 +51,7 @@ Displays a visualization of the audio spectrum. Note that because this filter re
 ## [Audio Vectorscope](#audio-vectorscope)
 
 Plots two channels of audio against each other on different axis. This display can show if audio is out-of-phase (displays as a horizontal line), dual-mono (displays as a verical line), or stereo (displays as a two dimensional complex shape).
-![Audio Vectorscope](media/playbackfilter_audio-vectorscope.jpg)
+![Audio Vectorscope](media/playbackfilter_audio_vectorscope.jpg)
 
 ## [Audio Volume](#audio-volume)
 
@@ -73,12 +73,12 @@ Generally lossy video codecs will show blocky structured patterns at higher numb
 
 ## [Bit Plane 10 slices](#bit-plane-10-slices)
 
-This filter is similar to **Bit Plane**, but it shows a section of each of the first 10 bit planes at once in the selected plane. The slices are presented in most-significant to least-significant order as left to right (or top to bottom if 'Rows' is selected). Each of the 10 bit planes is marked by a green border.
+This filter is similar to Bit Plane, but it shows a section of each of the first 10 bit planes at once in the selected plane. The slices are presented in most-significant to least-significant order as left to right (or top to bottom if 'Rows' is selected). Each of the 10 bit planes is marked by a green border.
 ![Bit Plane 10 Slices](media/playbackfilter_bit_plane_10_slices.jpg)
 
 ## [Bit Plane Noise](#bit-plane-noise)
 
-This filter is similar to **Bit Plane**, but instead of showing if the selected bit position of a selected plane is set to 0 or 1, it attempts to predict if that bit represents signal or noise. This filters uses a [method](https://en.wikipedia.org/wiki/Bit_plane) for calculating this by comparing each pixel's selected bit (X,Y) to selected bit of three adjacent pixels (X-1,Y), (X,Y-1) and (X-1,Y-1). If the bit is the same as at least two of the three adjacent bits, it may not be noise. A noisy bit-plane will have 49% to 51% pixels that are noise.
+This filter is similar to Bit Plane, but instead of showing if the selected bit position of a selected plane is set to 0 or 1, it attempts to predict if that bit represents signal or noise. This filters uses a [method](https://en.wikipedia.org/wiki/Bit_plane) for calculating this by comparing each pixel's selected bit (X,Y) to selected bit of three adjacent pixels (X-1,Y), (X,Y-1) and (X-1,Y-1). If the bit is the same as at least two of the three adjacent bits, it may not be noise. A noisy bit-plane will have 49% to 51% pixels that are noise.
 ![Bit Plane Noise](media/playbackfilter_bit_plane_noise.jpg)
 
 ## [Bit Plane Noise Graph](#bit-plane-noise-graph)
@@ -94,7 +94,7 @@ For video that uses the YUV colorspace and decode in a broadcast range. Values f
 ## [Broadcast Range Pixels](#broadcast-range-pixels)
 
 This is the same presentation as 'Normal' except that pixels that are outside of broadcast range are highlighted as white. Again here, you have the option of selecting **'Field'** to display field 1 (top) and field 2 (bottom) separately.
-![Broadcast Range Pixels](media/playbackfilter_broadcast_range_pixels.jpg)
+![Broadcast Range Pixels](/media/playbackfilter_broadcast_range_pixels.jpg)
 
 ## [Chroma Adjust](#chroma-adjust)
 
@@ -103,7 +103,7 @@ This filter enables the hue and saturation levels to be adjusted. Hue adjustment
 
 ## [CIE Scope](#cie-scope)
 
-This filter plots the range of visible colors as defined by the Committee Internationale de l'Eclairage/International Commission on Lighting (CIE) chromaticity diagram. See Georgia State University's [Hyperphysics](http://hyperphysics.phy-astr.gsu.edu/hbase/vision/cie.html) page for more information on this color space.
+This filter plots the range of visible colors as defined by the Committee Internationale de l'Eclairage/International Commission on Lighting (CIE).
 ![CIE Scope](media/playbackfilter_CIE_scope.jpg)
 
 ## [Color Matrix](#color-matrix)
@@ -206,7 +206,7 @@ This filter selects a video plane and highlights values with a specified range o
 
 A vectorscope display. This display plots chroma values (U/V color placement) in two dimensional graph (which is called a vectorscope). It can be used to read of the hue and saturation of the current frame. The whiter a pixel in the vectorscope, the more pixels of the input frame correspond to that pixel (that is the more pixels have this chroma value). The V component is displayed on the vertical (Y) axis, with the bottom edge being V = 0 and the top being V = 255\. The U component is displayed on the horizontal (Y) axis, with the left representing U = 0 and the right representing U = 255.
 Six blocks are highlighted to depict standardized color points for red (90, 16), green (54, 222), blue (240, 146), cyan (166, 240), magenta (202, 44), and yellow (16, 110). All valid chroma values fall within a circlular shape from the center to the outer edge of the plot.You may also select **'Field'** option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).
-![Vectorscope Split Screen](media/playback_layout_two_windows.jpg)
+![Vectorscope Split Screen](media/layout_two_windows.jpg)
 
 The vectorscope player provides the following options:
 
@@ -219,13 +219,17 @@ The vectorscope player provides the following options:
 
 ## [Vectorscope Target](#vectorscope-target)
 
-The Vectorscope Target is similar to the **Vectorscope** filter but a box is drawn over the image by setting an x and y coordinate and size of the box. The vectorscope image drawn will depict the vectorscope plotting of only the samples within the box. The original image may be shown as a background to the vectorscope by enabling the 'Background' checkbox.
+The Vectorscope Target is similar to the Vectorscope filter but a box is drawn over the image by setting an x and y coordinate and size of the box. The vectorscope image drawn will depict the vectorscope plotting of only the samples within the box. The original image may be shown as a background to the vectorscope by enabling the 'Background' checkbox.
 ![Vectorscope Target](media/playbackfilter_vectorscope_target.jpg)
 
 ## [Vertical Line Repetitions](#vertical-line-repeititons)
 
 This filter displays repetitive lines of video data.
 ![Vertical Line Repetitions](media/playbackfilter_vertical_line_repetitions_2.jpg)
+
+## [Vertical Repetition Pixels](#vertical-repetition-pixels)
+
+![Vertical Repetition Pixels](media/playbackfilter_vertical_repetition_pixels.jpg)
 
 ## [Waveform](#waveform)
 
@@ -245,7 +249,7 @@ The waveform player provides the following options:
 
 ## [Waveform Target](#waveform-target)
 
-The Waveform Target is similar to the **Waveform** filter but a box is drawn over the image by setting an x and y coordinate and size of the box. The waveform image drawn will depict the waveform plotting of only the samples within the box. The original image may be shown as a background to the vectorscope by enabling the 'Background' checkbox.
+The Waveform Target is similar to the Waveform filter but a box is drawn over the image by setting an x and y coordinate and size of the box. The waveform image drawn will depict the waveform plotting of only the samples within the box. The original image may be shown as a background to the vectorscope by enabling the 'Background' checkbox.
 ![Waveform Target](media/playbackfilter_waveform_target.jpg)
 
 ## [Waveform / Vectorscope](#waveform-vectorscope)
@@ -256,5 +260,4 @@ This filter plots the Waveform and Vectorscope on top of each other so that both
 ## [Zoom](#zoom)
 
 Allows a user to zoom to a particular portion of the image using X and Y coordinates. Includes "Strength" and "Intensity" modes.
-
 ![Zoom](media/playbackfilter_zoom.jpg)
