@@ -893,7 +893,7 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "aphasemeter=mpc=red",
+            "aphasemeter=mpc=red:video=1[out0][out1];[out0]anullsink;[out1]copy",
         },
     },
     {
