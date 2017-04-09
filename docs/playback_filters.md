@@ -199,3 +199,9 @@ Shows the output of FFmpeg's [showvolume](https://ffmpeg.org/ffmpeg-filters.html
 ## Audio Bit Scope
 
 Shows an audio bit scope visualization of the audio. See FFmpeg's [abitscope](https://ffmpeg.org/ffmpeg-filters.html#abitscope) filter.
+
+## EBU R128 Loudness Meter
+
+Displays a real time graph to observe the loudness evolution. The main graphing area contains the short-term loudness (3 seconds of analysis), and the gauge on the right is for the momentary loudness (400 milliseconds). 
+
+See FFmpeg's [ebur128](https://ffmpeg.org/ffmpeg-filters.html#ebur128) filter.
