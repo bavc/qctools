@@ -150,7 +150,7 @@ public:
     void                        Filter_Change(size_t FilterPos, int FilterType, const string &Filter);
     void                        Disable(const size_t Pos);
     double                      TimeStampOfCurrentFrame(size_t OutputPos);
-    void                        Scale_Change(int Scale_Width, int Scale_Height);
+    void                        Scale_Change(int Scale_Width, int Scale_Height, int index = -1 /* scale both left & right by default */);
     void                        Thumbnails_Modulo_Change(size_t Modulo);
 
     size_t                      TotalFramesCountPerAllStreams() const;

@@ -414,7 +414,7 @@ void ImageLabel::rescale()
     }
 
     auto picture = *Picture;
-    picture->Scale_Change(size().width(), size().height());
+    picture->Scale_Change(size().width(), size().height(), Pos - 1);
     auto image = picture->Image_Get(Pos - 1);
 
     if (image.isNull())

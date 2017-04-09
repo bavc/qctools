@@ -1455,7 +1455,7 @@ double FFmpeg_Glue::TimeStampOfCurrentFrame(const size_t OutputPos)
 }
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::Scale_Change(int Scale_Width_, int Scale_Height_)
+void FFmpeg_Glue::Scale_Change(int Scale_Width_, int Scale_Height_, int index /* = -1*/)
 {
     QMutexLocker locker(mutex);
 
@@ -1463,6 +1463,9 @@ void FFmpeg_Glue::Scale_Change(int Scale_Width_, int Scale_Height_)
 
     for (size_t Pos=0; Pos<OutputDatas.size(); Pos++)
     {
+        if(index != -1 && index != Pos)
+            continue;
+
         outputdata* OutputData=OutputDatas[Pos];
 
         if (OutputData)
