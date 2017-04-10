@@ -84,7 +84,7 @@ FORMS += \
 RESOURCES += \
     $$SOURCES_PATH/Resource/Resources.qrc
 
-help_images_dir="$$SOURCES_PATH/../Docs/media"
+help_images_dir="$$SOURCES_PATH/../docs/media"
 help_images.files = $$files($$help_images_dir/*, true)
 help_images.prefix = "/Help"
 help_images.alias = "./"
