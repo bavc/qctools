@@ -45,6 +45,7 @@
 #include <QDebug>
 #include <QStandardPaths>
 #include <QDir>
+#include <QSplitter>
 
 #include <sstream>
 //---------------------------------------------------------------------------
@@ -1374,7 +1375,7 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
 
     //Image1
     imageLabel1=new ImageLabel(&Picture, 1, this);
-    imageLabel1->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    imageLabel1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     imageLabel1->setMinimumSize(20, 20);
     imageLabel1->showDebugOverlay(Config::instance().getDebug());
     //Layout->addWidget(Image1, 1, 0, 1, 1);
@@ -1382,19 +1383,28 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
 
     //Image2
     imageLabel2=new ImageLabel(&Picture, 2, this);
-    imageLabel2->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    imageLabel2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     imageLabel2->setMinimumSize(20, 20);
     imageLabel2->showDebugOverlay(Config::instance().getDebug());
     //Layout->addWidget(Image2, 1, 2, 1, 1);
     //Layout->setColumnStretch(2, 1);
 
     // Mixing Image1 and Image2 in one widget
+    /*
     QHBoxLayout* ImageLayout=new QHBoxLayout();
     ImageLayout->setContentsMargins(0, -1, 0, 0);
     ImageLayout->setSpacing(0);
     ImageLayout->addWidget(imageLabel1);
     ImageLayout->addWidget(imageLabel2);
     Layout->addLayout(ImageLayout, 1, 0, 1, 3);
+    */
+    QSplitter* splitter = new QSplitter;
+    splitter->setStyleSheet("QSplitter::handle { background-color: gray }");
+
+    splitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    splitter->addWidget(imageLabel1);
+    splitter->addWidget(imageLabel2);
+    Layout->addWidget(splitter, 1, 0, 1, 3);
 
     // Info
     InfoArea=NULL;
