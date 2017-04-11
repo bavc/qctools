@@ -28,7 +28,6 @@
     </qresource>
     <qresource prefix="/">
         <file alias="Help/About.html">../../License.html</file>
-        <file alias="Help/qctools.md">../../docs/qctools.md</file>
         <file alias="Help/getting_started.md">../../docs/getting_started.md</file>
         <file alias="Help/how_to_use.md">../../docs/how_to_use.md</file>
         <file alias="Help/filter_descriptions.md">../../docs/filter_descriptions.md</file>
