@@ -33,6 +33,16 @@
       </widget>
      </item>
      <item>
+      <widget class="QRadioButton" name="normalScale_radioButton">
+       <property name="text">
+        <string>100%</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QRadioButton" name="freeScale_radioButton">
        <property name="text">
         <string>Free Scale</string>

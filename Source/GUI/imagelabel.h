@@ -46,7 +46,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void on_fitToScreen_radioButton_toggled(bool value);
-    void on_doubleSpinBox_valueChanged(double value);
+    void on_normalScale_radioButton_toggled(bool value);
     void on_scalePercentage_doubleSpinBox_valueChanged(double value);
 
 Q_SIGNALS:

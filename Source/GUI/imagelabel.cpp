@@ -315,7 +315,14 @@ void ImageLabel::on_fitToScreen_radioButton_toggled(bool value)
     }
 }
 
-void ImageLabel::on_doubleSpinBox_valueChanged(double value)
+void ImageLabel::on_normalScale_radioButton_toggled(bool value)
+{
+    if(value)
+    {
+        on_scalePercentage_doubleSpinBox_valueChanged(100);
+    }
+}
+
 void ImageLabel::on_scalePercentage_doubleSpinBox_valueChanged(double value)
 {
     if(*Picture)
