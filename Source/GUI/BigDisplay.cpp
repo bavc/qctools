@@ -894,7 +894,7 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "aphasemeter=mpc=red",
+            "aphasemeter=mpc=red:video=1[out0][out1];[out0]anullsink;[out1]copy",
         },
     },
     */
@@ -946,12 +946,11 @@ const filter Filters[]=
             "abitscope,drawgrid=w=iw:h=ih/8:t=1:c=gray@0.9",
         },
     },
-    /*
     {
-        "EBU r128 Loudness Meter",
+        "EBU R128 Loudness Meter",
         1,
         {
-            { Args_Type_Slider,   1,   1,  10,   1, "Zoom" },
+            { Args_Type_Slider,   9,   9,  18,   1, "Scale Meter"},
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
@@ -960,10 +959,9 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "ebur128=video=1[out0],anullsink",
+            "ebur128=video=1:meter=${1}[out0][out1];[out1]anullsink;[out0]copy",
         },
     },
-    */
     {
         "(End)",
         -1,
