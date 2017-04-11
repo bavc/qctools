@@ -168,7 +168,7 @@ void MainWindow::processFile(const QString &FileName)
 
     // Launch analysis
     FileInformation* file = new FileInformation(signalServer, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks);
-    connect(file, SIGNAL(positionChanged()), this, SLOT(Update()));
+    connect(file, SIGNAL(positionChanged()), this, SLOT(Update()), Qt::DirectConnection); // direct connection is required here to get Update called from separate thread
     file->setIndex(Files.size());
 
     Files.push_back(file);
@@ -375,7 +375,7 @@ void MainWindow::addFile(const QString &FileName)
 
     // Launch analysis
     FileInformation* Temp=new FileInformation(signalServer, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks);
-    connect(Temp, SIGNAL(positionChanged()), this, SLOT(Update()));
+    connect(Temp, SIGNAL(positionChanged()), this, SLOT(Update()), Qt::DirectConnection); // direct connection is required here to get Update called from separate thread
     Temp->setIndex(Files.size());
 
     Files.push_back(Temp);
@@ -395,7 +395,7 @@ void MainWindow::addFile(
                                               BlackmagicDeckLink_Glue,
 #endif // BLACKMAGICDECKLINK_YES
                                               FrameCount, Encoding_FileName, Encoding_Format);
-    connect(Temp, SIGNAL(positionChanged()), this, SLOT(Update()));
+    connect(Temp, SIGNAL(positionChanged()), this, SLOT(Update()), Qt::DirectConnection); // direct connection is required here to get Update called from separate thread
     Temp->setIndex(Files.size());
 
     Files.push_back(Temp);
