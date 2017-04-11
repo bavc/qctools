@@ -78,7 +78,7 @@ public:
 
 public slots:
     void updateParsingProgress();
-    void onStatsFileGenerationProgress(int written, int total);
+    void onStatsFileGenerationProgress(quint64 written, quint64 total);
     void onSignalServerUploadProgressChanged(qint64 written, qint64 total);
 
 private:
@@ -89,8 +89,8 @@ private:
     QTimer progressTimer;
     int indexOfStreamWithKnownFrameCount;
 
-    int statsFileBytesWritten;
-    int statsFileBytesTotal;
+    quint64 statsFileBytesWritten;
+    quint64 statsFileBytesTotal;
 
     qint64 statsFileBytesUploaded;
     qint64 statsFileBytesToUpload;

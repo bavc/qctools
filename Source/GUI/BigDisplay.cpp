@@ -781,6 +781,25 @@ const filter Filters[]=
         },
     },
     {
+        "EIA608 VITC Viewer",
+        0,
+        {
+            { Args_Type_Slider,   2,   0,  50, 100, "msd" },
+            { Args_Type_Slider,  30,   1, 100,   1, "scan_max" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "parity" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "zoom" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "readvitc=scan_max=${2},readeia608=scan_max=${2}:msd=${1},drawtext=fontfile=${fontfile}:fontcolor=white:fontsize=36:box=1:boxcolor=black@0.5:x=(w-tw)/2:y=h*3/4-ascent:text=Line %{metadata\\\\:lavfi.readeia608.0.line\\\\:-} %{metadata\\\\:lavfi.readeia608.0.cc\\\\:------} - Line %{metadata\\\\:lavfi.readeia608.1.line\\\\:-} %{metadata\\\\:lavfi.readeia608.1.cc\\\\:------},drawtext=fontfile=${fontfile}:fontcolor=white:fontsize=36:box=1:boxcolor=black@0.5:x=(w-tw)/2:y=h*3/4-ascent*3:text=VITC %{metadata\\\\:lavfi.readvitc.tc_str\\\\:-- -- -- --}",
+            "readvitc=scan_max=${2},readeia608=scan_max=${2}:msd=${1},crop=iw:${2}:0:0,scale=${width}:${height}:flags=neighbor,drawtext=fontfile=${fontfile}:fontcolor=white:fontsize=36:box=1:boxcolor=black@0.5:x=(w-tw)/2:y=h*3/4-ascent:text=Line %{metadata\\\\:lavfi.readeia608.0.line\\\\:-} %{metadata\\\\:lavfi.readeia608.0.cc\\\\:------} - Line %{metadata\\\\:lavfi.readeia608.1.line\\\\:-} %{metadata\\\\:lavfi.readeia608.1.cc\\\\:------},drawtext=fontfile=${fontfile}:fontcolor=white:fontsize=36:box=1:boxcolor=black@0.5:x=(w-tw)/2:y=h*3/4-ascent*3:text=VITC %{metadata\\\\:lavfi.readvitc.tc_str\\\\:-- -- -- --}",
+            "readvitc=scan_max=${2},readeia608=scan_max=${2}:msd=${1}:chp=1,drawtext=fontfile=${fontfile}:fontcolor=white:fontsize=36:box=1:boxcolor=black@0.5:x=(w-tw)/2:y=h*3/4-ascent:text=Line %{metadata\\\\:lavfi.readeia608.0.line\\\\:-} %{metadata\\\\:lavfi.readeia608.0.cc\\\\:------} - Line %{metadata\\\\:lavfi.readeia608.1.line\\\\:-} %{metadata\\\\:lavfi.readeia608.1.cc\\\\:------},drawtext=fontfile=${fontfile}:fontcolor=white:fontsize=36:box=1:boxcolor=black@0.5:x=(w-tw)/2:y=h*3/4-ascent*3:text=VITC %{metadata\\\\:lavfi.readvitc.tc_str\\\\:-- -- -- --}",
+            "readvitc=scan_max=${2},readeia608=scan_max=${2}:msd=${1}:chp=1,crop=iw:${2}:0:0,scale=${width}:${height}:flags=neighbor,drawtext=fontfile=${fontfile}:fontcolor=white:fontsize=36:box=1:boxcolor=black@0.5:x=(w-tw)/2:y=h*3/4-ascent:text=Line %{metadata\\\\:lavfi.readeia608.0.line\\\\:-} %{metadata\\\\:lavfi.readeia608.0.cc\\\\:------} - Line %{metadata\\\\:lavfi.readeia608.1.line\\\\:-} %{metadata\\\\:lavfi.readeia608.1.cc\\\\:------},drawtext=fontfile=${fontfile}:fontcolor=white:fontsize=36:box=1:boxcolor=black@0.5:x=(w-tw)/2:y=h*3/4-ascent*3:text=VITC %{metadata\\\\:lavfi.readvitc.tc_str\\\\:-- -- -- --}",
+        },
+    },
+    {
         "(Separator)",
         -1,
         {
@@ -861,6 +880,7 @@ const filter Filters[]=
             "avectorscope=m=lissajous:s=512x512:zoom=${1}",
         },
     },
+    /*
     {
         "Audio Phase Meter",
         1,
@@ -874,9 +894,10 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "aphasemeter=mpc=red",
+            "aphasemeter=mpc=red:video=1[out0][out1];[out0]anullsink;[out1]copy",
         },
     },
+    */
     {
         "Audio Frequency",
         1,
@@ -925,12 +946,11 @@ const filter Filters[]=
             "abitscope,drawgrid=w=iw:h=ih/8:t=1:c=gray@0.9",
         },
     },
-    /*
     {
-        "EBU r128 Loudness Meter",
+        "EBU R128 Loudness Meter",
         1,
         {
-            { Args_Type_Slider,   1,   1,  10,   1, "Zoom" },
+            { Args_Type_Slider,   9,   9,  18,   1, "Scale Meter"},
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
@@ -939,10 +959,9 @@ const filter Filters[]=
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "ebur128=video=1[out0],anullsink",
+            "ebur128=video=1:meter=${1}[out0][out1];[out1]anullsink;[out0]copy",
         },
     },
-    */
     {
         "(End)",
         -1,
@@ -1302,13 +1321,52 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     {
         Options[Pos].FiltersList=new QComboBox(this);
         Options[Pos].FiltersList->setFont(Font);
+
+        typedef QPair<QString, int> FilterInfo;
+        typedef QList<FilterInfo> FiltersGroup;
+        typedef QVector<FiltersGroup> FiltersGroups;
+
+        struct Sort
+        {
+            static bool filterInfoLessThan(const FilterInfo& i1, const FilterInfo& i2)
+            {
+                return i1.first < i2.first;
+            }
+        };
+
+        FiltersGroups filtersGroups;
+
         for (size_t FilterPos=0; FilterPos<FiltersListDefault_Count; FilterPos++)
         {
-            if (strcmp(Filters[FilterPos].Name, "(Separator)") && strcmp(Filters[FilterPos].Name, "(End)"))
-                Options[Pos].FiltersList->addItem(Filters[FilterPos].Name);
+            const char* filterName = Filters[FilterPos].Name;
+
+            if (strcmp(filterName, "(Separator)") && strcmp(filterName, "(End)"))
+            {
+                if(filtersGroups.empty())
+                    filtersGroups.push_back(FiltersGroup());
+
+                filtersGroups.back().append(FilterInfo(filterName, FilterPos));
+            }
             else if (strcmp(Filters[FilterPos].Name, "(End)"))
-                Options[Pos].FiltersList->insertSeparator(FiltersListDefault_Count);
+            {
+                filtersGroups.push_back(FiltersGroup());
+            }
         }
+
+        for(int i = 0; i < filtersGroups.length(); ++i)
+        {
+            FiltersGroup & filterGroup = filtersGroups[i];
+            qSort(filterGroup.begin(), filterGroup.end(), Sort::filterInfoLessThan);
+
+            for(FiltersGroup::const_iterator it = filterGroup.cbegin(); it != filterGroup.cend(); ++it)
+            {
+                 Options[Pos].FiltersList->addItem(it->first, it->second);
+            }
+
+            if(i != (filtersGroups.length() - 1))
+                Options[Pos].FiltersList->insertSeparator(FiltersListDefault_Count);
+        };
+
         Options[Pos].FiltersList->setMinimumWidth(Options[Pos].FiltersList->minimumSizeHint().width());
         Options[Pos].FiltersList->setMaximumWidth(Options[Pos].FiltersList->minimumSizeHint().width());
         Options[Pos].FiltersList->setMaxVisibleItems(25);
@@ -1361,8 +1419,17 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     Picture=NULL;
     Picture_Current1=Filters_Default1;
     Picture_Current2=Filters_Default2;
-    Options[0].FiltersList->setCurrentIndex(Picture_Current1);
-    Options[1].FiltersList->setCurrentIndex(Picture_Current2);
+
+    for(int playerIndex = 0; playerIndex < 2; ++playerIndex)
+    {
+        for(int displayFilterIndex = 0; displayFilterIndex < Options[playerIndex].FiltersList->count(); ++displayFilterIndex)
+        {
+            int physicalFilterIndex = Options[playerIndex].FiltersList->itemData(displayFilterIndex).toInt();
+            if((physicalFilterIndex == Filters_Default1 && playerIndex == 0) || (physicalFilterIndex == Filters_Default2 && playerIndex == 1))
+                Options[playerIndex].FiltersList->setCurrentIndex(displayFilterIndex);
+        }
+    }
+
     connect(Options[0].FiltersList, SIGNAL(currentIndexChanged(int)), this, SLOT(on_FiltersList1_currentIndexChanged(int)));
     connect(Options[1].FiltersList, SIGNAL(currentIndexChanged(int)), this, SLOT(on_FiltersList2_currentIndexChanged(int)));
 
@@ -2458,6 +2525,13 @@ void BigDisplay::updateImagesAndSlider(const QPixmap &pixmap1, const QPixmap &pi
 
 void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
 {
+    QComboBox* combo = qobject_cast<QComboBox*>(sender());
+    if(combo)
+    {
+        if(!combo->itemData(Pos).isNull())
+            Pos = combo->itemData(Pos).toInt();
+    }
+
     // Help
     if (Pos==0)
     {
@@ -2495,6 +2569,13 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
 //---------------------------------------------------------------------------
 void BigDisplay::on_FiltersList2_currentIndexChanged(int Pos)
 {
+    QComboBox* combo = qobject_cast<QComboBox*>(sender());
+    if(combo)
+    {
+        if(!combo->itemData(Pos).isNull())
+            Pos = combo->itemData(Pos).toInt();
+    }
+
     // Help
     if (Pos==0)
     {
