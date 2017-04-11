@@ -12,8 +12,8 @@
 [Crop Width (CropW)](#cropw)  
 [Crop Height (CropH)](#croph)  
 [Peak Signal to Noise Ratio (PSNRf)](#psnrf)  
-[Packet Duration Time](pkt_duration_time)(#pkd)  
-[Packet Size](pkt_size)(#ps)  
+[Packet Duration Time (pkt_duration_time)](#pkd)  
+[Packet Size (pkt_size)](#ps)  
 [Structural SImilarity Metric (SSIMf)](#ssimf)  
 [Mean Square Error (MSEf)](#msef)  
 [Interlacement Detection (single frame)](#singleframe)  
@@ -30,7 +30,7 @@
 
 ## YUV Values/ MIN, AVG, MAX, LOW, HIGH {#yuv}
 
-YUV refers to a particular a way of encoding color information in analog video where Y channels carry <q>luma</q>, or brightness information ([wikipedia.org/wiki/Luma](http://en.wikipedia.org/wiki/Luma_(video))), and U and V channels carry information about color, or <q>chrominance</q> ([wikipedia.org/wiki/Chrominance](http://en.wikipedia.org/wiki/Chrominance)). QCTools can analyze the YUV Values of a particular encoded video file in order to provide information about the appearance of the video. These filters examine every pixel in a given channel and records the Maximum, Minimum, and Average values.
+YUV refers to a particular a way of encoding color information in analog video where Y channels carry luma, or brightness information ([wikipedia.org/wiki/Luma](http://en.wikipedia.org/wiki/Luma_(video))), and U and V channels carry information about color, or chrominance ([wikipedia.org/wiki/Chrominance](http://en.wikipedia.org/wiki/Chrominance)). QCTools can analyze the YUV Values of a particular encoded video file in order to provide information about the appearance of the video. These filters examine every pixel in a given channel and records the Maximum, Minimum, and Average values.
 
 Each plot shows a dot-dash line to show the limits of broadcast range. In the Y graph there is a red dash-dot line at 235 (the equivalent of 100 IRE) to show broadcast white and a blue dash-dot line is at 16 (the equivalent of 7.5 IRE) to show broadcast black. All values plotted above the red dash-dot line should be decoded as white with all visual distinction in the values from 235-255 clipped to the same maximum value of white. Similarly values plotted from 0-16 would all be clipped and portrayed as black. The U and V graphs have similar lines at 16 and 240 to show the broadcast range limits of the chroma planes. Note: that these lines are only applicable to content that is decoded as broadcast range. Content marked as full range may appropriately exceed these limits.
 _(For in-depth descriptions of how luma and/or chroma noise -- and other types of artifacts-- may present, the **[A/V Artifact Atlas](https://bavc.github.io/avaa/index.html)** is an excellent reference.)_
