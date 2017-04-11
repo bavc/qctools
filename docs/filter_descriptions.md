@@ -2,31 +2,31 @@
 
 ### Video
 
-[YUV Values/ MIN, AVG, MAX, LOW, HIGH](#yuv)
-[YUV Values/ Difference](#diff)
-[Saturation](#saturation)
-[Hue](#hue)
-[Temporal Outliers](#tout)
-[Vertical Line Repetitions](#vrep)
-[Broadcast Range](#brng)
-[Crop Width (CropW)](#cropw)
-[Crop Height (CropH)](#croph)
-[Peak Signal to Noise Ratio (PSNRf)](#psnrf)
-[Packet Duration Time](pkt_duration_time)(#pkd)
-[Packet Size](pkt_size)(#ps)
-[Structural SImilarity Metric (SSIMf)](#ssimf)
-[Mean Square Error (MSEf)](#msef)
-[Interlacement Detection (single frame)](#singleframe)
-[Interlacement Detection (multiple frames)](#multiframe)
-[Interlacement Detection (repeated fields)](#repeated)
+[YUV Values/ MIN, AVG, MAX, LOW, HIGH](#yuv)  
+[YUV Values/ Difference](#diff)  
+[Saturation](#saturation)  
+[Hue](#hue)  
+[Temporal Outliers](#tout)  
+[Vertical Line Repetitions](#vrep)  
+[Broadcast Range](#brng)  
+[Crop Width (CropW)](#cropw)  
+[Crop Height (CropH)](#croph)  
+[Peak Signal to Noise Ratio (PSNRf)](#psnrf)  
+[Packet Duration Time](pkt_duration_time)(#pkd)  
+[Packet Size](pkt_size)(#ps)  
+[Structural SImilarity Metric (SSIMf)](#ssimf)  
+[Mean Square Error (MSEf)](#msef)  
+[Interlacement Detection (single frame)](#singleframe)  
+[Interlacement Detection (multiple frames)](#multiframe)  
+[Interlacement Detection (repeated fields)](#repeated)  
 
 ### Audio
 
-[R.128](#r128)
-[Audio Phase Meter](#phase)
-[DC Offset](#dc)
-[Audio Diffs](#audio-diffs)
-[RMS](#rms)
+[R.128](#r128)  
+[Audio Phase Meter](#phase)  
+[DC Offset](#dc)  
+[Audio Diffs](#audio-diffs)  
+[RMS](#rms)  
 
 ## YUV Values/ MIN, AVG, MAX, LOW, HIGH {#yuv}
 
