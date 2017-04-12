@@ -23,6 +23,7 @@ The QCTools preview window is intended as an analytical playback environment tha
 [CIE Scope](#cie-scope)  
 [Color Matrix](#color-matrix)  
 [Datascope](#datascope)  
+[EBU R128 Loudness Meter](#ebur128)  
 [EIA608 VITC Viewer](#eia608)
 [Extract Planes Equalized](#extract-planes-equalized)  
 [Extract Planes UV Equalized](#extract-planes-uv-equalized)  
@@ -192,139 +193,139 @@ Several options from FFmpeg's readeia608 filter are accessible:
 
 For more information, see the documentation on FFmpeg's [readvitc](https://ffmpeg.org/ffmpeg-filters.html#readvitc) and [readeia608](https://ffmpeg.org/ffmpeg-filters.html#readeia608) filters. A sample IMX file with both VITC and EIA608 data is available at the [Internet Archive](https://archive.org/download/vitc_eia608_sample/vitc_eia608_sample.mov).
 
-## [Value Highlight] {#value-highlight}
+## Value Highlight {#value-highlight}
 
 This filter selects a video plane and highlights values with a specified range of minimum value to maximum value. The original image of the plane will be presented in grayscale and values within the range will be highlighted as yellow; for instance to highlight Y values below NTSC broadcast range, set plane to Y, min to 0 and max to 16. The resulting image will highlight Y values below broadcast range in yellow.
 
 ![Value Highlight](media/playbackfilter_value_highlight.jpg)
 
-## [Saturation Highlight] {#saturation-highlight}
+## Saturation Highlight {#saturation-highlight}
 
 Highlights saturation with a user-defined range of minimum value to maximum value. Includes field mode.
 
 ![Saturation Highlight](media/playbackfilter_saturation_highlight_3.jpg)
 
-## [Chroma Adjust] {#chroma-adjust}
+## Chroma Adjust {#chroma-adjust}
 
 This filter enables the hue and saturation levels to be adjusted. Hue adjustments may be expressed in degrees where 0 is no change and 180 would invert the color. For saturation a value of 1 needs the saturation unchanged, 0 removes all color, and the saturation may be increased up to a maximum of 10\. The chroma values (Cb and Cr) may also be shifted by increasing or decreasing their values (similar to Red Shift/Blue Shift on a time-base corrector).
 
 ![Chroma Adjust](media/playbackfilter_chroma_adjust.jpg)
 
-## [Color Matrix] {#color-matrix}
+## Color Matrix {#color-matrix}
 
 Allows for playback in various color spaces, including BT.601, BT.709, SMPTE240M and FCC. The filter includes a **Reveal** slider so that the original image and a version interpreted through the selected color matrix may be shown side-by-side for review.
 
 ![Color Matrix](media/playbackfilter_color_matrix.jpg)
 
-## [Sample Range] {#sample-range}
+## Sample Range {#sample-range}
 
 This filter operates similarly to **Color Matrix** but shows the original image alongside a version interpreted through a selected sample range. Here you can see how the video would look it interpreted as either full range or broadcast range.
 
 ![Sample Range](media/playbackfilter_sample_range.jpg)
 
-## [Field Difference] {#field-difference}
+## Field Difference {#field-difference}
 
 This presentation visualizes the difference between video field 1 and field 2\. A middle gray image would mean that field 1 and field 2 were identical, whereas deviation to white or black indicates a difference.
 
 ![Field Difference](media/fielddiff.jpg)
 
-## [Temporal Difference] {#temporal-difference}
+## Temporal Difference {#temporal-difference}
 
 Displays an image obtained from the temporal difference between successive frames. Note that because this filter requires more than one frame to display the filter will need to be in playback mode to reveal an image.
 
 ![Temporal Difference](media/playbackfilter_temporal_difference.jpg)
 
-## [Pixel Offset Subtraction] {#pixel-offset-subtraction}
+## Pixel Offset Subtraction {#pixel-offset-subtraction}
 
 Displays an image by subtracting the offset level from each successive pixel.
 
 ![Pixel Offset Subtraction](media/playbackfilter_pixel_offset_subtraction.jpg)
 
-## [Broadcast Range Pixels] {#broadcast-range-pixels}
+## Broadcast Range Pixels {#broadcast-range-pixels}
 
 This is the same presentation as 'Normal' except that pixels that are outside of broadcast range are highlighted as white. Again here, you have the option of selecting **'Field'** to display field 1 (top) and field 2 (bottom) separately.
 
 ![Broadcast Range Pixels](media/playbackfilter_broadcast_range_pixels.jpg)
 
-## [Broadcast Illegal Focus] {#broadcast-illegal-focus}
+## Broadcast Illegal Focus {#broadcast-illegal-focus}
 
 For video that uses the YUV colorspace and decode in a broadcast range. Values from 0-16 (on an 8 bit scale) will all decode to black on a computer monitor, while values from 235-255 will decode as white. This filter allows the users to select to feature pixel data that is outside of broadcast range. Select "above whites" to set pixels with luma values from 236-255 to a range of grays (while all other pixels are set to black). Select "below black" to set pixels with luma values from 0-15 to a range of grays (while all other pixels are set to black). If a video frame only contains pixels that have luma values within broadcast range, then this filter will play black only black pixels. This filter portrays broadcast range compliance in somewhat the opposite way as the "Broadcast Range Pixels" filter since it focuses on values that may be crushed to black or white because they fall outside of broadcast range. Note that some videos may intentionally be encoded in 'full range' where this filter is less relevant.
 
 ![Broadcast Illegal Focus](media/playbackfilter_broadcast_illegal_focus.jpg)
 
-## [Temporal Outlier Pixels] {#temporal-outlier-pixels}
+## Temporal Outlier Pixels {#temporal-outlier-pixels}
 
 This is the same presentation as 'Normal' except that pixels that are labelled as temporal outliers are highlighted as white. Temporal outliers are pixels that significantly differ from their neighbors and often correspond to tape damage or playback error. Select **'Field'** to see the fields displayed separately.
 
 ![Temporal Outlier Pixels](media/playbackfilter_temporal_outlier_pixels_1.jpg)
 
-## [Vertical Line Repetitions] {#vertical-line-repeititons}
+## Vertical Line Repetitions {#vertical-line-repeititons}
 
 This filter displays repetitive lines of video data.
 
 ![Vertical Line Repetitions](media/playbackfilter_vertical_line_repetitions_2.jpg)
 
-## [Frame Tiles] {#frame-tiles}
+## Frame Tiles {#frame-tiles}
 
 Displays a user-defined "tiled" mosaic of successive frames. Maximum 12x12 grid. Note that because this filter requires more than one frame to display the filter will need to be in playback mode to reveal an image.
 
 ![Frame Tiles](media/playbackfilter_frame_tiles.jpg)
 
-## [Zoom] {#zoom}
+## Zoom {#zoom}
 
 Allows a user to zoom to a particular portion of the image using X and Y coordinates. Includes "Strength" and "Intensity" modes.
 
 ![Zoom](media/playbackfilter_zoom.jpg)
 
-## [Audio Spectrum] {#audio-spectrum}
+## Audio Spectrum {#audio-spectrum}
 
 Displays a visualization of the audio spectrum. Note that because this filter requires more than one frame to display the filter will need to be in playback mode to reveal an image.
 
 ![Audio Spectrum](media/playbackfilter_audio_spectrum.jpg)
 
-## [Audio Waveform] {#audio-waveform}
+## Audio Waveform {#audio-waveform}
 
 Displays a visualization of the audio waveform. Note that because this filter requires more than one frame to display the filter will need to be in playback mode to reveal an image.
 
 ![Audio Waveform](media/playbackfilter_audio_waveform.jpg)
 
-## [Show CQT] {#show-cqt}
+## Show CQT {#show-cqt}
 
 Displays a visualization of the audio as a musical scale. See [FFmpeg's showcqt documentation](https://ffmpeg.org/ffmpeg-filters.html#showcqt) for information and examples.
 
 ![Show CQT](media/playbackfilter_show_CQT_1.jpg)
 
-## [Audio Vectorscope] {#audio-vectorscope}
+## Audio Vectorscope {#audio-vectorscope}
 
 Plots two channels of audio against each other on different axis. This display can show if audio is out-of-phase (displays as a horizontal line), dual-mono (displays as a verical line), or stereo (displays as a two dimensional complex shape).
 
 ![Audio Vectorscope](media/playbackfilter_audio_vectorscope.jpg)
 
-## [Audio Phase Meter] {#audio-phase-meter}
+## Audio Phase Meter {#audio-phase-meter}
 
 Shows the output of FFmpeg's [aphasemeter](https://ffmpeg.org/ffmpeg-filters.html#aphasemeter) filter, displaying the audio phase.
 
 ![Audio Phase Meter](media/playbackfilter_audio_phase_meter.jpg)
 
-## [Audio Frequency] {#audio-frequency}
+## Audio Frequency {#audio-frequency}
 
 Shows the output of FFmpeg's [showfreqs](https://ffmpeg.org/ffmpeg-filters.html#showfreqs) filter, representing the audio power spectrum.
 
 ![Audio Frequency](media/playbackfilter_audio_frequency.jpg)
 
-## [Audio Volume] {#audio-volume}
+## Audio Volume {#audio-volume}
 
 Shows the output of FFmpeg's [showvolume](https://ffmpeg.org/ffmpeg-filters.html#showvolume) filter.
 
 ![Audio Volume](media/playbackfilter_audio_volume.jpg)
 
-## [Audio Bit Scope] {#audio-bit-scope}
+## Audio Bit Scope {#audio-bit-scope}
 
 Shows an audio bit scope visualization of the audio. See FFmpeg's [abitscope](https://ffmpeg.org/ffmpeg-filters.html#abitscope) filter.
 
 ![Audio Bit Scope](media/playbackfilter_audio_bit_scope.jpg)
 
-## EBU R128 Loudness Meter
+## EBU R128 Loudness Meter {#ebur128}
 
 Displays a real time graph to observe the loudness evolution. The main graphing area contains the short-term loudness (3 seconds of analysis), and the gauge on the right is for the momentary loudness (400 milliseconds).
 
