@@ -87,6 +87,10 @@ Some helpful **keyboard shortcuts** you may want to use are:
 
 By clicking on a thumbnail, you can open the preview window. The preview window serves as a playback environment that allows spot checking and manual video analysis. The preview window contains two playback windows that can be set to various selections; the filters allow the video to be processed in one of many ways which may help make particular issues more discernible. See the **Playback Filters** page for more details on these playback filters.
 
+When playing back a media file please note that QCTools will only render the video. The audio may be visualized in one of the Audio Playback Filters but the audio will not be presently aurally.
+
+Under situations where QCTools is not able to play back the video in real-time (for instance because the video is very large or the processing power available is not sufficient), there are options under the "View" toolbar menu to determine how playback should be prioritized under limited resources. Selecting "View>Play All Frames" will slow down the presentation of the video such that every frame can be displayed so that no frames are missed. By selecting "View>Play at Frame Rate" frames will be dropped during playback, if needed, in order to sustain the file's playback frame rate.
+
 ## Create/Export a Report {#create}
 
 When an analysis (which may be time consuming, depending on the length of the file) is complete the analysis data may then be exported to a compressed XML file for future use. At a later point, the video may be reviewed again simply by opening the XML file--using the **Import** menu, or dragging and dropping the XML into QCTools--instead of having to reload/ reanalyze the video file itself; this process will take considerably less time. Additionally, this file may be opened in other environments such as standard spreadsheet or database applications.
