@@ -112,7 +112,6 @@ The vectorscope player provides the following options:
 * Field: If the checkbox is enabled the player will show two waveforms side-by-side that depict field 1 and field 2 separately.
 * Intensity: Set intensity. Smaller values are useful to find out how many values of the same luminance are distributed across input rows/columns. Default value is 0.1\. Allowed range is [0, 1].
 * Mode: The vectorscope filter can be adjusted to different displays. The default is 'color3'. See [FFmpeg's vectorscope documentation](https://ffmpeg.org/ffmpeg-filters.html#vectorscope) for information on each option.
-* Peak: If enabled, the vectorscope will outline the extent of the plotted values to show an envelope around the plotted values. Peak may be adjusted to outline the extent frame-per-frame or over time.
 
 ![Vectorscope](media/vectorscope_illegal.jpg)
 
