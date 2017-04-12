@@ -26,8 +26,6 @@ The QCTools preview window is intended as an analytical playback environment tha
 | [Color Matrix](#color-matrix) |
 
 
----
-
 ## [Help] {#help}
 
 This selection will launch the Playback Filters window where you may review the documentation.
@@ -280,7 +278,7 @@ Displays a visualization of the audio as a musical scale. See [FFmpeg's showcqt 
 
 Plots two channels of audio against each other on different axis. This display can show if audio is out-of-phase (displays as a horizontal line), dual-mono (displays as a verical line), or stereo (displays as a two dimensional complex shape).
 
-![Audio Vectorscope](media/playbackfilter_audio-vectorscope.jpg)
+![Audio Vectorscope](media/playbackfilter_audio_vectorscope.jpg)
 
 ## [Audio Phase Meter] {#audio-phase-meter}
 
