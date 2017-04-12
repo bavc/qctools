@@ -140,10 +140,6 @@ In addition to technical metadata about the file (duration, frame rate, file siz
 
 ## Video Analysis Window {#analysis}
 
-![Video Analysis Window](media/Slide2.jpg)
-
-With the available views:
-
 ![Views](media/Slide3.jpg)
 
 Many playback filters will use contextual options to tweak them, please review the Playback Filters section of the help documentation for more details.
