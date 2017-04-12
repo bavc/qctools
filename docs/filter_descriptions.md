@@ -190,7 +190,7 @@ This filter plots the Peak Signal to Noise Ratio between the video in field 1 (o
 
 ![PSNRf](media/NGA000006_psnrf.jpg)
 
-## Packet Duration Time (pkt_duration_time) {#pkd}
+## Packet Duration Time (pkt\_duration\_time) {#pkd}
 
 The duration of the frame's presentation. Note: for constant frame rate video this will be the same value for every frame while it will vary for variable frame rate video.
 
