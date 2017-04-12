@@ -727,7 +727,7 @@ const filter Filters[]=
         },
     },
     {
-        "Vertical Repetition Pixels",
+        "Vertical Line Repetition",
         0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
