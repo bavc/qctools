@@ -14,7 +14,7 @@
 
 ## Install {#install}
 
-Go to [http://bavc.org/qctools](http://bavc.org/qctools) and download QCTools for your operating system (currently Windows, Mac OS X, and many Linux-based operating systems are supported). Initiate the install by double-clicking the icon, and follow the steps. New releases of QCTools will be periodically available at BAVC's [QCTools project website](http://www.bavc.org/qctools) as well as the releases tab on the [QCTools Github page](https://github.com/bavc/qctools/releases).
+Visit [https://bavc.org](https://bavc.org/preserve-media/preservation-tools) or [QCTools on Github](https://github.com/bavc/qctools) and download QCTools for your operating system (currently Windows, Mac OS X, and many Linux-based operating systems are supported). New releases of QCTools will be periodically available at BAVC. We encourage any issues, bugs, or ideas for QCTools to be submitted via our [issue tracker](https://github.com/bavc/qctools/issues).
 
 ## Preferences {#preferences}
 
@@ -22,7 +22,7 @@ QCTools provides a Preferences window to configure settings for running QCTools.
 
 ### Filters
 
-QCTool's analysis methods depend on filters from FFmpeg's libavfilter library. Currently this includes: [signalstats](http://ffmpeg.org/ffmpeg-filters.html#signalstats) (initially created as part the QCTools project), [cropdetect](http://ffmpeg.org/ffmpeg-filters.html#cropdetect), [PSNR](http://ffmpeg.org/ffmpeg-filters.html#psnr), [astats](http://ffmpeg.org/ffmpeg-filters.html#astats), [aphasemeter](http://ffmpeg.org/ffmpeg-filters.html#aphasemeter), and [EBU R.128](http://ffmpeg.org/ffmpeg-filters.html#ebur128).
+QCTool's analysis methods depend on filters from FFmpeg's libavfilter library. The "Filters" tab allows filters to be enabled or disabled. Currently this includes:
 
 | filter name | track type | application in QCTools |
 | [signalstats](http://ffmpeg.org/ffmpeg-filters.html#signalstats) | video | The `signalstats` analysis filter generates data to plot statistics on video signal levels, frame-to-frame differences, saturation and hue averages, and quantifications of visual patterns and errors. It is highly recommended to enable this filter. |
@@ -33,11 +33,19 @@ QCTool's analysis methods depend on filters from FFmpeg's libavfilter library. C
 | [aphasemeter](http://ffmpeg.org/ffmpeg-filters.html#aphasemeter) | audio | The audio phase value represents the mean phase of current audio frame. Value is in range [-1, 1]. The -1 means left and right channels are completely out of phase and 1 means channels are in phase. |
 | [EBU R.128](http://ffmpeg.org/ffmpeg-filters.html#ebur128) | audio | The EBU R.128 filter provides data on the perceived loudness of audio volume. |
 
-Enabling all filters naturally provides more data, but results in a slower analysis and large files. The EBU R.128 values represent perceived volume whereas the `astats` filters include metrics on actual volume (so the use of EBU R128 may not be considered essential if `astats` is in use).
+Enabling all filters naturally provides more data, but results in a slower analysis and larger files. The EBU R.128 values represent perceived volume whereas the `astats` filters include metrics on actual volume (so the use of EBU R128 may not be considered essential if `astats` is in use). Additionally `PSNR` and `SSIM` both cover similar metrics by quantifying the difference between the two fields of the frame (the image of the odd-numbered lines vs the image of the even-numbered lines); `SSIM` is recommended.
 
 ### Tracks
 
 The 'Tracks' Preference pane allows the user to set if they would like to analyze only the first track or all tracks of video and audio. Setting QCTools to analyze only the first track will result in a faster analyze but the other tracks would be ignored.
+
+### Signalserver
+
+QCTools now offers [SignalServer](https://github.com/bavc/signalserver) integration, allowing users to automatically or manually upload QCTools Reports as they are created by the application. Detailed SignalServer installation instructions can be found [here](https://github.com/bavc/signalserver/blob/master/README.md). Installation will vary based upon your specific technical infrastructure. Though designed for a Linux server environment, SignalServer can be installed on a local computer via [Docker](https://www.docker.com/).
+
+Once SignalServer has been [installed](https://github.com/bavc/signalserver/blob/master/README.md) and an account on the server has been created, you’ll need to connect it to QCTools. Under the SignalServer tab, fill in the following: the unique URL of your SignalServer instance, your username, and your password.
+
+![SignalServer view](signalserver_preferences.png)
 
 ## Load Video Files {#load}
 
@@ -51,7 +59,7 @@ As files are opened QCTools will begin immediately processing them. This involve
 
 ## Select Graph Filters {#select}
 
-By clicking the graph checkboxes you can select particular audiovisual metrics that you wish to analyze and display. You may make these selections before uploading your video or at any time after the QCTools analysis has been done and the graph display will update dynamically. As a default, 'Y values', 'U values', 'V values', 'Diffs', and 'Sat' (saturation) are selected. To begin, you may also want to select the **Temporal Outliers** (tout) Graph Filter. This will detect any large discrepancies between pixels and can provide an initial, high-level overview of potential errors.
+By clicking the graph checkboxes you can select particular audiovisual metrics that you wish to analyze and display. You may make these selections before uploading your video or at any time after the QCTools analysis has been done and the graph display will update dynamically. The checkboxes that enable/disable the graphs can also be dragged/dropped left or right which will reorder the presentation of the graphs accordingly. As a default, 'Y values', 'U values', 'V values', 'Diffs', and 'Sat' (saturation) are selected. To begin, you may also want to select the **Temporal Outliers** (tout) Graph Filter. This will detect any large discrepancies between pixels and can provide an initial, high-level overview of potential errors.
 
 For descriptions of each Filter and how to read graph values, please see the Help Section, denoted by the '?' icon in the toolbox portion of the application.
 
@@ -78,6 +86,10 @@ Some helpful **keyboard shortcuts** you may want to use are:
 ## Playback and Visual Analysis {#playback}
 
 By clicking on a thumbnail, you can open the preview window. The preview window serves as a playback environment that allows spot checking and manual video analysis. The preview window contains two playback windows that can be set to various selections; the filters allow the video to be processed in one of many ways which may help make particular issues more discernible. See the **Playback Filters** page for more details on these playback filters.
+
+When playing back a media file please note that QCTools will only render the video. The audio may be visualized in one of the Audio Playback Filters but the audio will not be presently aurally.
+
+Under situations where QCTools is not able to play back the video in real-time (for instance because the video is very large or the processing power available is not sufficient), there are options under the "View" toolbar menu to determine how playback should be prioritized under limited resources. Selecting "View>Play All Frames" will slow down the presentation of the video such that every frame can be displayed so that no frames are missed. By selecting "View>Play at Frame Rate" frames will be dropped during playback, if needed, in order to sustain the file's playback frame rate.
 
 ## Create/Export a Report {#create}
 
@@ -127,10 +139,6 @@ In addition to technical metadata about the file (duration, frame rate, file siz
 | MSEfY | The number of frames with an MSEfY value over 1000 |
 
 ## Video Analysis Window {#analysis}
-
-![Video Analysis Window](media/Slide2.jpg)
-
-With the available views:
 
 ![Views](media/Slide3.jpg)
 
