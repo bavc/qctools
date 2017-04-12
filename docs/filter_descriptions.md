@@ -192,6 +192,8 @@ This filter plots the Peak Signal to Noise Ratio between the video in field 1 (o
 
 ## Packet Duration Time (pkt_duration_time) {#pkd}
 
+The duration of the frame's presentation. Note: for constant frame rate video this will be the same value for every frame while it will vary for variable frame rate video.
+
 ## Packet Size (pkt_size) {#ps}
 
 This filter shows the encoded size of the frame.
