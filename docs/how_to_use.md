@@ -14,7 +14,7 @@
 
 ## Install {#install}
 
-Go to [http://bavc.org/qctools](http://bavc.org/qctools) and download QCTools for your operating system (currently Windows, Mac OS X, and many Linux-based operating systems are supported). Initiate the install by double-clicking the icon, and follow the steps. New releases of QCTools will be periodically available at BAVC's [QCTools project website](http://www.bavc.org/qctools) as well as the releases tab on the [QCTools Github page](https://github.com/bavc/qctools/releases).
+Visit [https://bavc.org](https://bavc.org/preserve-media/preservation-tools) or [QCTools on Github](https://github.com/bavc/qctools) and download QCTools for your operating system (currently Windows, Mac OS X, and many Linux-based operating systems are supported). New releases of QCTools will be periodically available at BAVC. We encourage any issues, bugs, or ideas for QCTools to be submitted via our [issue tracker](https://github.com/bavc/qctools/issues).
 
 ## Preferences {#preferences}
 
@@ -22,7 +22,7 @@ QCTools provides a Preferences window to configure settings for running QCTools.
 
 ### Filters
 
-QCTool's analysis methods depend on filters from FFmpeg's libavfilter library. Currently this includes: [signalstats](http://ffmpeg.org/ffmpeg-filters.html#signalstats) (initially created as part the QCTools project), [cropdetect](http://ffmpeg.org/ffmpeg-filters.html#cropdetect), [PSNR](http://ffmpeg.org/ffmpeg-filters.html#psnr), [astats](http://ffmpeg.org/ffmpeg-filters.html#astats), [aphasemeter](http://ffmpeg.org/ffmpeg-filters.html#aphasemeter), and [EBU R.128](http://ffmpeg.org/ffmpeg-filters.html#ebur128).
+QCTool's analysis methods depend on filters from FFmpeg's libavfilter library. The "Filters" tab allows filters to be enabled or disabled. Currently this includes: 
 
 | filter name | track type | application in QCTools |
 | [signalstats](http://ffmpeg.org/ffmpeg-filters.html#signalstats) | video | The `signalstats` analysis filter generates data to plot statistics on video signal levels, frame-to-frame differences, saturation and hue averages, and quantifications of visual patterns and errors. It is highly recommended to enable this filter. |
@@ -33,7 +33,7 @@ QCTool's analysis methods depend on filters from FFmpeg's libavfilter library. C
 | [aphasemeter](http://ffmpeg.org/ffmpeg-filters.html#aphasemeter) | audio | The audio phase value represents the mean phase of current audio frame. Value is in range [-1, 1]. The -1 means left and right channels are completely out of phase and 1 means channels are in phase. |
 | [EBU R.128](http://ffmpeg.org/ffmpeg-filters.html#ebur128) | audio | The EBU R.128 filter provides data on the perceived loudness of audio volume. |
 
-Enabling all filters naturally provides more data, but results in a slower analysis and large files. The EBU R.128 values represent perceived volume whereas the `astats` filters include metrics on actual volume (so the use of EBU R128 may not be considered essential if `astats` is in use).
+Enabling all filters naturally provides more data, but results in a slower analysis and larger files. The EBU R.128 values represent perceived volume whereas the `astats` filters include metrics on actual volume (so the use of EBU R128 may not be considered essential if `astats` is in use). Additionally `PSNR` and `SSIM` both cover similar metrics by quantifying the difference between the two fields of the frame (the image of the odd-numbered lines vs the image of the even-numbered lines); `SSIM` is recommended.
 
 ### Tracks
 
