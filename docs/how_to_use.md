@@ -39,6 +39,14 @@ Enabling all filters naturally provides more data, but results in a slower analy
 
 The 'Tracks' Preference pane allows the user to set if they would like to analyze only the first track or all tracks of video and audio. Setting QCTools to analyze only the first track will result in a faster analyze but the other tracks would be ignored.
 
+### Signalserver
+
+QCTools now offers [SignalServer](https://github.com/bavc/signalserver) integration, allowing users to automatically or manually upload QCTools Reports as they are created by the application. Detailed signalserver installation instructions can be found [here](https://github.com/bavc/signalserver/blob/master/README.md). Installation will vary based upon your specific technical infrastructure. Though designed for a Linux server environment, SignalServer can be installed on a local computer via docker.
+
+Once SignalServer has been properly [installed](https://github.com/bavc/signalserver/blob/master/README.md),and you’ve created a personal account, you’ll need to connect it to QCTools. You can do so by clicking on the menu bar at the top left of the QCTools screen and selecting Preferences (keyboard shortcut: #,). Under the SignalServer tab, fill in the following: the unique URL of your SignalServer app, and your user name and password. 
+
+<img src="media/signalserver_preferences.png" alt="signalserver" width="560"/>
+
 ## Load Video Files {#load}
 
 QCTools can currently accommodate several video file types including QuickTime, MXF, AVI, Matroska, MP4, and many other audiovisual file formats. Once the QCTools application is open you may identify selected video files for QCTools analysis in three ways:
