@@ -4,7 +4,7 @@ The QCTools preview window is intended as an analytical playback environment tha
 
 ---
 
-## Table of Contents
+# Table of Contents
 
 [Audio Bit Scope](#audio-bit-scope)  
 [Audio Frequency](#audio-frequency)  
@@ -47,6 +47,7 @@ The QCTools preview window is intended as an analytical playback environment tha
 [Waveform / Vectorscope](#waveform-vectorscope)  
 [Zoom](#zoom)  
 
+# Standard Displays
 
 ## Help {#help}
 
@@ -65,6 +66,8 @@ This view simply shows the video as QCTools interprets it, no special effects or
 This image shows two Normal displays side-by-side where the right image has **'Field'** enabled. By viewed the fields separated on the right, it is easily clear that while field 1 was read correctly from the tape, there was no color data was read for field 2\. This issue was due to a head clog and fixed by cleaning the video player and re-digitizing the content.
 
 ![Normal / Field Split](media/fieldsplit.jpg)
+
+# Video Playback Filters
 
 ## Histogram {#histogram}
 
@@ -276,6 +279,8 @@ Displays a user-defined "tiled" mosaic of successive frames. Maximum 12x12 grid.
 Allows a user to zoom to a particular portion of the image using X and Y coordinates. Includes "Strength" and "Intensity" modes.
 
 ![Zoom](media/playbackfilter_zoom.jpg)
+
+# Audio Playback Filters
 
 ## Audio Spectrum {#audio-spectrum}
 
