@@ -263,7 +263,7 @@ void MainWindow::on_actionExport_XmlGz_Prompt_triggered()
     if (FileName.size()==0)
         return;
 
-    Files[Files_CurrentPos]->Export_XmlGz(FileName);
+    Files[Files_CurrentPos]->Export_XmlGz(FileName, Prefs->ActiveFilters);
     statusBar()->showMessage("Exported to "+FileName);
 }
 
@@ -275,7 +275,7 @@ void MainWindow::on_actionExport_XmlGz_Sidecar_triggered()
 
     QString FileName=Files[Files_CurrentPos]->fileName() + ".qctools.xml.gz";
 
-    Files[Files_CurrentPos]->Export_XmlGz(FileName);
+    Files[Files_CurrentPos]->Export_XmlGz(FileName, Prefs->ActiveFilters);
     statusBar()->showMessage("Exported to "+FileName);
 
 }
@@ -287,7 +287,7 @@ void MainWindow::on_actionExport_XmlGz_SidecarAll_triggered()
     {
         QString FileName=Files[Pos]->fileName() + ".qctools.xml.gz";
 
-        Files[Pos]->Export_XmlGz(FileName);
+        Files[Pos]->Export_XmlGz(FileName, Prefs->ActiveFilters);
     }
 
     statusBar()->showMessage("All files exported to sidecar file");

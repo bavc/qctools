@@ -61,7 +61,7 @@ public:
     void startExport(const QString& exportFileName = QString());
 
     // Dumps
-    void                        Export_XmlGz                (const QString &ExportFileName);
+    void                        Export_XmlGz                (const QString &ExportFileName, const activefilters& filters);
     void                        Export_CSV                  (const QString &ExportFileName);
 
     // Infos
@@ -136,6 +136,8 @@ public:
     void setIndex(int value);
     bool parsed() const;
 
+    void setExportFilters(const activefilters& exportFilters);
+
 public Q_SLOTS:
 
     void checkFileUploaded(const QString& fileName);
@@ -182,6 +184,8 @@ private:
     bool m_autoCheckFileUploaded;
     bool m_autoUpload;
     bool m_hasStats;
+
+    activefilters m_exportFilters;
 };
 
 #endif // GUI_FileInformation_H

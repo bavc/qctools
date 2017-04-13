@@ -31,8 +31,8 @@ public:
     void                        StatsFromExternalData(const char* Data, size_t Size);
     void                        StatsFromFrame(struct AVFrame* Frame, int Width, int Height);
     void                        TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos);
-    string                      StatsToCSV();
-    string                      StatsToXML(int Width, int Height);
+    string                      StatsToCSV(const activefilters& filters);
+    string                      StatsToXML(int Width, int Height, const activefilters& filters);
 };
 
 #endif // Stats_H

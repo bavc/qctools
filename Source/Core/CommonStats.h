@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 #include <stdint.h>
+#include <Core/Core.h>
+
 using namespace std;
 
 struct AVFrame;
@@ -58,8 +60,8 @@ public:
     virtual void                StatsFromFrame(struct AVFrame* Frame, int Width, int Height) = 0;
     virtual void                TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos) = 0;
     virtual void                StatsFinish();
-    virtual string              StatsToCSV() {return string();};
-    virtual string              StatsToXML(int, int) {return string();};
+    virtual string              StatsToCSV(const activefilters& filters) = 0;
+    virtual string              StatsToXML(int width, int height, const activefilters& filters) = 0;
 
 protected:
     // Status

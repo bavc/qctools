@@ -300,7 +300,7 @@ void AudioStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
 }
 
 //---------------------------------------------------------------------------
-string AudioStats::StatsToCSV()
+string AudioStats::StatsToCSV(const activefilters& filters)
 {
     stringstream Value;
     Value<<",,,,,,pts,,,,,,,,,,,,,,,YMIN,YLOW,YAVG,YHIGH,YMAX,UMIN,ULOW,UAVG,UHIGH,UMAX,VMIN,VLOW,VAVG,VHIGH,VMAX,YDIF,UDIF,VDIF,SATMIN,SATLOW,SATAVG,SATHIGH,SATMAX,HUEMED,HUEAVG,TOUT,VREP,BRNG,CROPx1,CROPx2,CROPy1,CROPy2,CROPw,CROPh,MSEy,MSEu,MSEv,PSNRy,PSNRu,PSNRv";
@@ -337,7 +337,7 @@ string AudioStats::StatsToCSV()
 }
 
 //---------------------------------------------------------------------------
-string AudioStats::StatsToXML (int Width, int Height)
+string AudioStats::StatsToXML (int Width, int Height, const activefilters& filters)
 {
     stringstream Data;
 
@@ -362,7 +362,14 @@ string AudioStats::StatsToXML (int Width, int Height)
 
         for (size_t Plot_Pos=0; Plot_Pos<Item_AudioMax; Plot_Pos++)
         {
-            string key=PerItem[Plot_Pos].FFmpeg_Name;
+            const activefilter filter = PerItem[Plot_Pos].Filter;
+            if(filter == activefilter(-1))
+                continue;
+
+            if(!filters.test(filter))
+                continue;
+
+            const std::string& key = PerItem[Plot_Pos].FFmpeg_Name;
 
             stringstream value;
             //switch (Plot_Pos)

@@ -170,6 +170,7 @@ void MainWindow::processFile(const QString &FileName)
     FileInformation* file = new FileInformation(signalServer, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks);
     connect(file, SIGNAL(positionChanged()), this, SLOT(Update()), Qt::DirectConnection); // direct connection is required here to get Update called from separate thread
     file->setIndex(Files.size());
+    file->setExportFilters(Prefs->ActiveFilters);
 
     Files.push_back(file);
     Files_CurrentPos=0;
@@ -377,6 +378,7 @@ void MainWindow::addFile(const QString &FileName)
     FileInformation* Temp=new FileInformation(signalServer, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks);
     connect(Temp, SIGNAL(positionChanged()), this, SLOT(Update()), Qt::DirectConnection); // direct connection is required here to get Update called from separate thread
     Temp->setIndex(Files.size());
+    Temp->setExportFilters(Prefs->ActiveFilters);
 
     Files.push_back(Temp);
     ui->fileNamesBox->addItem(Temp->fileName());
@@ -397,6 +399,7 @@ void MainWindow::addFile(
                                               FrameCount, Encoding_FileName, Encoding_Format);
     connect(Temp, SIGNAL(positionChanged()), this, SLOT(Update()), Qt::DirectConnection); // direct connection is required here to get Update called from separate thread
     Temp->setIndex(Files.size());
+    Temp->setExportFilters(Prefs->ActiveFilters);
 
     Files.push_back(Temp);
     ui->fileNamesBox->addItem(Temp->fileName());

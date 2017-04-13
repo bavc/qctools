@@ -112,7 +112,7 @@ void FileInformation::runParse()
 
 void FileInformation::runExport()
 {
-    Export_XmlGz(m_exportFileName);
+    Export_XmlGz(m_exportFileName, m_exportFilters);
 }
 
 //***************************************************************************
@@ -482,7 +482,7 @@ void FileInformation::startExport(const QString &exportFileName)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void FileInformation::Export_XmlGz (const QString &ExportFileName)
+void FileInformation::Export_XmlGz (const QString &ExportFileName, const activefilters& filters)
 {
     if (!Glue)
         return;
@@ -504,7 +504,7 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName)
     // From stats
     for (size_t Pos=0; Pos<Stats.size(); Pos++)
         if (Stats[Pos])
-            Data<<Stats[Pos]->StatsToXML(Glue->Width_Get(), Glue->Height_Get());
+            Data<<Stats[Pos]->StatsToXML(Glue->Width_Get(), Glue->Height_Get(), filters);
 
     // Footer
     Data<<"    </frames>";
@@ -585,7 +585,7 @@ void FileInformation::Export_CSV (const QString &ExportFileName)
     if (ExportFileName.isEmpty())
         return;
 
-    string StatsToExternalData=ReferenceStat()->StatsToCSV();
+    string StatsToExternalData=ReferenceStat()->StatsToCSV(m_exportFilters);
 
     QFile F(ExportFileName);
     F.open(QIODevice::WriteOnly|QIODevice::Truncate);
@@ -984,4 +984,9 @@ void FileInformation::handleAutoUpload()
 bool FileInformation::parsed() const
 {
     return m_parsed;
+}
+
+void FileInformation::setExportFilters(const activefilters &exportFilters)
+{
+    m_exportFilters = exportFilters;
 }
