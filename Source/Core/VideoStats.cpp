@@ -380,7 +380,7 @@ void VideoStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
 }
 
 //---------------------------------------------------------------------------
-string VideoStats::StatsToCSV()
+string VideoStats::StatsToCSV(const activefilters& filters)
 {
     stringstream Value;
     Value<<",,,,,,pts,,,,,,,,,,,,,,,YMIN,YLOW,YAVG,YHIGH,YMAX,UMIN,ULOW,UAVG,UHIGH,UMAX,VMIN,VLOW,VAVG,VHIGH,VMAX,YDIF,UDIF,VDIF,SATMIN,SATLOW,SATAVG,SATHIGH,SATMAX,HUEMED,HUEAVG,TOUT,VREP,BRNG,CROPx1,CROPx2,CROPy1,CROPy2,CROPw,CROPh,MSEy,MSEu,MSEv,PSNRy,PSNRu,PSNRv";
@@ -417,7 +417,7 @@ string VideoStats::StatsToCSV()
 }
 
 //---------------------------------------------------------------------------
-string VideoStats::StatsToXML (int Width, int Height)
+string VideoStats::StatsToXML (int Width, int Height, const activefilters& filters)
 {
     stringstream Data;
 
@@ -447,9 +447,14 @@ string VideoStats::StatsToXML (int Width, int Height)
 
         for (size_t Plot_Pos=0; Plot_Pos<Item_VideoMax; Plot_Pos++)
         {
-            string key=PerItem[Plot_Pos].FFmpeg_Name;
-            if(key == "pkt_duration_time" || key == "pkt_size")
+            const activefilter filter = PerItem[Plot_Pos].Filter;
+            if(filter == activefilter(-1))
                 continue;
+
+            if(!filters.test(filter))
+                continue;
+
+            const std::string& key = PerItem[Plot_Pos].FFmpeg_Name;
 
             stringstream value;
             switch (Plot_Pos)

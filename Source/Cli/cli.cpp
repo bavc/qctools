@@ -307,6 +307,7 @@ int Cli::exec(QCoreApplication &a)
 
         QObject::connect(info.get(), SIGNAL(statsFileGenerationProgress(quint64, quint64)), this, SLOT(onStatsFileGenerationProgress(quint64, quint64)));
         QObject::connect(info.get(), SIGNAL(statsFileGenerated(SharedFile, const QString&)), &a, SLOT(quit()));
+        info->setExportFilters(filters);
         info->startExport(output);
         a.exec();
 

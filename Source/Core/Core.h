@@ -57,6 +57,7 @@ struct per_item
     const   bool        NewLine;
     const   double      DefaultLimit;
     const   double      DefaultLimit2;
+    const   activefilter Filter;
 };
 
 struct stream_info
