@@ -1,4 +1,4 @@
-0.8, 2017-04-11
+0.8, 2017-04-15
 -----
 + Added a QCTools command line interface, "qcli"
 + Added integration with Signalserver, uploading QCTools Report
