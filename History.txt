@@ -1,3 +1,30 @@
+0.8, 2017-04-11
+-----
++ Added a QCTools command line interface, "qcli"
++ Added integration with Signalserver, uploading QCTools Report
++ Added aphasemeter player
++ Optimizations for playback and multithreading
++ Added ffprobe's stream and format metadata to the QCTools Report
++ Added graphs to plot packet duration time and packet size
++ Adjusted graphs y-axis to accommodate non-8 bit values
++ Display frame type in playback window
++ Added Cb and Cr shifting to the Chroma Adjust player
++ Added documentation for filters, thx @retokromer @kieranjol
++ Rework of documentation from development in HTML to Markdown
++ Added audio bitscope player (abitscope)
++ Added a 10 column bit player (shows a sample of the first 10 MSBs)
++ Added integration of font management to drawing text in playback filters
++ Graphs can be rearranged by dragging their checkboxes
++ The List view can be sorted by filename
++ Alphabetized the playback filter menu
++ Consolidate to one .pro file with options to build with homebrew or with decklink
++ Added EIA608 and VITC viewer
++ Added contribution guidelines to repository
+- Fix crash on incomplete Matroska
+- Fix to vectorscope when fields are split
+- Fix crashes when the input contains audio but no video
+- Fixing on opening xml.gz files
+
 0.7.3, 2016-10-10
 -----
 + Added graphing the SSIM (Structural SImilarity Metric) between the two fields
