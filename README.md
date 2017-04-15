@@ -16,21 +16,31 @@ An overview of QCTools and how to use it can be found [here.](http://bavc.github
 
 # installation
 
+## via installers
+
 Go to http://bavc.org/qctools or [Releases](https://github.com/bavc/qctools/releases) and download QCTools for your operating system. Initiate the install by double-clicking the icon, and follow the steps. New releases of QCTools will be periodically available at the QCTools Project website.
+
+## via homebrew
 
 Of if you have homebrew, get the latest by running:
 ```
-brew install --HEAD amiaopensource/amiaos/qctools
+brew install amiaopensource/amiaos/qctools
 brew linkapps qctools
 ```
+
+## development builds
+
+### via homebrew
 
 Note that occasionally QCTools uses features from git-master of FFmpeg, thus you may need to update FFmpeg to git-master as well to try the newest pre-release QCTools features.
 
 ```
-brew reinstall --HEAD ffmpeg
+brew reinstall --HEAD ffmpeg --with-freetype
 brew install --HEAD amiaopensource/amiaos/qctools
 brew linkapps qctools
 ```
+
+### via daily builds
 
 Or grab one of the [QCTools daily builds](https://mediaarea.net/download/snapshots/binary/qctools/) provided by MediaArea. These builds will reflect git-master and are not tied to any particular release.
 
