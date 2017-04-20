@@ -2120,7 +2120,9 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
 
         if(fontFile.exists())
         {
-            str.replace(QString("${fontfile}"), fontFile.fileName());
+            QString fontFileName(fontFile.fileName());
+            fontFileName = fontFileName.replace(":", "\\\\:"); // ":" is a reserved character, it must be escaped
+            str.replace(QString("${fontfile}"), fontFileName);
         }
     }
 
