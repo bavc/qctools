@@ -1398,12 +1398,15 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     ImageLayout->addWidget(imageLabel2);
     Layout->addLayout(ImageLayout, 1, 0, 1, 3);
     */
-    QSplitter* splitter = new QSplitter;
+    splitter = new QSplitter;
+    splitter->installEventFilter(this);
     splitter->setStyleSheet("QSplitter::handle { background-color: gray }");
 
     splitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     splitter->addWidget(imageLabel1);
     splitter->addWidget(imageLabel2);
+    splitter->handle(1)->installEventFilter(this);
+
     Layout->addWidget(splitter, 1, 0, 1, 3);
 
     // Info
@@ -2521,6 +2524,23 @@ void BigDisplay::updateSelection(int Pos, ImageLabel* image, options& opts)
     {
         image->clearSelectionArea();
     }
+}
+
+bool BigDisplay::eventFilter(QObject *watched, QEvent *event)
+{
+    if((watched == splitter || watched == splitter->handle(1)) && event->type() == QEvent::MouseButtonDblClick)
+    {
+        QList<int> sizes;
+
+        int left = (width() - splitter->handle(0)->width()) / 2;
+        int right = width() - splitter->handle(0)->width() - left;
+
+        sizes << left << right;
+
+        splitter->setSizes(sizes);
+    }
+
+    return QWidget::eventFilter(watched, event);
 }
 
 void BigDisplay::updateImagesAndSlider(const QPixmap &pixmap1, const QPixmap &pixmap2, int sliderPos)
