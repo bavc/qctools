@@ -456,6 +456,9 @@ void ImageLabel::rescale(const QSize& newSize /*= QSize()*/ )
     auto picture = *Picture;
     auto availableSize = !newSize.isEmpty() ? newSize : ui->scrollArea->viewport()->size() - QSize(1, 1);
 
+    if(availableSize.width() < 0 || availableSize.height() < 0)
+        return;
+
     picture->Scale_Change(availableSize.width(), availableSize.height(), Pos - 1);
     auto scaleFactor = (qreal) availableSize.width() / picture->Width_Get();
 
