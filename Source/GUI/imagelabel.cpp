@@ -330,6 +330,13 @@ void ImageLabel::on_scalePercentage_doubleSpinBox_valueChanged(double value)
         double multiplier = value / 100;
         QSize newSize = QSize((*Picture)->Width_Get(), (*Picture)->Height_Get()) * multiplier;
 
+        if(!qFuzzyIsNull(100.00 - value) && !ui->freeScale_radioButton->isChecked())
+        {
+            ui->freeScale_radioButton->blockSignals(true);
+            ui->freeScale_radioButton->setChecked(true);
+            ui->freeScale_radioButton->blockSignals(false);
+        }
+
         rescale(newSize);
     }
 }
