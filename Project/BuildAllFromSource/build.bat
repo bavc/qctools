@@ -77,7 +77,7 @@ rem *** Build ffmpeg ***
 cd "%BUILD_DIR%\ffmpeg"
 
 set FFMPEG_CMDLINE=--prefix^=. --enable-gpl --enable-version3 --toolchain^=msvc
-set FFMPEG_CMDLINE=%FFMPEG_CMDLINE% --disable-securetransport --disable-videotoolbox --disable-swscale-alpha
+set FFMPEG_CMDLINE=%FFMPEG_CMDLINE% --disable-securetransport --disable-videotoolbox
 set FFMPEG_CMDLINE=%FFMPEG_CMDLINE% --disable-doc --disable-ffplay --disable-ffprobe --disable-ffserver --disable-debug
 if defined STATIC (
     set FFMPEG_CMDLINE=%FFMPEG_CMDLINE% --enable-static --disable-shared
