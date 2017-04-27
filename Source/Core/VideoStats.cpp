@@ -85,7 +85,21 @@ void VideoStats::StatsFromExternalData (const char* Data, size_t Size)
 
                         Attribute=Frame->Attribute("pkt_duration_time");
                         if (Attribute)
+                        {
                             durations[x_Current]=std::atof(Attribute);
+                            y[Item_pkt_duration_time][x_Current] = durations[x_Current];
+
+                            {
+                                double& group1Max = y_Max[PerItem[Item_pkt_duration_time].Group1];
+                                double& group1Min = y_Min[PerItem[Item_pkt_duration_time].Group1];
+                                double& current = durations[x_Current];
+
+                                if(group1Max < current)
+                                    group1Max = current;
+                                if(group1Min > current)
+                                    group1Min = current;
+                            }
+                        }
 
                         Attribute=Frame->Attribute("key_frame");
                         if (Attribute)
@@ -97,7 +111,21 @@ void VideoStats::StatsFromExternalData (const char* Data, size_t Size)
 
                         Attribute = Frame->Attribute("pkt_size");
                         if (Attribute)
+                        {
                             pkt_size[x_Current] = std::atoi(Attribute);
+                            y[Item_pkt_size][x_Current] = pkt_size[x_Current];
+
+                            {
+                                double& group1Max = y_Max[PerItem[Item_pkt_size].Group1];
+                                double& group1Min = y_Min[PerItem[Item_pkt_size].Group1];
+                                int& current = pkt_size[x_Current];
+
+                                if(group1Max < current)
+                                    group1Max = current;
+                                if(group1Min > current)
+                                    group1Min = current;
+                            }
+                        }
 
                         Attribute = Frame->Attribute("pkt_pts");
                         if (Attribute)
