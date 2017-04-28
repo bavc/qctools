@@ -1,0 +1,128 @@
+#!/bin/bash
+
+_play(){
+  ffplay -f concat -safe 0 /tmp/qcquery.ffconcat -vf "drawtext=fontfile='/Library/Fonts/Courier New.ttf':box=1:boxcolor=black@0.5:fontsize=32:x=(w-tw)/2:y=h*(3/4)-ascent:fontcolor=white:text=%{pts\\\:hms}"
+}
+
+if [ "${1}" = "r" ] ; then
+  _play
+fi
+
+value="$1"
+operator="$2"
+threshold="$3"
+inputfile="${4}"
+
+if [[ "${inputfile##*.}" != "gz" ]] ; then
+  if [[ -f "${inputfile}.qctools.xml.gz" ]] ; then
+    echo "Using the report at ${inputfile}.xml.gz"
+    inputfile="${inputfile}.qctools.xml.gz"
+  else
+    echo "Gonna make a report of that..."
+    qcli -i "${inputfile}"
+    inputfile="${inputfile}.qctools.xml.gz"
+  fi
+fi
+
+case "${value}" in
+  YMAX)    filtername="lavfi.signalstats.YMAX" ;;
+  YMIN)    filtername="lavfi.signalstats.YMIN" ;;
+  YAVG)    filtername="lavfi.signalstats.YAVG" ;;
+  YHIGH)   filtername="lavfi.signalstats.YHIGH" ;;
+  YLOW)    filtername="lavfi.signalstats.YLOW" ;;
+  UMAX)    filtername="lavfi.signalstats.UMAX" ;;
+  UMIN)    filtername="lavfi.signalstats.UMIN" ;;
+  UAVG)    filtername="lavfi.signalstats.UAVG" ;;
+  UHIGH)   filtername="lavfi.signalstats.UHIGH" ;;
+  ULOW)    filtername="lavfi.signalstats.ULOW" ;;
+  VMAX)    filtername="lavfi.signalstats.VMAX" ;;
+  VMIN)    filtername="lavfi.signalstats.VMIN" ;;
+  VAVG)    filtername="lavfi.signalstats.VAVG" ;;
+  VHIGH)   filtername="lavfi.signalstats.VHIGH" ;;
+  VLOW)    filtername="lavfi.signalstats.VLOW" ;;
+  YDIF)    filtername="lavfi.signalstats.YDIF" ;;
+  UDIF)    filtername="lavfi.signalstats.UDIF" ;;
+  VDIF)    filtername="lavfi.signalstats.VDIF" ;;
+  SATMAX)  filtername="lavfi.signalstats.SATMAX" ;;
+  SATMIN)  filtername="lavfi.signalstats.SATMIN" ;;
+  SATAVG)  filtername="lavfi.signalstats.SATAVG" ;;
+  SATHIGH) filtername="lavfi.signalstats.SATHIGH" ;;
+  SATLOW)  filtername="lavfi.signalstats.SATLOW" ;;
+  HUEAVG)  filtername="lavfi.signalstats.HUEAGE" ;;
+  HUEMED)  filtername="lavfi.signalstats.HUEMED" ;;
+  TOUT)    filtername="lavfi.signalstats.TOUT" ;;
+  VREP)    filtername="lavfi.signalstats.VREP" ;;
+  BRNG)    filtername="lavfi.signalstats.BRNG" ;;
+  MSEY)    filtername="lavfi.psnr.mse.y" ;;
+  MSEU)    filtername="lavfi.psnr.mse.u" ;;
+  MSEV)    filtername="lavfi.psnr.mse.v" ;;
+  PSNRY)   filtername="lavfi.psnr.mse.y" ;;
+  PSNRU)   filtername="lavfi.psnr.mse.u" ;;
+  PSNRV)   filtername="lavfi.psnr.mse.v" ;;
+  SSIMALL) filtername="lavfi.ssim.All" ;;
+  SSIMY)   filtername="lavfi.ssim.Y" ;;
+  SSIMU)   filtername="lavfi.ssim.U" ;;
+  SSIMV)   filtername="lavfi.ssim.V" ;;
+  IDETSB)  filtername="lavfi.idet.single.bff" ;;
+  IDETST)  filtername="lavfi.idet.single.tff" ;;
+  IDETSP)  filtername="lavfi.idet.single.progressive" ;;
+  IDETSU)  filtername="lavfi.idet.single.undetermined" ;;
+  IDETMB)  filtername="lavfi.idet.multiple.bff" ;;
+  IDETMT)  filtername="lavfi.idet.multiple.tff" ;;
+  IDETMP)  filtername="lavfi.idet.multiple.progressive" ;;
+  IDETMU)  filtername="lavfi.idet.multiple.undetermined" ;;
+  IDETRB)  filtername="lavfi.idet.repeated.bottom" ;;
+  IDETRT)  filtername="lavfi.idet.repeated.top" ;;
+  IDETRN)  filtername="lavfi.idet.repeated.neither" ;;
+esac
+
+case "${operator}" in
+  gt) op=">" ;;
+  lt) op="<" ;;
+  gte) op=">=" ;;
+  lte) op="<=" ;;
+  eq) op="=" ;;
+  ne) op="!=" ;;
+esac
+
+echo "Examining $(basename "${inputfile}")"
+echo "Testing \"${filtername}${op}${threshold}\""
+FRAMECOUNT=$(gzcat "${inputfile}" | xml sel -t -v "count(//frame[@media_type='video'])")
+MATCH=$(gzcat "${inputfile}" | xml sel -t -v "count(//tag[@key='${filtername}'][@value${op}${threshold}])")
+PERCENT=$(echo "scale=3;(${MATCH}/${FRAMECOUNT})*100" | bc)
+echo "Matching $MATCH of $FRAMECOUNT frames (${PERCENT}%)"
+
+filename=$(gzcat "${inputfile}" | xml sel -t -v "//format/@filename" -n)
+while read i ; do
+  fn=$(echo "$i" | cut -d, -f1)
+  val=$(echo "$i" | cut -d, -f2)
+  if [[ -z $first ]] ; then
+    first="$fn"
+    last="$fn"
+    firstval="$val"
+    lastval="$val"
+    echo "file $filename" > /tmp/qcquery.ffconcat
+    echo "inpoint ${val}" >> /tmp/qcquery.ffconcat
+  else
+    NEXT=$(echo "${last} + 15" | bc)
+    if [ "${fn}" -le "${NEXT}" ] ; then
+      end="$fn"
+      last="$fn"
+      endval="$val"
+      lastval="$val"
+    else
+      if [[ -n "${lastval}" ]] ; then
+        echo "outpoint $lastval" >> /tmp/qcquery.ffconcat
+      fi
+      echo "file $filename" >> /tmp/qcquery.ffconcat
+      echo "inpoint ${val}" >> /tmp/qcquery.ffconcat
+      last="$fn"
+      lastval="$val"
+    fi
+  fi
+done < <(gzcat "${inputfile}" | xml sel -t -m "//frame" -v "position()" -o "," -m "tag[@key='${filtername}'][@value${op}${threshold}]" -v ../@pkt_pts_time -b -n | grep -v ",$")
+if [[ -n "${lastval}" ]] ; then
+  echo "outpoint $lastval" >> /tmp/qcquery.ffconcat
+fi
+
+_play
