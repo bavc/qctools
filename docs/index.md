@@ -12,5 +12,5 @@
 ## Supplemental, web-based documentation
 
 * [A/V Artifact Atlas](https://bavc.github.io/avaa/)
-* [QCTools Cheat Sheet](https://docs.google.com/document/d/1xat34KWmMwmz8lzXPUACItPdGFR_kBv43Vu6Qkeaov4)
+* [QCTools Cheat Sheet](https://github.com/bavc/qctools-documentation/blob/master/qctools/QCToolsWorkshopCheatSheet.pdf)
 * [Seattle Municipal Archives User Guide](https://github.com/bavc/qctools-documentation/tree/master/SeattleMunicipalArchives)
