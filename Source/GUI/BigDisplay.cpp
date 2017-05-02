@@ -1770,7 +1770,6 @@ void BigDisplay::FiltersList1_currentIndexChanged(size_t FilterPos)
     Layout0->addWidget(Options[0].FiltersList, 0, 0, Qt::AlignLeft);
     FiltersList_currentIndexChanged(0, FilterPos, Layout0);
     Options[0].FiltersList_Fake=new QLabel(" ");
-    Options[0].FiltersList_Fake->setMinimumHeight(24);
     Layout0->addWidget(Options[0].FiltersList_Fake, 1, 0, Qt::AlignLeft);
     Layout0->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum), 0, 14);
     Layout->addLayout(Layout0, 0, 0, 1, 1, Qt::AlignLeft|Qt::AlignTop);
@@ -1797,7 +1796,6 @@ void BigDisplay::FiltersList2_currentIndexChanged(size_t FilterPos)
     FiltersList_currentIndexChanged(1, FilterPos, Layout0);
     Layout0->addWidget(Options[1].FiltersList, 0, 14, Qt::AlignRight);
     Options[1].FiltersList_Fake=new QLabel(" ");
-    Options[1].FiltersList_Fake->setMinimumHeight(24);
     Layout0->addWidget(Options[1].FiltersList_Fake, 1, 14, Qt::AlignRight);
     Layout->addLayout(Layout0, 0, 2, 1, 1, Qt::AlignRight|Qt::AlignTop);
 
