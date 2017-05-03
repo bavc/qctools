@@ -68,20 +68,23 @@
       </widget>
      </item>
      <item>
-      <spacer name="left_horizontalSpacer_2">
+      <widget class="QSlider" name="scalePercentage_horizontalSlider">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::MinimumExpanding</enum>
+       <property name="tickPosition">
+        <enum>QSlider::TicksBelow</enum>
        </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>17</width>
-         <height>17</height>
-        </size>
+       <property name="tickInterval">
+        <number>1</number>
        </property>
-      </spacer>
+      </widget>
      </item>
      <item>
       <widget class="QLabel" name="scale_label">
@@ -91,15 +94,27 @@
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="scalePercentage_doubleSpinBox">
+      <widget class="QSpinBox" name="scalePercentage_spinBox">
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="readOnly">
+        <bool>false</bool>
+       </property>
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::PlusMinus</enum>
+       </property>
+       <property name="specialValueText">
+        <string/>
+       </property>
        <property name="suffix">
         <string>%</string>
        </property>
        <property name="minimum">
-        <double>1.000000000000000</double>
+        <number>0</number>
        </property>
        <property name="maximum">
-        <double>1000.000000000000000</double>
+        <number>1000</number>
        </property>
       </widget>
      </item>
@@ -125,8 +140,8 @@
      <widget class="QWidget" name="scrollAreaWidgetContents">
       <property name="geometry">
        <rect>
-        <x>120</x>
-        <y>72</y>
+        <x>124</x>
+        <y>77</y>
         <width>300</width>
         <height>246</height>
        </rect>
@@ -137,5 +152,38 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>scalePercentage_horizontalSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>scalePercentage_spinBox</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>365</x>
+     <y>18</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>543</x>
+     <y>21</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>scalePercentage_spinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>scalePercentage_horizontalSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>525</x>
+     <y>7</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>3</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

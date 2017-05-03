@@ -319,25 +319,30 @@ void ImageLabel::on_normalScale_radioButton_toggled(bool value)
 {
     if(value)
     {
-        on_scalePercentage_doubleSpinBox_valueChanged(100);
+        on_scalePercentage_spinBox_valueChanged(100);
     }
 }
 
-void ImageLabel::on_scalePercentage_doubleSpinBox_valueChanged(double value)
+void ImageLabel::on_scalePercentage_spinBox_valueChanged(int value)
 {
     if(*Picture)
     {
-        double multiplier = value / 100;
+        double multiplier = ((double) value) / 100;
+
         QSize newSize = QSize((*Picture)->Width_Get(), (*Picture)->Height_Get()) * multiplier;
+        QSize currentSize = Pixmap.size();
 
-        if(!qFuzzyIsNull(100.00 - value) && !ui->freeScale_radioButton->isChecked())
+        if(newSize != currentSize)
         {
-            ui->freeScale_radioButton->blockSignals(true);
-            ui->freeScale_radioButton->setChecked(true);
-            ui->freeScale_radioButton->blockSignals(false);
-        }
+            if(value != 100 && !ui->freeScale_radioButton->isChecked())
+            {
+                ui->freeScale_radioButton->blockSignals(true);
+                ui->freeScale_radioButton->setChecked(true);
+                ui->freeScale_radioButton->blockSignals(false);
+            }
 
-        rescale(newSize);
+            rescale(newSize);
+        }
     }
 }
 
@@ -471,15 +476,17 @@ void ImageLabel::rescale(const QSize& newSize /*= QSize()*/ )
         return;
     }
 
-    qDebug() << (Pos == 1 ? "left" : "right");
-
     Pixmap.convertFromImage(QImage(image.data(), image.width(), image.height(), image.linesize(), QImage::Format_RGB888));
     uilabel->setGeometry(0, 0, Pixmap.width(), Pixmap.height());
     uilabel->setPixmap(Pixmap);
 
-    ui->scalePercentage_doubleSpinBox->blockSignals(true);
-    ui->scalePercentage_doubleSpinBox->setValue(scaleFactor * 100);
-    ui->scalePercentage_doubleSpinBox->blockSignals(false);
+    ui->scalePercentage_spinBox->blockSignals(true);
+    ui->scalePercentage_spinBox->setValue(scaleFactor * 100);
+    ui->scalePercentage_spinBox->blockSignals(false);
+
+    ui->scalePercentage_horizontalSlider->blockSignals(true);
+    ui->scalePercentage_horizontalSlider->setValue(scaleFactor * 100);
+    ui->scalePercentage_horizontalSlider->blockSignals(false);
 
     setSelectionArea(selectionPos.x(), selectionPos.y(), selectionSize.width(), selectionSize.height());
 }
