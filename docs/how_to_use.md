@@ -45,7 +45,7 @@ QCTools now offers [SignalServer](https://github.com/bavc/signalserver) integrat
 
 Once SignalServer has been [installed](https://github.com/bavc/signalserver/blob/master/README.md) and an account on the server has been created, you’ll need to connect it to QCTools. Under the SignalServer tab, fill in the following: the unique URL of your SignalServer instance, your username, and your password.
 
-![SignalServer view](signalserver_preferences.png)
+![SignalServer view](media/signalserver_preferences.png)
 
 ## Load Video Files {#load}
 
