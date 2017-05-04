@@ -405,6 +405,8 @@ FFmpeg_Glue::outputdata::~outputdata()
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
 {
+    ++FramePos;
+
     DecodedFrame=DecodedFrame_;
     
     //Filtering
@@ -449,14 +451,12 @@ void FFmpeg_Glue::outputdata::ApplyFilter()
     if (Filter.empty())
     {
         FilteredFrame = AVFramePtr(DecodedFrame, NoDeleter::free);
-        FramePos++;
         return;
     }
 
     if (!FilterGraph && !FilterGraph_Init())
     {
         FilteredFrame = AVFramePtr(DecodedFrame, NoDeleter::free);
-        FramePos++;
         return;
     }
             
@@ -465,7 +465,6 @@ void FFmpeg_Glue::outputdata::ApplyFilter()
     if (av_buffersrc_add_frame_flags(FilterGraph_Source_Context, DecodedFrame, 0)<0)
     {
         FilteredFrame = AVFramePtr(DecodedFrame, NoDeleter::free);
-        FramePos++;
         return;
     }
 
@@ -495,7 +494,6 @@ void FFmpeg_Glue::outputdata::ApplyFilter()
     };
 
     FilteredFrame = AVFramePtr(tmpFilteredFrame, FilteredFrameDeleter::free);
-    FramePos++;
 }
 
 //---------------------------------------------------------------------------
