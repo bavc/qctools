@@ -53,7 +53,7 @@ public:
         std::string foreground = std::string(displayValue, ForegroundChar);
         std::string background = std::string(backgroundWidth, BackgroundChar);
 
-        std::cout << "\r" << foreground << background << " " << value << " of " << max << " " << append.toStdString();
+        std::cout << "\r" << foreground << background << " " << value << " of " << max << " " << append.toStdString() << std::flush;
     }
 
 

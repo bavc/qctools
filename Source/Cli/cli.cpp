@@ -266,6 +266,8 @@ int Cli::exec(QCoreApplication &a)
         // parse
 
         progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
+        progress->setValue(0);
+
         QObject::connect(&progressTimer, SIGNAL(timeout()), this, SLOT(updateParsingProgress()));
         progressTimer.start(500);
 
@@ -286,6 +288,7 @@ int Cli::exec(QCoreApplication &a)
         std::cout << std::endl << "generating QCTools report... " << std::endl;
 
         progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
+        progress->setValue(0);
 
         QObject::connect(info.get(), SIGNAL(statsFileGenerationProgress(quint64, quint64)), this, SLOT(onStatsFileGenerationProgress(quint64, quint64)));
         QObject::connect(info.get(), SIGNAL(statsFileGenerated(SharedFile, const QString&)), &a, SLOT(quit()));
@@ -332,6 +335,7 @@ int Cli::exec(QCoreApplication &a)
 
             std::cout << "uploading... " << std::endl;
             progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
+            progress->setValue(0);
 
             info->upload(output);
             a.exec();
