@@ -31,6 +31,7 @@ class QRadioButton;
 class QButtonGroup;
 class QHBoxLayout;
 class QPushButton;
+class QSplitter;
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -167,6 +168,12 @@ protected:
     void                        FiltersList2_currentOptionChanged(size_t Picture_Current);
 
     void updateSelection(int Pos, ImageLabel* image, options& opts);
+
+private:
+    QSplitter* splitter;
+
+protected:
+    bool eventFilter(QObject *, QEvent *);
 
 Q_SIGNALS:
 	void rewind(int pos);

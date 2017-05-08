@@ -2,7 +2,8 @@
 #define IMAGELABEL_H
 
 #include <QResizeEvent>
-#include <QWidget>
+#include <QFrame>
+#include <QLabel>
 
 namespace Ui {
 class ImageLabel;
@@ -10,7 +11,7 @@ class ImageLabel;
 
 class FFmpeg_Glue;
 class SelectionArea;
-class ImageLabel : public QWidget
+class ImageLabel : public QFrame
 {
     Q_OBJECT
 
@@ -43,6 +44,12 @@ public Q_SLOTS:
 
     void showDebugOverlay(bool enable);
 
+private Q_SLOTS:
+    void on_fitToScreen_radioButton_toggled(bool value);
+    void on_normalScale_radioButton_toggled(bool value);
+    void on_scalePercentage_spinBox_valueChanged(int value);
+    void on_scalePercentage_horizontalSlider_valueChanged(int value);
+
 Q_SIGNALS:
 
     void selectionChanged(const QRectF& geometry);
@@ -53,7 +60,7 @@ protected:
     bool eventFilter(QObject* object, QEvent* event);
 
     bool needRescale();
-    void rescale();
+    void rescale(const QSize& newSize = QSize());
 private:
     Ui::ImageLabel *ui;
     SelectionArea* selectionArea;
@@ -69,6 +76,7 @@ private:
     FFmpeg_Glue**               Picture;
     size_t                      Pos;
     bool                        debugOverlay;
+    QLabel* uilabel;
 };
 
 #endif // IMAGELABEL_H

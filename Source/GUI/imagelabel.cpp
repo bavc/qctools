@@ -8,7 +8,7 @@
 
 ImageLabel::ImageLabel(FFmpeg_Glue** Picture_, size_t Pos_, QWidget *parent) :
     ui(new Ui::ImageLabel),
-    QWidget(parent),
+    QFrame(parent),
     Picture(Picture_),
     Pos(Pos_),
     selectionPos(0, 0),
@@ -19,7 +19,10 @@ ImageLabel::ImageLabel(FFmpeg_Glue** Picture_, size_t Pos_, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    selectionArea = new SelectionArea(ui->label);
+    uilabel = new QLabel();
+    ui->scrollArea->setWidget(uilabel);
+
+    selectionArea = new SelectionArea(uilabel);
 
     connect(selectionArea, &SelectionArea::geometryChangeFinished, this, [&]() {
         Q_EMIT selectionChangeFinished(QRectF(selectionPos, selectionSize));
@@ -54,7 +57,7 @@ ImageLabel::ImageLabel(FFmpeg_Glue** Picture_, size_t Pos_, QWidget *parent) :
         Q_EMIT selectionChanged(originalGeometry);
     });
 
-    ui->label->installEventFilter(this);
+    uilabel->installEventFilter(this);
 }
 
 ImageLabel::~ImageLabel()
@@ -85,6 +88,7 @@ void ImageLabel::updatePixmap(const QImage& image /*= nullptr*/)
 
     if (needRescale())
     {
+        qDebug() << (Pos == 1 ? "left" : "right") << " needs rescale, rescaling..";
         rescale();
     }
     else
@@ -104,12 +108,12 @@ void ImageLabel::updatePixmap(const QImage& image /*= nullptr*/)
         if (Image.isNull())
         {
             Pixmap = QPixmap(Pixmap.width(), Pixmap.height());
-            ui->label->setPixmap(Pixmap);
+            uilabel->setPixmap(Pixmap);
             return;
         }
 
         Pixmap.convertFromImage(Image);
-        ui->label->setPixmap(Pixmap);
+        uilabel->setPixmap(Pixmap);
     }
 }
 
@@ -117,14 +121,14 @@ void ImageLabel::setPixmap(const QPixmap &pixmap)
 {
     Pixmap = pixmap;
 
-	if (needRescale())
-	{
-		rescale();
-	} 
-	else
-	{
-		ui->label->setPixmap(pixmap);
-	}
+    if (needRescale())
+    {
+        rescale();
+    }
+    else
+    {
+        uilabel->setPixmap(pixmap);
+    }
 }
 
 size_t ImageLabel::GetPos() const
@@ -303,6 +307,67 @@ void ImageLabel::showDebugOverlay(bool enable)
     selectionArea->showDebugOverlay(enable);
 }
 
+void ImageLabel::on_fitToScreen_radioButton_toggled(bool value)
+{
+    if(value)
+    {
+        rescale();
+    }
+}
+
+void ImageLabel::on_normalScale_radioButton_toggled(bool value)
+{
+    if(value)
+    {
+        on_scalePercentage_spinBox_valueChanged(100);
+    }
+}
+
+void ImageLabel::on_scalePercentage_spinBox_valueChanged(int value)
+{
+    if(*Picture)
+    {
+        double multiplier = ((double) value) / 100;
+
+        QSize newSize = QSize((*Picture)->Width_Get(), (*Picture)->Height_Get()) * multiplier;
+        QSize currentSize = Pixmap.size();
+
+        if(newSize != currentSize)
+        {
+            if(value != 100 && !ui->freeScale_radioButton->isChecked())
+            {
+                ui->freeScale_radioButton->blockSignals(true);
+                ui->freeScale_radioButton->setChecked(true);
+                ui->freeScale_radioButton->blockSignals(false);
+            }
+
+            rescale(newSize);
+        }
+    }
+}
+
+const int MinSliderPercents = 50;
+const int MaxSliderPercents = 200;
+const int AvgSliderPercents = 100;
+
+void ImageLabel::on_scalePercentage_horizontalSlider_valueChanged(int value)
+{
+    int range = ui->scalePercentage_horizontalSlider->maximum() - ui->scalePercentage_horizontalSlider->minimum();
+    int halfRange = range / 2;
+    int valueInPercents = 0;
+
+    if(value <= halfRange)
+    {
+        valueInPercents = (AvgSliderPercents - MinSliderPercents) * (value - ui->scalePercentage_horizontalSlider->minimum()) / halfRange + MinSliderPercents;
+    }
+    else
+    {
+        valueInPercents = (MaxSliderPercents -  AvgSliderPercents) * (value - halfRange) / halfRange + AvgSliderPercents;
+    }
+
+    on_scalePercentage_spinBox_valueChanged(valueInPercents);
+}
+
 void ImageLabel::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
@@ -326,9 +391,9 @@ bool ImageLabel::eventFilter(QObject *object, QEvent *event)
 
         QWidget* widget = static_cast<QWidget*> (object);
 
-        ui->label->removeEventFilter(this);
+        uilabel->removeEventFilter(this);
         QApplication::sendEvent(object, event);
-        ui->label->installEventFilter(this);
+        uilabel->installEventFilter(this);
 
         QPainter p(widget);
         p.setPen(Qt::green);
@@ -347,9 +412,9 @@ bool ImageLabel::eventFilter(QObject *object, QEvent *event)
                    .arg(originalWidth)
                    .arg(originalHeight)
                    .arg(qreal(originalWidth) / originalHeight)
-                   .arg(ui->label->width())
-                   .arg(ui->label->height())
-                   .arg(qreal(ui->label->width()) / ui->label->height())
+                   .arg(uilabel->width())
+                   .arg(uilabel->height())
+                   .arg(qreal(uilabel->width()) / uilabel->height())
                 );
 
         p.drawText(20, 30, QString("imageLabelWidth: %1, imageLabelHeight: %2, dar: %3, sar: %4, output dar: %5")
@@ -372,13 +437,15 @@ bool ImageLabel::eventFilter(QObject *object, QEvent *event)
 
 bool ImageLabel::needRescale()
 {
-    if(*Picture == nullptr)
+    if(*Picture == nullptr || !ui->fitToScreen_radioButton->isChecked())
     {
         return false;
     }
 
     auto picture = *Picture;
-    QSize Size = size();
+    auto availableSize = ui->scrollArea->viewport()->size() - QSize(1, 1);
+
+    QSize Size = availableSize;
     QSize pixmapSize = Pixmap.size();
 
     auto dar = picture->OutputDAR_Get(Pos - 1);
@@ -406,7 +473,7 @@ bool ImageLabel::needRescale()
     return needRescale;
 }
 
-void ImageLabel::rescale()
+void ImageLabel::rescale(const QSize& newSize /*= QSize()*/ )
 {
     if(*Picture == nullptr)
     {
@@ -414,18 +481,51 @@ void ImageLabel::rescale()
     }
 
     auto picture = *Picture;
-    picture->Scale_Change(size().width(), size().height());
+    auto availableSize = !newSize.isEmpty() ? newSize : ui->scrollArea->viewport()->size() - QSize(1, 1);
+
+    if(availableSize.width() < 0 || availableSize.height() < 0)
+        return;
+
+    picture->Scale_Change(availableSize.width(), availableSize.height(), Pos - 1);
+    auto scaleFactor = (qreal) availableSize.width() / picture->Width_Get();
+
     auto image = picture->Image_Get(Pos - 1);
 
     if (image.isNull())
     {
         Pixmap = QPixmap(Pixmap.width(), Pixmap.height());
-        ui->label->setPixmap(Pixmap);
+        uilabel->setPixmap(Pixmap);
         return;
     }
 
     Pixmap.convertFromImage(QImage(image.data(), image.width(), image.height(), image.linesize(), QImage::Format_RGB888));
-    ui->label->setPixmap(Pixmap);
+    uilabel->setGeometry(0, 0, Pixmap.width(), Pixmap.height());
+    uilabel->setPixmap(Pixmap);
+
+    int percents = scaleFactor * 100 + 0.5;
+
+    ui->scalePercentage_spinBox->blockSignals(true);
+    ui->scalePercentage_spinBox->setValue(percents);
+    ui->scalePercentage_spinBox->blockSignals(false);
+
+    ui->scalePercentage_horizontalSlider->blockSignals(true);
+
+    int range = ui->scalePercentage_horizontalSlider->maximum() - ui->scalePercentage_horizontalSlider->minimum();
+    int halfRange = range / 2;
+
+    if(percents < MinSliderPercents)
+        percents = MinSliderPercents;
+    if(percents > MaxSliderPercents)
+        percents = MaxSliderPercents;
+
+    if(percents <= AvgSliderPercents) {
+        int percentRange = AvgSliderPercents - MinSliderPercents;
+        ui->scalePercentage_horizontalSlider->setValue(halfRange * (percents - MinSliderPercents) / percentRange);
+    } else {
+        int percentRange = MaxSliderPercents - AvgSliderPercents;
+        ui->scalePercentage_horizontalSlider->setValue(halfRange + halfRange * (percents - AvgSliderPercents) / percentRange);
+    }
+    ui->scalePercentage_horizontalSlider->blockSignals(false);
 
     setSelectionArea(selectionPos.x(), selectionPos.y(), selectionSize.width(), selectionSize.height());
 }

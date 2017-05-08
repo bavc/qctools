@@ -392,10 +392,8 @@ FFmpeg_Glue::outputdata::~outputdata()
 
     // FFmpeg pointers - Scale
     if (ScaledFrame)
-    {
-        av_freep(&ScaledFrame->data[0]);
-        av_frame_free(&ScaledFrame);
-    }
+        ScaledFrame.reset();
+
     if (ScaleContext)
         sws_freeContext(ScaleContext);
 
@@ -407,6 +405,8 @@ FFmpeg_Glue::outputdata::~outputdata()
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
 {
+    ++FramePos;
+
     DecodedFrame=DecodedFrame_;
     
     //Filtering
@@ -415,8 +415,8 @@ void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
     // Stats
     if (Stats && FilteredFrame && !Filter.empty())
     {
-        Stats->TimeStampFromFrame(FilteredFrame, FramePos-1);
-        Stats->StatsFromFrame(FilteredFrame, Stream->codec->width, Stream->codec->height);
+        Stats->TimeStampFromFrame(FilteredFrame.get(), FramePos-1);
+        Stats->StatsFromFrame(FilteredFrame.get(), Stream->codec->width, Stream->codec->height);
     }
 
     // Scale
@@ -430,27 +430,33 @@ void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
         default             :   ;
     }
 
+    /*
     // Clean up
     DiscardScaledFrame();
 
     // Clean up
     DiscardFilteredFrame();
+    */
 }
 
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::outputdata::ApplyFilter()
 {
+    struct NoDeleter {
+        static void free(AVFrame* frame) {
+            Q_UNUSED(frame)
+        }
+    };
+
     if (Filter.empty())
     {
-        FilteredFrame=DecodedFrame;
-        FramePos++;
+        FilteredFrame = AVFramePtr(DecodedFrame, NoDeleter::free);
         return;
     }
 
     if (!FilterGraph && !FilterGraph_Init())
     {
-        FilteredFrame=DecodedFrame;
-        FramePos++;
+        FilteredFrame = AVFramePtr(DecodedFrame, NoDeleter::free);
         return;
     }
             
@@ -458,28 +464,36 @@ void FFmpeg_Glue::outputdata::ApplyFilter()
     //if (av_buffersrc_add_frame_flags(FilterGraph_Source_Context, DecodedFrame, AV_BUFFERSRC_FLAG_KEEP_REF)<0)
     if (av_buffersrc_add_frame_flags(FilterGraph_Source_Context, DecodedFrame, 0)<0)
     {
-        FilteredFrame=DecodedFrame;
-        FramePos++;
+        FilteredFrame = AVFramePtr(DecodedFrame, NoDeleter::free);
         return;
     }
 
     // Pull filtered frames from the filtergraph 
-    FilteredFrame = av_frame_alloc();
-    int GetAnswer = av_buffersink_get_frame(FilterGraph_Sink_Context, FilteredFrame); //TODO: handling of multiple output per input
+    AVFrame* tmpFilteredFrame = av_frame_alloc();
+    int GetAnswer = av_buffersink_get_frame(FilterGraph_Sink_Context, tmpFilteredFrame); //TODO: handling of multiple output per input
     if (GetAnswer==AVERROR(EAGAIN) || GetAnswer==AVERROR_EOF)
     {
-        av_frame_free(&FilteredFrame);
-        FilteredFrame=NULL;
+        av_frame_free(&tmpFilteredFrame);
+        FilteredFrame = AVFramePtr(DecodedFrame, NoDeleter::free);
         return;
     }
     if (GetAnswer<0)
     {
-        av_frame_free(&FilteredFrame);
-        FilteredFrame=DecodedFrame;
+        av_frame_free(&tmpFilteredFrame);
+        FilteredFrame = AVFramePtr(DecodedFrame, NoDeleter::free);
         return;
     }
 
-    FramePos++;
+    struct FilteredFrameDeleter {
+        static void free(AVFrame* frame) {
+            if(frame) {
+                av_frame_unref(frame);
+                av_frame_free(&frame);
+            }
+        }
+    };
+
+    FilteredFrame = AVFramePtr(tmpFilteredFrame, FilteredFrameDeleter::free);
 }
 
 //---------------------------------------------------------------------------
@@ -500,14 +514,22 @@ void FFmpeg_Glue::outputdata::ApplyScale()
     if (!ScaleContext && !Scale_Init())
         return;
 
-    ScaledFrame = av_frame_alloc();
+    struct ScaledFrameDeleter {
+        static void free(AVFrame* frame) {
+            if(frame) {
+                av_freep(&frame->data[0]);
+                av_frame_free(&frame);
+            }
+        }
+    };
+
+    ScaledFrame = AVFramePtr(av_frame_alloc(), ScaledFrameDeleter::free);
     ScaledFrame->width=Width;
     ScaledFrame->height=Height;
+
     av_image_alloc(ScaledFrame->data, ScaledFrame->linesize, Width, Height, OutputMethod==Output_QImage?AV_PIX_FMT_RGB24:AV_PIX_FMT_YUVJ420P, 1);
     if (sws_scale(ScaleContext, FilteredFrame->data, FilteredFrame->linesize, 0, FilteredFrame->height, ScaledFrame->data, ScaledFrame->linesize)<0)
     {
-        av_freep(&ScaledFrame->data[0]);
-        av_frame_free(&ScaledFrame);
         ScaledFrame=FilteredFrame;
     }
 }
@@ -542,7 +564,7 @@ void FFmpeg_Glue::outputdata::AddThumbnail()
                                     
     JpegOutput_Packet->data=NULL;
     JpegOutput_Packet->size=0;
-    if (avcodec_encode_video2(JpegOutput_CodecContext, JpegOutput_Packet, ScaledFrame, &got_packet) < 0 || !got_packet)
+    if (avcodec_encode_video2(JpegOutput_CodecContext, JpegOutput_Packet, ScaledFrame.get(), &got_packet) < 0 || !got_packet)
     {
         Thumbnails.push_back(new bytes());
         return;
@@ -561,12 +583,7 @@ void FFmpeg_Glue::outputdata::DiscardScaledFrame()
     if (!ScaledFrame)
         return;
 
-    if (ScaledFrame!=FilteredFrame)
-    {
-        av_freep(&ScaledFrame->data[0]);
-        av_frame_free(&ScaledFrame);
-    }
-    ScaledFrame=NULL;
+    ScaledFrame.reset();
 }
 
 //---------------------------------------------------------------------------
@@ -575,12 +592,7 @@ void FFmpeg_Glue::outputdata::DiscardFilteredFrame()
     if (!FilteredFrame)
         return;
 
-    if (FilteredFrame!=DecodedFrame)
-    {
-        av_frame_unref(FilteredFrame);
-        av_frame_free(&FilteredFrame);
-    }
-    FilteredFrame=NULL;
+    FilteredFrame.reset();
 }
 
 //---------------------------------------------------------------------------
@@ -704,17 +716,13 @@ bool FFmpeg_Glue::outputdata::Scale_Init()
         
     if (!AdaptDAR())
         return false;
-    
+
     // Init
     ScaleContext = sws_getContext(FilteredFrame->width, FilteredFrame->height,
                                     (AVPixelFormat)FilteredFrame->format,
                                     Width, Height,
                                     OutputMethod==Output_QImage?AV_PIX_FMT_RGB24:AV_PIX_FMT_YUVJ420P,
                                     Output_QImage?/* SWS_BICUBIC */ SWS_FAST_BILINEAR :SWS_FAST_BILINEAR, NULL, NULL, NULL);
-    ScaledFrame=av_frame_alloc();
-    ScaledFrame->width=Width;
-    ScaledFrame->height=Height;
-    av_image_alloc(ScaledFrame->data, ScaledFrame->linesize, Width, Height, OutputMethod==Output_QImage?AV_PIX_FMT_RGB24:AV_PIX_FMT_YUVJ420P, 1);
 
     // All is OK
     return true;
@@ -729,33 +737,47 @@ void FFmpeg_Glue::outputdata::Scale_Free()
         ScaleContext=NULL;
     }
 
-    if (ScaledFrame)
-    {
-        av_freep(&ScaledFrame->data[0]);
-        av_frame_free(&ScaledFrame);
-        ScaledFrame=NULL;
-    }
+    ScaledFrame.reset();
 }
 
 //---------------------------------------------------------------------------
 bool FFmpeg_Glue::outputdata::AdaptDAR()
 {
-    // Display aspect ratio
-    double DAR;
-    if (!DecodedFrame)
-        DAR=4.0/3.0; // TODO: video frame DAR
-    else if (DecodedFrame->sample_aspect_ratio.num && DecodedFrame->sample_aspect_ratio.den)
-        DAR=((double)DecodedFrame->width)/DecodedFrame->height*DecodedFrame->sample_aspect_ratio.num/DecodedFrame->sample_aspect_ratio.den;
-    else
-        DAR=((double)DecodedFrame->width)/DecodedFrame->height;
-    if (DAR)
-    {
-        int Target_Width=Height*DAR;
-        int Target_Height=Width/DAR;
-        if (Target_Width>Width)
-            Height=Target_Height;
-        if (Target_Height>Height)
-            Width=Target_Width;
+    if(FilteredFrame && DecodedFrame && (FilteredFrame->width != DecodedFrame->width || FilteredFrame->height != DecodedFrame->height)) {
+
+        // if decoded frame differs from filtered - we are using filtered frame's geometry for calculating scaled width / height
+        double wh =((double)FilteredFrame->width) / FilteredFrame->height;
+
+        int width = FilteredFrame->width;
+        int height = FilteredFrame->height;
+
+        double WH =((double)Width) / Height;
+
+        if(WH > wh)
+            Width = ((double) width) * Height / height;
+        else
+            Height = ((double) height) * Width / width;
+
+    } else {
+
+        // Display aspect ratio
+        double DAR;
+        if (!DecodedFrame)
+            DAR=4.0/3.0; // TODO: video frame DAR
+        else if (DecodedFrame->sample_aspect_ratio.num && DecodedFrame->sample_aspect_ratio.den)
+            DAR=((double)DecodedFrame->width)/DecodedFrame->height*DecodedFrame->sample_aspect_ratio.num/DecodedFrame->sample_aspect_ratio.den;
+        else
+            DAR=((double)DecodedFrame->width)/DecodedFrame->height;
+        if (DAR)
+        {
+            int Target_Width=Height*DAR;
+            int Target_Height=Width/DAR;
+            if (Target_Width>Width)
+                Height=Target_Height;
+            if (Target_Height>Height)
+                Width=Target_Width;
+        }
+
     }
 
     return true;
@@ -1455,7 +1477,7 @@ double FFmpeg_Glue::TimeStampOfCurrentFrame(const size_t OutputPos)
 }
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::Scale_Change(int Scale_Width_, int Scale_Height_)
+void FFmpeg_Glue::Scale_Change(int Scale_Width_, int Scale_Height_, int index /* = -1*/)
 {
     QMutexLocker locker(mutex);
 
@@ -1463,6 +1485,9 @@ void FFmpeg_Glue::Scale_Change(int Scale_Width_, int Scale_Height_)
 
     for (size_t Pos=0; Pos<OutputDatas.size(); Pos++)
     {
+        if(index != -1 && index != Pos)
+            continue;
+
         outputdata* OutputData=OutputDatas[Pos];
 
         if (OutputData)
@@ -1894,11 +1919,14 @@ double FFmpeg_Glue::OutputDAR_Get(int Pos)
     if (OutputData)
     {
         auto DecodedFrame = OutputData->DecodedFrame;
+        auto FilteredFrame = OutputData->FilteredFrame;
 
         if (!DecodedFrame)
             DAR=4.0/3.0; // TODO: video frame DAR
 //        else if (DecodedFrame->sample_aspect_ratio.num && DecodedFrame->sample_aspect_ratio.den)
 //            DAR=((double)DecodedFrame->width)/DecodedFrame->height*DecodedFrame->sample_aspect_ratio.num/DecodedFrame->sample_aspect_ratio.den;
+        else if(FilteredFrame && (FilteredFrame->width != DecodedFrame->width || FilteredFrame->height != DecodedFrame->height))
+            DAR = ((double)FilteredFrame->width) / FilteredFrame->height;
         else
             DAR=((double)DecodedFrame->width)/DecodedFrame->height;
     }
@@ -2370,7 +2398,7 @@ string FFmpeg_Glue::FFmpeg_LibsVersion()
 }
 
 
-FFmpeg_Glue::Image::Image() : frame(NULL)
+FFmpeg_Glue::Image::Image()
 {
 
 }
@@ -2397,13 +2425,7 @@ int FFmpeg_Glue::Image::linesize() const
 
 void FFmpeg_Glue::Image::free()
 {
-    if(frame)
-    {
-        av_freep(&frame->data[0]);
-        av_frame_free(&frame);
-    }
-
-    frame = NULL;
+    frame.reset();
 }
 
 

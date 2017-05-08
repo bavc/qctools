@@ -12,6 +12,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 #include <stdint.h>
 #include <QByteArray>
 #include <QMutex>
@@ -49,6 +50,8 @@ public:
     FFmpeg_Glue(const string &FileName, activealltracks ActiveAllTracks, std::vector<CommonStats*>* Stats, StreamsStats** streamsStats, FormatStats** formatStats, bool WithStats=false);
     ~FFmpeg_Glue();
 
+    typedef std::shared_ptr<AVFrame> AVFramePtr;
+
     struct Image {
         Image();
 
@@ -62,7 +65,7 @@ public:
         int linesize() const;
 
         void free();
-        AVFrame* frame;
+        AVFramePtr frame;
     };
 
     // Images
@@ -150,7 +153,7 @@ public:
     void                        Filter_Change(size_t FilterPos, int FilterType, const string &Filter);
     void                        Disable(const size_t Pos);
     double                      TimeStampOfCurrentFrame(size_t OutputPos);
-    void                        Scale_Change(int Scale_Width, int Scale_Height);
+    void                        Scale_Change(int Scale_Width, int Scale_Height, int index = -1 /* scale both left & right by default */);
     void                        Thumbnails_Modulo_Change(size_t Modulo);
 
     size_t                      TotalFramesCountPerAllStreams() const;
@@ -240,11 +243,11 @@ private:
         AVFilterGraph*          FilterGraph;
         AVFilterContext*        FilterGraph_Source_Context;
         AVFilterContext*        FilterGraph_Sink_Context;
-        AVFrame*                FilteredFrame;
+        AVFramePtr              FilteredFrame;
 
         // FFmpeg pointers - Scale
         SwsContext*             ScaleContext;
-        AVFrame*                ScaledFrame;
+        AVFramePtr              ScaledFrame;
 
         // FFmpeg pointers - Output
         AVCodecContext*         JpegOutput_CodecContext;

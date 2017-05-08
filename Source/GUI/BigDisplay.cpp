@@ -45,6 +45,7 @@
 #include <QDebug>
 #include <QStandardPaths>
 #include <QDir>
+#include <QSplitter>
 
 #include <sstream>
 //---------------------------------------------------------------------------
@@ -1374,7 +1375,7 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
 
     //Image1
     imageLabel1=new ImageLabel(&Picture, 1, this);
-    imageLabel1->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    imageLabel1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     imageLabel1->setMinimumSize(20, 20);
     imageLabel1->showDebugOverlay(Config::instance().getDebug());
     //Layout->addWidget(Image1, 1, 0, 1, 1);
@@ -1382,19 +1383,31 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
 
     //Image2
     imageLabel2=new ImageLabel(&Picture, 2, this);
-    imageLabel2->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    imageLabel2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     imageLabel2->setMinimumSize(20, 20);
     imageLabel2->showDebugOverlay(Config::instance().getDebug());
     //Layout->addWidget(Image2, 1, 2, 1, 1);
     //Layout->setColumnStretch(2, 1);
 
     // Mixing Image1 and Image2 in one widget
+    /*
     QHBoxLayout* ImageLayout=new QHBoxLayout();
     ImageLayout->setContentsMargins(0, -1, 0, 0);
     ImageLayout->setSpacing(0);
     ImageLayout->addWidget(imageLabel1);
     ImageLayout->addWidget(imageLabel2);
     Layout->addLayout(ImageLayout, 1, 0, 1, 3);
+    */
+    splitter = new QSplitter;
+    splitter->installEventFilter(this);
+    splitter->setStyleSheet("QSplitter::handle { background-color: gray }");
+
+    splitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    splitter->addWidget(imageLabel1);
+    splitter->addWidget(imageLabel2);
+    splitter->handle(1)->installEventFilter(this);
+
+    Layout->addWidget(splitter, 1, 0, 1, 3);
 
     // Info
     InfoArea=NULL;
@@ -1757,7 +1770,6 @@ void BigDisplay::FiltersList1_currentIndexChanged(size_t FilterPos)
     Layout0->addWidget(Options[0].FiltersList, 0, 0, Qt::AlignLeft);
     FiltersList_currentIndexChanged(0, FilterPos, Layout0);
     Options[0].FiltersList_Fake=new QLabel(" ");
-    Options[0].FiltersList_Fake->setMinimumHeight(24);
     Layout0->addWidget(Options[0].FiltersList_Fake, 1, 0, Qt::AlignLeft);
     Layout0->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum), 0, 14);
     Layout->addLayout(Layout0, 0, 0, 1, 1, Qt::AlignLeft|Qt::AlignTop);
@@ -1784,7 +1796,6 @@ void BigDisplay::FiltersList2_currentIndexChanged(size_t FilterPos)
     FiltersList_currentIndexChanged(1, FilterPos, Layout0);
     Layout0->addWidget(Options[1].FiltersList, 0, 14, Qt::AlignRight);
     Options[1].FiltersList_Fake=new QLabel(" ");
-    Options[1].FiltersList_Fake->setMinimumHeight(24);
     Layout0->addWidget(Options[1].FiltersList_Fake, 1, 14, Qt::AlignRight);
     Layout->addLayout(Layout0, 0, 2, 1, 1, Qt::AlignRight|Qt::AlignTop);
 
@@ -2511,6 +2522,23 @@ void BigDisplay::updateSelection(int Pos, ImageLabel* image, options& opts)
     {
         image->clearSelectionArea();
     }
+}
+
+bool BigDisplay::eventFilter(QObject *watched, QEvent *event)
+{
+    if((watched == splitter || watched == splitter->handle(1)) && event->type() == QEvent::MouseButtonDblClick)
+    {
+        QList<int> sizes;
+
+        int left = (width() - splitter->handle(0)->width()) / 2;
+        int right = width() - splitter->handle(0)->width() - left;
+
+        sizes << left << right;
+
+        splitter->setSizes(sizes);
+    }
+
+    return QWidget::eventFilter(watched, event);
 }
 
 void BigDisplay::updateImagesAndSlider(const QPixmap &pixmap1, const QPixmap &pixmap2, int sliderPos)
