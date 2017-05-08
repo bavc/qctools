@@ -346,6 +346,28 @@ void ImageLabel::on_scalePercentage_spinBox_valueChanged(int value)
     }
 }
 
+const int MinSliderPercents = 50;
+const int MaxSliderPercents = 200;
+const int AvgSliderPercents = 100;
+
+void ImageLabel::on_scalePercentage_horizontalSlider_valueChanged(int value)
+{
+    int range = ui->scalePercentage_horizontalSlider->maximum() - ui->scalePercentage_horizontalSlider->minimum();
+    int halfRange = range / 2;
+    int valueInPercents = 0;
+
+    if(value <= halfRange)
+    {
+        valueInPercents = (AvgSliderPercents - MinSliderPercents) * (value - ui->scalePercentage_horizontalSlider->minimum()) / halfRange + MinSliderPercents;
+    }
+    else
+    {
+        valueInPercents = (MaxSliderPercents -  AvgSliderPercents) * (value - halfRange) / halfRange + AvgSliderPercents;
+    }
+
+    on_scalePercentage_spinBox_valueChanged(valueInPercents);
+}
+
 void ImageLabel::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
@@ -480,12 +502,29 @@ void ImageLabel::rescale(const QSize& newSize /*= QSize()*/ )
     uilabel->setGeometry(0, 0, Pixmap.width(), Pixmap.height());
     uilabel->setPixmap(Pixmap);
 
+    int percents = scaleFactor * 100 + 0.5;
+
     ui->scalePercentage_spinBox->blockSignals(true);
-    ui->scalePercentage_spinBox->setValue(scaleFactor * 100);
+    ui->scalePercentage_spinBox->setValue(percents);
     ui->scalePercentage_spinBox->blockSignals(false);
 
     ui->scalePercentage_horizontalSlider->blockSignals(true);
-    ui->scalePercentage_horizontalSlider->setValue(scaleFactor * 100);
+
+    int range = ui->scalePercentage_horizontalSlider->maximum() - ui->scalePercentage_horizontalSlider->minimum();
+    int halfRange = range / 2;
+
+    if(percents < MinSliderPercents)
+        percents = MinSliderPercents;
+    if(percents > MaxSliderPercents)
+        percents = MaxSliderPercents;
+
+    if(percents <= AvgSliderPercents) {
+        int percentRange = AvgSliderPercents - MinSliderPercents;
+        ui->scalePercentage_horizontalSlider->setValue(halfRange * (percents - MinSliderPercents) / percentRange);
+    } else {
+        int percentRange = MaxSliderPercents - AvgSliderPercents;
+        ui->scalePercentage_horizontalSlider->setValue(halfRange + halfRange * (percents - AvgSliderPercents) / percentRange);
+    }
     ui->scalePercentage_horizontalSlider->blockSignals(false);
 
     setSelectionArea(selectionPos.x(), selectionPos.y(), selectionSize.width(), selectionSize.height());

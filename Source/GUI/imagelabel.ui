@@ -70,7 +70,7 @@
      <item>
       <widget class="QSlider" name="scalePercentage_horizontalSlider">
        <property name="minimum">
-        <number>1</number>
+        <number>0</number>
        </property>
        <property name="maximum">
         <number>100</number>
@@ -152,38 +152,5 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>scalePercentage_horizontalSlider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>scalePercentage_spinBox</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>365</x>
-     <y>18</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>543</x>
-     <y>21</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>scalePercentage_spinBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>scalePercentage_horizontalSlider</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>525</x>
-     <y>7</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>299</x>
-     <y>3</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
