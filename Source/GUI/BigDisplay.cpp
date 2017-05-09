@@ -2175,8 +2175,8 @@ void BigDisplay::FiltersList1_currentOptionChanged(size_t Picture_Current)
     string Modified_String=FiltersList_currentOptionChanged(0, Picture_Current);
     Picture->Filter_Change(0, Filters[Picture_Current1].Type, Modified_String.c_str());
 
-    Frames_Pos=(size_t)-1;
-    ShowPicture ();
+    Picture->FrameAtPosition(Frames_Pos);
+    imageLabel1->adjustScale();
 }
 
 //---------------------------------------------------------------------------
@@ -2185,8 +2185,8 @@ void BigDisplay::FiltersList2_currentOptionChanged(size_t Picture_Current)
     string Modified_String=FiltersList_currentOptionChanged(1, Picture_Current);
     Picture->Filter_Change(1, Filters[Picture_Current2].Type, Modified_String.c_str());
 
-    Frames_Pos=(size_t)-1;
-    ShowPicture ();
+    Picture->FrameAtPosition(Frames_Pos);
+    imageLabel2->adjustScale();
 }
 
 //***************************************************************************

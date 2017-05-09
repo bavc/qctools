@@ -43,6 +43,7 @@ public Q_SLOTS:
     void clearSelectionArea();
 
     void showDebugOverlay(bool enable);
+    void adjustScale();
 
 private Q_SLOTS:
     void on_fitToScreen_radioButton_toggled(bool value);
