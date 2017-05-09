@@ -2139,33 +2139,6 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
 
     Modified_String = str.toStdString();
 
-    /*
-    Pos=Modified_String.find("${width}");
-    if (Pos!=string::npos)
-    {
-        Modified_String.erase(Pos, 8);
-        stringstream ss;
-        ss<<FileInfoData->Glue->Width_Get();
-        Modified_String.insert(Pos, ss.str());
-    }
-    Pos=Modified_String.find("${height}");
-    if (Pos!=string::npos)
-    {
-        Modified_String.erase(Pos, 9);
-        stringstream ss;
-        ss<<FileInfoData->Glue->Height_Get();
-        Modified_String.insert(Pos, ss.str());
-    }
-    Pos=Modified_String.find("${dar}");
-    if (Pos!=string::npos)
-    {
-        Modified_String.erase(Pos, 6);
-        stringstream ss;
-        ss<<FileInfoData->Glue->DAR_Get();
-        Modified_String.insert(Pos, ss.str());
-    }
-    */
-
     return Modified_String;
 }
 
@@ -2239,16 +2212,10 @@ void BigDisplay::ShowPicture ()
     if ((!ShouldUpate && Frames_Pos==FileInfoData->Frames_Pos_Get())
      || ( ShouldUpate && false)) // ToDo: try to optimize
         return;
+
     Frames_Pos=FileInfoData->Frames_Pos_Get();
     ShouldUpate=false;
-
     Picture->FrameAtPosition(Frames_Pos);
-    auto image = Picture->Image_Get(0);
-    if (!image.isNull())
-    {
-        Image_Width = image.width();
-        Image_Height = image.height();
-    }
 
     if (QThread::currentThread() == thread())
     {
@@ -2438,10 +2405,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
         Picture->Disable(0);
         imageLabel1->Remove();
         Layout->setColumnStretch(0, 0);
-        //move(pos().x()+Image_Width, pos().y());
-        //adjustSize();
         Picture_Current1=1;
-        repaint();
         return;
     }
 
@@ -2455,11 +2419,8 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
             {
                 imageLabel1->setVisible(true);
                 Layout->setColumnStretch(0, 1);
-                //move(pos().x()-Image_Width, pos().y());
-                //resize(width()+Image_Width, height());
             }
             Picture_Current1=Pos;
-            //Picture->Filter1_Change(Filters[Pos].Formula[0]);
             Picture->Filter_Change(0, 0, FiltersList_currentOptionChanged(Pos, 0));
 
             Frames_Pos=(size_t)-1;
@@ -2576,23 +2537,15 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
         Picture->Disable(0);
         imageLabel1->Remove();
         Layout->setColumnStretch(0, 0);
-        //move(pos().x()+Image_Width, pos().y());
-        //adjustSize();
-        repaint();
     }
 
     if (Picture_Current1<2)
     {
         imageLabel1->setVisible(true);
         Layout->setColumnStretch(0, 1);
-        //move(pos().x()-Image_Width, pos().y());
-        //resize(width()+Image_Width, height());
     }
+
     FiltersList1_currentIndexChanged(Pos);
-
-    Frames_Pos=(size_t)-1;
-    ShowPicture ();
-
     updateSelection(Pos, imageLabel1, Options[0]);
 }
 
@@ -2620,8 +2573,6 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(int Pos)
         Picture->Disable(1);
         imageLabel2->Remove();
         Layout->setColumnStretch(2, 0);
-        //adjustSize();
-        repaint();
     }
 
     FiltersList2_currentIndexChanged(Pos);
@@ -2645,9 +2596,7 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(QAction * action)
         Picture->Disable(1);
         imageLabel2->Remove();
         Layout->setColumnStretch(2, 0);
-        //adjustSize();
         Picture_Current2=1;
-        repaint();
         return;
     }
 
