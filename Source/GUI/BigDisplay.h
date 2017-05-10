@@ -154,8 +154,6 @@ protected:
     QSlider*                    Slider;
 
     // Temp
-    int                         Image_Width;
-    int                         Image_Height;
     QGridLayout*                Layout;
     size_t                      FiltersListDefault_Count;
 

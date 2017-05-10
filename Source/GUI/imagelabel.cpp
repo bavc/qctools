@@ -307,6 +307,16 @@ void ImageLabel::showDebugOverlay(bool enable)
     selectionArea->showDebugOverlay(enable);
 }
 
+void ImageLabel::adjustScale()
+{
+    QSize newSize;
+    if(!ui->fitToScreen_radioButton->isChecked())
+    {
+        double multiplier = ((double) ui->scalePercentage_spinBox->value()) / 100;
+        newSize = QSize((*Picture)->Width_Get(), (*Picture)->Height_Get()) * multiplier;
+    }
+    rescale(newSize);
+}
 void ImageLabel::on_fitToScreen_radioButton_toggled(bool value)
 {
     if(value)
