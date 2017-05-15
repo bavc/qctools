@@ -8,7 +8,7 @@ Documentation on how to use QCTools is available within the application under th
 
 # general info
 
-QCTools allows archivists, curators, preservationists and other moving image professionals to identify, filter, and asssess all manner of video errors and anomalies. The tool is flexible, providing a variety of viewing options, as well the ability to create and export reports (gzip, or .gz files, formatted according to the ffprobe xml standard).
+QCTools allows archivists, curators, preservationists and other moving image professionals to identify, filter, and assess all manner of video errors and anomalies. The tool is flexible, providing a variety of viewing options, as well the ability to create and export reports (gzip, or .gz files, formatted according to the ffprobe xml standard).
 
 For more information about the project, or to download the latest Mac/Windows/Ubuntu release, please visit [BAVC's QCTools homepage](http://www.bavc.org/qctools)
 
