@@ -346,7 +346,7 @@ void MainWindow::createGraphsLayout()
         TinyDisplayArea->hide();
     ui->verticalLayout->addWidget(TinyDisplayArea);
 
-    ControlArea=new Control(this, Files[Files_CurrentPos], Control::Style_Cols);
+    ControlArea=new Control(this, Files[Files_CurrentPos]);
     ControlArea->setPlayAllFrames(ui->actionPlay_All_Frames->isChecked());
 
     connect( ControlArea, SIGNAL( currentFrameChanged() ), 
@@ -355,9 +355,6 @@ void MainWindow::createGraphsLayout()
     if (!ui->actionGraphsLayout->isChecked())
         ControlArea->hide();
     ui->verticalLayout->addWidget(ControlArea);
-
-    //InfoArea=new Info(this, Files[Files_CurrentPos], Info::Style_Grid);
-    //ui->verticalLayout->addWidget(InfoArea);
 
     TinyDisplayArea->ControlArea=ControlArea;
     ControlArea->TinyDisplayArea=TinyDisplayArea;
