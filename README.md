@@ -69,7 +69,7 @@ QCTools files can also be generated via the command line with `qcli`. After inst
 `qcli` can be installed via homebrew with:
 
 ```
-brew install amiaopensource/amiaos/qcli
+brew install qcli
 ```
 
 # a/v artifact atlas
