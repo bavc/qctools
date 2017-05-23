@@ -42,6 +42,7 @@ public:
     double*                     y_Min;                      // Minimum y by plot
     double*                     y_Max;                      // Maximum y by plot
     double                      FirstTimeStamp;             // Time stamp of the first frame
+    char**                      comments;                   // Comments per frame (utf-8)
 
     // Status
     int                         Type_Get();

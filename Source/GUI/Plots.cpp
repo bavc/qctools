@@ -10,6 +10,7 @@
 #include "GUI/Plot.h"
 #include "GUI/PlotLegend.h"
 #include "GUI/PlotScaleWidget.h"
+#include "GUI/Comments.h"
 #include "Core/Core.h"
 #include "Core/VideoCore.h"
 #include <QComboBox>
@@ -19,6 +20,8 @@
 #include <qwt_plot_canvas.h>
 #include <cmath>
 #include <clocale>
+#include <QMouseEvent>
+#include <QInputDialog>
 
 //---------------------------------------------------------------------------
 
@@ -43,7 +46,8 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     QWidget( parent ),
     m_zoomFactor ( 0 ),
     m_fileInfoData( fileInformation ),
-    m_dataTypeIndex( Plots::AxisSeconds )
+    m_dataTypeIndex( Plots::AxisSeconds ),
+    m_notesPlot(nullptr)
 {
     setlocale(LC_NUMERIC, "C");
     QGridLayout* layout = new QGridLayout( this );
@@ -79,6 +83,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                         adjustGroupMax(group, m_fileInfoData->BitsPerRawSample());
 
                     // we allow to shrink the plot below height of the size hint
+                    plot->plotLayout()->setAlignCanvasToScales(false);
                     plot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
                     plot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
                     initYAxis( plot );
@@ -109,7 +114,18 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
         }
     }
 
-    layout->addWidget( m_scaleWidget, m_plotsCount, 0, 1, 2 );
+    m_notesPlot = createCommentsPlot(fileInformation, &m_dataTypeIndex);
+    m_notesPlot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
+    m_notesPlot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
+    m_notesPlot->canvas()->installEventFilter( this );
+
+    if(m_notesPlot)
+    {
+        layout->addWidget(m_notesPlot, m_plotsCount, 0);
+        layout->addWidget( m_notesPlot->legend(), m_plotsCount, 1 );
+    }
+
+    layout->addWidget( m_scaleWidget, m_plotsCount + 1, 0, 1, 2 );
 
     // combo box for the axis format
     XAxisFormatBox* xAxisBox = new XAxisFormatBox();
@@ -120,7 +136,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     int axisBoxRow = layout->rowCount() - 1;
 #if 1
     // one row below to have space enough for bottom scale tick labels
-    layout->addWidget( xAxisBox, m_plotsCount + 1, 1 );
+    layout->addWidget( xAxisBox, m_plotsCount + 2, 1 );
 #else
     layout->addWidget( xAxisBox, layout_y, 1 );
 #endif
@@ -300,6 +316,8 @@ void Plots::Zoom_Move( int Begin )
                 m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
         }
 
+    if(m_notesPlot)
+        m_notesPlot->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
     m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
 
     refresh();
@@ -336,6 +354,9 @@ void Plots::alignYAxes()
             maxExtent += 3; // margin
         }
 
+    if(m_notesPlot)
+        m_notesPlot->axisWidget(QwtPlot::yLeft)->scaleDraw()->setMinimumExtent( 0.0 );
+
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
         if ( m_fileInfoData->Stats[streamPos] && m_plots[streamPos] )
         {
@@ -348,6 +369,32 @@ void Plots::alignYAxes()
                 scaleWidget->scaleDraw()->setMinimumExtent( maxExtent );
             }
         }
+
+    if(m_notesPlot)
+        m_notesPlot->axisWidget(QwtPlot::yLeft)->scaleDraw()->setMinimumExtent(maxExtent);
+}
+
+void showEditFrameCommentsDialog(QWidget* parentWidget, FileInformation* info, CommonStats* stats, size_t frameIndex)
+{
+    bool ok = false;
+    QString note = QInputDialog::getMultiLineText(parentWidget,
+                          QString("Edit comment"),
+                          QString("Comment for frame %1:").arg(frameIndex),
+                          stats->comments[frameIndex] ? QString::fromUtf8(stats->comments[frameIndex]) : QString(),
+                          &ok);
+
+    if(ok)
+    {
+        if(stats->comments[frameIndex])
+            delete [] stats->comments[frameIndex];
+
+        if(note.isEmpty())
+            stats->comments[frameIndex] = nullptr;
+        else
+            stats->comments[frameIndex] = strdup(note.toUtf8().constData());
+
+        Q_EMIT info->commentsUpdated(stats);
+    }
 }
 
 bool Plots::eventFilter( QObject *object, QEvent *event )
@@ -370,6 +417,24 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
                     }
                 }
             }
+
+        if(m_notesPlot && object == m_notesPlot->canvas())
+            alignXAxis(m_notesPlot);
+    }
+    else if(event->type() == QEvent::MouseButtonPress)
+    {
+        QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+        if(mouseEvent->button() == Qt::RightButton)
+        {
+            showEditFrameCommentsDialog(parentWidget(), m_fileInfoData, m_fileInfoData->ReferenceStat(), framePos());
+        }
+    } else if(event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        if(keyEvent->key() == Qt::Key_M)
+        {
+            showEditFrameCommentsDialog(parentWidget(), m_fileInfoData, m_fileInfoData->ReferenceStat(), framePos());
+        }
     }
 
     return QWidget::eventFilter( object, event );
@@ -521,7 +586,7 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
     }
 }
 
-void Plots::alignXAxis( const Plot* plot )
+void Plots::alignXAxis( const QwtPlot* plot )
 {
     const QWidget* canvas = plot->canvas();
 
@@ -569,6 +634,9 @@ void Plots::onXAxisFormatChanged( int format )
                     if (m_plots[streamPos][group])
                     m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
             }
+
+        if(m_notesPlot)
+            m_notesPlot->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
 
         m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
 
@@ -635,6 +703,9 @@ void Plots::zoomXAxis( ZoomTypes zoomType )
                 m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
         }
 
+    if(m_notesPlot)
+        m_notesPlot->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
+
     m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
 
     refresh();
@@ -665,4 +736,10 @@ void Plots::replotAll()
                     m_plots[streamPos][group]->replot();
             }
         }
+
+    if(m_notesPlot)
+    {
+        m_notesPlot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
+        m_notesPlot->replot();
+    }
 }

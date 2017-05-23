@@ -115,7 +115,7 @@ private:
     void                        updateSamples( Plot* );
     void                        setCursorPos( int framePos );
 
-    void                        alignXAxis( const Plot* );
+    void                        alignXAxis( const QwtPlot* );
     void                        alignYAxes();
 
     void                        setVisibleFrames( int from, int to, bool force = false );
@@ -127,6 +127,7 @@ private:
 
 private:
     PlotScaleWidget*            m_scaleWidget;
+    QwtPlot*                    m_notesPlot;
     Plot***                     m_plots; // pointer on an array of streams and groups per stream and Plot* per group
     int                         m_plotsCount;
 

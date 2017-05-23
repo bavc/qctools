@@ -37,6 +37,7 @@ HEADERS += \
     $$SOURCES_PATH/GUI/Info.h \
     $$SOURCES_PATH/GUI/mainwindow.h \
     $$SOURCES_PATH/GUI/preferences.h \
+    $$SOURCES_PATH/GUI/Comments.h \
     $$SOURCES_PATH/GUI/Plot.h \
     $$SOURCES_PATH/GUI/Plots.h \
     $$SOURCES_PATH/GUI/PlotLegend.h \
@@ -59,6 +60,7 @@ SOURCES += \
     $$SOURCES_PATH/GUI/mainwindow_Callbacks.cpp \
     $$SOURCES_PATH/GUI/mainwindow_More.cpp \
     $$SOURCES_PATH/GUI/mainwindow_Ui.cpp \
+    $$SOURCES_PATH/GUI/Comments.cpp \
     $$SOURCES_PATH/GUI/Plot.cpp \
     $$SOURCES_PATH/GUI/Plots.cpp \
     $$SOURCES_PATH/GUI/PlotLegend.cpp \

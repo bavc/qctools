@@ -16,6 +16,7 @@
 #include "GUI/Help.h"
 #include "GUI/imagelabel.h"
 #include "GUI/config.h"
+#include "GUI/Comments.h"
 #include "Core/FileInformation.h"
 #include "Core/FFmpeg_Glue.h"
 
@@ -1425,9 +1426,12 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     connect(Slider, SIGNAL(actionTriggered(int)), this, SLOT(on_Slider_actionTriggered(int)));
     Layout->addWidget(Slider, 2, 0, 1, 3);
 
+    // Notes
+    Layout->addWidget(createCommentsPlot(FileInformationData_, nullptr), 3, 0, 1, 3, Qt::AlignBottom);
+
     // Control
     ControlArea=new Control(this, FileInfoData, true);
-    Layout->addWidget(ControlArea, 3, 0, 1, 3, Qt::AlignBottom);
+    Layout->addWidget(ControlArea, 4, 0, 1, 3, Qt::AlignBottom);
 
     setLayout(Layout);
 

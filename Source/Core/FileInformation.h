@@ -157,6 +157,7 @@ Q_SIGNALS:
     void signalServerUploadProgressChanged(qint64, qint64);
     void signalServerUploadStatusChanged();
 
+    void commentsUpdated(CommonStats* stats);
 private Q_SLOTS:
     void checkFileUploadedDone();
     void uploadDone();
