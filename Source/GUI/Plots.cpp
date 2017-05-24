@@ -47,7 +47,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     m_zoomFactor ( 0 ),
     m_fileInfoData( fileInformation ),
     m_dataTypeIndex( Plots::AxisSeconds ),
-    m_notesPlot(nullptr)
+    m_commentsPlot(nullptr)
 {
     setlocale(LC_NUMERIC, "C");
     QGridLayout* layout = new QGridLayout( this );
@@ -114,15 +114,17 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
         }
     }
 
-    m_notesPlot = createCommentsPlot(fileInformation, &m_dataTypeIndex);
-    m_notesPlot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
-    m_notesPlot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
-    m_notesPlot->canvas()->installEventFilter( this );
+    m_commentsPlot = createCommentsPlot(fileInformation, &m_dataTypeIndex);
+    m_commentsPlot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
+    m_commentsPlot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
 
-    if(m_notesPlot)
+    connect( m_commentsPlot, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
+    m_commentsPlot->canvas()->installEventFilter( this );
+
+    if(m_commentsPlot)
     {
-        layout->addWidget(m_notesPlot, m_plotsCount, 0);
-        layout->addWidget( m_notesPlot->legend(), m_plotsCount, 1 );
+        layout->addWidget(m_commentsPlot, m_plotsCount, 0);
+        layout->addWidget( m_commentsPlot->legend(), m_plotsCount, 1 );
     }
 
     layout->addWidget( m_scaleWidget, m_plotsCount + 1, 0, 1, 2 );
@@ -242,6 +244,9 @@ void Plots::setCursorPos( int newFramePos )
             for ( int i = 0; i < PerStreamType[type].CountOfGroups; ++i )
                 if (m_plots[streamPos][i])
                 m_plots[streamPos][i]->setCursorPos( x );
+
+            if(type == Type_Video)
+                m_commentsPlot->setCursorPos(x);
         }
 
     m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
@@ -316,8 +321,8 @@ void Plots::Zoom_Move( int Begin )
                 m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
         }
 
-    if(m_notesPlot)
-        m_notesPlot->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
+    if(m_commentsPlot)
+        m_commentsPlot->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
     m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
 
     refresh();
@@ -354,8 +359,8 @@ void Plots::alignYAxes()
             maxExtent += 3; // margin
         }
 
-    if(m_notesPlot)
-        m_notesPlot->axisWidget(QwtPlot::yLeft)->scaleDraw()->setMinimumExtent( 0.0 );
+    if(m_commentsPlot)
+        m_commentsPlot->axisWidget(QwtPlot::yLeft)->scaleDraw()->setMinimumExtent( 0.0 );
 
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
         if ( m_fileInfoData->Stats[streamPos] && m_plots[streamPos] )
@@ -370,8 +375,8 @@ void Plots::alignYAxes()
             }
         }
 
-    if(m_notesPlot)
-        m_notesPlot->axisWidget(QwtPlot::yLeft)->scaleDraw()->setMinimumExtent(maxExtent);
+    if(m_commentsPlot)
+        m_commentsPlot->axisWidget(QwtPlot::yLeft)->scaleDraw()->setMinimumExtent(maxExtent);
 }
 
 void showEditFrameCommentsDialog(QWidget* parentWidget, FileInformation* info, CommonStats* stats, size_t frameIndex)
@@ -418,8 +423,8 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
                 }
             }
 
-        if(m_notesPlot && object == m_notesPlot->canvas())
-            alignXAxis(m_notesPlot);
+        if(m_commentsPlot && object == m_commentsPlot->canvas())
+            alignXAxis(m_commentsPlot);
     }
     else if(event->type() == QEvent::MouseButtonPress)
     {
@@ -635,8 +640,8 @@ void Plots::onXAxisFormatChanged( int format )
                     m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
             }
 
-        if(m_notesPlot)
-            m_notesPlot->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
+        if(m_commentsPlot)
+            m_commentsPlot->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
 
         m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
 
@@ -703,8 +708,8 @@ void Plots::zoomXAxis( ZoomTypes zoomType )
                 m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
         }
 
-    if(m_notesPlot)
-        m_notesPlot->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
+    if(m_commentsPlot)
+        m_commentsPlot->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
 
     m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
 
@@ -737,9 +742,9 @@ void Plots::replotAll()
             }
         }
 
-    if(m_notesPlot)
+    if(m_commentsPlot)
     {
-        m_notesPlot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
-        m_notesPlot->replot();
+        m_commentsPlot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
+        m_commentsPlot->replot();
     }
 }

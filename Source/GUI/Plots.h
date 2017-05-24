@@ -59,6 +59,7 @@ public:
 // Class
 //***************************************************************************
 
+class CommentsPlot;
 class Plots : public QWidget
 {
     Q_OBJECT
@@ -127,7 +128,7 @@ private:
 
 private:
     PlotScaleWidget*            m_scaleWidget;
-    QwtPlot*                    m_notesPlot;
+    CommentsPlot*               m_commentsPlot;
     Plot***                     m_plots; // pointer on an array of streams and groups per stream and Plot* per group
     int                         m_plotsCount;
 

@@ -9,6 +9,8 @@
 #define GUI_Notes_H
 //---------------------------------------------------------------------------
 
+#include "Plot.h"
+
 #include <Core/Core.h>
 #include <Core/CommonStats.h>
 #include <Core/FileInformation.h>
@@ -22,6 +24,8 @@
 #include <qwt_plot_layout.h>
 #include <qwt_legend.h>
 #include <qwt_scale_draw.h>
+#include <qwt_plot_grid.h>
+#include <qwt_plot_picker.h>
 
 class CommentsSeriesData : public QwtPointSeriesData
 {
@@ -44,63 +48,42 @@ private:
     const int* pDataTypeIndex;
 };
 
-class CommentsHistogramSeriesData : public QwtIntervalSeriesData
+class CommentsPlotPicker: public QwtPlotPicker
 {
-    // QwtSeriesData interface
 public:
-    CommentsHistogramSeriesData(CommonStats* stats, const int* dataTypeIndex = 0) : stats(stats), pDataTypeIndex(dataTypeIndex) {
+    CommentsPlotPicker(QWidget* w, CommonStats* stats);
 
-    }
+    const QwtPlotCurve* curve( int index ) const;
+    virtual QwtText trackerTextF( const QPointF &pos ) const;
 
-    size_t size() const {
-        return stats->x_Current;
-    }
-
-    QwtIntervalSample sample(size_t i) const {
-        int dataTypeIndex = pDataTypeIndex ? *pDataTypeIndex : 0;
-        return (stats->comments[i] != nullptr) ? QwtIntervalSample(stats->x[dataTypeIndex][i], 0, stats->x[dataTypeIndex][i]) : QwtIntervalSample(stats->x[dataTypeIndex][i], 0, 0);
-    }
+protected:
+    virtual QString infoText( int index ) const;
 
 private:
     CommonStats* stats;
-    const int* pDataTypeIndex;
 };
 
-class CommentsBarChart : public QwtPlotBarChart
-{
-    // QwtPlotBarChart interface
-protected:
+class CommentsPlot : public QwtPlot {
+    Q_OBJECT
+public:
+    CommentsPlot(FileInformation* fileInfo, CommonStats* stats, const int* dataTypeIndex = nullptr);
 
-    // QwtPlotBarChart interface
-protected:
-    void drawBar(QPainter *painter, int sampleIndex, const QPointF &sample, const QwtColumnRect &rect) const {
+    int frameAt( double x ) const;
+    void setCursorPos( double x );
 
-        // QwtPlotBarChart::drawBar(painter, sampleIndex, sample, rect);
+Q_SIGNALS:
+    void cursorMoved(int index);
 
-        if(sample.y() != 0.0f)
-        {
-            /*
-            QwtColumnSymbol sym( QwtColumnSymbol::Box );
-            sym.setLineWidth( 1 );
-            sym.setFrameStyle( QwtColumnSymbol::Plain );
-            sym.draw( painter, rect );
-            */
+private Q_SLOTS:
+    void onPickerMoved(const QPointF& );
+    void onXScaleChanged();
 
-            QRectF r = rect.toRect();
-            {
-                r.setLeft( qRound( r.left() ) );
-                r.setRight( qRound( r.right() ) );
-                r.setTop( qRound( r.top() ) );
-                r.setBottom( qRound( r.bottom() ) );
-            }
+private:
+    const QwtPlotCurve* curve( int index ) const;
 
-            painter->setBrush(Qt::red);
-            painter->setRenderHint(QPainter::Antialiasing);
-            painter->drawEllipse(r.center(), 3, r.height() / 2);
-        }
-    }
+    PlotCursor* m_cursor;
 };
 
-QwtPlot* createCommentsPlot(FileInformation* fileInfo, const int* dataTypeIndex);
+CommentsPlot* createCommentsPlot(FileInformation* fileInfo, const int* dataTypeIndex);
 
 #endif // GUI_Notes_H

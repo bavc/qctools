@@ -1,4 +1,6 @@
 #include <GUI/Comments.h>
+#include <GUI/Plot.h>
+
 #include <qwt_scale_widget.h>
 #include <qwt_symbol.h>
 #include <qwt_scale_div.h>
@@ -8,6 +10,7 @@
 #include <qwt_plot_picker.h>
 #include <qwt_picker_machine.h>
 #include <qwt_series_data.h>
+#include <qwt_plot_grid.h>
 
 static inline void qwtDrawRectSymbols( QPainter *painter,
     const QPointF *points, int numPoints, const QwtSymbol &symbol )
@@ -87,23 +90,6 @@ static inline QRectF qwtIntersectedClipRect( const QRectF &rect, QPainter *paint
     return clipRect;
 }
 
-struct compareX
-{
-    inline bool operator()( const double x, const QPointF &pos ) const
-    {
-        return ( x < pos.x() );
-    }
-};
-
-static int indexLower( double x, const QwtSeriesData<QPointF> &data )
-{
-    int index = qwtUpperSampleIndex<QPointF>( data, x, compareX() );
-    if ( index == -1 )
-        index = data.size();
-
-    return index - 1;
-}
-
 class CommentsPlotCurve : public QwtPlotCurve {
     // QwtPlotCurve interface
 public:
@@ -155,70 +141,27 @@ private:
 
 };
 
-class CommentsPlotPicker: public QwtPlotPicker
-{
-public:
-    CommentsPlotPicker(QWidget* w, CommonStats* stats) : QwtPlotPicker(w), stats(stats)
-    {
-        setAxis( QwtPlot::xBottom, QwtPlot::yLeft );
-        setRubberBand( QwtPlotPicker::CrossRubberBand );
-        setRubberBandPen( QColor( Qt::green ) );
+CommentsPlot* createCommentsPlot(FileInformation* fileInfo, const int* dataTypeIndex) {
+    CommentsPlot* plot = new CommentsPlot(fileInfo, fileInfo->ReferenceStat(), dataTypeIndex);
 
-        setTrackerMode( QwtPicker::AlwaysOn );
-        setTrackerPen( QColor( Qt::black ) );
+    plot->replot();
+    return plot;
+}
 
-        setStateMachine( new QwtPickerDragPointMachine () );
-    }
+CommentsPlot::CommentsPlot(FileInformation* fileInfo, CommonStats* stats, const int* dataTypeIndex) {
 
-    const QwtPlotCurve* curve( int index ) const
-    {
-        const QwtPlotItemList curves = plot()->itemList( QwtPlotItem::Rtti_PlotCurve );
-        if ( index >= 0 && index < curves.size() )
-            return dynamic_cast<const QwtPlotCurve*>( curves[index] );
+    setAxisMaxMajor( QwtPlot::yLeft, 0 );
+    setAxisMaxMinor( QwtPlot::yLeft, 0 );
 
-        return NULL;
-    }
+    // Plot grid
+    QwtPlotGrid *grid = new QwtPlotGrid();
+    grid->enableXMin( true );
+    grid->enableYMin( true );
+    grid->setMajorPen( Qt::darkGray, 0, Qt::DotLine );
+    grid->setMinorPen( Qt::gray, 0 , Qt::DotLine );
+    grid->attach( this );
 
-    virtual QwtText trackerTextF( const QPointF &pos ) const
-    {
-        // the white text is hard to see over a light canvas background
-
-        QColor bg( Qt::darkGray );
-        bg.setAlpha( 160 );
-
-        QwtText text;
-
-        const int idx = dynamic_cast<const CommentsPlotCurve*>( curve(0) )->frameAt( pos.x() );
-        if ( idx >= 0 )
-        {
-            text = infoText( idx );
-            text.setBackgroundBrush( QBrush( bg ) );
-        }
-
-        return text;
-    }
-
-protected:
-    virtual QString infoText( int index ) const
-    {
-        if(stats->comments[index])
-            return QString::fromUtf8(stats->comments[index]);
-
-        return "";
-    }
-
-private:
-    CommonStats* stats;
-};
-
-QwtPlot* createCommentsPlot(FileInformation* fileInfo, const int* dataTypeIndex) {
-    QwtPlot* plot = new QwtPlot;
-    CommentsPlotPicker* picker = new CommentsPlotPicker(plot->canvas(), fileInfo->ReferenceStat());
-
-    QwtPlotCurve *curve = new CommentsPlotCurve();
-    curve->setPen( Qt::transparent, 4 ), curve->setRenderHint( QwtPlotItem::RenderAntialiased, true );
-
-    QwtPlotCanvas* canvas = dynamic_cast<QwtPlotCanvas*>( plot->canvas() );
+    QwtPlotCanvas* canvas = dynamic_cast<QwtPlotCanvas*>(this->canvas() );
     if ( canvas )
     {
         canvas->setFrameStyle( QFrame::Plain | QFrame::Panel );
@@ -227,6 +170,9 @@ QwtPlot* createCommentsPlot(FileInformation* fileInfo, const int* dataTypeIndex)
         canvas->setPalette( QColor("Cornsilk") );
 #endif
     }
+
+    QwtPlotCurve *curve = new CommentsPlotCurve();
+    curve->setPen( Qt::transparent, 4 ), curve->setRenderHint( QwtPlotItem::RenderAntialiased, true );
 
     QwtSymbol *symbol = new CommentsSymbol;
     symbol->setBrush(QBrush(Qt::red));
@@ -238,59 +184,132 @@ QwtPlot* createCommentsPlot(FileInformation* fileInfo, const int* dataTypeIndex)
 
     curve->setSymbol( symbol );
 
-    curve->setData(new CommentsSeriesData(fileInfo->ReferenceStat(), dataTypeIndex));
-    curve->attach( plot );
+    curve->setData(new CommentsSeriesData(stats, dataTypeIndex));
+    curve->attach( this );
 
-    plot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    plot->setMinimumHeight(plotHeight);
-    plot->setMaximumHeight(plotHeight);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    setMinimumHeight(plotHeight);
+    setMaximumHeight(plotHeight);
 
-    plot->setAxisAutoScale(QwtPlot::yLeft, false);
-    plot->setAxisScale(QwtPlot::yLeft, 0, 1);
+    setAxisAutoScale(QwtPlot::yLeft, false);
+    setAxisScale(QwtPlot::yLeft, 0, 1);
 
-    plot->enableAxis(QwtPlot::xBottom, false);
-    plot->setAxisAutoScale(QwtPlot::xBottom, true);
+    enableAxis(QwtPlot::xBottom, false);
+    setAxisAutoScale(QwtPlot::xBottom, true);
 
-    plot->axisWidget(QwtPlot::yLeft)->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone, false);
-    plot->axisWidget(QwtPlot::yLeft)->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels, false);
-    plot->axisWidget(QwtPlot::yLeft)->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Ticks, false);
+    axisWidget(QwtPlot::yLeft)->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone, false);
+    axisWidget(QwtPlot::yLeft)->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels, false);
+    axisWidget(QwtPlot::yLeft)->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Ticks, false);
 
-    QObject::connect(fileInfo, SIGNAL(commentsUpdated(CommonStats*)), plot, SLOT(replot()));
+    QObject::connect(fileInfo, SIGNAL(commentsUpdated(CommonStats*)), SLOT(replot()));
 
-    plot->replot();
+    m_cursor = new PlotCursor( canvas );
+    m_cursor->setPosition( 0 );
 
-    return plot;
+    CommentsPlotPicker* picker = new CommentsPlotPicker(this->canvas(), stats);
+    connect(picker, SIGNAL(moved(const QPointF&)), SLOT(onPickerMoved(const QPointF&)));
+    connect(picker, SIGNAL(selected(const QPointF&)), SLOT(onPickerMoved(const QPointF&)));
+
+    connect( axisWidget( QwtPlot::xBottom ), SIGNAL( scaleDivChanged() ), SLOT( onXScaleChanged() ) );
+
 }
 
-/*
-QwtPlot* createNotesPlot(FileInformation* fileInfo, const int* dataTypeIndex) {
+int CommentsPlot::frameAt(double x) const
+{
+    const QwtPlotCurve* curve = this->curve(0);
+    if ( curve == NULL )
+        return -1;
 
-    QwtPlot* plot = new QwtPlot;
-    QwtPlotBarChart* barchartPlot = new QwtPlotBarChart;
-    barchartPlot->setLayoutPolicy(QwtPlotBarChart::FixedSampleSize);
-    barchartPlot->attach(plot);
-    barchartPlot->setData(new SeriesData(fileInfo->ReferenceStat(), dataTypeIndex));
+    const QwtSeriesData<QPointF> &data = *curve->data();
 
-    plot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    plot->setMinimumHeight(60);
-    plot->setMaximumHeight(60);
+    int idx = ::indexLower( x, data );
+    if ( idx < 0 )
+    {
+        idx = 0;
+    }
+    else if ( idx < data.size() - 1 )
+    {
+        // index, where x is closer
+        const double x1 = data.sample( idx ).x();
+        const double x2 = data.sample( idx + 1 ).x();
 
-    plot->plotLayout()->setAlignCanvasToScales( false ); // this line removes weird spacing between yAxis and 'zero' on xAxis
+        if ( qAbs( x - x2 ) < qAbs( x - x1 ) )
+            idx++;
+    }
 
-    plot->enableAxis(QwtPlot::xBottom, true);
-    plot->setAxisAutoScale(QwtPlot::xBottom, false);
-
-    plot->enableAxis(QwtPlot::yLeft, true);
-    plot->setAxisAutoScale(QwtPlot::yLeft, false);
-    plot->setAxisScale(QwtPlot::yLeft, 0, 1);
-
-    plot->axisWidget(QwtPlot::yLeft)->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels, false);
-    plot->axisWidget(QwtPlot::yLeft)->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Ticks, false);
-
-    QObject::connect(fileInfo, SIGNAL(commentsUpdated(CommonStats*)), plot, SLOT(replot()));
-
-    plot->replot();
-
-    return plot;
+    return idx;
 }
-*/
+
+const QwtPlotCurve *CommentsPlot::curve(int index) const
+{
+    const QwtPlotItemList curves = itemList( QwtPlotItem::Rtti_PlotCurve );
+    if ( index >= 0 && index < curves.size() )
+        return dynamic_cast<const QwtPlotCurve*>( curves[index] );
+
+    return NULL;
+}
+
+void CommentsPlot::onPickerMoved(const QPointF & pos)
+{
+    const int idx = frameAt( pos.x() );
+    if ( idx >= 0 )
+        Q_EMIT cursorMoved( idx );
+}
+
+void CommentsPlot::onXScaleChanged()
+{
+    m_cursor->updateOverlay();
+}
+
+void CommentsPlot::setCursorPos(double x)
+{
+    m_cursor->setPosition( x );
+}
+
+CommentsPlotPicker::CommentsPlotPicker(QWidget *w, CommonStats *stats) : QwtPlotPicker(w), stats(stats)
+{
+    setAxis( QwtPlot::xBottom, QwtPlot::yLeft );
+    setRubberBand( QwtPlotPicker::CrossRubberBand );
+    setRubberBandPen( QColor( Qt::green ) );
+
+    setTrackerMode( QwtPicker::AlwaysOn );
+    setTrackerPen( QColor( Qt::black ) );
+
+    setStateMachine( new QwtPickerDragPointMachine () );
+}
+
+const QwtPlotCurve *CommentsPlotPicker::curve(int index) const
+{
+    const QwtPlotItemList curves = plot()->itemList( QwtPlotItem::Rtti_PlotCurve );
+    if ( index >= 0 && index < curves.size() )
+        return dynamic_cast<const QwtPlotCurve*>( curves[index] );
+
+    return NULL;
+}
+
+QwtText CommentsPlotPicker::trackerTextF(const QPointF &pos) const
+{
+    // the white text is hard to see over a light canvas background
+
+    QColor bg( Qt::darkGray );
+    bg.setAlpha( 160 );
+
+    QwtText text;
+
+    const int idx = dynamic_cast<const CommentsPlotCurve*>( curve(0) )->frameAt( pos.x() );
+    if ( idx >= 0 )
+    {
+        text = infoText( idx );
+        text.setBackgroundBrush( QBrush( bg ) );
+    }
+
+    return text;
+}
+
+QString CommentsPlotPicker::infoText(int index) const
+{
+    if(stats->comments[index])
+        return QString::fromUtf8(stats->comments[index]);
+
+    return "";
+}

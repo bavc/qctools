@@ -10,7 +10,11 @@
 //---------------------------------------------------------------------------
 
 #include <Core/Core.h>
+#include <QEvent>
+#include <QResizeEvent>
 #include <qwt_plot.h>
+#include <qwt_series_data.h>
+#include <qwt_widget_overlay.h>
 
 class QwtPlotCurve;
 class PlotCursor;
@@ -20,6 +24,93 @@ class FileInformation;
 //***************************************************************************
 // Class
 //***************************************************************************
+
+class PlotCursor: public QwtWidgetOverlay
+{
+public:
+    PlotCursor( QWidget *canvas ):
+        QwtWidgetOverlay( canvas ),
+        m_pos( 0.0 )
+    {
+    }
+
+    void setPosition( double pos )
+    {
+        if ( m_pos != pos )
+        {
+            m_pos = pos;
+            updateOverlay();
+        }
+    }
+
+    virtual void drawOverlay( QPainter *painter ) const
+    {
+        const int pos = translatedPos( m_pos );
+
+        const QRect cr = parentWidget()->contentsRect();
+        if ( pos >= cr.left() && pos < cr.right() )
+        {
+            painter->setPen( Qt::magenta );
+            painter->drawLine( pos, cr.top(), pos, cr.bottom() );
+        }
+    }
+
+    virtual QRegion maskHint() const
+    {
+        const QRect cr = parentWidget()->contentsRect();
+        return QRect( translatedPos( m_pos ), cr.top(), 1, cr.height() );
+    }
+
+    virtual bool eventFilter( QObject *object, QEvent *event )
+    {
+        if ( object == parent() && event->type() == QEvent::Resize )
+        {
+            const QResizeEvent *resizeEvent =
+                static_cast<const QResizeEvent *>( event );
+            resize( resizeEvent->size() );
+            updateOverlay();
+
+            return true;
+        }
+
+        return QObject::eventFilter( object, event );
+    }
+
+private:
+    int translatedPos( double pos ) const
+    {
+        // translate from plot into widget coordinate
+
+        const QwtPlot* plot = dynamic_cast<QwtPlot*>( parent()->parent() );
+        if ( plot )
+        {
+            const QwtScaleMap scaleMap = plot->canvasMap( QwtPlot::xBottom );
+            return qRound( scaleMap.transform( pos ) );
+        }
+
+        return -1;
+    }
+
+    double m_pos;
+    int m_widgetPos;
+};
+
+struct compareX
+{
+    inline bool operator()( const double x, const QPointF &pos ) const
+    {
+        return ( x < pos.x() );
+    }
+};
+
+static int indexLower( double x, const QwtSeriesData<QPointF> &data )
+{
+    int index = qwtUpperSampleIndex<QPointF>( data, x, compareX() );
+    if ( index == -1 )
+        index = data.size();
+
+    return index - 1;
+}
 
 class Plot : public QwtPlot
 {
