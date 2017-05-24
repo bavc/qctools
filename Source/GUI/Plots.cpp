@@ -380,26 +380,54 @@ void Plots::alignYAxes()
 }
 
 void showEditFrameCommentsDialog(QWidget* parentWidget, FileInformation* info, CommonStats* stats, size_t frameIndex)
-{
-    bool ok = false;
-    QString note = QInputDialog::getMultiLineText(parentWidget,
-                          QString("Edit comment"),
-                          QString("Comment for frame %1:").arg(frameIndex),
-                          stats->comments[frameIndex] ? QString::fromUtf8(stats->comments[frameIndex]) : QString(),
-                          &ok);
-
-    if(ok)
+{    
+    class InputDialogEx : public QInputDialog
     {
-        if(stats->comments[frameIndex])
-            delete [] stats->comments[frameIndex];
+    public:
+        enum DialogResultEx {
+            Delete = QDialog::Rejected,
+            Save = QDialog::Accepted,
+            Close = 2
+        };
 
-        if(note.isEmpty())
-            stats->comments[frameIndex] = nullptr;
-        else
-            stats->comments[frameIndex] = strdup(note.toUtf8().constData());
+        InputDialogEx(QWidget* parent = nullptr) : QInputDialog(parent) {
+            this->setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+        }
+    protected:
+        void closeEvent(QCloseEvent *event)
+        {
+            done(InputDialogEx::Close);
+        }
 
-        Q_EMIT info->commentsUpdated(stats);
-    }
+        void keyPressEvent(QKeyEvent *event)
+        {
+            if(event->key() == Qt::Key_Escape)
+                done(InputDialogEx::Close);
+            else
+                QDialog::keyPressEvent(event);
+        }
+    };
+
+    InputDialogEx dialog(parentWidget);
+    dialog.setWindowTitle(QString("Edit comment"));
+    dialog.setLabelText(QString("Comment for frame %1:").arg(frameIndex));
+    dialog.setTextValue(stats->comments[frameIndex] ? QString::fromUtf8(stats->comments[frameIndex]) : QString());
+    dialog.setOkButtonText(QString("Save"));
+    dialog.setCancelButtonText(QString("Delete"));
+    int result = dialog.exec();
+
+    if(result == InputDialogEx::Close)
+        return;
+
+    if(stats->comments[frameIndex])
+        delete [] stats->comments[frameIndex];
+
+    if(result == InputDialogEx::Delete || dialog.textValue().isEmpty())
+        stats->comments[frameIndex] = nullptr;
+    else // result == InputDialogEx::Save
+        stats->comments[frameIndex] = strdup(dialog.textValue().toUtf8().constData());
+
+    Q_EMIT info->commentsUpdated(stats);
 }
 
 bool Plots::eventFilter( QObject *object, QEvent *event )
