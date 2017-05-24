@@ -426,10 +426,10 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
         if(m_commentsPlot && object == m_commentsPlot->canvas())
             alignXAxis(m_commentsPlot);
     }
-    else if(event->type() == QEvent::MouseButtonPress)
+    else if(event->type() == QEvent::MouseButtonDblClick)
     {
         QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
-        if(mouseEvent->button() == Qt::RightButton)
+        if(mouseEvent->button() == Qt::LeftButton)
         {
             showEditFrameCommentsDialog(parentWidget(), m_fileInfoData, m_fileInfoData->ReferenceStat(), framePos());
         }
