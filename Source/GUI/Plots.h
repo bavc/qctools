@@ -19,6 +19,8 @@ class QwtPlot;
 class Plot;
 class PlotScaleWidget;
 
+void showEditFrameCommentsDialog(QWidget* parentWidget, FileInformation* info, CommonStats* stats, size_t frameIndex);
+
 class FrameInterval
 {
 public:

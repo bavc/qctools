@@ -17,6 +17,7 @@
 #include "GUI/imagelabel.h"
 #include "GUI/config.h"
 #include "GUI/Comments.h"
+#include "GUI/Plots.h"
 #include "Core/FileInformation.h"
 #include "Core/FFmpeg_Glue.h"
 
@@ -47,6 +48,7 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QSplitter>
+#include <qwt_scale_widget.h>
 
 #include <sstream>
 //---------------------------------------------------------------------------
@@ -1073,6 +1075,7 @@ DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Other
     Slider->setGeometry(initial_x, y() + height(), slider_width, height());
     connect(Slider, SIGNAL(valueChanged(int)), this, SLOT(on_sliderMoved(int)));
     connect(Slider, SIGNAL(sliderMoved(int)), this, SLOT(on_sliderMoved(int)));
+
     Slider->setFocusPolicy(Qt::NoFocus);
     //Layout->addWidget(Slider);
     //Popup->setFocusPolicy(Qt::NoFocus);
@@ -1394,7 +1397,6 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     }
 
     splitter = new QSplitter;
-    splitter->installEventFilter(this);
     splitter->setStyleSheet("QSplitter::handle { background-color: gray }");
     splitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -1410,6 +1412,7 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     }
 
     splitter->handle(1)->installEventFilter(this);
+    splitter->installEventFilter(this);
 
     Layout->addWidget(splitter, 1, 0, 1, 3);
 
@@ -1422,12 +1425,32 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     // Slider
     Slider=new QSlider(Qt::Horizontal);
     Slider->setMaximum(FileInfoData->Glue->VideoFrameCount_Get() - 1);
-    connect(Slider, SIGNAL(sliderMoved(int)), this, SLOT(on_Slider_sliderMoved(int)));
-    connect(Slider, SIGNAL(actionTriggered(int)), this, SLOT(on_Slider_actionTriggered(int)));
+
+    connect(Slider, SIGNAL(valueChanged(int)), this, SLOT(onSliderValueChanged(int)));
+    connect(Slider, SIGNAL(valueChanged(int)), this, SLOT(onCursorMoved(int)));
+
     Layout->addWidget(Slider, 2, 0, 1, 3);
 
+    plot = createCommentsPlot(FileInformationData_, nullptr);
+    plot->enableAxis(QwtPlot::yLeft, false);
+    plot->enableAxis(QwtPlot::xBottom, true);
+    plot->setAxisScale(QwtPlot::xBottom, Slider->minimum(), Slider->maximum());
+    plot->setAxisAutoScale(QwtPlot::xBottom, false);
+
+    plot->setFrameShape(QFrame::NoFrame);
+    plot->setObjectName("commentsPlot");
+    plot->setStyleSheet("#commentsPlot { border: 0px solid transparent; }");
+    plot->canvas()->setObjectName("commentsPlotCanvas");
+    dynamic_cast<QFrame*>(plot->canvas())->setFrameStyle( QFrame::NoFrame );
+    dynamic_cast<QFrame*>(plot->canvas())->setContentsMargins(0, 0, 0, 0);
+
+    connect( plot, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
+    plot->canvas()->installEventFilter( this );
+
     // Notes
-    Layout->addWidget(createCommentsPlot(FileInformationData_, nullptr), 3, 0, 1, 3, Qt::AlignBottom);
+    Layout->addWidget(
+                plot,
+                3, 0, 1, 3, Qt::AlignBottom);
 
     // Control
     ControlArea=new Control(this, FileInfoData, true);
@@ -2206,18 +2229,9 @@ void BigDisplay::ShowPicture ()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void BigDisplay::on_Slider_sliderMoved(int value)
+void BigDisplay::onSliderValueChanged(int value)
 {
-	Q_EMIT rewind(Slider->sliderPosition());
-}
-
-//---------------------------------------------------------------------------
-void BigDisplay::on_Slider_actionTriggered(int action )
-{
-    if (action==QAbstractSlider::SliderMove)
-        return;
-
-	Q_EMIT rewind(Slider->sliderPosition());
+    Q_EMIT rewind(Slider->value());
 }
 
 //---------------------------------------------------------------------------
@@ -2390,9 +2404,32 @@ bool BigDisplay::eventFilter(QObject *watched, QEvent *event)
         sizes << left << right;
 
         splitter->setSizes(sizes);
+    } else if(watched == plot->canvas()) {
+
+        if(event->type() == QEvent::MouseButtonDblClick)
+        {
+            QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+            if(mouseEvent->button() == Qt::LeftButton)
+            {
+                showEditFrameCommentsDialog(parentWidget(), FileInfoData, FileInfoData->ReferenceStat(), Slider->value());
+            }
+        } else if(event->type() == QEvent::KeyPress)
+        {
+            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+            if(keyEvent->key() == Qt::Key_M)
+            {
+                showEditFrameCommentsDialog(parentWidget(), FileInfoData, FileInfoData->ReferenceStat(), Slider->value());
+            }
+        }
     }
 
     return QWidget::eventFilter(watched, event);
+}
+
+void BigDisplay::onCursorMoved(int x)
+{
+    plot->setCursorPos(x);
+    Slider->setValue(x);
 }
 
 void BigDisplay::updateImagesAndSlider(const QPixmap &pixmap1, const QPixmap &pixmap2, int sliderPos)

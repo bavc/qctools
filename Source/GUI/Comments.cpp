@@ -172,15 +172,15 @@ CommentsPlot::CommentsPlot(FileInformation* fileInfo, CommonStats* stats, const 
     }
 
     QwtPlotCurve *curve = new CommentsPlotCurve();
-    curve->setPen( Qt::transparent, 4 ), curve->setRenderHint( QwtPlotItem::RenderAntialiased, true );
+    curve->setPen( Qt::transparent, 0 ), curve->setRenderHint( QwtPlotItem::RenderAntialiased, true );
 
     QwtSymbol *symbol = new CommentsSymbol;
     symbol->setBrush(QBrush(Qt::red));
-    symbol->setPen( QPen( Qt::red, 2 ));
+    symbol->setPen( QPen( Qt::red, 1 ));
     symbol->setCachePolicy(QwtSymbol::NoCache);
 
     int plotHeight = 30;
-    symbol->setSize(QSize(10, plotHeight));
+    symbol->setSize(QSize(11, plotHeight));
 
     curve->setSymbol( symbol );
 
@@ -197,9 +197,17 @@ CommentsPlot::CommentsPlot(FileInformation* fileInfo, CommonStats* stats, const 
     enableAxis(QwtPlot::xBottom, false);
     setAxisAutoScale(QwtPlot::xBottom, true);
 
+    axisWidget(QwtPlot::xBottom)->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone, false);
+    axisWidget(QwtPlot::xBottom)->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels, false);
+    axisWidget(QwtPlot::xBottom)->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Ticks, false);
+
     axisWidget(QwtPlot::yLeft)->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone, false);
     axisWidget(QwtPlot::yLeft)->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels, false);
     axisWidget(QwtPlot::yLeft)->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Ticks, false);
+
+    axisWidget(QwtPlot::yRight)->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone, false);
+    axisWidget(QwtPlot::yRight)->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels, false);
+    axisWidget(QwtPlot::yRight)->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Ticks, false);
 
     QObject::connect(fileInfo, SIGNAL(commentsUpdated(CommonStats*)), SLOT(replot()));
 
