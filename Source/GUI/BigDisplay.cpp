@@ -1321,7 +1321,7 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     for (size_t Pos=0; Pos<2; Pos++)
     {
         Options[Pos].FiltersList=new QComboBox(this);
-        Options[Pos].FiltersList->setProperty("playerIndex", Pos);
+        Options[Pos].FiltersList->setProperty("playerIndex", (int) Pos); // unfortunately QVariant doesn't support size_t
         Options[Pos].FiltersList->setFont(Font);
 
         typedef QPair<QString, int> FilterInfo;
