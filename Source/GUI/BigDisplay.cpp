@@ -1321,6 +1321,7 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     for (size_t Pos=0; Pos<2; Pos++)
     {
         Options[Pos].FiltersList=new QComboBox(this);
+        Options[Pos].FiltersList->setProperty("playerIndex", Pos);
         Options[Pos].FiltersList->setFont(Font);
 
         typedef QPair<QString, int> FilterInfo;
@@ -1371,27 +1372,25 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
         Options[Pos].FiltersList->setMinimumWidth(Options[Pos].FiltersList->minimumSizeHint().width());
         Options[Pos].FiltersList->setMaximumWidth(Options[Pos].FiltersList->minimumSizeHint().width());
         Options[Pos].FiltersList->setMaxVisibleItems(25);
+
     }
-
-    //Image1
-    imageLabel1=new ImageLabel(&Picture, 1, this);
-    imageLabel1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    imageLabel1->setMinimumSize(20, 20);
-    imageLabel1->showDebugOverlay(Config::instance().getDebug());
-
-    //Image2
-    imageLabel2=new ImageLabel(&Picture, 2, this);
-    imageLabel2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    imageLabel2->setMinimumSize(20, 20);
-    imageLabel2->showDebugOverlay(Config::instance().getDebug());
 
     splitter = new QSplitter;
     splitter->installEventFilter(this);
     splitter->setStyleSheet("QSplitter::handle { background-color: gray }");
-
     splitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    splitter->addWidget(imageLabel1);
-    splitter->addWidget(imageLabel2);
+
+    // Players
+    for (size_t Pos=0; Pos<2; Pos++)
+    {
+        imageLabels[Pos] =new ImageLabel(&Picture, Pos + 1, this);
+        imageLabels[Pos]->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        imageLabels[Pos]->setMinimumSize(20, 20);
+        imageLabels[Pos]->showDebugOverlay(Config::instance().getDebug());
+
+        splitter->addWidget(imageLabels[Pos]);
+    }
+
     splitter->handle(1)->installEventFilter(this);
 
     Layout->addWidget(splitter, 1, 0, 1, 3);
@@ -1417,8 +1416,8 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
 
     // Picture
     Picture=NULL;
-    Picture_Current1=Filters_Default1;
-    Picture_Current2=Filters_Default2;
+    Picture_Current[0] = Filters_Default1;
+    Picture_Current[1] = Filters_Default2;
 
     for(int playerIndex = 0; playerIndex < 2; ++playerIndex)
     {
@@ -1428,10 +1427,9 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
             if((physicalFilterIndex == Filters_Default1 && playerIndex == 0) || (physicalFilterIndex == Filters_Default2 && playerIndex == 1))
                 Options[playerIndex].FiltersList->setCurrentIndex(displayFilterIndex);
         }
-    }
 
-    connect(Options[0].FiltersList, SIGNAL(currentIndexChanged(int)), this, SLOT(on_FiltersList1_currentIndexChanged(int)));
-    connect(Options[1].FiltersList, SIGNAL(currentIndexChanged(int)), this, SLOT(on_FiltersList2_currentIndexChanged(int)));
+        connect(Options[playerIndex].FiltersList, SIGNAL(currentIndexChanged(int)), this, SLOT(on_FiltersList_currentIndexChanged(int)));
+    }
 
     // Info
     Frames_Pos=-1;
@@ -1718,82 +1716,50 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
             default:                ;
         }
     }
-
-    // Reorder focus order
-    // Does not work as expected
-    /*
-    if (Pos==1) //Only if left and right blocks are designed
-    {
-        QWidget* First=Options[0].FiltersList;
-        QWidget* Second=NULL;
-        for (Pos=0; Pos<2; Pos++)
-            for (size_t OptionPos=0; OptionPos<Args_Max; OptionPos++)
-            {
-                Second=Options[Pos].Checks[OptionPos];
-                if (Second==NULL)
-                    Second=Options[Pos].Sliders_SpinBox[OptionPos];
-                if (Second==NULL)
-                    Second=Options[Pos].Radios[OptionPos][1];
-                if (Second==NULL)
-                    Second=Options[Pos].ColorButton[OptionPos];
-                if (Second)
-                {
-                    setTabOrder(First, Second);
-                    First=Second;
-                    Second=NULL;
-                }
-            }
-        setTabOrder(First, Options[1].FiltersList);
-    }
-    */
 }
 
 //---------------------------------------------------------------------------
-void BigDisplay::FiltersList1_currentIndexChanged(size_t FilterPos)
+void BigDisplay::FiltersList_currentIndexChanged(size_t playerIndex, size_t FilterPos)
 {
-    QGridLayout* Layout0=new QGridLayout();
-    Layout0->setContentsMargins(0, 0, 0, 0);
-    Layout0->setSpacing(8);
-    Layout0->addWidget(Options[0].FiltersList, 0, 0, Qt::AlignLeft);
-    FiltersList_currentIndexChanged(0, FilterPos, Layout0);
-    Options[0].FiltersList_Fake=new QLabel(" ");
-    Layout0->addWidget(Options[0].FiltersList_Fake, 1, 0, Qt::AlignLeft);
-    Layout0->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum), 0, 14);
-    Layout->addLayout(Layout0, 0, 0, 1, 1, Qt::AlignLeft|Qt::AlignTop);
-
-    if (Picture_Current1<2)
+    // todo: consider consolidation this parts
+    if(playerIndex == 0)
     {
-        imageLabel1->setVisible(true);
-        // Layout->setColumnStretch(0, 1);
+        QGridLayout* Layout0=new QGridLayout();
+        Layout0->setContentsMargins(0, 0, 0, 0);
+        Layout0->setSpacing(8);
+
+        Layout0->addWidget(Options[playerIndex].FiltersList, 0, 0, Qt::AlignLeft);
+        FiltersList_currentIndexChanged(playerIndex, FilterPos, Layout0);
+
+        Options[playerIndex].FiltersList_Fake=new QLabel(" ");
+        Layout0->addWidget(Options[playerIndex].FiltersList_Fake, 1, 0, Qt::AlignLeft);
+        Layout0->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum), 0, 14);
+        Layout->addLayout(Layout0, 0, 0, 1, 1, Qt::AlignLeft|Qt::AlignTop);
     }
-    Picture_Current1=FilterPos;
-    FiltersList1_currentOptionChanged(Picture_Current1);
-
-    updateSelection(FilterPos, imageLabel1, Options[0]);
-}
-
-//---------------------------------------------------------------------------
-void BigDisplay::FiltersList2_currentIndexChanged(size_t FilterPos)
-{
-    QGridLayout* Layout0=new QGridLayout();
-    Layout0->setContentsMargins(0, 0, 0, 0);
-    Layout0->setSpacing(8);
-    Layout0->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum), 0, 0);
-    FiltersList_currentIndexChanged(1, FilterPos, Layout0);
-    Layout0->addWidget(Options[1].FiltersList, 0, 14, Qt::AlignRight);
-    Options[1].FiltersList_Fake=new QLabel(" ");
-    Layout0->addWidget(Options[1].FiltersList_Fake, 1, 14, Qt::AlignRight);
-    Layout->addLayout(Layout0, 0, 2, 1, 1, Qt::AlignRight|Qt::AlignTop);
-
-    if (Picture_Current2<2)
+    else
     {
-        imageLabel2->setVisible(true);
-        // Layout->setColumnStretch(2, 1);
-    }
-    Picture_Current2=FilterPos;
-    FiltersList2_currentOptionChanged(Picture_Current2);
+        QGridLayout* Layout0=new QGridLayout();
+        Layout0->setContentsMargins(0, 0, 0, 0);
+        Layout0->setSpacing(8);
+        Layout0->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum), 0, 0);
 
-    updateSelection(FilterPos, imageLabel2, Options[1]);
+        FiltersList_currentIndexChanged(playerIndex, FilterPos, Layout0);
+        Layout0->addWidget(Options[playerIndex].FiltersList, 0, 14, Qt::AlignRight);
+
+        Options[playerIndex].FiltersList_Fake=new QLabel(" ");
+        Layout0->addWidget(Options[playerIndex].FiltersList_Fake, 1, 14, Qt::AlignRight);
+        Layout->addLayout(Layout0, 0, 2, 1, 1, Qt::AlignRight|Qt::AlignTop);
+    }
+
+    if (FilterPos >= 2)
+    {
+        imageLabels[playerIndex]->setVisible(true);
+    }
+
+    Picture_Current[playerIndex] = FilterPos;
+    on_FiltersList_currentOptionChanged(playerIndex, FilterPos);
+
+    updateSelection(FilterPos, imageLabels[playerIndex], Options[playerIndex]);
 }
 
 //---------------------------------------------------------------------------
@@ -2128,27 +2094,15 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
 }
 
 //---------------------------------------------------------------------------
-void BigDisplay::FiltersList1_currentOptionChanged(size_t Picture_Current)
+void BigDisplay::on_FiltersList_currentOptionChanged(size_t playerIndex, size_t filterIndex)
 {
-    string Modified_String=FiltersList_currentOptionChanged(0, Picture_Current);
-    Picture->Filter_Change(0, Filters[Picture_Current1].Type, Modified_String.c_str());
+    string Modified_String=FiltersList_currentOptionChanged(playerIndex, filterIndex);
+    Picture->Filter_Change(playerIndex, Filters[filterIndex].Type, Modified_String.c_str());
 
     Picture->FrameAtPosition(Frames_Pos);
 
-    if(imageLabel1->isVisible())
-        imageLabel1->adjustScale();
-}
-
-//---------------------------------------------------------------------------
-void BigDisplay::FiltersList2_currentOptionChanged(size_t Picture_Current)
-{
-    string Modified_String=FiltersList_currentOptionChanged(1, Picture_Current);
-    Picture->Filter_Change(1, Filters[Picture_Current2].Type, Modified_String.c_str());
-
-    Picture->FrameAtPosition(Frames_Pos);
-
-    if(imageLabel2->isVisible())
-        imageLabel2->adjustScale();
+    if(imageLabels[playerIndex]->isVisible())
+        imageLabels[playerIndex]->adjustScale();
 }
 
 //***************************************************************************
@@ -2177,8 +2131,9 @@ void BigDisplay::InitPicture()
             Picture->InputData_Set(FileInfoData->Glue->InputData_Get()); // Using data from the analyzed file
         Picture->AddOutput(0, width, height, FFmpeg_Glue::Output_QImage);
         Picture->AddOutput(1, width, height, FFmpeg_Glue::Output_QImage);
-        FiltersList1_currentIndexChanged(Picture_Current1);
-        FiltersList2_currentIndexChanged(Picture_Current2);
+
+        setCurrentFilter(0, Picture_Current[0]);
+        setCurrentFilter(1, Picture_Current[1]);
     }
 }
 
@@ -2253,39 +2208,39 @@ void BigDisplay::on_FiltersSource_stateChanged(int state)
 //---------------------------------------------------------------------------
 void BigDisplay::on_FiltersOptions1_click()
 {
-    FiltersList1_currentOptionChanged(Picture_Current1);
+    on_FiltersList_currentOptionChanged(0, Picture_Current[0]);
 }
 
 //---------------------------------------------------------------------------
 void BigDisplay::on_FiltersOptions2_click()
 {
-    FiltersList2_currentOptionChanged(Picture_Current2);
+    on_FiltersList_currentOptionChanged(1, Picture_Current[1]);
 }
 
 //---------------------------------------------------------------------------
 void BigDisplay::on_FiltersOptions1_toggle(bool checked)
 {
     if (checked)
-        FiltersList1_currentOptionChanged(Picture_Current1);
+            on_FiltersList_currentOptionChanged(0, Picture_Current[0]);
 }
 
 //---------------------------------------------------------------------------
 void BigDisplay::on_FiltersOptions2_toggle(bool checked)
 {
     if (checked)
-        FiltersList2_currentOptionChanged(Picture_Current2);
+            on_FiltersList_currentOptionChanged(1, Picture_Current[1]);
 }
 
 //---------------------------------------------------------------------------
 void BigDisplay::on_FiltersSpinBox1_click()
 {
-    FiltersList1_currentOptionChanged(Picture_Current1);
+    on_FiltersList_currentOptionChanged(0, Picture_Current[0]);
 }
 
 //---------------------------------------------------------------------------
 void BigDisplay::on_FiltersSpinBox2_click()
 {
-    FiltersList2_currentOptionChanged(Picture_Current2);
+    on_FiltersList_currentOptionChanged(1, Picture_Current[1]);
 }
 
 //---------------------------------------------------------------------------
@@ -2301,7 +2256,7 @@ void BigDisplay::on_Color1_click(bool checked)
     if (Color.isValid())
     {
         Options[0].ColorValue[OptionPos]=Color.rgb()&0x00FFFFFF;
-        FiltersList2_currentOptionChanged(Picture_Current2);
+        on_FiltersList_currentOptionChanged(0, Picture_Current[0]);
     }
     hide();
     show();
@@ -2319,7 +2274,7 @@ void BigDisplay::on_Color2_click(bool checked)
     if (Color.isValid())
     {
         Options[1].ColorValue[OptionPos]=Color.rgb()&0x00FFFFFF;
-        FiltersList2_currentOptionChanged(Picture_Current2);
+        on_FiltersList_currentOptionChanged(1, Picture_Current[1]);
     }
     hide();
     show();
@@ -2379,6 +2334,29 @@ void BigDisplay::updateSelection(int Pos, ImageLabel* image, options& opts)
     }
 }
 
+void BigDisplay::setCurrentFilter(size_t playerIndex, size_t filterIndex)
+{
+    // Help
+    if (filterIndex == 0)
+    {
+        Help* Frame=new Help(this);
+        Frame->PlaybackFilters();
+        return;
+    }
+
+    ImageLabel* imageLabel = imageLabels[playerIndex];
+
+    // None
+    if (filterIndex == 1)
+    {
+        Picture->Disable(playerIndex);
+        imageLabel->Remove();
+    }
+
+    FiltersList_currentIndexChanged(playerIndex, filterIndex);
+    updateSelection(filterIndex, imageLabel, Options[playerIndex]);
+}
+
 bool BigDisplay::eventFilter(QObject *watched, QEvent *event)
 {
     if((watched == splitter || watched == splitter->handle(1)) && event->type() == QEvent::MouseButtonDblClick)
@@ -2402,75 +2380,23 @@ void BigDisplay::updateImagesAndSlider(const QPixmap &pixmap1, const QPixmap &pi
         Slider->setSliderPosition(sliderPos);
 
     if(!pixmap1.isNull())
-        imageLabel1->setPixmap(pixmap1);
+        imageLabels[0]->setPixmap(pixmap1);
 
     if(!pixmap2.isNull())
-        imageLabel2->setPixmap(pixmap2);
+        imageLabels[1]->setPixmap(pixmap2);
 }
 
-void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
+void BigDisplay::on_FiltersList_currentIndexChanged(int Pos)
 {
     QComboBox* combo = qobject_cast<QComboBox*>(sender());
     if(combo)
-    {
+    {        
         if(!combo->itemData(Pos).isNull())
             Pos = combo->itemData(Pos).toInt();
+
+        int playerIndex = combo->property("playerIndex").toInt();
+        setCurrentFilter(playerIndex, Pos);
     }
-
-    // Help
-    if (Pos==0)
-    {
-        Help* Frame=new Help(this);
-        Frame->PlaybackFilters();
-        return;
-    }
-
-    // None
-    if (Pos==1)
-    {
-        Picture->Disable(0);
-        imageLabel1->Remove();
-        // Layout->setColumnStretch(0, 0);
-    }
-
-    if (Picture_Current1<2)
-    {
-        imageLabel1->setVisible(true);
-        // Layout->setColumnStretch(0, 1);
-    }
-
-    FiltersList1_currentIndexChanged(Pos);
-    updateSelection(Pos, imageLabel1, Options[0]);
-}
-
-//---------------------------------------------------------------------------
-void BigDisplay::on_FiltersList2_currentIndexChanged(int Pos)
-{
-    QComboBox* combo = qobject_cast<QComboBox*>(sender());
-    if(combo)
-    {
-        if(!combo->itemData(Pos).isNull())
-            Pos = combo->itemData(Pos).toInt();
-    }
-
-    // Help
-    if (Pos==0)
-    {
-        Help* Frame=new Help(this);
-        Frame->PlaybackFilters();
-        return;
-    }
-
-    // None
-    if (Pos==1)
-    {
-        Picture->Disable(1);
-        imageLabel2->Remove();
-        // Layout->setColumnStretch(2, 0);
-    }
-
-    FiltersList2_currentIndexChanged(Pos);
-    updateSelection(Pos, imageLabel2, Options[1]);
 }
 
 //---------------------------------------------------------------------------
