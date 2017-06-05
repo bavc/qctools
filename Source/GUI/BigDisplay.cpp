@@ -1378,26 +1378,13 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     imageLabel1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     imageLabel1->setMinimumSize(20, 20);
     imageLabel1->showDebugOverlay(Config::instance().getDebug());
-    //Layout->addWidget(Image1, 1, 0, 1, 1);
-    //Layout->setColumnStretch(0, 1);
 
     //Image2
     imageLabel2=new ImageLabel(&Picture, 2, this);
     imageLabel2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     imageLabel2->setMinimumSize(20, 20);
     imageLabel2->showDebugOverlay(Config::instance().getDebug());
-    //Layout->addWidget(Image2, 1, 2, 1, 1);
-    //Layout->setColumnStretch(2, 1);
 
-    // Mixing Image1 and Image2 in one widget
-    /*
-    QHBoxLayout* ImageLayout=new QHBoxLayout();
-    ImageLayout->setContentsMargins(0, -1, 0, 0);
-    ImageLayout->setSpacing(0);
-    ImageLayout->addWidget(imageLabel1);
-    ImageLayout->addWidget(imageLabel2);
-    Layout->addLayout(ImageLayout, 1, 0, 1, 3);
-    */
     splitter = new QSplitter;
     splitter->installEventFilter(this);
     splitter->setStyleSheet("QSplitter::handle { background-color: gray }");
@@ -1777,8 +1764,7 @@ void BigDisplay::FiltersList1_currentIndexChanged(size_t FilterPos)
     if (Picture_Current1<2)
     {
         imageLabel1->setVisible(true);
-        Layout->setColumnStretch(0, 1);
-        //resize(width()+Image_Width, height());
+        // Layout->setColumnStretch(0, 1);
     }
     Picture_Current1=FilterPos;
     FiltersList1_currentOptionChanged(Picture_Current1);
@@ -1802,8 +1788,7 @@ void BigDisplay::FiltersList2_currentIndexChanged(size_t FilterPos)
     if (Picture_Current2<2)
     {
         imageLabel2->setVisible(true);
-        Layout->setColumnStretch(2, 1);
-        //resize(width()+Image_Width, height());
+        // Layout->setColumnStretch(2, 1);
     }
     Picture_Current2=FilterPos;
     FiltersList2_currentOptionChanged(Picture_Current2);
@@ -2149,7 +2134,9 @@ void BigDisplay::FiltersList1_currentOptionChanged(size_t Picture_Current)
     Picture->Filter_Change(0, Filters[Picture_Current1].Type, Modified_String.c_str());
 
     Picture->FrameAtPosition(Frames_Pos);
-    imageLabel1->adjustScale();
+
+    if(imageLabel1->isVisible())
+        imageLabel1->adjustScale();
 }
 
 //---------------------------------------------------------------------------
@@ -2159,7 +2146,9 @@ void BigDisplay::FiltersList2_currentOptionChanged(size_t Picture_Current)
     Picture->Filter_Change(1, Filters[Picture_Current2].Type, Modified_String.c_str());
 
     Picture->FrameAtPosition(Frames_Pos);
-    imageLabel2->adjustScale();
+
+    if(imageLabel2->isVisible())
+        imageLabel2->adjustScale();
 }
 
 //***************************************************************************
@@ -2404,7 +2393,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
     {
         Picture->Disable(0);
         imageLabel1->Remove();
-        Layout->setColumnStretch(0, 0);
+        // Layout->setColumnStretch(0, 0);
         Picture_Current1=1;
         return;
     }
@@ -2418,7 +2407,7 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
             if (Picture_Current1<2)
             {
                 imageLabel1->setVisible(true);
-                Layout->setColumnStretch(0, 1);
+                // Layout->setColumnStretch(0, 1);
             }
             Picture_Current1=Pos;
             Picture->Filter_Change(0, 0, FiltersList_currentOptionChanged(Pos, 0));
@@ -2536,13 +2525,13 @@ void BigDisplay::on_FiltersList1_currentIndexChanged(int Pos)
     {
         Picture->Disable(0);
         imageLabel1->Remove();
-        Layout->setColumnStretch(0, 0);
+        // Layout->setColumnStretch(0, 0);
     }
 
     if (Picture_Current1<2)
     {
         imageLabel1->setVisible(true);
-        Layout->setColumnStretch(0, 1);
+        // Layout->setColumnStretch(0, 1);
     }
 
     FiltersList1_currentIndexChanged(Pos);
@@ -2572,7 +2561,7 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(int Pos)
     {
         Picture->Disable(1);
         imageLabel2->Remove();
-        Layout->setColumnStretch(2, 0);
+        // Layout->setColumnStretch(2, 0);
     }
 
     FiltersList2_currentIndexChanged(Pos);
@@ -2595,7 +2584,7 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(QAction * action)
     {
         Picture->Disable(1);
         imageLabel2->Remove();
-        Layout->setColumnStretch(2, 0);
+        // Layout->setColumnStretch(2, 0);
         Picture_Current2=1;
         return;
     }
