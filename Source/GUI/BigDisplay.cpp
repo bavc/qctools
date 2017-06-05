@@ -2251,58 +2251,6 @@ void BigDisplay::on_FiltersSource_stateChanged(int state)
 }
 
 //---------------------------------------------------------------------------
-void BigDisplay::on_FiltersList1_click()
-{
-    QMenu* Menu=new QMenu(this);
-    QActionGroup* ActionGroup=new QActionGroup(this);
-
-    for (size_t Pos=0; Pos<FiltersListDefault_Count; Pos++)
-    {
-        if (strcmp(Filters[Pos].Name, "(Separator)"))
-        {
-            QAction* Action=new QAction(Filters[Pos].Name, this);
-            Action->setCheckable(true);
-            if (Pos==Picture_Current1)
-                Action->setChecked(true);
-            if (Pos)
-                ActionGroup->addAction(Action);
-            Menu->addAction(Action);
-        }
-        else
-            Menu->addSeparator();
-    }
-
-    connect(Menu, SIGNAL(triggered(QAction*)), this, SLOT(on_FiltersList1_currentIndexChanged(QAction*)));
-    Menu->exec(Options[0].FiltersList->mapToGlobal(QPoint(-Menu->width(), Options[0].FiltersList->height())));
-}
-
-//---------------------------------------------------------------------------
-void BigDisplay::on_FiltersList2_click()
-{
-    QMenu* Menu=new QMenu(this);
-    QActionGroup* ActionGroup=new QActionGroup(this);
-
-    for (size_t Pos=0; Pos<FiltersListDefault_Count; Pos++)
-    {
-        if (strcmp(Filters[Pos].Name, "(Separator)"))
-        {
-            QAction* Action=new QAction(Filters[Pos].Name, this);
-            Action->setCheckable(true);
-            if (Pos==Picture_Current2)
-                Action->setChecked(true);
-            if (Pos)
-                ActionGroup->addAction(Action);
-            Menu->addAction(Action);
-        }
-        else
-            Menu->addSeparator();
-    }
-
-    connect(Menu, SIGNAL(triggered(QAction*)), this, SLOT(on_FiltersList2_currentIndexChanged(QAction*)));
-    Menu->exec(Options[1].FiltersList->mapToGlobal(QPoint(Options[1].FiltersList->width(), Options[1].FiltersList->height())));
-}
-
-//---------------------------------------------------------------------------
 void BigDisplay::on_FiltersOptions1_click()
 {
     FiltersList1_currentOptionChanged(Picture_Current1);
@@ -2375,49 +2323,6 @@ void BigDisplay::on_Color2_click(bool checked)
     }
     hide();
     show();
-}
-
-//---------------------------------------------------------------------------
-void BigDisplay::on_FiltersList1_currentIndexChanged(QAction * action)
-{
-    // Help
-    if (action->text()=="Help")
-    {
-        Help* Frame=new Help(this);
-        Frame->PlaybackFilters();
-        return;
-    }
-
-    // None
-    if (action->text()=="No display")
-    {
-        Picture->Disable(0);
-        imageLabel1->Remove();
-        // Layout->setColumnStretch(0, 0);
-        Picture_Current1=1;
-        return;
-    }
-
-    // Filters
-    size_t Pos=0;
-    for (; Pos<FiltersListDefault_Count; Pos++)
-    {
-        if (action->text()==Filters[Pos].Name)
-        {
-            if (Picture_Current1<2)
-            {
-                imageLabel1->setVisible(true);
-                // Layout->setColumnStretch(0, 1);
-            }
-            Picture_Current1=Pos;
-            Picture->Filter_Change(0, 0, FiltersList_currentOptionChanged(Pos, 0));
-
-            Frames_Pos=(size_t)-1;
-            ShowPicture ();
-            updateSelection(Pos, imageLabel1, Options[0]);
-            return;
-        }
-    }
 }
 
 //---------------------------------------------------------------------------
@@ -2566,40 +2471,6 @@ void BigDisplay::on_FiltersList2_currentIndexChanged(int Pos)
 
     FiltersList2_currentIndexChanged(Pos);
     updateSelection(Pos, imageLabel2, Options[1]);
-}
-
-//---------------------------------------------------------------------------
-void BigDisplay::on_FiltersList2_currentIndexChanged(QAction * action)
-{
-    // Help
-    if (action->text()=="Help")
-    {
-        Help* Frame=new Help(this);
-        Frame->PlaybackFilters();
-        return;
-    }
-
-    // None
-    if (action->text()=="No display")
-    {
-        Picture->Disable(1);
-        imageLabel2->Remove();
-        // Layout->setColumnStretch(2, 0);
-        Picture_Current2=1;
-        return;
-    }
-
-    // Filters
-    size_t Pos=0;
-    for (; Pos<FiltersListDefault_Count; Pos++)
-    {
-        if (action->text()==Filters[Pos].Name)
-        {
-            FiltersList2_currentIndexChanged(Pos);
-            updateSelection(Pos, imageLabel2, Options[1]);
-            return;
-        }
-    }
 }
 
 //---------------------------------------------------------------------------

@@ -179,15 +179,11 @@ Q_SIGNALS:
 public Q_SLOTS:
     void updateImagesAndSlider(const QPixmap& pixmap1, const QPixmap& pixmap2, int sliderPos);
 
-    void on_FiltersList1_currentIndexChanged(QAction * action);
-    void on_FiltersList2_currentIndexChanged(QAction * action);
     void on_FiltersList1_currentIndexChanged(int Pos);
     void on_FiltersList2_currentIndexChanged(int Pos);
     void on_Slider_sliderMoved(int value);
     void on_Slider_actionTriggered (int action);
     void on_FiltersSource_stateChanged(int state);
-    void on_FiltersList1_click();
-    void on_FiltersList2_click();
     void on_FiltersOptions1_click();
     void on_FiltersOptions2_click();
     void on_FiltersOptions1_toggle(bool checked);
