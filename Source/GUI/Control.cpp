@@ -241,6 +241,7 @@ Control::~Control()
 //***************************************************************************
 // Actions
 //***************************************************************************
+static QTime zeroTime = QTime::fromString("00:00:00");
 
 //---------------------------------------------------------------------------
 void Control::Update()
@@ -277,36 +278,16 @@ void Control::Update()
         Info_Frames->setText(QString("Frame %1 [%2]").arg(Frames_Pos).arg(FileInfoData->Frame_Type_Get()));
     else
         Info_Frames->setText(QString());
-    if (Milliseconds!=(int)-1)
+
+    if (Milliseconds >= 0)
     {
-        string Time;
-        int H1=Milliseconds/36000000; Milliseconds%=36000000;
-        int H2=Milliseconds/ 3600000; Milliseconds%= 3600000;
-        int M1=Milliseconds/  600000; Milliseconds%=  600000;
-        int M2=Milliseconds/   60000; Milliseconds%=   60000;
-        int S1=Milliseconds/   10000; Milliseconds%=   10000;
-        int S2=Milliseconds/    1000; Milliseconds%=    1000;
-        int m1=Milliseconds/     100; Milliseconds%=     100;
-        int m2=Milliseconds/      10; Milliseconds%=      10;
-        int m3=Milliseconds         ;
-        Time.append(1, '0'+H1);
-        Time.append(1, '0'+H2);
-        Time.append(1, ':');
-        Time.append(1, '0'+M1);
-        Time.append(1, '0'+M2);
-        Time.append(1, ':');
-        Time.append(1, '0'+S1);
-        Time.append(1, '0'+S2);
-        Time.append(1, '.');
-        Time.append(1, '0'+m1);
-        Time.append(1, '0'+m2);
-        Time.append(1, '0'+m3);
-        Info_Time->setText(QString().fromUtf8(Time.c_str()));
+        QTime time = zeroTime;
+        time = time.addMSecs(Milliseconds);
+        QString timeString = time.toString("hh:mm:ss.zzz");
+        Info_Time->setText(timeString);
     }
     else
-        Info_Time->setText(QString());
-
-    // qDebug() << "Milliseconds: " << Milliseconds;
+        Info_Time->setText("");
 
     // Controls
     if (Frames_Pos==0)
