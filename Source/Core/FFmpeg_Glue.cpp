@@ -15,6 +15,7 @@
 #include "Core/FormatStats.h"
 
 #include <QXmlStreamReader>
+#include <QDebug>
 
 extern "C"
 {
@@ -1118,6 +1119,7 @@ void FFmpeg_Glue::ModifyOutput(size_t InputPos, size_t OutputPos, size_t FilterP
 void FFmpeg_Glue::Seek(size_t FramePos)
 {
     QMutexLocker locker(mutex);
+    qDebug() << "Seek " << FramePos;
 
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
     {
@@ -1172,10 +1174,34 @@ void FFmpeg_Glue::FrameAtPosition(size_t FramePos)
 
         if (InputData && InputData->Type==AVMEDIA_TYPE_VIDEO)
         {
-            if (InputData->FramePos!=FramePos)
-                Seek(FramePos);
+            // qDebug() << "*** frameAtPosition: FramePos = " << FramePos << ", InputData->FramePos = " << InputData->FramePos;
+
+            if (InputData->FramePos != FramePos)
+            {
+                if(FramePos == -1)
+                {
+                    // qDebug("Initial Seek");
+                    Seek(FramePos);
+                }
+                else if(FramePos >= InputData->FramePos)
+                {
+                    // qDebug("Seek forward");
+                    Seek(FramePos + 1);
+                    InputData->FramePos = FramePos;
+                }
+                else
+                {
+                    // qDebug("Seek backward");
+                    Seek(FramePos + 1);
+                    InputData->FramePos = FramePos;
+                }
+
+                // qDebug() << "frameAtPosition after Seek: FramePos = " << FramePos << ", InputData->FramePos = " << InputData->FramePos;
+            }
+
             NextFrame();
 
+            // qDebug() << "frameAtPosition after NextFrame: FramePos = " << FramePos << ", InputData->FramePos = " << InputData->FramePos;
             break;
         }
     }
@@ -1324,7 +1350,9 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
             if (OutputDatas[OutputPos] && OutputDatas[OutputPos]->Stream==InputData->Stream)
                 OutputDatas[OutputPos]->Process(Frame);
 
-        InputData->FramePos++;
+        if(Decode)
+            InputData->FramePos++;
+
         if (InputData->FramePos>InputData->FrameCount)
             InputData->FrameCount=InputData->FramePos;
         if (!InputDatas_Copy && FileName.empty() && (!InputData->FramesCache || InputData->FramesCache->size()<300)) // Value arbitrary choosen
