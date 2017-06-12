@@ -272,6 +272,23 @@ const filter Filters[]=
         },
     },
     {
+        "Oscilloscope",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Slider,   500000,   0,   1000000,   1, "SX pos" },
+            { Args_Type_Slider,   500000,   0,   1000000,   1, "SY pos" },
+            { Args_Type_Slider,   500000,   0,   1000000,   1, "S size" },
+            { Args_Type_Slider,   500000,   0,   1000000,   1, "S tilt" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "oscilloscope=x=${2}/1000000:y=${3}/1000000:s=${4}/1000000:t=${5}/1000000",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]oscilloscope=x=${2}/1000000:y=${3}/1000000:s=${4}/1000000:t=${5}/1000000[a2];[b1]oscilloscope=x=${2}/1000000:y=${3}/1000000:s=${4}/1000000:t=${5}/1000000[b2],[a2][b2]vstack",
+        },
+    },
+    {
         "Vectorscope",
         0,
         {
