@@ -758,7 +758,7 @@ const filter Filters[]=
         },
         {
             "signalstats=out=vrep:c=${2}",
-            "il=l=d:c=d,signalstats=out=vrep:c=${2}",
+            "signalstats=out=vrep:c=${2},il=l=d:c=d",
         },
     },
     {
