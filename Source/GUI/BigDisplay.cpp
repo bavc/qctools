@@ -898,7 +898,6 @@ const filter Filters[]=
             "avectorscope=m=lissajous:s=512x512:zoom=${1}",
         },
     },
-    /*
     {
         "Audio Phase Meter",
         1,
@@ -915,7 +914,6 @@ const filter Filters[]=
             "aphasemeter=mpc=red:video=1[out0][out1];[out0]anullsink;[out1]copy",
         },
     },
-    */
     {
         "Audio Frequency",
         1,
