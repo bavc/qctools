@@ -1,5 +1,6 @@
 #include <GUI/Comments.h>
 #include <GUI/Plot.h>
+#include <GUI/PlotLegend.h>
 
 #include <qwt_scale_widget.h>
 #include <qwt_symbol.h>
@@ -172,7 +173,10 @@ CommentsPlot::CommentsPlot(FileInformation* fileInfo, CommonStats* stats, const 
     }
 
     QwtPlotCurve *curve = new CommentsPlotCurve();
-    curve->setPen( Qt::transparent, 0 ), curve->setRenderHint( QwtPlotItem::RenderAntialiased, true );
+    curve->setTitle("Comments");
+    curve->setStyle(QwtPlotCurve::Dots);
+    curve->setPen( Qt::red, 0);
+    curve->setRenderHint( QwtPlotItem::RenderAntialiased, true );
 
     QwtSymbol *symbol = new CommentsSymbol;
     symbol->setBrush(QBrush(Qt::red));
@@ -220,6 +224,13 @@ CommentsPlot::CommentsPlot(FileInformation* fileInfo, CommonStats* stats, const 
 
     connect( axisWidget( QwtPlot::xBottom ), SIGNAL( scaleDivChanged() ), SLOT( onXScaleChanged() ) );
 
+    m_legend = new PlotLegend();
+    m_legend->setMaximumHeight(plotHeight);
+
+    connect( this, SIGNAL( legendDataChanged( const QVariant &, const QList<QwtLegendData> & ) ),
+         m_legend, SLOT( updateLegend( const QVariant &, const QList<QwtLegendData> & ) ) );
+
+    updateLegend();
 }
 
 int CommentsPlot::frameAt(double x) const

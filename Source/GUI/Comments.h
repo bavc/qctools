@@ -63,6 +63,7 @@ private:
     CommonStats* stats;
 };
 
+class PlotLegend;
 class CommentsPlot : public QwtPlot {
     Q_OBJECT
 public:
@@ -70,6 +71,8 @@ public:
 
     int frameAt( double x ) const;
     void setCursorPos( double x );
+
+    PlotLegend *legend() { return m_legend; }
 
 Q_SIGNALS:
     void cursorMoved(int index);
@@ -82,6 +85,7 @@ private:
     const QwtPlotCurve* curve( int index ) const;
 
     PlotCursor* m_cursor;
+    PlotLegend* m_legend;
 };
 
 CommentsPlot* createCommentsPlot(FileInformation* fileInfo, const int* dataTypeIndex);
