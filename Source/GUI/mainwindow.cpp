@@ -7,6 +7,7 @@
 //---------------------------------------------------------------------------
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "Core/FFmpeg_Glue.h"
 #include "GUI/Plots.h"
 #include "GUI/preferences.h"
 
@@ -781,4 +782,40 @@ void MainWindow::updateSignalServerUploadStatus()
 void MainWindow::updateSignalServerUploadProgress(qint64 value, qint64 total)
 {
     ui->actionSignalServer_status->setText(QString("Uploading: %1 / %2").arg(value).arg(total));
+}
+
+void MainWindow::on_actionNavigateNextComment_triggered()
+{
+    if (Files_CurrentPos>=Files.size())
+        return;
+
+    auto framesCount = Files[Files_CurrentPos]->Glue->VideoFrameCount_Get();
+    auto currentPos = Files[Files_CurrentPos]->Frames_Pos_Get();
+    while(++currentPos < framesCount)
+    {
+        if(Files[Files_CurrentPos]->ReferenceStat()->comments[currentPos])
+        {
+            Files[Files_CurrentPos]->Frames_Pos_Set(currentPos);
+            PlotsArea->onCurrentFrameChanged();
+            break;
+        }
+    }
+}
+
+void MainWindow::on_actionNavigatePreviousComment_triggered()
+{
+    if (Files_CurrentPos>=Files.size())
+        return;
+
+    auto currentPos = Files[Files_CurrentPos]->Frames_Pos_Get();
+    while(--currentPos >= 0)
+    {
+        if(Files[Files_CurrentPos]->ReferenceStat()->comments[currentPos])
+        {
+            Files[Files_CurrentPos]->Frames_Pos_Set(currentPos);
+            PlotsArea->onCurrentFrameChanged();
+            break;
+        }
+    }
+
 }

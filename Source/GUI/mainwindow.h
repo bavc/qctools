@@ -230,6 +230,10 @@ private Q_SLOTS:
     void updateSignalServerUploadStatus();
     void updateSignalServerUploadProgress(qint64, qint64);
 
+    void on_actionNavigateNextComment_triggered();
+
+    void on_actionNavigatePreviousComment_triggered();
+
 private:
     void updateScrollBar( bool blockSignals = false );
     bool isPlotZoomable() const;
