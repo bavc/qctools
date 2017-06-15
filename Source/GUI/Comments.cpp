@@ -12,6 +12,7 @@
 #include <qwt_picker_machine.h>
 #include <qwt_series_data.h>
 #include <qwt_plot_grid.h>
+#include <QTextDocument>
 
 static inline void qwtDrawRectSymbols( QPainter *painter,
     const QPointF *points, int numPoints, const QwtSymbol &symbol )
@@ -318,7 +319,10 @@ QwtText CommentsPlotPicker::trackerTextF(const QPointF &pos) const
     const int idx = dynamic_cast<const CommentsPlotCurve*>( curve(0) )->frameAt( pos.x() );
     if ( idx >= 0 )
     {
-        text = infoText( idx );
+        QTextDocument doc;
+        doc.setHtml(infoText(idx));
+
+        text = doc.toPlainText();
         text.setBackgroundBrush( QBrush( bg ) );
     }
 

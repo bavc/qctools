@@ -26,6 +26,7 @@ extern "C"
 #include <iomanip>
 #include <cstdlib>
 #include <cfloat>
+#include <QString>
 using namespace tinyxml2;
 //---------------------------------------------------------------------------
 
@@ -198,7 +199,7 @@ void VideoStats::StatsFromExternalData (const char* Data, size_t Size)
                                         const char* value = Tag->Attribute("value");
                                         if(value)
                                         {
-                                            comments[x_Current] = strdup(value);
+                                            comments[x_Current] = strdup(QString::fromUtf8(value).toHtmlEscaped().toUtf8().data());
                                         }
                                     }
                                  }

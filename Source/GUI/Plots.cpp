@@ -22,6 +22,7 @@
 #include <clocale>
 #include <QMouseEvent>
 #include <QInputDialog>
+#include <QTextDocument>
 
 //---------------------------------------------------------------------------
 
@@ -411,7 +412,16 @@ void showEditFrameCommentsDialog(QWidget* parentWidget, FileInformation* info, C
     InputDialogEx dialog(parentWidget);
     dialog.setWindowTitle(QString("Edit comment"));
     dialog.setLabelText(QString("Comment for frame %1:").arg(frameIndex));
-    dialog.setTextValue(stats->comments[frameIndex] ? QString::fromUtf8(stats->comments[frameIndex]) : QString());
+
+    QString textValue;
+    if(stats->comments[frameIndex])
+    {
+        QTextDocument doc;
+        doc.setHtml(QString::fromUtf8(stats->comments[frameIndex]));
+        textValue = doc.toPlainText();
+    }
+
+    dialog.setTextValue(textValue);
     dialog.setOkButtonText(QString("Save"));
     dialog.setCancelButtonText(QString("Delete"));
     int result = dialog.exec();
@@ -425,7 +435,7 @@ void showEditFrameCommentsDialog(QWidget* parentWidget, FileInformation* info, C
     if(result == InputDialogEx::Delete || dialog.textValue().isEmpty())
         stats->comments[frameIndex] = nullptr;
     else // result == InputDialogEx::Save
-        stats->comments[frameIndex] = strdup(dialog.textValue().toUtf8().constData());
+        stats->comments[frameIndex] = strdup(dialog.textValue().toHtmlEscaped().toUtf8().constData());
 
     Q_EMIT info->commentsUpdated(stats);
 }
