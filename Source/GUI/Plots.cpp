@@ -11,6 +11,7 @@
 #include "GUI/PlotLegend.h"
 #include "GUI/PlotScaleWidget.h"
 #include "GUI/Comments.h"
+#include "GUI/CommentsEditor.h"
 #include "Core/Core.h"
 #include "Core/VideoCore.h"
 #include <QComboBox>
@@ -23,6 +24,7 @@
 #include <QMouseEvent>
 #include <QInputDialog>
 #include <QTextDocument>
+#include <QPushButton>
 
 //---------------------------------------------------------------------------
 
@@ -381,35 +383,8 @@ void Plots::alignYAxes()
 }
 
 void showEditFrameCommentsDialog(QWidget* parentWidget, FileInformation* info, CommonStats* stats, size_t frameIndex)
-{    
-    class InputDialogEx : public QInputDialog
-    {
-    public:
-        enum DialogResultEx {
-            Delete = QDialog::Rejected,
-            Save = QDialog::Accepted,
-            Close = 2
-        };
-
-        InputDialogEx(QWidget* parent = nullptr) : QInputDialog(parent) {
-            this->setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-        }
-    protected:
-        void closeEvent(QCloseEvent *event)
-        {
-            done(InputDialogEx::Close);
-        }
-
-        void keyPressEvent(QKeyEvent *event)
-        {
-            if(event->key() == Qt::Key_Escape)
-                done(InputDialogEx::Close);
-            else
-                QDialog::keyPressEvent(event);
-        }
-    };
-
-    InputDialogEx dialog(parentWidget);
+{
+    CommentsEditor dialog;
     dialog.setWindowTitle(QString("Edit comment"));
     dialog.setLabelText(QString("Comment for frame %1:").arg(frameIndex));
 
@@ -421,20 +396,23 @@ void showEditFrameCommentsDialog(QWidget* parentWidget, FileInformation* info, C
         textValue = doc.toPlainText();
     }
 
+    if(stats->comments[frameIndex])
+    {
+        dialog.buttons()->button(QDialogButtonBox::Discard)->setVisible(true);
+    }
+
     dialog.setTextValue(textValue);
-    dialog.setOkButtonText(QString("Save"));
-    dialog.setCancelButtonText(QString("Delete"));
     int result = dialog.exec();
 
-    if(result == InputDialogEx::Close)
+    if(result == QDialog::Rejected)
         return;
 
     if(stats->comments[frameIndex])
         delete [] stats->comments[frameIndex];
 
-    if(result == InputDialogEx::Delete || dialog.textValue().isEmpty())
+    if(result == QDialogButtonBox::DestructiveRole || dialog.textValue().isEmpty())
         stats->comments[frameIndex] = nullptr;
-    else // result == InputDialogEx::Save
+    else // result == QDialog::Accepted
         stats->comments[frameIndex] = strdup(dialog.textValue().toHtmlEscaped().toUtf8().constData());
 
     Q_EMIT info->commentsUpdated(stats);
