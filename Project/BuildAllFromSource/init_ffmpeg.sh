@@ -10,7 +10,7 @@ _install_yasm(){
 }
 
 if [ ! -d ffmpeg ] ; then
-    git clone git://source.ffmpeg.org/ffmpeg.git ffmpeg
+    git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg
 fi
 
     cd ffmpeg
