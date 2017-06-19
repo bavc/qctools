@@ -12,6 +12,7 @@
 #include "Core/Core.h"
 #include "Core/CommonStats.h"
 #include "Core/FileInformation.h"
+#include "GUI/Comments.h"
 
 #include <QWidget>
 
@@ -61,7 +62,6 @@ public:
 // Class
 //***************************************************************************
 
-class CommentsPlot;
 class Plots : public QWidget
 {
     Q_OBJECT
@@ -89,6 +89,7 @@ public:
     void                        setPlotVisible( size_t type, size_t group, bool on );
 
     const QwtPlot*              plot( size_t streamPos, size_t group ) const;
+    CommentsPlot*               commentsPlot() const { return m_commentsPlot; }
 
     void                        Zoom_Move( int Begin );
     void                        refresh();

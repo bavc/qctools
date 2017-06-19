@@ -11,6 +11,7 @@
 #include "GUI/preferences.h"
 #include "GUI/Help.h"
 #include "GUI/Plots.h"
+#include "GUI/Comments.h"
 #include "GUI/draggablechildrenbehaviour.h"
 #include "Core/Core.h"
 #include "Core/VideoCore.h"
@@ -136,6 +137,16 @@ void MainWindow::Ui_Init()
 
             CheckBoxes[type].push_back(CheckBox);
         }
+
+    m_commentsCheckbox=new QCheckBox("comments");
+    m_commentsCheckbox->setProperty("type", (quint64) Type_Max);
+    m_commentsCheckbox->setProperty("group", (quint64) 0);
+    m_commentsCheckbox->setToolTip("comments");
+    m_commentsCheckbox->setCheckable(true);
+    m_commentsCheckbox->setChecked(true);
+    m_commentsCheckbox->setVisible(false);
+    QObject::connect(m_commentsCheckbox, SIGNAL(toggled(bool)), this, SLOT(on_check_toggled(bool)));
+    ui->horizontalLayout->addWidget(m_commentsCheckbox);
 
     qDebug() << "checkboxes in layout: " << ui->horizontalLayout->count();
 
@@ -362,6 +373,9 @@ void MainWindow::refreshDisplay()
         for (size_t type = 0; type<Type_Max; type++)
             for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
                 PlotsArea->setPlotVisible( type, group, CheckBoxes[type][group]->checkState()==Qt::Checked );
+
+        PlotsArea->commentsPlot()->setVisible(m_commentsCheckbox->checkState()==Qt::Checked);
+        PlotsArea->commentsPlot()->legend()->setVisible(m_commentsCheckbox->checkState()==Qt::Checked);
     }
 }
 

@@ -110,6 +110,7 @@ public:
 
     //CheckBoxes
     std::vector<QCheckBox*>     CheckBoxes[Type_Max];
+    QCheckBox*                  m_commentsCheckbox;
 
     // Files
     std::vector<FileInformation*> Files;

@@ -506,10 +506,15 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
         Q_ASSERT(legendItem);
 
         auto plot = qobject_cast<Plot*> (plotItem->widget());
-        Q_ASSERT(plot);
+        if(plot)
+            currentOrderedPlotsInfo.push_back(std::make_tuple(plot->group(), plot->type(), plot->streamPos()));
 
-        currentOrderedPlotsInfo.push_back(std::make_tuple(plot->group(), plot->type(), plot->streamPos()));
+        auto commentsPlot = qobject_cast<CommentsPlot*> (plotItem->widget());
+        if(commentsPlot)
+            currentOrderedPlotsInfo.push_back(std::make_tuple(0, Type_Max, 0));
     }
+
+    currentOrderedPlotsInfo.push_back(std::make_tuple(0, Type_Max, 0));
 
     for(auto filterInfo : orderedFilterInfo)
     {
@@ -555,18 +560,8 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
                     auto plotWidget = gridLayout->itemAtPosition(j, 0)->widget();
                     auto legendWidget = gridLayout->itemAtPosition(j, 1)->widget();
 
-                    {
-                        auto plot = qobject_cast<Plot*> (plotWidget);
-                        qDebug() << "jg: " << plot->group() << ", t: " << plot->type() << ", p: " << plot->streamPos() << ", ptr = " << plot;
-                    }
-
                     auto swapPlotWidget = gridLayout->itemAtPosition(i, 0)->widget();
                     auto swapLegendWidget = gridLayout->itemAtPosition(i, 1)->widget();
-
-                    {
-                        auto plot = qobject_cast<Plot*> (swapPlotWidget);
-                        qDebug() << "ig: " << plot->group() << ", t: " << plot->type() << ", p: " << plot->streamPos() << ", ptr = " << plot;
-                    }
 
                     gridLayout->removeWidget(plotWidget);
                     gridLayout->removeWidget(legendWidget);
@@ -590,21 +585,6 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
     }
 
     Q_ASSERT(rowsCount == gridLayout->rowCount());
-
-    for(auto row = 0; row < m_plotsCount; ++row)
-    {
-        auto plotItem = gridLayout->itemAtPosition(row, 0);
-        auto legendItem = gridLayout->itemAtPosition(row, 1);
-
-        Q_ASSERT(plotItem);
-        Q_ASSERT(legendItem);
-
-        auto plot = qobject_cast<Plot*> (plotItem->widget());
-        Q_ASSERT(plot);
-
-        Q_ASSERT(plot->group() == std::get<0>(expectedOrderedPlotsInfo[row]) &&
-                 plot->type() == std::get<1>(expectedOrderedPlotsInfo[row]));
-    }
 }
 
 void Plots::alignXAxis( const QwtPlot* plot )

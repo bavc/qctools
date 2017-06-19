@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 
 #include "Plot.h"
+#include "PlotLegend.h"
 
 #include <Core/Core.h>
 #include <Core/CommonStats.h>
@@ -63,7 +64,6 @@ private:
     CommonStats* stats;
 };
 
-class PlotLegend;
 class CommentsPlot : public QwtPlot {
     Q_OBJECT
 public:

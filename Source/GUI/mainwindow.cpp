@@ -345,6 +345,8 @@ void MainWindow::on_actionFilesList_triggered()
     for (size_t type = 0; type < Type_Max; type++)
         for (size_t group=0; group<CheckBoxes[type].size(); group++)
             CheckBoxes[type][group]->hide();
+    m_commentsCheckbox->hide();
+
     if (ui->fileNamesBox)
         ui->fileNamesBox->hide();
     if (PlotsArea)
@@ -388,6 +390,8 @@ void MainWindow::on_actionGraphsLayout_triggered()
         for (size_t group=0; group<CheckBoxes[type].size(); group++)
             if (CheckBoxes[type][group] && Files_CurrentPos<Files.size() && Files[Files_CurrentPos]->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
                 CheckBoxes[type][group]->show();
+    m_commentsCheckbox->show();
+
     if (ui->fileNamesBox)
         ui->fileNamesBox->show();
     if (PlotsArea)
