@@ -14,50 +14,55 @@
 #include <qwt_plot_grid.h>
 #include <QTextDocument>
 
-static inline void qwtDrawRectSymbols( QPainter *painter,
+static inline void qwtDrawRhombSymbols( QPainter *painter,
     const QPointF *points, int numPoints, const QwtSymbol &symbol )
 {
     const QSize size = symbol.size();
 
     QPen pen = symbol.pen();
     pen.setJoinStyle( Qt::MiterJoin );
-    painter->setPen( pen );
+    painter->setPen( Qt::black );
     painter->setBrush( symbol.brush() );
-    painter->setRenderHint( QPainter::Antialiasing, false );
 
     if ( QwtPainter::roundingAlignment( painter ) )
     {
-        const int sw = size.width();
-        const int sh = size.height();
-        const int sw2 = size.width() / 2;
-        const int sh2 = size.height() / 2;
-
         for ( int i = 0; i < numPoints; i++ )
         {
             const int x = qRound( points[i].x() );
-            const int y = qRound( points[i].y() );
+            const int y = size.height() / 2;
 
-            if(y != 0)
-            {
-                const QRect r( x - sw2, 0, sw, sh);
-                QwtPainter::drawRect( painter, r );
-            }
+            const int x1 = x - size.width() / 2;
+            const int y1 = 0;
+            const int x2 = x1 + size.width();
+            const int y2 = size.height();
+
+            QPolygonF polygon;
+            polygon += QPointF( x, y1 );
+            polygon += QPointF( x1, y );
+            polygon += QPointF( x, y2 );
+            polygon += QPointF( x2, y );
+
+            QwtPainter::drawPolygon( painter, polygon );
         }
     }
     else
     {
-        const double sw = size.width();
-        const double sh = size.height();
-        const double sw2 = 0.5 * size.width();
-        const double sh2 = 0.5 * size.height();
-
         for ( int i = 0; i < numPoints; i++ )
         {
-            const double x = points[i].x();
-            const double y = points[i].y();
+            const QPointF &pos = points[i];
 
-            const QRectF r( x - sw2, y - sh2, sw, sh );
-            QwtPainter::drawRect( painter, r );
+            const double x1 = pos.x() - 0.5 * size.width();
+            const double y1 = pos.y() - 0.5 * size.height();
+            const double x2 = x1 + size.width();
+            const double y2 = y1 + size.height();
+
+            QPolygonF polygon;
+            polygon += QPointF( pos.x(), y1 );
+            polygon += QPointF( x2, pos.y() );
+            polygon += QPointF( pos.x(), y2 );
+            polygon += QPointF( x1, pos.y() );
+
+            QwtPainter::drawPolygon( painter, polygon );
         }
     }
 }
@@ -66,13 +71,12 @@ class CommentsSymbol : public QwtSymbol
 {
     // QwtSymbol interface
 public:
-    CommentsSymbol() : QwtSymbol(QwtSymbol::UserStyle) {
-
+    CommentsSymbol() : QwtSymbol(QwtSymbol::Diamond) {
     }
 
 protected:
     void renderSymbols(QPainter *painter, const QPointF *points, int numPoints) const {
-        qwtDrawRectSymbols(painter, points, numPoints, *this);
+        qwtDrawRhombSymbols(painter, points, numPoints, *this);
     }
 };
 
