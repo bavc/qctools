@@ -3,6 +3,9 @@ sudo: required
 dist: trusty
 language: cpp
 
+notifications:
+  slack: qctools:O7mksywLB5VaIbEmMNgpN5BQ
+
 os:
   - osx
   - linux
