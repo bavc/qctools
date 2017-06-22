@@ -390,7 +390,9 @@ void MainWindow::on_actionGraphsLayout_triggered()
         for (size_t group=0; group<CheckBoxes[type].size(); group++)
             if (CheckBoxes[type][group] && Files_CurrentPos<Files.size() && Files[Files_CurrentPos]->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
                 CheckBoxes[type][group]->show();
-    m_commentsCheckbox->show();
+
+    if(Files_CurrentPos<Files.size())
+        m_commentsCheckbox->show();
 
     if (ui->fileNamesBox)
         ui->fileNamesBox->show();
