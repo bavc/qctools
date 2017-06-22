@@ -392,7 +392,8 @@ void showEditFrameCommentsDialog(QWidget* parentWidget, FileInformation* info, C
     if(stats->comments[frameIndex])
     {
         QTextDocument doc;
-        doc.setHtml(QString::fromUtf8(stats->comments[frameIndex]));
+        textValue = QString::fromUtf8(stats->comments[frameIndex]);
+        doc.setHtml(textValue.replace("\n", "<br>"));
         textValue = doc.toPlainText();
     }
 
@@ -410,10 +411,17 @@ void showEditFrameCommentsDialog(QWidget* parentWidget, FileInformation* info, C
     if(stats->comments[frameIndex])
         delete [] stats->comments[frameIndex];
 
-    if(result == QDialogButtonBox::DestructiveRole || dialog.textValue().isEmpty())
+    static QString replacePattern = "<br ***>";
+    static QString htmlEscapedPattern = replacePattern.toHtmlEscaped();
+
+    textValue = dialog.textValue().replace("\n", replacePattern);
+    textValue = textValue.toHtmlEscaped();
+    textValue = textValue.replace(htmlEscapedPattern, "\n");
+
+    if(result == QDialogButtonBox::DestructiveRole || textValue.isEmpty())
         stats->comments[frameIndex] = nullptr;
     else // result == QDialog::Accepted
-        stats->comments[frameIndex] = strdup(dialog.textValue().toHtmlEscaped().toUtf8().constData());
+        stats->comments[frameIndex] = strdup(textValue.toUtf8().constData());
 
     Q_EMIT info->commentsUpdated(stats);
 }
