@@ -311,6 +311,9 @@ void MainWindow::createGraphsLayout()
             for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
                 if (CheckBoxes[type][group])
                     CheckBoxes[type][group]->hide();
+
+        m_commentsCheckbox->hide();
+
         if (ui->fileNamesBox)
             ui->fileNamesBox->hide();
 
