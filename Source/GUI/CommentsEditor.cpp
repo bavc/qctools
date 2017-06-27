@@ -38,6 +38,17 @@ QDialogButtonBox *CommentsEditor::buttons() const
     return ui->buttonBox;
 }
 
+void CommentsEditor::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Return && event->modifiers() == Qt::AltModifier)
+    {
+        QKeyEvent e(QEvent::KeyPress, Qt::Key_Return, Qt::NoModifier);
+        QApplication::sendEvent(ui->buttonBox, &e);
+    }
+
+    QDialog::keyPressEvent(event);
+}
+
 void CommentsEditor::on_buttonBox_clicked(QAbstractButton *button)
 {
     if(button == ui->buttonBox->button(QDialogButtonBox::Discard))
