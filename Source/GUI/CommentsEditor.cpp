@@ -9,6 +9,8 @@ CommentsEditor::CommentsEditor(QWidget *parent) :
     ui->setupUi(this);
     ui->buttonBox->button(QDialogButtonBox::Discard)->setText("Delete");
     ui->buttonBox->button(QDialogButtonBox::Discard)->setVisible(false);
+
+    ui->plainTextEdit->setFocus();
 }
 
 CommentsEditor::~CommentsEditor()
