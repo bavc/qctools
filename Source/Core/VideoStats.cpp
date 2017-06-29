@@ -170,12 +170,16 @@ void VideoStats::StatsFromExternalData (const char* Data, size_t Size)
                         else
                             Width=0;
 
+                        setWidth(Width);
+
                         int Height;
                         Attribute=Frame->Attribute("width");
                         if (Attribute)
                             Height=std::atoi(Attribute);
                         else
                             Height=0;
+
+                        setHeight(Height);
 
                         XMLElement* Tag=Frame->FirstChildElement();
                         while (Tag)
@@ -459,14 +463,34 @@ string VideoStats::StatsToCSV(const activefilters& filters)
     return Value.str();
 }
 
+int VideoStats::getWidth() const
+{
+    return width;
+}
+
+void VideoStats::setWidth(int width)
+{
+    width = width;
+}
+
+int VideoStats::getHeight() const
+{
+    return height;
+}
+
+void VideoStats::setHeight(int height)
+{
+    height = height;
+}
+
 //---------------------------------------------------------------------------
-string VideoStats::StatsToXML (int Width, int Height, const activefilters& filters)
+string VideoStats::StatsToXML (const activefilters& filters)
 {
     stringstream Data;
 
     // Per frame (note: the XML header and footer are not created here)
-    stringstream width; width<<Width; // Note: we use the same value for all frame, we should later use the right value per frame
-    stringstream height; height<<Height; // Note: we use the same value for all frame, we should later use the right value per frame
+    stringstream widthStream; widthStream<<width; // Note: we use the same value for all frame, we should later use the right value per frame
+    stringstream heightStream; heightStream<<height; // Note: we use the same value for all frame, we should later use the right value per frame
     for (size_t x_Pos=0; x_Pos<x_Current; ++x_Pos)
     {
         stringstream pkt_pts_time; pkt_pts_time<<fixed<<setprecision(7)<<(x[1][x_Pos]+FirstTimeStamp);
@@ -482,7 +506,7 @@ string VideoStats::StatsToXML (int Width, int Height, const activefilters& filte
             Data<<" pkt_duration_time=\"" << pkt_duration_time.str() << "\"";
         Data << " pkt_pos=\"" << pkt_pos[x_Pos] << "\"";
         Data << " pkt_size=\"" << pkt_size[x_Pos] << "\"";
-        Data<<" width=\"" << width.str() << "\" height=\"" << height.str() <<"\"";
+        Data<<" width=\"" << widthStream.str() << "\" height=\"" << heightStream.str() <<"\"";
         Data << " pix_fmt=\"" << av_get_pix_fmt_name((AVPixelFormat) pix_fmt[x_Pos]) << "\"";
         Data << " pict_type=\"" << pict_type_char[x_Pos] << "\"";
 
@@ -505,12 +529,12 @@ string VideoStats::StatsToXML (int Width, int Height, const activefilters& filte
             case Item_Crop_x2 :
             case Item_Crop_w :
                 // Special case, values are from width
-                value<<Width-y[Plot_Pos][x_Pos];
+                value<<width-y[Plot_Pos][x_Pos];
                 break;
             case Item_Crop_y2 :
             case Item_Crop_h :
                 // Special case, values are from height
-                value<<Height-y[Plot_Pos][x_Pos];
+                value<<height-y[Plot_Pos][x_Pos];
                 break;
             default:
                 value<<y[Plot_Pos][x_Pos];

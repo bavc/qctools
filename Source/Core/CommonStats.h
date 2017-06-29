@@ -62,7 +62,7 @@ public:
     virtual void                TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos) = 0;
     virtual void                StatsFinish();
     virtual string              StatsToCSV(const activefilters& filters) = 0;
-    virtual string              StatsToXML(int width, int height, const activefilters& filters) = 0;
+    virtual string              StatsToXML(const activefilters& filters) = 0;
 
 protected:
     // Status
