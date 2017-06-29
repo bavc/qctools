@@ -186,15 +186,7 @@ void VideoStats::StatsFromExternalData (const char* Data, size_t Size)
                                 const char* key=Tag->Attribute("key");
                                 if (key)
                                 {
-                                    for (size_t Plot_Pos=0; Plot_Pos<Item_VideoMax; Plot_Pos++)
-                                        if (!strcmp(key, PerItem[Plot_Pos].FFmpeg_Name))
-                                        {
-                                            j=Plot_Pos;
-                                            break;
-                                        }
-                                } else {
-                                    const char* name = Tag->Attribute("name");
-                                    if(name && strcmp(name, "qctools.comment") == 0)
+                                    if(strcmp(key, "qctools.comment") == 0)
                                     {
                                         const char* value = Tag->Attribute("value");
                                         if(value)
@@ -202,7 +194,17 @@ void VideoStats::StatsFromExternalData (const char* Data, size_t Size)
                                             comments[x_Current] = strdup(QString::fromUtf8(value).toHtmlEscaped().toUtf8().data());
                                         }
                                     }
-                                 }
+                                    else
+                                    {
+                                        for (size_t Plot_Pos=0; Plot_Pos<Item_VideoMax; Plot_Pos++)
+                                            if (!strcmp(key, PerItem[Plot_Pos].FFmpeg_Name))
+                                            {
+                                                j=Plot_Pos;
+                                                break;
+                                            }
+                                    }
+
+                                }
 
                                 if (j!=Item_VideoMax)
                                 {
@@ -518,7 +520,7 @@ string VideoStats::StatsToXML (int Width, int Height, const activefilters& filte
         }
 
         if(comments[x_Pos])
-            Data<<"            <tag name=\"qctools.comment\" value=\"" << comments[x_Pos] << "\"/>\n";
+            Data<<"            <tag key=\"qctools.comment\" value=\"" << comments[x_Pos] << "\"/>\n";
 
         Data<<"        </frame>\n";
     }
