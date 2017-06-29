@@ -99,7 +99,9 @@ void MainWindow::closeFile()
     }
 
     // Launch analysis
+    Files[Files_CurrentPos]->deleteLater();
     Files.erase(Files.begin()+Files_CurrentPos);
+
     ui->fileNamesBox->removeItem(Files_CurrentPos);
     if (ui->fileNamesBox->isVisible())
         ui->fileNamesBox->setCurrentIndex(Files_CurrentPos<Files.size()?Files_CurrentPos:Files_CurrentPos-1);
