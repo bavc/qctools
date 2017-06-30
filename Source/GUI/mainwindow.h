@@ -63,6 +63,7 @@ public:
 #ifdef BLACKMAGICDECKLINK_YES
     void                        openCapture                 ();
 #endif // BLACKMAGICDECKLINK_YES
+    bool                        canCloseFile                (size_t index);
     void                        closeFile                   ();
     void                        closeAllFiles               ();
     void                        Zoom_Move                   (size_t Begin);

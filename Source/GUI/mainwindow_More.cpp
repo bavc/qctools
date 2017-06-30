@@ -88,6 +88,19 @@ void MainWindow::openCapture()
 }
 #endif // BLACKMAGICDECKLINK_YES
 //---------------------------------------------------------------------------
+bool MainWindow::canCloseFile(size_t index)
+{
+    if(Files[index]->commentsUpdated())
+    {
+        auto result = QMessageBox::warning(this, "Comments has been updated!",
+                                           "This report contains unsaved comments. If you close before saving, your changes will be lost.",
+                                           QMessageBox::Cancel | QMessageBox::Close, QMessageBox::Cancel);
+        return result == QMessageBox::Close;
+    }
+
+    return true;
+}
+
 void MainWindow::closeFile()
 {
     if (Files_CurrentPos==(size_t)-1)
@@ -98,22 +111,31 @@ void MainWindow::closeFile()
         return;
     }
 
-    // Launch analysis
-    Files[Files_CurrentPos]->deleteLater();
-    Files.erase(Files.begin()+Files_CurrentPos);
+    if(canCloseFile(Files_CurrentPos))
+    {
+        // Launch analysis
+        Files[Files_CurrentPos]->deleteLater();
+        Files.erase(Files.begin()+Files_CurrentPos);
 
-    ui->fileNamesBox->removeItem(Files_CurrentPos);
-    if (ui->fileNamesBox->isVisible())
-        ui->fileNamesBox->setCurrentIndex(Files_CurrentPos<Files.size()?Files_CurrentPos:Files_CurrentPos-1);
-    else
-        Files_CurrentPos=Files_CurrentPos<Files.size()?Files_CurrentPos:Files_CurrentPos-1;
+        ui->fileNamesBox->removeItem(Files_CurrentPos);
+        if (ui->fileNamesBox->isVisible())
+            ui->fileNamesBox->setCurrentIndex(Files_CurrentPos<Files.size()?Files_CurrentPos:Files_CurrentPos-1);
+        else
+            Files_CurrentPos=Files_CurrentPos<Files.size()?Files_CurrentPos:Files_CurrentPos-1;
 
-    TimeOut();
+        TimeOut();
+    }
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::closeAllFiles()
 {
+    for(size_t Pos = 0; Pos < Files.size(); Pos++)
+    {
+        if(!canCloseFile(Pos))
+            return;
+    }
+
     if (FilesListArea)
         FilesListArea->hide();
     clearGraphsLayout();

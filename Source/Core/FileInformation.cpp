@@ -137,7 +137,8 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     formatStats(NULL),
     m_autoCheckFileUploaded(true),
     m_autoUpload(true),
-    m_hasStats(false)
+    m_hasStats(false),
+    m_commentsUpdated(false)
 {
     static struct RegisterMetatypes {
         RegisterMetatypes() {
@@ -584,6 +585,7 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName, const activef
     }
 
     Q_EMIT statsFileGenerated(file, name);
+    m_commentsUpdated = false;
 }
 
 //---------------------------------------------------------------------------
@@ -956,6 +958,12 @@ void FileInformation::cancelUpload()
         uploadOperation->cancel();
 }
 
+void FileInformation::setCommentsUpdated(CommonStats *stats)
+{
+    m_commentsUpdated = true;
+    Q_EMIT commentsUpdated(stats);
+}
+
 void FileInformation::uploadDone()
 {
     Q_EMIT signalServerUploadStatusChanged();
@@ -996,4 +1004,9 @@ bool FileInformation::parsed() const
 void FileInformation::setExportFilters(const activefilters &exportFilters)
 {
     m_exportFilters = exportFilters;
+}
+
+bool FileInformation::commentsUpdated() const
+{
+    return m_commentsUpdated;
 }

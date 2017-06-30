@@ -137,6 +137,7 @@ public:
     bool parsed() const;
 
     void setExportFilters(const activefilters& exportFilters);
+    bool commentsUpdated() const;
 
 public Q_SLOTS:
 
@@ -144,6 +145,7 @@ public Q_SLOTS:
     void upload(const QFileInfo& fileInfo);
     void upload(SharedFile file, const QString& fileName);
     void cancelUpload();
+    void setCommentsUpdated(CommonStats* stats);
 
 Q_SIGNALS:
     void positionChanged();
@@ -185,6 +187,7 @@ private:
     bool m_autoCheckFileUploaded;
     bool m_autoUpload;
     bool m_hasStats;
+    bool m_commentsUpdated;
 
     activefilters m_exportFilters;
 };

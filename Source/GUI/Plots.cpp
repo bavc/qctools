@@ -408,9 +408,6 @@ void showEditFrameCommentsDialog(QWidget* parentWidget, FileInformation* info, C
     if(result == QDialog::Rejected)
         return;
 
-    if(stats->comments[frameIndex])
-        delete [] stats->comments[frameIndex];
-
     static QString replacePattern = "<br ***>";
     static QString htmlEscapedPattern = replacePattern.toHtmlEscaped();
 
@@ -419,11 +416,22 @@ void showEditFrameCommentsDialog(QWidget* parentWidget, FileInformation* info, C
     textValue = textValue.replace(htmlEscapedPattern, "\n");
 
     if(result == QDialogButtonBox::DestructiveRole || textValue.isEmpty())
-        stats->comments[frameIndex] = nullptr;
-    else // result == QDialog::Accepted
-        stats->comments[frameIndex] = strdup(textValue.toUtf8().constData());
-
-    Q_EMIT info->commentsUpdated(stats);
+    {
+        if(stats->comments[frameIndex] != nullptr)
+        {
+            delete [] stats->comments[frameIndex];
+            stats->comments[frameIndex] = nullptr;
+            info->setCommentsUpdated(stats);
+        }
+    } else // result == QDialog::Accepted
+    {
+        if(!stats->comments[frameIndex] || strcmp(stats->comments[frameIndex], textValue.toUtf8().constData()) != 0)
+        {
+            delete [] stats->comments[frameIndex];
+            stats->comments[frameIndex] = strdup(textValue.toUtf8().constData());
+            info->setCommentsUpdated(stats);
+        }
+    }
 }
 
 bool Plots::eventFilter( QObject *object, QEvent *event )
