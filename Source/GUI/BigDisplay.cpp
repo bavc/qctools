@@ -457,14 +457,14 @@ const filter Filters[]=
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Rows" },
             { Args_Type_Yuv,      0,   0,   0,   0, "Plane"},
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Slider,   0,   1,   0,   1, "x offset" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-            "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,\
+            "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,split[h1][h2];[h1][h2]hstack,crop=iw/2:ih:${3}:0,\
             split=10[b0][b1][b2][b3][b4][b5][b6][b7][b8][b9];\
             [b0]crop=iw/10:ih:(iw/10)*0:0,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-1))*pow(2\\,1)[b0c];\
             [b1]crop=iw/10:ih:(iw/10)*1:0,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-2))*pow(2\\,2)[b1c];\
@@ -477,7 +477,7 @@ const filter Filters[]=
             [b8]crop=iw/10:ih:(iw/10)*8:0,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-9))*pow(2\\,9)[b8c];\
             [b9]crop=iw/10:ih:(iw/10)*9:0,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-10))*pow(2\\,10)[b9c];\
             [b0c][b1c][b2c][b3c][b4c][b5c][b6c][b7c][b8c][b9c]hstack=10,format=yuv444p,drawgrid=w=iw/10:h=ih:t=2:c=green@0.5",
-            "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,\
+            "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,split[h1][h2];[h1][h2]hstack,crop=iw/2:ih:${3}:0,\
             split=10[b0][b1][b2][b3][b4][b5][b6][b7][b8][b9];\
             [b0]crop=iw:ih/10:0:(ih/10)*0,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-1))*pow(2\\,1)[b0c];\
             [b1]crop=iw:ih/10:0:(ih/10)*1,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-2))*pow(2\\,2)[b1c];\
@@ -1540,7 +1540,7 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                                 SelectWidth = Filters[FilterPos].Args[OptionPos2].Default ? true : false;
                                         Max = SelectWidth ? FileInfoData->Glue->Width_Get() : FileInfoData->Glue->Height_Get();
                                     }
-                                    else if (MaxTemp == "x" || MaxTemp == "Reveal")
+                                    else if (MaxTemp == "x" || MaxTemp == "x offset" || MaxTemp == "Reveal")
                                         Max = FileInfoData->Glue->Width_Get();
                                     else if (MaxTemp == "y" || MaxTemp == "s" || MaxTemp == "w" || MaxTemp == "h")
                                         Max = FileInfoData->Glue->Height_Get();
