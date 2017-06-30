@@ -236,6 +236,9 @@ private Q_SLOTS:
 
     void on_actionNavigatePreviousComment_triggered();
 
+protected:
+    void closeEvent(QCloseEvent* event);
+
 private:
     void updateScrollBar( bool blockSignals = false );
     bool isPlotZoomable() const;

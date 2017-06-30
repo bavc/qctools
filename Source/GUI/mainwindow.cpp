@@ -155,6 +155,12 @@ MainWindow::~MainWindow()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionQuit_triggered()
 {
+    for(size_t Pos = 0; Pos < Files.size(); Pos++)
+    {
+        if(!canCloseFile(Pos))
+            return;
+    }
+
     close();
 }
 
@@ -824,4 +830,16 @@ void MainWindow::on_actionNavigatePreviousComment_triggered()
         }
     }
 
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    for(size_t Pos = 0; Pos < Files.size(); Pos++)
+    {
+        if(!canCloseFile(Pos))
+        {
+            event->ignore();
+            return;
+        }
+    }
 }
