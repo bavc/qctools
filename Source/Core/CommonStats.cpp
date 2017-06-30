@@ -107,6 +107,9 @@ CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t Cou
     pict_type_char = new char[Data_Reserved];
     memset(pict_type_char, 0x00, Data_Reserved * sizeof(char));
 
+    comments = new char*[Data_Reserved];
+    memset(comments, 0x00, Data_Reserved * sizeof(char*));
+
     // Data - Maximums
     x_Current=0;
     x_Current_Max=FrameCount;
@@ -149,6 +152,11 @@ CommonStats::~CommonStats()
     delete[] pkt_size;
     delete[] pix_fmt;
     delete[] pict_type_char;
+
+    for (size_t j = 0; j < Data_Reserved; ++j)
+        delete [] comments[j];
+
+    delete [] comments;
 }
 
 //***************************************************************************
@@ -291,6 +299,7 @@ void CommonStats::Data_Reserve(size_t NewValue)
     int*                        pkt_size_Old = pkt_size;
     int*                        pix_fmt_Old = pix_fmt;
     char*                       pict_type_char_Old = pict_type_char;
+    char**                      comments_Old = comments;
 
     // Computing new value
     while (Data_Reserved < NewValue + (1 << 18)) //We reserve extra space, minimum 2^18 frames added
@@ -346,6 +355,10 @@ void CommonStats::Data_Reserve(size_t NewValue)
     memcpy(pict_type_char, pict_type_char_Old, Data_Reserved_Old * sizeof(char));
     memset(&pict_type_char[Data_Reserved_Old], 0x00, diff * sizeof(char));
 
+    comments = new char*[Data_Reserved];
+    memcpy(comments, comments_Old, Data_Reserved_Old * sizeof(char*));
+    memset(&comments[Data_Reserved_Old], 0x00, diff * sizeof(char*));
+
     delete[] x_Old;
     delete[] y_Old;
     delete[] durations_Old;
@@ -354,4 +367,5 @@ void CommonStats::Data_Reserve(size_t NewValue)
     delete[] pkt_size_Old;
     delete[] pix_fmt_Old;
     delete[] pict_type_char_Old;
+    delete[] comments_Old;
 }

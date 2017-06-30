@@ -132,11 +132,11 @@ public:
     int                         ABitDepth_Get();
     
     // FFmpeg information
-    string                      FFmpeg_Version();
-    int                         FFmpeg_Year();
-    string                      FFmpeg_Compiler();
-    string                      FFmpeg_Configuration();
-    string                      FFmpeg_LibsVersion();
+    static string               FFmpeg_Version();
+    static int                  FFmpeg_Year();
+    static string               FFmpeg_Compiler();
+    static string               FFmpeg_Configuration();
+    static string               FFmpeg_LibsVersion();
  
     // Actions
     void                        AddInput_Video(size_t FrameCount, int time_base_num, int time_base_den, int Width, int Height, int BitDepth, bool Compression, int TimecodeBCD=-1);

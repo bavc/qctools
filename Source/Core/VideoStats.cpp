@@ -26,6 +26,7 @@ extern "C"
 #include <iomanip>
 #include <cstdlib>
 #include <cfloat>
+#include <QString>
 using namespace tinyxml2;
 //---------------------------------------------------------------------------
 
@@ -169,12 +170,16 @@ void VideoStats::StatsFromExternalData (const char* Data, size_t Size)
                         else
                             Width=0;
 
+                        setWidth(Width);
+
                         int Height;
                         Attribute=Frame->Attribute("width");
                         if (Attribute)
                             Height=std::atoi(Attribute);
                         else
                             Height=0;
+
+                        setHeight(Height);
 
                         XMLElement* Tag=Frame->FirstChildElement();
                         while (Tag)
@@ -184,12 +189,26 @@ void VideoStats::StatsFromExternalData (const char* Data, size_t Size)
                                 size_t j=Item_VideoMax;
                                 const char* key=Tag->Attribute("key");
                                 if (key)
-                                    for (size_t Plot_Pos=0; Plot_Pos<Item_VideoMax; Plot_Pos++)
-                                        if (!strcmp(key, PerItem[Plot_Pos].FFmpeg_Name))
+                                {
+                                    if(strcmp(key, "qctools.comment") == 0)
+                                    {
+                                        const char* value = Tag->Attribute("value");
+                                        if(value)
                                         {
-                                            j=Plot_Pos;
-                                            break;
+                                            comments[x_Current] = strdup(QString::fromUtf8(value).toHtmlEscaped().toUtf8().data());
                                         }
+                                    }
+                                    else
+                                    {
+                                        for (size_t Plot_Pos=0; Plot_Pos<Item_VideoMax; Plot_Pos++)
+                                            if (!strcmp(key, PerItem[Plot_Pos].FFmpeg_Name))
+                                            {
+                                                j=Plot_Pos;
+                                                break;
+                                            }
+                                    }
+
+                                }
 
                                 if (j!=Item_VideoMax)
                                 {
@@ -444,14 +463,34 @@ string VideoStats::StatsToCSV(const activefilters& filters)
     return Value.str();
 }
 
+int VideoStats::getWidth() const
+{
+    return width;
+}
+
+void VideoStats::setWidth(int width)
+{
+    width = width;
+}
+
+int VideoStats::getHeight() const
+{
+    return height;
+}
+
+void VideoStats::setHeight(int height)
+{
+    height = height;
+}
+
 //---------------------------------------------------------------------------
-string VideoStats::StatsToXML (int Width, int Height, const activefilters& filters)
+string VideoStats::StatsToXML (const activefilters& filters)
 {
     stringstream Data;
 
     // Per frame (note: the XML header and footer are not created here)
-    stringstream width; width<<Width; // Note: we use the same value for all frame, we should later use the right value per frame
-    stringstream height; height<<Height; // Note: we use the same value for all frame, we should later use the right value per frame
+    stringstream widthStream; widthStream<<width; // Note: we use the same value for all frame, we should later use the right value per frame
+    stringstream heightStream; heightStream<<height; // Note: we use the same value for all frame, we should later use the right value per frame
     for (size_t x_Pos=0; x_Pos<x_Current; ++x_Pos)
     {
         stringstream pkt_pts_time; pkt_pts_time<<fixed<<setprecision(7)<<(x[1][x_Pos]+FirstTimeStamp);
@@ -467,7 +506,7 @@ string VideoStats::StatsToXML (int Width, int Height, const activefilters& filte
             Data<<" pkt_duration_time=\"" << pkt_duration_time.str() << "\"";
         Data << " pkt_pos=\"" << pkt_pos[x_Pos] << "\"";
         Data << " pkt_size=\"" << pkt_size[x_Pos] << "\"";
-        Data<<" width=\"" << width.str() << "\" height=\"" << height.str() <<"\"";
+        Data<<" width=\"" << widthStream.str() << "\" height=\"" << heightStream.str() <<"\"";
         Data << " pix_fmt=\"" << av_get_pix_fmt_name((AVPixelFormat) pix_fmt[x_Pos]) << "\"";
         Data << " pict_type=\"" << pict_type_char[x_Pos] << "\"";
 
@@ -490,12 +529,12 @@ string VideoStats::StatsToXML (int Width, int Height, const activefilters& filte
             case Item_Crop_x2 :
             case Item_Crop_w :
                 // Special case, values are from width
-                value<<Width-y[Plot_Pos][x_Pos];
+                value<<width-y[Plot_Pos][x_Pos];
                 break;
             case Item_Crop_y2 :
             case Item_Crop_h :
                 // Special case, values are from height
-                value<<Height-y[Plot_Pos][x_Pos];
+                value<<height-y[Plot_Pos][x_Pos];
                 break;
             default:
                 value<<y[Plot_Pos][x_Pos];
@@ -503,6 +542,9 @@ string VideoStats::StatsToXML (int Width, int Height, const activefilters& filte
 
             Data<<"            <tag key=\""+key+"\" value=\""+value.str()+"\"/>\n";
         }
+
+        if(comments[x_Pos])
+            Data<<"            <tag key=\"qctools.comment\" value=\"" << comments[x_Pos] << "\"/>\n";
 
         Data<<"        </frame>\n";
     }

@@ -88,6 +88,19 @@ void MainWindow::openCapture()
 }
 #endif // BLACKMAGICDECKLINK_YES
 //---------------------------------------------------------------------------
+bool MainWindow::canCloseFile(size_t index)
+{
+    if(Files[index]->commentsUpdated())
+    {
+        auto result = QMessageBox::warning(this, "Comments has been updated!",
+                                           "This report contains unsaved comments. If you close before saving, your changes will be lost.",
+                                           QMessageBox::Cancel | QMessageBox::Close, QMessageBox::Cancel);
+        return result == QMessageBox::Close;
+    }
+
+    return true;
+}
+
 void MainWindow::closeFile()
 {
     if (Files_CurrentPos==(size_t)-1)
@@ -98,20 +111,31 @@ void MainWindow::closeFile()
         return;
     }
 
-    // Launch analysis
-    Files.erase(Files.begin()+Files_CurrentPos);
-    ui->fileNamesBox->removeItem(Files_CurrentPos);
-    if (ui->fileNamesBox->isVisible())
-        ui->fileNamesBox->setCurrentIndex(Files_CurrentPos<Files.size()?Files_CurrentPos:Files_CurrentPos-1);
-    else
-        Files_CurrentPos=Files_CurrentPos<Files.size()?Files_CurrentPos:Files_CurrentPos-1;
+    if(canCloseFile(Files_CurrentPos))
+    {
+        // Launch analysis
+        Files[Files_CurrentPos]->deleteLater();
+        Files.erase(Files.begin()+Files_CurrentPos);
 
-    TimeOut();
+        ui->fileNamesBox->removeItem(Files_CurrentPos);
+        if (ui->fileNamesBox->isVisible())
+            ui->fileNamesBox->setCurrentIndex(Files_CurrentPos<Files.size()?Files_CurrentPos:Files_CurrentPos-1);
+        else
+            Files_CurrentPos=Files_CurrentPos<Files.size()?Files_CurrentPos:Files_CurrentPos-1;
+
+        TimeOut();
+    }
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::closeAllFiles()
 {
+    for(size_t Pos = 0; Pos < Files.size(); Pos++)
+    {
+        if(!canCloseFile(Pos))
+            return;
+    }
+
     if (FilesListArea)
         FilesListArea->hide();
     clearGraphsLayout();
@@ -311,6 +335,9 @@ void MainWindow::createGraphsLayout()
             for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
                 if (CheckBoxes[type][group])
                     CheckBoxes[type][group]->hide();
+
+        m_commentsCheckbox->hide();
+
         if (ui->fileNamesBox)
             ui->fileNamesBox->hide();
 
@@ -346,7 +373,7 @@ void MainWindow::createGraphsLayout()
         TinyDisplayArea->hide();
     ui->verticalLayout->addWidget(TinyDisplayArea);
 
-    ControlArea=new Control(this, Files[Files_CurrentPos], Control::Style_Cols);
+    ControlArea=new Control(this, Files[Files_CurrentPos]);
     ControlArea->setPlayAllFrames(ui->actionPlay_All_Frames->isChecked());
 
     connect( ControlArea, SIGNAL( currentFrameChanged() ), 
@@ -355,9 +382,6 @@ void MainWindow::createGraphsLayout()
     if (!ui->actionGraphsLayout->isChecked())
         ControlArea->hide();
     ui->verticalLayout->addWidget(ControlArea);
-
-    //InfoArea=new Info(this, Files[Files_CurrentPos], Info::Style_Grid);
-    //ui->verticalLayout->addWidget(InfoArea);
 
     TinyDisplayArea->ControlArea=ControlArea;
     ControlArea->TinyDisplayArea=TinyDisplayArea;

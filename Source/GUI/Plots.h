@@ -12,12 +12,15 @@
 #include "Core/Core.h"
 #include "Core/CommonStats.h"
 #include "Core/FileInformation.h"
+#include "GUI/Comments.h"
 
 #include <QWidget>
 
 class QwtPlot;
 class Plot;
 class PlotScaleWidget;
+
+void showEditFrameCommentsDialog(QWidget* parentWidget, FileInformation* info, CommonStats* stats, size_t frameIndex);
 
 class FrameInterval
 {
@@ -86,6 +89,7 @@ public:
     void                        setPlotVisible( size_t type, size_t group, bool on );
 
     const QwtPlot*              plot( size_t streamPos, size_t group ) const;
+    CommentsPlot*               commentsPlot() const { return m_commentsPlot; }
 
     void                        Zoom_Move( int Begin );
     void                        refresh();
@@ -115,7 +119,7 @@ private:
     void                        updateSamples( Plot* );
     void                        setCursorPos( int framePos );
 
-    void                        alignXAxis( const Plot* );
+    void                        alignXAxis( const QwtPlot* );
     void                        alignYAxes();
 
     void                        setVisibleFrames( int from, int to, bool force = false );
@@ -127,6 +131,7 @@ private:
 
 private:
     PlotScaleWidget*            m_scaleWidget;
+    CommentsPlot*               m_commentsPlot;
     Plot***                     m_plots; // pointer on an array of streams and groups per stream and Plot* per group
     int                         m_plotsCount;
 

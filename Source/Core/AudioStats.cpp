@@ -337,7 +337,7 @@ string AudioStats::StatsToCSV(const activefilters& filters)
 }
 
 //---------------------------------------------------------------------------
-string AudioStats::StatsToXML (int Width, int Height, const activefilters& filters)
+string AudioStats::StatsToXML (const activefilters& filters)
 {
     stringstream Data;
 

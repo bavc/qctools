@@ -103,6 +103,8 @@
     <addaction name="actionZoomOut"/>
     <addaction name="separator"/>
     <addaction name="actionGoTo"/>
+    <addaction name="actionNavigatePreviousComment"/>
+    <addaction name="actionNavigateNextComment"/>
     <addaction name="separator"/>
     <addaction name="actionPlay_All_Frames"/>
     <addaction name="actionPlay_at_Frame_Rate"/>
@@ -520,6 +522,22 @@
    </property>
    <property name="toolTip">
     <string>Upload all stats to signalserver</string>
+   </property>
+  </action>
+  <action name="actionNavigateNextComment">
+   <property name="text">
+    <string>Navigate to next comment</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+.</string>
+   </property>
+  </action>
+  <action name="actionNavigatePreviousComment">
+   <property name="text">
+    <string>Navigate to previous comment</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+,</string>
    </property>
   </action>
  </widget>

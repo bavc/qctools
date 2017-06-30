@@ -32,7 +32,18 @@ public:
     void                        StatsFromFrame(struct AVFrame* Frame, int Width, int Height);
     void                        TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos);
     string                      StatsToCSV(const activefilters& filters);
-    string                      StatsToXML(int Width, int Height, const activefilters& filters);
+    string                      StatsToXML(const activefilters& filters);
+
+    int getWidth() const;
+    void setWidth(int getWidth);
+
+    int getHeight() const;
+    void setHeight(int getHeight);
+
+private:
+
+    int width;
+    int height;
 };
 
 #endif // Stats_H

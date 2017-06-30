@@ -93,6 +93,7 @@ Q_SIGNALS:
 // Class
 //***************************************************************************
 
+class CommentsPlot;
 class BigDisplay : public QDialog
 {
     Q_OBJECT
@@ -167,6 +168,8 @@ protected:
 
 private:
     QSplitter* splitter;
+    CommentsPlot* plot;
+
     void setCurrentFilter(size_t playerIndex, size_t filterIndex);
 
 protected:
@@ -175,13 +178,15 @@ protected:
 Q_SIGNALS:
 	void rewind(int pos);
 
+private Q_SLOTS:
+    void onCursorMoved(int x);
+
 public Q_SLOTS:
     void updateImagesAndSlider(const QPixmap& pixmap1, const QPixmap& pixmap2, int sliderPos);
+    void onSliderValueChanged(int value);
 
     void on_FiltersList_currentIndexChanged(int Pos);
 
-    void on_Slider_sliderMoved(int value);
-    void on_Slider_actionTriggered (int action);
     void on_FiltersSource_stateChanged(int state);
     void on_FiltersOptions1_click();
     void on_FiltersOptions2_click();

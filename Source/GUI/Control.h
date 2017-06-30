@@ -35,13 +35,7 @@ class Control : public QWidget
     Q_OBJECT
 
 public:
-    enum style
-    {
-        Style_Cols,
-        Style_Grid,
-    };
-    explicit Control(QWidget *parent, FileInformation* FileInfoData, 
-        style Style, bool IsSlave=false);
+    explicit Control(QWidget *parent, FileInformation* FileInfoData, bool IsSlave=false);
 
     virtual ~Control();
 
@@ -119,7 +113,6 @@ private:
     // File information
     FileInformation*            FileInfoData;
     int                         Frames_Pos;
-    style                       Style;
 
     // Time
     QTimer* Timer;

@@ -63,6 +63,7 @@ public:
 #ifdef BLACKMAGICDECKLINK_YES
     void                        openCapture                 ();
 #endif // BLACKMAGICDECKLINK_YES
+    bool                        canCloseFile                (size_t index);
     void                        closeFile                   ();
     void                        closeAllFiles               ();
     void                        Zoom_Move                   (size_t Begin);
@@ -110,6 +111,7 @@ public:
 
     //CheckBoxes
     std::vector<QCheckBox*>     CheckBoxes[Type_Max];
+    QCheckBox*                  m_commentsCheckbox;
 
     // Files
     std::vector<FileInformation*> Files;
@@ -229,6 +231,13 @@ private Q_SLOTS:
     void updateSignalServerCheckUploadedStatus();
     void updateSignalServerUploadStatus();
     void updateSignalServerUploadProgress(qint64, qint64);
+
+    void on_actionNavigateNextComment_triggered();
+
+    void on_actionNavigatePreviousComment_triggered();
+
+protected:
+    void closeEvent(QCloseEvent* event);
 
 private:
     void updateScrollBar( bool blockSignals = false );

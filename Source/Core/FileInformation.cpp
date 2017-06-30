@@ -137,7 +137,8 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     formatStats(NULL),
     m_autoCheckFileUploaded(true),
     m_autoUpload(true),
-    m_hasStats(false)
+    m_hasStats(false),
+    m_commentsUpdated(false)
 {
     static struct RegisterMetatypes {
         RegisterMetatypes() {
@@ -484,27 +485,34 @@ void FileInformation::startExport(const QString &exportFileName)
 //---------------------------------------------------------------------------
 void FileInformation::Export_XmlGz (const QString &ExportFileName, const activefilters& filters)
 {
-    if (!Glue)
-        return;
-
     stringstream Data;
 
     // Header
     Data<<"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
     Data<<"<!-- Created by QCTools " << Version << " -->\n";
     Data<<"<ffprobe:ffprobe xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:ffprobe='http://www.ffmpeg.org/schema/ffprobe' xsi:schemaLocation='http://www.ffmpeg.org/schema/ffprobe ffprobe.xsd'>\n";
-    Data<<"    <program_version version=\"" << Glue->FFmpeg_Version() << "\" copyright=\"Copyright (c) 2007-" << Glue->FFmpeg_Year() << " the FFmpeg developers\" build_date=\"" __DATE__ "\" build_time=\"" __TIME__ "\" compiler_ident=\"" << Glue->FFmpeg_Compiler() << "\" configuration=\"" << Glue->FFmpeg_Configuration() << "\"/>\n";
+    Data<<"    <program_version version=\"" << FFmpeg_Glue::FFmpeg_Version() << "\" copyright=\"Copyright (c) 2007-" << FFmpeg_Glue::FFmpeg_Year() << " the FFmpeg developers\" build_date=\"" __DATE__ "\" build_time=\"" __TIME__ "\" compiler_ident=\"" << FFmpeg_Glue::FFmpeg_Compiler() << "\" configuration=\"" << FFmpeg_Glue::FFmpeg_Configuration() << "\"/>\n";
     Data<<"\n";
     Data<<"    <library_versions>\n";
-    Data<<Glue->FFmpeg_LibsVersion();
+    Data<<FFmpeg_Glue::FFmpeg_LibsVersion();
     Data<<"    </library_versions>\n";
 
     Data<<"    <frames>\n";
 
     // From stats
     for (size_t Pos=0; Pos<Stats.size(); Pos++)
+    {
         if (Stats[Pos])
-            Data<<Stats[Pos]->StatsToXML(Glue->Width_Get(), Glue->Height_Get(), filters);
+        {
+            if(Stats[Pos]->Type_Get() == Type_Video && Glue)
+            {
+                auto videoStats = static_cast<VideoStats*>(Stats[Pos]);
+                videoStats->setWidth(Glue->Width_Get());
+                videoStats->setHeight(Glue->Height_Get());
+            }
+            Data<<Stats[Pos]->StatsToXML(filters);
+        }
+    }
 
     // Footer
     Data<<"    </frames>";
@@ -577,6 +585,7 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName, const activef
     }
 
     Q_EMIT statsFileGenerated(file, name);
+    m_commentsUpdated = false;
 }
 
 //---------------------------------------------------------------------------
@@ -949,6 +958,12 @@ void FileInformation::cancelUpload()
         uploadOperation->cancel();
 }
 
+void FileInformation::setCommentsUpdated(CommonStats *stats)
+{
+    m_commentsUpdated = true;
+    Q_EMIT commentsUpdated(stats);
+}
+
 void FileInformation::uploadDone()
 {
     Q_EMIT signalServerUploadStatusChanged();
@@ -989,4 +1004,9 @@ bool FileInformation::parsed() const
 void FileInformation::setExportFilters(const activefilters &exportFilters)
 {
     m_exportFilters = exportFilters;
+}
+
+bool FileInformation::commentsUpdated() const
+{
+    return m_commentsUpdated;
 }

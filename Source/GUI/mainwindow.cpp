@@ -7,6 +7,7 @@
 //---------------------------------------------------------------------------
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "Core/FFmpeg_Glue.h"
 #include "GUI/Plots.h"
 #include "GUI/preferences.h"
 
@@ -154,6 +155,12 @@ MainWindow::~MainWindow()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionQuit_triggered()
 {
+    for(size_t Pos = 0; Pos < Files.size(); Pos++)
+    {
+        if(!canCloseFile(Pos))
+            return;
+    }
+
     close();
 }
 
@@ -344,6 +351,8 @@ void MainWindow::on_actionFilesList_triggered()
     for (size_t type = 0; type < Type_Max; type++)
         for (size_t group=0; group<CheckBoxes[type].size(); group++)
             CheckBoxes[type][group]->hide();
+    m_commentsCheckbox->hide();
+
     if (ui->fileNamesBox)
         ui->fileNamesBox->hide();
     if (PlotsArea)
@@ -387,6 +396,10 @@ void MainWindow::on_actionGraphsLayout_triggered()
         for (size_t group=0; group<CheckBoxes[type].size(); group++)
             if (CheckBoxes[type][group] && Files_CurrentPos<Files.size() && Files[Files_CurrentPos]->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
                 CheckBoxes[type][group]->show();
+
+    if(Files_CurrentPos<Files.size())
+        m_commentsCheckbox->show();
+
     if (ui->fileNamesBox)
         ui->fileNamesBox->show();
     if (PlotsArea)
@@ -781,4 +794,52 @@ void MainWindow::updateSignalServerUploadStatus()
 void MainWindow::updateSignalServerUploadProgress(qint64 value, qint64 total)
 {
     ui->actionSignalServer_status->setText(QString("Uploading: %1 / %2").arg(value).arg(total));
+}
+
+void MainWindow::on_actionNavigateNextComment_triggered()
+{
+    if (Files_CurrentPos>=Files.size())
+        return;
+
+    auto framesCount = Files[Files_CurrentPos]->Glue->VideoFrameCount_Get();
+    auto currentPos = Files[Files_CurrentPos]->Frames_Pos_Get();
+    while(++currentPos < framesCount)
+    {
+        if(Files[Files_CurrentPos]->ReferenceStat()->comments[currentPos])
+        {
+            Files[Files_CurrentPos]->Frames_Pos_Set(currentPos);
+            PlotsArea->onCurrentFrameChanged();
+            break;
+        }
+    }
+}
+
+void MainWindow::on_actionNavigatePreviousComment_triggered()
+{
+    if (Files_CurrentPos>=Files.size())
+        return;
+
+    auto currentPos = Files[Files_CurrentPos]->Frames_Pos_Get();
+    while(--currentPos >= 0)
+    {
+        if(Files[Files_CurrentPos]->ReferenceStat()->comments[currentPos])
+        {
+            Files[Files_CurrentPos]->Frames_Pos_Set(currentPos);
+            PlotsArea->onCurrentFrameChanged();
+            break;
+        }
+    }
+
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    for(size_t Pos = 0; Pos < Files.size(); Pos++)
+    {
+        if(!canCloseFile(Pos))
+        {
+            event->ignore();
+            return;
+        }
+    }
 }

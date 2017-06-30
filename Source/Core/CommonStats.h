@@ -42,6 +42,7 @@ public:
     double*                     y_Min;                      // Minimum y by plot
     double*                     y_Max;                      // Maximum y by plot
     double                      FirstTimeStamp;             // Time stamp of the first frame
+    char**                      comments;                   // Comments per frame (utf-8)
 
     // Status
     int                         Type_Get();
@@ -61,7 +62,7 @@ public:
     virtual void                TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos) = 0;
     virtual void                StatsFinish();
     virtual string              StatsToCSV(const activefilters& filters) = 0;
-    virtual string              StatsToXML(int width, int height, const activefilters& filters) = 0;
+    virtual string              StatsToXML(const activefilters& filters) = 0;
 
 protected:
     // Status

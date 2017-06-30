@@ -37,10 +37,9 @@
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Control::Control(QWidget *parent, FileInformation* FileInformationData_, style Style_, bool IsSlave_):
+Control::Control(QWidget *parent, FileInformation* FileInformationData_, bool IsSlave_):
     QWidget(parent),
     FileInfoData(FileInformationData_),
-    Style(Style_),
     IsSlave(IsSlave_),
     playAllFrames(true)
 {
@@ -71,46 +70,31 @@ Control::Control(QWidget *parent, FileInformation* FileInformationData_, style S
     M9->setIcon(QIcon(":/icon/backward.png"));
     M9->setIconSize(QSize(32, 32));
     connect(M9, SIGNAL(clicked(bool)), this, SLOT(on_M9_clicked(bool)));
-    if (Style==Style_Cols)
-        Layout->addWidget(M9, 0, 0, 1, 1);
-    else
-        Layout->addWidget(M9, 0, 0, 1, 1);
+    Layout->addWidget(M9, 0, 0, 1, 1);
 
     M2=new QToolButton(this);
     M2->setText("-2x");
     M2->setFont(Font);
     connect(M2, SIGNAL(clicked(bool)), this, SLOT(on_M2_clicked(bool)));
-    if (Style==Style_Cols)
-        Layout->addWidget(M2, 0, 1, 1, 1);
-    else
-        Layout->addWidget(M2, 0, 0, 1, 1);
+    Layout->addWidget(M2, 0, 1, 1, 1);
 
     M1=new QToolButton(this);
     M1->setText("-1x");
     M1->setFont(Font);
     connect(M1, SIGNAL(clicked(bool)), this, SLOT(on_M1_clicked(bool)));
-    if (Style==Style_Cols)
-        Layout->addWidget(M1, 0, 2, 1, 1);
-    else
-        Layout->addWidget(M1, 0, 1, 1, 1);
+    Layout->addWidget(M1, 0, 2, 1, 1);
 
     M0=new QToolButton(this);
     M0->setText("-0.5x");
     M0->setFont(Font);
     connect(M0, SIGNAL(clicked(bool)), this, SLOT(on_M0_clicked(bool)));
-    if (Style==Style_Cols)
-        Layout->addWidget(M0, 0, 3, 1, 1);
-    else
-        Layout->addWidget(M0, 0, 2, 1, 1);
+    Layout->addWidget(M0, 0, 3, 1, 1);
 
     Minus=new QToolButton(this);
     connect(Minus, SIGNAL(clicked(bool)), this, SLOT(on_Minus_clicked(bool)));
     Minus->setText("Previous");
     Minus->setFont(Font);
-    if (Style==Style_Cols)
-        Layout->addWidget(Minus, 0, 4, 1, 1);
-    else
-        Layout->addWidget(Minus, 1, 0, 1, 3);
+    Layout->addWidget(Minus, 0, 4, 1, 1);
 
     Info_Time=new QLabel(this);
     Info_Time->setFont(Font);
@@ -120,10 +104,7 @@ Control::Control(QWidget *parent, FileInformation* FileInformationData_, style S
     //Info_Time->setPalette(Palette);
     //Info_Time->setAutoFillBackground(true);
     Info_Time->setAlignment(Qt::AlignCenter);
-    if (Style==Style_Cols)
-        Layout->addWidget(Info_Time, 0, 5, 1, 1);
-    else
-        Layout->addWidget(Info_Time, 3, 0, 1, 3);
+    Layout->addWidget(Info_Time, 0, 5, 1, 1);
 
     PlayPause=new QToolButton(this);
     PlayPause->setText(">");
@@ -132,10 +113,7 @@ Control::Control(QWidget *parent, FileInformation* FileInformationData_, style S
     PlayPause->setIconSize(QSize(48, 48));
     connect(PlayPause, SIGNAL(clicked(bool)), this, SLOT(on_PlayPause_clicked(bool)));
 
-    if (Style==Style_Cols)
-        Layout->addWidget(PlayPause, 0, 6, 1, 1);
-    else
-        Layout->addWidget(PlayPause, 4, 1, 1, 1);
+    Layout->addWidget(PlayPause, 0, 6, 1, 1);
 
     Pause=new QToolButton(this);
     Pause->setVisible(false);
@@ -149,46 +127,31 @@ Control::Control(QWidget *parent, FileInformation* FileInformationData_, style S
     //Info_Frames->setPalette(Palette);
     //Info_Frames->setAutoFillBackground(true);
     Info_Frames->setAlignment(Qt::AlignCenter);
-    if (Style==Style_Cols)
-        Layout->addWidget(Info_Frames, 0, 7, 1, 1);
-    else
-        Layout->addWidget(Info_Frames, 3, 0, 1, 3);
+    Layout->addWidget(Info_Frames, 0, 7, 1, 1);
 
     Plus=new QToolButton(this);
     connect(Plus, SIGNAL(clicked(bool)), this, SLOT(on_Plus_clicked(bool)));
     Plus->setText("   Next   ");
     Plus->setFont(Font);
-    if (Style==Style_Cols)
-        Layout->addWidget(Plus, 0, 8, 1, 1);
-    else
-        Layout->addWidget(Plus, 5, 0, 1, 3);
+    Layout->addWidget(Plus, 0, 8, 1, 1);
 
     P0=new QToolButton(this);
     P0->setText("+0.5x");
     P0->setFont(Font);
     connect(P0, SIGNAL(clicked(bool)), this, SLOT(on_P0_clicked(bool)));
-    if (Style==Style_Cols)
-        Layout->addWidget(P0, 0, 9, 1, 1);
-    else
-        Layout->addWidget(P0, 6, 0, 1, 1);
+    Layout->addWidget(P0, 0, 9, 1, 1);
 
     P1=new QToolButton(this);
     P1->setText("+1x");
     P1->setFont(Font);
     connect(P1, SIGNAL(clicked(bool)), this, SLOT(on_P1_clicked(bool)));
-    if (Style==Style_Cols)
-        Layout->addWidget(P1, 0, 10, 1, 1);
-    else
-        Layout->addWidget(P1, 6, 1, 1, 1);
+    Layout->addWidget(P1, 0, 10, 1, 1);
 
     P2=new QToolButton(this);
     P2->setText("+2x");
     P2->setFont(Font);
     connect(P2, SIGNAL(clicked(bool)), this, SLOT(on_P2_clicked(bool)));
-    if (Style==Style_Cols)
-        Layout->addWidget(P2, 0, 11, 1, 1);
-    else
-        Layout->addWidget(P2, 6, 2, 1, 1);
+    Layout->addWidget(P2, 0, 11, 1, 1);
 
     P9=new QToolButton(this);
     P9->setText("|>");
@@ -196,10 +159,7 @@ Control::Control(QWidget *parent, FileInformation* FileInformationData_, style S
     P9->setIcon(QIcon(":/icon/forward.png"));
     P9->setIconSize(QSize(32, 32));
     connect(P9, SIGNAL(clicked(bool)), this, SLOT(on_P9_clicked(bool)));
-    if (Style==Style_Cols)
-        Layout->addWidget(P9, 0, 12, 1, 1);
-    else
-        Layout->addWidget(P9, 6, 2, 1, 1);
+    Layout->addWidget(P9, 0, 12, 1, 1);
 
     setLayout(Layout);
 
