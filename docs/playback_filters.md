@@ -81,7 +81,7 @@ Generally lossy video codecs will show blocky structured patterns at higher numb
 
 ## Bit Plane 10 slices {#bit-plane-10-slices}
 
-This filter is similar to **Bit Plane**, but it shows a section of each of the first 10 bit planes at once in the selected plane. The slices are presented in most-significant to least-significant order as left to right (or top to bottom if 'Rows' is selected). Each of the 10 bit planes is marked by a green border.
+This filter is similar to **Bit Plane**, but it shows a section of each of the first 10 bit planes at once in the selected plane. The slices are presented in most-significant to least-significant order as left to right (or top to bottom if 'Rows' is selected). Each of the 10 bit planes is marked by a green border. This filter can be offset horizontally by a desired numbers of pixels using the "x offset" option. This will move the frame to the left, allowing different sections of the frame to be compared.
 
 ![Bit Plane 10 Slices](media/playbackfilter_bit_plane_10_slices.jpg)
 
