@@ -76,13 +76,16 @@ You can also 'play' the window within the graph view. When playing the graph's c
 
 Some helpful **keyboard shortcuts** you may want to use are:
 
+*   'f' - To enlarge the window to full screen
 *   'j' - To rewind
 *   'k' - To pause
 *   'l' - To Fast Forward
-*   'f' - To enlarge the window to full screen
+*   'm' - Add a comment
 *   space bar - Toggle between play and pause
 *   left - Select the previous frame
 *   right - Select the next frame
+*   command + , - Jump to previous comment frame
+*   command + . - Jump to next comment frame
 
 ## Playback and Visual Analysis {#playback}
 
@@ -149,6 +152,6 @@ Many playback filters will use contextual options to tweak them, please review t
 
 Comments can be added to QCTools reports and exported alongside video metadata. Comments may be used to relay information about a specific frame in a file.
 
-Comments can be added by selecting a frame and double-clicking (or using `command-m`) to open the comment dialogue box. There, a comment relating to the frame or charts can be written and saved. Comments can be saved by clicking the "Save" button or by using the shortcut `option-enter`. This will cause a red diamond to appear in the comments graph. To delete a comment, open the dialogue box for the comment by double-clicking on its diamond and either remove all text or use the `Delete` button. If you attempt to close the file within QCTools, or close QCTools entirely, without exporting the report with added comments, you will be prompted to do so (or ignore the prompt and close anyway).
+Comments can be added by selecting a frame and double-clicking (or using `command + m`) to open the comment dialogue box. There, a comment relating to the frame or charts can be written and saved. Comments can be saved by clicking the "Save" button or by using the shortcut `option + enter`. This will cause a red diamond to appear in the comments graph. To delete a comment, open the dialogue box for the comment by double-clicking on its diamond and either remove all text or use the `Delete` button. If you attempt to close the file within QCTools, or close QCTools entirely, without exporting the report with added comments, you will be prompted to do so (or ignore the prompt and close anyway). Comment frames can be quickly jumped to using the `command + ,` and `command + .` keyboard shortcuts.
 
 Comments can be viewed in QCTools by hovering over their respective diamond or by double-clicking and opening the dialogue box. When exported, comments will appear in the QCTools XML nested under the chosen frame, and look like this: `<tag key="qctools.comment" value="This is my comment."/>`
