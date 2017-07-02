@@ -84,8 +84,8 @@ Some helpful **keyboard shortcuts** you may want to use are:
 *   space bar - Toggle between play and pause
 *   left - Select the previous frame
 *   right - Select the next frame
-*   `CTRL+`, (Mac: `command+,`) - Jump to previous comment frame
-*   `CTRL+`. (Mac: `command+.`) - Jump to next comment frame
+*   `CTRL+,` (Mac: `command+,`) - Jump to previous comment frame
+*   `CTRL+.` (Mac: `command+.`) - Jump to next comment frame
 
 ## Playback and Visual Analysis {#playback}
 
