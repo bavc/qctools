@@ -292,6 +292,23 @@ const filter Filters[]=
         },
     },
     {
+        "Pixel Scope",
+        0,
+        {
+            { Args_Type_Toggle,      0,   0,       0,   0, "Field" },
+            { Args_Type_Slider, 250000,   0, 1000000,   1, "X pos" },
+            { Args_Type_Slider, 250000,   0, 1000000,   1, "Y pos" },
+            { Args_Type_Slider,      8,   1,      80,   1, "width" },
+            { Args_Type_Slider,      8,   1,      80,   1, "height" },
+            { Args_Type_None,        0,   0,       0,   0, },
+            { Args_Type_None,        0,   0,       0,   0, },
+        },
+        {
+            "pixscope=x=${2}/1000000:y=${3}/1000000:w=${4}:h=${5}",
+            "il=l=d:c=d,pixscope=x=${2}/1000000:y=${3}/1000000:w=${4}:h=${5}",
+        },
+    },
+    {
         "Vectorscope",
         0,
         {
