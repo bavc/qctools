@@ -172,7 +172,7 @@ BRNG = Broadcast Range
 
 #### Samples which demonstrate Broadcast Range anomalies:
 
-![Broadcast Range Anomaly 1](media/RANG_293_0046_syncloss2.jpg) ![Broadcast Range Anomaly 2](media/brng_seattleparade.jpg)
+![Broadcast Range Anomaly 1](media/RANG_293_0046_syncloss2.jpg)
 
 ## Crop Width (CropW) {#cropw}
 
