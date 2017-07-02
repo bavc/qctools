@@ -11,6 +11,7 @@
 *   [Data Analysis Window](#data)
 *   [List View](#list)
 *   [Video Analysis Window](#analysis)
+*   [Comments](#comments)
 
 ## Install {#install}
 
@@ -143,3 +144,11 @@ In addition to technical metadata about the file (duration, frame rate, file siz
 ![Views](media/Slide3.jpg)
 
 Many playback filters will use contextual options to tweak them, please review the Playback Filters section of the help documentation for more details.
+
+## Comments {#comments}
+
+Comments can be added to QCTools reports and exported alongside video metadata. Comments may be used to relay information about a specific frame in a file.
+
+Comments can be added by selecting a frame and double-clicking (or using `command-m`) to open the comment dialogue box. There, a comment relating to the frame or charts can be written and saved. Comments can be saved by clicking the "Save" button or by using the shortcut `option-enter`. This will cause a red diagonal to appear in the comments graph. To delete a comment, open the dialogue box for the comment by double-clicking on its diamond and either remove all text or use the `Delete` button. If you attempt to close the file within QCTools, or close QCTools entirely, without exporting the report with added comments, you will be prompted to do so (or ignore the prompt and close anyway).
+
+Comments will appear in the QCTools XML nested under the chosen frame, and look like this: `<tag key="qctools.comment" value="This is my comment."/>`
