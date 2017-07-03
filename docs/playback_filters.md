@@ -14,7 +14,7 @@ The QCTools preview window is intended as an analytical playback environment tha
 [Audio Vectorscope](#audio-vectorscope)  
 [Audio Volume](#audio-volume)  
 [Audio Waveform](#audio-waveform)  
-[Bit Plane](#bit-plane) [No Display](#no-display)   
+[Bit Plane](#bit-plane)   
 [Bit Plane 10 slices](#bit-plane-10-slices)    
 [Bit Plane Noise](#bit-plane-noise)   
 [Broadcast Illegal Focus](#broadcast-illegal-focus)   
@@ -32,6 +32,7 @@ The QCTools preview window is intended as an analytical playback environment tha
 [Help](#help)  
 [Histogram](#histogram)  
 [Line Select](#line-select)  
+[No Display](#no-display)  
 [Normal](#normal)  
 [Pixel Offset Subtraction](#pixel-offset-subtraction)  
 [Sample Range](#sample-range)  
@@ -80,7 +81,7 @@ Generally lossy video codecs will show blocky structured patterns at higher numb
 
 ## Bit Plane 10 slices {#bit-plane-10-slices}
 
-This filter is similar to **Bit Plane**, but it shows a section of each of the first 10 bit planes at once in the selected plane. The slices are presented in most-significant to least-significant order as left to right (or top to bottom if 'Rows' is selected). Each of the 10 bit planes is marked by a green border.
+This filter is similar to **Bit Plane**, but it shows a section of each of the first 10 bit planes at once in the selected plane. The slices are presented in most-significant to least-significant order as left to right (or top to bottom if 'Rows' is selected). Each of the 10 bit planes is marked by a green border. This filter can be offset horizontally by a desired numbers of pixels using the "x offset" option. This will move the frame to the left, allowing different sections of the frame to be compared.
 
 ![Bit Plane 10 Slices](media/playbackfilter_bit_plane_10_slices.jpg)
 
