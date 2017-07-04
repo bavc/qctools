@@ -226,8 +226,6 @@ private:
         void                    ApplyScale();
         void                    ReplaceImage();
         void                    AddThumbnail();
-        void                    DiscardScaledFrame();
-        void                    DiscardFilteredFrame();
 
         // In
         bool                    Enabled;

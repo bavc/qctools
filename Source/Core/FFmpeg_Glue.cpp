@@ -430,14 +430,6 @@ void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
         case Output_Jpeg    :   AddThumbnail();  break;
         default             :   ;
     }
-
-    /*
-    // Clean up
-    DiscardScaledFrame();
-
-    // Clean up
-    DiscardFilteredFrame();
-    */
 }
 
 //---------------------------------------------------------------------------
@@ -469,22 +461,6 @@ void FFmpeg_Glue::outputdata::ApplyFilter()
         return;
     }
 
-    // Pull filtered frames from the filtergraph 
-    AVFrame* tmpFilteredFrame = av_frame_alloc();
-    int GetAnswer = av_buffersink_get_frame(FilterGraph_Sink_Context, tmpFilteredFrame); //TODO: handling of multiple output per input
-    if (GetAnswer==AVERROR(EAGAIN) || GetAnswer==AVERROR_EOF)
-    {
-        av_frame_free(&tmpFilteredFrame);
-        FilteredFrame.reset();
-        return;
-    }
-    if (GetAnswer<0)
-    {
-        av_frame_free(&tmpFilteredFrame);
-        FilteredFrame = AVFramePtr(DecodedFrame, NoDeleter::free);
-        return;
-    }
-
     struct FilteredFrameDeleter {
         static void free(AVFrame* frame) {
             if(frame) {
@@ -494,7 +470,19 @@ void FFmpeg_Glue::outputdata::ApplyFilter()
         }
     };
 
-    FilteredFrame = AVFramePtr(tmpFilteredFrame, FilteredFrameDeleter::free);
+    // Pull filtered frames from the filtergraph 
+    FilteredFrame = AVFramePtr(av_frame_alloc(), FilteredFrameDeleter::free);
+    int GetAnswer = av_buffersink_get_frame(FilterGraph_Sink_Context, FilteredFrame.get()); //TODO: handling of multiple output per input
+    if (GetAnswer==AVERROR(EAGAIN) || GetAnswer==AVERROR_EOF)
+    {
+        FilteredFrame.reset();
+        return;
+    }
+    if (GetAnswer<0)
+    {
+        FilteredFrame = AVFramePtr(DecodedFrame, NoDeleter::free);
+        return;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -541,10 +529,7 @@ void FFmpeg_Glue::outputdata::ReplaceImage()
     if (!ScaledFrame)
         return;    
 
-    image.free();
     image.frame = ScaledFrame;
-
-    ScaledFrame = NULL;
 }
 
 //---------------------------------------------------------------------------
@@ -576,24 +561,6 @@ void FFmpeg_Glue::outputdata::AddThumbnail()
     memcpy(JpegItem->Data, JpegOutput_Packet->data, JpegOutput_Packet->size);
     JpegItem->Size=JpegOutput_Packet->size;
     Thumbnails.push_back(JpegItem);
-}
-
-//---------------------------------------------------------------------------
-void FFmpeg_Glue::outputdata::DiscardScaledFrame()
-{
-    if (!ScaledFrame)
-        return;
-
-    ScaledFrame.reset();
-}
-
-//---------------------------------------------------------------------------
-void FFmpeg_Glue::outputdata::DiscardFilteredFrame()
-{
-    if (!FilteredFrame)
-        return;
-
-    FilteredFrame.reset();
 }
 
 //---------------------------------------------------------------------------
