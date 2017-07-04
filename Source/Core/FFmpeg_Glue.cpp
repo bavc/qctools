@@ -475,7 +475,7 @@ void FFmpeg_Glue::outputdata::ApplyFilter()
     if (GetAnswer==AVERROR(EAGAIN) || GetAnswer==AVERROR_EOF)
     {
         av_frame_free(&tmpFilteredFrame);
-        FilteredFrame = AVFramePtr(DecodedFrame, NoDeleter::free);
+        FilteredFrame.reset();
         return;
     }
     if (GetAnswer<0)
