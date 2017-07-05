@@ -503,7 +503,9 @@ void ImageLabel::rescale(const QSize& newSize /*= QSize()*/ )
 
     if (image.isNull())
     {
-        Pixmap = QPixmap(Pixmap.width(), Pixmap.height());
+
+        Pixmap = QPixmap(picture->OutputWidth_Get(Pos - 1), picture->OutputHeight_Get(Pos - 1));
+        uilabel->setGeometry(0, 0, Pixmap.width(), Pixmap.height());
         uilabel->setPixmap(Pixmap);
         return;
     }

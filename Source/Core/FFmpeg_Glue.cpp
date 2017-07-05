@@ -1929,6 +1929,30 @@ double FFmpeg_Glue::OutputDAR_Get(int Pos)
     return DAR;
 }
 
+int FFmpeg_Glue::OutputWidth_Get(int Pos)
+{
+    outputdata* OutputData=OutputDatas[Pos];
+
+    if (OutputData)
+    {
+        return OutputData->Width;
+    }
+
+    return 0;
+}
+
+int FFmpeg_Glue::OutputHeight_Get(int Pos)
+{
+    outputdata* OutputData=OutputDatas[Pos];
+
+    if (OutputData)
+    {
+        return OutputData->Height;
+    }
+
+    return 0;
+}
+
 //---------------------------------------------------------------------------
 string FFmpeg_Glue::PixFormat_Get()
 {

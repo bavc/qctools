@@ -118,6 +118,9 @@ public:
     string                      SAR_Get();
 
     double                      OutputDAR_Get(int Pos);
+    int                         OutputWidth_Get(int Pos);
+    int                         OutputHeight_Get(int Pos);
+
     QString                     FrameType_Get() const;
     string                      PixFormat_Get();
     string                      ColorSpace_Get();
