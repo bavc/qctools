@@ -118,6 +118,9 @@ public:
     string                      SAR_Get();
 
     double                      OutputDAR_Get(int Pos);
+    int                         OutputWidth_Get(int Pos);
+    int                         OutputHeight_Get(int Pos);
+
     QString                     FrameType_Get() const;
     string                      PixFormat_Get();
     string                      ColorSpace_Get();
@@ -222,12 +225,10 @@ private:
         
         //Actions
         void                    Process(AVFrame* DecodedFrame);
-        void                    ApplyFilter();
-        void                    ApplyScale();
+        void                    ApplyFilter(const AVFramePtr& sourceFrame);
+        void                    ApplyScale(const AVFramePtr& sourceFrame);
         void                    ReplaceImage();
         void                    AddThumbnail();
-        void                    DiscardScaledFrame();
-        void                    DiscardFilteredFrame();
 
         // In
         bool                    Enabled;
@@ -237,7 +238,7 @@ private:
         // FFmpeg pointers - Input
         int                     Type;
         AVStream*               Stream;
-        AVFrame*                DecodedFrame;
+        AVFramePtr              DecodedFrame;
 
         // FFmpeg pointers - Filter
         AVFilterGraph*          FilterGraph;
@@ -248,6 +249,8 @@ private:
         // FFmpeg pointers - Scale
         SwsContext*             ScaleContext;
         AVFramePtr              ScaledFrame;
+
+        AVFramePtr              OutputFrame;
 
         // FFmpeg pointers - Output
         AVCodecContext*         JpegOutput_CodecContext;

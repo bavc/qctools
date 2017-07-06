@@ -408,10 +408,20 @@ void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
 {
     ++FramePos;
 
-    DecodedFrame=DecodedFrame_;
-    
+    struct NoDeleter {
+        static void free(AVFrame* frame) {
+            Q_UNUSED(frame)
+        }
+    };
+
+    DecodedFrame = AVFramePtr(DecodedFrame_, NoDeleter::free);
+    OutputFrame = DecodedFrame;
+
     //Filtering
-    ApplyFilter();
+    ApplyFilter(OutputFrame);
+
+    if(FilteredFrame)
+        OutputFrame = FilteredFrame;
 
     // Stats
     if (Stats && FilteredFrame && !Filter.empty())
@@ -421,7 +431,10 @@ void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
     }
 
     // Scale
-    ApplyScale();
+    ApplyScale(OutputFrame);
+
+    if(ScaledFrame)
+        OutputFrame = ScaledFrame;
 
     // Output
     switch (OutputMethod)
@@ -430,60 +443,23 @@ void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
         case Output_Jpeg    :   AddThumbnail();  break;
         default             :   ;
     }
-
-    /*
-    // Clean up
-    DiscardScaledFrame();
-
-    // Clean up
-    DiscardFilteredFrame();
-    */
 }
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::outputdata::ApplyFilter()
+void FFmpeg_Glue::outputdata::ApplyFilter(const AVFramePtr& sourceFrame)
 {
-    struct NoDeleter {
-        static void free(AVFrame* frame) {
-            Q_UNUSED(frame)
-        }
-    };
+    FilteredFrame.reset();
 
     if (Filter.empty())
-    {
-        FilteredFrame = AVFramePtr(DecodedFrame, NoDeleter::free);
         return;
-    }
 
     if (!FilterGraph && !FilterGraph_Init())
-    {
-        FilteredFrame = AVFramePtr(DecodedFrame, NoDeleter::free);
         return;
-    }
             
     // Push the decoded Frame into the filtergraph 
     //if (av_buffersrc_add_frame_flags(FilterGraph_Source_Context, DecodedFrame, AV_BUFFERSRC_FLAG_KEEP_REF)<0)
-    if (av_buffersrc_add_frame_flags(FilterGraph_Source_Context, DecodedFrame, 0)<0)
-    {
-        FilteredFrame = AVFramePtr(DecodedFrame, NoDeleter::free);
+    if (av_buffersrc_add_frame_flags(FilterGraph_Source_Context, sourceFrame.get(), 0)<0)
         return;
-    }
-
-    // Pull filtered frames from the filtergraph 
-    AVFrame* tmpFilteredFrame = av_frame_alloc();
-    int GetAnswer = av_buffersink_get_frame(FilterGraph_Sink_Context, tmpFilteredFrame); //TODO: handling of multiple output per input
-    if (GetAnswer==AVERROR(EAGAIN) || GetAnswer==AVERROR_EOF)
-    {
-        av_frame_free(&tmpFilteredFrame);
-        FilteredFrame = AVFramePtr(DecodedFrame, NoDeleter::free);
-        return;
-    }
-    if (GetAnswer<0)
-    {
-        av_frame_free(&tmpFilteredFrame);
-        FilteredFrame = AVFramePtr(DecodedFrame, NoDeleter::free);
-        return;
-    }
 
     struct FilteredFrameDeleter {
         static void free(AVFrame* frame) {
@@ -494,13 +470,28 @@ void FFmpeg_Glue::outputdata::ApplyFilter()
         }
     };
 
-    FilteredFrame = AVFramePtr(tmpFilteredFrame, FilteredFrameDeleter::free);
+    // Pull filtered frames from the filtergraph 
+    FilteredFrame = AVFramePtr(av_frame_alloc(), FilteredFrameDeleter::free);
+    int GetAnswer = av_buffersink_get_frame(FilterGraph_Sink_Context, FilteredFrame.get()); //TODO: handling of multiple output per input
+    if (GetAnswer==AVERROR(EAGAIN) || GetAnswer==AVERROR_EOF)
+    {
+        FilteredFrame.reset();
+        OutputFrame.reset();
+        return;
+    }
+
+    if (GetAnswer<0)
+    {
+        FilteredFrame.reset();
+    }
 }
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::outputdata::ApplyScale()
+void FFmpeg_Glue::outputdata::ApplyScale(const AVFramePtr& sourceFrame)
 {
-    if (!FilteredFrame || !FilteredFrame->width || !FilteredFrame->height)
+    ScaledFrame.reset();
+
+    if (!sourceFrame || !sourceFrame->width || !sourceFrame->height)
         return;
 
     switch (OutputMethod)
@@ -529,22 +520,16 @@ void FFmpeg_Glue::outputdata::ApplyScale()
     ScaledFrame->height=Height;
 
     av_image_alloc(ScaledFrame->data, ScaledFrame->linesize, Width, Height, OutputMethod==Output_QImage?AV_PIX_FMT_RGB24:AV_PIX_FMT_YUVJ420P, 1);
-    if (sws_scale(ScaleContext, FilteredFrame->data, FilteredFrame->linesize, 0, FilteredFrame->height, ScaledFrame->data, ScaledFrame->linesize)<0)
+    if (sws_scale(ScaleContext, sourceFrame->data, sourceFrame->linesize, 0, sourceFrame->height, ScaledFrame->data, ScaledFrame->linesize)<0)
     {
-        ScaledFrame=FilteredFrame;
+        ScaledFrame.reset();
     }
 }
 
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::outputdata::ReplaceImage()
 {
-    if (!ScaledFrame)
-        return;    
-
-    image.free();
-    image.frame = ScaledFrame;
-
-    ScaledFrame = NULL;
+    image.frame = OutputFrame;
 }
 
 //---------------------------------------------------------------------------
@@ -565,7 +550,7 @@ void FFmpeg_Glue::outputdata::AddThumbnail()
                                     
     JpegOutput_Packet->data=NULL;
     JpegOutput_Packet->size=0;
-    if (avcodec_encode_video2(JpegOutput_CodecContext, JpegOutput_Packet, ScaledFrame.get(), &got_packet) < 0 || !got_packet)
+    if (avcodec_encode_video2(JpegOutput_CodecContext, JpegOutput_Packet, OutputFrame.get(), &got_packet) < 0 || !got_packet)
     {
         Thumbnails.push_back(new bytes());
         return;
@@ -576,24 +561,6 @@ void FFmpeg_Glue::outputdata::AddThumbnail()
     memcpy(JpegItem->Data, JpegOutput_Packet->data, JpegOutput_Packet->size);
     JpegItem->Size=JpegOutput_Packet->size;
     Thumbnails.push_back(JpegItem);
-}
-
-//---------------------------------------------------------------------------
-void FFmpeg_Glue::outputdata::DiscardScaledFrame()
-{
-    if (!ScaledFrame)
-        return;
-
-    ScaledFrame.reset();
-}
-
-//---------------------------------------------------------------------------
-void FFmpeg_Glue::outputdata::DiscardFilteredFrame()
-{
-    if (!FilteredFrame)
-        return;
-
-    FilteredFrame.reset();
 }
 
 //---------------------------------------------------------------------------
@@ -712,15 +679,15 @@ void FFmpeg_Glue::outputdata::FilterGraph_Free()
 //---------------------------------------------------------------------------
 bool FFmpeg_Glue::outputdata::Scale_Init()
 {
-    if (!FilteredFrame)
+    if (!OutputFrame)
         return false;    
         
     if (!AdaptDAR())
         return false;
 
     // Init
-    ScaleContext = sws_getContext(FilteredFrame->width, FilteredFrame->height,
-                                    (AVPixelFormat)FilteredFrame->format,
+    ScaleContext = sws_getContext(OutputFrame->width, OutputFrame->height,
+                                    (AVPixelFormat)OutputFrame->format,
                                     Width, Height,
                                     OutputMethod==Output_QImage?AV_PIX_FMT_RGB24:AV_PIX_FMT_YUVJ420P,
                                     Output_QImage?/* SWS_BICUBIC */ SWS_FAST_BILINEAR :SWS_FAST_BILINEAR, NULL, NULL, NULL);
@@ -1347,7 +1314,7 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
             InputData->FirstTimeStamp=((double)ts)*InputData->Stream->time_base.num/InputData->Stream->time_base.den;
         
         for (size_t OutputPos=0; OutputPos<OutputDatas.size(); OutputPos++)
-            if (OutputDatas[OutputPos] && OutputDatas[OutputPos]->Stream==InputData->Stream)
+            if (OutputDatas[OutputPos] && OutputDatas[OutputPos]->Enabled && OutputDatas[OutputPos]->Stream==InputData->Stream)
                 OutputDatas[OutputPos]->Process(Frame);
 
         if(Decode)
@@ -1960,6 +1927,30 @@ double FFmpeg_Glue::OutputDAR_Get(int Pos)
     }
 
     return DAR;
+}
+
+int FFmpeg_Glue::OutputWidth_Get(int Pos)
+{
+    outputdata* OutputData=OutputDatas[Pos];
+
+    if (OutputData)
+    {
+        return OutputData->Width;
+    }
+
+    return 0;
+}
+
+int FFmpeg_Glue::OutputHeight_Get(int Pos)
+{
+    outputdata* OutputData=OutputDatas[Pos];
+
+    if (OutputData)
+    {
+        return OutputData->Height;
+    }
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------
