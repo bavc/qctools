@@ -22,6 +22,9 @@ ImageLabel::ImageLabel(FFmpeg_Glue** Picture_, size_t Pos_, QWidget *parent) :
     uilabel = new QLabel();
     ui->scrollArea->setWidget(uilabel);
 
+    if(debugOverlay)
+        ui->scrollArea->setStyleSheet("background: green");
+
     selectionArea = new SelectionArea(uilabel);
 
     connect(selectionArea, &SelectionArea::geometryChangeFinished, this, [&]() {
@@ -417,7 +420,7 @@ bool ImageLabel::eventFilter(QObject *object, QEvent *event)
         auto scaledX = selectionPos.x() * scaledWidth / originalWidth;
         auto scaledY = selectionPos.y() * scaledHeight / originalHeight;
 
-        p.fillRect(QRect(0, 0, size().width(), 50), QColor(128, 128, 128, 128));
+        p.fillRect(QRect(0, 0, size().width(), 80), QColor(32, 32, 32, 200));
         p.drawText(20, 20, QString("frameWidth: %1, frameHeight: %2, fw/fh: %3, imageWidth: %4, imageHeigh: %5, iw/ih: %6")
                    .arg(originalWidth)
                    .arg(originalHeight)
@@ -427,14 +430,14 @@ bool ImageLabel::eventFilter(QObject *object, QEvent *event)
                    .arg(qreal(uilabel->width()) / uilabel->height())
                 );
 
-        p.drawText(20, 30, QString("imageLabelWidth: %1, imageLabelHeight: %2, dar: %3, sar: %4, output dar: %5")
+        p.drawText(20, 40, QString("imageLabelWidth: %1, imageLabelHeight: %2, dar: %3, sar: %4, output dar: %5")
                    .arg(width())
                    .arg(height())
                    .arg(QString::number(picture->DAR_Get()))
                    .arg(QString::fromStdString(picture->SAR_Get()))
                    .arg(QString::number(picture->OutputDAR_Get(Pos - 1))));
 
-        p.drawText(20, 40, QString("selectionWidth: %1, selectionHeight: %2, aspect ratio: %3")
+        p.drawText(20, 60, QString("selectionWidth: %1, selectionHeight: %2, aspect ratio: %3")
                    .arg(selectionArea->geometry().width())
                    .arg(selectionArea->geometry().height())
                    .arg(qreal(selectionArea->geometry().width()) / selectionArea->geometry().height()));

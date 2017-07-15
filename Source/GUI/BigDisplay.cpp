@@ -1404,6 +1404,10 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     for (size_t Pos=0; Pos<2; Pos++)
     {
         imageLabels[Pos] =new ImageLabel(&Picture, Pos + 1, this);
+
+        if(Config::instance().getDebug())
+            imageLabels[Pos]->setStyleSheet("background: yellow");
+
         imageLabels[Pos]->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         imageLabels[Pos]->setMinimumSize(20, 20);
         imageLabels[Pos]->showDebugOverlay(Config::instance().getDebug());
