@@ -541,3 +541,8 @@ void ImageLabel::rescale(const QSize& newSize /*= QSize()*/ )
 
     setSelectionArea(selectionPos.x(), selectionPos.y(), selectionSize.width(), selectionSize.height());
 }
+
+QSize ImageLabel::pixmapSize() const
+{
+    return Pixmap.size();
+}

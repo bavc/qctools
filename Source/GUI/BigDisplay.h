@@ -12,6 +12,8 @@
 //---------------------------------------------------------------------------
 #include <QDialog>
 #include <QDoubleSpinBox>
+#include <QResizeEvent>
+#include <QTimer>
 #include <string>
 
 class FFmpeg_Glue;
@@ -168,12 +170,15 @@ protected:
 
 private:
     QSplitter* splitter;
+    QTimer timer;
+
     CommentsPlot* plot;
 
     void setCurrentFilter(size_t playerIndex, size_t filterIndex);
 
 protected:
     bool eventFilter(QObject *, QEvent *);
+    void resizeEvent(QResizeEvent * e);
 
 Q_SIGNALS:
 	void rewind(int pos);
@@ -198,6 +203,9 @@ public Q_SLOTS:
     void on_Color2_click(bool checked);
 
     void on_Full_triggered();
+
+private Q_SLOTS:
+    void onAfterResize();
 };
 
 #endif // GUI_BigDisplay_H

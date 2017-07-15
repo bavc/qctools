@@ -1413,6 +1413,7 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
 
     splitter->handle(1)->installEventFilter(this);
     splitter->installEventFilter(this);
+    connect(splitter, SIGNAL(splitterMoved(int, int)), &timer, SLOT(start()));
 
     Layout->addWidget(splitter, 1, 0, 1, 3);
 
@@ -1494,6 +1495,10 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     QObject::connect(shortcutSpace, SIGNAL(activated()), ControlArea->PlayPause, SLOT(click()));
     QShortcut *shortcutF = new QShortcut(QKeySequence(Qt::Key_F), this);
     QObject::connect(shortcutF, SIGNAL(activated()), this, SLOT(on_Full_triggered()));
+
+    timer.setInterval(10);
+    timer.setSingleShot(true);
+    connect(&timer, SIGNAL(timeout()), this, SLOT(onAfterResize()));
 }
 
 //---------------------------------------------------------------------------
@@ -2106,6 +2111,10 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
     str.replace(QString("${height}"), QString::number(FileInfoData->Glue->Height_Get()));
     str.replace(QString("${dar}"), QString::number(FileInfoData->Glue->DAR_Get()));
 
+    QSize windowSize = imageLabels[Pos]->pixmapSize();
+    str.replace(QString("${window_width}"), QString::number(windowSize.width()));
+    str.replace(QString("${window_height}"), QString::number(windowSize.height()));
+
     QString tempLocation = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
     QDir tempDir(tempLocation);
 
@@ -2464,4 +2473,18 @@ void BigDisplay::on_Full_triggered()
         setWindowState(Qt::WindowActive);
     else
         setWindowState(Qt::WindowMaximized);
+}
+
+void BigDisplay::onAfterResize()
+{
+    qDebug() << "after resize";
+
+    on_FiltersOptions1_click();
+    on_FiltersOptions2_click();
+}
+
+void BigDisplay::resizeEvent(QResizeEvent  *e)
+{
+    QDialog::resizeEvent(e);
+    timer.start();
 }

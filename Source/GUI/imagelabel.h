@@ -24,6 +24,7 @@ public:
     void                        setPixmap(const QPixmap& pixmap);
 
     size_t                      GetPos() const;
+    QSize                       pixmapSize() const;
 
 public Q_SLOTS:
 
