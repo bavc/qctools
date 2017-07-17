@@ -274,6 +274,8 @@ private:
         bool                    Scale_Init();
         void                    Scale_Free();
         bool                    AdaptDAR();
+        double                  GetDAR();
+
         int                     Width;
         int                     Height;
     };

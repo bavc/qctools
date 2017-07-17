@@ -711,44 +711,35 @@ void FFmpeg_Glue::outputdata::Scale_Free()
 //---------------------------------------------------------------------------
 bool FFmpeg_Glue::outputdata::AdaptDAR()
 {
-    if(FilteredFrame && DecodedFrame && (FilteredFrame->width != DecodedFrame->width || FilteredFrame->height != DecodedFrame->height)) {
+    double DAR = GetDAR();
 
-        // if decoded frame differs from filtered - we are using filtered frame's geometry for calculating scaled width / height
-        double wh =((double)FilteredFrame->width) / FilteredFrame->height;
-
-        int width = FilteredFrame->width;
-        int height = FilteredFrame->height;
-
-        double WH =((double)Width) / Height;
-
-        if(WH > wh)
-            Width = ((double) width) * Height / height;
-        else
-            Height = ((double) height) * Width / width;
-
-    } else {
-
-        // Display aspect ratio
-        double DAR;
-        if (!DecodedFrame)
-            DAR=4.0/3.0; // TODO: video frame DAR
-        else if (DecodedFrame->sample_aspect_ratio.num && DecodedFrame->sample_aspect_ratio.den)
-            DAR=((double)DecodedFrame->width)/DecodedFrame->height*DecodedFrame->sample_aspect_ratio.num/DecodedFrame->sample_aspect_ratio.den;
-        else
-            DAR=((double)DecodedFrame->width)/DecodedFrame->height;
-        if (DAR)
-        {
-            int Target_Width=Height*DAR;
-            int Target_Height=Width/DAR;
-            if (Target_Width>Width)
-                Height=Target_Height;
-            if (Target_Height>Height)
-                Width=Target_Width;
-        }
-
-    }
+    int Target_Width=Height*DAR;
+    int Target_Height=Width/DAR;
+    if (Target_Width>Width)
+        Height=Target_Height;
+    if (Target_Height>Height)
+        Width=Target_Width;
 
     return true;
+}
+
+double GetDAR(const FFmpeg_Glue::AVFramePtr & frame) {
+    if(frame->sample_aspect_ratio.num && frame->sample_aspect_ratio.den) {
+        return ((double)frame->width)/frame->height*frame->sample_aspect_ratio.num/frame->sample_aspect_ratio.den;
+    } else {
+        return ((double)frame->width)/frame->height;
+    }
+}
+
+double FFmpeg_Glue::outputdata::GetDAR()
+{
+    if(FilteredFrame)
+        return ::GetDAR(FilteredFrame);
+
+    if(DecodedFrame)
+        return ::GetDAR(DecodedFrame);
+
+    return 4.0/3.0;
 }
 
 //***************************************************************************
@@ -1913,17 +1904,7 @@ double FFmpeg_Glue::OutputDAR_Get(int Pos)
 
     if (OutputData)
     {
-        auto DecodedFrame = OutputData->DecodedFrame;
-        auto FilteredFrame = OutputData->FilteredFrame;
-
-        if (!DecodedFrame)
-            DAR=4.0/3.0; // TODO: video frame DAR
-//        else if (DecodedFrame->sample_aspect_ratio.num && DecodedFrame->sample_aspect_ratio.den)
-//            DAR=((double)DecodedFrame->width)/DecodedFrame->height*DecodedFrame->sample_aspect_ratio.num/DecodedFrame->sample_aspect_ratio.den;
-        else if(FilteredFrame && (FilteredFrame->width != DecodedFrame->width || FilteredFrame->height != DecodedFrame->height))
-            DAR = ((double)FilteredFrame->width) / FilteredFrame->height;
-        else
-            DAR=((double)DecodedFrame->width)/DecodedFrame->height;
+        DAR = OutputData->GetDAR();
     }
 
     return DAR;
