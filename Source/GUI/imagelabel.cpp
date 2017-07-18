@@ -315,8 +315,12 @@ void ImageLabel::adjustScale()
     QSize newSize;
     if(!ui->fitToScreen_radioButton->isChecked())
     {
+        auto picture = *Picture;
         double multiplier = ((double) ui->scalePercentage_spinBox->value()) / 100;
-        newSize = QSize((*Picture)->Width_Get(), (*Picture)->Height_Get()) * multiplier;
+
+        newSize = QSize(picture->OutputFilterWidth_Get(Pos - 1), picture->OutputFilterHeight_Get(Pos - 1)) * multiplier;
+        if(newSize.isEmpty())
+            newSize = QSize((*Picture)->Width_Get(), (*Picture)->Height_Get()) * multiplier;
     }
     rescale(newSize);
 }
@@ -340,9 +344,13 @@ void ImageLabel::on_scalePercentage_spinBox_valueChanged(int value)
 {
     if(*Picture)
     {
+        auto picture = *Picture;
         double multiplier = ((double) value) / 100;
 
-        QSize newSize = QSize((*Picture)->Width_Get(), (*Picture)->Height_Get()) * multiplier;
+        QSize newSize = QSize(picture->OutputFilterWidth_Get(Pos - 1), picture->OutputFilterHeight_Get(Pos - 1)) * multiplier;
+        if(newSize.isEmpty())
+            newSize = QSize((*Picture)->Width_Get(), (*Picture)->Height_Get()) * multiplier;
+
         QSize currentSize = Pixmap.size();
 
         if(newSize != currentSize)
@@ -496,7 +504,7 @@ void ImageLabel::rescale(const QSize& newSize /*= QSize()*/ )
     auto picture = *Picture;
     auto availableSize = !newSize.isEmpty() ? newSize : ui->scrollArea->viewport()->size() - QSize(1, 1);
 
-    if(availableSize.width() < 0 || availableSize.height() < 0)
+    if(availableSize.width() <= 0 || availableSize.height() <= 0)
         return;
 
     picture->Scale_Change(availableSize.width(), availableSize.height(), Pos - 1);
