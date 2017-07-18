@@ -4,6 +4,7 @@
 #include "Core/FFmpeg_Glue.h"
 #include <QDebug>
 #include <QPainter>
+#include <QTimer>
 #include <cmath>
 
 ImageLabel::ImageLabel(FFmpeg_Glue** Picture_, size_t Pos_, QWidget *parent) :
@@ -91,7 +92,6 @@ void ImageLabel::updatePixmap(const QImage& image /*= nullptr*/)
 
     if (needRescale())
     {
-        qDebug() << (Pos == 1 ? "left" : "right") << " needs rescale, rescaling..";
         rescale();
     }
     else
@@ -310,7 +310,7 @@ void ImageLabel::showDebugOverlay(bool enable)
     selectionArea->showDebugOverlay(enable);
 }
 
-void ImageLabel::adjustScale()
+void ImageLabel::adjustScale(bool delayedRescale)
 {
     QSize newSize;
     if(!ui->fitToScreen_radioButton->isChecked())
@@ -322,7 +322,16 @@ void ImageLabel::adjustScale()
         if(newSize.isEmpty())
             newSize = QSize((*Picture)->Width_Get(), (*Picture)->Height_Get()) * multiplier;
     }
-    rescale(newSize);
+
+    if(!delayedRescale) {
+        rescale(newSize);
+    }
+    else
+    {
+        QTimer::singleShot(0, [=] {
+            rescale(newSize);
+        });
+    }
 }
 void ImageLabel::on_fitToScreen_radioButton_toggled(bool value)
 {

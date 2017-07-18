@@ -2481,10 +2481,21 @@ void BigDisplay::on_Full_triggered()
 
 void BigDisplay::onAfterResize()
 {
-    qDebug() << "after resize";
+    for(int playerIndex = 0; playerIndex < 2; ++playerIndex)
+    {
+        int filterIndex = Picture_Current[playerIndex];
 
-    on_FiltersOptions1_click();
-    on_FiltersOptions2_click();
+        string Modified_String=FiltersList_currentOptionChanged(playerIndex, filterIndex);
+        Picture->Filter_Change(playerIndex, Filters[filterIndex].Type, Modified_String.c_str());
+    }
+
+    Picture->FrameAtPosition(Frames_Pos);
+
+    for(int playerIndex = 0; playerIndex < 2; ++playerIndex)
+    {
+        if(imageLabels[playerIndex]->isVisible())
+            imageLabels[playerIndex]->adjustScale(true);
+    }
 }
 
 void BigDisplay::resizeEvent(QResizeEvent  *e)
