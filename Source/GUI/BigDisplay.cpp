@@ -1413,11 +1413,15 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
         imageLabels[Pos]->showDebugOverlay(Config::instance().getDebug());
 
         splitter->addWidget(imageLabels[Pos]);
+        imageLabels[Pos]->installEventFilter(this);
     }
 
     splitter->handle(1)->installEventFilter(this);
     splitter->installEventFilter(this);
-    connect(splitter, SIGNAL(splitterMoved(int, int)), &timer, SLOT(start()));
+    connect(splitter, &QSplitter::splitterMoved, this, [&] {
+            qDebug() << "splitter moved";
+            timer.start();
+    });
 
     Layout->addWidget(splitter, 1, 0, 1, 3);
 
@@ -2407,6 +2411,23 @@ void BigDisplay::setCurrentFilter(size_t playerIndex, size_t filterIndex)
 
 bool BigDisplay::eventFilter(QObject *watched, QEvent *event)
 {
+    if(watched == splitter && event->type() == QEvent::Resize)
+    {
+        qDebug() << "entering splitter: resize event";
+        bool result = QWidget::eventFilter(watched, event);
+        qDebug() << "leaving splitter: resize event";
+
+        return result;
+    }
+
+    if((watched == imageLabels[0] || watched == imageLabels[1]) && event->type() == QEvent::Resize)
+    {
+        qDebug() << "entering imagelabel: resize event";
+        bool result = QWidget::eventFilter(watched, event);
+        qDebug() << "leaving imagelabel: resize event";
+        return result;
+    }
+
     if((watched == splitter || watched == splitter->handle(1)) && event->type() == QEvent::MouseButtonDblClick)
     {
         QList<int> sizes;
@@ -2500,6 +2521,10 @@ void BigDisplay::onAfterResize()
 
 void BigDisplay::resizeEvent(QResizeEvent  *e)
 {
+    qDebug() << "entering BigDisplay::resizeEvent";
+
     QDialog::resizeEvent(e);
     timer.start();
+
+    qDebug() << "leaving BigDisplay::resizeEvent";
 }

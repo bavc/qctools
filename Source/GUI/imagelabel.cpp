@@ -312,6 +312,8 @@ void ImageLabel::showDebugOverlay(bool enable)
 
 void ImageLabel::adjustScale(bool delayedRescale)
 {
+    qDebug() << "entering imageLabel: adjustScale";
+
     QSize newSize;
     if(!ui->fitToScreen_radioButton->isChecked())
     {
@@ -332,7 +334,9 @@ void ImageLabel::adjustScale(bool delayedRescale)
             rescale(newSize);
         });
     }
+    qDebug() << "leaving imageLabel: adjustScale";
 }
+
 void ImageLabel::on_fitToScreen_radioButton_toggled(bool value)
 {
     if(value)
@@ -345,6 +349,8 @@ void ImageLabel::on_normalScale_radioButton_toggled(bool value)
 {
     if(value)
     {
+        setScaleSliderPercentage(100);
+        setScaleSpinboxPercentage(100);
         on_scalePercentage_spinBox_valueChanged(100);
     }
 }
@@ -400,9 +406,13 @@ void ImageLabel::on_scalePercentage_horizontalSlider_valueChanged(int value)
 
 void ImageLabel::resizeEvent(QResizeEvent *event)
 {
+    qDebug() << "entering ImageLabel::resizeEvent";
+
     QWidget::resizeEvent(event);
 
     updatePixmap();
+
+    qDebug() << "leaving ImageLabel::resizeEvent";
 }
 
 bool ImageLabel::eventFilter(QObject *object, QEvent *event)
@@ -503,43 +513,8 @@ bool ImageLabel::needRescale()
     return needRescale;
 }
 
-void ImageLabel::rescale(const QSize& newSize /*= QSize()*/ )
+void ImageLabel::setScaleSliderPercentage(int percents)
 {
-    if(*Picture == nullptr)
-    {
-        return;
-    }
-
-    auto picture = *Picture;
-    auto availableSize = !newSize.isEmpty() ? newSize : ui->scrollArea->viewport()->size() - QSize(1, 1);
-
-    if(availableSize.width() <= 0 || availableSize.height() <= 0)
-        return;
-
-    picture->Scale_Change(availableSize.width(), availableSize.height(), Pos - 1);
-    auto scaleFactor = (qreal) availableSize.width() / picture->Width_Get();
-
-    auto image = picture->Image_Get(Pos - 1);
-
-    if (image.isNull())
-    {
-
-        Pixmap = QPixmap(picture->OutputWidth_Get(Pos - 1), picture->OutputHeight_Get(Pos - 1));
-        uilabel->setGeometry(0, 0, Pixmap.width(), Pixmap.height());
-        uilabel->setPixmap(Pixmap);
-        return;
-    }
-
-    Pixmap.convertFromImage(QImage(image.data(), image.width(), image.height(), image.linesize(), QImage::Format_RGB888));
-    uilabel->setGeometry(0, 0, Pixmap.width(), Pixmap.height());
-    uilabel->setPixmap(Pixmap);
-
-    int percents = scaleFactor * 100 + 0.5;
-
-    ui->scalePercentage_spinBox->blockSignals(true);
-    ui->scalePercentage_spinBox->setValue(percents);
-    ui->scalePercentage_spinBox->blockSignals(false);
-
     ui->scalePercentage_horizontalSlider->blockSignals(true);
 
     int range = ui->scalePercentage_horizontalSlider->maximum() - ui->scalePercentage_horizontalSlider->minimum();
@@ -558,6 +533,56 @@ void ImageLabel::rescale(const QSize& newSize /*= QSize()*/ )
         ui->scalePercentage_horizontalSlider->setValue(halfRange + halfRange * (percents - AvgSliderPercents) / percentRange);
     }
     ui->scalePercentage_horizontalSlider->blockSignals(false);
+}
+
+void ImageLabel::setScaleSpinboxPercentage(int percents)
+{
+    ui->scalePercentage_spinBox->blockSignals(true);
+    ui->scalePercentage_spinBox->setValue(percents);
+    ui->scalePercentage_spinBox->blockSignals(false);
+}
+
+void ImageLabel::rescale(const QSize& newSize /*= QSize()*/ )
+{
+    qDebug() << "imageLabel::rescale";
+
+    if(*Picture == nullptr)
+    {
+        return;
+    }
+
+    auto picture = *Picture;
+    auto availableSize = !newSize.isEmpty() ? newSize : ui->scrollArea->viewport()->size() - QSize(1, 1);
+
+    if(availableSize.width() <= 0 || availableSize.height() <= 0)
+        return;
+
+    int width = picture->OutputFilterWidth_Get(Pos - 1);
+    if(width == 0)
+        width = picture->Width_Get();
+
+    picture->Scale_Change(availableSize.width(), availableSize.height(), Pos - 1);
+    auto scaleFactor = (qreal) availableSize.width() / width;
+
+    auto image = picture->Image_Get(Pos - 1);
+
+    if (image.isNull())
+    {
+
+        Pixmap = QPixmap(picture->OutputWidth_Get(Pos - 1), picture->OutputHeight_Get(Pos - 1));
+        uilabel->setGeometry(0, 0, Pixmap.width(), Pixmap.height());
+        uilabel->setPixmap(Pixmap);
+        return;
+    }
+
+    Pixmap.convertFromImage(QImage(image.data(), image.width(), image.height(), image.linesize(), QImage::Format_RGB888));
+    uilabel->setGeometry(0, 0, Pixmap.width(), Pixmap.height());
+    uilabel->setPixmap(Pixmap);
+
+    int percents = scaleFactor * 100 + 0.5;
+
+    setScaleSpinboxPercentage(percents);
+    setScaleSliderPercentage(percents);
 
     setSelectionArea(selectionPos.x(), selectionPos.y(), selectionSize.width(), selectionSize.height());
 }

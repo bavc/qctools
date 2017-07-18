@@ -26,6 +26,10 @@ public:
     size_t                      GetPos() const;
     QSize                       pixmapSize() const;
 
+    void setScaleSliderPercentage(int percents);
+
+    void setScaleSpinboxPercentage(int percents);
+
 public Q_SLOTS:
 
     void setImage(const QImage& image);
