@@ -191,6 +191,14 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "of telecine). Each frame's classification is plotted with a half-life of 1.",
         ActiveFilter_Video_Idet,
     },
+    //deflicker
+    {
+        Item_DEFL,     1,    -1,    1,  4,  "flicker", false,
+        "Plots a quantification of the temporal frame luminance variation by an\n"
+        "arithmetric mean of sets of 5 frames. The plotted value shows the relative\n"
+        "change in luminance that would be used by libavfilter's deflicker filter.",
+        ActiveFilter_Video_Deflicker,
+    },
     //Item_pkt_duration_time
     {
         Item_pkt_duration_time,     1,    0,    2,  4,  "pkt_duration_time", false,
@@ -289,6 +297,8 @@ const struct per_item VideoPerItem [Item_VideoMax]=
     { Group_IDET_R,    Group_VideoMax,     "bottom",        "lavfi.idet.repeated.bottom", 2,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_Idet  },
     { Group_IDET_R,    Group_VideoMax,     "top",           "lavfi.idet.repeated.top",    2,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_Idet  },
     { Group_IDET_R,    Group_VideoMax,     "neither",       "lavfi.idet.repeated.neither",     2,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_Idet  },
+    //DEFL
+    { Group_DEFL,      Group_VideoMax,     "flicker",       "lavfi.deflicker.relative_change",     5,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_Deflicker  },
     // pkt_duration_time & pkt_size
     { Group_pkt_duration_time, Group_VideoMax,     "pkt_duration_time",        "pkt_duration_time", 5,  false,   DBL_MAX, DBL_MAX, (activefilter) -1 },
     { Group_pkt_size,  Group_VideoMax,     "pkt_size",      "pkt_size",                  0,  false,   DBL_MAX, DBL_MAX, (activefilter) -1 },

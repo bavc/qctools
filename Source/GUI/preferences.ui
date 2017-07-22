@@ -69,6 +69,13 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QCheckBox" name="Filters_Video_Deflicker">
+                <property name="text">
+                 <string>deflicker (temporal frame luminance variations)</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
            </layout>
@@ -339,6 +346,7 @@
   <tabstop>Filters_Video_Psnr</tabstop>
   <tabstop>Filters_Video_Ssim</tabstop>
   <tabstop>Filters_Video_Idet</tabstop>
+  <tabstop>Filters_Video_Deflicker</tabstop>
   <tabstop>Filters_Audio_astats</tabstop>
   <tabstop>Filters_Audio_EbuR128</tabstop>
   <tabstop>Filters_Audio_aphasemeter</tabstop>

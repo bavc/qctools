@@ -222,6 +222,10 @@ Similar to single-frame interlaced detection, but incorporates the classificatio
 
 This plots uses an assessment that tries and detects fields that are repeated between adjacent frames (a sign of telecine). See [http://ffmpeg.org/ffmpeg-filters.html#idet](http://ffmpeg.org/ffmpeg-filters.html#idet) for more information.
 
+## Deflicker {#deflicker}
+
+This plots quantifies temporal frame luminance variations as the average mean of 5 frames at a time. See [http://ffmpeg.org/ffmpeg-filters.html#deflicker](http://ffmpeg.org/ffmpeg-filters.html#deflicker) for more information.
+
 ## Audio
 
 ## R.128 {#r128}

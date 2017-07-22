@@ -94,6 +94,7 @@ int Cli::exec(QCoreApplication &a)
                 << "            astats" << std::endl
                 << "            ssim" << std::endl
                 << "            idet" << std::endl
+                << "            deflicker" << std::endl
                 << std::endl
                 << "-y" << std::endl
                 << "    Force creation of <qctools-report> even if it already exists" << std::endl
@@ -217,6 +218,8 @@ int Cli::exec(QCoreApplication &a)
                 filters |= 1 << ActiveFilter_Video_Ssim;
             else if(filterString == "idet")
                 filters |= 1 << ActiveFilter_Video_Idet;
+            else if(filterString == "deflicker")
+                filters |= 1 << ActiveFilter_Video_Deflicker;
         }
 
         std::cout << "filters selected: ";
@@ -236,6 +239,8 @@ int Cli::exec(QCoreApplication &a)
             std::cout << "ssim" << " ";
         if(filters.test(ActiveFilter_Video_Idet))
             std::cout << "idet" << " ";
+        if(filters.test(ActiveFilter_Video_Deflicker))
+            std::cout << "deflicker" << " ";
 
         std::cout << std::endl;
     }
