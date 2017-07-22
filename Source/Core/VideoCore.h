@@ -87,6 +87,8 @@ enum VideoItem
     Item_IDET_R_B,
     Item_IDET_R_T,
     Item_IDET_R_N,
+    //deflicker.ratio
+    Item_DEFL,
     //pkt_duration_time & pkt_size
     Item_pkt_duration_time,
     Item_pkt_size,
@@ -119,6 +121,7 @@ enum VideoGroup
     Group_IDET_S,
     Group_IDET_M,
     Group_IDET_R,
+    Group_DEFL,
     Group_pkt_duration_time,
     Group_pkt_size,
     Group_VideoMax

@@ -220,6 +220,8 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
             Filters[0]+=",cropdetect=reset=1:round=1";
         if (ActiveFilters[ActiveFilter_Video_Idet])
             Filters[0]+=",idet=half_life=1";
+        if (ActiveFilters[ActiveFilter_Video_Deflicker])
+            Filters[0]+=",deflicker=bypass=1";
         if (ActiveFilters[ActiveFilter_Video_Psnr] && ActiveFilters[ActiveFilter_Video_Ssim])
         {
             Filters[0]+=",split[a][b];[a]field=top[a1];[b]field=bottom,split[b1][b2];[a1][b1]psnr[c1];[c1][b2]ssim";
