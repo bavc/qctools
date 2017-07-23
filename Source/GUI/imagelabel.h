@@ -24,6 +24,11 @@ public:
     void                        setPixmap(const QPixmap& pixmap);
 
     size_t                      GetPos() const;
+    QSize                       pixmapSize() const;
+
+    void setScaleSliderPercentage(int percents);
+
+    void setScaleSpinboxPercentage(int percents);
 
 public Q_SLOTS:
 
@@ -43,7 +48,7 @@ public Q_SLOTS:
     void clearSelectionArea();
 
     void showDebugOverlay(bool enable);
-    void adjustScale();
+    void adjustScale(bool delayedRescale = false);
 
 private Q_SLOTS:
     void on_fitToScreen_radioButton_toggled(bool value);

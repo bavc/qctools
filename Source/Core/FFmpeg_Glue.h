@@ -121,6 +121,9 @@ public:
     int                         OutputWidth_Get(int Pos);
     int                         OutputHeight_Get(int Pos);
 
+    int                         OutputFilterWidth_Get(int Pos);
+    int                         OutputFilterHeight_Get(int Pos);
+
     QString                     FrameType_Get() const;
     string                      PixFormat_Get();
     string                      ColorSpace_Get();
@@ -274,6 +277,8 @@ private:
         bool                    Scale_Init();
         void                    Scale_Free();
         bool                    AdaptDAR();
+        double                  GetDAR();
+
         int                     Width;
         int                     Height;
     };

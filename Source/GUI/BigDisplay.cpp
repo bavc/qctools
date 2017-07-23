@@ -1404,15 +1404,24 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     for (size_t Pos=0; Pos<2; Pos++)
     {
         imageLabels[Pos] =new ImageLabel(&Picture, Pos + 1, this);
+
+        if(Config::instance().getDebug())
+            imageLabels[Pos]->setStyleSheet("background: yellow");
+
         imageLabels[Pos]->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         imageLabels[Pos]->setMinimumSize(20, 20);
         imageLabels[Pos]->showDebugOverlay(Config::instance().getDebug());
 
         splitter->addWidget(imageLabels[Pos]);
+        imageLabels[Pos]->installEventFilter(this);
     }
 
     splitter->handle(1)->installEventFilter(this);
     splitter->installEventFilter(this);
+    connect(splitter, &QSplitter::splitterMoved, this, [&] {
+            qDebug() << "splitter moved";
+            timer.start();
+    });
 
     Layout->addWidget(splitter, 1, 0, 1, 3);
 
@@ -1494,6 +1503,10 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     QObject::connect(shortcutSpace, SIGNAL(activated()), ControlArea->PlayPause, SLOT(click()));
     QShortcut *shortcutF = new QShortcut(QKeySequence(Qt::Key_F), this);
     QObject::connect(shortcutF, SIGNAL(activated()), this, SLOT(on_Full_triggered()));
+
+    timer.setInterval(10);
+    timer.setSingleShot(true);
+    connect(&timer, SIGNAL(timeout()), this, SLOT(onAfterResize()));
 }
 
 //---------------------------------------------------------------------------
@@ -2106,6 +2119,10 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
     str.replace(QString("${height}"), QString::number(FileInfoData->Glue->Height_Get()));
     str.replace(QString("${dar}"), QString::number(FileInfoData->Glue->DAR_Get()));
 
+    QSize windowSize = imageLabels[Pos]->pixmapSize();
+    str.replace(QString("${window_width}"), QString::number(windowSize.width()));
+    str.replace(QString("${window_height}"), QString::number(windowSize.height()));
+
     QString tempLocation = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
     QDir tempDir(tempLocation);
 
@@ -2394,6 +2411,23 @@ void BigDisplay::setCurrentFilter(size_t playerIndex, size_t filterIndex)
 
 bool BigDisplay::eventFilter(QObject *watched, QEvent *event)
 {
+    if(watched == splitter && event->type() == QEvent::Resize)
+    {
+        qDebug() << "entering splitter: resize event";
+        bool result = QWidget::eventFilter(watched, event);
+        qDebug() << "leaving splitter: resize event";
+
+        return result;
+    }
+
+    if((watched == imageLabels[0] || watched == imageLabels[1]) && event->type() == QEvent::Resize)
+    {
+        qDebug() << "entering imagelabel: resize event";
+        bool result = QWidget::eventFilter(watched, event);
+        qDebug() << "leaving imagelabel: resize event";
+        return result;
+    }
+
     if((watched == splitter || watched == splitter->handle(1)) && event->type() == QEvent::MouseButtonDblClick)
     {
         QList<int> sizes;
@@ -2464,4 +2498,33 @@ void BigDisplay::on_Full_triggered()
         setWindowState(Qt::WindowActive);
     else
         setWindowState(Qt::WindowMaximized);
+}
+
+void BigDisplay::onAfterResize()
+{
+    for(int playerIndex = 0; playerIndex < 2; ++playerIndex)
+    {
+        int filterIndex = Picture_Current[playerIndex];
+
+        string Modified_String=FiltersList_currentOptionChanged(playerIndex, filterIndex);
+        Picture->Filter_Change(playerIndex, Filters[filterIndex].Type, Modified_String.c_str());
+    }
+
+    Picture->FrameAtPosition(Frames_Pos);
+
+    for(int playerIndex = 0; playerIndex < 2; ++playerIndex)
+    {
+        if(imageLabels[playerIndex]->isVisible())
+            imageLabels[playerIndex]->adjustScale(true);
+    }
+}
+
+void BigDisplay::resizeEvent(QResizeEvent  *e)
+{
+    qDebug() << "entering BigDisplay::resizeEvent";
+
+    QDialog::resizeEvent(e);
+    timer.start();
+
+    qDebug() << "leaving BigDisplay::resizeEvent";
 }
