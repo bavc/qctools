@@ -171,11 +171,17 @@ public:
     std::vector<size_t>         FramesCountForAllStreams() const;
     std::vector<size_t>         FramesProcessedForAllStreams() const;
 
+    AVFramePtr                  DecodedFrame(size_t index) const;
+    AVFramePtr                  FilteredFrame(size_t index) const;
+    AVFramePtr                  ScaledFrame(size_t index) const;
+
     // Between different FFmpeg_Glue instances
     void*                       InputData_Get() { return InputDatas[0]; }
     void                        InputData_Set(void* InputData) {InputDatas.push_back((inputdata*)InputData); InputDatas_Copy=true;}
 
     void setThreadSafe(bool enable);
+
+    static double               GetDAR(const FFmpeg_Glue::AVFramePtr & frame);
 
 private:
     QMutex* mutex;
