@@ -319,10 +319,7 @@ void ImageLabel::adjustScale(bool delayedRescale)
     {
         auto picture = *Picture;
         double multiplier = ((double) ui->scalePercentage_spinBox->value()) / 100;
-
-        newSize = QSize(picture->OutputFilterWidth_Get(Pos - 1), picture->OutputFilterHeight_Get(Pos - 1)) * multiplier;
-        if(newSize.isEmpty())
-            newSize = QSize((*Picture)->Width_Get(), (*Picture)->Height_Get()) * multiplier;
+        newSize = QSize(pictureWidth(), pictureHeight()) * multiplier;
     }
 
     if(!delayedRescale) {
@@ -362,10 +359,7 @@ void ImageLabel::on_scalePercentage_spinBox_valueChanged(int value)
         auto picture = *Picture;
         double multiplier = ((double) value) / 100;
 
-        QSize newSize = QSize(picture->OutputFilterWidth_Get(Pos - 1), picture->OutputFilterHeight_Get(Pos - 1)) * multiplier;
-        if(newSize.isEmpty())
-            newSize = QSize((*Picture)->Width_Get(), (*Picture)->Height_Get()) * multiplier;
-
+        QSize newSize = QSize(pictureWidth(), pictureHeight()) * multiplier;
         QSize currentSize = Pixmap.size();
 
         if(newSize != currentSize)
@@ -542,6 +536,38 @@ void ImageLabel::setScaleSpinboxPercentage(int percents)
     ui->scalePercentage_spinBox->blockSignals(false);
 }
 
+int ImageLabel::pictureWidth() const
+{
+    if(*Picture == nullptr)
+    {
+        return 0;
+    }
+
+    auto picture = *Picture;
+
+    int width = picture->OutputFilterWidth_Get(Pos - 1);
+    if(width == 0)
+        width = picture->Width_Get();
+
+    return width;
+}
+
+int ImageLabel::pictureHeight() const
+{
+    if(*Picture == nullptr)
+    {
+        return 0;
+    }
+
+    auto picture = *Picture;
+
+    int height = picture->OutputFilterHeight_Get(Pos - 1);
+    if(height == 0)
+        height = picture->Height_Get();
+
+    return height;
+}
+
 void ImageLabel::rescale(const QSize& newSize /*= QSize()*/ )
 {
     qDebug() << "imageLabel::rescale";
@@ -557,9 +583,7 @@ void ImageLabel::rescale(const QSize& newSize /*= QSize()*/ )
     if(availableSize.width() <= 0 || availableSize.height() <= 0)
         return;
 
-    int width = picture->OutputFilterWidth_Get(Pos - 1);
-    if(width == 0)
-        width = picture->Width_Get();
+    int width = pictureWidth();
 
     picture->Scale_Change(availableSize.width(), availableSize.height(), Pos - 1);
     auto scaleFactor = (qreal) availableSize.width() / width;
