@@ -406,8 +406,6 @@ FFmpeg_Glue::outputdata::~outputdata()
 //---------------------------------------------------------------------------
 void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
 {
-    ++FramePos;
-
     struct NoDeleter {
         static void free(AVFrame* frame) {
             Q_UNUSED(frame)
@@ -421,7 +419,10 @@ void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
     ApplyFilter(OutputFrame);
 
     if(FilteredFrame)
+    {
+        ++FramePos; // only increase frame position if filter succeed, otherwise it breaks audio filters
         OutputFrame = FilteredFrame;
+    }
 
     // Stats
     if (Stats && FilteredFrame && !Filter.empty())
@@ -442,7 +443,7 @@ void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
         case Output_QImage  :   ReplaceImage(); break;
         case Output_Jpeg    :   AddThumbnail();  break;
         default             :   ;
-    }
+    }    
 }
 
 //---------------------------------------------------------------------------
