@@ -30,6 +30,9 @@ public:
 
     void setScaleSpinboxPercentage(int percents);
 
+    int pictureWidth() const;
+    int pictureHeight() const;
+
 public Q_SLOTS:
 
     void setImage(const QImage& image);

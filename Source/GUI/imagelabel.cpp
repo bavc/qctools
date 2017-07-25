@@ -7,6 +7,8 @@
 #include <QTimer>
 #include <cmath>
 
+#include <libavformat/avformat.h>
+
 ImageLabel::ImageLabel(FFmpeg_Glue** Picture_, size_t Pos_, QWidget *parent) :
     ui(new Ui::ImageLabel),
     QFrame(parent),
@@ -319,10 +321,7 @@ void ImageLabel::adjustScale(bool delayedRescale)
     {
         auto picture = *Picture;
         double multiplier = ((double) ui->scalePercentage_spinBox->value()) / 100;
-
-        newSize = QSize(picture->OutputFilterWidth_Get(Pos - 1), picture->OutputFilterHeight_Get(Pos - 1)) * multiplier;
-        if(newSize.isEmpty())
-            newSize = QSize((*Picture)->Width_Get(), (*Picture)->Height_Get()) * multiplier;
+        newSize = QSize(pictureWidth(), pictureHeight()) * multiplier;
     }
 
     if(!delayedRescale) {
@@ -362,10 +361,7 @@ void ImageLabel::on_scalePercentage_spinBox_valueChanged(int value)
         auto picture = *Picture;
         double multiplier = ((double) value) / 100;
 
-        QSize newSize = QSize(picture->OutputFilterWidth_Get(Pos - 1), picture->OutputFilterHeight_Get(Pos - 1)) * multiplier;
-        if(newSize.isEmpty())
-            newSize = QSize((*Picture)->Width_Get(), (*Picture)->Height_Get()) * multiplier;
-
+        QSize newSize = QSize(pictureWidth(), pictureHeight()) * multiplier;
         QSize currentSize = Pixmap.size();
 
         if(newSize != currentSize)
@@ -447,7 +443,7 @@ bool ImageLabel::eventFilter(QObject *object, QEvent *event)
         auto scaledX = selectionPos.x() * scaledWidth / originalWidth;
         auto scaledY = selectionPos.y() * scaledHeight / originalHeight;
 
-        p.fillRect(QRect(0, 0, size().width(), 80), QColor(32, 32, 32, 200));
+        p.fillRect(QRect(0, 0, size().width(), 100), QColor(32, 32, 32, 200));
         p.drawText(20, 20, QString("frameWidth: %1, frameHeight: %2, fw/fh: %3, imageWidth: %4, imageHeigh: %5, iw/ih: %6")
                    .arg(originalWidth)
                    .arg(originalHeight)
@@ -468,6 +464,41 @@ bool ImageLabel::eventFilter(QObject *object, QEvent *event)
                    .arg(selectionArea->geometry().width())
                    .arg(selectionArea->geometry().height())
                    .arg(qreal(selectionArea->geometry().width()) / selectionArea->geometry().height()));
+
+        QSize decodedSize = QSize(0, 0);
+        QSize decodedSar = QSize(0, 0);
+        double decodedDar = 0.0;
+        auto decodedFrame = picture->DecodedFrame(Pos - 1);
+        if(decodedFrame) {
+            decodedSize = QSize(decodedFrame->width, decodedFrame->height);
+            decodedSar = QSize(decodedFrame->sample_aspect_ratio.num, decodedFrame->sample_aspect_ratio.den);
+            decodedDar = picture->GetDAR(decodedFrame);
+        }
+
+        QSize filteredSize = QSize(0, 0);
+        QSize filteredSar = QSize(0, 0);
+        double filteredDar = 0.0;
+        auto filteredFrame = picture->FilteredFrame(Pos - 1);
+        if(filteredFrame) {
+            filteredSize = QSize(filteredFrame->width, filteredFrame->height);
+            filteredSar = QSize(filteredFrame->sample_aspect_ratio.num, filteredFrame->sample_aspect_ratio.den);
+            filteredDar = picture->GetDAR(filteredFrame);
+        }
+
+        QSize scaledSize = QSize(0, 0);
+        QSize scaledSar = QSize(0, 0);
+        double scaledDar = 0.0;
+        auto scaledFrame = picture->ScaledFrame(Pos - 1);
+        if(scaledFrame) {
+            scaledSize = QSize(scaledFrame->width, scaledFrame->height);
+            scaledSar = QSize(scaledFrame->sample_aspect_ratio.num, scaledFrame->sample_aspect_ratio.den);
+            scaledDar = picture->GetDAR(scaledFrame);
+        }
+
+        p.drawText(20, 80, QString("decoded: %1/%2 SAR: %3/%4 DAR: %5, filtered: %6/%7 SAR: %8/%9 DAR: %10, scaled: %11/%12 SAR: %13/%14 DAR: %15")
+                   .arg(decodedSize.width()).arg(decodedSize.height()).arg(decodedSar.width()).arg(decodedSar.height()).arg(decodedDar)
+                   .arg(filteredSize.width()).arg(filteredSize.height()).arg(filteredSar.width()).arg(filteredSar.height()).arg(filteredDar)
+                   .arg(scaledSize.width()).arg(scaledSize.height()).arg(scaledSar.width()).arg(scaledSar.height()).arg(scaledDar));
 
         return true;
     }
@@ -542,6 +573,38 @@ void ImageLabel::setScaleSpinboxPercentage(int percents)
     ui->scalePercentage_spinBox->blockSignals(false);
 }
 
+int ImageLabel::pictureWidth() const
+{
+    if(*Picture == nullptr)
+    {
+        return 0;
+    }
+
+    auto picture = *Picture;
+
+    int width = picture->OutputFilterWidth_Get(Pos - 1);
+    if(width == 0)
+        width = picture->Width_Get();
+
+    return width;
+}
+
+int ImageLabel::pictureHeight() const
+{
+    if(*Picture == nullptr)
+    {
+        return 0;
+    }
+
+    auto picture = *Picture;
+
+    int height = picture->OutputFilterHeight_Get(Pos - 1);
+    if(height == 0)
+        height = picture->Height_Get();
+
+    return height;
+}
+
 void ImageLabel::rescale(const QSize& newSize /*= QSize()*/ )
 {
     qDebug() << "imageLabel::rescale";
@@ -557,9 +620,7 @@ void ImageLabel::rescale(const QSize& newSize /*= QSize()*/ )
     if(availableSize.width() <= 0 || availableSize.height() <= 0)
         return;
 
-    int width = picture->OutputFilterWidth_Get(Pos - 1);
-    if(width == 0)
-        width = picture->Width_Get();
+    int width = pictureWidth();
 
     picture->Scale_Change(availableSize.width(), availableSize.height(), Pos - 1);
     auto scaleFactor = (qreal) availableSize.width() / width;

@@ -724,7 +724,7 @@ bool FFmpeg_Glue::outputdata::AdaptDAR()
     return true;
 }
 
-double GetDAR(const FFmpeg_Glue::AVFramePtr & frame) {
+double FFmpeg_Glue::GetDAR(const FFmpeg_Glue::AVFramePtr & frame) {
     if(frame->sample_aspect_ratio.num && frame->sample_aspect_ratio.den) {
         return ((double)frame->width)/frame->height*frame->sample_aspect_ratio.num/frame->sample_aspect_ratio.den;
     } else {
@@ -735,10 +735,10 @@ double GetDAR(const FFmpeg_Glue::AVFramePtr & frame) {
 double FFmpeg_Glue::outputdata::GetDAR()
 {
     if(FilteredFrame)
-        return ::GetDAR(FilteredFrame);
+        return FFmpeg_Glue::GetDAR(FilteredFrame);
 
     if(DecodedFrame)
-        return ::GetDAR(DecodedFrame);
+        return FFmpeg_Glue::GetDAR(DecodedFrame);
 
     return 4.0/3.0;
 }
@@ -1602,6 +1602,21 @@ std::vector<size_t> FFmpeg_Glue::FramesProcessedForAllStreams() const
     }
 
     return totalFramesProcessedPerStream;
+}
+
+FFmpeg_Glue::AVFramePtr FFmpeg_Glue::DecodedFrame(size_t index) const
+{
+    return OutputDatas[index]->DecodedFrame;
+}
+
+FFmpeg_Glue::AVFramePtr FFmpeg_Glue::FilteredFrame(size_t index) const
+{
+    return OutputDatas[index]->FilteredFrame;
+}
+
+FFmpeg_Glue::AVFramePtr FFmpeg_Glue::ScaledFrame(size_t index) const
+{
+    return OutputDatas[index]->ScaledFrame;
 }
 
 void FFmpeg_Glue::setThreadSafe(bool enable)
