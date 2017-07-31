@@ -40,13 +40,8 @@ ImageLabel::ImageLabel(FFmpeg_Glue** Picture_, size_t Pos_, QWidget *parent) :
 
         QRectF originalGeometry(geometry);
 
-        auto originalWidth = (*Picture)->Width_Get();
-        auto originalHeight = (*Picture)->Height_Get();
-
-        if(originalWidth > originalHeight)
-            originalHeight = originalWidth / (*Picture)->OutputDAR_Get(Pos - 1);
-        else
-            originalWidth = originalHeight * (*Picture)->OutputDAR_Get(Pos - 1);
+        auto originalWidth = pictureWidth();
+        auto originalHeight = pictureHeight();
 
         QSizeF size(originalGeometry.width() * originalWidth / scaledWidth,
                     originalGeometry.height() * originalHeight / scaledHeight);
@@ -145,7 +140,7 @@ void ImageLabel::moveSelectionX(double value)
 {
     selectionPos.setX(value);
 
-    int originalWidth = (*Picture)->Width_Get();
+    int originalWidth = pictureWidth();
     int scaledWidth = Pixmap.width();
     int scaledX = (value * scaledWidth / originalWidth);
 
@@ -167,7 +162,7 @@ void ImageLabel::moveSelectionY(double value)
 {
     selectionPos.setY(value);
 
-    int originalHeight = (*Picture)->Height_Get();
+    int originalHeight = pictureHeight();
     int scaledHeight = Pixmap.height();
     int scaledY = (value * scaledHeight / originalHeight);
 
@@ -189,7 +184,7 @@ void ImageLabel::changeSelectionWidth(double value)
 {
     selectionSize.setWidth(value);
 
-    auto originalWidth = (*Picture)->Width_Get();
+    auto originalWidth = pictureWidth();
     auto scaledWidth = Pixmap.width();
 
     int width = (value * scaledWidth / originalWidth);
@@ -215,7 +210,7 @@ void ImageLabel::changeSelectionHeight(double value)
 {
     selectionSize.setHeight(value);
 
-    auto originalHeight = (*Picture)->Height_Get();
+    auto originalHeight = pictureHeight();
     auto scaledHeight = Pixmap.height();
 
     int height = (value * scaledHeight / originalHeight);
@@ -263,13 +258,8 @@ void ImageLabel::setSelectionArea(double x, double y, double w, double h)
 
     // x, y - top left of box
 
-    auto originalWidth = (*Picture)->Width_Get();
-    auto originalHeight = (*Picture)->Height_Get();
-
-    if(originalWidth > originalHeight)
-        originalHeight = originalWidth / (*Picture)->OutputDAR_Get(Pos - 1);
-    else
-        originalWidth = originalHeight * (*Picture)->OutputDAR_Get(Pos - 1);
+    auto originalWidth = pictureWidth();
+    auto originalHeight = pictureHeight();
 
     auto scaledWidth = Pixmap.width();
     auto scaledHeight = Pixmap.height();
@@ -434,8 +424,8 @@ bool ImageLabel::eventFilter(QObject *object, QEvent *event)
         QPainter p(widget);
         p.setPen(Qt::green);
 
-        auto originalWidth = (*Picture)->Width_Get();
-        auto originalHeight = (*Picture)->Height_Get();
+        auto originalWidth = pictureWidth();
+        auto originalHeight = pictureHeight();
 
         auto scaledWidth = selectionArea->width();
         auto scaledHeight = selectionArea->height();

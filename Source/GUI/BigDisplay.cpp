@@ -795,10 +795,10 @@ const filter Filters[]=
             { Args_Type_Toggle,   1,   0,   0,   0, "Zoom"},
         },
         {
-            "setsar=1/1,scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
-            "setsar=1/1,crop=x=${1}:y=${2}:w=${3}:h=${4},scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
-            "il=l=d:c=d,setsar=1/1,scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
-            "il=l=d:c=d,setsar=1/1,crop=x=${1}:y=${2}:w=${3}:h=${4},scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
+            "scale=${width}:${height}:flags=neighbor,histeq=strength=${5},setsar=1/1",
+            "crop=x=${1}:y=${2}:w=${3}:h=${4},scale=${width}:${height}:flags=neighbor,histeq=strength=${5},setsar=1/1",
+            "il=l=d:c=d,scale=${width}:${height}:flags=neighbor,histeq=strength=${5},setsar=1/1",
+            "il=l=d:c=d,crop=x=${1}:y=${2}:w=${3}:h=${4},scale=${width}:${height}:flags=neighbor,histeq=strength=${5},setsar=1/1",
         },
     },
     {
@@ -1580,9 +1580,9 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                                 SelectWidth = Filters[FilterPos].Args[OptionPos2].Default ? true : false;
                                         Max = SelectWidth ? FileInfoData->Glue->Width_Get() : FileInfoData->Glue->Height_Get();
                                     }
-                                    else if (MaxTemp == "x" || MaxTemp == "x offset" || MaxTemp == "Reveal")
+                                    else if (MaxTemp == "x" || MaxTemp == "x offset" || MaxTemp == "Reveal" || MaxTemp == "w")
                                         Max = FileInfoData->Glue->Width_Get();
-                                    else if (MaxTemp == "y" || MaxTemp == "s" || MaxTemp == "w" || MaxTemp == "h")
+                                    else if (MaxTemp == "y" || MaxTemp == "s" || MaxTemp == "h")
                                         Max = FileInfoData->Glue->Height_Get();
                                     else if (MaxTemp.contains("bit position", Qt::CaseInsensitive) && FileInfoData->Glue->BitsPerRawSample_Get() != 0)
                                         Max = FileInfoData->Glue->BitsPerRawSample_Get();
