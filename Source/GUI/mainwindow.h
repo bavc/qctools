@@ -238,6 +238,7 @@ private Q_SLOTS:
 
 protected:
     void closeEvent(QCloseEvent* event);
+    void resizeEvent(QResizeEvent* event);
 
 private:
     void updateScrollBar( bool blockSignals = false );
