@@ -790,15 +790,14 @@ const filter Filters[]=
             { Args_Type_Slider, 120,  16,   0,   1, "w" },
             { Args_Type_Slider, 120,  16,   0,   1, "h" },
             { Args_Type_Slider,   0,   0,  10,  10, "Strength" },
-            //{ Args_Type_Slider,   0,   0,  10,  10, "Intensity" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Toggle,   1,   0,   0,   0, "Zoom"},
+            { Args_Type_Toggle,   0,   0,   0,   0, "Data" },
         },
         {
-            "setsar=1/1,scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
             "setsar=1/1,crop=x=${1}:y=${2}:w=${3}:h=${4},scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
-            "il=l=d:c=d,setsar=1/1,scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
+            "setsar=1/1,crop=x=${1}:y=${2}:w=${3}:h=${4},split[a][b];[a]scale=${width}:${height}:flags=neighbor,histeq=strength=${5}[a1];[b]crop=8:4:iw/2-4:ih/2-2,datascope=s=180x180:axis=1[b1];[a1][b1]overlay=x=if(lt(${1}\\,180)\\,${width}-180\\,0):y=if(lt(${2}\\,180)\\,${height}-180\\,0)",
             "il=l=d:c=d,setsar=1/1,crop=x=${1}:y=${2}:w=${3}:h=${4},scale=${width}:${height}:flags=neighbor,histeq=strength=${5}",
+            "il=l=d:c=d,setsar=1/1,crop=x=${1}:y=${2}:w=${3}:h=${4},split[a][b];[a]scale=${width}:${height}:flags=neighbor,histeq=strength=${5}[a1];[b]crop=8:4:iw/2-4:ih/2-2,datascope=s=180x180:axis=1[b1];[a1][b1]overlay=x=if(lt(${1}\\,180)\\,${width}-180\\,0):y=if(lt(${2}\\,180)\\,${height}-180\\,0)",
         },
     },
     {
