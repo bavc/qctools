@@ -117,6 +117,8 @@ void MainWindow::Ui_Init()
     //ToolBar
     QObject::connect(ui->toolBar, SIGNAL(visibilityChanged(bool)), this, SLOT(on_Toolbar_visibilityChanged(bool)));
 
+    ui->horizontalLayout->setSpacing(0);
+
     //ToolTip
     if (ui->fileNamesBox)
         ui->fileNamesBox->hide();
