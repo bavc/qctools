@@ -12,6 +12,7 @@
 #include <QProcess>
 #include <QByteArray>
 #include <QMutex>
+#include <QPushButton>
 
 #include <vector>
 using namespace std;
@@ -110,8 +111,8 @@ public:
     QLabel*                     DragDrop_Text;
 
     //CheckBoxes
-    std::vector<QCheckBox*>     CheckBoxes[Type_Max];
-    QCheckBox*                  m_commentsCheckbox;
+    std::vector<QPushButton*>     CheckBoxes[Type_Max];
+    QPushButton*                  m_commentsCheckbox;
 
     // Files
     std::vector<FileInformation*> Files;

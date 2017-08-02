@@ -41,6 +41,7 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QActionGroup>
+#include <QPushButton>
 
 #include <qwt_plot_renderer.h>
 #include <QDebug>
@@ -125,7 +126,11 @@ void MainWindow::Ui_Init()
     for (size_t type = 0; type < Type_Max; type++)
         for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ ) // Group_Axis
         {
-            QCheckBox* CheckBox=new QCheckBox(PerStreamType[type].PerGroup[group].Name);
+            QPushButton* CheckBox=new QPushButton(PerStreamType[type].PerGroup[group].Name);
+
+            QFontMetrics metrics(CheckBox->font());
+            CheckBox->setMinimumWidth(metrics.width(CheckBox->text()) + 10);
+            CheckBox->setCheckable(true);
 
             CheckBox->setProperty("type", (quint64) type); // unfortunately QVariant doesn't support size_t
             CheckBox->setProperty("group", (quint64) group);
@@ -140,7 +145,10 @@ void MainWindow::Ui_Init()
             CheckBoxes[type].push_back(CheckBox);
         }
 
-    m_commentsCheckbox=new QCheckBox("comments");
+    m_commentsCheckbox=new QPushButton("comments");
+    QFontMetrics metrics(m_commentsCheckbox->font());
+    m_commentsCheckbox->setMinimumWidth(metrics.width(m_commentsCheckbox->text()) + 10);
+
     m_commentsCheckbox->setProperty("type", (quint64) Type_Max);
     m_commentsCheckbox->setProperty("group", (quint64) 0);
     m_commentsCheckbox->setToolTip("comments");
@@ -374,10 +382,10 @@ void MainWindow::refreshDisplay()
     {
         for (size_t type = 0; type<Type_Max; type++)
             for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
-                PlotsArea->setPlotVisible( type, group, CheckBoxes[type][group]->checkState()==Qt::Checked );
+                PlotsArea->setPlotVisible( type, group, CheckBoxes[type][group]->isChecked() );
 
-        PlotsArea->commentsPlot()->setVisible(m_commentsCheckbox->checkState()==Qt::Checked);
-        PlotsArea->commentsPlot()->legend()->setVisible(m_commentsCheckbox->checkState()==Qt::Checked);
+        PlotsArea->commentsPlot()->setVisible(m_commentsCheckbox->isChecked());
+        PlotsArea->commentsPlot()->legend()->setVisible(m_commentsCheckbox->isChecked());
     }
 }
 
