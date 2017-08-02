@@ -33,6 +33,7 @@
 #include <QMessageBox>
 
 #include "GUI/draggablechildrenbehaviour.h"
+#include "GUI/config.h"
 
 //***************************************************************************
 // Constructor / Desructor
@@ -841,5 +842,18 @@ void MainWindow::closeEvent(QCloseEvent *event)
             event->ignore();
             return;
         }
+    }
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event);
+
+    if(Config::instance().getDebug())
+    {
+        static QLabel* label = new QLabel();
+        ui->statusBar->insertPermanentWidget(0, label);
+
+        label->setText(QString("MainWindow width = %1, height = %2").arg(width()).arg(height()));
     }
 }
