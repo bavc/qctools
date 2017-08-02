@@ -611,6 +611,25 @@ const filter Filters[]=
         },
     },
     {
+        "Chroma Delay",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Slider,   0,-128, 128,   1, "Chroma Shift"},
+            { Args_Type_Toggle,   1,   0,   0,   0, "Interleave" },
+            { Args_Type_None,          0,   0,   0,   0, },
+            { Args_Type_None,          0,   0,   0,   0, },
+            { Args_Type_None,          0,   0,   0,   0, },
+            { Args_Type_None,          0,   0,   0,   0, },
+        },
+        {
+            "format=yuv444p,pad=w=iw+256:h=ih:x=128,geq=lum=lum(X\\,Y):cb=cb(X-${2}\\,Y):cr=cr(X-${2}\\,Y)",
+            "format=yuv444p,split[y][u];[y]extractplanes=y,pad=w=iw+256:h=ih:x=128,format=yuv444p[y1];[u]extractplanes=u,histeq,pad=w=iw+256:h=ih:x=${2}+128:y=0,format=yuv444p[u1];[y1][u1]vstack,il=l=i:c=i",
+            "il=l=d:c=d,format=yuv444p,pad=w=iw+256:h=ih:x=128,geq=lum=lum(X\\,Y):cb=cb(X-${2}\\,Y):cr=cr(X-${2}\\,Y)",
+            "il=l=d:c=d,format=yuv444p,split[y][u];[y]extractplanes=y,pad=w=iw+256:h=ih:x=128,format=yuv444p[y1];[u]extractplanes=u,histeq,pad=w=iw+256:h=ih:x=${2}+128:y=0,format=yuv444p[u1];[y1][u1]vstack,il=l=i:c=i",
+        },
+    },
+    {
         "Color Matrix",
         0,
         {
