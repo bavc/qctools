@@ -65,6 +65,7 @@ public Q_SLOTS:
     void on_P2_clicked(bool checked);
     void on_P9_clicked(bool checked);
 
+    void copyTimeStamp();
     void setCurrentFrame(size_t frame);
     void rewind(int frame);
 
