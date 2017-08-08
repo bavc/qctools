@@ -86,6 +86,7 @@ Some helpful **keyboard shortcuts** you may want to use are:
 *   right - Select the next frame
 *   `CTRL+,` (Mac: `command+,`) - Jump to previous comment frame
 *   `CTRL+.` (Mac: `command+.`) - Jump to next comment frame
+*   `CTRL+C` (Mac: `command+C`) - Copy the current timestamp to the clipboard
 
 ## Playback and Visual Analysis {#playback}
 
