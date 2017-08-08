@@ -20,6 +20,7 @@ The QCTools preview window is intended as an analytical playback environment tha
 [Broadcast Illegal Focus](#broadcast-illegal-focus)   
 [Broadcast Range Pixels](#broadcast-range-pixels)   
 [Chroma Adjust](#chroma-adjust)  
+[Chroma Delay](#chroma-delay)  
 [CIE Scope](#cie-scope)  
 [Color Matrix](#color-matrix)  
 [Datascope](#datascope)  
@@ -120,6 +121,10 @@ This filter plots the range of visible colors as defined by the Committee Intern
 This filter enables the hue and saturation levels to be adjusted. Hue adjustments may be expressed in degrees where 0 is no change and 180 would invert the color. For saturation a value of 1 needs the saturation unchanged, 0 removes all color, and the saturation may be increased up to a maximum of 10\. The chroma values (Cb and Cr) may also be shifted by increasing or decreasing their values (similar to Red Shift/Blue Shift on a time-base corrector).
 
 ![Chroma Adjust](media/playbackfilter_chroma_adjust.jpg)
+
+## Chroma Delay {#chroma-delay}
+
+This filter allows the Cb and Cr planes to be offset left or right to check if the color data is properly timed to the luminence data. The 'chroma shift' value can be used to shift the Cb and Cr color planes up to 128 pixel columns to the left or right. When 'interleave' is enabled the Y and Cb planes are both presented in grayscale interleaved by line, so the alignment of the planes may be seen in an alternate way. Unchecking 'interleave' will presented the planes rendered properly with the shifted chroma.
 
 ## Color Matrix {#color-matrix}
 
