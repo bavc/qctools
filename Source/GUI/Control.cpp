@@ -30,6 +30,8 @@
 #include <QTime>
 #include <math.h> // for floor on mac
 #include <QCheckBox>
+#include <QClipboard>
+#include <QShortcut>
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -172,6 +174,9 @@ Control::Control(QWidget *parent, FileInformation* FileInformationData_, bool Is
     ShouldUpate=false;
 
     Update();
+
+    QShortcut *shortcutCopy = new QShortcut(QKeySequence(QKeySequence::Copy), this);
+    QObject::connect(shortcutCopy, SIGNAL(activated()), this, SLOT(copyTimeStamp()));
 }
 
 //---------------------------------------------------------------------------
@@ -728,6 +733,11 @@ void Control::on_P9_clicked(bool checked)
         FileInfoData->Frames_Pos_Set(FileInfoData->ReferenceStat()->x_Current_Max-1);
         Q_EMIT currentFrameChanged();
     }
+}
+
+void Control::copyTimeStamp()
+{
+    qApp->clipboard()->setText(Info_Time->text());
 }
 
 void Control::setCurrentFrame(size_t frame)
