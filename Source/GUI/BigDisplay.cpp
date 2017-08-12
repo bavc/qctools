@@ -1085,6 +1085,11 @@ DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Other
         setDecimals(1);
         setSingleStep(0.1);
     }
+    else if (Divisor<=100)
+    {
+        setDecimals(2);
+        setSingleStep(0.01);
+    }
 
     if (IsBitSlice)
         setPrefix("Bit ");
