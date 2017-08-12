@@ -32,6 +32,7 @@ The QCTools preview window is intended as an analytical playback environment tha
 [Frame Tiles](#frame-tiles)  
 [Help](#help)  
 [Histogram](#histogram)  
+[Limiter](#limiter)  
 [Line Select](#line-select)  
 [Luma Adjust](#luma-adjust)  
 [No Display](#no-display)  
@@ -182,6 +183,10 @@ Displays a user-defined "tiled" mosaic of successive frames. Maximum 12x12 grid.
 The histogram shows the frequency of occurrence of values per channel. Typically the histogram will show one graph per channel (one for each Y, U, and V or one for each red, green, and blue). Video with a lot of contrast and a well distributed range of luminance values will result in a histogram with an even spread. You may also select **'Field'** option which will depict fields 1 and 2 separately (field 1 on top, field 2 on bottom).
 
 ![Histogram](media/playbackfilter_histogram_3.jpg)
+
+## Limiter {#limiter}
+
+Constrain playback to a specified sample range of the frame. Setting min and max values will clip all values below min to min and all values above max to max. For instance with an 8 bit video, the samples above broadcast range could be examined by setting min to 235 (the upper limit of broadcast range) and 255 (the highest possible 8-bit value). The strength value will apply a global color histogram equalization to stress the difference between the sample values. See the FFmpeg [limiter](http://ffmpeg.org/ffmpeg-filters.html#limiter) filter for more information.
 
 ## Line Select {#line-select}
 

@@ -688,6 +688,25 @@ const filter Filters[]=
         },
     },
     {
+        "Limiter",
+        0,
+        {
+            { Args_Type_Toggle,        0,   0,   0,   0, "Field" },
+            { Args_Type_YuvA,          0,   0,   0,   0, "Plane" },
+            { Args_Type_Slider,        0,   0, 255,   1, "Min"},
+            { Args_Type_Slider,      255,   0, 255,   1, "Max"},
+            { Args_Type_Slider,        2,   0,  10,  10, "Strength" },
+            { Args_Type_None,          0,   0,   0,   0, },
+            { Args_Type_None,          0,   0,   0,   0, },
+        },
+        {
+            "limiter=min=${3}:max=${4}:planes=${2},histeq=strength=${5}",
+            "limiter=min=${3}:max=${4}:planes=7,histeq=strength=${5}",
+            "il=l=d:c=d,limiter=min=${3}:max=${4}:planes=${2},histeq=strength=${5}",
+            "il=l=d:c=d,limiter=min=${3}:max=${4}:planes=7,histeq=strength=${5}",
+        },
+    },
+    {
         "Field Difference",
         0,
         {
@@ -1620,6 +1639,10 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                     // Special case: "Line", max is source width or height
                                     int Max;
                                     QString MaxTemp(Filters[FilterPos].Args[OptionPos].Name);
+                                    if(strcmp(Filters[FilterPos].Name, "Limiter") == 0)
+                                    {
+                                        Max = pow(2, FileInfoData->Glue->BitsPerRawSample_Get()) - 1;
+                                    } else
                                     if (MaxTemp == "Line")
                                     {
                                         bool SelectWidth = false;
