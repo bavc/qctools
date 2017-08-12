@@ -33,6 +33,7 @@ The QCTools preview window is intended as an analytical playback environment tha
 [Help](#help)  
 [Histogram](#histogram)  
 [Line Select](#line-select)  
+[Luma Adjust](#luma-adjust)  
 [No Display](#no-display)  
 [Normal](#normal)  
 [Pixel Offset Subtraction](#pixel-offset-subtraction)  
@@ -187,6 +188,10 @@ The histogram shows the frequency of occurrence of values per channel. Typically
 Allows a user to select one line of video signal to display as a waveform. Includes **'Vertical'** and **'Background'** modes. When **'Vertical'** is enable the user may select to plot a waveform of a single column rather than the default plot of a single row. The **'Background'** option shows the frame image under the waveform with the highlighted row or column highlighted in yellow.
 
 ![Line Select](media/lineselect.jpg)
+
+## Luma Adjust {#luma-adjust}
+
+Allows the Y values to be increased or decreased via the **Offset** slider. Also the **Contrast** allows a multiplier to be applied to all Y values. The **Waveform** checkbox will display a waveform stacked with the adjusted image.
 
 ## Pixel Offset Subtraction {#pixel-offset-subtraction}
 

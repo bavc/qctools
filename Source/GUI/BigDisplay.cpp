@@ -611,6 +611,32 @@ const filter Filters[]=
         },
     },
     {
+        "Luma Adjust",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Waveform" },
+            { Args_Type_Slider,   0,-180, 180,   1, "Offset"},
+            { Args_Type_Slider, 100,   0, 400, 100, "Contrast"},
+            { Args_Type_Slider,   0,   0,   5,   1, "Filter" },
+            { Args_Type_Slider,   0,   0,   2,   1, "Scale" },
+            { Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
+        },
+        {
+            "format=yuv444p|yuvj444p,lutyuv=y=(val+${3})*${4}:u=val:v=val",
+            "format=yuv444p|yuvj444p,lutyuv=y=(val+${3})*${4}:u=val:v=val,split[a][b];[a]waveform=intensity=${7}:graticule=green:flags=numbers+dots:f=${5}:scale=${6},\
+            scale=${width}:${height},setsar=1/1[a1];[b]setsar=1/1[b1];\
+            [b1][a1]vstack",
+            "il=l=d:c=d,format=yuv444p|yuvj444p,lutyuv=y=(val+${3})*${4}:u=val:v=val",
+            "format=yuv444p|yuvj444p,split[a][b];\
+            [a]field=top,split[t1][t2];\
+            [t1]lutyuv=y=(val+${3})*${4}:u=val:v=val,waveform=intensity=${7}:graticule=green:flags=numbers+dots:f=${5}:scale=${6}[t1w];\
+            [b]field=bottom,split[b1][b2];\
+            [b1]lutyuv=y=(val+${3})*${4}:u=val:v=val,waveform=intensity=${7}:graticule=green:flags=numbers+dots:f=${5}:scale=${6}[b1w];\
+            [t2][t1w][b2][b1w]vstack=4",
+        },
+    },
+    {
         "Chroma Delay",
         0,
         {
@@ -1058,6 +1084,11 @@ DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Other
     {
         setDecimals(1);
         setSingleStep(0.1);
+    }
+    else if (Divisor<=100)
+    {
+        setDecimals(2);
+        setSingleStep(0.01);
     }
 
     if (IsBitSlice)
