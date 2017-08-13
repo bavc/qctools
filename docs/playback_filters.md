@@ -37,6 +37,7 @@ The QCTools preview window is intended as an analytical playback environment tha
 [Luma Adjust](#luma-adjust)  
 [No Display](#no-display)  
 [Normal](#normal)  
+[Oscilloscope](#oscilloscope)  
 [Pixel Offset Subtraction](#pixel-offset-subtraction)  
 [Sample Range](#sample-range)  
 [Saturation Highlight](#saturation-highlight)  
@@ -197,6 +198,10 @@ Allows a user to select one line of video signal to display as a waveform. Inclu
 ## Luma Adjust {#luma-adjust}
 
 Allows the Y values to be increased or decreased via the **Offset** slider. Also the **Contrast** allows a multiplier to be applied to all Y values. The **Waveform** checkbox will display a waveform stacked with the adjusted image.
+
+## Oscilloscope {#oscilloscope}
+
+Provides a 2D Video Oscilloscope. Useful to measure spatial impulse, step responses, chroma delays, etc. See FFmpeg's [oscilloscope documentation](http://ffmpeg.org/ffmpeg-filters.html#oscilloscope) for more information.
 
 ## Pixel Offset Subtraction {#pixel-offset-subtraction}
 
