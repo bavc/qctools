@@ -306,15 +306,32 @@ const filter Filters[]=
         {
             "vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
             "format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name[a2];[b1]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name[b2];[a2][b2]vstack,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
-            // draft version with a low, med, high, and full vectorscope
-            //"split=4[v1][v2][v3][v4];\
-            [v1]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=0:h=.33[V1];\
-            [v2]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=.33:h=.66[V2];\
-            [v3]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=.66:h=1[V3];\
-            [v4]format=yuv444p|rgb24,vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name[V4];\
-            [V1][V2]hstack[W1];\
-            [V3][V4]hstack[W2];\
-            [W1][W2]vstack,scale=ih:ih,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+        },
+    },
+    {
+        "Vectorscope High/Low",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
+            { Args_Type_Slider,   3,   0,   5,   1, "Mode" },
+            { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
+            { Args_Type_Slider,   1,   0,   2,   1, "Colorspace" },
+            { Args_Type_Slider,  50,   0, 100, 100, "Threshold" },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "split[h][l];[l]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=0:h=${6}[l1];[h]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=${6}:h=1[h1];[l1][h1]hstack",
+            "format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,split[a][b];\
+            [a]field=top,split[th][tl];\
+            [b]field=bottom,split[bh][bl];\
+            [th]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=${6}:h=1[th1];\
+            [tl]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=0:h=${6}[tl1];\
+            [bh]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=${6}:h=1[bh1];\
+            [bl]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=0:h=${6}[bl1];\
+            [tl1][th1]hstack[t];\
+            [bl1][bh1]hstack[b];\
+            [t][b]vstack",
         },
     },
     {
@@ -392,7 +409,7 @@ const filter Filters[]=
             "drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=32:height=4,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=4:height=32",
             "il=l=d:c=d,datascope=x=${2}:y=${3}:mode=${5}:axis=${4}",
             "il=l=d:c=d,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=32:height=4,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=4:height=32",
-            
+
         },
     },
     {
@@ -1148,7 +1165,7 @@ DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(DoubleSpinBoxWithSlider** Other
     //Popup->setFocusPolicy(Qt::NoFocus);
     //Popup->setLayout(Layout);
     connect(this, SIGNAL(valueChanged(double)), this, SLOT(on_valueChanged(double)));
-	
+
     Slider->hide();
 }
 
@@ -2553,7 +2570,7 @@ void BigDisplay::on_FiltersList_currentIndexChanged(int Pos)
 {
     QComboBox* combo = qobject_cast<QComboBox*>(sender());
     if(combo)
-    {        
+    {
         if(!combo->itemData(Pos).isNull())
             Pos = combo->itemData(Pos).toInt();
 

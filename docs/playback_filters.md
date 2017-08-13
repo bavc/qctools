@@ -44,6 +44,7 @@ The QCTools preview window is intended as an analytical playback environment tha
 [Temporal Outlier Pixels](#temporal-outlier-pixels)  
 [Value Highlight](#value-highlight)  
 [Vectorscope](#vectorscope)  
+[Vectorscope High/Low](#vectorscope-highlow)  
 [Vertical Line Repetitions](#vertical-line-repetitions)  
 [Vertical Repetition Pixels](#vertical-repetition-pixels)  
 [Vectorscope Target](#vectorscope-target)  
@@ -248,6 +249,10 @@ The vectorscope player provides the following options:
 * Mode: The vectorscope filter can be adjusted to different displays. The default is 'color3'. See [FFmpeg's vectorscope documentation](https://ffmpeg.org/ffmpeg-filters.html#vectorscope) for information on each option.
 
 ![Vectorscope](media/vectorscope_illegal.jpg)
+
+## Vectorscope High/Low #{vectorscope-highlow}
+
+This player is similar to Vectorscope but it shows two vectorscopes side by side showing the lower range of colors on the left and higher range of colors on the right. The threshold slider can adjust the divider between low and high in allocating plotted colors between the two vectorscopes. This technique can be helpful to isolate colors which occur in a shadow or a highlight. See [FFmpeg's vectorscope documentation](https://ffmpeg.org/ffmpeg-filters.html#vectorscope) for information, particularly the lthreshold and hthreshold options which are used here to generate the two vectorscope images.
 
 ## Vectorscope Target {#vectorscope-target}
 
