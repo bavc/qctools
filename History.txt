@@ -14,6 +14,8 @@
 + Add a chroma delay player
 + Add a luma adjust player
 + Add limiter player
++ Add Vectorscope High Low player
++ Update Broadcast Illegal Focus to use lutyuv rather than geq, better with non-8-bit
 x Fixes to frame tiles and value highlight players
 x Fixes scaling issues when there is a selection box
 x Fix loading pkt_size and pkt_duration from xml.gz files
