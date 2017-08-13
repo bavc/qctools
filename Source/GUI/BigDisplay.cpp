@@ -798,17 +798,17 @@ const filter Filters[]=
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_Ranges,   1,   0,   0,   0, "Outer Range"},
-            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_Slider,   3,   0,  10,  10, "Strength" },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
             { Args_Type_None,     0,   0,   0,   0, },
         },
         {
-                       "geq=lum=if(gt(lum(X\\,Y)\\,235)\\,(lum(X\\,Y)-235)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
-                       "geq=lum=if(lt(lum(X\\,Y)\\,16)\\,(lum(X\\,Y)+1)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
-            "il=l=d:c=d,geq=lum=if(gt(lum(X\\,Y)\\,235)\\,(lum(X\\,Y)-235)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
-            "il=l=d:c=d,geq=lum=if(lt(lum(X\\,Y)\\,16)\\,(lum(X\\,Y)+1)*16\\,0):cb=128:cr=128,format=yuv444p|rgb24",
+                       "lutyuv=y=if(gt(val\\,maxval)\\,val-maxval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2,histeq=strength=${3}",
+                       "lutyuv=y=if(lt(val\\,minval)\\,val+minval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2,histeq=strength=${3}",
+            "il=l=d:c=d,lutyuv=y=if(gt(val\\,maxval)\\,val-maxval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2,histeq=strength=${3}",
+            "il=l=d:c=d,lutyuv=y=if(lt(val\\,minval)\\,val+minval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2,histeq=strength=${3}",
         },
     },
     {
