@@ -1658,6 +1658,9 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                     QString MaxTemp(Filters[FilterPos].Args[OptionPos].Name);
                                     if(strcmp(Filters[FilterPos].Name, "Limiter") == 0)
                                     {
+                                      if(FileInfoData->Glue->BitsPerRawSample_Get() == 0){
+                                        Max = 8;
+                                      } else
                                         Max = pow(2, FileInfoData->Glue->BitsPerRawSample_Get()) - 1;
                                     } else
                                     if (MaxTemp == "Line")
