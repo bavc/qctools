@@ -1,4 +1,4 @@
-0.9, 2017-08-14
+0.9, 2017-08-15
 -----
 + Add scaling options for players (now with 100%, fit to window, and free scale)
 + Oscilloscope player
