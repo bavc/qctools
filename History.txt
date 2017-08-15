@@ -1,3 +1,26 @@
+0.9, 2017-08-15
+-----
++ Add scaling options for players (now with 100%, fit to window, and free scale)
++ Oscilloscope player
++ Support for a comments track for temporal annotations
++ Support a horizontal offset variable in 10 column Bit Plane player
++ Update graph selection from checkboxes to toggle buttons
++ Refactoring player code, deduplication, and cleanup
++ Add phase meter player
++ Documentation updates
++ Expanded --debug mode
++ Add a deflicker graph
++ Keyboard shortcut to copy the active timestamp
++ Add a chroma delay player
++ Add a luma adjust player
++ Add limiter player
++ Add Vectorscope High Low player
++ Update Broadcast Illegal Focus to use lutyuv rather than geq, better with non-8-bit
+x Fixes to frame tiles and value highlight players
+x Fixes scaling issues when there is a selection box
+x Fix loading pkt_size and pkt_duration from xml.gz files
+x Fix to use of VREP player with field split
+
 0.8, 2017-04-15
 -----
 + Added a QCTools command line interface, "qcli"
