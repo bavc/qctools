@@ -833,6 +833,28 @@ void MainWindow::on_actionNavigatePreviousComment_triggered()
 
 }
 
+void MainWindow::openRecentFile()
+{
+    if (const QAction *action = qobject_cast<const QAction *>(sender()))
+    {
+        bool fileAlreadyOpened = false;
+        for(auto i = 0; i < ui->fileNamesBox->count(); ++i)
+        {
+            if(ui->fileNamesBox->itemText(i) == action->text())
+            {
+                fileAlreadyOpened = true;
+                break;
+            }
+        }
+
+        if(!fileAlreadyOpened)
+        {
+            addFile(action->text());
+            addFile_finish();
+        }
+    }
+}
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     for(size_t Pos = 0; Pos < Files.size(); Pos++)

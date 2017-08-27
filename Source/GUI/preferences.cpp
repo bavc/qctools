@@ -24,7 +24,8 @@
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-PreferencesDialog::PreferencesDialog(SignalServerConnectionChecker* connectionChecker, QWidget *parent) :
+PreferencesDialog::PreferencesDialog(Preferences* preferences, SignalServerConnectionChecker* connectionChecker, QWidget *parent) :
+    preferences(preferences),
     connectionChecker(connectionChecker),
     QDialog(parent),
     ui(new Ui::Preferences)
@@ -46,37 +47,37 @@ PreferencesDialog::~PreferencesDialog()
 
 QList<std::tuple<int, int> > PreferencesDialog::loadFilterSelectorsOrder()
 {
-    return preferences.loadFilterSelectorsOrder();
+    return preferences->loadFilterSelectorsOrder();
 }
 
 void PreferencesDialog::saveFilterSelectorsOrder(const QList<std::tuple<int, int> > &order)
 {
-    preferences.saveFilterSelectorsOrder(order);
+    preferences->saveFilterSelectorsOrder(order);
 }
 
 bool PreferencesDialog::isSignalServerEnabled() const
 {
-    return preferences.isSignalServerEnabled();
+    return preferences->isSignalServerEnabled();
 }
 
 bool PreferencesDialog::isSignalServerAutoUploadEnabled() const
 {
-    return preferences.isSignalServerAutoUploadEnabled();
+    return preferences->isSignalServerAutoUploadEnabled();
 }
 
 QString PreferencesDialog::signalServerUrlString() const
 {
-    return preferences.signalServerUrlString();
+    return preferences->signalServerUrlString();
 }
 
 QString PreferencesDialog::signalServerLogin() const
 {
-    return preferences.signalServerLogin();
+    return preferences->signalServerLogin();
 }
 
 QString PreferencesDialog::signalServerPassword() const
 {
-    return preferences.signalServerPassword();
+    return preferences->signalServerPassword();
 }
 
 //***************************************************************************
@@ -86,8 +87,8 @@ QString PreferencesDialog::signalServerPassword() const
 //---------------------------------------------------------------------------
 void PreferencesDialog::Load()
 {
-    ActiveFilters = preferences.activeFilters();
-    ActiveAllTracks = preferences.activeAllTracks();
+    ActiveFilters = preferences->activeFilters();
+    ActiveAllTracks = preferences->activeAllTracks();
 
     ui->Filters_Video_signalstats->setChecked(ActiveFilters[ActiveFilter_Video_signalstats]);
     ui->Filters_Video_cropdetect->setChecked(ActiveFilters[ActiveFilter_Video_cropdetect]);
@@ -113,15 +114,15 @@ void PreferencesDialog::Load()
 //---------------------------------------------------------------------------
 void PreferencesDialog::Save()
 {
-    preferences.setActiveFilters(ActiveFilters);
-    preferences.setActiveAllTracks(ActiveAllTracks);
-    preferences.setSignalServerUrlString(ui->signalServerUrl_lineEdit->text());
-    preferences.setSignalServerLogin(ui->signalServerLogin_lineEdit->text());
-    preferences.setSignalServerPassword(ui->signalServerPassword_lineEdit->text());
-    preferences.setSignalServerEnabled(ui->signalServerEnable_checkBox->isChecked());
-    preferences.setSignalServerAutoUploadEnabled(ui->signalServerEnableAutoUpload_checkBox->isChecked());
+    preferences->setActiveFilters(ActiveFilters);
+    preferences->setActiveAllTracks(ActiveAllTracks);
+    preferences->setSignalServerUrlString(ui->signalServerUrl_lineEdit->text());
+    preferences->setSignalServerLogin(ui->signalServerLogin_lineEdit->text());
+    preferences->setSignalServerPassword(ui->signalServerPassword_lineEdit->text());
+    preferences->setSignalServerEnabled(ui->signalServerEnable_checkBox->isChecked());
+    preferences->setSignalServerAutoUploadEnabled(ui->signalServerEnableAutoUpload_checkBox->isChecked());
 
-    preferences.sync();
+    preferences->sync();
 }
 
 //***************************************************************************

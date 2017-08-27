@@ -47,6 +47,9 @@ public:
     QString signalServerPassword() const;
     void setSignalServerPassword(const QString& password);
 
+    QStringList recentFiles() const;
+    void setRecentFiles(const QStringList& recentFiles);
+
     void sync();
 };
 

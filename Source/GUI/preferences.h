@@ -18,7 +18,7 @@ class PreferencesDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit PreferencesDialog(SignalServerConnectionChecker* connectionChecker, QWidget *parent = 0);
+    explicit PreferencesDialog(Preferences* preferences, SignalServerConnectionChecker* connectionChecker, QWidget *parent = 0);
     ~PreferencesDialog();
 
     //Preferences
@@ -45,7 +45,7 @@ private:
     void Load();
     void Save();
 
-    Preferences preferences;
+    Preferences* preferences;
 
 private Q_SLOTS:
     void on_testConnection_pushButton_clicked();

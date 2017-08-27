@@ -201,6 +201,8 @@ void MainWindow::processFile(const QString &FileName)
     ui->fileNamesBox->addItem(FileName);
 
     TimeOut();
+
+    updateRecentFiles(FileName);
 }
 
 //---------------------------------------------------------------------------
@@ -406,6 +408,8 @@ void MainWindow::addFile(const QString &FileName)
 
     Files.push_back(Temp);
     ui->fileNamesBox->addItem(Temp->fileName());
+
+    updateRecentFiles(FileName);
 }
 
 //---------------------------------------------------------------------------
@@ -427,6 +431,8 @@ void MainWindow::addFile(
 
     Files.push_back(Temp);
     ui->fileNamesBox->addItem(Temp->fileName());
+
+    updateRecentFiles(Temp->fileName());
 }
 
 //---------------------------------------------------------------------------
