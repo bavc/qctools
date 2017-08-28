@@ -53,6 +53,7 @@
 // Constants
 //***************************************************************************
 
+const int MaxRecentFiles = 20;
 
 //***************************************************************************
 //
@@ -367,6 +368,12 @@ void MainWindow::updateRecentFiles(const QString &fileName)
 
             recentFilesActions.prepend(action);
             recentFiles.prepend(fileName);
+
+            if(recentFiles.size() > MaxRecentFiles)
+            {
+                recentFiles.takeLast();
+                ui->menuFile->removeAction(recentFilesActions.takeLast());
+            }
         }
         else
         {
