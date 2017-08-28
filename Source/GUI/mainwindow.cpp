@@ -884,3 +884,16 @@ void MainWindow::resizeEvent(QResizeEvent *event)
         label->setText(QString("MainWindow width = %1, height = %2").arg(width()).arg(height()));
     }
 }
+
+void MainWindow::on_actionClear_Recent_History_triggered()
+{
+    for(auto action : recentFilesActions)
+    {
+        ui->menuFile->removeAction(action);
+    }
+
+    recentFilesActions.clear();
+    preferences->setRecentFiles(QStringList());
+
+    ui->actionClear_Recent_History->setEnabled(false);
+}

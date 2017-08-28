@@ -225,7 +225,7 @@ void MainWindow::Ui_Init()
 
         if(recentFilesActions.empty())
         {
-            ui->menuFile->insertAction(ui->menuFile->insertSeparator(ui->actionQuit), action);
+            ui->menuFile->insertAction(ui->menuFile->insertSeparator(ui->actionClear_Recent_History), action);
         }
         else
         {
@@ -233,6 +233,11 @@ void MainWindow::Ui_Init()
         }
 
         recentFilesActions.prepend(action);
+    }
+
+    if(recentFiles.length())
+    {
+        ui->actionClear_Recent_History->setEnabled(true);
     }
 }
 
@@ -348,6 +353,8 @@ QAction *MainWindow::createOpenRecentAction(const QString &fileName)
 
 void MainWindow::updateRecentFiles(const QString &fileName)
 {
+    ui->actionClear_Recent_History->setEnabled(true);
+
     QStringList recentFiles = preferences->recentFiles();
     auto index = recentFiles.indexOf(fileName);
 
@@ -359,7 +366,7 @@ void MainWindow::updateRecentFiles(const QString &fileName)
 
             if(recentFilesActions.empty())
             {
-                ui->menuFile->insertAction(ui->menuFile->insertSeparator(ui->actionQuit), action);
+                ui->menuFile->insertAction(ui->menuFile->insertSeparator(ui->actionClear_Recent_History), action);
             }
             else
             {

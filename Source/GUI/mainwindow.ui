@@ -84,6 +84,7 @@
     <addaction name="actionClose"/>
     <addaction name="actionCloseAll"/>
     <addaction name="separator"/>
+    <addaction name="actionClear_Recent_History"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -538,6 +539,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+,</string>
+   </property>
+  </action>
+  <action name="actionClear_Recent_History">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Clear Recent History</string>
    </property>
   </action>
  </widget>

@@ -244,6 +244,8 @@ private Q_SLOTS:
 
     void openRecentFile();
 
+    void on_actionClear_Recent_History_triggered();
+
 protected:
     void closeEvent(QCloseEvent* event);
     void resizeEvent(QResizeEvent* event);
