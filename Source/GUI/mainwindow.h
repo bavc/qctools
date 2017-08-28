@@ -45,6 +45,8 @@ class PreferencesDialog;
 class BlackmagicDeckLink_Glue;
 class DraggableChildrenBehaviour;
 class SignalServer;
+class Preferences;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -124,7 +126,10 @@ public:
 
     //Preferences
     PreferencesDialog*          Prefs;
+    Preferences*                preferences;
     
+    QList<QAction*>             recentFilesActions;
+
     SignalServer*               getSignalServer();
     QList<std::tuple<int, int>> getFilterSelectorsOrder(int start, int end);
 
@@ -237,6 +242,10 @@ private Q_SLOTS:
 
     void on_actionNavigatePreviousComment_triggered();
 
+    void openRecentFile();
+
+    void on_actionClear_Recent_History_triggered();
+
 protected:
     void closeEvent(QCloseEvent* event);
     void resizeEvent(QResizeEvent* event);
@@ -246,6 +255,9 @@ private:
     bool isPlotZoomable() const;
     void Zoom( bool );
     void changeFilterSelectorsOrder(QList<std::tuple<int, int> > filtersInfo);
+
+    QAction* createOpenRecentAction(const QString& fileName);
+    void updateRecentFiles(const QString& fileName);
 
     DraggableChildrenBehaviour* draggableBehaviour;
     SignalServer* signalServer;

@@ -53,6 +53,7 @@
 // Constants
 //***************************************************************************
 
+const int MaxRecentFiles = 20;
 
 //***************************************************************************
 //
@@ -186,8 +187,10 @@ void MainWindow::Ui_Init()
 	connect(connectionChecker, SIGNAL(connectionStateChanged(SignalServerConnectionChecker::State)),
 		this, SLOT(onSignalServerConnectionChanged(SignalServerConnectionChecker::State)));
 
+    preferences = new Preferences(this);
+
     //Preferences
-    Prefs=new PreferencesDialog(connectionChecker, this);
+    Prefs=new PreferencesDialog(preferences, connectionChecker, this);
     connect(Prefs, SIGNAL(saved()), this, SLOT(updateSignalServerSettings()));
 
     updateSignalServerSettings();
@@ -212,6 +215,30 @@ void MainWindow::Ui_Init()
         delete ui->actionBlackmagicDeckLinkCapture;
         delete ui->menuBlackmagicDeckLink;
     #endif //
+
+    QStringList recentFiles = preferences->recentFiles();
+
+    int recentFilesIndex = recentFiles.length();
+    while(recentFilesIndex-- > 0)
+    {
+        auto action = createOpenRecentAction(recentFiles[recentFilesIndex]);
+
+        if(recentFilesActions.empty())
+        {
+            ui->menuFile->insertAction(ui->menuFile->insertSeparator(ui->actionClear_Recent_History), action);
+        }
+        else
+        {
+            ui->menuFile->insertAction(recentFilesActions.first(), action);
+        }
+
+        recentFilesActions.prepend(action);
+    }
+
+    if(recentFiles.length())
+    {
+        ui->actionClear_Recent_History->setEnabled(true);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -313,6 +340,58 @@ void MainWindow::changeFilterSelectorsOrder(QList<std::tuple<int, int> > filters
     for(auto item : items)
     {
         boxlayout->addItem(item);
+    }
+}
+
+QAction *MainWindow::createOpenRecentAction(const QString &fileName)
+{
+    auto action = new QAction(fileName, this);
+    connect(action, SIGNAL(triggered()), this, SLOT(openRecentFile()));
+
+    return action;
+}
+
+void MainWindow::updateRecentFiles(const QString &fileName)
+{
+    ui->actionClear_Recent_History->setEnabled(true);
+
+    QStringList recentFiles = preferences->recentFiles();
+    auto index = recentFiles.indexOf(fileName);
+
+    if(index != 0)
+    {
+        if(index == -1)
+        {
+            auto action = createOpenRecentAction(fileName);
+
+            if(recentFilesActions.empty())
+            {
+                ui->menuFile->insertAction(ui->menuFile->insertSeparator(ui->actionClear_Recent_History), action);
+            }
+            else
+            {
+                ui->menuFile->insertAction(recentFilesActions.first(), action);
+            }
+
+            recentFilesActions.prepend(action);
+            recentFiles.prepend(fileName);
+
+            if(recentFiles.size() > MaxRecentFiles)
+            {
+                recentFiles.takeLast();
+                ui->menuFile->removeAction(recentFilesActions.takeLast());
+            }
+        }
+        else
+        {
+            ui->menuFile->removeAction(recentFilesActions[index]);
+            ui->menuFile->insertAction(recentFilesActions.first(), recentFilesActions[index]);
+
+            recentFilesActions.move(index, 0);
+            recentFiles.move(index, 0);
+        }
+
+        preferences->setRecentFiles(recentFiles);
     }
 }
 

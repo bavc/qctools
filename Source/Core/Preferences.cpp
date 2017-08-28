@@ -162,6 +162,34 @@ void Preferences::setSignalServerPassword(const QString &password)
     settings.setValue(KeySignalServerPassword, pwdValue);
 }
 
+QStringList Preferences::recentFiles() const
+{
+    QSettings settings;
+    QStringList recentFiles;
+
+    auto recentFilesCount = settings.beginReadArray("recentFiles");
+    for (int recentFileIndex = 0; recentFileIndex < recentFilesCount; ++recentFileIndex) {
+        settings.setArrayIndex(recentFileIndex);
+        recentFiles.append(settings.value("file").toString());
+    }
+    settings.endArray();
+
+    return recentFiles;
+}
+
+void Preferences::setRecentFiles(const QStringList &recentFiles)
+{
+    QSettings settings;
+
+    auto recentFilesCount = recentFiles.size();
+    settings.beginWriteArray("recentFiles");
+    for (int recentFileIndex = 0; recentFileIndex < recentFilesCount; ++recentFileIndex) {
+        settings.setArrayIndex(recentFileIndex);
+        settings.setValue("file", recentFiles.at(recentFileIndex));
+    }
+    settings.endArray();
+}
+
 void Preferences::sync()
 {
     QSettings settings;

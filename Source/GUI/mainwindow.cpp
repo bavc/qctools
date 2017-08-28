@@ -833,6 +833,33 @@ void MainWindow::on_actionNavigatePreviousComment_triggered()
 
 }
 
+void MainWindow::openRecentFile()
+{
+    if (const QAction *action = qobject_cast<const QAction *>(sender()))
+    {
+        bool fileAlreadyOpened = false;
+        for(auto i = 0; i < ui->fileNamesBox->count(); ++i)
+        {
+            if(ui->fileNamesBox->itemText(i) == action->text())
+            {
+                fileAlreadyOpened = true;
+                break;
+            }
+        }
+
+        if(!fileAlreadyOpened)
+        {
+            if(!QFile::exists(action->text()))
+            {
+                QMessageBox::warning(this, "Can't open file", QString("File %1 doesn't exist").arg(action->text()));
+            } else {
+                addFile(action->text());
+                addFile_finish();
+            }
+        }
+    }
+}
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     for(size_t Pos = 0; Pos < Files.size(); Pos++)
@@ -856,4 +883,17 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 
         label->setText(QString("MainWindow width = %1, height = %2").arg(width()).arg(height()));
     }
+}
+
+void MainWindow::on_actionClear_Recent_History_triggered()
+{
+    for(auto action : recentFilesActions)
+    {
+        ui->menuFile->removeAction(action);
+    }
+
+    recentFilesActions.clear();
+    preferences->setRecentFiles(QStringList());
+
+    ui->actionClear_Recent_History->setEnabled(false);
 }
