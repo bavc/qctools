@@ -849,8 +849,13 @@ void MainWindow::openRecentFile()
 
         if(!fileAlreadyOpened)
         {
-            addFile(action->text());
-            addFile_finish();
+            if(!QFile::exists(action->text()))
+            {
+                QMessageBox::warning(this, "Can't open file", QString("File %1 doesn't exist").arg(action->text()));
+            } else {
+                addFile(action->text());
+                addFile_finish();
+            }
         }
     }
 }
