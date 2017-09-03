@@ -58,6 +58,25 @@ QList<std::tuple<int, int>> MainWindow::getFilterSelectorsOrder(int start = 0, i
     return filtersInfo;
 }
 
+QStringList MainWindow::getSelectedFilters() const
+{
+    QStringList selectedFilters;
+
+    for (size_t type = 0; type < Type_Max; type++)
+    {
+        for(auto checkbox : CheckBoxes[type])
+        {
+            if(checkbox->isChecked())
+                selectedFilters << checkbox->text();
+        }
+    }
+
+    if(m_commentsCheckbox->isChecked())
+        selectedFilters << m_commentsCheckbox->text();
+
+    return selectedFilters;
+}
+
 QAction *MainWindow::uploadAction() const
 {
     return ui->actionUploadToSignalServer;
@@ -129,6 +148,7 @@ MainWindow::~MainWindow()
 {
     Prefs->saveFilterSelectorsOrder(getFilterSelectorsOrder());
 
+    preferences->saveSelectedFilters(getSelectedFilters());
     // Controls
     delete ControlArea;
 

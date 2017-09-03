@@ -79,6 +79,33 @@ void Preferences::saveFilterSelectorsOrder(const FilterSelectorsOrder &order)
     settings.setValue(KeyFilterSelectorsOrder, QVariant::fromValue(order));
 }
 
+QStringList Preferences::loadSelectedFilters()
+{
+    QStringList selectedFilters;
+    QSettings settings;
+
+    auto selectedFiltersCount = settings.beginReadArray("selectedFilters");
+    for (int selectedFiltersIndex = 0; selectedFiltersIndex < selectedFiltersCount; ++selectedFiltersIndex) {
+        settings.setArrayIndex(selectedFiltersIndex);
+        selectedFilters.append(settings.value("filterName").toString());
+    }
+    settings.endArray();
+
+    return selectedFilters;
+}
+
+void Preferences::saveSelectedFilters(const QStringList &filters)
+{
+    QSettings settings;
+    settings.beginWriteArray("selectedFilters");
+    for (int i = 0; i < filters.size(); ++i)
+    {
+        settings.setArrayIndex(i);
+        settings.setValue("filterName", filters.at(i));
+    }
+    settings.endArray();
+}
+
 bool Preferences::isSignalServerEnabled() const
 {
     QSettings settings;

@@ -132,6 +132,7 @@ public:
 
     SignalServer*               getSignalServer();
     QList<std::tuple<int, int>> getFilterSelectorsOrder(int start, int end);
+    QStringList                 getSelectedFilters() const;
 
     QAction* uploadAction() const;
     QAction* uploadAllAction() const;
