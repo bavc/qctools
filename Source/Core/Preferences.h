@@ -32,6 +32,9 @@ public:
     FilterSelectorsOrder loadFilterSelectorsOrder();
     void saveFilterSelectorsOrder(const FilterSelectorsOrder& order);
 
+    QStringList loadSelectedFilters();
+    void saveSelectedFilters(const QStringList& filters);
+
     bool isSignalServerEnabled() const;
     void setSignalServerEnabled(bool enabled);
 

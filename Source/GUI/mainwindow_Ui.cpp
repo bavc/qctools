@@ -42,6 +42,7 @@
 #include <QCheckBox>
 #include <QActionGroup>
 #include <QPushButton>
+#include <QSet>
 
 #include <qwt_plot_renderer.h>
 #include <QDebug>
@@ -124,6 +125,11 @@ void MainWindow::Ui_Init()
     //ToolTip
     if (ui->fileNamesBox)
         ui->fileNamesBox->hide();
+
+    preferences = new Preferences(this);
+
+    QSet<QString> selectedFilters = QSet<QString>::fromList(preferences->loadSelectedFilters());
+
     for (size_t type = 0; type < Type_Max; type++)
         for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ ) // Group_Axis
         {
@@ -137,8 +143,17 @@ void MainWindow::Ui_Init()
             CheckBox->setProperty("group", (quint64) group);
 
             CheckBox->setToolTip(PerStreamType[type].PerGroup[group].Description);
-            CheckBox->setCheckable(true);
-            CheckBox->setChecked(PerStreamType[type].PerGroup[group].CheckedByDefault);
+
+            if(!selectedFilters.empty())
+            {
+                auto checkboxText = CheckBox->text();
+                auto filterSelected = selectedFilters.contains(checkboxText);
+                CheckBox->setChecked(filterSelected);
+            } else
+            {
+                CheckBox->setChecked(PerStreamType[type].PerGroup[group].CheckedByDefault);
+            }
+
             CheckBox->setVisible(false);
             QObject::connect(CheckBox, SIGNAL(toggled(bool)), this, SLOT(on_check_toggled(bool)));
             ui->horizontalLayout->addWidget(CheckBox);
@@ -186,8 +201,6 @@ void MainWindow::Ui_Init()
     connectionChecker = new SignalServerConnectionChecker(this);
 	connect(connectionChecker, SIGNAL(connectionStateChanged(SignalServerConnectionChecker::State)),
 		this, SLOT(onSignalServerConnectionChanged(SignalServerConnectionChecker::State)));
-
-    preferences = new Preferences(this);
 
     //Preferences
     Prefs=new PreferencesDialog(preferences, connectionChecker, this);
