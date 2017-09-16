@@ -141,6 +141,8 @@ Allows for playback in various color spaces, including BT.601, BT.709, SMPTE240M
 
 This view presents a quadrant view of a zoom in on the four corners of the image. The W and H options can be adjusted to change the width and height of the corner to crop and display. The resulting pixels are then enlarged and shown within a grid. This view can be used to determine a precise cropping for an image or to inspect the details of the frame's edges.
 
+When the 'field' mode is selected the four quadrants are split to show the top field on the top of each part of the quadrant and the bottom field on the bottom of each part of the quadrant.
+
 ## Datascope {#datascope}
 
 ![Datascope](media/playbackfilter_datascope.jpg)
