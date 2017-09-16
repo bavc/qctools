@@ -883,6 +883,23 @@ const filter Filters[]=
         },
     },
     {
+        "Corners",
+        0,
+        {
+            { Args_Type_Slider,  24,   1,  48,   1, "W" },
+            { Args_Type_Slider,  24,   1,  48,   1, "H" },
+            { Args_Type_Slider,   0,   0,  10,  10, "Strength" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "split=4[a][b][c][d];[a]crop=w=${1}:h=${2}:x=0:y=0,histeq=strength=${3}[a1];[b]crop=w=${1}:h=${2}:x=iw-${1}:y=0,histeq=strength=${3}[b1];[c]crop=w=${1}:h=${2}:x=0:y=ih-${2},histeq=strength=${3}[c1];[d]crop=w=${1}:h=${2}:x=iw-${1}:y=ih-${2},histeq=strength=${3}[d1];[a1][b1]hstack[ab];[c1][d1]hstack[cd];[ab][cd]vstack,scale=${height}:${height}:flags=neighbor,setsar=1/1,drawgrid=w=iw/2:h=ih/2:t=2:c=green@0.5,drawgrid=w=iw/(${1}*2):h=ih/(${2}*2):t=1:c=green@0.5",
+            "split=4[a][b][c][d];[a]crop=w=${1}:h=${2}:x=0:y=0,histeq=strength=${3}[a1];[b]crop=w=${1}:h=${2}:x=iw-${1}:y=0,histeq=strength=${3}[b1];[c]crop=w=${1}:h=${2}:x=0:y=ih-${2},histeq=strength=${3}[c1];[d]crop=w=${1}:h=${2}:x=iw-${1}:y=ih-${2},histeq=strength=${3}[d1];[a1][b1]hstack[ab];[c1][d1]hstack[cd];[ab][cd]vstack,il=l=d:c=d,scale=${height}:${height}:flags=neighbor,setsar=1/1,drawgrid=w=iw/2:h=ih/4:t=2:c=green@0.5,drawgrid=w=iw/(${1}*2):h=ih/(${2}*2):t=1:c=green@0.5",
+        },
+    },
+    {
         "EIA608 VITC Viewer",
         0,
         {
