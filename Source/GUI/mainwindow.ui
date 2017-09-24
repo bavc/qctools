@@ -86,6 +86,7 @@
     <addaction name="separator"/>
     <addaction name="actionClear_Recent_History"/>
     <addaction name="separator"/>
+    <addaction name="actionReveal_file_location"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuView">
@@ -547,6 +548,11 @@
    </property>
    <property name="text">
     <string>Clear Recent History</string>
+   </property>
+  </action>
+  <action name="actionReveal_file_location">
+   <property name="text">
+    <string>Reveal file location</string>
    </property>
   </action>
  </widget>

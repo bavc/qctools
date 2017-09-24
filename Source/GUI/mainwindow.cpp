@@ -917,3 +917,12 @@ void MainWindow::on_actionClear_Recent_History_triggered()
 
     ui->actionClear_Recent_History->setEnabled(false);
 }
+
+void MainWindow::on_actionReveal_file_location_triggered()
+{
+    if(Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
+        return;
+
+    QFileInfo fileInfo(Files[Files_CurrentPos]->fileName());
+    QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absoluteDir().path()));
+}
