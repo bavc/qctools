@@ -118,7 +118,6 @@ public:
 
     // Files
     std::vector<FileInformation*> Files;
-    size_t                      Files_CurrentPos;
     size_t                      Thumbnails_Modulo;
 
     // Deck
@@ -136,6 +135,10 @@ public:
 
     QAction* uploadAction() const;
     QAction* uploadAllAction() const;
+
+    size_t getFilesCurrentPos() const;
+    void setFilesCurrentPos(const size_t &value);
+    bool isFileSelected() const;
 
 public Q_SLOTS:
 	void Update();
@@ -266,6 +269,7 @@ private:
     SignalServer* signalServer;
     SignalServerConnectionChecker* connectionChecker;
     QWidget* connectionIndicator;
+    size_t files_CurrentPos;
 
     Ui::MainWindow *ui;
 };
