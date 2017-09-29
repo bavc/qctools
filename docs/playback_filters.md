@@ -23,6 +23,7 @@ The QCTools preview window is intended as an analytical playback environment tha
 [Chroma Delay](#chroma-delay)  
 [CIE Scope](#cie-scope)  
 [Color Matrix](#color-matrix)  
+[Corners](#corners)  
 [Datascope](#datascope)  
 [EBU R128 Loudness Meter](#ebur128)  
 [EIA608 VITC Viewer](#eia608)
@@ -135,6 +136,12 @@ This filter allows the Cb and Cr planes to be offset left or right to check if t
 Allows for playback in various color spaces, including BT.601, BT.709, SMPTE240M and FCC. The filter includes a **Reveal** slider so that the original image and a version interpreted through the selected color matrix may be shown side-by-side for review.
 
 ![Color Matrix](media/playbackfilter_color_matrix.jpg)
+
+## Corners {#corners}
+
+This view presents a quadrant view of a zoom in on the four corners of the image. The W and H options can be adjusted to change the width and height of the corner to crop and display. The resulting pixels are then enlarged and shown within a grid. This view can be used to determine a precise cropping for an image or to inspect the details of the frame's edges.
+
+When the 'field' mode is selected the four quadrants are split to show the top field on the top of each part of the quadrant and the bottom field on the bottom of each part of the quadrant.
 
 ## Datascope {#datascope}
 
