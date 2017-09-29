@@ -103,7 +103,7 @@ bool MainWindow::canCloseFile(size_t index)
 
 void MainWindow::closeFile()
 {
-    if (Files_CurrentPos==(size_t)-1)
+    if (getFilesCurrentPos()==(size_t)-1)
         return;
     if (Files.size()==1)
     {
@@ -111,17 +111,17 @@ void MainWindow::closeFile()
         return;
     }
 
-    if(canCloseFile(Files_CurrentPos))
+    if(canCloseFile(getFilesCurrentPos()))
     {
         // Launch analysis
-        Files[Files_CurrentPos]->deleteLater();
-        Files.erase(Files.begin()+Files_CurrentPos);
+        Files[getFilesCurrentPos()]->deleteLater();
+        Files.erase(Files.begin()+getFilesCurrentPos());
 
-        ui->fileNamesBox->removeItem(Files_CurrentPos);
+        ui->fileNamesBox->removeItem(getFilesCurrentPos());
         if (ui->fileNamesBox->isVisible())
-            ui->fileNamesBox->setCurrentIndex(Files_CurrentPos<Files.size()?Files_CurrentPos:Files_CurrentPos-1);
+            ui->fileNamesBox->setCurrentIndex(getFilesCurrentPos()<Files.size()?getFilesCurrentPos():getFilesCurrentPos()-1);
         else
-            Files_CurrentPos=Files_CurrentPos<Files.size()?Files_CurrentPos:Files_CurrentPos-1;
+            setFilesCurrentPos(getFilesCurrentPos()<Files.size()?getFilesCurrentPos():getFilesCurrentPos()-1);
 
         TimeOut();
     }
@@ -197,7 +197,7 @@ void MainWindow::processFile(const QString &FileName)
     file->setExportFilters(Prefs->ActiveFilters);
 
     Files.push_back(file);
-    Files_CurrentPos=0;
+    setFilesCurrentPos(0);
     ui->fileNamesBox->addItem(FileName);
 
     TimeOut();
@@ -225,7 +225,7 @@ void MainWindow::clearFiles()
     }
     clearGraphsLayout();
 
-    Files_CurrentPos=(size_t)-1;
+    setFilesCurrentPos((size_t)-1);
 }
 
 //---------------------------------------------------------------------------
@@ -255,7 +255,7 @@ void MainWindow::createDragDrop()
     DragDrop_Image=new QLabel(this);
     DragDrop_Image->setAlignment(Qt::AlignCenter);
     DragDrop_Image->setPixmap(QPixmap(":/icon/dropfiles.png").scaled(256, 256));
-    if (Files_CurrentPos!=(size_t)-1)
+    if (getFilesCurrentPos()!=(size_t)-1)
         DragDrop_Image->hide();
     ui->verticalLayout->addWidget(DragDrop_Image);
 
@@ -266,7 +266,7 @@ void MainWindow::createDragDrop()
     Palette.setColor(QPalette::WindowText, Qt::darkGray);
     DragDrop_Text->setPalette(Palette);
     DragDrop_Text->setText("Drop video file(s) here");
-    if (Files_CurrentPos!=(size_t)-1)
+    if (getFilesCurrentPos()!=(size_t)-1)
         DragDrop_Text->hide();
     ui->verticalLayout->addWidget(DragDrop_Text);
 }
@@ -286,7 +286,7 @@ void MainWindow::createFilesList()
 {
     clearFilesList();
 
-    if (Files_CurrentPos==(size_t)-1)
+    if (getFilesCurrentPos()==(size_t)-1)
     {
         createDragDrop();
         return;
@@ -331,7 +331,7 @@ void MainWindow::createGraphsLayout()
 {
     clearGraphsLayout();
 
-    if (Files_CurrentPos==(size_t)-1)
+    if (getFilesCurrentPos()==(size_t)-1)
     {
         for (size_t type = 0; type < Type_Max; type++)
             for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
@@ -350,14 +350,14 @@ void MainWindow::createGraphsLayout()
 
     for (size_t type = 0; type < Type_Max; type++)
         for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
-            if (CheckBoxes[type][group] && Files_CurrentPos<Files.size() && Files[Files_CurrentPos]->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
+            if (CheckBoxes[type][group] && getFilesCurrentPos()<Files.size() && Files[getFilesCurrentPos()]->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
                 CheckBoxes[type][group]->show();
             else
                 CheckBoxes[type][group]->hide();
     if (ui->fileNamesBox)
         ui->fileNamesBox->show();
 
-    PlotsArea=Files[Files_CurrentPos]->Stats.empty()?NULL:new Plots(this, Files[Files_CurrentPos]);
+    PlotsArea=Files[getFilesCurrentPos()]->Stats.empty()?NULL:new Plots(this, Files[getFilesCurrentPos()]);
 
     auto filtersInfo = Prefs->loadFilterSelectorsOrder();
     changeFilterSelectorsOrder(filtersInfo);
@@ -370,12 +370,12 @@ void MainWindow::createGraphsLayout()
         ui->verticalLayout->addWidget(PlotsArea);
     }
 
-    TinyDisplayArea=new TinyDisplay(this, Files[Files_CurrentPos]);
+    TinyDisplayArea=new TinyDisplay(this, Files[getFilesCurrentPos()]);
     if (!ui->actionGraphsLayout->isChecked())
         TinyDisplayArea->hide();
     ui->verticalLayout->addWidget(TinyDisplayArea);
 
-    ControlArea=new Control(this, Files[Files_CurrentPos]);
+    ControlArea=new Control(this, Files[getFilesCurrentPos()]);
     ControlArea->setPlayAllFrames(ui->actionPlay_All_Frames->isChecked());
 
     connect( ControlArea, SIGNAL( currentFrameChanged() ), 
@@ -464,13 +464,13 @@ void MainWindow::addFile_finish()
 //---------------------------------------------------------------------------
 void MainWindow::selectFile(int NewFilePos)
 {
-    Files_CurrentPos=NewFilePos;
+    setFilesCurrentPos(NewFilePos);
 
     for(int i = 0; i < Files.size(); ++i)
     {
         FileInformation* file = Files[i];
 
-        if(i == Files_CurrentPos) {
+        if(i == getFilesCurrentPos()) {
             connect(file, SIGNAL(signalServerCheckUploadedStatusChanged()), this, SLOT(updateSignalServerCheckUploadedStatus()));
             connect(file, SIGNAL(signalServerUploadStatusChanged()), this, SLOT(updateSignalServerUploadStatus()));
             connect(file, SIGNAL(signalServerUploadProgressChanged(qint64, qint64)), this, SLOT(updateSignalServerUploadProgress(qint64, qint64)));
@@ -481,9 +481,9 @@ void MainWindow::selectFile(int NewFilePos)
         }
     }
 
-    if(!Files.empty())
+    if(!Files.empty() && isFileSelected())
     {
-        FileInformation* file = Files[Files_CurrentPos];
+        FileInformation* file = Files[getFilesCurrentPos()];
         if(file->signalServerUploadStatus() == FileInformation::Idle)
         {
             updateSignalServerCheckUploadedStatus();

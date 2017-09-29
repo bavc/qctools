@@ -113,11 +113,11 @@ MainWindow::MainWindow(QWidget *parent) :
     DragDrop_Image=NULL;
     DragDrop_Text=NULL;
 
-    // Files
-    Files_CurrentPos=(size_t)-1;
-
     // UI
     Ui_Init();
+
+    // Files
+    setFilesCurrentPos((size_t)-1);
 
     // Deck
     DeckRunning=false;
@@ -246,16 +246,16 @@ void MainWindow::on_actionGoTo_triggered()
     if (!ControlArea && !TinyDisplayArea) //TODO: without TinyDisplayArea
         return;
 
-    if (Files_CurrentPos>=Files.size())
+    if (getFilesCurrentPos()>=Files.size())
         return;
 
     bool ok;
-    int i = QInputDialog::getInt(this, tr("Go to frame at position..."), Files[Files_CurrentPos]->ReferenceStat()->x_Current_Max?("frame position (0-"+QString::number(Files[Files_CurrentPos]->ReferenceStat()->x_Current_Max-1)+"):"):QString("frame position (0-based)"), Files[Files_CurrentPos]->Frames_Pos_Get(), 0, Files[Files_CurrentPos]->ReferenceStat()->x_Current_Max-1, 1, &ok);
-    if (Files[Files_CurrentPos]->ReferenceStat()->x_Current_Max && i>=Files[Files_CurrentPos]->ReferenceStat()->x_Current_Max)
-        i=Files[Files_CurrentPos]->ReferenceStat()->x_Current_Max-1;
+    int i = QInputDialog::getInt(this, tr("Go to frame at position..."), Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max?("frame position (0-"+QString::number(Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max-1)+"):"):QString("frame position (0-based)"), Files[getFilesCurrentPos()]->Frames_Pos_Get(), 0, Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max-1, 1, &ok);
+    if (Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max && i>=Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max)
+        i=Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max-1;
     if (ok)
     {
-        Files[Files_CurrentPos]->Frames_Pos_Set(i);
+        Files[getFilesCurrentPos()]->Frames_Pos_Set(i);
     }
 }
 
@@ -284,26 +284,26 @@ void MainWindow::on_actionImport_XmlGz_Prompt_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionExport_XmlGz_Prompt_triggered()
 {
-    if (Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
+    if (getFilesCurrentPos()>=Files.size() || !Files[getFilesCurrentPos()])
         return;
 
-    QString FileName=QFileDialog::getSaveFileName(this, "Export to .qctools.xml.gz", Files[Files_CurrentPos]->fileName() + ".qctools.xml.gz", "Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml)", 0, QFileDialog::DontUseNativeDialog);
+    QString FileName=QFileDialog::getSaveFileName(this, "Export to .qctools.xml.gz", Files[getFilesCurrentPos()]->fileName() + ".qctools.xml.gz", "Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml)", 0, QFileDialog::DontUseNativeDialog);
     if (FileName.size()==0)
         return;
 
-    Files[Files_CurrentPos]->Export_XmlGz(FileName, Prefs->ActiveFilters);
+    Files[getFilesCurrentPos()]->Export_XmlGz(FileName, Prefs->ActiveFilters);
     statusBar()->showMessage("Exported to "+FileName);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::on_actionExport_XmlGz_Sidecar_triggered()
 {
-    if (Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
+    if (getFilesCurrentPos()>=Files.size() || !Files[getFilesCurrentPos()])
         return;
 
-    QString FileName=Files[Files_CurrentPos]->fileName() + ".qctools.xml.gz";
+    QString FileName=Files[getFilesCurrentPos()]->fileName() + ".qctools.xml.gz";
 
-    Files[Files_CurrentPos]->Export_XmlGz(FileName, Prefs->ActiveFilters);
+    Files[getFilesCurrentPos()]->Export_XmlGz(FileName, Prefs->ActiveFilters);
     statusBar()->showMessage("Exported to "+FileName);
 
 }
@@ -324,12 +324,12 @@ void MainWindow::on_actionExport_XmlGz_SidecarAll_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionExport_XmlGz_Custom_triggered()
 {
-    if (Files_CurrentPos>=Files.size() || !Files[Files_CurrentPos])
+    if (getFilesCurrentPos()>=Files.size() || !Files[getFilesCurrentPos()])
         return;
 
     // TODO
     // Temp
-    QString Name=Files[Files_CurrentPos]->fileName();
+    QString Name=Files[getFilesCurrentPos()]->fileName();
     Name.replace(":", "");
     statusBar()->showMessage("(Not implemeted) Export to ~/.qctools"+Name+".qctools.xml.gz");
 }
@@ -415,10 +415,10 @@ void MainWindow::on_actionGraphsLayout_triggered()
         ui->actionWindowOut->setVisible(false);
     for (size_t type = 0; type < Type_Max; type++)
         for (size_t group=0; group<CheckBoxes[type].size(); group++)
-            if (CheckBoxes[type][group] && Files_CurrentPos<Files.size() && Files[Files_CurrentPos]->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
+            if (CheckBoxes[type][group] && getFilesCurrentPos()<Files.size() && Files[getFilesCurrentPos()]->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
                 CheckBoxes[type][group]->show();
 
-    if(Files_CurrentPos<Files.size())
+    if(getFilesCurrentPos()<Files.size())
         m_commentsCheckbox->show();
 
     if (ui->fileNamesBox)
@@ -433,7 +433,7 @@ void MainWindow::on_actionGraphsLayout_triggered()
         FilesListArea->hide();
 
     if (ui->fileNamesBox)
-        ui->fileNamesBox->setCurrentIndex(Files_CurrentPos);
+        ui->fileNamesBox->setCurrentIndex(getFilesCurrentPos());
 
     TimeOut();
 }
@@ -490,7 +490,7 @@ void MainWindow::on_actionAbout_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_fileNamesBox_currentIndexChanged(int index)
 {
-    Files_CurrentPos=index;
+    setFilesCurrentPos(index);
     if (!ui->actionGraphsLayout->isChecked())
         return;
     createGraphsLayout();
@@ -602,9 +602,9 @@ void MainWindow::on_actionPlay_All_Frames_triggered()
 
 void MainWindow::on_actionUploadToSignalServer_triggered()
 {
-    if(!Files.empty())
+    if(!Files.empty() && isFileSelected())
     {
-        FileInformation* file = Files[Files_CurrentPos];
+        FileInformation* file = Files[getFilesCurrentPos()];
         if(file->signalServerUploadStatus() == FileInformation::Uploading)
         {
             file->cancelUpload();
@@ -741,7 +741,7 @@ void MainWindow::updateSignalServerCheckUploadedStatus()
     int index = mo.indexOfEnumerator("SignalServerCheckUploadedStatus");
     QMetaEnum metaEnum = mo.enumerator(index);
 
-    FileInformation* file = Files[Files_CurrentPos];
+    FileInformation* file = Files[getFilesCurrentPos()];
     FileInformation::SignalServerCheckUploadedStatus checkUploadedStatus = file->signalServerCheckUploadedStatus();
     QString key = convertEnumToQString<FileInformation>("SignalServerCheckUploadedStatus", checkUploadedStatus);
     ui->actionSignalServer_status->setText(QString("Signalserver: %1").arg(key));
@@ -776,7 +776,7 @@ void MainWindow::updateSignalServerUploadStatus()
     int index = mo.indexOfEnumerator("SignalServerUploadStatus");
     QMetaEnum metaEnum = mo.enumerator(index);
 
-    FileInformation* file = Files[Files_CurrentPos];
+    FileInformation* file = Files[getFilesCurrentPos()];
     FileInformation::SignalServerUploadStatus uploadStatus = file->signalServerUploadStatus();
 
     ui->actionSignalServer_status->setToolTip("");
@@ -819,16 +819,16 @@ void MainWindow::updateSignalServerUploadProgress(qint64 value, qint64 total)
 
 void MainWindow::on_actionNavigateNextComment_triggered()
 {
-    if (Files_CurrentPos>=Files.size())
+    if (getFilesCurrentPos()>=Files.size())
         return;
 
-    auto framesCount = Files[Files_CurrentPos]->Glue->VideoFrameCount_Get();
-    auto currentPos = Files[Files_CurrentPos]->Frames_Pos_Get();
+    auto framesCount = Files[getFilesCurrentPos()]->Glue->VideoFrameCount_Get();
+    auto currentPos = Files[getFilesCurrentPos()]->Frames_Pos_Get();
     while(++currentPos < framesCount)
     {
-        if(Files[Files_CurrentPos]->ReferenceStat()->comments[currentPos])
+        if(Files[getFilesCurrentPos()]->ReferenceStat()->comments[currentPos])
         {
-            Files[Files_CurrentPos]->Frames_Pos_Set(currentPos);
+            Files[getFilesCurrentPos()]->Frames_Pos_Set(currentPos);
             PlotsArea->onCurrentFrameChanged();
             break;
         }
@@ -837,15 +837,15 @@ void MainWindow::on_actionNavigateNextComment_triggered()
 
 void MainWindow::on_actionNavigatePreviousComment_triggered()
 {
-    if (Files_CurrentPos>=Files.size())
+    if (getFilesCurrentPos()>=Files.size())
         return;
 
-    auto currentPos = Files[Files_CurrentPos]->Frames_Pos_Get();
+    auto currentPos = Files[getFilesCurrentPos()]->Frames_Pos_Get();
     while(--currentPos >= 0)
     {
-        if(Files[Files_CurrentPos]->ReferenceStat()->comments[currentPos])
+        if(Files[getFilesCurrentPos()]->ReferenceStat()->comments[currentPos])
         {
-            Files[Files_CurrentPos]->Frames_Pos_Set(currentPos);
+            Files[getFilesCurrentPos()]->Frames_Pos_Set(currentPos);
             PlotsArea->onCurrentFrameChanged();
             break;
         }
@@ -905,6 +905,22 @@ void MainWindow::resizeEvent(QResizeEvent *event)
     }
 }
 
+size_t MainWindow::getFilesCurrentPos() const
+{
+    return files_CurrentPos;
+}
+
+void MainWindow::setFilesCurrentPos(const size_t &value)
+{
+    files_CurrentPos = value;
+    ui->actionReveal_file_location->setEnabled(isFileSelected());
+}
+
+bool MainWindow::isFileSelected() const
+{
+    return files_CurrentPos != (size_t)-1;
+}
+
 void MainWindow::on_actionClear_Recent_History_triggered()
 {
     for(auto action : recentFilesActions)
@@ -916,4 +932,13 @@ void MainWindow::on_actionClear_Recent_History_triggered()
     preferences->setRecentFiles(QStringList());
 
     ui->actionClear_Recent_History->setEnabled(false);
+}
+
+void MainWindow::on_actionReveal_file_location_triggered()
+{
+    if(getFilesCurrentPos()>=Files.size() || !Files[getFilesCurrentPos()])
+        return;
+
+    QFileInfo fileInfo(Files[getFilesCurrentPos()]->fileName());
+    QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absoluteDir().path()));
 }

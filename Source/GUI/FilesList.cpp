@@ -18,9 +18,11 @@
 #include <QFileInfo>
 #include <QHeaderView>
 #include <QMenu>
+#include <QDir>
 #include <QContextMenuEvent>
 #include <sstream>
 #include <cassert>
+#include <QDesktopServices>
 //---------------------------------------------------------------------------
 
 enum statstype
@@ -321,6 +323,7 @@ void FilesList::UpdateAll()
 
         QTableWidgetItem* VerticalHeaderItem=new QTableWidgetItem(FileInfo.fileName());
         VerticalHeaderItem->setToolTip(Main->Files[Files_Pos]->fileName());
+        VerticalHeaderItem->setData(Qt::UserRole, FileInfo.filePath());
         setVerticalHeaderItem((int)Files_Pos, VerticalHeaderItem);
 
         setItem((int)Files_Pos, Col_SignalServer,   new TableWidgetItem());
@@ -441,6 +444,7 @@ void FilesList::contextMenuEvent (QContextMenuEvent* Event)
     menu.addAction(Main->uploadAction());
     menu.addAction(Main->uploadAllAction());
     menu.addSeparator();
+    menu.addAction(new QAction("Reveal file location", this));
     menu.addAction(new QAction("Close", this)); //If you change this, change the test text too
 
     //Displaying
@@ -468,6 +472,12 @@ void FilesList::contextMenuEvent (QContextMenuEvent* Event)
         Main->closeFile();
         UpdateAll();
         return;
+    }
+    if(Text == "Reveal file location")
+    {
+        QString fileName = verticalHeaderItem(Item->row())->data(Qt::UserRole).toString();
+        QFileInfo fileInfo(fileName);
+        QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absoluteDir().path()));
     }
 }
 

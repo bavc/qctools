@@ -108,9 +108,9 @@ void MainWindow::TimeOut ()
 #endif // BLACKMAGICDECKLINK_YES
     }
 
-    if (Files_CurrentPos!=(size_t)-1)
+    if (isFileSelected())
     {
-        CommonStats* Stats=Files[Files_CurrentPos]->ReferenceStat();
+        CommonStats* Stats=Files[getFilesCurrentPos()]->ReferenceStat();
         if (Stats && Stats->State_Get()<1)
         {
             stringstream Message;
