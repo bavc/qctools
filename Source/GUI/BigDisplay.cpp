@@ -296,15 +296,15 @@ const filter Filters[]=
         0,
         {
             { Args_Type_Toggle,      0,   0,       0,   0, "Field" },
-            { Args_Type_Slider, 250000,   0, 1000000,   1, "X pos" },
-            { Args_Type_Slider, 250000,   0, 1000000,   1, "Y pos" },
+            { Args_Type_Slider,     20,   0,       0,   1, "x" },
+            { Args_Type_Slider,     20,   0,       0,   1, "y" },
             { Args_Type_Slider,      8,   1,      80,   1, "width" },
             { Args_Type_Slider,      8,   1,      80,   1, "height" },
             { Args_Type_None,        0,   0,       0,   0, },
             { Args_Type_None,        0,   0,       0,   0, },
         },
         {
-            "pixscope=x=${2}/1000000:y=${3}/1000000:w=${4}:h=${5}",
+            "pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5}",
             "il=l=d:c=d,pixscope=x=${2}/1000000:y=${3}/1000000:w=${4}:h=${5}",
         },
     },
@@ -1153,7 +1153,21 @@ void DoubleSpinBoxWithSlider::applyValue(double value, bool notify)
         int ValueInt=(int)Value;
         if(Value-0.5>=ValueInt)
             ValueInt++;
-        Slider->setValue(Value);
+
+        int oldValue = Slider->value();
+        if(oldValue != ValueInt)
+        {
+            blockSignals(true);
+
+            Slider->blockSignals(true);
+            Slider->setValue(ValueInt);
+            Slider->blockSignals(false);
+
+            setValue(value);
+            blockSignals(false);
+
+            Q_EMIT valueChanged(value);
+        }
 
         if(notify)
             Q_EMIT controlValueChanged(Value);
@@ -1198,7 +1212,24 @@ void DoubleSpinBoxWithSlider::hidePopup ()
 //---------------------------------------------------------------------------
 void DoubleSpinBoxWithSlider::on_valueChanged (double value)
 {
-    applyValue(value, false);
+    if (IsBitSlice)
+    {
+        if (value<1)
+            setPrefix(QString());
+        else
+            setPrefix("Bit ");
+    }
+
+    if (Slider)
+    {
+        double Value=value*Divisor;
+        int ValueInt=(int)Value;
+        if(Value-0.5>=ValueInt)
+            ValueInt++;
+
+        Slider->setValue(ValueInt);
+        Q_EMIT controlValueChanged(Value);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -2339,12 +2370,26 @@ void BigDisplay::updateSelection(int Pos, ImageLabel* image, options& opts)
 
     if(strcmp(Filters[Pos].Name, "Waveform Target") == 0 ||
             strcmp(Filters[Pos].Name, "Vectorscope Target") ==  0 ||
-            strcmp(Filters[Pos].Name, "Zoom") ==  0)
+            strcmp(Filters[Pos].Name, "Zoom") ==  0 ||
+            strcmp(Filters[Pos].Name, "Pixel Scope") == 0)
     {
-        auto& xSpinBox = opts.Sliders_SpinBox[0];
-        auto& ySpinBox = opts.Sliders_SpinBox[1];
-        auto& wSpinBox = opts.Sliders_SpinBox[2];
-        auto& hSpinBox = opts.Sliders_SpinBox[3];
+        int xIndex = 0;
+        int yIndex = 1;
+        int wIndex = 2;
+        int hIndex = 3;
+
+        if(strcmp(Filters[Pos].Name, "Pixel Scope") == 0)
+        {
+            xIndex = 1;
+            yIndex = 2;
+            wIndex = 3;
+            hIndex = 4;
+        }
+
+        auto& xSpinBox = opts.Sliders_SpinBox[xIndex];
+        auto& ySpinBox = opts.Sliders_SpinBox[yIndex];
+        auto& wSpinBox = opts.Sliders_SpinBox[wIndex];
+        auto& hSpinBox = opts.Sliders_SpinBox[hIndex];
 
         image->setSelectionArea(xSpinBox->value(), ySpinBox->value(), wSpinBox->value(), hSpinBox->value());
 
@@ -2357,22 +2402,21 @@ void BigDisplay::updateSelection(int Pos, ImageLabel* image, options& opts)
         connect(hSpinBox, &DoubleSpinBoxWithSlider::controlValueChanged, image, &ImageLabel::changeSelectionHeight);
 
         connect(image, &ImageLabel::selectionChangeFinished, [&](const QRectF& geometry) {
-            qDebug() << "x: " << geometry.x();
-            qDebug() << "y: " << geometry.y();
+            qDebug() << "selectionChangeFinished: "
+                     << ", x: " << geometry.x() << ", y: " << geometry.y()
+                     << ", w: " << geometry.width() << ", h: " << geometry.height();
 
-            xSpinBox->applyValue(geometry.topLeft().x(), true);
-            ySpinBox->applyValue(geometry.topLeft().y(), true);
-            wSpinBox->applyValue(geometry.width(), true);
-            hSpinBox->applyValue(geometry.height(), true);
+            xSpinBox->applyValue(geometry.topLeft().x(), false);
+            ySpinBox->applyValue(geometry.topLeft().y(), false);
+            wSpinBox->applyValue(geometry.width(), false);
+            hSpinBox->applyValue(geometry.height(), false);
 
         });
 
         connect(image, &ImageLabel::selectionChanged, [&](const QRectF& geometry) {
-            qDebug() << "x: " << geometry.x();
-            qDebug() << "y: " << geometry.y();
-
-            qDebug() << "width: " << geometry.width();
-            qDebug() << "height: " << geometry.height();
+            qDebug() << "selectionChanged: "
+                     << ", x: " << geometry.x() << ", y: " << geometry.y()
+                     << ", w: " << geometry.width() << ", h: " << geometry.height();
 
             xSpinBox->applyValue(geometry.x(), false);
             ySpinBox->applyValue(geometry.y(), false);
