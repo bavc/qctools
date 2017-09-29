@@ -305,7 +305,7 @@ const filter Filters[]=
         },
         {
             "pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5}",
-            "il=l=d:c=d,pixscope=x=${2}/1000000:y=${3}/1000000:w=${4}:h=${5}",
+            "il=l=d:c=d,pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5}",
         },
     },
     {
