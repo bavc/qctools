@@ -80,6 +80,22 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                 if (m_fileInfoData->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
                 {
                     Plot* plot = new Plot( streamPos, type, group, fileInformation, this );
+
+                    const size_t plotType = plot->type();
+                    const size_t plotGroup = plot->group();
+                    const CommonStats* stat = stats( plot->streamPos() );
+
+                    auto streamInfo = PerStreamType[plotType];
+
+                    for(auto j = 0; j < streamInfo.PerGroup[plotGroup].Count; ++j)
+                    {
+                        auto xData = stat->x[m_dataTypeIndex];
+                        auto yIndex = streamInfo.PerGroup[plotGroup].Start + j;
+                        auto yData = stat->y[yIndex];
+
+                        plot->setData(j, new Plot::SeriesData(stats( plot->streamPos()), m_dataTypeIndex, yIndex));
+                    }
+
                     plot->addGuidelines(m_fileInfoData->BitsPerRawSample());
 
                     if(type == Type_Video)
@@ -296,11 +312,7 @@ void Plots::updateSamples( Plot* plot )
 
     for(auto j = 0; j < streamInfo.PerGroup[plotGroup].Count; ++j)
     {
-        auto xData = stat->x[m_dataTypeIndex];
-        auto yIndex = streamInfo.PerGroup[plotGroup].Start + j;
-        auto yData = stat->y[yIndex];
-
-        plot->setCurveSamples( j, xData, yData, stat->x_Current );
+        plot->replot();
     }
 }
 

@@ -286,13 +286,6 @@ const QwtPlotCurve* Plot::curve( int index ) const
     return NULL;
 }   
 
-void Plot::setCurveSamples( int index,
-    const double *xData, const double *yData, int size )
-{
-    if ( index >= 0 && index < m_curves.size() )
-        m_curves[index]->setRawSamples( xData, yData, size );
-}
-
 void Plot::setYAxis( double min, double max, int numSteps )
 {
     setAxisScale( QwtPlot::yLeft, min, max, ::stepSize( max - min, numSteps ) );
@@ -301,6 +294,11 @@ void Plot::setYAxis( double min, double max, int numSteps )
 void Plot::setCursorPos( double x )
 {
     m_cursor->setPosition( x );
+}
+
+void Plot::setData(int curveIndex, QwtSeriesData<QPointF> *series)
+{
+    m_curves[curveIndex]->setData(series);
 }
 
 QColor Plot::curveColor( int index ) const

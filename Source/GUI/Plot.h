@@ -9,6 +9,7 @@
 #define GUI_Plot_H
 //---------------------------------------------------------------------------
 
+#include <Core/CommonStats.h>
 #include <Core/Core.h>
 #include <QEvent>
 #include <QResizeEvent>
@@ -117,6 +118,31 @@ class Plot : public QwtPlot
     Q_OBJECT
 
 public:
+    class SeriesData : public QwtPointSeriesData
+    {
+        // QwtSeriesData interface
+    public:
+        SeriesData(CommonStats* stats, const int& xDataIndex, const int yDataIndex)
+            : stats(stats), xDataIndex(xDataIndex), yDataIndex(yDataIndex) {
+
+        }
+
+        size_t size() const {
+            return stats->x_Current;
+        }
+        QPointF sample(size_t i) const {
+            auto xData = stats->x[xDataIndex];
+            auto yData = stats->y[yDataIndex];
+
+            return QPointF(xData[i], yData[i]);
+        }
+
+    private:
+        CommonStats* stats;
+        const int& xDataIndex;
+        const int yDataIndex;
+    };
+
     explicit Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* fileInformation, QWidget *parent );
     virtual ~Plot();
 
@@ -126,8 +152,7 @@ public:
     void setYAxis( double min, double max, int numSteps );
     void setCursorPos( double x );
 
-    void setCurveSamples( int index,
-        const double *xData, const double *yData, int size );
+    void setData(int curveIndex, QwtSeriesData<QPointF> *series);
 
     size_t streamPos() const { return m_streamPos; }
     size_t type() const { return m_type; }
