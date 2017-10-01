@@ -25,6 +25,7 @@
         <file>signalserver_success.png</file>
         <file>signalserver_upload.png</file>
         <file>signalserver_uploading.png</file>
+        <file>settings.png</file>
     </qresource>
     <qresource prefix="/">
         <file alias="Help/About.html">../../License.html</file>

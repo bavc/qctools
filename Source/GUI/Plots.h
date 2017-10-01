@@ -114,8 +114,6 @@ private:
     void                        replotAll();
 
     void                        initAxisFormat( int index );
-
-    void                        initYAxis( Plot* );
     void                        updateSamples( Plot* );
     void                        setCursorPos( int framePos );
 

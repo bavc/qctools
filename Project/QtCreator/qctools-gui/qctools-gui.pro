@@ -48,7 +48,8 @@ HEADERS += \
     $$SOURCES_PATH/GUI/Imagelabel.h \
     $$SOURCES_PATH/GUI/config.h \
     $$SOURCES_PATH/GUI/draggablechildrenbehaviour.h \
-    $$SOURCES_PATH/ThirdParty/cqmarkdown/CMarkdown.h
+    $$SOURCES_PATH/ThirdParty/cqmarkdown/CMarkdown.h \
+    $$SOURCES_PATH/GUI/booleanchartconditioneditor.h
 
 SOURCES += \
     $$SOURCES_PATH/GUI/BigDisplay.cpp \
@@ -73,7 +74,8 @@ SOURCES += \
     $$SOURCES_PATH/GUI/Imagelabel.cpp \
     $$SOURCES_PATH/GUI/config.cpp \
     $$SOURCES_PATH/GUI/draggablechildrenbehaviour.cpp \
-    $$SOURCES_PATH/ThirdParty/cqmarkdown/CMarkdown.cpp
+    $$SOURCES_PATH/ThirdParty/cqmarkdown/CMarkdown.cpp \
+    $$SOURCES_PATH/GUI/booleanchartconditioneditor.cpp
 
 win32 {
     INCLUDEPATH += $$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib
@@ -84,7 +86,8 @@ FORMS += \
     $$SOURCES_PATH/GUI/preferences.ui \
     $$SOURCES_PATH/GUI/CommentsEditor.ui \
     $$SOURCES_PATH/GUI/blackmagicdecklink_userinput.ui \
-    $$SOURCES_PATH/GUI/imagelabel.ui
+    $$SOURCES_PATH/GUI/imagelabel.ui \
+    $$SOURCES_PATH/GUI/booleanchartconditioneditor.ui
 
 RESOURCES += \
     $$SOURCES_PATH/Resource/Resources.qrc

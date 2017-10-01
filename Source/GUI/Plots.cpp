@@ -12,6 +12,7 @@
 #include "GUI/PlotScaleWidget.h"
 #include "GUI/Comments.h"
 #include "GUI/CommentsEditor.h"
+#include "booleanchartconditioneditor.h"
 #include "Core/Core.h"
 #include "Core/VideoCore.h"
 #include <QComboBox>
@@ -25,6 +26,9 @@
 #include <QInputDialog>
 #include <QTextDocument>
 #include <QPushButton>
+#include <QCheckBox>
+#include <QToolButton>
+#include <qwt_plot_curve.h>
 
 //---------------------------------------------------------------------------
 
@@ -87,15 +91,6 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
 
                     auto streamInfo = PerStreamType[plotType];
 
-                    for(auto j = 0; j < streamInfo.PerGroup[plotGroup].Count; ++j)
-                    {
-                        auto xData = stat->x[m_dataTypeIndex];
-                        auto yIndex = streamInfo.PerGroup[plotGroup].Start + j;
-                        auto yData = stat->y[yIndex];
-
-                        plot->setData(j, new Plot::SeriesData(stats( plot->streamPos()), m_dataTypeIndex, yIndex));
-                    }
-
                     plot->addGuidelines(m_fileInfoData->BitsPerRawSample());
 
                     if(type == Type_Video)
@@ -105,7 +100,8 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                     plot->plotLayout()->setAlignCanvasToScales(false);
                     plot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
                     plot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
-                    initYAxis( plot );
+                    plot->initYAxis();
+
                     updateSamples( plot );
 
                     connect( plot, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
@@ -113,7 +109,92 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                     plot->canvas()->installEventFilter( this );
 
                     layout->addWidget( plot, m_plotsCount, 0 );
-                    layout->addWidget( plot->legend(), m_plotsCount, 1 );
+                    QVBoxLayout* legendLayout = new QVBoxLayout();
+                    legendLayout->setContentsMargins(5, 0, 5, 0);
+                    legendLayout->setSpacing(10);
+                    legendLayout->setAlignment(Qt::AlignVCenter);
+
+                    QToolButton* booleanConfigButton = new QToolButton();
+                    connect(plot, SIGNAL(visibilityChanged(bool)), booleanConfigButton, SLOT(setVisible(bool)));
+                    connect(booleanConfigButton, &QToolButton::clicked, this, [=] {
+                        QDialog dialog;
+                        dialog.setWindowTitle("Edit boolean conditions");
+                        QVBoxLayout* vbox = new QVBoxLayout;
+                        dialog.setLayout(vbox);
+
+                        QList<QPair<PlotSeriesData*, BooleanChartConditionEditor*>> pairs;
+
+                        for(size_t j = 0; j < streamInfo.PerGroup[plotGroup].Count; ++j)
+                        {
+                            PlotSeriesData* data = const_cast<PlotSeriesData*>(static_cast<const PlotSeriesData*> (plot->getData(j)));
+                            auto conditionEditor = new BooleanChartConditionEditor(nullptr);
+                            auto curve = dynamic_cast<const QwtPlotCurve*>( plot->getCurve(j) );
+
+                            QString title = curve->title().text();
+                            conditionEditor->setLabel(title);
+                            conditionEditor->setColor(curve->pen().color());
+
+                            conditionEditor->setLessThan(data->condition().lessThanFormula);
+                            conditionEditor->setMoreThan(data->condition().moreThanFormula);
+
+                            vbox->insertWidget(0, conditionEditor);
+                            pairs.append(QPair<PlotSeriesData*, BooleanChartConditionEditor*>(data, conditionEditor));
+                        }
+
+                        auto dialogButtonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
+                        connect(dialogButtonBox->button(QDialogButtonBox::Save), SIGNAL(clicked()), &dialog, SLOT(accept()));
+                        connect(dialogButtonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), &dialog, SLOT(reject()));
+
+                        dialog.layout()->addWidget(dialogButtonBox);
+                        if(QDialog::Accepted == dialog.exec())
+                        {
+                            for(auto pair : pairs) {
+                                auto data = pair.first;
+                                auto editor = pair.second;
+
+                                QString lessThan = editor->getLessThan();
+                                QString moreThan = editor->getMoreThan();
+
+                                data->condition().lessThanFormula = lessThan;
+                                data->condition().moreThanFormula = moreThan;
+                                data->condition().update();
+                            }
+
+                            plot->updateSymbols();
+                            plot->replot();
+                        }
+                    });
+
+                    QPushButton* booleanPlotSwitch = new QPushButton("boolean");
+                    QFontMetrics metrics(booleanPlotSwitch->font());
+                    booleanPlotSwitch->setMaximumWidth(metrics.width(booleanPlotSwitch->text()) + 10);
+                    booleanPlotSwitch->setCheckable(true);
+
+                    connect(plot, SIGNAL(visibilityChanged(bool)), booleanPlotSwitch, SLOT(setVisible(bool)));
+
+                    for(size_t j = 0; j < streamInfo.PerGroup[plotGroup].Count; ++j)
+                    {
+                        size_t yIndex = streamInfo.PerGroup[plotGroup].Start + j;
+
+                        auto seriesData = new PlotSeriesData(stats( plot->streamPos()), m_dataTypeIndex, yIndex, plotGroup, j, streamInfo.PerGroup[plotGroup].Count);
+                        plot->setData(j, seriesData);
+                        connect(booleanPlotSwitch, SIGNAL(toggled(bool)), seriesData, SLOT(setBoolean(bool)));
+                    }
+
+                    connect(booleanPlotSwitch, SIGNAL(toggled(bool)), plot, SLOT(setBoolean(bool)));
+
+                    QHBoxLayout* booleanAndConfigurationLayout = new QHBoxLayout();
+                    booleanAndConfigurationLayout->setSpacing(5);
+                    booleanAndConfigurationLayout->addWidget(booleanPlotSwitch);
+                    booleanAndConfigurationLayout->addWidget(booleanConfigButton);
+
+                    legendLayout->addItem(booleanAndConfigurationLayout);
+                    legendLayout->addWidget(plot->legend());
+                    layout->addLayout(legendLayout, m_plotsCount, 1);
+
+                    int height = booleanPlotSwitch->sizeHint().height();
+                    booleanConfigButton->setIcon(QIcon(":/icon/settings.png"));
+                    booleanConfigButton->setMaximumSize(QSize(height, height));
 
                     m_plots[streamPos][group] = plot;
 
@@ -191,7 +272,7 @@ void Plots::refresh()
             for ( int i = 0; i < PerStreamType[type].CountOfGroups; i++ )
                 if (m_plots[streamPos][i])
             {
-                initYAxis( m_plots[streamPos][i] );
+                m_plots[streamPos][i]->initYAxis();
                 updateSamples( m_plots[streamPos][i] );
             }
         }
@@ -272,33 +353,6 @@ void Plots::setCursorPos( int newFramePos )
     m_scaleWidget->update();
 
     replotAll();
-}
-
-//---------------------------------------------------------------------------
-void Plots::initYAxis( Plot* plot )
-{
-    const size_t plotType = plot->type();
-    const size_t plotGroup = plot->group();
-
-    CommonStats* stat = stats( plot->streamPos() );
-    const struct per_group& group = PerStreamType[plotType].PerGroup[plotGroup];
-
-    double yMin = stat->y_Min[plotGroup];
-    double yMax = stat->y_Max[plotGroup];
-
-    if ( ( group.Min != group.Max ) && ( yMax - yMin >= ( group.Max - group.Min) / 2 ) )
-        yMax = group.Max;
-
-    if ( yMin != yMax )
-    {
-        plot->setYAxis( yMin, yMax, group.StepsCount );
-    }
-    else
-    {
-        //Special case, in order to force a scale of 0 to 1
-        plot->setYAxis( 0.0, 1.0, 1 );
-    }
-
 }
 
 //---------------------------------------------------------------------------
@@ -705,14 +759,14 @@ void Plots::zoomXAxis( ZoomTypes zoomType )
         m_zoomFactor--;
     else if ( zoomType == ZoomOneToOne)
         m_zoomFactor = 0;
-        
+
     qDebug() << "m_zoomFactor: " << m_zoomFactor;
     int numVisibleFrames = m_fileInfoData->Frames_Count_Get() >> m_zoomFactor;
 
     if(m_zoomType == ZoomOneToOne)
     {
         numVisibleFrames = plot(0, 0)->canvas()->contentsRect().width();
-        m_zoomFactor = log(m_fileInfoData->Frames_Count_Get() / numVisibleFrames) / log(2);
+        m_zoomFactor = log(double(m_fileInfoData->Frames_Count_Get()) / numVisibleFrames) / log(2);
     }
 
     int to = qMin( framePos() + numVisibleFrames / 2, numFrames() );
@@ -722,22 +776,25 @@ void Plots::zoomXAxis( ZoomTypes zoomType )
 
     setVisibleFrames( from, to );
 
+    m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
+
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
+    {
         if ( m_fileInfoData->Stats[streamPos] && m_plots[streamPos] )
         {
-		    size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+            auto type = m_fileInfoData->Stats[streamPos]->Type_Get();
 
-            for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
-                if (m_plots[streamPos][group])
-                m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
+            for ( size_t group = 0; group < PerStreamType[type].CountOfGroups; group++ )
+                if (m_plots[streamPos][group]) {
+                    m_plots[streamPos][group]->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
+                    m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
+                    m_plots[streamPos][group]->updateSymbols();
+                }
         }
+    }
 
     if(m_commentsPlot)
         m_commentsPlot->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
-
-    m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
-
-    refresh();
 
     m_scaleWidget->update();
 

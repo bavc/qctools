@@ -21,6 +21,7 @@ class QwtPlotCurve;
 class PlotCursor;
 class PlotLegend;
 class FileInformation;
+class QCheckBox;
 
 //***************************************************************************
 // Class
@@ -113,38 +114,120 @@ static int indexLower( double x, const QwtSeriesData<QPointF> &data )
     return index - 1;
 }
 
+class PlotSeriesData : public QObject, public QwtPointSeriesData
+{
+    // QwtSeriesData interface
+    Q_OBJECT
+public:
+    PlotSeriesData(CommonStats* stats, const int& xDataIndex, const size_t yDataIndex, size_t plotGroup, size_t curveIndex, size_t curvesCount)
+        : m_boolean(false), m_stats(stats), m_xDataIndex(xDataIndex), m_yDataIndex(yDataIndex), m_plotGroup(plotGroup), m_curveIndex(curveIndex), m_curvesCount(curvesCount),
+        m_condition(stats, plotGroup)
+    {
+
+    }
+
+    size_t size() const {
+        return m_stats->x_Current;
+    }
+    QPointF sample(size_t i) const {
+
+        auto xData = m_stats->x[m_xDataIndex];
+        auto yData = m_stats->y[m_yDataIndex];
+
+        return QPointF(xData[i], (m_boolean ? toBoolean(yData[i], 1.0) : yData[i]));
+    }
+
+    double toBoolean(double y) const {
+        return m_condition.match(y) ? 1.0 : 0.0;
+    }
+
+    double toBoolean(double y, double globalMax) const {
+        auto value = toBoolean(y);
+
+        auto min = globalMax * (m_curveIndex) / m_curvesCount;
+        auto max = globalMax * (m_curveIndex + 1) / m_curvesCount;
+
+        auto adjustedValue = min + value * (max - min) * 0.9;
+
+        return adjustedValue;
+    }
+
+    struct Condition
+    {
+        Condition(CommonStats* stats, size_t plotGroup) : m_stats(stats), m_plotGroup(plotGroup) {
+            moreThanFormula = "yHalf";
+            update();
+        }
+        double lessThan;
+        bool hasLessThan;
+        QString lessThanFormula;
+
+        double moreThan;
+        bool hasMoreThan;
+        QString moreThanFormula;
+
+        CommonStats* m_stats;
+        size_t m_plotGroup;
+
+        bool match(double y) const {
+            if(!hasLessThan && !hasMoreThan)
+                return false;
+
+            if(hasLessThan && y > lessThan)
+                return false;
+
+            if(hasMoreThan && y < moreThan)
+                return false;
+
+            return true;
+        }
+
+        double formulaToValue(const QString& formula, bool& ok) {
+            if(formula == "yHalf") {
+                ok = true;
+                return (m_stats->y_Max[m_plotGroup] - m_stats->y_Min[m_plotGroup]) / 2;
+            }
+
+            return formula.toDouble(&ok);
+        }
+
+        void update() {
+            lessThan = formulaToValue(lessThanFormula, hasLessThan);
+            moreThan = formulaToValue(moreThanFormula, hasMoreThan);
+        }
+    };
+
+    Condition& condition() {
+        return m_condition;
+    }
+
+public Q_SLOTS:
+    void setBoolean(bool enable) {
+        qDebug() << "boolean mode: " << enable;
+        m_boolean = enable;
+    }
+
+private:
+    bool m_boolean;
+    Condition m_condition;
+    CommonStats* m_stats;
+    const int& m_xDataIndex;
+    const size_t m_yDataIndex;
+    size_t m_plotGroup;
+    size_t m_curveIndex;
+    size_t m_curvesCount;
+};
+
 class Plot : public QwtPlot
 {
     Q_OBJECT
 
 public:
-    class SeriesData : public QwtPointSeriesData
-    {
-        // QwtSeriesData interface
-    public:
-        SeriesData(CommonStats* stats, const int& xDataIndex, const int yDataIndex)
-            : stats(stats), xDataIndex(xDataIndex), yDataIndex(yDataIndex) {
-
-        }
-
-        size_t size() const {
-            return stats->x_Current;
-        }
-        QPointF sample(size_t i) const {
-            auto xData = stats->x[xDataIndex];
-            auto yData = stats->y[yDataIndex];
-
-            return QPointF(xData[i], yData[i]);
-        }
-
-    private:
-        CommonStats* stats;
-        const int& xDataIndex;
-        const int yDataIndex;
-    };
-
     explicit Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* fileInformation, QWidget *parent );
     virtual ~Plot();
+
+    const CommonStats*          stats( size_t statsPos = (size_t)-1 ) const;
+    CommonStats*                stats( size_t statsPos = (size_t)-1 );
 
     virtual QSize sizeHint() const;
     virtual QSize minimumSizeHint() const;
@@ -152,7 +235,9 @@ public:
     void setYAxis( double min, double max, int numSteps );
     void setCursorPos( double x );
 
-    void setData(int curveIndex, QwtSeriesData<QPointF> *series);
+    void setData(size_t curveIndex, QwtSeriesData<QPointF> *series);
+    const QwtSeriesData<QPointF>* getData(size_t curveIndex) const;
+    const QwtPlotCurve* getCurve(size_t curveIndex) const;
 
     size_t streamPos() const { return m_streamPos; }
     size_t type() const { return m_type; }
@@ -163,9 +248,16 @@ public:
     int frameAt( double x ) const;
 
     void addGuidelines(int bitsPerRawSample);
+    virtual void setVisible(bool visible) override;
 
+    void updateSymbols();
 Q_SIGNALS:
     void cursorMoved( int index );
+    void visibilityChanged(bool visible);
+
+public Q_SLOTS:
+    void initYAxis();
+    void setBoolean(bool value);
 
 private Q_SLOTS:
     void onPickerMoved( const QPointF& );
@@ -180,9 +272,12 @@ private:
     const size_t            m_group;
     QVector<QwtPlotCurve*>  m_curves;
     PlotCursor*             m_cursor;
+    QCheckBox*              m_booleanPlotCheckbox;
 
     PlotLegend*             m_legend;
     const FileInformation*  m_fileInformation;
+
+    bool                    m_boolean;
 };
 
 #endif // GUI_Plot_H
