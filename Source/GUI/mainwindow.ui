@@ -206,12 +206,12 @@
    <addaction name="actionZoomOne"/>
    <addaction name="actionZoomOut"/>
    <addaction name="separator"/>
-   <addaction name="actionFiltersLayout"/>
    <addaction name="actionWindowOut"/>
    <addaction name="actionUploadToSignalServer"/>
    <addaction name="actionSignalServer_status"/>
    <addaction name="actionFilesList"/>
    <addaction name="actionGraphsLayout"/>
+   <addaction name="actionFiltersLayout"/>
    <addaction name="separator"/>
    <addaction name="actionGettingStarted"/>
   </widget>
