@@ -914,6 +914,7 @@ void MainWindow::setFilesCurrentPos(const size_t &value)
 {
     files_CurrentPos = value;
     ui->actionReveal_file_location->setEnabled(isFileSelected());
+    ui->actionFiltersLayout->setEnabled(isFileSelected());
 }
 
 bool MainWindow::isFileSelected() const
