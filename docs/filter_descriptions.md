@@ -2,31 +2,31 @@
 
 ### Video
 
-[YUV Values/ MIN, AVG, MAX, LOW, HIGH](#yuv)  
-[YUV Values/ Difference](#diff)  
-[Saturation](#saturation)  
-[Hue](#hue)  
-[Temporal Outliers](#tout)  
-[Vertical Line Repetitions](#vrep)  
-[Broadcast Range](#brng)  
-[Crop Width (CropW)](#cropw)  
-[Crop Height (CropH)](#croph)  
-[Peak Signal to Noise Ratio (PSNRf)](#psnrf)  
-[Packet Duration Time (pkt_duration_time)](#pkd)  
-[Packet Size (pkt_size)](#ps)  
-[Structural SImilarity Metric (SSIMf)](#ssimf)  
-[Mean Square Error (MSEf)](#msef)  
-[Interlacement Detection (single frame)](#singleframe)  
-[Interlacement Detection (multiple frames)](#multiframe)  
-[Interlacement Detection (repeated fields)](#repeated)  
+[YUV Values/ MIN, AVG, MAX, LOW, HIGH](#yuv)
+[YUV Values/ Difference](#diff)
+[Saturation](#saturation)
+[Hue](#hue)
+[Temporal Outliers](#tout)
+[Vertical Line Repetitions](#vrep)
+[Broadcast Range](#brng)
+[Crop Width (CropW)](#cropw)
+[Crop Height (CropH)](#croph)
+[Peak Signal to Noise Ratio (PSNRf)](#psnrf)
+[Packet Duration Time (pkt_duration_time)](#pkd)
+[Packet Size (pkt_size)](#ps)
+[Structural SImilarity Metric (SSIMf)](#ssimf)
+[Mean Square Error (MSEf)](#msef)
+[Interlacement Detection (single frame)](#singleframe)
+[Interlacement Detection (multiple frames)](#multiframe)
+[Interlacement Detection (repeated fields)](#repeated)
 
 ### Audio
 
-[R.128](#r128)  
-[Audio Phase Meter](#phase)  
-[DC Offset](#dc)  
-[Audio Diffs](#audio-diffs)  
-[RMS](#rms)  
+[R.128](#r128)
+[Audio Phase Meter](#phase)
+[DC Offset](#dc)
+[Audio Diffs](#audio-diffs)
+[RMS](#rms)
 
 ## YUV Values/ MIN, AVG, MAX, LOW, HIGH {#yuv}
 
@@ -54,11 +54,11 @@ Y MAX = Y channel maximum
 #### Samples which demonstrate Y Value anomalies:
 
 In the graph below, you can see the YMAX spikes which would manifest as white lines across the video picture:
-![YMAX spikes](media/YMAX_DHC0177_trackingerror_ffv1_h264.jpg)
+![YMAX Spikes](media/graph_ymax_spikes.jpg)
 
 The graph below illustrates a reading with many luma spikes in the Y LOW, Y AVG, and Y HIGH, most notably in the first second of the graph.
 
-![luma spikes](media/YValues_293_0047_SKEW_ffv1_h264.jpg)
+![Luma Spikes](media/graph_luma_spikes.jpg)
 
 | Filter Domain | Filter Name(s) | Values* |
 | Y Channel | Y LOW, Y HIGH | 16-235 |
@@ -71,7 +71,7 @@ This filter works in a similar fashion as the YUV \*MIN and \*MAX filters, but i
 
 #### Samples which demonstrate YUV LOW/HIGH anomalies:
 
-![YHIGH](media/YValues_DHC0267_trackingerror_ffv1_h264.jpg)
+![YHIGH](media/graph_yhigh_h264.jpg)
 
 ### U, V Value Filters: U MIN, U AVG, U MAX/ V MIN, V AVG, V MAX
 
@@ -93,15 +93,15 @@ U MAX, V MAX = U channel maximum, V channel maximum
 
 The graph of this video file shows dramatic spikes and drops in U and V MIN/MAX values. You can also see attendant activity in the Sat (Saturation) and MSEf (Mean Square Error) filters (see descriptions below).
 
-![UV Values](media/digibeta_error_shows-illegal-chroma_extreme_minmax_uv.jpg)
+![UV Values](media/graph_uv_values.jpg)
 
 This is a good example of dramatic activity in U and V channels showing around the 4-6s mark, corresponding to chrominance noise in the video (visible rainbow-ed speckles across the picture).
 
-![UV Channels](media/UV_293_0050_chrominancenoise_ffv1_h264.jpg)
+![UV Channels](media/graph_uv_channels.jpg)
 
 Notice U noise in the graph below from approximately 2.86s to 4.37s. Also seen in U DIF reading.
 
-![U Noise](media/UNoise_293_0047_JITTERS_ffv1.jpg)
+![U Noise](media/graph_unoise.jpg)
 
 ## YUV Values/ Difference {#diff}
 
@@ -118,7 +118,7 @@ V DIF = Difference of V Channel between two frames
 
 #### Samples which demonstrate YUV Difference anomalies:
 
-![YUV Differences](media/seattle_parade_yuvdiffs.jpg)
+![YUV Differences](media/graph_yuvdiffs.jpg)
 
 ## Saturation {#saturation}
 
@@ -147,7 +147,7 @@ This filter was created to detect white speckle noise in analog VHS and 8mm vide
 
 You can see several blips in the graph reading, especially around 7.5s, 15s, and 24s
 
-![Temp Outliers](media/TOUT_DHC0177_trackingerror_ffv1_h264.jpg)
+![Temp Outliers](media/graph_tout.jpg)
 
 ## Vertical Line Repetitions (VREP) {#vrep}
 
@@ -158,8 +158,8 @@ Vertical Line Repetitions, or the VREP filter, is useful in analyzing U-Matic ta
 
 #### Samples which demonstrate Vertical Repetition anomalies:
 
-![Vertical Repetitions 1](media/VREP_293_0047_JITTER.jpg)
-![Vertical Repetitions 2](media/DAN_Rogers2_umatic_error-vrep.jpg)
+![Vertical Repetitions 1](media/graph_vertical_line_repetitions_01.jpg)
+![Vertical Repetitions 2](media/graph_vertical_line_repetitions_02.jpg)
 
 ## Broadcast Range (BRNG) {#brng}
 
@@ -172,7 +172,7 @@ BRNG = Broadcast Range
 
 #### Samples which demonstrate Broadcast Range anomalies:
 
-![Broadcast Range Anomaly 1](media/RANG_293_0046_syncloss2.jpg)
+![Broadcast Range Anomaly 1](media/graph_brng_anomaly.jpg)
 
 ## Crop Width (CropW) {#cropw}
 
@@ -188,7 +188,7 @@ This filter plots the Peak Signal to Noise Ratio between the video in field 1 (o
 
 #### Samples which demonstrate Peak Signal to Noise Ratio anomalies:
 
-![PSNRf](media/NGA000006_psnrf.jpg)
+![PSNRf](media/graph_peak_signal_noise_ratio.jpg)
 
 ## Packet Duration Time (pkt\_duration\_time) {#pkd}
 
@@ -204,7 +204,7 @@ This filter is similar to PSNRf but reports on the Mean Square Error between fie
 
 #### Samples which demonstrate Mean Square Error anomalies:
 
-![MSEf](media/NGA000006_msef.jpg)
+![MSEf](media/graph_mean_square_error.jpg)
 
 ## Structural SImilarity Metric (SSIMf) {#ssimf}
 
