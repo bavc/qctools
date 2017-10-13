@@ -8,7 +8,7 @@ BooleanChartConditionEditor::BooleanChartConditionEditor(QWidget *parent) :
     ui->setupUi(this);
 
     m_defaultTextColor = ui->condition_lineEdit->palette().color(QPalette::Text);
-    m_validatedTextColor = QColor(Qt::green);
+    m_validatedTextColor = QColor(Qt::darkGreen);
     m_errorTextColor = QColor(Qt::red);
 
     m_validationTimer.setSingleShot(true);
