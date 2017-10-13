@@ -47,7 +47,7 @@ before_install:
   
   - if [[ $TRAVIS_OS_NAME == linux ]]; then sudo add-apt-repository --yes ppa:beineri/opt-qt551-trusty; fi
   - if [[ $TRAVIS_OS_NAME == linux ]]; then sudo apt-get update -qq; fi
-  - if [[ $TRAVIS_OS_NAME == linux ]]; then sudo apt-get install --force-yes -qq qt55base mesa-common-dev libglu1-mesa-dev; fi
+  - if [[ $TRAVIS_OS_NAME == linux ]]; then sudo apt-get install --force-yes -qq qt55base qt55declarative mesa-common-dev libglu1-mesa-dev; fi
   - if [[ $TRAVIS_OS_NAME == linux ]]; then sudo chmod 777 ./Project/BuildAllFromSource/*; fi
   - if [[ $TRAVIS_OS_NAME == linux ]]; then source /opt/qt55/bin/qt55-env.sh; fi
 
