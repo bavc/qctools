@@ -16,6 +16,12 @@
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <widget class="QLabel" name="label">
+     <property name="minimumSize">
+      <size>
+       <width>60</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -41,17 +47,17 @@
     </widget>
    </item>
    <item>
-    <widget class="QLineEdit" name="moreThan_lineEdit"/>
-   </item>
-   <item>
-    <widget class="QLabel" name="yLabel">
-     <property name="text">
-      <string>&lt; Y &lt;</string>
+    <widget class="QLineEdit" name="condition_lineEdit">
+     <property name="minimumSize">
+      <size>
+       <width>260</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="placeholderText">
+      <string>type condition here (like Y &lt; 0.5)</string>
      </property>
     </widget>
-   </item>
-   <item>
-    <widget class="QLineEdit" name="lessThan_lineEdit"/>
    </item>
   </layout>
  </widget>

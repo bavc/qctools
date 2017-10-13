@@ -132,10 +132,9 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
 
                             QString title = curve->title().text();
                             conditionEditor->setLabel(title);
-                            conditionEditor->setColor(curve->pen().color());
 
-                            conditionEditor->setLessThan(data->condition().lessThanFormula);
-                            conditionEditor->setMoreThan(data->condition().moreThanFormula);
+                            conditionEditor->setColor(curve->pen().color());
+                            conditionEditor->setCondition(data->condition());
 
                             vbox->insertWidget(0, conditionEditor);
                             pairs.append(QPair<PlotSeriesData*, BooleanChartConditionEditor*>(data, conditionEditor));
@@ -152,11 +151,9 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                                 auto data = pair.first;
                                 auto editor = pair.second;
 
-                                QString lessThan = editor->getLessThan();
-                                QString moreThan = editor->getMoreThan();
+                                QString condition = editor->getCondition();
 
-                                data->condition().lessThanFormula = lessThan;
-                                data->condition().moreThanFormula = moreThan;
+                                data->condition().m_conditionString = condition;
                                 data->condition().update();
                             }
 

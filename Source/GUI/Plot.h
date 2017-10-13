@@ -11,6 +11,8 @@
 
 #include <Core/CommonStats.h>
 #include <Core/Core.h>
+#include <QJSEngine>
+#include <QJSValue>
 #include <QEvent>
 #include <QResizeEvent>
 #include <qwt_plot.h>
@@ -155,45 +157,42 @@ public:
     struct Condition
     {
         Condition(CommonStats* stats, size_t plotGroup) : m_stats(stats), m_plotGroup(plotGroup) {
-            moreThanFormula = "yHalf";
+            m_conditionString = "y < yHalf";
+            m_engine.globalObject().setProperty("yHalf", (m_stats->y_Max[m_plotGroup] - m_stats->y_Min[m_plotGroup]) / 2);
+
+            auto pow2 = m_engine.evaluate("function(value) { return Math.pow(value, 2); }");
+            m_engine.globalObject().setProperty("pow2", pow2);
+
+            auto pow = m_engine.evaluate("function(base, exponent) { return Math.pow(base, exponent); }");
+            m_engine.globalObject().setProperty("pow", pow);
+
             update();
         }
-        double lessThan;
-        bool hasLessThan;
-        QString lessThanFormula;
-
-        double moreThan;
-        bool hasMoreThan;
-        QString moreThanFormula;
 
         CommonStats* m_stats;
         size_t m_plotGroup;
 
+        QString m_conditionString;
+        mutable QJSValue m_conditionFunction;
+        mutable QJSEngine m_engine;
+
         bool match(double y) const {
-            if(!hasLessThan && !hasMoreThan)
-                return false;
 
-            if(hasLessThan && y > lessThan)
-                return false;
+            if(m_conditionFunction.isCallable() && m_conditionFunction.call(QJSValueList() << y).toBool())
+                return true;
 
-            if(hasMoreThan && y < moreThan)
-                return false;
-
-            return true;
+            return false;
         }
 
-        double formulaToValue(const QString& formula, bool& ok) {
-            if(formula == "yHalf") {
-                ok = true;
-                return (m_stats->y_Max[m_plotGroup] - m_stats->y_Min[m_plotGroup]) / 2;
-            }
-
-            return formula.toDouble(&ok);
+        QJSValue makeConditionFunction(const QString& condition) const {
+            return m_engine.evaluate(QString("function(y) { return %1; }").arg(condition));
         }
 
         void update() {
-            lessThan = formulaToValue(lessThanFormula, hasLessThan);
-            moreThan = formulaToValue(moreThanFormula, hasMoreThan);
+            if(m_conditionString.isEmpty())
+                m_conditionFunction = QJSValue();
+            else
+                m_conditionFunction = makeConditionFunction(m_conditionString);
         }
     };
 
