@@ -23,11 +23,11 @@ else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PW
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../qctools-lib/debug/qctools.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../qctools-lib/libqctools.a
 
-SOURCES_PATH = $$PWD/../../../Source
-message("qctools: SOURCES_PATH = " $$absolute_path($$SOURCES_PATH))
+SOURCES_PATH = $$absolute_path($$PWD/../../../Source)
+message("qctools: SOURCES_PATH = " $$SOURCES_PATH)
 
 THIRD_PARTY_PATH = $$absolute_path($$SOURCES_PATH/../..)
-message("qctools: THIRD_PARTY_PATH = " $$absolute_path($$THIRD_PARTY_PATH))
+message("qctools: THIRD_PARTY_PATH = " $$THIRD_PARTY_PATH)
 
 HEADERS += \
     $$SOURCES_PATH/GUI/BigDisplay.h \
@@ -78,7 +78,9 @@ SOURCES += \
     $$SOURCES_PATH/GUI/booleanchartconditioneditor.cpp
 
 win32 {
-    INCLUDEPATH += $$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib
+    ZLIB_INCLUDE_PATH = $$absolute_path($$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib/src)
+    message("qctools: ZLIB_INCLUDE_PATH = " $$ZLIB_INCLUDE_PATH)
+    INCLUDEPATH += $$ZLIB_INCLUDE_PATH
 }
 
 FORMS += \
