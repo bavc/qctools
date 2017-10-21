@@ -29,6 +29,8 @@ message("qctools: SOURCES_PATH = " $$SOURCES_PATH)
 THIRD_PARTY_PATH = $$absolute_path($$SOURCES_PATH/../..)
 message("qctools: THIRD_PARTY_PATH = " $$THIRD_PARTY_PATH)
 
+INCLUDEPATH += $$SOURCES_PATH/GUI
+
 HEADERS += \
     $$SOURCES_PATH/GUI/BigDisplay.h \
     $$SOURCES_PATH/GUI/Control.h \
@@ -49,7 +51,8 @@ HEADERS += \
     $$SOURCES_PATH/GUI/config.h \
     $$SOURCES_PATH/GUI/draggablechildrenbehaviour.h \
     $$SOURCES_PATH/ThirdParty/cqmarkdown/CMarkdown.h \
-    $$SOURCES_PATH/GUI/booleanchartconditioneditor.h
+    $$SOURCES_PATH/GUI/booleanchartconditioneditor.h \
+    $$SOURCES_PATH/GUI/booleanchartconditioninput.h
 
 SOURCES += \
     $$SOURCES_PATH/GUI/BigDisplay.cpp \
@@ -75,7 +78,8 @@ SOURCES += \
     $$SOURCES_PATH/GUI/config.cpp \
     $$SOURCES_PATH/GUI/draggablechildrenbehaviour.cpp \
     $$SOURCES_PATH/ThirdParty/cqmarkdown/CMarkdown.cpp \
-    $$SOURCES_PATH/GUI/booleanchartconditioneditor.cpp
+    $$SOURCES_PATH/GUI/booleanchartconditioneditor.cpp \
+    $$SOURCES_PATH/GUI/booleanchartconditioninput.cpp
 
 win32 {
     ZLIB_INCLUDE_PATH = $$absolute_path($$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib/src)
@@ -89,7 +93,8 @@ FORMS += \
     $$SOURCES_PATH/GUI/CommentsEditor.ui \
     $$SOURCES_PATH/GUI/blackmagicdecklink_userinput.ui \
     $$SOURCES_PATH/GUI/imagelabel.ui \
-    $$SOURCES_PATH/GUI/booleanchartconditioneditor.ui
+    $$SOURCES_PATH/GUI/booleanchartconditioneditor.ui \
+    $$SOURCES_PATH/GUI/booleanchartconditioninput.ui
 
 RESOURCES += \
     $$SOURCES_PATH/Resource/Resources.qrc

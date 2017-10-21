@@ -25,6 +25,7 @@
 
 #include "Core/FileInformation.h"
 #include "Core/VideoCore.h"
+#include <cassert>
 
 static double stepSize( double distance, int numSteps )
 {
@@ -231,6 +232,10 @@ protected:
                 const QPolygonF points = mapper.toPointsF(xMap, yMap,
                         data(), i, i);
 
+                const PlotSeriesData* plotSeriesData = static_cast<const PlotSeriesData*>(data());
+                const PlotSeriesData::Condition* lastCondition = plotSeriesData->getLastCondition();
+                assert(lastCondition);
+                p->setBrush(lastCondition->m_color);
                 s.drawSymbols( p, points );
             }
         }

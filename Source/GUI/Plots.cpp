@@ -12,7 +12,8 @@
 #include "GUI/PlotScaleWidget.h"
 #include "GUI/Comments.h"
 #include "GUI/CommentsEditor.h"
-#include "booleanchartconditioneditor.h"
+#include "GUI/booleanchartconditioneditor.h"
+#include "GUI/booleanchartconditioninput.h"
 #include "Core/Core.h"
 #include "Core/VideoCore.h"
 #include <QComboBox>
@@ -131,10 +132,10 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                             auto curve = dynamic_cast<const QwtPlotCurve*>( plot->getCurve(j) );
 
                             QString title = curve->title().text();
-                            conditionEditor->setLabel(title);
 
-                            conditionEditor->setColor(curve->pen().color());
-                            conditionEditor->setCondition(data->condition());
+                            conditionEditor->setLabel(title);
+                            conditionEditor->setDefaultColor(curve->pen().color());
+                            conditionEditor->setConditions(data->conditions());
 
                             vbox->insertWidget(0, conditionEditor);
                             pairs.append(QPair<PlotSeriesData*, BooleanChartConditionEditor*>(data, conditionEditor));
@@ -151,10 +152,25 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                                 auto data = pair.first;
                                 auto editor = pair.second;
 
-                                QString condition = editor->getCondition();
+                                if(data->conditions().items.size() != editor->conditionsCount())
+                                {
+                                    if(data->conditions().items.size() > editor->conditionsCount())
+                                    {
+                                        while(data->conditions().items.size() > editor->conditionsCount())
+                                            data->mutableConditions().removeCondition();
+                                    }
+                                    else
+                                    {
+                                        while(data->conditions().items.size() < editor->conditionsCount())
+                                            data->mutableConditions().addCondition();
+                                    }
+                                }
 
-                                data->condition().m_conditionString = condition;
-                                data->condition().update();
+                                for(auto i = 0; i < editor->conditionsCount(); ++i)
+                                {
+                                    auto conditionInput = editor->getCondition(i);
+                                    data->mutableConditions().updateCondition(i, conditionInput->getCondition(), conditionInput->getColor());
+                                }
                             }
 
                             plot->updateSymbols();

@@ -11,9 +11,9 @@
 
 #include <Core/CommonStats.h>
 #include <Core/Core.h>
+#include <QEvent>
 #include <QJSEngine>
 #include <QJSValue>
-#include <QEvent>
 #include <QResizeEvent>
 #include <qwt_plot.h>
 #include <qwt_series_data.h>
@@ -113,8 +113,9 @@ class PlotSeriesData : public QObject, public QwtPointSeriesData
     Q_OBJECT
 public:
     PlotSeriesData(CommonStats* stats, const int& xDataIndex, const size_t yDataIndex, size_t plotGroup, size_t curveIndex, size_t curvesCount)
-        : m_boolean(false), m_stats(stats), m_xDataIndex(xDataIndex), m_yDataIndex(yDataIndex), m_plotGroup(plotGroup), m_curveIndex(curveIndex), m_curvesCount(curvesCount),
-        m_condition(stats, plotGroup)
+        : m_boolean(false), m_conditions(stats, plotGroup), m_lastCondition(nullptr),
+          m_stats(stats), m_xDataIndex(xDataIndex), m_yDataIndex(yDataIndex), m_plotGroup(plotGroup), m_curveIndex(curveIndex),
+          m_curvesCount(curvesCount)
     {
 
     }
@@ -131,7 +132,14 @@ public:
     }
 
     double toBoolean(double y) const {
-        return m_condition.match(y) ? 1.0 : 0.0;
+        for(auto& condition : qAsConst(m_conditions.items)) {
+            if(condition.match(y)) {
+                m_lastCondition = &condition;
+                return 1.0;
+            }
+        }
+
+        return 0.0;
     }
 
     double toBoolean(double y, double globalMax) const {
@@ -147,25 +155,19 @@ public:
 
     struct Condition
     {
-        Condition(CommonStats* stats, size_t plotGroup) : m_stats(stats), m_plotGroup(plotGroup) {
-            m_conditionString = "y < yHalf";
-            m_engine.globalObject().setProperty("yHalf", (m_stats->y_Max[m_plotGroup] - m_stats->y_Min[m_plotGroup]) / 2);
-
-            auto pow2 = m_engine.evaluate("function(value) { return Math.pow(value, 2); }");
-            m_engine.globalObject().setProperty("pow2", pow2);
-
-            auto pow = m_engine.evaluate("function(base, exponent) { return Math.pow(base, exponent); }");
-            m_engine.globalObject().setProperty("pow", pow);
-
-            update();
+        Condition() : m_engine(nullptr) {
         }
 
-        CommonStats* m_stats;
-        size_t m_plotGroup;
+        Condition(QJSEngine* engine) : m_engine(engine) {
+        }
 
+        Condition(const Condition& other) = default;
+        Condition(Condition&& other) = default;
+
+        QJSEngine* m_engine;
+        QColor m_color;
         QString m_conditionString;
         mutable QJSValue m_conditionFunction;
-        mutable QJSEngine m_engine;
 
         bool match(double y) const {
 
@@ -175,8 +177,12 @@ public:
             return false;
         }
 
+        static QJSValue makeConditionFunction(QJSEngine* engine, const QString& condition) {
+            return engine->evaluate(QString("function(y) { return %1; }").arg(condition));
+        }
+
         QJSValue makeConditionFunction(const QString& condition) const {
-            return m_engine.evaluate(QString("function(y) { return %1; }").arg(condition));
+            return makeConditionFunction(m_engine, condition);
         }
 
         void update() {
@@ -187,8 +193,52 @@ public:
         }
     };
 
-    Condition& condition() {
-        return m_condition;
+    struct Conditions
+    {
+        Conditions(CommonStats* stats, size_t plotGroup) : m_stats(stats), m_plotGroup(plotGroup) {
+            engine.globalObject().setProperty("yHalf", (m_stats->y_Max[m_plotGroup] - m_stats->y_Min[m_plotGroup]) / 2);
+
+            auto pow2 = engine.evaluate("function(value) { return Math.pow(value, 2); }");
+            engine.globalObject().setProperty("pow2", pow2);
+
+            auto pow = engine.evaluate("function(base, exponent) { return Math.pow(base, exponent); }");
+            engine.globalObject().setProperty("pow", pow);
+        }
+
+        void addCondition() {
+            items.append(Condition(&engine));
+        }
+
+        void removeCondition() {
+            items.removeLast();
+        }
+
+        void updateCondition(int i, const QString& conditionString, const QColor& color) {
+            auto & condition = items[i];
+            qDebug() << "updateCondition: " << i << ", string = " << conditionString << ", color = " << color;
+
+            condition.m_conditionString = conditionString;
+            condition.m_color = color;
+            condition.update();
+        }
+
+        mutable QJSEngine engine;
+        QVector<Condition> items;
+
+        CommonStats* m_stats;
+        size_t m_plotGroup;
+    };
+
+    const Conditions& conditions() const{
+        return m_conditions;
+    }
+
+    Conditions& mutableConditions() {
+        return m_conditions;
+    }
+
+    const Condition* getLastCondition() const {
+        return m_lastCondition;
     }
 
 public Q_SLOTS:
@@ -199,7 +249,8 @@ public Q_SLOTS:
 
 private:
     bool m_boolean;
-    Condition m_condition;
+    Conditions m_conditions;
+    mutable const Condition* m_lastCondition;
     CommonStats* m_stats;
     const int& m_xDataIndex;
     const size_t m_yDataIndex;

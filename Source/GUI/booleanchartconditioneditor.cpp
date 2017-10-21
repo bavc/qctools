@@ -1,5 +1,9 @@
-#include "booleanchartconditioneditor.h"
+#include "GUI/booleanchartconditioninput.h"
+#include "GUI/booleanchartconditioneditor.h"
 #include "ui_booleanchartconditioneditor.h"
+#include <QCompleter>
+#include <QStandardItemModel>
+#include <cassert>
 
 BooleanChartConditionEditor::BooleanChartConditionEditor(QWidget *parent) :
     QWidget(parent),
@@ -7,46 +11,8 @@ BooleanChartConditionEditor::BooleanChartConditionEditor(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    m_defaultTextColor = ui->condition_lineEdit->palette().color(QPalette::Text);
-    m_validatedTextColor = QColor(Qt::darkGreen);
-    m_errorTextColor = QColor(Qt::red);
-
-    m_validationTimer.setSingleShot(true);
-    m_validationTimer.setInterval(500);
-
-    connect(&m_validationTimer, &QTimer::timeout, [&] {
-        if(!m_condition)
-            return;
-
-        QColor color;
-        if(ui->condition_lineEdit->text().isEmpty())
-        {
-            color = m_defaultTextColor;
-            ui->condition_lineEdit->setToolTip("No condition");
-        }
-        else
-        {
-            auto result = m_condition->makeConditionFunction(ui->condition_lineEdit->text());
-            if(result.isError() || !result.isCallable()) {
-                color = m_errorTextColor;
-                ui->condition_lineEdit->setToolTip("Error: " + result.toString());
-            } else {
-                auto callResult = result.call(QJSValueList() << 0);
-                if(callResult.isError() && !result.isBool()) {
-                    color = m_errorTextColor;
-                    ui->condition_lineEdit->setToolTip("Error: " + callResult.toString());
-                } else {
-                    color = m_validatedTextColor;
-                    ui->condition_lineEdit->setToolTip("Success");
-                }
-            }
-        }
-
-        auto palette = ui->condition_lineEdit->palette();
-        palette.setColor(QPalette::Text, color);
-
-        ui->condition_lineEdit->setPalette(palette);
-    });
+    getCondition(0)->setRemoveButtonEnabled(false);
+    connect(getCondition(0), SIGNAL(addButtonClicked()), this, SLOT(addCondition()));
 }
 
 BooleanChartConditionEditor::~BooleanChartConditionEditor()
@@ -54,32 +20,87 @@ BooleanChartConditionEditor::~BooleanChartConditionEditor()
     delete ui;
 }
 
+BooleanChartConditionInput *BooleanChartConditionEditor::getCondition(int index) const
+{
+    return static_cast<BooleanChartConditionInput*> (ui->verticalLayout->itemAt(index)->widget());
+}
+
+int BooleanChartConditionEditor::conditionsCount() const
+{
+    return ui->verticalLayout->count();
+}
+
 void BooleanChartConditionEditor::setLabel(const QString &label)
 {
     ui->label->setText(label);
 }
 
-void BooleanChartConditionEditor::setColor(const QColor &color)
+void BooleanChartConditionEditor::setDefaultColor(const QColor &color)
 {
-    QPalette palette = ui->frame->palette();
-    palette.setColor( backgroundRole(), color);
-
-    ui->frame->setPalette(palette);
+    m_defaultColor = color;
+    getCondition(0)->setColor(m_defaultColor);
 }
 
-void BooleanChartConditionEditor::setCondition(const PlotSeriesData::Condition &value)
+void BooleanChartConditionEditor::setConditions(const PlotSeriesData::Conditions &value)
 {
-    ui->condition_lineEdit->setText(value.m_conditionString);
-    m_condition = &value;
-    m_validationTimer.start(0);
+    if(value.items.size() == 0)
+    {
+        while(conditionsCount() != 1)
+            removeCondition();
+
+        auto condition = getCondition(0);
+        assert(condition);
+
+        condition->setJsEngine(&value.engine);
+        condition->setColor(m_defaultColor);
+        condition->setCondition(QString());
+    }
+    else
+    {
+        if(conditionsCount() != value.items.size())
+        {
+            if(conditionsCount() > value.items.size())
+            {
+                while(conditionsCount() != value.items.size())
+                    removeCondition();
+            }
+            else
+            {
+                while(conditionsCount() != value.items.size())
+                    addCondition();
+            }
+        }
+
+        for(auto i = 0; i < conditionsCount(); ++i)
+        {
+            auto condition = getCondition(i);
+            assert(condition);
+
+            condition->setJsEngine(&value.engine);
+            condition->setColor(value.items[i].m_color);
+            condition->setCondition(value.items[i].m_conditionString);
+        }
+    }
 }
 
-QString BooleanChartConditionEditor::getCondition() const
+void BooleanChartConditionEditor::addCondition()
 {
-    return ui->condition_lineEdit->text();
+    int index = ui->verticalLayout->indexOf(static_cast<QWidget*>(sender()));
+
+    auto input = new BooleanChartConditionInput();
+    input->setJsEngine(getCondition(0)->getJsEngine());
+    input->setColor(m_defaultColor);
+    ui->verticalLayout->insertWidget(index + 1, input);
+
+    connect(input, SIGNAL(addButtonClicked()), this, SLOT(addCondition()));
+    connect(input, SIGNAL(removeButtonClicked()), this, SLOT(removeCondition()));
 }
 
-void BooleanChartConditionEditor::on_condition_lineEdit_textEdited(const QString &arg1)
+void BooleanChartConditionEditor::removeCondition()
 {
-    m_validationTimer.start();
+    auto widget = sender() != nullptr ? static_cast<QWidget*>(sender()) :
+                                        ui->verticalLayout->itemAt(ui->verticalLayout->count() - 1)->widget();
+
+    widget->deleteLater();
+    ui->verticalLayout->removeWidget(widget);
 }

@@ -1,7 +1,6 @@
 #ifndef BOOLEANCHARTCONDITIONEDITOR_H
 #define BOOLEANCHARTCONDITIONEDITOR_H
 
-#include <QTimer>
 #include <QWidget>
 #include "Plot.h"
 
@@ -9,7 +8,7 @@ namespace Ui {
 class BooleanChartConditionEditor;
 }
 
-class QJSEngine;
+class BooleanChartConditionInput;
 class BooleanChartConditionEditor : public QWidget
 {
     Q_OBJECT
@@ -18,23 +17,20 @@ public:
     explicit BooleanChartConditionEditor(QWidget *parent = 0);
     ~BooleanChartConditionEditor();
 
-    void setLabel(const QString& label);
-    void setColor(const QColor& color);
+    BooleanChartConditionInput* getCondition(int index) const;
+    int conditionsCount() const;
 
-    void setCondition(const PlotSeriesData::Condition& value);
-    QString getCondition() const;
+    void setLabel(const QString& label);
+    void setDefaultColor(const QColor& color);
+    void setConditions(const PlotSeriesData::Conditions& value);
 
 private Q_SLOTS:
-    void on_condition_lineEdit_textEdited(const QString &arg1);
+    void addCondition();
+    void removeCondition();
 
 private:
+    QColor m_defaultColor;
     Ui::BooleanChartConditionEditor *ui;
-    QTimer m_validationTimer;
-    const PlotSeriesData::Condition* m_condition;
-
-    QColor m_defaultTextColor;
-    QColor m_validatedTextColor;
-    QColor m_errorTextColor;
 };
 
 #endif // BOOLEANCHARTCONDITIONEDITOR_H

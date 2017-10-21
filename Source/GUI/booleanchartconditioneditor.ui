@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>379</width>
-    <height>44</height>
+    <width>518</width>
+    <height>46</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
     <widget class="QLabel" name="label">
      <property name="minimumSize">
       <size>
-       <width>60</width>
-       <height>0</height>
+       <width>24</width>
+       <height>24</height>
       </size>
      </property>
      <property name="text">
@@ -28,39 +28,22 @@
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="frame">
-     <property name="minimumSize">
-      <size>
-       <width>22</width>
-       <height>22</height>
-      </size>
-     </property>
-     <property name="autoFillBackground">
-      <bool>true</bool>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLineEdit" name="condition_lineEdit">
-     <property name="minimumSize">
-      <size>
-       <width>260</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="placeholderText">
-      <string>type condition here (like Y &lt; 0.5)</string>
-     </property>
-    </widget>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="BooleanChartConditionInput" name="widget" native="true"/>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>BooleanChartConditionInput</class>
+   <extends>QWidget</extends>
+   <header>booleanchartconditioninput.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
