@@ -637,22 +637,22 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
                     qDebug() << "i: " << i << ", j: " << j;
 
                     auto plotWidget = gridLayout->itemAtPosition(j, 0)->widget();
-                    auto legendWidget = gridLayout->itemAtPosition(j, 1)->widget();
+                    auto legendItem = gridLayout->itemAtPosition(j, 1);
 
                     auto swapPlotWidget = gridLayout->itemAtPosition(i, 0)->widget();
-                    auto swapLegendWidget = gridLayout->itemAtPosition(i, 1)->widget();
+                    auto swapLegendItem = gridLayout->itemAtPosition(i, 1);
 
                     gridLayout->removeWidget(plotWidget);
-                    gridLayout->removeWidget(legendWidget);
+                    gridLayout->removeItem(legendItem);
 
                     gridLayout->removeWidget(swapPlotWidget);
-                    gridLayout->removeWidget(swapLegendWidget);
+                    gridLayout->removeItem(swapLegendItem);
 
                     gridLayout->addWidget(plotWidget, i, 0);
-                    gridLayout->addWidget(legendWidget, i, 1);
+                    gridLayout->addItem(legendItem, i, 1);
 
                     gridLayout->addWidget(swapPlotWidget, j, 0);
-                    gridLayout->addWidget(swapLegendWidget, j, 1);
+                    gridLayout->addItem(swapLegendItem, j, 1);
 
                     currentOrderedPlotsInfo[j] = currentOrderedPlotsInfo[i];
                     currentOrderedPlotsInfo[i] = expectedOrderedPlotsInfo[i];
