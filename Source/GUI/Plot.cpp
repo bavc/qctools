@@ -171,7 +171,7 @@ public:
     }
     QRect boundingRect() const {
         QRect rect = QwtSymbol::boundingRect();
-        rect.moveCenter(QPoint(0, -rect.top()));
+        // rect.moveCenter(QPoint(0, -rect.top()));
         return rect;
     }
 protected:
@@ -181,26 +181,15 @@ protected:
         QPen pen = this->pen();
         pen.setJoinStyle( Qt::MiterJoin );
         painter->setPen( Qt::black );
-        painter->setBrush( this->brush() );
 
-        if ( QwtPainter::roundingAlignment( painter ) )
+        for ( int i = 0; i < numPoints; i++ )
         {
-            for ( int i = 0; i < numPoints; i++ )
-            {
-                QwtPainter::drawRect(painter, points[i].x() - size.width() / 2, 0, size.width(), size.height());
-            }
-        }
-        else
-        {
-            for ( int i = 0; i < numPoints; i++ )
-            {
-                const QPointF &pos = points[i];
+            const QPointF &pos = points[i];
 
-                const double x1 = pos.x() - 0.5 * size.width();
-                const double y1 = pos.y() - 0.5 * size.height();
+            const double x1 = pos.x() - 0.5 * size.width();
+            const double y1 = pos.y(); //  - 0.5 * size.height();
 
-                QwtPainter::drawRect(painter, x1, y1, size.width(), size.height());
-            }
+            QwtPainter::drawRect(painter, x1, y1, size.width(), size.height());
         }
     }
 };
@@ -335,6 +324,7 @@ void Plot::updateSymbols()
             curve->setStyle(QwtPlotCurve::Dots);
 
             QwtSymbol *symbol = new PlotSymbol();
+            symbol->setCachePolicy(QwtSymbol::NoCache);
             symbol->setBrush(curve->pen().color());
             symbol->setPen(Qt::transparent);
 
