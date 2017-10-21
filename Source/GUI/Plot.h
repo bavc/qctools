@@ -107,15 +107,6 @@ struct compareX
     }
 };
 
-static int indexLower( double x, const QwtSeriesData<QPointF> &data )
-{
-    int index = qwtUpperSampleIndex<QPointF>( data, x, compareX() );
-    if ( index == -1 )
-        index = data.size();
-
-    return index - 1;
-}
-
 class PlotSeriesData : public QObject, public QwtPointSeriesData
 {
     // QwtSeriesData interface

@@ -643,6 +643,15 @@ void Plot::onPickerMoved( const QPointF& pos )
         Q_EMIT cursorMoved( idx );
 }
 
+static int indexLower( double x, const QwtSeriesData<QPointF> &data )
+{
+    int index = qwtUpperSampleIndex<QPointF>( data, x, compareX() );
+    if ( index == -1 )
+        index = data.size();
+
+    return index - 1;
+}
+
 int Plot::frameAt( double x ) const
 {
     const QwtPlotCurve* curve = this->curve(0);
