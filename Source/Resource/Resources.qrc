@@ -26,6 +26,8 @@
         <file>signalserver_upload.png</file>
         <file>signalserver_uploading.png</file>
         <file>settings.png</file>
+        <file>bar_chart.png</file>
+        <file>chart_chart.png</file>
     </qresource>
     <qresource prefix="/">
         <file alias="Help/About.html">../../License.html</file>

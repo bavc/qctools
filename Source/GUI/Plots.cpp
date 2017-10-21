@@ -162,9 +162,8 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                         }
                     });
 
-                    QPushButton* booleanPlotSwitch = new QPushButton("boolean");
-                    QFontMetrics metrics(booleanPlotSwitch->font());
-                    booleanPlotSwitch->setMaximumWidth(metrics.width(booleanPlotSwitch->text()) + 10);
+                    QToolButton* booleanPlotSwitch = new QToolButton();
+                    booleanPlotSwitch->setIcon(QIcon(":/icon/bar_chart.png"));
                     booleanPlotSwitch->setCheckable(true);
 
                     connect(plot, SIGNAL(visibilityChanged(bool)), booleanPlotSwitch, SLOT(setVisible(bool)));
@@ -179,8 +178,12 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                     }
 
                     connect(booleanPlotSwitch, SIGNAL(toggled(bool)), plot, SLOT(setBoolean(bool)));
+                    connect(booleanPlotSwitch, &QToolButton::toggled, this, [=](bool toggled) {
+                        booleanPlotSwitch->setIcon(toggled ? QIcon(":/icon/chart_chart.png") : QIcon(":/icon/bar_chart.png"));
+                    });
 
                     QHBoxLayout* booleanAndConfigurationLayout = new QHBoxLayout();
+                    booleanAndConfigurationLayout->setAlignment(Qt::AlignLeft);
                     booleanAndConfigurationLayout->setSpacing(5);
                     booleanAndConfigurationLayout->addWidget(booleanPlotSwitch);
                     booleanAndConfigurationLayout->addWidget(booleanConfigButton);
