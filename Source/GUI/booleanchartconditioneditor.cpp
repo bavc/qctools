@@ -43,6 +43,42 @@ void BooleanChartConditionEditor::setDefaultColor(const QColor &color)
 
 void BooleanChartConditionEditor::setConditions(const PlotSeriesData::Conditions &value)
 {
+    class CompleterModel : public QStandardItemModel {
+    public:
+        typedef QPair<QString, QString> Word;
+        typedef QList<Word> Words;
+        QVariant data(const QModelIndex &index, int role) const
+        {
+            if(role == Qt::DisplayRole)
+                return QStandardItemModel::data(index, Qt::UserRole + 1).toString() + " - " + QStandardItemModel::data(index, Qt::UserRole + 2).toString();
+
+            if(role == Qt::EditRole)
+                return QStandardItemModel::data(index, Qt::UserRole + 1);
+
+            return QStandardItemModel::data(index, role);
+        }
+
+        void setWords(const Words& words) {
+            for(auto& word : words) {
+                auto data = new QStandardItem;
+                data->setData(word.first, Qt::UserRole + 1);
+                data->setData(word.second, Qt::UserRole + 2);
+                appendRow(data);
+            }
+        }
+    };
+
+    CompleterModel* model = new CompleterModel();
+    CompleterModel::Words words;
+    words << CompleterModel::Word("y", "y value of chart");
+    words << CompleterModel::Word("yHalf", "(plot max - plot min) / 2");
+    words << CompleterModel::Word("pow", "pow(base, exponent)");
+    words << CompleterModel::Word("pow2", "pow2(exponent)");
+    model->setWords(words);
+
+    QCompleter *completer = new QCompleter(model, this);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+
     if(value.items.size() == 0)
     {
         while(conditionsCount() != 1)
@@ -51,6 +87,7 @@ void BooleanChartConditionEditor::setConditions(const PlotSeriesData::Conditions
         auto condition = getCondition(0);
         assert(condition);
 
+        condition->setCompleter(completer);
         condition->setJsEngine(&value.engine);
         condition->setColor(m_defaultColor);
         condition->setCondition(QString());
@@ -76,6 +113,7 @@ void BooleanChartConditionEditor::setConditions(const PlotSeriesData::Conditions
             auto condition = getCondition(i);
             assert(condition);
 
+            condition->setCompleter(completer);
             condition->setJsEngine(&value.engine);
             condition->setColor(value.items[i].m_color);
             condition->setCondition(value.items[i].m_conditionString);
@@ -88,6 +126,7 @@ void BooleanChartConditionEditor::addCondition()
     int index = ui->verticalLayout->indexOf(static_cast<QWidget*>(sender()));
 
     auto input = new BooleanChartConditionInput();
+    input->setCompleter(getCondition(0)->getCompleter());
     input->setJsEngine(getCondition(0)->getJsEngine());
     input->setColor(m_defaultColor);
     ui->verticalLayout->insertWidget(index + 1, input);
