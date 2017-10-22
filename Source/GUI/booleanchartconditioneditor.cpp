@@ -2,6 +2,7 @@
 #include "GUI/booleanchartconditioneditor.h"
 #include "ui_booleanchartconditioneditor.h"
 #include <QCompleter>
+#include <QJSValueIterator>
 #include <QStandardItemModel>
 #include <cassert>
 
@@ -69,11 +70,8 @@ void BooleanChartConditionEditor::setConditions(const PlotSeriesData::Conditions
     };
 
     CompleterModel* model = new CompleterModel();
-    CompleterModel::Words words;
-    words << CompleterModel::Word("y", "y value of chart");
-    words << CompleterModel::Word("yHalf", "(plot max - plot min) / 2");
-    words << CompleterModel::Word("pow", "pow(base, exponent)");
-    words << CompleterModel::Word("pow2", "pow2(exponent)");
+
+    CompleterModel::Words words = value.engine.property("autocomplete").value<CompleterModel::Words>();
     model->setWords(words);
 
     QCompleter *completer = new QCompleter(model, this);

@@ -11,6 +11,7 @@
 
 #include <Core/CommonStats.h>
 #include <Core/Core.h>
+#include "Core/VideoCore.h"
 #include <QEvent>
 #include <QJSEngine>
 #include <QJSValue>
@@ -112,8 +113,8 @@ class PlotSeriesData : public QObject, public QwtPointSeriesData
     // QwtSeriesData interface
     Q_OBJECT
 public:
-    PlotSeriesData(CommonStats* stats, const int& xDataIndex, const size_t yDataIndex, size_t plotGroup, size_t curveIndex, size_t curvesCount)
-        : m_boolean(false), m_conditions(stats, plotGroup), m_lastCondition(nullptr),
+    PlotSeriesData(CommonStats* stats, const QString& title, int bitDepth, const int& xDataIndex, const size_t yDataIndex, size_t plotGroup, size_t curveIndex, size_t curvesCount)
+        : m_boolean(false), m_conditions(stats, plotGroup, title, bitDepth), m_lastCondition(nullptr),
           m_stats(stats), m_xDataIndex(xDataIndex), m_yDataIndex(yDataIndex), m_plotGroup(plotGroup), m_curveIndex(curveIndex),
           m_curvesCount(curvesCount)
     {
@@ -195,14 +196,52 @@ public:
 
     struct Conditions
     {
-        Conditions(CommonStats* stats, size_t plotGroup) : m_stats(stats), m_plotGroup(plotGroup) {
+        Conditions(CommonStats* stats, size_t plotGroup, const QString& title, int bitdepth) : m_stats(stats), m_plotGroup(plotGroup), m_curveTitle(title), m_bitdepth(bitdepth) {
+
+            QList<QPair<QString, QString>> autocomplete;
+            autocomplete << QPair<QString, QString>("y", "y value of chart");
+
             engine.globalObject().setProperty("yHalf", (m_stats->y_Max[m_plotGroup] - m_stats->y_Min[m_plotGroup]) / 2);
+            autocomplete << QPair<QString, QString>("yHalf", "(plot max - plot min) / 2");
 
             auto pow2 = engine.evaluate("function(value) { return Math.pow(value, 2); }");
             engine.globalObject().setProperty("pow2", pow2);
+            autocomplete << QPair<QString, QString>("pow2", "pow2(exponent)");
 
             auto pow = engine.evaluate("function(base, exponent) { return Math.pow(base, exponent); }");
             engine.globalObject().setProperty("pow", pow);
+            autocomplete << QPair<QString, QString>("pow", "pow(base, exponent)");
+
+            if(bitdepth == 0)
+            {
+                qWarning("bitdepth is 0, assuming 8...");
+                bitdepth = 8;
+            }
+
+            if(plotGroup == Group_Y || plotGroup == Group_U || plotGroup == Group_V || plotGroup == Group_YDiff || plotGroup == Group_UDiff || plotGroup == Group_VDiff)
+            {
+                engine.globalObject().setProperty("maxval", ::pow(2, bitdepth));
+                autocomplete << QPair<QString, QString>("maxval", QString("2^bitdepth - %1").arg(engine.globalObject().property("maxval").toInt()));
+
+                engine.globalObject().setProperty("minval", 0);
+                autocomplete << QPair<QString, QString>("minval", QString("0"));
+
+                if(plotGroup == Group_Y || plotGroup == Group_YDiff)
+                {
+                    engine.globalObject().setProperty("broadcastmaxval", 235 * (::pow(2, bitdepth - 8)));
+                    autocomplete << QPair<QString, QString>("broadcastmaxval", QString("235 * (2^(bitdepth - 8)) - %1").arg(engine.globalObject().property("broadcastmaxval").toInt()));
+
+                } else if(plotGroup == Group_U || plotGroup == Group_UDiff || plotGroup == Group_V || plotGroup == Group_VDiff)
+                {
+                    engine.globalObject().setProperty("broadcastmaxval", 240 * (::pow(2, bitdepth - 8)));
+                    autocomplete << QPair<QString, QString>("broadcastmaxval", QString("240 * (2^(bitdepth - 8)) - %1").arg(engine.globalObject().property("broadcastmaxval").toInt()));
+                }
+
+                engine.globalObject().setProperty("broadcastminval", 16 * (::pow(2, bitdepth - 8)));
+                autocomplete << QPair<QString, QString>("broadcastminval", QString("16 * (2^(bitdepth - 8)) - %1").arg(engine.globalObject().property("broadcastminval").toInt()));
+            }
+
+            engine.setProperty("autocomplete", QVariant::fromValue(autocomplete));
         }
 
         void addCondition() {
@@ -227,6 +266,8 @@ public:
 
         CommonStats* m_stats;
         size_t m_plotGroup;
+        QString m_curveTitle;
+        int m_bitdepth;
     };
 
     const Conditions& conditions() const{
@@ -276,7 +317,7 @@ public:
     void setYAxis( double min, double max, int numSteps );
     void setCursorPos( double x );
 
-    void setData(size_t curveIndex, QwtSeriesData<QPointF> *series);
+    void setData(size_t curveIndex, PlotSeriesData *series);
     const QwtSeriesData<QPointF>* getData(size_t curveIndex) const;
     const QwtPlotCurve* getCurve(size_t curveIndex) const;
 

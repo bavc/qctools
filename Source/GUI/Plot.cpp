@@ -24,7 +24,6 @@
 #include <qwt_symbol.h>
 
 #include "Core/FileInformation.h"
-#include "Core/VideoCore.h"
 #include <cassert>
 
 static double stepSize( double distance, int numSteps )
@@ -513,7 +512,7 @@ void Plot::setCursorPos( double x )
     m_cursor->setPosition( x );
 }
 
-void Plot::setData(size_t curveIndex, QwtSeriesData<QPointF> *series)
+void Plot::setData(size_t curveIndex, PlotSeriesData *series)
 {
     m_curves[curveIndex]->setData(series);
 }

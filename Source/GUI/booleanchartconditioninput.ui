@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>392</width>
+    <width>520</width>
     <height>41</height>
    </rect>
   </property>
@@ -40,7 +40,7 @@
     <widget class="QLineEdit" name="condition_lineEdit">
      <property name="minimumSize">
       <size>
-       <width>300</width>
+       <width>400</width>
        <height>0</height>
       </size>
      </property>

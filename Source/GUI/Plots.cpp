@@ -188,7 +188,8 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                     {
                         size_t yIndex = streamInfo.PerGroup[plotGroup].Start + j;
 
-                        auto seriesData = new PlotSeriesData(stats( plot->streamPos()), m_dataTypeIndex, yIndex, plotGroup, j, streamInfo.PerGroup[plotGroup].Count);
+                        auto seriesData = new PlotSeriesData(stats(plot->streamPos()), plot->getCurve(j)->title().text(), m_fileInfoData->BitsPerRawSample(),
+                                                             m_dataTypeIndex, yIndex, plotGroup, j, streamInfo.PerGroup[plotGroup].Count);
                         plot->setData(j, seriesData);
                         connect(booleanPlotSwitch, SIGNAL(toggled(bool)), seriesData, SLOT(setBoolean(bool)));
                     }

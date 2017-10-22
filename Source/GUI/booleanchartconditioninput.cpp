@@ -2,6 +2,8 @@
 #include "ui_booleanchartconditioninput.h"
 #include <QColorDialog>
 #include <QJSValueList>
+#include <QList>
+#include <QStringBuilder>
 #include <cassert>
 
 BooleanChartConditionInput::BooleanChartConditionInput(QWidget *parent) :
@@ -31,7 +33,7 @@ BooleanChartConditionInput::BooleanChartConditionInput(QWidget *parent) :
             if(ui->condition_lineEdit->text().isEmpty())
             {
                 color = m_defaultTextColor;
-                ui->condition_lineEdit->setToolTip("No condition");
+                ui->condition_lineEdit->setToolTip("No condition\n\n" + getTooltipHelp());
             }
             else
             {
@@ -46,7 +48,7 @@ BooleanChartConditionInput::BooleanChartConditionInput(QWidget *parent) :
                         ui->condition_lineEdit->setToolTip("Error: " + callResult.toString());
                     } else {
                         color = m_validatedTextColor;
-                        ui->condition_lineEdit->setToolTip("Success");
+                        ui->condition_lineEdit->setToolTip("Success\n\n" + getTooltipHelp());
                     }
                 }
             }
@@ -94,6 +96,7 @@ QString BooleanChartConditionInput::getCondition() const
 void BooleanChartConditionInput::setJsEngine(QJSEngine *engine)
 {
     m_engine = engine;
+    m_autocompletion = engine->property("autocomplete").value<QList<QPair<QString, QString>>>();
 }
 
 QJSEngine *BooleanChartConditionInput::getJsEngine() const
@@ -109,6 +112,18 @@ void BooleanChartConditionInput::setCompleter(QCompleter *completer)
 QCompleter *BooleanChartConditionInput::getCompleter() const
 {
     return ui->condition_lineEdit->completer();
+}
+
+QString BooleanChartConditionInput::getTooltipHelp() const
+{
+    QString help("help: \n");
+
+    for(auto item : m_autocompletion)
+    {
+        help.append(QString("%1 - %2\n").arg(item.first).arg(item.second));
+    }
+
+    return help;
 }
 
 void BooleanChartConditionInput::on_remove_toolButton_clicked()
@@ -130,5 +145,20 @@ void BooleanChartConditionInput::on_color_toolButton_clicked()
 
 void BooleanChartConditionInput::on_condition_lineEdit_textEdited(const QString &arg1)
 {
+    Q_UNUSED(arg1);
+
+    m_validationTimer.start();
+}
+
+void BooleanChartConditionInput::on_condition_lineEdit_editingFinished()
+{
+    m_validationTimer.start();
+}
+
+void BooleanChartConditionInput::on_condition_lineEdit_cursorPositionChanged(int arg1, int arg2)
+{
+    Q_UNUSED(arg1);
+    Q_UNUSED(arg2);
+
     m_validationTimer.start();
 }
