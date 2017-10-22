@@ -179,10 +179,6 @@ protected:
     void renderSymbols(QPainter *painter, const QPointF *points, int numPoints) const {
         const QSize size = this->size();
 
-        QPen pen = this->pen();
-        pen.setJoinStyle( Qt::MiterJoin );
-        painter->setPen( Qt::black );
-
         for ( int i = 0; i < numPoints; i++ )
         {
             const QPointF &pos = points[i];
@@ -223,6 +219,7 @@ protected:
         mapper.setBoundingRect( clipRect );
 
         double booleanZero = double(m_index) / m_count;
+        p->setPen(Qt::NoPen);
 
         for ( int i = from; i <= to; ++i )
         {
@@ -346,7 +343,7 @@ void Plot::updateSymbols()
 
                 double dt = transformed2 - transformed1;
 
-                symbolWidth = qRound(qRound(dt) * 0.9);
+                symbolWidth = qRound(dt * 1.1f); // for some reasons qwt add some spacing between samples so * 1.1 is just workaround for it
             }
             if(symbolWidth == 0)
                 symbolWidth = 1;
