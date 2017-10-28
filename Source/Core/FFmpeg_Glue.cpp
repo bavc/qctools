@@ -2005,8 +2005,6 @@ string FFmpeg_Glue::PixFormat_Get()
         case AV_PIX_FMT_YUVJ420P: return "planar YUV 4:2:0, 12bpp, full scale (JPEG), deprecated in favor of PIX_FMT_YUV420P and setting color_range";
         case AV_PIX_FMT_YUVJ422P: return "planar YUV 4:2:2, 16bpp, full scale (JPEG), deprecated in favor of PIX_FMT_YUV422P and setting color_range";
         case AV_PIX_FMT_YUVJ444P: return "planar YUV 4:4:4, 24bpp, full scale (JPEG), deprecated in favor of PIX_FMT_YUV444P and setting color_range";
-//        case AV_PIX_FMT_XVMC_MPEG2_MC: return "XVideo Motion Acceleration via common packet passing";
-//        case AV_PIX_FMT_XVMC_MPEG2_IDCT: return "XVideo Motion Acceleration";
         case AV_PIX_FMT_UYVY422: return "packed YUV 4:2:2, 16bpp, Cb Y0 Cr Y1";
         case AV_PIX_FMT_UYYVYY411: return "packed YUV 4:1:1, 12bpp, Cb Y0 Y1 Cr Y2 Y3";
         case AV_PIX_FMT_BGR8:    return "packed RGB 3:3:2:8bpp, (msb)2B 3G 3R(lsb)";
@@ -2028,13 +2026,6 @@ string FFmpeg_Glue::PixFormat_Get()
         case AV_PIX_FMT_YUV440P: return "planar YUV 4:4:0 (1 Cr & Cb sample per 1x2 Y samples)";
         case AV_PIX_FMT_YUVJ440P: return "planar YUV 4:4:0 full scale (JPEG), deprecated in favor of PIX_FMT_YUV440P and setting color_range";
         case AV_PIX_FMT_YUVA420P: return "planar YUV 4:2:0, 20bpp, (1 Cr & Cb sample per 2x2 Y & A samples)";
-//#if FF_API_VDPAU
-//        case AV_PIX_FMT_VDPAU_H264: return "H.264 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
-//        case AV_PIX_FMT_VDPAU_MPEG1: return "MPEG-1 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
-//        case AV_PIX_FMT_VDPAU_MPEG2: return "MPEG-2 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
-//        case AV_PIX_FMT_VDPAU_WMV3: return "WMV3 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
-//        case AV_PIX_FMT_VDPAU_VC1: return "VC-1 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
-//#endif
         case AV_PIX_FMT_RGB48BE: return "packed RGB 16:16:16, 48bpp, 16R, 16G, 16B, the 2-byte value for each R/G/B component is stored as big-endian";
         case AV_PIX_FMT_RGB48LE: return "packed RGB 16:16:16, 48bpp, 16R, 16G, 16B, the 2-byte value for each R/G/B component is stored as little-endian";
 
@@ -2048,9 +2039,16 @@ string FFmpeg_Glue::PixFormat_Get()
         case AV_PIX_FMT_BGR555BE: return "packed BGR 5:5:5, 16bpp, (msb)1A 5B 5G 5R(lsb), big-endian, most significant bit to 1";
         case AV_PIX_FMT_BGR555LE: return "packed BGR 5:5:5, 16bpp, (msb)1A 5B 5G 5R(lsb), little-endian, most significant bit to 1";
 
+#if FF_API_VAAPI
+        /** @name Deprecated pixel formats */
+        /**@{*/
         case AV_PIX_FMT_VAAPI_MOCO: return "HW acceleration through VA API at motion compensation entry-point, Picture.data[3] contains a vaapi_render_state struct which contains macroblocks as well as various fields extracted from headers";
         case AV_PIX_FMT_VAAPI_IDCT: return "HW acceleration through VA API at IDCT entry-point, Picture.data[3] contains a vaapi_render_state struct which contains fields extracted from headers";
         case AV_PIX_FMT_VAAPI_VLD: return "HW decoding through VA API, Picture.data[3] contains a vaapi_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
+        /**@}*/
+#else
+        case AV_PIX_FMT_VAAPI: return "Hardware acceleration through VA-API, data[3] contains a VASurfaceID";
+#endif
 
         case AV_PIX_FMT_YUV420P16LE: return "planar YUV 4:2:0, 24bpp, (1 Cr & Cb sample per 2x2 Y samples), little-endian";
         case AV_PIX_FMT_YUV420P16BE: return "planar YUV 4:2:0, 24bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian";
@@ -2058,19 +2056,22 @@ string FFmpeg_Glue::PixFormat_Get()
         case AV_PIX_FMT_YUV422P16BE: return "planar YUV 4:2:2, 32bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian";
         case AV_PIX_FMT_YUV444P16LE: return "planar YUV 4:4:4, 48bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian";
         case AV_PIX_FMT_YUV444P16BE: return "planar YUV 4:4:4, 48bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian";
-//#if FF_API_VDPAU
-//        case AV_PIX_FMT_VDPAU_MPEG4: return "MPEG4 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
-//#endif
         case AV_PIX_FMT_DXVA2_VLD:  return "HW decoding through DXVA2, Picture.data[3] contains a LPDIRECT3DSURFACE9 pointer";
 
         case AV_PIX_FMT_RGB444LE: return "packed RGB 4:4:4, 16bpp, (msb)4A 4R 4G 4B(lsb), little-endian, most significant bits to 0";
         case AV_PIX_FMT_RGB444BE: return "packed RGB 4:4:4, 16bpp, (msb)4A 4R 4G 4B(lsb), big-endian, most significant bits to 0";
         case AV_PIX_FMT_BGR444LE: return "packed BGR 4:4:4, 16bpp, (msb)4A 4B 4G 4R(lsb), little-endian, most significant bits to 1";
         case AV_PIX_FMT_BGR444BE: return "packed BGR 4:4:4, 16bpp, (msb)4A 4B 4G 4R(lsb), big-endian, most significant bits to 1";
-        case AV_PIX_FMT_GRAY8A:  return "8bit gray, 8bit alpha";
+        case AV_PIX_FMT_YA8: 	return "8bit gray, 8bit alpha";
+
         case AV_PIX_FMT_BGR48BE: return "packed RGB 16:16:16, 48bpp, 16B, 16G, 16R, the 2-byte value for each R/G/B component is stored as big-endian";
         case AV_PIX_FMT_BGR48LE: return "packed RGB 16:16:16, 48bpp, 16B, 16G, 16R, the 2-byte value for each R/G/B component is stored as little-endian";
 
+        /**
+        * The following 12 formats have the disadvantage of needing 1 format for each bit depth.
+        * Notice that each 9/10 bits sample is stored in 16 bits with extra padding.
+        * If you want to support multiple bit depths, then using AV_PIX_FMT_YUV420P16* with the bpp stored separately is better.
+        */
         case AV_PIX_FMT_YUV420P9BE: return "planar YUV 4:2:0, 13.5bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian";
         case AV_PIX_FMT_YUV420P9LE: return "planar YUV 4:2:0, 13.5bpp, (1 Cr & Cb sample per 2x2 Y samples), little-endian";
         case AV_PIX_FMT_YUV420P10BE: return "planar YUV 4:2:0, 15bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian";
@@ -2083,22 +2084,15 @@ string FFmpeg_Glue::PixFormat_Get()
         case AV_PIX_FMT_YUV444P10LE: return "planar YUV 4:4:4, 30bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian";
         case AV_PIX_FMT_YUV422P9BE: return "planar YUV 4:2:2, 18bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian";
         case AV_PIX_FMT_YUV422P9LE: return "planar YUV 4:2:2, 18bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian";
-//        case AV_PIX_FMT_VDA_VLD:  return "hardware decoding through VDA";
-
-//#ifdef AV_PIX_FMT_ABI_GIT_MASTER
-        case AV_PIX_FMT_RGBA64BE: return "packed RGBA 16:16:16:16, 64bpp, 16R, 16G, 16B, 16A, the 2-byte value for each R/G/B/A component is stored as big-endian";
-        case AV_PIX_FMT_RGBA64LE: return "packed RGBA 16:16:16:16, 64bpp, 16R, 16G, 16B, 16A, the 2-byte value for each R/G/B/A component is stored as little-endian";
-        case AV_PIX_FMT_BGRA64BE: return "packed RGBA 16:16:16:16, 64bpp, 16B, 16G, 16R, 16A, the 2-byte value for each R/G/B/A component is stored as big-endian";
-        case AV_PIX_FMT_BGRA64LE: return "packed RGBA 16:16:16:16, 64bpp, 16B, 16G, 16R, 16A, the 2-byte value for each R/G/B/A component is stored as little-endian";
-//#endif
-        case AV_PIX_FMT_GBRP:    return "planar GBR 4:4:4 24bpp";
+        case AV_PIX_FMT_GBRP: 		return "planar GBR 4:4:4 24bpp";
         case AV_PIX_FMT_GBRP9BE: return "planar GBR 4:4:4 27bpp, big-endian";
         case AV_PIX_FMT_GBRP9LE: return "planar GBR 4:4:4 27bpp, little-endian";
         case AV_PIX_FMT_GBRP10BE: return "planar GBR 4:4:4 30bpp, big-endian";
         case AV_PIX_FMT_GBRP10LE: return "planar GBR 4:4:4 30bpp, little-endian";
         case AV_PIX_FMT_GBRP16BE: return "planar GBR 4:4:4 48bpp, big-endian";
         case AV_PIX_FMT_GBRP16LE: return "planar GBR 4:4:4 48bpp, little-endian";
-
+        case AV_PIX_FMT_YUVA422P: return "planar YUV 4:2:2 24bpp, (1 Cr & Cb sample per 2x1 Y & A samples)";
+        case AV_PIX_FMT_YUVA444P: return "planar YUV 4:4:4 32bpp, (1 Cr & Cb sample per 1x1 Y & A samples)";
         case AV_PIX_FMT_YUVA420P9BE: return "planar YUV 4:2:0 22.5bpp, (1 Cr & Cb sample per 2x2 Y & A samples), big-endian";
         case AV_PIX_FMT_YUVA420P9LE: return "planar YUV 4:2:0 22.5bpp, (1 Cr & Cb sample per 2x2 Y & A samples), little-endian";
         case AV_PIX_FMT_YUVA422P9BE: return "planar YUV 4:2:2 27bpp, (1 Cr & Cb sample per 2x1 Y & A samples), big-endian";
@@ -2126,12 +2120,42 @@ string FFmpeg_Glue::PixFormat_Get()
         case AV_PIX_FMT_NV20LE:     return "interleaved chroma YUV 4:2:2, 20bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian";
         case AV_PIX_FMT_NV20BE:     return "interleaved chroma YUV 4:2:2, 20bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian";
 
-        case AV_PIX_FMT_0RGB:    return "packed RGB 8:8:8, 32bpp, 0RGB0RGB...";
-        case AV_PIX_FMT_RGB0:    return "packed RGB 8:8:8, 32bpp, RGB0RGB0...";
-        case AV_PIX_FMT_0BGR:    return "packed BGR 8:8:8, 32bpp, 0BGR0BGR...";
-        case AV_PIX_FMT_BGR0:    return "packed BGR 8:8:8, 32bpp, BGR0BGR0...";
-        case AV_PIX_FMT_YUVA444P: return "planar YUV 4:4:4 32bpp, (1 Cr & Cb sample per 1x1 Y & A samples)";
-        case AV_PIX_FMT_YUVA422P: return "planar YUV 4:2:2 24bpp, (1 Cr & Cb sample per 2x1 Y & A samples)";
+        case AV_PIX_FMT_RGBA64BE: 	return "packed RGBA 16:16:16:16, 64bpp, 16R, 16G, 16B, 16A, the 2-byte value for each R/G/B/A component is stored as big-endian";
+        case AV_PIX_FMT_RGBA64LE: 	return "packed RGBA 16:16:16:16, 64bpp, 16R, 16G, 16B, 16A, the 2-byte value for each R/G/B/A component is stored as little-endian";
+        case AV_PIX_FMT_BGRA64BE: 	return "packed RGBA 16:16:16:16, 64bpp, 16B, 16G, 16R, 16A, the 2-byte value for each R/G/B/A component is stored as big-endian";
+        case AV_PIX_FMT_BGRA64LE: 	return "packed RGBA 16:16:16:16, 64bpp, 16B, 16G, 16R, 16A, the 2-byte value for each R/G/B/A component is stored as little-endian";
+
+        case AV_PIX_FMT_YVYU422: 	return "packed YUV 4:2:2, 16bpp, Y0 Cr Y1 Cb";
+
+        case AV_PIX_FMT_YA16BE: 	return "16 bits gray, 16 bits alpha (big-endian)";
+        case AV_PIX_FMT_YA16LE: 	return "16 bits gray, 16 bits alpha (little-endian)";
+
+        case AV_PIX_FMT_GBRAP: 		return "planar GBRA 4:4:4:4 32bpp";
+        case AV_PIX_FMT_GBRAP16BE: 	return "planar GBRA 4:4:4:4 64bpp, big-endian";
+        case AV_PIX_FMT_GBRAP16LE: 	return "planar GBRA 4:4:4:4 64bpp, little-endian";
+        /**
+         *  HW acceleration through QSV, data[3] contains a pointer to the
+         *  mfxFrameSurface1 structure.
+         */
+        case AV_PIX_FMT_QSV: 	return "HW acceleration through QSV";
+        /**
+         * HW acceleration though MMAL, data[3] contains a pointer to the
+         * MMAL_BUFFER_HEADER_T structure.
+         */
+        case AV_PIX_FMT_MMAL: 	return "HW acceleration though MMAL";
+
+        case AV_PIX_FMT_D3D11VA_VLD: return "HW decoding through Direct3D11 via old API";
+
+        /**
+         * HW acceleration through CUDA. data[i] contain CUdeviceptr pointers
+         * exactly as for system memory frames.
+         */
+        case AV_PIX_FMT_CUDA: "HW acceleration through CUDA";
+
+        case AV_PIX_FMT_0RGB: return "packed RGB 8:8:8, 32bpp, XRGBXRGB...   X=unused/undefined";
+        case AV_PIX_FMT_RGB0: return "packed RGB 8:8:8, 32bpp, RGBXRGBX...   X=unused/undefined";
+        case AV_PIX_FMT_0BGR: return "packed BGR 8:8:8, 32bpp, XBGRXBGR...   X=unused/undefined";
+        case AV_PIX_FMT_BGR0: return "packed BGR 8:8:8, 32bpp, BGRXBGRX...   X=unused/undefined";
 
         case AV_PIX_FMT_YUV420P12BE: return "planar YUV 4:2:0,18bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian";
         case AV_PIX_FMT_YUV420P12LE: return "planar YUV 4:2:0,18bpp, (1 Cr & Cb sample per 2x2 Y samples), little-endian";
@@ -2145,19 +2169,16 @@ string FFmpeg_Glue::PixFormat_Get()
         case AV_PIX_FMT_YUV444P12LE: return "planar YUV 4:4:4,36bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian";
         case AV_PIX_FMT_YUV444P14BE: return "planar YUV 4:4:4,42bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian";
         case AV_PIX_FMT_YUV444P14LE: return "planar YUV 4:4:4,42bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian";
-        case AV_PIX_FMT_GBRP12BE:  return "planar GBR 4:4:4 36bpp, big-endian";
-        case AV_PIX_FMT_GBRP12LE:  return "planar GBR 4:4:4 36bpp, little-endian";
-        case AV_PIX_FMT_GBRP14BE:  return "planar GBR 4:4:4 42bpp, big-endian";
-        case AV_PIX_FMT_GBRP14LE:  return "planar GBR 4:4:4 42bpp, little-endian";
-        case AV_PIX_FMT_GBRAP:     return "planar GBRA 4:4:4:4 32bpp";
-        case AV_PIX_FMT_GBRAP16BE: return "planar GBRA 4:4:4:4 64bpp, big-endian";
-        case AV_PIX_FMT_GBRAP16LE: return "planar GBRA 4:4:4:4 64bpp, little-endian";
-        case AV_PIX_FMT_YUVJ411P:  return "planar YUV 4:1:1, 12bpp, (1 Cr & Cb sample per 4x1 Y samples) full scale (JPEG), deprecated in favor of PIX_FMT_YUV411P and setting color_range";
+        case AV_PIX_FMT_GBRP12BE: return "planar GBR 4:4:4 36bpp, big-endian";
+        case AV_PIX_FMT_GBRP12LE: return "planar GBR 4:4:4 36bpp, little-endian";
+        case AV_PIX_FMT_GBRP14BE: return "planar GBR 4:4:4 42bpp, big-endian";
+        case AV_PIX_FMT_GBRP14LE: return "planar GBR 4:4:4 42bpp, little-endian";
+        case AV_PIX_FMT_YUVJ411P: return "planar YUV 4:1:1, 12bpp, (1 Cr & Cb sample per 4x1 Y samples) full scale (JPEG), deprecated in favor of AV_PIX_FMT_YUV411P and setting color_range";
 
-        case AV_PIX_FMT_BAYER_BGGR8:  return "bayer, BGBG..(odd line), GRGR..(even line), 8-bit samples";
-        case AV_PIX_FMT_BAYER_RGGB8:  return "bayer, RGRG..(odd line), GBGB..(even line), 8-bit samples";
-        case AV_PIX_FMT_BAYER_GBRG8:  return "bayer, GBGB..(odd line), RGRG..(even line), 8-bit samples";
-        case AV_PIX_FMT_BAYER_GRBG8:  return "bayer, GRGR..(odd line), BGBG..(even line), 8-bit samples";
+        case AV_PIX_FMT_BAYER_BGGR8: return "bayer, BGBG..(odd line), GRGR..(even line), 8-bit samples";
+        case AV_PIX_FMT_BAYER_RGGB8: return "bayer, RGRG..(odd line), GBGB..(even line), 8-bit samples";
+        case AV_PIX_FMT_BAYER_GBRG8: return "bayer, GBGB..(odd line), RGRG..(even line), 8-bit samples";
+        case AV_PIX_FMT_BAYER_GRBG8: return "bayer, GRGR..(odd line), BGBG..(even line), 8-bit samples";
         case AV_PIX_FMT_BAYER_BGGR16LE: return "bayer, BGBG..(odd line), GRGR..(even line), 16-bit samples, little-endian";
         case AV_PIX_FMT_BAYER_BGGR16BE: return "bayer, BGBG..(odd line), GRGR..(even line), 16-bit samples, big-endian";
         case AV_PIX_FMT_BAYER_RGGB16LE: return "bayer, RGRG..(odd line), GBGB..(even line), 16-bit samples, little-endian";
@@ -2166,6 +2187,63 @@ string FFmpeg_Glue::PixFormat_Get()
         case AV_PIX_FMT_BAYER_GBRG16BE: return "bayer, GBGB..(odd line), RGRG..(even line), 16-bit samples, big-endian";
         case AV_PIX_FMT_BAYER_GRBG16LE: return "bayer, GRGR..(odd line), BGBG..(even line), 16-bit samples, little-endian";
         case AV_PIX_FMT_BAYER_GRBG16BE: return "bayer, GRGR..(odd line), BGBG..(even line), 16-bit samples, big-endian";
+
+        case AV_PIX_FMT_XVMC: return "XVideo Motion Acceleration via common packet passing";
+
+        case AV_PIX_FMT_YUV440P10LE: return "planar YUV 4:4:0,20bpp, (1 Cr & Cb sample per 1x2 Y samples), little-endian";
+        case AV_PIX_FMT_YUV440P10BE: return "planar YUV 4:4:0,20bpp, (1 Cr & Cb sample per 1x2 Y samples), big-endian";
+        case AV_PIX_FMT_YUV440P12LE: return "planar YUV 4:4:0,24bpp, (1 Cr & Cb sample per 1x2 Y samples), little-endian";
+        case AV_PIX_FMT_YUV440P12BE: return "planar YUV 4:4:0,24bpp, (1 Cr & Cb sample per 1x2 Y samples), big-endian";
+        case AV_PIX_FMT_AYUV64LE: return "packed AYUV 4:4:4,64bpp (1 Cr & Cb sample per 1x1 Y & A samples), little-endian";
+        case AV_PIX_FMT_AYUV64BE: return "packed AYUV 4:4:4,64bpp (1 Cr & Cb sample per 1x1 Y & A samples), big-endian";
+
+        case AV_PIX_FMT_VIDEOTOOLBOX: return "hardware decoding through Videotoolbox";
+
+        case AV_PIX_FMT_P010LE: return "NV12, with 10bpp per component, data in the high bits, zeros in the low bits, little-endian";
+        case AV_PIX_FMT_P010BE: return "NV12, with 10bpp per component, data in the high bits, zeros in the low bits, big-endian";
+
+        case AV_PIX_FMT_GBRAP12BE: return "planar GBR 4:4:4:4 48bpp, big-endian";
+        case AV_PIX_FMT_GBRAP12LE: return "planar GBR 4:4:4:4 48bpp, little-endian";
+
+        case AV_PIX_FMT_GBRAP10BE: return "planar GBR 4:4:4:4 40bpp, big-endian";
+        case AV_PIX_FMT_GBRAP10LE: return "planar GBR 4:4:4:4 40bpp, little-endian";
+
+        case AV_PIX_FMT_MEDIACODEC: return "hardware decoding through MediaCodec";
+
+        case AV_PIX_FMT_GRAY12BE: return "Y, 12bpp, big-endian";
+        case AV_PIX_FMT_GRAY12LE: return "Y, 12bpp, little-endian";
+        case AV_PIX_FMT_GRAY10BE: return "Y, 10bpp, big-endian";
+        case AV_PIX_FMT_GRAY10LE: return "Y, 10bpp, little-endian";
+
+        case AV_PIX_FMT_P016LE: return "like NV12, with 16bpp per component, little-endian";
+        case AV_PIX_FMT_P016BE: return "like NV12, with 16bpp per component, big-endian";
+
+        /**
+         * Hardware surfaces for Direct3D11.
+         *
+         * This is preferred over the legacy AV_PIX_FMT_D3D11VA_VLD. The new D3D11
+         * hwaccel API and filtering support AV_PIX_FMT_D3D11 only.
+         *
+         * data[0] contains a ID3D11Texture2D pointer, and data[1] contains the
+         * texture array index of the frame as intptr_t if the ID3D11Texture2D is
+         * an array texture (or always 0 if it's a normal texture).
+         */
+        case AV_PIX_FMT_D3D11: return "Hardware surfaces for Direct3D11";
+
+        case AV_PIX_FMT_GRAY9BE: return "Y, 9bpp, big-endian";
+        case AV_PIX_FMT_GRAY9LE: return "Y, 9bpp, little-endian";
+
+        case AV_PIX_FMT_GBRPF32BE: return "IEEE-754 single precision planar GBR 4:4:4, 96bpp, big-endian";
+        case AV_PIX_FMT_GBRPF32LE: return "IEEE-754 single precision planar GBR 4:4:4, 96bpp, little-endian";
+        case AV_PIX_FMT_GBRAPF32BE: return "IEEE-754 single precision planar GBRA 4:4:4:4, 128bpp, big-endian";
+        case AV_PIX_FMT_GBRAPF32LE: return "IEEE-754 single precision planar GBRA 4:4:4:4, 128bpp, little-endian";
+
+        /**
+         * DRM-managed buffers exposed through PRIME buffer sharing.
+         *
+         * data[0] points to an AVDRMFrameDescriptor.
+         */
+        case AV_PIX_FMT_DRM_PRIME: return "DRM-managed buffers exposed through PRIME buffer sharing.";
         default: return string();
     }
 }
