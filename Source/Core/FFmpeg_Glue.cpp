@@ -192,7 +192,7 @@ bool FFmpeg_Glue::inputdata::InitEncode()
         Encode_CodecContext=Encode_Stream->codec;
         if (!Encode_CodecContext)
             return false;
-        Encode_CodecContext->flags         = CODEC_FLAG_GLOBAL_HEADER;
+        Encode_CodecContext->flags         = AV_CODEC_FLAG_GLOBAL_HEADER;
         Encode_CodecContext->width         = Stream->codec->width;
         Encode_CodecContext->height        = Stream->codec->height;
         if (Encode_CodecID==AV_CODEC_ID_NONE)
@@ -605,8 +605,8 @@ bool FFmpeg_Glue::outputdata::FilterGraph_Init()
 
     // Source
     stringstream    Args;
-    AVFilter*       Source;
-    AVFilter*       Sink;
+    const AVFilter*       Source;
+    const AVFilter*       Sink;
     if (Type==AVMEDIA_TYPE_VIDEO)
     {
         Source                                  = avfilter_get_by_name("buffer");
@@ -2005,8 +2005,8 @@ string FFmpeg_Glue::PixFormat_Get()
         case AV_PIX_FMT_YUVJ420P: return "planar YUV 4:2:0, 12bpp, full scale (JPEG), deprecated in favor of PIX_FMT_YUV420P and setting color_range";
         case AV_PIX_FMT_YUVJ422P: return "planar YUV 4:2:2, 16bpp, full scale (JPEG), deprecated in favor of PIX_FMT_YUV422P and setting color_range";
         case AV_PIX_FMT_YUVJ444P: return "planar YUV 4:4:4, 24bpp, full scale (JPEG), deprecated in favor of PIX_FMT_YUV444P and setting color_range";
-        case AV_PIX_FMT_XVMC_MPEG2_MC: return "XVideo Motion Acceleration via common packet passing";
-        case AV_PIX_FMT_XVMC_MPEG2_IDCT: return "XVideo Motion Acceleration";
+//        case AV_PIX_FMT_XVMC_MPEG2_MC: return "XVideo Motion Acceleration via common packet passing";
+//        case AV_PIX_FMT_XVMC_MPEG2_IDCT: return "XVideo Motion Acceleration";
         case AV_PIX_FMT_UYVY422: return "packed YUV 4:2:2, 16bpp, Cb Y0 Cr Y1";
         case AV_PIX_FMT_UYYVYY411: return "packed YUV 4:1:1, 12bpp, Cb Y0 Y1 Cr Y2 Y3";
         case AV_PIX_FMT_BGR8:    return "packed RGB 3:3:2:8bpp, (msb)2B 3G 3R(lsb)";
@@ -2029,11 +2029,11 @@ string FFmpeg_Glue::PixFormat_Get()
         case AV_PIX_FMT_YUVJ440P: return "planar YUV 4:4:0 full scale (JPEG), deprecated in favor of PIX_FMT_YUV440P and setting color_range";
         case AV_PIX_FMT_YUVA420P: return "planar YUV 4:2:0, 20bpp, (1 Cr & Cb sample per 2x2 Y & A samples)";
 //#if FF_API_VDPAU
-        case AV_PIX_FMT_VDPAU_H264: return "H.264 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
-        case AV_PIX_FMT_VDPAU_MPEG1: return "MPEG-1 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
-        case AV_PIX_FMT_VDPAU_MPEG2: return "MPEG-2 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
-        case AV_PIX_FMT_VDPAU_WMV3: return "WMV3 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
-        case AV_PIX_FMT_VDPAU_VC1: return "VC-1 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
+//        case AV_PIX_FMT_VDPAU_H264: return "H.264 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
+//        case AV_PIX_FMT_VDPAU_MPEG1: return "MPEG-1 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
+//        case AV_PIX_FMT_VDPAU_MPEG2: return "MPEG-2 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
+//        case AV_PIX_FMT_VDPAU_WMV3: return "WMV3 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
+//        case AV_PIX_FMT_VDPAU_VC1: return "VC-1 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
 //#endif
         case AV_PIX_FMT_RGB48BE: return "packed RGB 16:16:16, 48bpp, 16R, 16G, 16B, the 2-byte value for each R/G/B component is stored as big-endian";
         case AV_PIX_FMT_RGB48LE: return "packed RGB 16:16:16, 48bpp, 16R, 16G, 16B, the 2-byte value for each R/G/B component is stored as little-endian";
@@ -2059,7 +2059,7 @@ string FFmpeg_Glue::PixFormat_Get()
         case AV_PIX_FMT_YUV444P16LE: return "planar YUV 4:4:4, 48bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian";
         case AV_PIX_FMT_YUV444P16BE: return "planar YUV 4:4:4, 48bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian";
 //#if FF_API_VDPAU
-        case AV_PIX_FMT_VDPAU_MPEG4: return "MPEG4 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
+//        case AV_PIX_FMT_VDPAU_MPEG4: return "MPEG4 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers";
 //#endif
         case AV_PIX_FMT_DXVA2_VLD:  return "HW decoding through DXVA2, Picture.data[3] contains a LPDIRECT3DSURFACE9 pointer";
 
@@ -2083,7 +2083,7 @@ string FFmpeg_Glue::PixFormat_Get()
         case AV_PIX_FMT_YUV444P10LE: return "planar YUV 4:4:4, 30bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian";
         case AV_PIX_FMT_YUV422P9BE: return "planar YUV 4:2:2, 18bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian";
         case AV_PIX_FMT_YUV422P9LE: return "planar YUV 4:2:2, 18bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian";
-        case AV_PIX_FMT_VDA_VLD:  return "hardware decoding through VDA";
+//        case AV_PIX_FMT_VDA_VLD:  return "hardware decoding through VDA";
 
 //#ifdef AV_PIX_FMT_ABI_GIT_MASTER
         case AV_PIX_FMT_RGBA64BE: return "packed RGBA 16:16:16:16, 64bpp, 16R, 16G, 16B, 16A, the 2-byte value for each R/G/B/A component is stored as big-endian";
