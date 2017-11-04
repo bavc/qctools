@@ -133,7 +133,9 @@ public:
     }
 
     double toBoolean(double y) const {
-        for(auto& condition : qAsConst(m_conditions.items)) {
+        for(auto i = 0; i < m_conditions.items.size(); ++i) {
+            const auto& condition = m_conditions.items[i];
+
             if(condition.match(y)) {
                 m_lastCondition = &condition;
                 return 1.0;
