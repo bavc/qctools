@@ -166,6 +166,7 @@ public:
 
         Condition(const Condition& other) = default;
         Condition(Condition&& other) = default;
+        Condition& operator=(const Condition&) = default;
 
         QJSEngine* m_engine;
         QColor m_color;
