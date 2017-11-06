@@ -8,6 +8,7 @@ namespace Ui {
 class BooleanChartConditionEditor;
 }
 
+class QCompleter;
 class BooleanChartConditionInput;
 class BooleanChartConditionEditor : public QWidget
 {
@@ -23,6 +24,11 @@ public:
     void setLabel(const QString& label);
     void setDefaultColor(const QColor& color);
     void setConditions(const PlotSeriesData::Conditions& value);
+
+    QCompleter* makeCompleter(QJSEngine& engine);
+
+public Q_SLOTS:
+    void onConditionsUpdated();
 
 private Q_SLOTS:
     void addCondition();

@@ -96,7 +96,6 @@ QString BooleanChartConditionInput::getCondition() const
 void BooleanChartConditionInput::setJsEngine(QJSEngine *engine)
 {
     m_engine = engine;
-    m_autocompletion = engine->property("autocomplete").value<QList<QPair<QString, QString>>>();
 }
 
 QJSEngine *BooleanChartConditionInput::getJsEngine() const
@@ -106,7 +105,9 @@ QJSEngine *BooleanChartConditionInput::getJsEngine() const
 
 void BooleanChartConditionInput::setCompleter(QCompleter *completer)
 {
+    Q_ASSERT(m_engine);
     ui->condition_lineEdit->setCompleter(completer);
+    m_autocompletion = m_engine->property("autocomplete").value<QList<QPair<QString, QString>>>();
 }
 
 QCompleter *BooleanChartConditionInput::getCompleter() const

@@ -127,8 +127,10 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
 
                         for(size_t j = 0; j < streamInfo.PerGroup[plotGroup].Count; ++j)
                         {
-                            PlotSeriesData* data = const_cast<PlotSeriesData*>(static_cast<const PlotSeriesData*> (plot->getData(j)));
                             auto conditionEditor = new BooleanChartConditionEditor(nullptr);
+                            PlotSeriesData* data = const_cast<PlotSeriesData*>(static_cast<const PlotSeriesData*> (plot->getData(j)));
+
+                            data->mutableConditions().updateAll(m_fileInfoData->BitsPerRawSample());
                             auto curve = dynamic_cast<const QwtPlotCurve*>( plot->getCurve(j) );
 
                             QString title = curve->title().text();
@@ -136,6 +138,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                             conditionEditor->setLabel(title);
                             conditionEditor->setDefaultColor(curve->pen().color());
                             conditionEditor->setConditions(data->conditions());
+                            connect(data, SIGNAL(conditionsUpdated()), conditionEditor, SLOT(onConditionsUpdated()));
 
                             vbox->insertWidget(0, conditionEditor);
                             pairs.append(QPair<PlotSeriesData*, BooleanChartConditionEditor*>(data, conditionEditor));
@@ -152,24 +155,24 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                                 auto data = pair.first;
                                 auto editor = pair.second;
 
-                                if(data->conditions().items.size() != editor->conditionsCount())
+                                if(data->conditions().m_items.size() != editor->conditionsCount())
                                 {
-                                    if(data->conditions().items.size() > editor->conditionsCount())
+                                    if(data->conditions().m_items.size() > editor->conditionsCount())
                                     {
-                                        while(data->conditions().items.size() > editor->conditionsCount())
-                                            data->mutableConditions().removeCondition();
+                                        while(data->conditions().m_items.size() > editor->conditionsCount())
+                                            data->mutableConditions().remove();
                                     }
                                     else
                                     {
-                                        while(data->conditions().items.size() < editor->conditionsCount())
-                                            data->mutableConditions().addCondition();
+                                        while(data->conditions().m_items.size() < editor->conditionsCount())
+                                            data->mutableConditions().add();
                                     }
                                 }
 
                                 for(auto i = 0; i < editor->conditionsCount(); ++i)
                                 {
                                     auto conditionInput = editor->getCondition(i);
-                                    data->mutableConditions().updateCondition(i, conditionInput->getCondition(), conditionInput->getColor());
+                                    data->mutableConditions().update(i, conditionInput->getCondition(), conditionInput->getColor());
                                 }
                             }
 
@@ -385,7 +388,6 @@ void Plots::updateSamples( Plot* plot )
     for(auto j = 0; j < streamInfo.PerGroup[plotGroup].Count; ++j)
     {
         plot->replot();
-        // plot->updateBooleanConditions();
     }
 }
 

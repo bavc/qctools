@@ -289,6 +289,15 @@ void Plot::initYAxis()
     if(m_boolean)
     {
         setYAxis(0.0, 1.0, 1);
+
+        auto streamInfo = PerStreamType[m_type];
+        CommonStats* stat = stats( streamPos() );
+
+        for(size_t j = 0; j < streamInfo.PerGroup[m_group].Count; ++j)
+        {
+            PlotSeriesData* data = const_cast<PlotSeriesData*>(static_cast<const PlotSeriesData*> (getData(j)));
+            data->mutableConditions().updateAll(m_fileInformation->BitsPerRawSample());
+        }
     }
     else
     {
@@ -361,6 +370,11 @@ void Plot::updateSymbols()
             curve->setSymbol(nullptr);
         }
     }
+}
+
+bool Plot::isBoolean() const
+{
+    return m_boolean;
 }
 
 void Plot::setBoolean(bool value)

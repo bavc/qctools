@@ -4,7 +4,6 @@
 #include <QCompleter>
 #include <QJSValueIterator>
 #include <QStandardItemModel>
-#include <cassert>
 
 BooleanChartConditionEditor::BooleanChartConditionEditor(QWidget *parent) :
     QWidget(parent),
@@ -42,7 +41,7 @@ void BooleanChartConditionEditor::setDefaultColor(const QColor &color)
     getCondition(0)->setColor(m_defaultColor);
 }
 
-void BooleanChartConditionEditor::setConditions(const PlotSeriesData::Conditions &value)
+QCompleter* BooleanChartConditionEditor::makeCompleter(QJSEngine& engine)
 {
     class CompleterModel : public QStandardItemModel {
     public:
@@ -76,37 +75,44 @@ void BooleanChartConditionEditor::setConditions(const PlotSeriesData::Conditions
     QCompleter *completer = new QCompleter(this);
     CompleterModel* model = new CompleterModel(completer);
 
-    CompleterModel::Words words = value.engine.property("autocomplete").value<CompleterModel::Words>();
+    CompleterModel::Words words = engine.property("autocomplete").value<CompleterModel::Words>();
     model->setWords(words);
 
     completer->setModel(model);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
 
-    if(value.items.size() == 0)
+    return completer;
+}
+
+void BooleanChartConditionEditor::setConditions(const PlotSeriesData::Conditions &value)
+{
+    auto completer = makeCompleter(value.m_engine);
+
+    if(value.m_items.size() == 0)
     {
         while(conditionsCount() != 1)
             removeCondition();
 
         auto condition = getCondition(0);
-        assert(condition);
+        Q_ASSERT(condition);
 
+        condition->setJsEngine(&value.m_engine);
         condition->setCompleter(completer);
-        condition->setJsEngine(&value.engine);
         condition->setColor(m_defaultColor);
         condition->setCondition(QString());
     }
     else
     {
-        if(conditionsCount() != value.items.size())
+        if(conditionsCount() != value.m_items.size())
         {
-            if(conditionsCount() > value.items.size())
+            if(conditionsCount() > value.m_items.size())
             {
-                while(conditionsCount() != value.items.size())
+                while(conditionsCount() != value.m_items.size())
                     removeCondition();
             }
             else
             {
-                while(conditionsCount() != value.items.size())
+                while(conditionsCount() != value.m_items.size())
                     addCondition();
             }
         }
@@ -114,13 +120,26 @@ void BooleanChartConditionEditor::setConditions(const PlotSeriesData::Conditions
         for(auto i = 0; i < conditionsCount(); ++i)
         {
             auto condition = getCondition(i);
-            assert(condition);
+            Q_ASSERT(condition);
 
+            condition->setJsEngine(&value.m_engine);
             condition->setCompleter(completer);
-            condition->setJsEngine(&value.engine);
-            condition->setColor(value.items[i].m_color);
-            condition->setCondition(value.items[i].m_conditionString);
+            condition->setColor(value.m_items[i].m_color);
+            condition->setCondition(value.m_items[i].m_conditionString);
         }
+    }
+}
+
+void BooleanChartConditionEditor::onConditionsUpdated()
+{
+    Q_ASSERT(getCondition(0));
+    if(!getCondition(0)->getJsEngine())
+        return;
+
+    auto completer = makeCompleter(*getCondition(0)->getJsEngine());
+    for(auto i = 0; i < conditionsCount(); ++i)
+    {
+        getCondition(i)->setCompleter(completer);
     }
 }
 
