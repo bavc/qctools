@@ -287,7 +287,7 @@ void Plots::refresh()
         {
             size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
             for ( int i = 0; i < PerStreamType[type].CountOfGroups; i++ )
-                if (m_plots[streamPos][i])
+                if (m_plots[streamPos][i] && m_plots[streamPos][i]->isVisible())
             {
                 m_plots[streamPos][i]->initYAxis();
                 updateSamples( m_plots[streamPos][i] );
@@ -296,6 +296,7 @@ void Plots::refresh()
 
     setCursorPos( framePos() );
     replotAll();
+
 }
 
 //---------------------------------------------------------------------------
@@ -384,6 +385,7 @@ void Plots::updateSamples( Plot* plot )
     for(auto j = 0; j < streamInfo.PerGroup[plotGroup].Count; ++j)
     {
         plot->replot();
+        // plot->updateBooleanConditions();
     }
 }
 
