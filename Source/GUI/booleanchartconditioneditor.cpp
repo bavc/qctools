@@ -48,6 +48,10 @@ void BooleanChartConditionEditor::setConditions(const PlotSeriesData::Conditions
     public:
         typedef QPair<QString, QString> Word;
         typedef QList<Word> Words;
+
+        CompleterModel(QObject* parent = nullptr) : QStandardItemModel(parent) {
+        }
+
         QVariant data(const QModelIndex &index, int role) const
         {
             if(role == Qt::DisplayRole)
@@ -69,12 +73,13 @@ void BooleanChartConditionEditor::setConditions(const PlotSeriesData::Conditions
         }
     };
 
-    CompleterModel* model = new CompleterModel();
+    QCompleter *completer = new QCompleter(this);
+    CompleterModel* model = new CompleterModel(completer);
 
     CompleterModel::Words words = value.engine.property("autocomplete").value<CompleterModel::Words>();
     model->setWords(words);
 
-    QCompleter *completer = new QCompleter(model, this);
+    completer->setModel(model);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
 
     if(value.items.size() == 0)
