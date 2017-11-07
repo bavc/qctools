@@ -120,8 +120,8 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                     connect(booleanConfigButton, &QToolButton::clicked, this, [=] {
                         QDialog dialog;
                         dialog.setWindowTitle("Edit boolean conditions");
-                        QVBoxLayout* vbox = new QVBoxLayout;
-                        dialog.setLayout(vbox);
+                        QGridLayout* grid = new QGridLayout;
+                        dialog.setLayout(grid);
 
                         QList<QPair<PlotSeriesData*, BooleanChartConditionEditor*>> pairs;
 
@@ -140,7 +140,9 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                             conditionEditor->setConditions(data->conditions());
                             connect(data, SIGNAL(conditionsUpdated()), conditionEditor, SLOT(onConditionsUpdated()));
 
-                            vbox->insertWidget(0, conditionEditor);
+                            grid->addWidget(conditionEditor->takeLabel(), j, 0, Qt::AlignHCenter);
+                            grid->addWidget(conditionEditor, j, 1, Qt::AlignHCenter);
+
                             pairs.append(QPair<PlotSeriesData*, BooleanChartConditionEditor*>(data, conditionEditor));
                         }
 
@@ -148,7 +150,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                         connect(dialogButtonBox->button(QDialogButtonBox::Save), SIGNAL(clicked()), &dialog, SLOT(accept()));
                         connect(dialogButtonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), &dialog, SLOT(reject()));
 
-                        dialog.layout()->addWidget(dialogButtonBox);
+                        grid->addWidget(dialogButtonBox, streamInfo.PerGroup[plotGroup].Count, 1);
                         if(QDialog::Accepted == dialog.exec())
                         {
                             for(auto pair : pairs) {

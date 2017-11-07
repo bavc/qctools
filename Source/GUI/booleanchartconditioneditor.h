@@ -1,6 +1,7 @@
 #ifndef BOOLEANCHARTCONDITIONEDITOR_H
 #define BOOLEANCHARTCONDITIONEDITOR_H
 
+#include <QLabel>
 #include <QWidget>
 #include "Plot.h"
 
@@ -22,6 +23,8 @@ public:
     int conditionsCount() const;
 
     void setLabel(const QString& label);
+    QLabel* takeLabel();
+
     void setDefaultColor(const QColor& color);
     void setConditions(const PlotSeriesData::Conditions& value);
 
