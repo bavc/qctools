@@ -358,6 +358,7 @@ void MainWindow::createGraphsLayout()
         ui->fileNamesBox->show();
 
     PlotsArea=Files[getFilesCurrentPos()]->Stats.empty()?NULL:new Plots(this, Files[getFilesCurrentPos()]);
+    applyBooleanChartsProfile();
 
     auto filtersInfo = Prefs->loadFilterSelectorsOrder();
     changeFilterSelectorsOrder(filtersInfo);
@@ -529,5 +530,30 @@ void MainWindow::Update()
 		ControlArea->Update();
 
 	if(InfoArea)
-		InfoArea->Update();
+        InfoArea->Update();
+}
+
+void MainWindow::applyBooleanChartsProfile()
+{
+    if(PlotsArea) {
+        PlotsArea->loadBooleanChartsProfile(m_booleanChartsProfile.object());
+    }
+}
+
+void MainWindow::loadBooleanChartsProfile(const QString &profile)
+{
+    QFile file(profile);
+    if(!file.exists(profile)) {
+        return;
+    }
+    if(!file.open(QIODevice::ReadOnly)) {
+        return;
+    }
+
+    auto bytes = file.readAll();
+    if(m_booleanChartsProfile.isEmpty())
+        qDebug() << "m_booleanChartsProfile is empty";
+
+    m_booleanChartsProfile = QJsonDocument::fromJson(bytes);
+    applyBooleanChartsProfile();
 }

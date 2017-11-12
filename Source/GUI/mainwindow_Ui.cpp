@@ -43,6 +43,7 @@
 #include <QActionGroup>
 #include <QPushButton>
 #include <QSet>
+#include <QJsonDocument>
 
 #include <qwt_plot_renderer.h>
 #include <QDebug>
@@ -103,6 +104,27 @@ void MainWindow::Ui_Init()
     QWidget* spacer = new QWidget();
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->toolBar->insertWidget(ui->actionFilesList, spacer);
+
+    QLabel* boleanChartProfile = new QLabel("Select boolean charts profile: ");
+    ui->toolBar->insertWidget(ui->actionFilesList, boleanChartProfile);
+
+    QComboBox* combobox = new QComboBox;
+
+    QDir dir;
+    auto entries = dir.entryInfoList(QStringList() << "*.json", QDir::Files);
+    for(auto entry : entries) {
+        combobox->addItem(entry.fileName());
+    }
+
+    ui->toolBar->insertWidget(ui->actionFilesList, combobox);
+
+    QObject::connect(combobox, static_cast<void (QComboBox::*)(const QString &)>(&QComboBox::activated), [&](const QString &selectedProfile) {
+        loadBooleanChartsProfile(selectedProfile);
+    });
+
+    if(combobox->count() != 0) {
+        loadBooleanChartsProfile(combobox->currentText());
+    }
 
     // Config
     ui->verticalLayout->setSpacing(0);

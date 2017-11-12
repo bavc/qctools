@@ -20,6 +20,8 @@
 #include <qwt_series_data.h>
 #include <qwt_widget_overlay.h>
 #include <cassert>
+#include <QJsonObject>
+#include <QJsonArray>
 
 class QwtPlotCurve;
 class PlotCursor;
@@ -115,7 +117,7 @@ class PlotSeriesData : public QObject, public QwtPointSeriesData
     Q_OBJECT
 public:
     PlotSeriesData(CommonStats* stats, const QString& title, int bitDepth, const int& xDataIndex, const size_t yDataIndex, size_t plotGroup, size_t curveIndex, size_t curvesCount)
-        : m_boolean(false), m_conditions(stats, this, plotGroup, title, bitDepth), m_lastCondition(nullptr),
+        : m_boolean(false), m_conditions(stats, this, plotGroup, title, curveIndex, bitDepth), m_lastCondition(nullptr),
           m_stats(stats), m_xDataIndex(xDataIndex), m_yDataIndex(yDataIndex), m_plotGroup(plotGroup), m_curveIndex(curveIndex),
           m_curvesCount(curvesCount)
     {
@@ -204,8 +206,39 @@ public:
 
     struct Conditions
     {
-        Conditions(CommonStats* stats, PlotSeriesData* seriesData, size_t plotGroup, const QString& title, int bitdepth) : m_stats(stats), m_seriesData(seriesData), m_plotGroup(plotGroup), m_curveTitle(title), m_bitdepth(bitdepth) {
+        Conditions(CommonStats* stats, PlotSeriesData* seriesData, size_t plotGroup, const QString& title, int curveIndex, int bitdepth) : m_stats(stats), m_seriesData(seriesData),
+            m_plotGroup(plotGroup), m_curveTitle(title), m_curveIndex(curveIndex), m_bitdepth(bitdepth) {
 
+        }
+
+        QJsonObject toJson() const {
+            QJsonObject jsonObject;
+            jsonObject.insert("curveTitle", m_curveTitle);
+            jsonObject.insert("curveIndex", m_curveIndex);
+            jsonObject.insert("plotGroup", (int) m_plotGroup);
+
+            QJsonArray curveConditons;
+            for(auto & condition : m_items) {
+                QJsonObject conditionObject;
+                conditionObject.insert("color", condition.m_color.name());
+                conditionObject.insert("value", condition.m_conditionString);
+
+                curveConditons.append(conditionObject);
+            }
+
+            jsonObject.insert("curveConditions", curveConditons);
+            return jsonObject;
+        }
+
+        void clear() {
+            m_items.clear();
+        }
+
+        void add(const QString& value, const QColor& color) {
+            m_items.append(Condition(&m_engine, m_stats, m_plotGroup));
+            m_items.back().m_conditionString = value;
+            m_items.back().m_color = color;
+            m_items.back().update();
         }
 
         void add() {
@@ -294,6 +327,7 @@ public:
 
         size_t m_plotGroup;
         QString m_curveTitle;
+        int m_curveIndex;
         int m_bitdepth;
     };
 
@@ -349,8 +383,11 @@ public:
     void setCursorPos( double x );
 
     void setData(size_t curveIndex, PlotSeriesData *series);
-    const QwtSeriesData<QPointF>* getData(size_t curveIndex) const;
+    const PlotSeriesData* getData(size_t curveIndex) const;
+    PlotSeriesData* getData(size_t);
+
     const QwtPlotCurve* getCurve(size_t curveIndex) const;
+    int curvesCount() const;
 
     size_t streamPos() const { return m_streamPos; }
     size_t type() const { return m_type; }

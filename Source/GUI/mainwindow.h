@@ -13,6 +13,7 @@
 #include <QByteArray>
 #include <QMutex>
 #include <QPushButton>
+#include <QJsonDocument>
 
 #include <vector>
 using namespace std;
@@ -142,6 +143,8 @@ public:
 
 public Q_SLOTS:
 	void Update();
+    void applyBooleanChartsProfile();
+    void loadBooleanChartsProfile(const QString& profile);
 
 private Q_SLOTS:
 
@@ -270,6 +273,8 @@ private:
     SignalServerConnectionChecker* connectionChecker;
     QWidget* connectionIndicator;
     size_t files_CurrentPos;
+
+    QJsonDocument m_booleanChartsProfile;
 
     Ui::MainWindow *ui;
 };

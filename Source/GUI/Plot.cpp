@@ -295,7 +295,7 @@ void Plot::initYAxis()
 
         for(size_t j = 0; j < streamInfo.PerGroup[m_group].Count; ++j)
         {
-            PlotSeriesData* data = const_cast<PlotSeriesData*>(static_cast<const PlotSeriesData*> (getData(j)));
+            PlotSeriesData* data = getData(j);
             data->mutableConditions().updateAll(m_fileInformation->BitsPerRawSample());
         }
     }
@@ -531,14 +531,24 @@ void Plot::setData(size_t curveIndex, PlotSeriesData *series)
     m_curves[curveIndex]->setData(series);
 }
 
-const QwtSeriesData<QPointF>* Plot::getData(size_t curveIndex) const
+const PlotSeriesData* Plot::getData(size_t curveIndex) const
 {
-    return m_curves[curveIndex]->data();
+    return static_cast<PlotSeriesData*> (m_curves[curveIndex]->data());
+}
+
+PlotSeriesData *Plot::getData(size_t curveIndex)
+{
+    return static_cast<PlotSeriesData*> (m_curves[curveIndex]->data());
 }
 
 const QwtPlotCurve* Plot::getCurve(size_t curveIndex) const
 {
     return m_curves[curveIndex];
+}
+
+int Plot::curvesCount() const
+{
+    return m_curves.size();
 }
 
 QColor Plot::curveColor( int index ) const

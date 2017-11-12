@@ -31,6 +31,7 @@
 #include <QDebug>
 #include <QMetaEnum>
 #include <QMessageBox>
+#include <QJsonDocument>
 
 #include "GUI/draggablechildrenbehaviour.h"
 #include "GUI/config.h"
@@ -146,6 +147,14 @@ MainWindow::MainWindow(QWidget *parent) :
 //---------------------------------------------------------------------------
 MainWindow::~MainWindow()
 {
+    if(PlotsArea) {
+        auto json = QJsonDocument(PlotsArea->saveBooleanChartsProfile()).toJson();
+        QFile booleanConditions("booleanConditions.json");
+        if(booleanConditions.open(QIODevice::WriteOnly))  {
+            booleanConditions.write(json);
+        }
+    }
+
     Prefs->saveFilterSelectorsOrder(getFilterSelectorsOrder());
 
     preferences->saveSelectedFilters(getSelectedFilters());

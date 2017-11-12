@@ -92,6 +92,10 @@ QCompleter* BooleanChartConditionEditor::makeCompleter(QJSEngine& engine)
 
 void BooleanChartConditionEditor::setConditions(const PlotSeriesData::Conditions &value)
 {
+    auto condition = getCondition(0);
+    Q_ASSERT(condition);
+    condition->setJsEngine(&value.m_engine);
+
     auto completer = makeCompleter(value.m_engine);
 
     if(value.m_items.size() == 0)
@@ -99,10 +103,6 @@ void BooleanChartConditionEditor::setConditions(const PlotSeriesData::Conditions
         while(conditionsCount() != 1)
             removeCondition();
 
-        auto condition = getCondition(0);
-        Q_ASSERT(condition);
-
-        condition->setJsEngine(&value.m_engine);
         condition->setCompleter(completer);
         condition->setColor(m_defaultColor);
         condition->setCondition(QString());

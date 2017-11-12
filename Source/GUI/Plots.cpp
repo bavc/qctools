@@ -125,10 +125,11 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
 
                         QList<QPair<PlotSeriesData*, BooleanChartConditionEditor*>> pairs;
 
-                        for(size_t j = 0; j < streamInfo.PerGroup[plotGroup].Count; ++j)
+                        int j = streamInfo.PerGroup[plotGroup].Count;
+                        while(j-- > 0)
                         {
                             auto conditionEditor = new BooleanChartConditionEditor(nullptr);
-                            PlotSeriesData* data = const_cast<PlotSeriesData*>(static_cast<const PlotSeriesData*> (plot->getData(j)));
+                            PlotSeriesData* data = plot->getData(j);
 
                             data->mutableConditions().updateAll(m_fileInfoData->BitsPerRawSample());
                             auto curve = dynamic_cast<const QwtPlotCurve*>( plot->getCurve(j) );
@@ -140,8 +141,8 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                             conditionEditor->setConditions(data->conditions());
                             connect(data, SIGNAL(conditionsUpdated()), conditionEditor, SLOT(onConditionsUpdated()));
 
-                            grid->addWidget(conditionEditor->takeLabel(), j, 0, Qt::AlignHCenter);
-                            grid->addWidget(conditionEditor, j, 1, Qt::AlignHCenter);
+                            grid->addWidget(conditionEditor->takeLabel(), streamInfo.PerGroup[plotGroup].Count - 1 - j, 0, Qt::AlignHCenter);
+                            grid->addWidget(conditionEditor, streamInfo.PerGroup[plotGroup].Count - 1 - j, 1, Qt::AlignHCenter);
 
                             pairs.append(QPair<PlotSeriesData*, BooleanChartConditionEditor*>(data, conditionEditor));
                         }
@@ -690,6 +691,105 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
     }
 
     Q_ASSERT(rowsCount == gridLayout->rowCount());
+}
+
+QJsonObject Plots::saveBooleanChartsProfile()
+{
+    QJsonObject conditionsObject;
+    QJsonArray conditionsArray;
+
+    for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
+    {
+        if ( m_fileInfoData->Stats[streamPos] && m_plots[streamPos] )
+        {
+            auto type = m_fileInfoData->Stats[streamPos]->Type_Get();
+
+            for ( size_t group = 0; group < PerStreamType[type].CountOfGroups; group++ )
+                if (m_plots[streamPos][group]) {
+                    auto plot = m_plots[streamPos][group];
+                    QJsonObject plotObject;
+
+                    plotObject.insert("streamPos", (int) plot->streamPos());
+                    plotObject.insert("type", (int) plot->type());
+                    plotObject.insert("group", (int) plot->group());
+                    plotObject.insert("plotTitle", PerStreamType[plot->type()].PerGroup[plot->group()].Name);
+
+                    QJsonArray plotConditions;
+                    auto streamInfo = PerStreamType[plot->type()];
+                    for(size_t j = 0; j < streamInfo.PerGroup[plot->group()].Count; ++j)
+                    {
+                        auto curveData = static_cast<const PlotSeriesData*>(plot->getData(j));
+                        plotConditions.append(curveData->conditions().toJson());
+                    }
+
+                    plotObject.insert("plotConditions", plotConditions);
+                    conditionsArray.append(plotObject);
+                }
+        }
+    }
+
+    conditionsObject.insert("conditions", conditionsArray);
+    return conditionsObject;
+}
+
+void Plots::loadBooleanChartsProfile(const QJsonObject& profile)
+{
+    for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
+    {
+        if ( m_fileInfoData->Stats[streamPos] && m_plots[streamPos] ) {
+            auto type = m_fileInfoData->Stats[streamPos]->Type_Get();
+
+            for ( size_t group = 0; group < PerStreamType[type].CountOfGroups; group++ ) {
+                if (m_plots[streamPos][group]) {
+                    auto plot = m_plots[streamPos][group];
+
+                    auto streamInfo = PerStreamType[plot->type()];
+                    for(size_t j = 0; j < streamInfo.PerGroup[plot->group()].Count; ++j)
+                    {
+                        auto curveData = plot->getData(j);
+                        curveData->mutableConditions().clear();
+                    }
+                }
+            }
+        }
+    }
+
+    QJsonArray conditions = profile.value("conditions").toArray();
+    for(auto condition : conditions) {
+        auto conditionObject = condition.toObject();
+        auto plotGroup = conditionObject.value("group").toInt();
+        auto plotType = conditionObject.value("type").toInt();
+        auto streamPos = conditionObject.value("streamPos").toInt();
+        auto plotTitle = conditionObject.value("plotTitle").toString();
+
+        auto plotConditions = conditionObject.value("plotConditions").toArray();
+
+        if(streamPos < m_fileInfoData->Stats.size() && m_fileInfoData->Stats[streamPos] && m_plots[streamPos]) {
+            if(plotType == m_fileInfoData->Stats[streamPos]->Type_Get() && plotGroup < PerStreamType[plotType].CountOfGroups) {
+                if (m_plots[streamPos][plotGroup]) {
+                    auto plot = m_plots[streamPos][plotGroup];
+
+                    for(auto plotCondition : plotConditions) {
+                        auto plotConditionObject = plotCondition.toObject();
+
+                        auto curveIndex = plotConditionObject.value("curveIndex").toInt();
+                        if(curveIndex < plot->curvesCount()) {
+                            auto curveData = plot->getData(curveIndex);
+                            auto curveConditions = plotConditionObject.value("curveConditions").toArray();
+
+                            for(auto curveCondition : curveConditions) {
+                                auto curveConditionObject = curveCondition.toObject();
+                                auto value = curveConditionObject.value("value").toString();
+                                auto color = QColor(curveConditionObject.value("color").toString());
+
+                                curveData->mutableConditions().add(value, color);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 void Plots::alignXAxis( const QwtPlot* plot )
