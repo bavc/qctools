@@ -786,6 +786,9 @@ void Plots::loadBooleanChartsProfile(const QJsonObject& profile)
                             }
                         }
                     }
+
+                    if(plot->isBoolean())
+                        plot->replot();
                 }
             }
         }
