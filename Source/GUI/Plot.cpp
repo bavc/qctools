@@ -91,7 +91,7 @@ protected:
             info += "=";
 
             if ((*m_curves)[i]->dataSize() != 0)
-                info += QString::number((*m_curves)[i]->sample(index).ry(), 'f', itemInfo.DigitsAfterComma);
+                info += QString::number(static_cast<PlotSeriesData*>((*m_curves)[i]->data())->originalSample(index).ry(), 'f', itemInfo.DigitsAfterComma);
             else
                 info += QString("n/a");
         }

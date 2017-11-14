@@ -135,6 +135,14 @@ public:
         return QPointF(xData[i], (m_boolean ? toBoolean(yData[i], 1.0) : yData[i]));
     }
 
+    QPointF originalSample(size_t i) const {
+
+        auto xData = m_stats->x[m_xDataIndex];
+        auto yData = m_stats->y[m_yDataIndex];
+
+        return QPointF(xData[i], yData[i]);
+    }
+
     double toBoolean(double y) const {
         for(auto i = 0; i < m_conditions.m_items.size(); ++i) {
             const auto& condition = m_conditions.m_items[i];
