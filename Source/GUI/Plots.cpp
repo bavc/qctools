@@ -247,7 +247,14 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     if(m_commentsPlot)
     {
         layout->addWidget(m_commentsPlot, m_plotsCount, 0);
-        layout->addWidget( m_commentsPlot->legend(), m_plotsCount, 1 );
+
+        QVBoxLayout* legendLayout = new QVBoxLayout();
+        legendLayout->setContentsMargins(5, 0, 5, 0);
+        legendLayout->setSpacing(10);
+        legendLayout->setAlignment(Qt::AlignVCenter);
+        legendLayout->addWidget(m_commentsPlot->legend());
+
+        layout->addLayout(legendLayout, m_plotsCount, 1 );
     }
 
     layout->addWidget( m_scaleWidget, m_plotsCount + 1, 0, 1, 2 );
