@@ -1,0 +1,621 @@
+{
+    "conditions": [
+        {
+            "group": 0,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                        {
+                            "color": "#035bff",
+                            "value": "y < yHalf"
+                        },
+                        {
+                            "color": "#46ff2a",
+                            "value": "y > yHalf"
+                        }
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "Y MIN",
+                    "plotGroup": 0
+                },
+                {
+                    "curveConditions": [
+                        {
+                            "color": "#006600",
+                            "value": ""
+                        }
+                    ],
+                    "curveIndex": 1,
+                    "curveTitle": "Y LOW",
+                    "plotGroup": 0
+                },
+                {
+                    "curveConditions": [
+                        {
+                            "color": "#000000",
+                            "value": ""
+                        }
+                    ],
+                    "curveIndex": 2,
+                    "curveTitle": "Y AVG",
+                    "plotGroup": 0
+                },
+                {
+                    "curveConditions": [
+                        {
+                            "color": "#00ff00",
+                            "value": ""
+                        }
+                    ],
+                    "curveIndex": 3,
+                    "curveTitle": "Y HIGH",
+                    "plotGroup": 0
+                },
+                {
+                    "curveConditions": [
+                        {
+                            "color": "#ff0000",
+                            "value": "y < 682"
+                        },
+                        {
+                            "color": "#07ff30",
+                            "value": "682 > y < 600"
+                        }
+                    ],
+                    "curveIndex": 4,
+                    "curveTitle": "Y MAX",
+                    "plotGroup": 0
+                }
+            ],
+            "plotTitle": "Y",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 1,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "U MIN",
+                    "plotGroup": 1
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 1,
+                    "curveTitle": "U LOW",
+                    "plotGroup": 1
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 2,
+                    "curveTitle": "U AVG",
+                    "plotGroup": 1
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 3,
+                    "curveTitle": "U HIGH",
+                    "plotGroup": 1
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 4,
+                    "curveTitle": "U MAX",
+                    "plotGroup": 1
+                }
+            ],
+            "plotTitle": "U",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 2,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "V MIN",
+                    "plotGroup": 2
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 1,
+                    "curveTitle": "V LOW",
+                    "plotGroup": 2
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 2,
+                    "curveTitle": "V AVG",
+                    "plotGroup": 2
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 3,
+                    "curveTitle": "V HIGH",
+                    "plotGroup": 2
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 4,
+                    "curveTitle": "V MAX",
+                    "plotGroup": 2
+                }
+            ],
+            "plotTitle": "V",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 3,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "Y DIF",
+                    "plotGroup": 3
+                }
+            ],
+            "plotTitle": "YDiff",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 4,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "U DIF",
+                    "plotGroup": 4
+                }
+            ],
+            "plotTitle": "UDiff",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 5,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "V DIF",
+                    "plotGroup": 5
+                }
+            ],
+            "plotTitle": "VDiff",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 6,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "V DIF",
+                    "plotGroup": 6
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 1,
+                    "curveTitle": "U DIF",
+                    "plotGroup": 6
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 2,
+                    "curveTitle": "Y DIF",
+                    "plotGroup": 6
+                }
+            ],
+            "plotTitle": "Diffs",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 7,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "SAT MIN",
+                    "plotGroup": 7
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 1,
+                    "curveTitle": "SAT LOW",
+                    "plotGroup": 7
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 2,
+                    "curveTitle": "SAT AVG",
+                    "plotGroup": 7
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 3,
+                    "curveTitle": "SAT HIGH",
+                    "plotGroup": 7
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 4,
+                    "curveTitle": "SAT MAX",
+                    "plotGroup": 7
+                }
+            ],
+            "plotTitle": "Sat",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 8,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "HUE MED",
+                    "plotGroup": 8
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 1,
+                    "curveTitle": "HUE AVG",
+                    "plotGroup": 8
+                }
+            ],
+            "plotTitle": "Hue",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 9,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "TOUT",
+                    "plotGroup": 9
+                }
+            ],
+            "plotTitle": "TOUT",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 10,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "VREP",
+                    "plotGroup": 10
+                }
+            ],
+            "plotTitle": "VREP",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 11,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "BRNG",
+                    "plotGroup": 11
+                }
+            ],
+            "plotTitle": "BRNG",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 15,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "MSEf V",
+                    "plotGroup": 15
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 1,
+                    "curveTitle": "MSEf U",
+                    "plotGroup": 15
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 2,
+                    "curveTitle": "MSEf Y",
+                    "plotGroup": 15
+                }
+            ],
+            "plotTitle": "MSEf",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 16,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "PSNRf V",
+                    "plotGroup": 16
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 1,
+                    "curveTitle": "PSNRf U",
+                    "plotGroup": 16
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 2,
+                    "curveTitle": "PSNRf Y",
+                    "plotGroup": 16
+                }
+            ],
+            "plotTitle": "PSNRf",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 18,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "s.bff",
+                    "plotGroup": 18
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 1,
+                    "curveTitle": "s.tff",
+                    "plotGroup": 18
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 2,
+                    "curveTitle": "s.prog",
+                    "plotGroup": 18
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 3,
+                    "curveTitle": "s.und",
+                    "plotGroup": 18
+                }
+            ],
+            "plotTitle": "idet S",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 19,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "m.bff",
+                    "plotGroup": 19
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 1,
+                    "curveTitle": "m.tff",
+                    "plotGroup": 19
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 2,
+                    "curveTitle": "m.prog",
+                    "plotGroup": 19
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 3,
+                    "curveTitle": "m.und",
+                    "plotGroup": 19
+                }
+            ],
+            "plotTitle": "idet M",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 20,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "bottom",
+                    "plotGroup": 20
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 1,
+                    "curveTitle": "top",
+                    "plotGroup": 20
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 2,
+                    "curveTitle": "neither",
+                    "plotGroup": 20
+                }
+            ],
+            "plotTitle": "idet R",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 22,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "pkt_duration_time",
+                    "plotGroup": 22
+                }
+            ],
+            "plotTitle": "pkt_duration_time",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 23,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "pkt_size",
+                    "plotGroup": 23
+                }
+            ],
+            "plotTitle": "pkt_size",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 2,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "DC Offset",
+                    "plotGroup": 2
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 1,
+                    "curveTitle": "Min Level",
+                    "plotGroup": 2
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 2,
+                    "curveTitle": "Max Level",
+                    "plotGroup": 2
+                }
+            ],
+            "plotTitle": "Levels",
+            "streamPos": 1,
+            "type": 1
+        },
+        {
+            "group": 3,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "ADIF Min",
+                    "plotGroup": 3
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 1,
+                    "curveTitle": "ADIF Max",
+                    "plotGroup": 3
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 2,
+                    "curveTitle": "ADIF Mean",
+                    "plotGroup": 3
+                }
+            ],
+            "plotTitle": "Aud Diffs",
+            "streamPos": 1,
+            "type": 1
+        },
+        {
+            "group": 4,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "Peak Level",
+                    "plotGroup": 4
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 1,
+                    "curveTitle": "RMS Peak",
+                    "plotGroup": 4
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 2,
+                    "curveTitle": "RMS Trough",
+                    "plotGroup": 4
+                }
+            ],
+            "plotTitle": "RMS",
+            "streamPos": 1,
+            "type": 1
+        }
+    ]
+}

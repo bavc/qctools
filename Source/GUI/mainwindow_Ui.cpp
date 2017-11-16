@@ -110,20 +110,34 @@ void MainWindow::Ui_Init()
 
     QComboBox* combobox = new QComboBox;
 
-    QDir dir;
-    auto entries = dir.entryInfoList(QStringList() << "*.json", QDir::Files);
-    for(auto entry : entries) {
-        combobox->addItem(entry.fileName());
+    // system profiles
+    {
+        QDir dir(":/boolean_profiles");
+        auto entries = dir.entryInfoList(QStringList() << "*.json", QDir::Files);
+        for(auto entry : entries) {
+            combobox->addItem(entry.fileName() + " (system)", entry.filePath());
+        }
+    }
+
+    // user profiles
+    {
+        QDir dir;
+        auto entries = dir.entryInfoList(QStringList() << "*.json", QDir::Files);
+        for(auto entry : entries) {
+            combobox->addItem(entry.fileName(), entry.filePath());
+        }
     }
 
     ui->toolBar->insertWidget(ui->actionFilesList, combobox);
 
-    QObject::connect(combobox, static_cast<void (QComboBox::*)(const QString &)>(&QComboBox::activated), [&](const QString &selectedProfile) {
-        loadBooleanChartsProfile(selectedProfile);
+    QObject::connect(combobox, static_cast<void (QComboBox::*)(int index)>(&QComboBox::activated), [this, combobox](int index) {
+        auto displayText = combobox->itemText(index);
+        auto value = combobox->itemData(index).toString();
+        loadBooleanChartsProfile(value);
     });
 
     if(combobox->count() != 0) {
-        loadBooleanChartsProfile(combobox->currentText());
+        loadBooleanChartsProfile(combobox->itemData(combobox->currentIndex()).toString());
     }
 
     // Config
