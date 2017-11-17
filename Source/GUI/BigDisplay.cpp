@@ -880,6 +880,23 @@ const filter Filters[]=
         },
     },
     {
+        "Line Over Time",
+        0,
+        {
+            { Args_Type_Slider,   1,   1,   0,   1, "Line" },
+            { Args_Type_Slider, 480,  20,1080,   1, "Count"},
+            { Args_Type_Toggle,   0,   0,   0,   0, "Show Two Lines" },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+            { Args_Type_None,     0,   0,   0,   0, },
+        },
+        {
+            "crop=iw:1:0:${1}:0:1,tile=1x${2}:overlap=${2}-1:init_padding=${2}-1",
+            "split[a][b];[a]crop=iw:1:0:${1}:0:1,tile=1x${2}:overlap=${2}-1:init_padding=${2}-1,pad=iw:ih+1[a1];[b]crop=iw:1:0:${1}+1:0:1,tile=1x${2}:overlap=${2}-1:init_padding=${2}-1[b1];[a1][b1]vstack"
+        },
+    },
+    {
         "Zoom",
         0,
         {

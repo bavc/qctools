@@ -34,6 +34,7 @@ The QCTools preview window is intended as an analytical playback environment tha
 [Help](#help)  
 [Histogram](#histogram)  
 [Limiter](#limiter)  
+[Lines Over Time](#line-over-time)  
 [Line Select](#line-select)  
 [Luma Adjust](#luma-adjust)  
 [No Display](#no-display)  
@@ -196,6 +197,10 @@ The histogram shows the frequency of occurrence of values per channel. Typically
 ## Limiter {#limiter}
 
 Constrain playback to a specified sample range of the frame. Setting min and max values will clip all values below min to min and all values above max to max. For instance with an 8 bit video, the samples above broadcast range could be examined by setting min to 235 (the upper limit of broadcast range) and 255 (the highest possible 8-bit value). The strength value will apply a global color histogram equalization to stress the difference between the sample values. See the FFmpeg [limiter](http://ffmpeg.org/ffmpeg-filters.html#limiter) filter for more information.
+
+## Lines over Time {#line-over-time}
+
+This filter shows only 1 or 2 lines of video accumulate over time, like a slit-scan video. It can be used to focus on a single line of video (such as captioning in line 21) but showing multiple frames of an isolated line at once. The image is generated with FFmpeg's [tile filter](http://ffmpeg.org/ffmpeg-filters.html#tile).
 
 ## Line Select {#line-select}
 
