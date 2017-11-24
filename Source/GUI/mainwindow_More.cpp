@@ -22,6 +22,7 @@
 #include "GUI/blackmagicdecklink_userinput.h"
 #include "GUI/preferences.h"
 #include "GUI/BigDisplay.h"
+#include "GUI/booleanprofilesmodel.h"
 
 //---------------------------------------------------------------------------
 
@@ -358,6 +359,15 @@ void MainWindow::createGraphsLayout()
         ui->fileNamesBox->show();
 
     PlotsArea=Files[getFilesCurrentPos()]->Stats.empty()?NULL:new Plots(this, Files[getFilesCurrentPos()]);
+    connect(PlotsArea, &Plots::booleanProfileChanged, this, [&] {
+        auto selectedProfileFileName = m_profileSelectorCombobox->itemData(m_profileSelectorCombobox->currentIndex(), BooleanProfilesModel::Data).toString();
+        auto isSystem = m_profileSelectorCombobox->itemData(m_profileSelectorCombobox->currentIndex(), BooleanProfilesModel::IsSystem).toBool();
+
+        if(!isSystem) {
+            saveBooleanChartsProfile(selectedProfileFileName);
+        }
+    });
+
     applyBooleanChartsProfile();
 
     auto filtersInfo = Prefs->loadFilterSelectorsOrder();
@@ -556,4 +566,15 @@ void MainWindow::loadBooleanChartsProfile(const QString &profile)
 
     m_booleanChartsProfile = QJsonDocument::fromJson(bytes);
     applyBooleanChartsProfile();
+}
+
+void MainWindow::saveBooleanChartsProfile(const QString &profileName)
+{
+    if(PlotsArea) {
+        auto json = QJsonDocument(PlotsArea->saveBooleanChartsProfile()).toJson();
+        QFile profile(profileName);
+        if(profile.open(QIODevice::WriteOnly))  {
+            profile.write(json);
+        }
+    }
 }

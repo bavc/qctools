@@ -141,10 +141,14 @@ public:
     void setFilesCurrentPos(const size_t &value);
     bool isFileSelected() const;
 
+Q_SIGNALS:
+    void fileSelected(bool selected);
+
 public Q_SLOTS:
 	void Update();
     void applyBooleanChartsProfile();
     void loadBooleanChartsProfile(const QString& profile);
+    void saveBooleanChartsProfile(const QString& profile);
 
 private Q_SLOTS:
 
@@ -275,6 +279,7 @@ private:
     size_t files_CurrentPos;
 
     QJsonDocument m_booleanChartsProfile;
+    QComboBox* m_profileSelectorCombobox;
 
     Ui::MainWindow *ui;
 };

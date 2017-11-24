@@ -147,14 +147,6 @@ MainWindow::MainWindow(QWidget *parent) :
 //---------------------------------------------------------------------------
 MainWindow::~MainWindow()
 {
-    if(PlotsArea) {
-        auto json = QJsonDocument(PlotsArea->saveBooleanChartsProfile()).toJson();
-        QFile booleanConditions("booleanConditions.json");
-        if(booleanConditions.open(QIODevice::WriteOnly))  {
-            booleanConditions.write(json);
-        }
-    }
-
     Prefs->saveFilterSelectorsOrder(getFilterSelectorsOrder());
 
     preferences->saveSelectedFilters(getSelectedFilters());
@@ -921,7 +913,15 @@ size_t MainWindow::getFilesCurrentPos() const
 
 void MainWindow::setFilesCurrentPos(const size_t &value)
 {
-    files_CurrentPos = value;
+    bool fileWasSelected = isFileSelected();
+
+    if(files_CurrentPos != value) {
+        files_CurrentPos = value;
+
+        if(fileWasSelected != isFileSelected())
+            Q_EMIT(fileSelected(isFileSelected()));
+    }
+
     ui->actionReveal_file_location->setEnabled(isFileSelected());
     ui->actionFiltersLayout->setEnabled(isFileSelected());
 }

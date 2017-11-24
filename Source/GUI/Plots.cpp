@@ -180,6 +180,8 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
 
                             plot->updateSymbols();
                             plot->replot();
+
+                            Q_EMIT booleanProfileChanged();
                         }
                     });
 
@@ -740,6 +742,8 @@ QJsonObject Plots::saveBooleanChartsProfile()
 
 void Plots::loadBooleanChartsProfile(const QJsonObject& profile)
 {
+    QJsonArray conditions = profile.value("conditions").toArray();
+
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
     {
         if ( m_fileInfoData->Stats[streamPos] && m_plots[streamPos] ) {
@@ -755,12 +759,14 @@ void Plots::loadBooleanChartsProfile(const QJsonObject& profile)
                         auto curveData = plot->getData(j);
                         curveData->mutableConditions().clear();
                     }
+
+                    if(conditions.empty() && plot->isBoolean())
+                        plot->replot();
                 }
             }
         }
     }
 
-    QJsonArray conditions = profile.value("conditions").toArray();
     for(auto condition : conditions) {
         auto conditionObject = condition.toObject();
         auto plotGroup = conditionObject.value("group").toInt();

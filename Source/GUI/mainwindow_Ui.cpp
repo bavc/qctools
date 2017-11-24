@@ -5,7 +5,9 @@
  */
 
 //---------------------------------------------------------------------------
+#include "booleanprofilesmodel.h"
 #include "mainwindow.h"
+#include "managebooleanconditions.h"
 #include "ui_mainwindow.h"
 
 #include "GUI/preferences.h"
@@ -44,6 +46,7 @@
 #include <QPushButton>
 #include <QSet>
 #include <QJsonDocument>
+#include <QStandardItemModel>
 
 #include <qwt_plot_renderer.h>
 #include <QDebug>
@@ -108,37 +111,58 @@ void MainWindow::Ui_Init()
     QLabel* boleanChartProfile = new QLabel("Select boolean charts profile: ");
     ui->toolBar->insertWidget(ui->actionFilesList, boleanChartProfile);
 
-    QComboBox* combobox = new QComboBox;
+    m_profileSelectorCombobox = new QComboBox;
+    connect(this, &MainWindow::fileSelected, m_profileSelectorCombobox, &QComboBox::setEnabled);
 
-    // system profiles
-    {
-        QDir dir(":/boolean_profiles");
-        auto entries = dir.entryInfoList(QStringList() << "*.json", QDir::Files);
-        for(auto entry : entries) {
-            combobox->addItem(entry.fileName() + " (system)", entry.filePath());
-        }
-    }
+    auto profilesModel = new BooleanProfilesModel(m_profileSelectorCombobox);
 
-    // user profiles
-    {
-        QDir dir;
-        auto entries = dir.entryInfoList(QStringList() << "*.json", QDir::Files);
-        for(auto entry : entries) {
-            combobox->addItem(entry.fileName(), entry.filePath());
-        }
-    }
+    m_profileSelectorCombobox->setModel(profilesModel);
 
-    ui->toolBar->insertWidget(ui->actionFilesList, combobox);
+    ui->toolBar->insertWidget(ui->actionFilesList, m_profileSelectorCombobox);
 
-    QObject::connect(combobox, static_cast<void (QComboBox::*)(int index)>(&QComboBox::activated), [this, combobox](int index) {
-        auto displayText = combobox->itemText(index);
-        auto value = combobox->itemData(index).toString();
+    QObject::connect(m_profileSelectorCombobox, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), [this](int index) {
+        auto value = m_profileSelectorCombobox->itemData(index).toString();
         loadBooleanChartsProfile(value);
     });
 
-    if(combobox->count() != 0) {
-        loadBooleanChartsProfile(combobox->itemData(combobox->currentIndex()).toString());
+    if(m_profileSelectorCombobox->count() != 0) {
+        loadBooleanChartsProfile(m_profileSelectorCombobox->itemData(m_profileSelectorCombobox->currentIndex()).toString());
     }
+
+    QToolButton* manageBooleanProfiles = new QToolButton;
+    manageBooleanProfiles->setIcon(QIcon(":/icon/settings.png"));
+
+    connect(this, &MainWindow::fileSelected, manageBooleanProfiles, &QToolButton::setEnabled);
+    connect(manageBooleanProfiles, &QToolButton::clicked, [this, profilesModel] {
+        ManageBooleanConditions manageDialog(profilesModel);
+        connect(&manageDialog, &ManageBooleanConditions::newProfile, this, [&](const QString& profileName) {
+            auto currentProfile = m_profileSelectorCombobox->currentData(BooleanProfilesModel::Display).toString();
+
+            Plots fakePlots(0, Files[getFilesCurrentPos()]);
+            QJsonDocument profilesJson = QJsonDocument(fakePlots.saveBooleanChartsProfile());
+
+            QFile file(profileName);
+            if(file.open(QFile::WriteOnly))
+                file.write(profilesJson.toJson());
+
+            if(currentProfile == profileName) {
+                m_booleanChartsProfile = profilesJson;
+                applyBooleanChartsProfile();
+            }
+        });
+
+        connect(&manageDialog, &ManageBooleanConditions::profileUpdated, this, [&](const QString& profileName) {
+            auto currentProfile = m_profileSelectorCombobox->currentData(BooleanProfilesModel::Display).toString();
+
+            if(currentProfile == profileName) {
+                loadBooleanChartsProfile(profileName);
+            }
+        });
+
+        manageDialog.exec();
+    });
+
+    ui->toolBar->insertWidget(ui->actionFilesList, manageBooleanProfiles);
 
     // Config
     ui->verticalLayout->setSpacing(0);

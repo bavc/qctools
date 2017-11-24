@@ -106,6 +106,9 @@ public:
     QJsonObject                 saveBooleanChartsProfile();
     void                        loadBooleanChartsProfile(const QJsonObject& profile);
 
+Q_SIGNALS:
+    void                        booleanProfileChanged();
+
 public Q_SLOTS:
     void                        onCurrentFrameChanged();
 
