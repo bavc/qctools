@@ -185,6 +185,7 @@ public:
         size_t m_plotGroup;
 
         QColor m_color;
+        QString m_name;
         QString m_conditionString;
         mutable QJSValue m_conditionFunction;
 
@@ -204,7 +205,17 @@ public:
             return makeConditionFunction(m_engine, condition);
         }
 
-        void update() {
+        void update(const QString& conditionString, const QColor& color, const QString& name) {
+
+            m_color = color;
+            m_name = name;
+            m_conditionString = conditionString;
+
+            update();
+        }
+
+        void update()
+        {
             if(m_conditionString.isEmpty())
                 m_conditionFunction = QJSValue();
             else
@@ -230,6 +241,7 @@ public:
                 QJsonObject conditionObject;
                 conditionObject.insert("color", condition.m_color.name());
                 conditionObject.insert("value", condition.m_conditionString);
+                conditionObject.insert("name", condition.m_name);
 
                 curveConditons.append(conditionObject);
             }
@@ -242,29 +254,23 @@ public:
             m_items.clear();
         }
 
-        void add(const QString& value, const QColor& color) {
+        void add(const QString& value, const QColor& color, const QString& name) {
             m_items.append(Condition(&m_engine, m_stats, m_plotGroup));
-            m_items.back().m_conditionString = value;
-            m_items.back().m_color = color;
-            m_items.back().update();
+            m_items.back().update(value, color, name);
         }
 
         void add() {
             m_items.append(Condition(&m_engine, m_stats, m_plotGroup));
-            m_items.back().update();
         }
 
         void remove() {
             m_items.removeLast();
         }
 
-        void update(int i, const QString& conditionString, const QColor& color) {
+        void update(int i, const QString& conditionString, const QColor& color, const QString& name) {
             auto & condition = m_items[i];
-            qDebug() << "updateCondition: " << i << ", string = " << conditionString << ", color = " << color;
-
-            condition.m_conditionString = conditionString;
-            condition.m_color = color;
-            condition.update();
+            qDebug() << "updateCondition: " << i << ", string = " << conditionString << ", color = " << color << ", name = " << name;
+            condition.update(conditionString, color, name);
         }
 
         void updateAll(int bitdepth)

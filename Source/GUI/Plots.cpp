@@ -174,7 +174,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                                 for(auto i = 0; i < editor->conditionsCount(); ++i)
                                 {
                                     auto conditionInput = editor->getCondition(i);
-                                    data->mutableConditions().update(i, conditionInput->getCondition(), conditionInput->getColor());
+                                    data->mutableConditions().update(i, conditionInput->getCondition(), conditionInput->getColor(), conditionInput->getName());
                                 }
                             }
 
@@ -787,8 +787,9 @@ void Plots::loadBooleanChartsProfile(const QJsonObject& profile)
                                 auto curveConditionObject = curveCondition.toObject();
                                 auto value = curveConditionObject.value("value").toString();
                                 auto color = QColor(curveConditionObject.value("color").toString());
+                                auto name = curveConditionObject.value("name").toString();
 
-                                curveData->mutableConditions().add(value, color);
+                                curveData->mutableConditions().add(value, color, name);
                             }
                         }
                     }

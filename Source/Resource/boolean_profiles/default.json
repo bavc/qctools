@@ -7,10 +7,12 @@
                     "curveConditions": [
                         {
                             "color": "#035bff",
+                            "name": "",
                             "value": "y < yHalf"
                         },
                         {
                             "color": "#46ff2a",
+                            "name": "",
                             "value": "y > yHalf"
                         }
                     ],
@@ -22,6 +24,7 @@
                     "curveConditions": [
                         {
                             "color": "#006600",
+                            "name": "",
                             "value": ""
                         }
                     ],
@@ -33,6 +36,7 @@
                     "curveConditions": [
                         {
                             "color": "#000000",
+                            "name": "",
                             "value": ""
                         }
                     ],
@@ -44,6 +48,7 @@
                     "curveConditions": [
                         {
                             "color": "#00ff00",
+                            "name": "",
                             "value": ""
                         }
                     ],
@@ -55,11 +60,13 @@
                     "curveConditions": [
                         {
                             "color": "#ff0000",
+                            "name": "cool condiiton1",
                             "value": "y < 682"
                         },
                         {
                             "color": "#07ff30",
-                            "value": "682 > y < 600"
+                            "name": "682 > y && y > 600",
+                            "value": "682 > y && y > 600"
                         }
                     ],
                     "curveIndex": 4,
@@ -342,6 +349,72 @@
             "type": 0
         },
         {
+            "group": 12,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "Crop Left",
+                    "plotGroup": 12
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 1,
+                    "curveTitle": "Crop Right",
+                    "plotGroup": 12
+                }
+            ],
+            "plotTitle": "CropW",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 13,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "Crop Top",
+                    "plotGroup": 13
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 1,
+                    "curveTitle": "Crop Bottom",
+                    "plotGroup": 13
+                }
+            ],
+            "plotTitle": "CropH",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 14,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "Crop Width",
+                    "plotGroup": 14
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 1,
+                    "curveTitle": "Crop Height",
+                    "plotGroup": 14
+                }
+            ],
+            "plotTitle": "CropF",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
             "group": 15,
             "plotConditions": [
                 {
@@ -396,6 +469,42 @@
                 }
             ],
             "plotTitle": "PSNRf",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
+            "group": 17,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "SSIMf All",
+                    "plotGroup": 17
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 1,
+                    "curveTitle": "SSIMf V",
+                    "plotGroup": 17
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 2,
+                    "curveTitle": "SSIMf U",
+                    "plotGroup": 17
+                },
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 3,
+                    "curveTitle": "SSIMf Y",
+                    "plotGroup": 17
+                }
+            ],
+            "plotTitle": "SSIMf",
             "streamPos": 0,
             "type": 0
         },
@@ -501,6 +610,21 @@
             "type": 0
         },
         {
+            "group": 21,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "flicker",
+                    "plotGroup": 21
+                }
+            ],
+            "plotTitle": "flicker",
+            "streamPos": 0,
+            "type": 0
+        },
+        {
             "group": 22,
             "plotConditions": [
                 {
@@ -529,6 +653,36 @@
             "plotTitle": "pkt_size",
             "streamPos": 0,
             "type": 0
+        },
+        {
+            "group": 0,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "R128.M",
+                    "plotGroup": 0
+                }
+            ],
+            "plotTitle": "R.128",
+            "streamPos": 1,
+            "type": 1
+        },
+        {
+            "group": 1,
+            "plotConditions": [
+                {
+                    "curveConditions": [
+                    ],
+                    "curveIndex": 0,
+                    "curveTitle": "Phase",
+                    "plotGroup": 1
+                }
+            ],
+            "plotTitle": "Audio Phase",
+            "streamPos": 1,
+            "type": 1
         },
         {
             "group": 2,

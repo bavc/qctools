@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>520</width>
+    <width>673</width>
     <height>41</height>
    </rect>
   </property>
@@ -33,6 +33,19 @@
      </property>
      <property name="text">
       <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="name_lineEdit">
+     <property name="minimumSize">
+      <size>
+       <width>175</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="placeholderText">
+      <string>type condition name here</string>
      </property>
     </widget>
    </item>

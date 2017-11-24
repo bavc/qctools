@@ -99,6 +99,7 @@ void BooleanChartConditionEditor::setConditions(const PlotSeriesData::Conditions
 
         condition->setCompleter(completer);
         condition->setColor(m_defaultColor);
+        condition->setName(QString());
         condition->setCondition(QString());
     }
     else
@@ -125,6 +126,7 @@ void BooleanChartConditionEditor::setConditions(const PlotSeriesData::Conditions
             condition->setJsEngine(&value.m_engine);
             condition->setCompleter(completer);
             condition->setColor(value.m_items[i].m_color);
+            condition->setName(value.m_items[i].m_name);
             condition->setCondition(value.m_items[i].m_conditionString);
         }
     }

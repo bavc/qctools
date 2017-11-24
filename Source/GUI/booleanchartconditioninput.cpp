@@ -82,6 +82,16 @@ void BooleanChartConditionInput::setRemoveButtonEnabled(bool value)
     ui->remove_toolButton->setEnabled(value);
 }
 
+void BooleanChartConditionInput::setName(const QString &name)
+{
+    ui->name_lineEdit->setText(name);
+}
+
+QString BooleanChartConditionInput::getName() const
+{
+    return ui->name_lineEdit->text();
+}
+
 void BooleanChartConditionInput::setCondition(const QString &value)
 {
     ui->condition_lineEdit->setText(value);

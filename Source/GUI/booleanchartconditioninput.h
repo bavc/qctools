@@ -24,6 +24,9 @@ public:
 
     void setRemoveButtonEnabled(bool value);
 
+    void setName(const QString& name);
+    QString getName() const;
+
     void setCondition(const QString& value);
     QString getCondition() const;
 
