@@ -32,13 +32,7 @@ int BooleanChartConditionEditor::conditionsCount() const
 
 void BooleanChartConditionEditor::setLabel(const QString &label)
 {
-    ui->label->setText(label);
-}
-
-QLabel *BooleanChartConditionEditor::takeLabel()
-{
-    ui->horizontalLayout->removeWidget(ui->label);
-    return ui->label;
+    ui->groupBox->setTitle(label);
 }
 
 void BooleanChartConditionEditor::setDefaultColor(const QColor &color)

@@ -120,7 +120,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                     connect(booleanConfigButton, &QToolButton::clicked, this, [=] {
                         QDialog dialog;
                         dialog.setWindowTitle("Edit boolean conditions");
-                        QGridLayout* grid = new QGridLayout;
+                        QVBoxLayout* grid = new QVBoxLayout;
                         dialog.setLayout(grid);
 
                         QList<QPair<PlotSeriesData*, BooleanChartConditionEditor*>> pairs;
@@ -141,8 +141,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                             conditionEditor->setConditions(data->conditions());
                             connect(data, SIGNAL(conditionsUpdated()), conditionEditor, SLOT(onConditionsUpdated()));
 
-                            grid->addWidget(conditionEditor->takeLabel(), streamInfo.PerGroup[plotGroup].Count - 1 - j, 0, Qt::AlignHCenter);
-                            grid->addWidget(conditionEditor, streamInfo.PerGroup[plotGroup].Count - 1 - j, 1, Qt::AlignHCenter);
+                            grid->addWidget(conditionEditor, streamInfo.PerGroup[plotGroup].Count - 1 - j);
 
                             pairs.append(QPair<PlotSeriesData*, BooleanChartConditionEditor*>(data, conditionEditor));
                         }
@@ -151,7 +150,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                         connect(dialogButtonBox->button(QDialogButtonBox::Save), SIGNAL(clicked()), &dialog, SLOT(accept()));
                         connect(dialogButtonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), &dialog, SLOT(reject()));
 
-                        grid->addWidget(dialogButtonBox, streamInfo.PerGroup[plotGroup].Count, 1);
+                        grid->addWidget(dialogButtonBox, streamInfo.PerGroup[plotGroup].Count);
                         if(QDialog::Accepted == dialog.exec())
                         {
                             for(auto pair : pairs) {
