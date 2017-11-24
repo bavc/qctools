@@ -148,6 +148,9 @@ void BooleanChartConditionEditor::onConditionsUpdated()
 void BooleanChartConditionEditor::addCondition()
 {
     int index = ui->verticalLayout->indexOf(static_cast<QWidget*>(sender()));
+    if(index == -1) {
+        index = ui->verticalLayout->count() - 1;
+    }
 
     auto input = new BooleanChartConditionInput();
     input->setJsEngine(getCondition(0)->getJsEngine());
