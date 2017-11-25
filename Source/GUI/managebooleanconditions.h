@@ -33,6 +33,8 @@ private Q_SLOTS:
 
     void on_rename_pushButton_clicked();
 
+    void on_openLocation_pushButton_clicked();
+
 private:
     Ui::ManageBooleanConditions *ui;
 };

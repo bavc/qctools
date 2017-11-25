@@ -1,9 +1,11 @@
 #include "managebooleanconditions.h"
 #include "ui_managebooleanconditions.h"
 
+#include <QDesktopServices>
 #include <QFileInfo>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QUrl>
 
 ManageBooleanConditions::ManageBooleanConditions(BooleanProfilesModel *model, QWidget *parent) :
     QDialog(parent),
@@ -195,4 +197,9 @@ void ManageBooleanConditions::on_rename_pushButton_clicked()
             QMessageBox::warning(this, "Warning", QString("Failed to rename profile %1 to %2").arg(selectedProfileFileName).arg(profileName));
         }
     }
+}
+
+void ManageBooleanConditions::on_openLocation_pushButton_clicked()
+{
+    QDesktopServices::openUrl(QUrl::fromLocalFile("."));
 }

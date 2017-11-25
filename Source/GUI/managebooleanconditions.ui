@@ -14,19 +14,6 @@
    <string>Manage boolean conditions</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="5" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
    <item row="6" column="1">
     <widget class="QPushButton" name="close_pushButton">
      <property name="text">
@@ -39,6 +26,19 @@
       <bool>true</bool>
      </property>
     </widget>
+   </item>
+   <item row="5" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item row="0" column="0" rowspan="7">
     <widget class="QListView" name="listView">
@@ -57,13 +57,6 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
-    <widget class="QPushButton" name="rename_pushButton">
-     <property name="text">
-      <string>Rename</string>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="1">
     <widget class="QPushButton" name="add_pushButton">
      <property name="text">
@@ -75,6 +68,20 @@
     <widget class="QPushButton" name="copy_pushButton">
      <property name="text">
       <string>Copy</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QPushButton" name="rename_pushButton">
+     <property name="text">
+      <string>Rename</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QPushButton" name="openLocation_pushButton">
+     <property name="text">
+      <string>Open folder</string>
      </property>
     </widget>
    </item>
