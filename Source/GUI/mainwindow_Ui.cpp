@@ -47,6 +47,7 @@
 #include <QSet>
 #include <QJsonDocument>
 #include <QStandardItemModel>
+#include <QMessageBox>
 
 #include <qwt_plot_renderer.h>
 #include <QDebug>
@@ -142,8 +143,14 @@ void MainWindow::Ui_Init()
             QJsonDocument profilesJson = QJsonDocument(fakePlots.saveBooleanChartsProfile());
 
             QFile file(profileName);
-            if(file.open(QFile::WriteOnly))
+            QFileInfo info(file);
+
+            if(file.open(QFile::WriteOnly)) {
+                qDebug() << "profile created: " << info.absolutePath();
                 file.write(profilesJson.toJson());
+            } else {
+                QMessageBox::warning(this, "Warning", QString("Failed to create profile %1 at %2").arg(profileName).arg(info.absolutePath()));
+            }
 
             if(currentProfile == profileName) {
                 m_booleanChartsProfile = profilesJson;
