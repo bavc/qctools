@@ -13,11 +13,16 @@ public:
         IsSystem = Qt::UserRole + 2
     };
 
-    BooleanProfilesModel(QObject* parent);
+    BooleanProfilesModel(QObject* parent, const QString& profilesLocation);
 
     QVariant data(const QModelIndex &index, int role) const;
 
     void append(const QString& path, const QString& name, bool isSystem);
+
+    QString absoluteProfilesPath() const;
+
+private:
+    QString m_absoluteProfilesPath;
 };
 
 #endif // BOOLEANPROFILESMODEL_H

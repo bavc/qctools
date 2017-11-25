@@ -13,6 +13,8 @@ ManageBooleanConditions::ManageBooleanConditions(BooleanProfilesModel *model, QW
 {
     ui->setupUi(this);
     ui->listView->setModel(model);
+    ui->profileLocationUrl_label->setText(QString("<a href='%1'>%2</a>")
+                                          .arg(QUrl::fromLocalFile(model->absoluteProfilesPath()).toString()).arg(model->absoluteProfilesPath()));
 }
 
 ManageBooleanConditions::~ManageBooleanConditions()
@@ -76,24 +78,25 @@ void ManageBooleanConditions::on_add_pushButton_clicked()
     BooleanProfilesModel* model = static_cast<BooleanProfilesModel*> (ui->listView->model());
 
     QString defaultProfileFileName = pickDefaultProfileName();
-    QString profileName = getProfileName(defaultProfileFileName);
+    QString profileFileName = getProfileName(defaultProfileFileName);
+    QString profileFilePath = model->absoluteProfilesPath() + "/" + profileFileName;
 
-    if(profileName.isEmpty())
+    if(profileFileName.isEmpty())
         return;
 
-    if(QFileInfo(profileName).exists()) {
-        auto answer = QMessageBox::question(this, "Warning", QString("Profile %1 already exists. Do you want to overwrite it?").arg(profileName));
+    if(QFileInfo(profileFileName).exists()) {
+        auto answer = QMessageBox::question(this, "Warning", QString("Profile %1 already exists. Do you want to overwrite it?").arg(profileFileName));
         if(answer == QMessageBox::Yes) {
-            QFile file(profileName);
+            QFile file(profileFileName);
             if(!file.remove()) {
-                QMessageBox::warning(this, "Warning", QString("Failed to delete profile %1").arg(profileName));
+                QMessageBox::warning(this, "Warning", QString("Failed to delete profile %1").arg(profileFileName));
             } else {
-                Q_EMIT newProfile(profileName);
+                Q_EMIT newProfile(profileFilePath);
             }
         }
     } else {
-        model->append(profileName, profileName, false);
-        Q_EMIT newProfile(profileName);
+        model->append(profileFilePath, profileFileName, false);
+        Q_EMIT newProfile(profileFilePath);
     }
 }
 
@@ -104,38 +107,39 @@ void ManageBooleanConditions::on_copy_pushButton_clicked()
         return;
 
     auto selectedRow = ui->listView->selectionModel()->selectedRows().first().row();
-    auto selectedProfileFileName = model->item(selectedRow, 0)->data(BooleanProfilesModel::Data).toString();
+    auto selectedProfileFilePath = model->item(selectedRow, 0)->data(BooleanProfilesModel::Data).toString();
 
     QString defaultProfileFileName = pickDefaultProfileName();
-    QString profileName = getProfileName(defaultProfileFileName);
+    QString profileFileName = getProfileName(defaultProfileFileName);
+    QString profileFilePath = model->absoluteProfilesPath() + "/" + profileFileName;
 
-    if(profileName.isEmpty() || profileName == selectedProfileFileName)
+    if(profileFileName.isEmpty() || profileFilePath == selectedProfileFilePath)
         return;
 
-    if(QFileInfo(profileName).exists()) {
-        auto answer = QMessageBox::question(this, "Warning", QString("Profile %1 already exists. Do you want to overwrite it?").arg(profileName));
+    if(QFileInfo(profileFilePath).exists()) {
+        auto answer = QMessageBox::question(this, "Warning", QString("Profile %1 already exists. Do you want to overwrite it?").arg(profileFileName));
         if(answer == QMessageBox::Yes) {
-            QFile file(profileName);
+            QFile file(profileFilePath);
             if(!file.remove()) {
-                QMessageBox::warning(this, "Warning", QString("Failed to delete profile %1").arg(profileName));
+                QMessageBox::warning(this, "Warning", QString("Failed to delete profile %1").arg(profileFilePath));
             } else {
-                if(QFile::copy(selectedProfileFileName, profileName)) {
-                    QFile file(profileName);
-                    file.setPermissions(QFile::WriteOther);
-                    Q_EMIT profileUpdated(profileName);
+                if(QFile::copy(selectedProfileFilePath, profileFilePath)) {
+                    QFile file(profileFilePath);
+                    file.setPermissions(file.permissions() | QFile::WriteOwner);
+                    Q_EMIT profileUpdated(profileFilePath);
                 } else {
-                    QMessageBox::warning(this, "Warning", QString("Failed to copy profile %1 to %2").arg(selectedProfileFileName).arg(profileName));
+                    QMessageBox::warning(this, "Warning", QString("Failed to copy profile %1 to %2").arg(selectedProfileFilePath).arg(profileFilePath));
                 }
             }
         }
     } else {
-        if(QFile::copy(selectedProfileFileName, profileName)) {
-            QFile file(profileName);
-            file.setPermissions(QFile::WriteOther);
-            model->append(profileName, profileName, false);
-            Q_EMIT profileUpdated(profileName);
+        if(QFile::copy(selectedProfileFilePath, profileFilePath)) {
+            QFile file(profileFilePath);
+            file.setPermissions(file.permissions() | QFile::WriteOwner);
+            model->append(profileFilePath, profileFileName, false);
+            Q_EMIT profileUpdated(profileFilePath);
         } else {
-            QMessageBox::warning(this, "Warning", QString("Failed to copy profile %1 to %2").arg(selectedProfileFileName).arg(profileName));
+            QMessageBox::warning(this, "Warning", QString("Failed to copy profile %1 to %2").arg(selectedProfileFilePath).arg(profileFilePath));
         }
     }
 
@@ -165,41 +169,37 @@ void ManageBooleanConditions::on_rename_pushButton_clicked()
         return;
 
     auto selectedRow = ui->listView->selectionModel()->selectedRows().first().row();
-    auto selectedProfileFileName = model->item(selectedRow, 0)->data(BooleanProfilesModel::Data).toString();
+    auto selectedProfileFilePath = model->item(selectedRow, 0)->data(BooleanProfilesModel::Data).toString();
 
     QString defaultProfileFileName = pickDefaultProfileName();
-    QString profileName = getProfileName(defaultProfileFileName);
+    QString profileFileName = getProfileName(defaultProfileFileName);
+    QString profileFilePath = model->absoluteProfilesPath() + "/" + profileFileName;
 
-    if(profileName.isEmpty() || profileName == selectedProfileFileName)
+    if(profileFileName.isEmpty() || profileFileName == selectedProfileFilePath)
         return;
 
-    if(QFileInfo(profileName).exists()) {
-        auto answer = QMessageBox::question(this, "Warning", QString("Profile %1 already exists. Do you want to overwrite it?").arg(profileName));
+    if(QFileInfo(profileFilePath).exists()) {
+        auto answer = QMessageBox::question(this, "Warning", QString("Profile %1 already exists. Do you want to overwrite it?").arg(profileFileName));
         if(answer == QMessageBox::Yes) {
-            QFile file(profileName);
+            QFile file(profileFilePath);
             if(!file.remove()) {
-                QMessageBox::warning(this, "Warning", QString("Failed to delete profile %1").arg(profileName));
+                QMessageBox::warning(this, "Warning", QString("Failed to delete profile %1").arg(profileFileName));
             } else {
-                if(QFile::rename(selectedProfileFileName, profileName)) {
+                if(QFile::rename(selectedProfileFilePath, profileFilePath)) {
                     model->removeRow(selectedRow);
-                    Q_EMIT profileUpdated(profileName);
+                    Q_EMIT profileUpdated(profileFilePath);
                 } else {
-                    QMessageBox::warning(this, "Warning", QString("Failed to rename profile %1 to %2").arg(selectedProfileFileName).arg(profileName));
+                    QMessageBox::warning(this, "Warning", QString("Failed to rename profile %1 to %2").arg(selectedProfileFilePath).arg(profileFileName));
                 }
             }
         }
     } else {
-        if(QFile::rename(selectedProfileFileName, profileName)) {
+        if(QFile::rename(selectedProfileFilePath, profileFilePath)) {
             model->removeRow(selectedRow);
-            model->append(profileName, profileName, false);
-            Q_EMIT profileUpdated(profileName);
+            model->append(profileFilePath, profileFileName, false);
+            Q_EMIT profileUpdated(profileFilePath);
         } else {
-            QMessageBox::warning(this, "Warning", QString("Failed to rename profile %1 to %2").arg(selectedProfileFileName).arg(profileName));
+            QMessageBox::warning(this, "Warning", QString("Failed to rename profile %1 to %2").arg(selectedProfileFilePath).arg(profileFileName));
         }
     }
-}
-
-void ManageBooleanConditions::on_openLocation_pushButton_clicked()
-{
-    QDesktopServices::openUrl(QUrl::fromLocalFile("."));
 }

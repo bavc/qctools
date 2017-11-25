@@ -14,33 +14,7 @@
    <string>Manage boolean conditions</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="6" column="1">
-    <widget class="QPushButton" name="close_pushButton">
-     <property name="text">
-      <string>Close</string>
-     </property>
-     <property name="shortcut">
-      <string>Alt+4</string>
-     </property>
-     <property name="default">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="0" column="0" rowspan="7">
+   <item row="0" column="0" rowspan="6">
     <widget class="QListView" name="listView">
      <property name="sizePolicy">
       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
@@ -48,12 +22,11 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QPushButton" name="remove_pushButton">
-     <property name="text">
-      <string>Remove</string>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -71,6 +44,13 @@
      </property>
     </widget>
    </item>
+   <item row="2" column="1">
+    <widget class="QPushButton" name="remove_pushButton">
+     <property name="text">
+      <string>Remove</string>
+     </property>
+    </widget>
+   </item>
    <item row="3" column="1">
     <widget class="QPushButton" name="rename_pushButton">
      <property name="text">
@@ -79,11 +59,60 @@
     </widget>
    </item>
    <item row="4" column="1">
-    <widget class="QPushButton" name="openLocation_pushButton">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="5" column="1">
+    <widget class="QPushButton" name="close_pushButton">
      <property name="text">
-      <string>Open folder</string>
+      <string>Close</string>
+     </property>
+     <property name="shortcut">
+      <string>Alt+4</string>
+     </property>
+     <property name="default">
+      <bool>true</bool>
      </property>
     </widget>
+   </item>
+   <item row="6" column="0" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Profiles location: </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="profileLocationUrl_label">
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="openExternalLinks">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

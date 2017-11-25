@@ -115,7 +115,7 @@ void MainWindow::Ui_Init()
     m_profileSelectorCombobox = new QComboBox;
     connect(this, &MainWindow::fileSelected, m_profileSelectorCombobox, &QComboBox::setEnabled);
 
-    auto profilesModel = new BooleanProfilesModel(m_profileSelectorCombobox);
+    auto profilesModel = new BooleanProfilesModel(m_profileSelectorCombobox, QCoreApplication::applicationDirPath());
 
     m_profileSelectorCombobox->setModel(profilesModel);
 
@@ -136,33 +136,31 @@ void MainWindow::Ui_Init()
     connect(this, &MainWindow::fileSelected, manageBooleanProfiles, &QToolButton::setEnabled);
     connect(manageBooleanProfiles, &QToolButton::clicked, [this, profilesModel] {
         ManageBooleanConditions manageDialog(profilesModel);
-        connect(&manageDialog, &ManageBooleanConditions::newProfile, this, [&](const QString& profileName) {
-            auto currentProfile = m_profileSelectorCombobox->currentData(BooleanProfilesModel::Display).toString();
+        connect(&manageDialog, &ManageBooleanConditions::newProfile, this, [&](const QString& profileFilePath) {
+            auto currentProfileFilePath = m_profileSelectorCombobox->currentData(BooleanProfilesModel::Data).toString();
 
             Plots fakePlots(0, Files[getFilesCurrentPos()]);
             QJsonDocument profilesJson = QJsonDocument(fakePlots.saveBooleanChartsProfile());
 
-            QFile file(profileName);
-            QFileInfo info(file);
-
+            QFile file(profileFilePath);
             if(file.open(QFile::WriteOnly)) {
-                qDebug() << "profile created: " << info.absolutePath();
+                qDebug() << "profile created: " << profileFilePath;
                 file.write(profilesJson.toJson());
             } else {
-                QMessageBox::warning(this, "Warning", QString("Failed to create profile %1 at %2").arg(profileName).arg(info.absolutePath()));
+                QMessageBox::warning(this, "Warning", QString("Failed to create profile %1").arg(profileFilePath));
             }
 
-            if(currentProfile == profileName) {
+            if(currentProfileFilePath == profileFilePath) {
                 m_booleanChartsProfile = profilesJson;
                 applyBooleanChartsProfile();
             }
         });
 
-        connect(&manageDialog, &ManageBooleanConditions::profileUpdated, this, [&](const QString& profileName) {
-            auto currentProfile = m_profileSelectorCombobox->currentData(BooleanProfilesModel::Display).toString();
+        connect(&manageDialog, &ManageBooleanConditions::profileUpdated, this, [&](const QString& profileFilePath) {
+            auto currentProfile = m_profileSelectorCombobox->currentData(BooleanProfilesModel::Data).toString();
 
-            if(currentProfile == profileName) {
-                loadBooleanChartsProfile(profileName);
+            if(currentProfile == profileFilePath) {
+                loadBooleanChartsProfile(profileFilePath);
             }
         });
 

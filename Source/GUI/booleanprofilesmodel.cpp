@@ -1,6 +1,7 @@
 #include "booleanprofilesmodel.h"
 
-BooleanProfilesModel::BooleanProfilesModel(QObject *parent) : QStandardItemModel(parent) {
+BooleanProfilesModel::BooleanProfilesModel(QObject *parent, const QString& profilesLocation) : QStandardItemModel(parent), m_absoluteProfilesPath(profilesLocation) {
+
     // system profiles
     {
         QDir dir(":/boolean_profiles");
@@ -12,7 +13,7 @@ BooleanProfilesModel::BooleanProfilesModel(QObject *parent) : QStandardItemModel
 
     // user profiles
     {
-        QDir dir;
+        QDir dir(m_absoluteProfilesPath);
         auto entries = dir.entryInfoList(QStringList() << "*.json", QDir::Files);
         for(auto entry : entries) {
             append(entry.filePath(), entry.fileName(), false);
@@ -40,4 +41,9 @@ void BooleanProfilesModel::append(const QString &path, const QString &name, bool
     data->setData(isSystem, IsSystem);
 
     appendRow(data);
+}
+
+QString BooleanProfilesModel::absoluteProfilesPath() const
+{
+    return m_absoluteProfilesPath;
 }
