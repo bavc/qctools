@@ -66,7 +66,7 @@ void TinyDisplay::resizeEvent(QResizeEvent *e)
 void TinyDisplay::thumbsLayoutResized()
 {
     const int width = QWidget::width();
-    const int THUMB_WANTED_WIDTH = 120;
+    const int THUMB_WANTED_WIDTH = 108;
 
     if (lastWidth != width) {
         int total_thumbs = width / THUMB_WANTED_WIDTH;
