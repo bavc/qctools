@@ -1,5 +1,5 @@
-#include "managebooleanconditions.h"
-#include "ui_managebooleanconditions.h"
+#include "managebarchartconditions.h"
+#include "ui_managebarchartconditions.h"
 
 #include <QDesktopServices>
 #include <QFileInfo>
@@ -7,9 +7,9 @@
 #include <QMessageBox>
 #include <QUrl>
 
-ManageBooleanConditions::ManageBooleanConditions(BooleanProfilesModel *model, QWidget *parent) :
+ManageBarchartConditions::ManageBarchartConditions(BarchartProfilesModel *model, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::ManageBooleanConditions)
+    ui(new Ui::ManageBarchartConditions)
 {
     ui->setupUi(this);
     ui->listView->setModel(model);
@@ -17,12 +17,12 @@ ManageBooleanConditions::ManageBooleanConditions(BooleanProfilesModel *model, QW
                                           .arg(QUrl::fromLocalFile(model->absoluteProfilesPath()).toString()).arg(model->absoluteProfilesPath()));
 }
 
-ManageBooleanConditions::~ManageBooleanConditions()
+ManageBarchartConditions::~ManageBarchartConditions()
 {
     delete ui;
 }
 
-QString ManageBooleanConditions::getProfileName(const QString& defaultProfileFileName)
+QString ManageBarchartConditions::getProfileName(const QString& defaultProfileFileName)
 {
     QInputDialog dialog(this);
     dialog.setWindowTitle("Enter profile name");
@@ -45,9 +45,9 @@ QString ManageBooleanConditions::getProfileName(const QString& defaultProfileFil
     return profileName;
 }
 
-QString ManageBooleanConditions::pickDefaultProfileName()
+QString ManageBarchartConditions::pickDefaultProfileName()
 {
-    BooleanProfilesModel* model = static_cast<BooleanProfilesModel*> (ui->listView->model());
+    auto model = static_cast<BarchartProfilesModel*> (ui->listView->model());
 
     QString defaultProfileName = "profile";
 
@@ -57,7 +57,7 @@ QString ManageBooleanConditions::pickDefaultProfileName()
         defaultProfileFileName = defaultProfileName + QString::number(number) + ".json";
 
         for(auto i = 0; i < ui->listView->model()->rowCount(); ++i) {
-            auto existingProfileName = model->item(i, 0)->data(BooleanProfilesModel::Display).toString();
+            auto existingProfileName = model->item(i, 0)->data(BarchartProfilesModel::Display).toString();
             if(defaultProfileFileName == existingProfileName) {
                 defaultProfileFileName.clear();
                 break;
@@ -73,9 +73,9 @@ QString ManageBooleanConditions::pickDefaultProfileName()
     return defaultProfileFileName;
 }
 
-void ManageBooleanConditions::on_add_pushButton_clicked()
+void ManageBarchartConditions::on_add_pushButton_clicked()
 {
-    BooleanProfilesModel* model = static_cast<BooleanProfilesModel*> (ui->listView->model());
+    auto model = static_cast<BarchartProfilesModel*> (ui->listView->model());
 
     QString defaultProfileFileName = pickDefaultProfileName();
     QString profileFileName = getProfileName(defaultProfileFileName);
@@ -100,14 +100,14 @@ void ManageBooleanConditions::on_add_pushButton_clicked()
     }
 }
 
-void ManageBooleanConditions::on_copy_pushButton_clicked()
+void ManageBarchartConditions::on_copy_pushButton_clicked()
 {
-    BooleanProfilesModel* model = static_cast<BooleanProfilesModel*> (ui->listView->model());
+    auto model = static_cast<BarchartProfilesModel*> (ui->listView->model());
     if(ui->listView->selectionModel()->selectedRows().empty())
         return;
 
     auto selectedRow = ui->listView->selectionModel()->selectedRows().first().row();
-    auto selectedProfileFilePath = model->item(selectedRow, 0)->data(BooleanProfilesModel::Data).toString();
+    auto selectedProfileFilePath = model->item(selectedRow, 0)->data(BarchartProfilesModel::Data).toString();
 
     QString defaultProfileFileName = pickDefaultProfileName();
     QString profileFileName = getProfileName(defaultProfileFileName);
@@ -145,14 +145,14 @@ void ManageBooleanConditions::on_copy_pushButton_clicked()
 
 }
 
-void ManageBooleanConditions::on_remove_pushButton_clicked()
+void ManageBarchartConditions::on_remove_pushButton_clicked()
 {
-    BooleanProfilesModel* model = static_cast<BooleanProfilesModel*> (ui->listView->model());
+    auto model = static_cast<BarchartProfilesModel*> (ui->listView->model());
     if(ui->listView->selectionModel()->selectedRows().empty())
         return;
 
     auto selectedRow = ui->listView->selectionModel()->selectedRows().first().row();
-    auto selectedProfileFileName = model->item(selectedRow, 0)->data(BooleanProfilesModel::Data).toString();
+    auto selectedProfileFileName = model->item(selectedRow, 0)->data(BarchartProfilesModel::Data).toString();
 
     QFile profile(selectedProfileFileName);
     if(profile.remove()) {
@@ -162,14 +162,14 @@ void ManageBooleanConditions::on_remove_pushButton_clicked()
     }
 }
 
-void ManageBooleanConditions::on_rename_pushButton_clicked()
+void ManageBarchartConditions::on_rename_pushButton_clicked()
 {
-    BooleanProfilesModel* model = static_cast<BooleanProfilesModel*> (ui->listView->model());
+    auto model = static_cast<BarchartProfilesModel*> (ui->listView->model());
     if(ui->listView->selectionModel()->selectedRows().empty())
         return;
 
     auto selectedRow = ui->listView->selectionModel()->selectedRows().first().row();
-    auto selectedProfileFilePath = model->item(selectedRow, 0)->data(BooleanProfilesModel::Data).toString();
+    auto selectedProfileFilePath = model->item(selectedRow, 0)->data(BarchartProfilesModel::Data).toString();
 
     QString defaultProfileFileName = pickDefaultProfileName();
     QString profileFileName = getProfileName(defaultProfileFileName);

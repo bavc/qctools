@@ -117,7 +117,7 @@ class PlotSeriesData : public QObject, public QwtPointSeriesData
     Q_OBJECT
 public:
     PlotSeriesData(CommonStats* stats, const QString& title, int bitDepth, const int& xDataIndex, const size_t yDataIndex, size_t plotGroup, size_t curveIndex, size_t curvesCount)
-        : m_boolean(false), m_conditions(stats, this, plotGroup, title, curveIndex, bitDepth), m_lastCondition(nullptr),
+        : m_barchart(false), m_conditions(stats, this, plotGroup, title, curveIndex, bitDepth), m_lastCondition(nullptr),
           m_stats(stats), m_xDataIndex(xDataIndex), m_yDataIndex(yDataIndex), m_plotGroup(plotGroup), m_curveIndex(curveIndex),
           m_curvesCount(curvesCount)
     {
@@ -132,7 +132,7 @@ public:
         auto xData = m_stats->x[m_xDataIndex];
         auto yData = m_stats->y[m_yDataIndex];
 
-        return QPointF(xData[i], (m_boolean ? toBoolean(yData[i], 1.0) : yData[i]));
+        return QPointF(xData[i], (m_barchart ? toBarchart(yData[i], 1.0) : yData[i]));
     }
 
     QPointF originalSample(size_t i) const {
@@ -143,7 +143,7 @@ public:
         return QPointF(xData[i], yData[i]);
     }
 
-    double toBoolean(double y) const {
+    double toBarchart(double y) const {
         for(auto i = 0; i < m_conditions.m_items.size(); ++i) {
             const auto& condition = m_conditions.m_items[i];
 
@@ -156,8 +156,8 @@ public:
         return 0.0;
     }
 
-    double toBoolean(double y, double globalMax) const {
-        auto value = toBoolean(y);
+    double toBarchart(double y, double globalMax) const {
+        auto value = toBarchart(y);
 
         auto min = globalMax * (m_curveIndex) / m_curvesCount;
         auto max = globalMax * (m_curveIndex + 1) / m_curvesCount;
@@ -358,9 +358,9 @@ public:
     }
 
 public Q_SLOTS:
-    void setBoolean(bool enable) {
-        qDebug() << "boolean mode: " << enable;
-        m_boolean = enable;
+    void setBarchart(bool enable) {
+        qDebug() << "barchart mode: " << enable;
+        m_barchart = enable;
         m_conditions.updateAll(m_conditions.m_bitdepth);
     }
 
@@ -368,7 +368,7 @@ Q_SIGNALS:
     void conditionsUpdated();
 
 private:
-    bool m_boolean;
+    bool m_barchart;
     Conditions m_conditions;
     mutable const Condition* m_lastCondition;
     CommonStats* m_stats;
@@ -415,7 +415,7 @@ public:
     virtual void setVisible(bool visible) override;
 
     void updateSymbols();
-    bool isBoolean() const;
+    bool isBarchart() const;
 
 Q_SIGNALS:
     void cursorMoved( int index );
@@ -423,7 +423,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     void initYAxis();
-    void setBoolean(bool value);
+    void setBarchart(bool value);
 
 private Q_SLOTS:
     void onPickerMoved( const QPointF& );
@@ -438,12 +438,12 @@ private:
     const size_t            m_group;
     QVector<QwtPlotCurve*>  m_curves;
     PlotCursor*             m_cursor;
-    QCheckBox*              m_booleanPlotCheckbox;
+    QCheckBox*              m_barchartPlotCheckbox;
 
     PlotLegend*             m_legend;
     const FileInformation*  m_fileInformation;
 
-    bool                    m_boolean;
+    bool                    m_barchart;
 };
 
 #endif // GUI_Plot_H

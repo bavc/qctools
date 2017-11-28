@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>BooleanChartConditionEditor</class>
- <widget class="QWidget" name="BooleanChartConditionEditor">
+ <class>BarchartConditionEditor</class>
+ <widget class="QWidget" name="BarchartConditionEditor">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -33,7 +33,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="BooleanChartConditionInput" name="widget" native="true"/>
+       <widget class="BarchartConditionInput" name="widget" native="true"/>
       </item>
      </layout>
     </widget>
@@ -42,9 +42,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>BooleanChartConditionInput</class>
+   <class>barchartConditionInput</class>
    <extends>QWidget</extends>
-   <header>booleanchartconditioninput.h</header>
+   <header>barchartconditioninput.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -1,11 +1,11 @@
-#ifndef BOOLEANPROFILESMODEL_H
-#define BOOLEANPROFILESMODEL_H
+#ifndef BARCHARTPROFILESMODEL_H
+#define BARCHARTPROFILESMODEL_H
 
 #include <QDir>
 #include <QObject>
 #include <QStandardItemModel>
 
-class BooleanProfilesModel : public QStandardItemModel {
+class BarchartProfilesModel : public QStandardItemModel {
 public:
     enum Roles {
         Data = Qt::UserRole,
@@ -13,7 +13,7 @@ public:
         IsSystem = Qt::UserRole + 2
     };
 
-    BooleanProfilesModel(QObject* parent, const QString& profilesLocation);
+    BarchartProfilesModel(QObject* parent, const QString& profilesLocation);
 
     QVariant data(const QModelIndex &index, int role) const;
 
@@ -25,4 +25,4 @@ private:
     QString m_absoluteProfilesPath;
 };
 
-#endif // BOOLEANPROFILESMODEL_H
+#endif // BARCHARTPROFILESMODEL_H

@@ -103,11 +103,11 @@ public:
     void                        adjustGroupMax(int group, int bitsPerRawSample);
     void                        changeOrder(QList<std::tuple<int, int>> filterSelectorsInfo);
 
-    QJsonObject                 saveBooleanChartsProfile();
-    void                        loadBooleanChartsProfile(const QJsonObject& profile);
+    QJsonObject                 saveBarchartsProfile();
+    void                        loadBarchartsProfile(const QJsonObject& profile);
 
 Q_SIGNALS:
-    void                        booleanProfileChanged();
+    void                        barchartProfileChanged();
 
 public Q_SLOTS:
     void                        onCurrentFrameChanged();

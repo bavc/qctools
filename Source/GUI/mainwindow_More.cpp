@@ -22,7 +22,7 @@
 #include "GUI/blackmagicdecklink_userinput.h"
 #include "GUI/preferences.h"
 #include "GUI/BigDisplay.h"
-#include "GUI/booleanprofilesmodel.h"
+#include "GUI/barchartprofilesmodel.h"
 
 //---------------------------------------------------------------------------
 
@@ -359,16 +359,16 @@ void MainWindow::createGraphsLayout()
         ui->fileNamesBox->show();
 
     PlotsArea=Files[getFilesCurrentPos()]->Stats.empty()?NULL:new Plots(this, Files[getFilesCurrentPos()]);
-    connect(PlotsArea, &Plots::booleanProfileChanged, this, [&] {
-        auto selectedProfileFileName = m_profileSelectorCombobox->itemData(m_profileSelectorCombobox->currentIndex(), BooleanProfilesModel::Data).toString();
-        auto isSystem = m_profileSelectorCombobox->itemData(m_profileSelectorCombobox->currentIndex(), BooleanProfilesModel::IsSystem).toBool();
+    connect(PlotsArea, &Plots::barchartProfileChanged, this, [&] {
+        auto selectedProfileFileName = m_profileSelectorCombobox->itemData(m_profileSelectorCombobox->currentIndex(), BarchartProfilesModel::Data).toString();
+        auto isSystem = m_profileSelectorCombobox->itemData(m_profileSelectorCombobox->currentIndex(), BarchartProfilesModel::IsSystem).toBool();
 
         if(!isSystem) {
-            saveBooleanChartsProfile(selectedProfileFileName);
+            saveBarchartsProfile(selectedProfileFileName);
         }
     });
 
-    applyBooleanChartsProfile();
+    applyBarchartsProfile();
 
     auto filtersInfo = Prefs->loadFilterSelectorsOrder();
     changeFilterSelectorsOrder(filtersInfo);
@@ -543,14 +543,14 @@ void MainWindow::Update()
         InfoArea->Update();
 }
 
-void MainWindow::applyBooleanChartsProfile()
+void MainWindow::applyBarchartsProfile()
 {
     if(PlotsArea) {
-        PlotsArea->loadBooleanChartsProfile(m_booleanChartsProfile.object());
+        PlotsArea->loadBarchartsProfile(m_barchartsProfile.object());
     }
 }
 
-void MainWindow::loadBooleanChartsProfile(const QString &profile)
+void MainWindow::loadBarchartsProfile(const QString &profile)
 {
     QFile file(profile);
     if(!file.exists(profile)) {
@@ -561,17 +561,17 @@ void MainWindow::loadBooleanChartsProfile(const QString &profile)
     }
 
     auto bytes = file.readAll();
-    if(m_booleanChartsProfile.isEmpty())
-        qDebug() << "m_booleanChartsProfile is empty";
+    if(m_barchartsProfile.isEmpty())
+        qDebug() << "m_barchartsProfile is empty";
 
-    m_booleanChartsProfile = QJsonDocument::fromJson(bytes);
-    applyBooleanChartsProfile();
+    m_barchartsProfile = QJsonDocument::fromJson(bytes);
+    applyBarchartsProfile();
 }
 
-void MainWindow::saveBooleanChartsProfile(const QString &profileName)
+void MainWindow::saveBarchartsProfile(const QString &profileName)
 {
     if(PlotsArea) {
-        auto json = QJsonDocument(PlotsArea->saveBooleanChartsProfile()).toJson();
+        auto json = QJsonDocument(PlotsArea->saveBarchartsProfile()).toJson();
         QFile profile(profileName);
         if(profile.open(QIODevice::WriteOnly))  {
             profile.write(json);

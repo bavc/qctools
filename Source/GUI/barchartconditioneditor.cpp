@@ -1,13 +1,13 @@
-#include "GUI/booleanchartconditioninput.h"
-#include "GUI/booleanchartconditioneditor.h"
-#include "ui_booleanchartconditioneditor.h"
+#include "GUI/barchartconditioninput.h"
+#include "GUI/barchartconditioneditor.h"
+#include "ui_barchartconditioneditor.h"
 #include <QCompleter>
 #include <QJSValueIterator>
 #include <QStandardItemModel>
 
-BooleanChartConditionEditor::BooleanChartConditionEditor(QWidget *parent) :
+BarchartConditionEditor::BarchartConditionEditor(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::BooleanChartConditionEditor)
+    ui(new Ui::BarchartConditionEditor)
 {
     ui->setupUi(this);
 
@@ -15,33 +15,33 @@ BooleanChartConditionEditor::BooleanChartConditionEditor(QWidget *parent) :
     connect(getCondition(0), SIGNAL(addButtonClicked()), this, SLOT(addCondition()));
 }
 
-BooleanChartConditionEditor::~BooleanChartConditionEditor()
+BarchartConditionEditor::~BarchartConditionEditor()
 {
     delete ui;
 }
 
-BooleanChartConditionInput *BooleanChartConditionEditor::getCondition(int index) const
+BarchartConditionInput *BarchartConditionEditor::getCondition(int index) const
 {
-    return static_cast<BooleanChartConditionInput*> (ui->verticalLayout->itemAt(index)->widget());
+    return static_cast<BarchartConditionInput*> (ui->verticalLayout->itemAt(index)->widget());
 }
 
-int BooleanChartConditionEditor::conditionsCount() const
+int BarchartConditionEditor::conditionsCount() const
 {
     return ui->verticalLayout->count();
 }
 
-void BooleanChartConditionEditor::setLabel(const QString &label)
+void BarchartConditionEditor::setLabel(const QString &label)
 {
     ui->groupBox->setTitle(label);
 }
 
-void BooleanChartConditionEditor::setDefaultColor(const QColor &color)
+void BarchartConditionEditor::setDefaultColor(const QColor &color)
 {
     m_defaultColor = color;
     getCondition(0)->setColor(m_defaultColor);
 }
 
-QCompleter* BooleanChartConditionEditor::makeCompleter(QJSEngine& engine)
+QCompleter* BarchartConditionEditor::makeCompleter(QJSEngine& engine)
 {
     class CompleterModel : public QStandardItemModel {
     public:
@@ -84,7 +84,7 @@ QCompleter* BooleanChartConditionEditor::makeCompleter(QJSEngine& engine)
     return completer;
 }
 
-void BooleanChartConditionEditor::setConditions(const PlotSeriesData::Conditions &value)
+void BarchartConditionEditor::setConditions(const PlotSeriesData::Conditions &value)
 {
     auto condition = getCondition(0);
     Q_ASSERT(condition);
@@ -132,7 +132,7 @@ void BooleanChartConditionEditor::setConditions(const PlotSeriesData::Conditions
     }
 }
 
-void BooleanChartConditionEditor::onConditionsUpdated()
+void BarchartConditionEditor::onConditionsUpdated()
 {
     Q_ASSERT(getCondition(0));
     if(!getCondition(0)->getJsEngine())
@@ -145,14 +145,14 @@ void BooleanChartConditionEditor::onConditionsUpdated()
     }
 }
 
-void BooleanChartConditionEditor::addCondition()
+void BarchartConditionEditor::addCondition()
 {
     int index = ui->verticalLayout->indexOf(static_cast<QWidget*>(sender()));
     if(index == -1) {
         index = ui->verticalLayout->count() - 1;
     }
 
-    auto input = new BooleanChartConditionInput();
+    auto input = new BarchartConditionInput();
     input->setJsEngine(getCondition(0)->getJsEngine());
     input->setCompleter(getCondition(0)->getCompleter());
     input->setColor(m_defaultColor);
@@ -162,7 +162,7 @@ void BooleanChartConditionEditor::addCondition()
     connect(input, SIGNAL(removeButtonClicked()), this, SLOT(removeCondition()));
 }
 
-void BooleanChartConditionEditor::removeCondition()
+void BarchartConditionEditor::removeCondition()
 {
     auto widget = sender() != nullptr ? static_cast<QWidget*>(sender()) :
                                         ui->verticalLayout->itemAt(ui->verticalLayout->count() - 1)->widget();

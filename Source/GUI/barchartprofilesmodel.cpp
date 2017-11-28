@@ -1,10 +1,10 @@
-#include "booleanprofilesmodel.h"
+#include "barchartprofilesmodel.h"
 
-BooleanProfilesModel::BooleanProfilesModel(QObject *parent, const QString& profilesLocation) : QStandardItemModel(parent), m_absoluteProfilesPath(profilesLocation) {
+BarchartProfilesModel::BarchartProfilesModel(QObject *parent, const QString& profilesLocation) : QStandardItemModel(parent), m_absoluteProfilesPath(profilesLocation) {
 
     // system profiles
     {
-        QDir dir(":/boolean_profiles");
+        QDir dir(":/barchart_profiles");
         auto entries = dir.entryInfoList(QStringList() << "*.json", QDir::Files);
         for(auto entry : entries) {
             append(entry.filePath(), entry.fileName(), true);
@@ -21,7 +21,7 @@ BooleanProfilesModel::BooleanProfilesModel(QObject *parent, const QString& profi
     }
 }
 
-QVariant BooleanProfilesModel::data(const QModelIndex &index, int role) const
+QVariant BarchartProfilesModel::data(const QModelIndex &index, int role) const
 {
     if(role == Qt::DisplayRole) {
         bool isSystem = QStandardItemModel::data(index, IsSystem).toBool();
@@ -34,7 +34,7 @@ QVariant BooleanProfilesModel::data(const QModelIndex &index, int role) const
     return QStandardItemModel::data(index, role);
 }
 
-void BooleanProfilesModel::append(const QString &path, const QString &name, bool isSystem) {
+void BarchartProfilesModel::append(const QString &path, const QString &name, bool isSystem) {
     auto data = new QStandardItem;
     data->setData(path, Data);
     data->setData(name, Display);
@@ -43,7 +43,7 @@ void BooleanProfilesModel::append(const QString &path, const QString &name, bool
     appendRow(data);
 }
 
-QString BooleanProfilesModel::absoluteProfilesPath() const
+QString BarchartProfilesModel::absoluteProfilesPath() const
 {
     return m_absoluteProfilesPath;
 }

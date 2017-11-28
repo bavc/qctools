@@ -146,9 +146,9 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 	void Update();
-    void applyBooleanChartsProfile();
-    void loadBooleanChartsProfile(const QString& profile);
-    void saveBooleanChartsProfile(const QString& profile);
+    void applyBarchartsProfile();
+    void loadBarchartsProfile(const QString& profile);
+    void saveBarchartsProfile(const QString& profile);
 
 private Q_SLOTS:
 
@@ -278,7 +278,7 @@ private:
     QWidget* connectionIndicator;
     size_t files_CurrentPos;
 
-    QJsonDocument m_booleanChartsProfile;
+    QJsonDocument m_barchartsProfile;
     QComboBox* m_profileSelectorCombobox;
 
     Ui::MainWindow *ui;

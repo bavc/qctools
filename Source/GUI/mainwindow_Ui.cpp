@@ -5,9 +5,9 @@
  */
 
 //---------------------------------------------------------------------------
-#include "booleanprofilesmodel.h"
+#include "barchartprofilesmodel.h"
 #include "mainwindow.h"
-#include "managebooleanconditions.h"
+#include "managebarchartconditions.h"
 #include "ui_mainwindow.h"
 
 #include "GUI/preferences.h"
@@ -109,13 +109,13 @@ void MainWindow::Ui_Init()
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->toolBar->insertWidget(ui->actionFilesList, spacer);
 
-    QLabel* boleanChartProfile = new QLabel("Select boolean charts profile: ");
+    QLabel* boleanChartProfile = new QLabel("Select barchart profile: ");
     ui->toolBar->insertWidget(ui->actionFilesList, boleanChartProfile);
 
     m_profileSelectorCombobox = new QComboBox;
     connect(this, &MainWindow::fileSelected, m_profileSelectorCombobox, &QComboBox::setEnabled);
 
-    auto profilesModel = new BooleanProfilesModel(m_profileSelectorCombobox, QCoreApplication::applicationDirPath());
+    auto profilesModel = new BarchartProfilesModel(m_profileSelectorCombobox, QCoreApplication::applicationDirPath());
 
     m_profileSelectorCombobox->setModel(profilesModel);
 
@@ -123,24 +123,24 @@ void MainWindow::Ui_Init()
 
     QObject::connect(m_profileSelectorCombobox, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), [this](int index) {
         auto value = m_profileSelectorCombobox->itemData(index).toString();
-        loadBooleanChartsProfile(value);
+        loadBarchartsProfile(value);
     });
 
     if(m_profileSelectorCombobox->count() != 0) {
-        loadBooleanChartsProfile(m_profileSelectorCombobox->itemData(m_profileSelectorCombobox->currentIndex()).toString());
+        loadBarchartsProfile(m_profileSelectorCombobox->itemData(m_profileSelectorCombobox->currentIndex()).toString());
     }
 
-    QToolButton* manageBooleanProfiles = new QToolButton;
-    manageBooleanProfiles->setIcon(QIcon(":/icon/settings.png"));
+    QToolButton* manageBarchartProfiles = new QToolButton;
+    manageBarchartProfiles->setIcon(QIcon(":/icon/settings.png"));
 
-    connect(this, &MainWindow::fileSelected, manageBooleanProfiles, &QToolButton::setEnabled);
-    connect(manageBooleanProfiles, &QToolButton::clicked, [this, profilesModel] {
-        ManageBooleanConditions manageDialog(profilesModel);
-        connect(&manageDialog, &ManageBooleanConditions::newProfile, this, [&](const QString& profileFilePath) {
-            auto currentProfileFilePath = m_profileSelectorCombobox->currentData(BooleanProfilesModel::Data).toString();
+    connect(this, &MainWindow::fileSelected, manageBarchartProfiles, &QToolButton::setEnabled);
+    connect(manageBarchartProfiles, &QToolButton::clicked, [this, profilesModel] {
+        ManageBarchartConditions manageDialog(profilesModel);
+        connect(&manageDialog, &ManageBarchartConditions::newProfile, this, [&](const QString& profileFilePath) {
+            auto currentProfileFilePath = m_profileSelectorCombobox->currentData(BarchartProfilesModel::Data).toString();
 
             Plots fakePlots(0, Files[getFilesCurrentPos()]);
-            QJsonDocument profilesJson = QJsonDocument(fakePlots.saveBooleanChartsProfile());
+            QJsonDocument profilesJson = QJsonDocument(fakePlots.saveBarchartsProfile());
 
             QFile file(profileFilePath);
             if(file.open(QFile::WriteOnly)) {
@@ -151,23 +151,23 @@ void MainWindow::Ui_Init()
             }
 
             if(currentProfileFilePath == profileFilePath) {
-                m_booleanChartsProfile = profilesJson;
-                applyBooleanChartsProfile();
+                m_barchartsProfile = profilesJson;
+                applyBarchartsProfile();
             }
         });
 
-        connect(&manageDialog, &ManageBooleanConditions::profileUpdated, this, [&](const QString& profileFilePath) {
-            auto currentProfile = m_profileSelectorCombobox->currentData(BooleanProfilesModel::Data).toString();
+        connect(&manageDialog, &ManageBarchartConditions::profileUpdated, this, [&](const QString& profileFilePath) {
+            auto currentProfile = m_profileSelectorCombobox->currentData(BarchartProfilesModel::Data).toString();
 
             if(currentProfile == profileFilePath) {
-                loadBooleanChartsProfile(profileFilePath);
+                loadBarchartsProfile(profileFilePath);
             }
         });
 
         manageDialog.exec();
     });
 
-    ui->toolBar->insertWidget(ui->actionFilesList, manageBooleanProfiles);
+    ui->toolBar->insertWidget(ui->actionFilesList, manageBarchartProfiles);
 
     // Config
     ui->verticalLayout->setSpacing(0);

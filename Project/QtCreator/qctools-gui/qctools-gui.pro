@@ -51,10 +51,10 @@ HEADERS += \
     $$SOURCES_PATH/GUI/config.h \
     $$SOURCES_PATH/GUI/draggablechildrenbehaviour.h \
     $$SOURCES_PATH/ThirdParty/cqmarkdown/CMarkdown.h \
-    $$SOURCES_PATH/GUI/booleanchartconditioneditor.h \
-    $$SOURCES_PATH/GUI/booleanchartconditioninput.h \
-    $$SOURCES_PATH/GUI/managebooleanconditions.h \
-    $$SOURCES_PATH/GUI/booleanprofilesmodel.h
+    $$SOURCES_PATH/GUI/barchartconditioneditor.h \
+    $$SOURCES_PATH/GUI/barchartconditioninput.h \
+    $$SOURCES_PATH/GUI/managebarchartconditions.h \
+    $$SOURCES_PATH/GUI/barchartprofilesmodel.h
 
 SOURCES += \
     $$SOURCES_PATH/GUI/BigDisplay.cpp \
@@ -80,10 +80,10 @@ SOURCES += \
     $$SOURCES_PATH/GUI/config.cpp \
     $$SOURCES_PATH/GUI/draggablechildrenbehaviour.cpp \
     $$SOURCES_PATH/ThirdParty/cqmarkdown/CMarkdown.cpp \
-    $$SOURCES_PATH/GUI/booleanchartconditioneditor.cpp \
-    $$SOURCES_PATH/GUI/booleanchartconditioninput.cpp \
-    $$SOURCES_PATH/GUI/managebooleanconditions.cpp \
-    $$SOURCES_PATH/GUI/booleanprofilesmodel.cpp
+    $$SOURCES_PATH/GUI/barchartconditioneditor.cpp \
+    $$SOURCES_PATH/GUI/barchartconditioninput.cpp \
+    $$SOURCES_PATH/GUI/managebarchartconditions.cpp \
+    $$SOURCES_PATH/GUI/barchartprofilesmodel.cpp
 
 win32 {
     greaterThan(QT_MAJOR_VERSION, 4): {
@@ -103,9 +103,9 @@ FORMS += \
     $$SOURCES_PATH/GUI/CommentsEditor.ui \
     $$SOURCES_PATH/GUI/blackmagicdecklink_userinput.ui \
     $$SOURCES_PATH/GUI/imagelabel.ui \
-    $$SOURCES_PATH/GUI/booleanchartconditioneditor.ui \
-    $$SOURCES_PATH/GUI/booleanchartconditioninput.ui \
-    $$SOURCES_PATH/GUI/managebooleanconditions.ui
+    $$SOURCES_PATH/GUI/barchartconditioneditor.ui \
+    $$SOURCES_PATH/GUI/barchartconditioninput.ui \
+    $$SOURCES_PATH/GUI/managebarchartconditions.ui
 
 RESOURCES += \
     $$SOURCES_PATH/Resource/Resources.qrc

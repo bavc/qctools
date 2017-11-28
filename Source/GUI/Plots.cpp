@@ -12,8 +12,8 @@
 #include "GUI/PlotScaleWidget.h"
 #include "GUI/Comments.h"
 #include "GUI/CommentsEditor.h"
-#include "GUI/booleanchartconditioneditor.h"
-#include "GUI/booleanchartconditioninput.h"
+#include "GUI/barchartconditioneditor.h"
+#include "GUI/barchartconditioninput.h"
 #include "Core/Core.h"
 #include "Core/VideoCore.h"
 #include <QComboBox>
@@ -115,20 +115,20 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                     legendLayout->setSpacing(10);
                     legendLayout->setAlignment(Qt::AlignVCenter);
 
-                    QToolButton* booleanConfigButton = new QToolButton();
-                    connect(plot, SIGNAL(visibilityChanged(bool)), booleanConfigButton, SLOT(setVisible(bool)));
-                    connect(booleanConfigButton, &QToolButton::clicked, this, [=] {
+                    QToolButton* barchartConfigButton = new QToolButton();
+                    connect(plot, SIGNAL(visibilityChanged(bool)), barchartConfigButton, SLOT(setVisible(bool)));
+                    connect(barchartConfigButton, &QToolButton::clicked, this, [=] {
                         QDialog dialog;
-                        dialog.setWindowTitle("Edit boolean conditions");
+                        dialog.setWindowTitle("Edit barchart conditions");
                         QVBoxLayout* grid = new QVBoxLayout;
                         dialog.setLayout(grid);
 
-                        QList<QPair<PlotSeriesData*, BooleanChartConditionEditor*>> pairs;
+                        QList<QPair<PlotSeriesData*, BarchartConditionEditor*>> pairs;
 
                         int j = streamInfo.PerGroup[plotGroup].Count;
                         while(j-- > 0)
                         {
-                            auto conditionEditor = new BooleanChartConditionEditor(nullptr);
+                            auto conditionEditor = new BarchartConditionEditor(nullptr);
                             PlotSeriesData* data = plot->getData(j);
 
                             data->mutableConditions().updateAll(m_fileInfoData->BitsPerRawSample());
@@ -143,7 +143,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
 
                             grid->addWidget(conditionEditor, streamInfo.PerGroup[plotGroup].Count - 1 - j);
 
-                            pairs.append(QPair<PlotSeriesData*, BooleanChartConditionEditor*>(data, conditionEditor));
+                            pairs.append(QPair<PlotSeriesData*, BarchartConditionEditor*>(data, conditionEditor));
                         }
 
                         auto dialogButtonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
@@ -181,15 +181,15 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                             plot->updateSymbols();
                             plot->replot();
 
-                            Q_EMIT booleanProfileChanged();
+                            Q_EMIT barchartProfileChanged();
                         }
                     });
 
-                    QToolButton* booleanPlotSwitch = new QToolButton();
-                    booleanPlotSwitch->setIcon(QIcon(":/icon/bar_chart.png"));
-                    booleanPlotSwitch->setCheckable(true);
+                    QToolButton* barchartPlotSwitch = new QToolButton();
+                    barchartPlotSwitch->setIcon(QIcon(":/icon/bar_chart.png"));
+                    barchartPlotSwitch->setCheckable(true);
 
-                    connect(plot, SIGNAL(visibilityChanged(bool)), booleanPlotSwitch, SLOT(setVisible(bool)));
+                    connect(plot, SIGNAL(visibilityChanged(bool)), barchartPlotSwitch, SLOT(setVisible(bool)));
 
                     for(size_t j = 0; j < streamInfo.PerGroup[plotGroup].Count; ++j)
                     {
@@ -198,27 +198,27 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                         auto seriesData = new PlotSeriesData(stats(plot->streamPos()), plot->getCurve(j)->title().text(), m_fileInfoData->BitsPerRawSample(),
                                                              m_dataTypeIndex, yIndex, plotGroup, j, streamInfo.PerGroup[plotGroup].Count);
                         plot->setData(j, seriesData);
-                        connect(booleanPlotSwitch, SIGNAL(toggled(bool)), seriesData, SLOT(setBoolean(bool)));
+                        connect(barchartPlotSwitch, SIGNAL(toggled(bool)), seriesData, SLOT(setBarchart(bool)));
                     }
 
-                    connect(booleanPlotSwitch, SIGNAL(toggled(bool)), plot, SLOT(setBoolean(bool)));
-                    connect(booleanPlotSwitch, &QToolButton::toggled, this, [=](bool toggled) {
-                        booleanPlotSwitch->setIcon(toggled ? QIcon(":/icon/chart_chart.png") : QIcon(":/icon/bar_chart.png"));
+                    connect(barchartPlotSwitch, SIGNAL(toggled(bool)), plot, SLOT(setBarchart(bool)));
+                    connect(barchartPlotSwitch, &QToolButton::toggled, this, [=](bool toggled) {
+                        barchartPlotSwitch->setIcon(toggled ? QIcon(":/icon/chart_chart.png") : QIcon(":/icon/bar_chart.png"));
                     });
 
-                    QHBoxLayout* booleanAndConfigurationLayout = new QHBoxLayout();
-                    booleanAndConfigurationLayout->setAlignment(Qt::AlignLeft);
-                    booleanAndConfigurationLayout->setSpacing(5);
-                    booleanAndConfigurationLayout->addWidget(booleanPlotSwitch);
-                    booleanAndConfigurationLayout->addWidget(booleanConfigButton);
+                    QHBoxLayout* barchartAndConfigurationLayout = new QHBoxLayout();
+                    barchartAndConfigurationLayout->setAlignment(Qt::AlignLeft);
+                    barchartAndConfigurationLayout->setSpacing(5);
+                    barchartAndConfigurationLayout->addWidget(barchartPlotSwitch);
+                    barchartAndConfigurationLayout->addWidget(barchartConfigButton);
 
-                    legendLayout->addItem(booleanAndConfigurationLayout);
+                    legendLayout->addItem(barchartAndConfigurationLayout);
                     legendLayout->addWidget(plot->legend());
                     layout->addLayout(legendLayout, m_plotsCount, 1);
 
-                    int height = booleanPlotSwitch->sizeHint().height();
-                    booleanConfigButton->setIcon(QIcon(":/icon/settings.png"));
-                    booleanConfigButton->setMaximumSize(QSize(height, height));
+                    int height = barchartPlotSwitch->sizeHint().height();
+                    barchartConfigButton->setIcon(QIcon(":/icon/settings.png"));
+                    barchartConfigButton->setMaximumSize(QSize(height, height));
 
                     m_plots[streamPos][group] = plot;
 
@@ -701,7 +701,7 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
     Q_ASSERT(rowsCount == gridLayout->rowCount());
 }
 
-QJsonObject Plots::saveBooleanChartsProfile()
+QJsonObject Plots::saveBarchartsProfile()
 {
     QJsonObject conditionsObject;
     QJsonArray conditionsArray;
@@ -740,7 +740,7 @@ QJsonObject Plots::saveBooleanChartsProfile()
     return conditionsObject;
 }
 
-void Plots::loadBooleanChartsProfile(const QJsonObject& profile)
+void Plots::loadBarchartsProfile(const QJsonObject& profile)
 {
     QJsonArray conditions = profile.value("conditions").toArray();
 
@@ -760,7 +760,7 @@ void Plots::loadBooleanChartsProfile(const QJsonObject& profile)
                         curveData->mutableConditions().clear();
                     }
 
-                    if(conditions.empty() && plot->isBoolean())
+                    if(conditions.empty() && plot->isBarchart())
                         plot->replot();
                 }
             }
@@ -800,7 +800,7 @@ void Plots::loadBooleanChartsProfile(const QJsonObject& profile)
                         }
                     }
 
-                    if(plot->isBoolean())
+                    if(plot->isBarchart())
                         plot->replot();
                 }
             }

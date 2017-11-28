@@ -1,14 +1,14 @@
-#include "GUI/booleanchartconditioninput.h"
-#include "ui_booleanchartconditioninput.h"
+#include "GUI/barchartconditioninput.h"
+#include "ui_barchartconditioninput.h"
 #include <QColorDialog>
 #include <QJSValueList>
 #include <QList>
 #include <QStringBuilder>
 #include <cassert>
 
-BooleanChartConditionInput::BooleanChartConditionInput(QWidget *parent) :
+BarchartConditionInput::BarchartConditionInput(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::BooleanChartConditionInput),
+    ui(new Ui::BarchartConditionInput),
     m_engine(nullptr)
 {
     ui->setupUi(this);
@@ -61,71 +61,71 @@ BooleanChartConditionInput::BooleanChartConditionInput(QWidget *parent) :
 
 }
 
-BooleanChartConditionInput::~BooleanChartConditionInput()
+BarchartConditionInput::~BarchartConditionInput()
 {
     delete ui;
 }
 
-void BooleanChartConditionInput::setColor(const QColor &color)
+void BarchartConditionInput::setColor(const QColor &color)
 {
     m_color = color;
     ui->color_toolButton->setStyleSheet("background: " + color.name() + ";");
 }
 
-QColor BooleanChartConditionInput::getColor() const
+QColor BarchartConditionInput::getColor() const
 {
     return m_color;
 }
 
-void BooleanChartConditionInput::setRemoveButtonEnabled(bool value)
+void BarchartConditionInput::setRemoveButtonEnabled(bool value)
 {
     ui->remove_toolButton->setEnabled(value);
 }
 
-void BooleanChartConditionInput::setName(const QString &name)
+void BarchartConditionInput::setName(const QString &name)
 {
     ui->name_lineEdit->setText(name);
 }
 
-QString BooleanChartConditionInput::getName() const
+QString BarchartConditionInput::getName() const
 {
     return ui->name_lineEdit->text();
 }
 
-void BooleanChartConditionInput::setCondition(const QString &value)
+void BarchartConditionInput::setCondition(const QString &value)
 {
     ui->condition_lineEdit->setText(value);
     m_validationTimer.start(0);
 }
 
-QString BooleanChartConditionInput::getCondition() const
+QString BarchartConditionInput::getCondition() const
 {
     return ui->condition_lineEdit->text();
 }
 
-void BooleanChartConditionInput::setJsEngine(QJSEngine *engine)
+void BarchartConditionInput::setJsEngine(QJSEngine *engine)
 {
     m_engine = engine;
 }
 
-QJSEngine *BooleanChartConditionInput::getJsEngine() const
+QJSEngine *BarchartConditionInput::getJsEngine() const
 {
     return m_engine;
 }
 
-void BooleanChartConditionInput::setCompleter(QCompleter *completer)
+void BarchartConditionInput::setCompleter(QCompleter *completer)
 {
     Q_ASSERT(m_engine);
     ui->condition_lineEdit->setCompleter(completer);
     m_autocompletion = m_engine->property("autocomplete").value<QList<QPair<QString, QString>>>();
 }
 
-QCompleter *BooleanChartConditionInput::getCompleter() const
+QCompleter *BarchartConditionInput::getCompleter() const
 {
     return ui->condition_lineEdit->completer();
 }
 
-QString BooleanChartConditionInput::getTooltipHelp() const
+QString BarchartConditionInput::getTooltipHelp() const
 {
     QString help("help: \n");
 
@@ -137,36 +137,36 @@ QString BooleanChartConditionInput::getTooltipHelp() const
     return help;
 }
 
-void BooleanChartConditionInput::on_remove_toolButton_clicked()
+void BarchartConditionInput::on_remove_toolButton_clicked()
 {
     Q_EMIT removeButtonClicked();
 }
 
-void BooleanChartConditionInput::on_add_toolButton_clicked()
+void BarchartConditionInput::on_add_toolButton_clicked()
 {
     Q_EMIT addButtonClicked();
 }
 
-void BooleanChartConditionInput::on_color_toolButton_clicked()
+void BarchartConditionInput::on_color_toolButton_clicked()
 {
     auto color = QColorDialog::getColor(getColor(), this, "Pick the color for condition");
     if(color.isValid())
         setColor(color);
 }
 
-void BooleanChartConditionInput::on_condition_lineEdit_textEdited(const QString &arg1)
+void BarchartConditionInput::on_condition_lineEdit_textEdited(const QString &arg1)
 {
     Q_UNUSED(arg1);
 
     m_validationTimer.start();
 }
 
-void BooleanChartConditionInput::on_condition_lineEdit_editingFinished()
+void BarchartConditionInput::on_condition_lineEdit_editingFinished()
 {
     m_validationTimer.start();
 }
 
-void BooleanChartConditionInput::on_condition_lineEdit_cursorPositionChanged(int arg1, int arg2)
+void BarchartConditionInput::on_condition_lineEdit_cursorPositionChanged(int arg1, int arg2)
 {
     Q_UNUSED(arg1);
     Q_UNUSED(arg2);

@@ -1,5 +1,5 @@
-#ifndef BOOLEANCHARTCONDITIONINPUT_H
-#define BOOLEANCHARTCONDITIONINPUT_H
+#ifndef BarchartConditionInput_H
+#define BarchartConditionInput_H
 
 #include <QCompleter>
 #include <QPushButton>
@@ -8,16 +8,16 @@
 #include "Plot.h"
 
 namespace Ui {
-class BooleanChartConditionInput;
+class BarchartConditionInput;
 }
 
-class BooleanChartConditionInput : public QWidget
+class BarchartConditionInput : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit BooleanChartConditionInput(QWidget *parent = 0);
-    ~BooleanChartConditionInput();
+    explicit BarchartConditionInput(QWidget *parent = 0);
+    ~BarchartConditionInput();
 
     void setColor(const QColor& color);
     QColor getColor() const;
@@ -56,7 +56,7 @@ private Q_SLOTS:
 
 private:
     QColor m_color;
-    Ui::BooleanChartConditionInput *ui;
+    Ui::BarchartConditionInput *ui;
 
     QTimer m_validationTimer;
     QJSEngine* m_engine;
@@ -67,4 +67,4 @@ private:
     QList<QPair<QString, QString>> m_autocompletion;
 };
 
-#endif // BOOLEANCHARTCONDITIONINPUT_H
+#endif // BarchartConditionInput_H

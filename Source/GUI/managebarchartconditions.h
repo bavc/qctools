@@ -1,21 +1,21 @@
-#ifndef MANAGEBOOLEANCONDITIONS_H
-#define MANAGEBOOLEANCONDITIONS_H
+#ifndef MANAGEBARCHARTCONDITIONS_H
+#define MANAGEBARCHARTCONDITIONS_H
 
-#include "booleanprofilesmodel.h"
+#include "barchartprofilesmodel.h"
 
 #include <QDialog>
 
 namespace Ui {
-class ManageBooleanConditions;
+class ManageBarchartConditions;
 }
 
-class ManageBooleanConditions : public QDialog
+class ManageBarchartConditions : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit ManageBooleanConditions(BooleanProfilesModel* model, QWidget *parent = 0);
-    ~ManageBooleanConditions();
+    explicit ManageBarchartConditions(BarchartProfilesModel* model, QWidget *parent = 0);
+    ~ManageBarchartConditions();
 
     QString pickDefaultProfileName();
     QString getProfileName(const QString& defaultProfileName);
@@ -34,7 +34,7 @@ private Q_SLOTS:
     void on_rename_pushButton_clicked();
 
 private:
-    Ui::ManageBooleanConditions *ui;
+    Ui::ManageBarchartConditions *ui;
 };
 
-#endif // MANAGEBOOLEANCONDITIONS_H
+#endif // MANAGEBARCHARTCONDITIONS_H

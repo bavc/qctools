@@ -217,13 +217,13 @@ protected:
         const QRectF clipRect = qwtIntersectedClipRect( canvasRect, p );
         mapper.setBoundingRect( clipRect );
 
-        double booleanZero = double(m_index) / m_count;
+        double barchartZero = double(m_index) / m_count;
         p->setPen(Qt::NoPen);
 
         for ( int i = from; i <= to; ++i )
         {
             auto y = data()->sample(i).ry();
-            if(!qFuzzyCompare(y, booleanZero))
+            if(!qFuzzyCompare(y, barchartZero))
             {
                 const QPolygonF points = mapper.toPointsF(xMap, yMap,
                         data(), i, i);
@@ -286,7 +286,7 @@ void Plot::setVisible(bool visible)
 
 void Plot::initYAxis()
 {
-    if(m_boolean)
+    if(m_barchart)
     {
         setYAxis(0.0, 1.0, 1);
 
@@ -327,7 +327,7 @@ void Plot::initYAxis()
 
 void Plot::updateSymbols()
 {
-    if(m_boolean)
+    if(m_barchart)
     {
         for(auto curve : m_curves)
         {
@@ -372,16 +372,16 @@ void Plot::updateSymbols()
     }
 }
 
-bool Plot::isBoolean() const
+bool Plot::isBarchart() const
 {
-    return m_boolean;
+    return m_barchart;
 }
 
-void Plot::setBoolean(bool value)
+void Plot::setBarchart(bool value)
 {
-    if(m_boolean != value)
+    if(m_barchart != value)
     {
-        m_boolean = value;
+        m_barchart = value;
 
         updateSymbols();
         initYAxis();
@@ -395,7 +395,7 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
     m_type( Type ),
     m_group( Group ),
     m_fileInformation( fileInformation ),
-    m_boolean (false)
+    m_barchart (false)
 {
     setAutoReplot( false );
 

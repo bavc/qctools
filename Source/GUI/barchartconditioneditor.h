@@ -1,25 +1,25 @@
-#ifndef BOOLEANCHARTCONDITIONEDITOR_H
-#define BOOLEANCHARTCONDITIONEDITOR_H
+#ifndef BarchartConditionEditor_H
+#define BarchartConditionEditor_H
 
 #include <QLabel>
 #include <QWidget>
 #include "Plot.h"
 
 namespace Ui {
-class BooleanChartConditionEditor;
+class BarchartConditionEditor;
 }
 
 class QCompleter;
-class BooleanChartConditionInput;
-class BooleanChartConditionEditor : public QWidget
+class BarchartConditionInput;
+class BarchartConditionEditor : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit BooleanChartConditionEditor(QWidget *parent = 0);
-    ~BooleanChartConditionEditor();
+    explicit BarchartConditionEditor(QWidget *parent = 0);
+    ~BarchartConditionEditor();
 
-    BooleanChartConditionInput* getCondition(int index) const;
+    BarchartConditionInput* getCondition(int index) const;
     int conditionsCount() const;
 
     void setLabel(const QString& label);
@@ -39,7 +39,7 @@ private Q_SLOTS:
 
 private:
     QColor m_defaultColor;
-    Ui::BooleanChartConditionEditor *ui;
+    Ui::BarchartConditionEditor *ui;
 };
 
-#endif // BOOLEANCHARTCONDITIONEDITOR_H
+#endif // BarchartConditionEditor_H
