@@ -226,15 +226,14 @@ public:
     struct Conditions
     {
         Conditions(CommonStats* stats, PlotSeriesData* seriesData, size_t plotGroup, const QString& title, int curveIndex, int bitdepth) : m_stats(stats), m_seriesData(seriesData),
-            m_plotGroup(plotGroup), m_curveTitle(title), m_curveIndex(curveIndex), m_bitdepth(bitdepth) {
+            m_plotGroup(plotGroup), m_chartTitle(title), m_curveIndex(curveIndex), m_bitdepth(bitdepth) {
 
         }
 
         QJsonObject toJson() const {
             QJsonObject jsonObject;
-            jsonObject.insert("curveTitle", m_curveTitle);
-            jsonObject.insert("curveIndex", m_curveIndex);
-            jsonObject.insert("plotGroup", (int) m_plotGroup);
+            jsonObject.insert("chartTitle", m_chartTitle);
+            jsonObject.insert("chartIndex", m_curveIndex);
 
             QJsonArray curveConditons;
             for(auto & condition : m_items) {
@@ -246,7 +245,7 @@ public:
                 curveConditons.append(conditionObject);
             }
 
-            jsonObject.insert("curveConditions", curveConditons);
+            jsonObject.insert("formulas", curveConditons);
             return jsonObject;
         }
 
@@ -340,7 +339,7 @@ public:
         PlotSeriesData* m_seriesData;
 
         size_t m_plotGroup;
-        QString m_curveTitle;
+        QString m_chartTitle;
         int m_curveIndex;
         int m_bitdepth;
     };

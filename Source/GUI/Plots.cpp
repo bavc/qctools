@@ -718,31 +718,31 @@ QJsonObject Plots::saveBarchartsProfile()
                     QJsonObject plotObject;
 
                     plotObject.insert("streamPos", (int) plot->streamPos());
-                    plotObject.insert("type", (int) plot->type());
-                    plotObject.insert("group", (int) plot->group());
+                    plotObject.insert("plotType", (int) plot->type());
+                    plotObject.insert("plotGroup", (int) plot->group());
                     plotObject.insert("plotTitle", PerStreamType[plot->type()].PerGroup[plot->group()].Name);
 
-                    QJsonArray plotConditions;
+                    QJsonArray plotFormulas;
                     auto streamInfo = PerStreamType[plot->type()];
                     for(size_t j = 0; j < streamInfo.PerGroup[plot->group()].Count; ++j)
                     {
                         auto curveData = static_cast<const PlotSeriesData*>(plot->getData(j));
-                        plotConditions.append(curveData->conditions().toJson());
+                        plotFormulas.append(curveData->conditions().toJson());
                     }
 
-                    plotObject.insert("plotConditions", plotConditions);
+                    plotObject.insert("plotFormulas", plotFormulas);
                     conditionsArray.append(plotObject);
                 }
         }
     }
 
-    conditionsObject.insert("conditions", conditionsArray);
+    conditionsObject.insert("profileFormulas", conditionsArray);
     return conditionsObject;
 }
 
 void Plots::loadBarchartsProfile(const QJsonObject& profile)
 {
-    QJsonArray conditions = profile.value("conditions").toArray();
+    QJsonArray conditions = profile.value("profileFormulas").toArray();
 
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
     {
@@ -769,31 +769,31 @@ void Plots::loadBarchartsProfile(const QJsonObject& profile)
 
     for(auto condition : conditions) {
         auto conditionObject = condition.toObject();
-        auto plotGroup = conditionObject.value("group").toInt();
-        auto plotType = conditionObject.value("type").toInt();
+        auto plotGroup = conditionObject.value("plotGroup").toInt();
+        auto plotType = conditionObject.value("plotType").toInt();
         auto streamPos = conditionObject.value("streamPos").toInt();
         auto plotTitle = conditionObject.value("plotTitle").toString();
 
-        auto plotConditions = conditionObject.value("plotConditions").toArray();
+        auto plotFormulas = conditionObject.value("plotFormulas").toArray();
 
         if(streamPos < m_fileInfoData->Stats.size() && m_fileInfoData->Stats[streamPos] && m_plots[streamPos]) {
             if(plotType == m_fileInfoData->Stats[streamPos]->Type_Get() && plotGroup < PerStreamType[plotType].CountOfGroups) {
                 if (m_plots[streamPos][plotGroup]) {
                     auto plot = m_plots[streamPos][plotGroup];
 
-                    for(auto plotCondition : plotConditions) {
+                    for(auto plotCondition : plotFormulas) {
                         auto plotConditionObject = plotCondition.toObject();
 
-                        auto curveIndex = plotConditionObject.value("curveIndex").toInt();
+                        auto curveIndex = plotConditionObject.value("chartIndex").toInt();
                         if(curveIndex < plot->curvesCount()) {
                             auto curveData = plot->getData(curveIndex);
-                            auto curveConditions = plotConditionObject.value("curveConditions").toArray();
+                            auto formulas = plotConditionObject.value("formulas").toArray();
 
-                            for(auto curveCondition : curveConditions) {
-                                auto curveConditionObject = curveCondition.toObject();
-                                auto value = curveConditionObject.value("value").toString();
-                                auto color = QColor(curveConditionObject.value("color").toString());
-                                auto label = curveConditionObject.value("label").toString();
+                            for(auto formula : formulas) {
+                                auto formulaObject = formula.toObject();
+                                auto value = formulaObject.value("value").toString();
+                                auto color = QColor(formulaObject.value("color").toString());
+                                auto label = formulaObject.value("label").toString();
 
                                 curveData->mutableConditions().add(value, color, label);
                             }
