@@ -126,7 +126,7 @@ void BarchartConditionEditor::setConditions(const PlotSeriesData::Conditions &va
             condition->setJsEngine(&value.m_engine);
             condition->setCompleter(completer);
             condition->setColor(value.m_items[i].m_color);
-            condition->setName(value.m_items[i].m_name);
+            condition->setName(value.m_items[i].m_label);
             condition->setCondition(value.m_items[i].m_conditionString);
         }
     }

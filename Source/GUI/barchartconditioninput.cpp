@@ -84,12 +84,12 @@ void BarchartConditionInput::setRemoveButtonEnabled(bool value)
 
 void BarchartConditionInput::setName(const QString &name)
 {
-    ui->name_lineEdit->setText(name);
+    ui->label_lineEdit->setText(name);
 }
 
 QString BarchartConditionInput::getName() const
 {
-    return ui->name_lineEdit->text();
+    return ui->label_lineEdit->text();
 }
 
 void BarchartConditionInput::setCondition(const QString &value)

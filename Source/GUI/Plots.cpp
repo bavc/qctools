@@ -793,9 +793,9 @@ void Plots::loadBarchartsProfile(const QJsonObject& profile)
                                 auto curveConditionObject = curveCondition.toObject();
                                 auto value = curveConditionObject.value("value").toString();
                                 auto color = QColor(curveConditionObject.value("color").toString());
-                                auto name = curveConditionObject.value("name").toString();
+                                auto label = curveConditionObject.value("label").toString();
 
-                                curveData->mutableConditions().add(value, color, name);
+                                curveData->mutableConditions().add(value, color, label);
                             }
                         }
                     }

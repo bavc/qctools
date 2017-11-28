@@ -7,12 +7,12 @@
                     "curveConditions": [
                         {
                             "color": "#035bff",
-                            "name": "",
+                            "label": "",
                             "value": "y < yHalf"
                         },
                         {
                             "color": "#46ff2a",
-                            "name": "",
+                            "label": "",
                             "value": "y > yHalf"
                         }
                     ],
@@ -24,7 +24,7 @@
                     "curveConditions": [
                         {
                             "color": "#006600",
-                            "name": "",
+                            "label": "",
                             "value": ""
                         }
                     ],
@@ -36,7 +36,7 @@
                     "curveConditions": [
                         {
                             "color": "#000000",
-                            "name": "",
+                            "label": "",
                             "value": ""
                         }
                     ],
@@ -48,7 +48,7 @@
                     "curveConditions": [
                         {
                             "color": "#00ff00",
-                            "name": "",
+                            "label": "",
                             "value": ""
                         }
                     ],
@@ -60,12 +60,12 @@
                     "curveConditions": [
                         {
                             "color": "#ff0000",
-                            "name": "cool condiiton1",
+                            "label": "cool condiiton1",
                             "value": "y < 682"
                         },
                         {
                             "color": "#07ff30",
-                            "name": "682 > y && y > 600",
+                            "label": "682 > y && y > 600",
                             "value": "682 > y && y > 600"
                         }
                     ],

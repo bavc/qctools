@@ -37,7 +37,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QLineEdit" name="name_lineEdit">
+    <widget class="QLineEdit" name="label_lineEdit">
      <property name="minimumSize">
       <size>
        <width>175</width>
@@ -45,7 +45,7 @@
       </size>
      </property>
      <property name="placeholderText">
-      <string>type condition name here</string>
+      <string>type condition label here</string>
      </property>
     </widget>
    </item>
