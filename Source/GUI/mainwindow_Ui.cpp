@@ -136,11 +136,27 @@ void MainWindow::Ui_Init()
             QPushButton* CheckBox=new QPushButton(PerStreamType[type].PerGroup[group].Name);
 
             QFontMetrics metrics(CheckBox->font());
-            CheckBox->setMinimumWidth(metrics.width(CheckBox->text()) + 10);
+            CheckBox->setMinimumWidth(metrics.width(CheckBox->text()));
             CheckBox->setCheckable(true);
-
+            CheckBox->setFlat(true);
             CheckBox->setProperty("type", (quint64) type); // unfortunately QVariant doesn't support size_t
             CheckBox->setProperty("group", (quint64) group);
+            CheckBox->setStyleSheet("\
+                QPushButton {\
+                    color: black;\
+                    padding-top: 8px;\
+                    padding-bottom: 8px;\
+                    border: solid;\
+                    border-color: lightgrey;\
+                    border-width: 0 0 0 1px;\
+                }\
+                QPushButton:checked{\
+                    background-color: grey;\
+                }\
+                QPushButton:hover{\
+                    background-color: lightgrey;\
+                }  \
+                ");
 
             CheckBox->setToolTip(PerStreamType[type].PerGroup[group].Description);
 
@@ -161,13 +177,30 @@ void MainWindow::Ui_Init()
             CheckBoxes[type].push_back(CheckBox);
         }
 
-    m_commentsCheckbox=new QPushButton("comments");
+    m_commentsCheckbox=new QPushButton("Comments");
     QFontMetrics metrics(m_commentsCheckbox->font());
-    m_commentsCheckbox->setMinimumWidth(metrics.width(m_commentsCheckbox->text()) + 10);
+    m_commentsCheckbox->setMinimumWidth(metrics.width(m_commentsCheckbox->text()));
 
     m_commentsCheckbox->setProperty("type", (quint64) Type_Max);
     m_commentsCheckbox->setProperty("group", (quint64) 0);
     m_commentsCheckbox->setToolTip("comments");
+    m_commentsCheckbox->setFlat(true);
+    m_commentsCheckbox->setStyleSheet("\
+        QPushButton {\
+            color: black;\
+            padding-top: 8px;\
+            padding-bottom: 8px;\
+            border: solid;\
+            border-color: lightgrey;\
+            border-width: 0 1px 0 0;\
+        }\
+        QPushButton:checked{\
+            background-color: grey;\
+        }\
+        QPushButton:hover{\
+            background-color: lightgrey;\
+        }  \
+        ");
     m_commentsCheckbox->setCheckable(true);
     m_commentsCheckbox->setChecked(true);
     m_commentsCheckbox->setVisible(false);
@@ -461,7 +494,7 @@ void MainWindow::Export_PDF()
 
     /*
     QwtPlotRenderer PlotRenderer;
-    PlotRenderer.renderDocument(const_cast<QwtPlot*>( PlotsArea->plot(TempType, Group_Y) ), 
+    PlotRenderer.renderDocument(const_cast<QwtPlot*>( PlotsArea->plot(TempType, Group_Y) ),
         SaveFileName, "PDF", QSizeF(210, 297), 150);
     QDesktopServices::openUrl(QUrl("file:///"+SaveFileName, QUrl::TolerantMode));
     */
