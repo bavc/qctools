@@ -153,6 +153,7 @@ public:
             }
         }
 
+        m_lastCondition = nullptr;
         return 0.0;
     }
 

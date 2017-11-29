@@ -42,11 +42,12 @@ static double stepSize( double distance, int numSteps )
 class PlotPicker: public QwtPlotPicker
 {
 public:
-    PlotPicker( QWidget *canvas , const struct stream_info* streamInfo, const size_t group, const QVector<QwtPlotCurve*>* curves, const FileInformation* fileInformation):
+    PlotPicker( Plot *plot, const struct stream_info* streamInfo, const size_t group, const QVector<QwtPlotCurve*>* curves, const FileInformation* fileInformation):
+        m_plot(plot),
         m_streamInfo( streamInfo ),
         m_group( group ),
         m_curves( curves ),
-        QwtPlotPicker( canvas ),
+        QwtPlotPicker(plot->canvas()),
         m_fileInformation(fileInformation)
     {
         setAxis( QwtPlot::xBottom, QwtPlot::yLeft );
@@ -71,16 +72,32 @@ public:
         const int idx = dynamic_cast<const Plot*>( plot() )->frameAt( pos.x() );
         if ( idx >= 0 )
         {
-            text = infoText( idx );
+            text = QwtText(infoText( text.font(), idx ), QwtText::RichText);
             text.setBackgroundBrush( QBrush( bg ) );
         }
 
         return text;
     }
 
-protected:
-    virtual QString infoText( int index ) const
+    virtual QRect trackerRect( const QFont & font) const {
+        QRect rect = QwtPlotPicker::trackerRect(font);
+
+        return rect;
+    }
+
+    virtual void drawTracker( QPainter *painter ) const
     {
+        QRect rect = trackerRect(painter->font());
+
+        QwtPlotPicker::drawTracker(painter);
+    }
+
+protected:
+    virtual QString infoText(const QFont& font, int index ) const
+    {
+        QFontMetrics metrics(font);
+        auto fontHeight = metrics.height();
+
         QString info = QString( "Frame %1 [%2]" ).arg(index).arg(m_fileInformation ? m_fileInformation->Frame_Type_Get(-1, index) : "");
         for( unsigned i = 0; i < m_streamInfo->PerGroup[m_group].Count; ++i )
         {
@@ -96,9 +113,31 @@ protected:
                 info += QString("n/a");
         }
 
+        if(m_plot->isBarchart())
+        {
+            for( unsigned i = 0; i < m_streamInfo->PerGroup[m_group].Count; ++i )
+            {
+                auto curve = (*m_curves)[i];
+                auto sample = static_cast<PlotSeriesData*>(curve->data())->sample(index);
+                Q_UNUSED(sample);
+
+                const per_item &itemInfo = m_streamInfo->PerItem[m_streamInfo->PerGroup[m_group].Start + i];
+                auto curveData = static_cast<PlotSeriesData*>((*m_curves)[i]->data());
+                if(curveData->getLastCondition()) {
+                    info += QString("\n<table><tr><td width=%1 bgcolor=%2>&nbsp;</td><td>&nbsp;-&nbsp;%3</td><td>(%4)</td</tr></table>")
+                            .arg(fontHeight)
+                            .arg(curveData->getLastCondition()->m_color.name())
+                            .arg(curveData->getLastCondition()->m_label)
+                            .arg(curve->title().text());
+                }
+            }
+
+        }
+
         return info;
     }
 
+    const Plot*                     m_plot;
     const struct stream_info*       m_streamInfo; 
     const size_t                    m_group;
     const QVector<QwtPlotCurve*>*   m_curves;
@@ -454,7 +493,7 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
         m_curves += curve;
     }
 
-    PlotPicker* picker = new PlotPicker( canvas, &PerStreamType[m_type], m_group, &m_curves, fileInformation );
+    PlotPicker* picker = new PlotPicker( this, &PerStreamType[m_type], m_group, &m_curves, fileInformation );
     connect( picker, SIGNAL( moved( const QPointF& ) ), SLOT( onPickerMoved( const QPointF& ) ) );
     connect( picker, SIGNAL( selected( const QPointF& ) ), SLOT( onPickerMoved( const QPointF& ) ) );
 
