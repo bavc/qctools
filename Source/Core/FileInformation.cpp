@@ -414,13 +414,21 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         Glue->AddOutput(0, 0, 0, FFmpeg_Glue::Output_Stats, 1, Filters[1]);
     }
 
-    // Looking for the first video stream
+    // Looking for the reference stream (video or audio)
     ReferenceStream_Pos=0;
     for (; ReferenceStream_Pos<Stats.size(); ReferenceStream_Pos++)
         if (Stats[ReferenceStream_Pos] && Stats[ReferenceStream_Pos]->Type_Get()==0)
             break;
     if (ReferenceStream_Pos>=Stats.size())
-        ReferenceStream_Pos=0;
+    {
+        Stats.clear();
+        ReferenceStream_Pos = 0;
+        for (; ReferenceStream_Pos<Stats.size(); ReferenceStream_Pos++)
+            if (Stats[ReferenceStream_Pos] && Stats[ReferenceStream_Pos]->Type_Get()==1) //Audio
+                break;
+        if (ReferenceStream_Pos>=Stats.size())
+            Stats.clear(); //Removing all, as we can not sync with video or audio
+    }
 
     Frames_Pos=0;
     WantToStop=false;
