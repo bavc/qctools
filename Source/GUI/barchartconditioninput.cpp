@@ -92,6 +92,16 @@ QString BarchartConditionInput::getName() const
     return ui->label_lineEdit->text();
 }
 
+void BarchartConditionInput::setEliminateSpikes(bool eliminateSpikes)
+{
+    ui->eliminateSpikes_checkBox->setChecked(eliminateSpikes);
+}
+
+bool BarchartConditionInput::getEliminateSpikes() const
+{
+    return ui->eliminateSpikes_checkBox->isChecked();
+}
+
 void BarchartConditionInput::setCondition(const QString &value)
 {
     ui->condition_lineEdit->setText(value);

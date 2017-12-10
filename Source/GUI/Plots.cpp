@@ -174,7 +174,8 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                                 for(auto i = 0; i < editor->conditionsCount(); ++i)
                                 {
                                     auto conditionInput = editor->getCondition(i);
-                                    data->mutableConditions().update(i, conditionInput->getCondition(), conditionInput->getColor(), conditionInput->getName());
+                                    data->mutableConditions().update(i, conditionInput->getCondition(), conditionInput->getColor(),
+                                                                     conditionInput->getName(), conditionInput->getEliminateSpikes());
                                 }
                             }
 
@@ -794,8 +795,9 @@ void Plots::loadBarchartsProfile(const QJsonObject& profile)
                                 auto value = formulaObject.value("value").toString();
                                 auto color = QColor(formulaObject.value("color").toString());
                                 auto label = formulaObject.value("label").toString();
+                                auto eliminateSpikes = formulaObject.value("eliminateSpikes").toBool();
 
-                                curveData->mutableConditions().add(value, color, label);
+                                curveData->mutableConditions().add(value, color, label, eliminateSpikes);
                             }
                         }
                     }

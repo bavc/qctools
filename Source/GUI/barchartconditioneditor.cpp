@@ -127,6 +127,7 @@ void BarchartConditionEditor::setConditions(const PlotSeriesData::Conditions &va
             condition->setCompleter(completer);
             condition->setColor(value.m_items[i].m_color);
             condition->setName(value.m_items[i].m_label);
+            condition->setEliminateSpikes(value.m_items[i].m_eliminateSpikes);
             condition->setCondition(value.m_items[i].m_conditionString);
         }
     }

@@ -27,6 +27,9 @@ public:
     void setName(const QString& name);
     QString getName() const;
 
+    void setEliminateSpikes(bool eliminateSpikes);
+    bool getEliminateSpikes() const;
+
     void setCondition(const QString& value);
     QString getCondition() const;
 

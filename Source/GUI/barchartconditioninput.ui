@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>673</width>
-    <height>41</height>
+    <width>805</width>
+    <height>45</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -59,6 +59,13 @@
      </property>
      <property name="placeholderText">
       <string>type you condition here (ex: y &lt; yHalf)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="eliminateSpikes_checkBox">
+     <property name="text">
+      <string>Eliminate spikes</string>
      </property>
     </widget>
    </item>

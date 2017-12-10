@@ -8,6 +8,7 @@
                     "formulas": [
                         {
                             "color": "#ff0000",
+                            "eliminateSpikes": false,
                             "label": "",
                             "value": ""
                         }
@@ -19,6 +20,7 @@
                     "formulas": [
                         {
                             "color": "#006600",
+                            "eliminateSpikes": false,
                             "label": "",
                             "value": ""
                         }
@@ -30,6 +32,7 @@
                     "formulas": [
                         {
                             "color": "#000000",
+                            "eliminateSpikes": false,
                             "label": "",
                             "value": ""
                         }
@@ -41,6 +44,7 @@
                     "formulas": [
                         {
                             "color": "#00ff00",
+                            "eliminateSpikes": false,
                             "label": "",
                             "value": ""
                         }
@@ -52,16 +56,19 @@
                     "formulas": [
                         {
                             "color": "#2815ff",
+                            "eliminateSpikes": false,
                             "label": "cool",
                             "value": "y < yHalf"
                         },
                         {
                             "color": "#ffff5e",
+                            "eliminateSpikes": false,
                             "label": "even more cool",
                             "value": "y > yHalf"
                         },
                         {
                             "color": "#ff0000",
+                            "eliminateSpikes": false,
                             "label": "the very best",
                             "value": ""
                         }
@@ -197,18 +204,42 @@
                     "chartIndex": 0,
                     "chartTitle": "V DIF",
                     "formulas": [
+                        {
+                            "color": "#800000",
+                            "eliminateSpikes": false,
+                            "label": "",
+                            "value": ""
+                        }
                     ]
                 },
                 {
                     "chartIndex": 1,
                     "chartTitle": "U DIF",
                     "formulas": [
+                        {
+                            "color": "#000080",
+                            "eliminateSpikes": false,
+                            "label": "",
+                            "value": ""
+                        }
                     ]
                 },
                 {
                     "chartIndex": 2,
                     "chartTitle": "Y DIF",
                     "formulas": [
+                        {
+                            "color": "#008000",
+                            "eliminateSpikes": true,
+                            "label": "condition1",
+                            "value": "y > 10"
+                        },
+                        {
+                            "color": "#ffaa00",
+                            "eliminateSpikes": false,
+                            "label": "condition2",
+                            "value": "y > 12"
+                        }
                     ]
                 }
             ],
@@ -321,66 +352,6 @@
             "plotFormulas": [
                 {
                     "chartIndex": 0,
-                    "chartTitle": "Crop Left",
-                    "formulas": [
-                    ]
-                },
-                {
-                    "chartIndex": 1,
-                    "chartTitle": "Crop Right",
-                    "formulas": [
-                    ]
-                }
-            ],
-            "plotGroup": 12,
-            "plotTitle": "CropW",
-            "plotType": 0,
-            "streamPos": 0
-        },
-        {
-            "plotFormulas": [
-                {
-                    "chartIndex": 0,
-                    "chartTitle": "Crop Top",
-                    "formulas": [
-                    ]
-                },
-                {
-                    "chartIndex": 1,
-                    "chartTitle": "Crop Bottom",
-                    "formulas": [
-                    ]
-                }
-            ],
-            "plotGroup": 13,
-            "plotTitle": "CropH",
-            "plotType": 0,
-            "streamPos": 0
-        },
-        {
-            "plotFormulas": [
-                {
-                    "chartIndex": 0,
-                    "chartTitle": "Crop Width",
-                    "formulas": [
-                    ]
-                },
-                {
-                    "chartIndex": 1,
-                    "chartTitle": "Crop Height",
-                    "formulas": [
-                    ]
-                }
-            ],
-            "plotGroup": 14,
-            "plotTitle": "CropF",
-            "plotType": 0,
-            "streamPos": 0
-        },
-        {
-            "plotFormulas": [
-                {
-                    "chartIndex": 0,
                     "chartTitle": "MSEf V",
                     "formulas": [
                     ]
@@ -433,142 +404,6 @@
             "plotFormulas": [
                 {
                     "chartIndex": 0,
-                    "chartTitle": "SSIMf All",
-                    "formulas": [
-                    ]
-                },
-                {
-                    "chartIndex": 1,
-                    "chartTitle": "SSIMf V",
-                    "formulas": [
-                    ]
-                },
-                {
-                    "chartIndex": 2,
-                    "chartTitle": "SSIMf U",
-                    "formulas": [
-                    ]
-                },
-                {
-                    "chartIndex": 3,
-                    "chartTitle": "SSIMf Y",
-                    "formulas": [
-                    ]
-                }
-            ],
-            "plotGroup": 17,
-            "plotTitle": "SSIMf",
-            "plotType": 0,
-            "streamPos": 0
-        },
-        {
-            "plotFormulas": [
-                {
-                    "chartIndex": 0,
-                    "chartTitle": "s.bff",
-                    "formulas": [
-                    ]
-                },
-                {
-                    "chartIndex": 1,
-                    "chartTitle": "s.tff",
-                    "formulas": [
-                    ]
-                },
-                {
-                    "chartIndex": 2,
-                    "chartTitle": "s.prog",
-                    "formulas": [
-                    ]
-                },
-                {
-                    "chartIndex": 3,
-                    "chartTitle": "s.und",
-                    "formulas": [
-                    ]
-                }
-            ],
-            "plotGroup": 18,
-            "plotTitle": "idet S",
-            "plotType": 0,
-            "streamPos": 0
-        },
-        {
-            "plotFormulas": [
-                {
-                    "chartIndex": 0,
-                    "chartTitle": "m.bff",
-                    "formulas": [
-                    ]
-                },
-                {
-                    "chartIndex": 1,
-                    "chartTitle": "m.tff",
-                    "formulas": [
-                    ]
-                },
-                {
-                    "chartIndex": 2,
-                    "chartTitle": "m.prog",
-                    "formulas": [
-                    ]
-                },
-                {
-                    "chartIndex": 3,
-                    "chartTitle": "m.und",
-                    "formulas": [
-                    ]
-                }
-            ],
-            "plotGroup": 19,
-            "plotTitle": "idet M",
-            "plotType": 0,
-            "streamPos": 0
-        },
-        {
-            "plotFormulas": [
-                {
-                    "chartIndex": 0,
-                    "chartTitle": "bottom",
-                    "formulas": [
-                    ]
-                },
-                {
-                    "chartIndex": 1,
-                    "chartTitle": "top",
-                    "formulas": [
-                    ]
-                },
-                {
-                    "chartIndex": 2,
-                    "chartTitle": "neither",
-                    "formulas": [
-                    ]
-                }
-            ],
-            "plotGroup": 20,
-            "plotTitle": "idet R",
-            "plotType": 0,
-            "streamPos": 0
-        },
-        {
-            "plotFormulas": [
-                {
-                    "chartIndex": 0,
-                    "chartTitle": "flicker",
-                    "formulas": [
-                    ]
-                }
-            ],
-            "plotGroup": 21,
-            "plotTitle": "flicker",
-            "plotType": 0,
-            "streamPos": 0
-        },
-        {
-            "plotFormulas": [
-                {
-                    "chartIndex": 0,
                     "chartTitle": "pkt_duration_time",
                     "formulas": [
                     ]
@@ -592,34 +427,6 @@
             "plotTitle": "pkt_size",
             "plotType": 0,
             "streamPos": 0
-        },
-        {
-            "plotFormulas": [
-                {
-                    "chartIndex": 0,
-                    "chartTitle": "R128.M",
-                    "formulas": [
-                    ]
-                }
-            ],
-            "plotGroup": 0,
-            "plotTitle": "R.128",
-            "plotType": 1,
-            "streamPos": 1
-        },
-        {
-            "plotFormulas": [
-                {
-                    "chartIndex": 0,
-                    "chartTitle": "Phase",
-                    "formulas": [
-                    ]
-                }
-            ],
-            "plotGroup": 1,
-            "plotTitle": "Audio Phase",
-            "plotType": 1,
-            "streamPos": 1
         },
         {
             "plotFormulas": [

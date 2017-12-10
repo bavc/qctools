@@ -132,7 +132,7 @@ public:
         auto xData = m_stats->x[m_xDataIndex];
         auto yData = m_stats->y[m_yDataIndex];
 
-        return QPointF(xData[i], (m_barchart ? toBarchart(yData[i], 1.0) : yData[i]));
+        return QPointF(xData[i], (m_barchart ? toBarchart(yData, i, 1.0) : yData[i]));
     }
 
     QPointF originalSample(size_t i) const {
@@ -143,11 +143,23 @@ public:
         return QPointF(xData[i], yData[i]);
     }
 
-    double toBarchart(double y) const {
+    double toBarchart(double* yData, int index) const {
+
+        auto y = yData[index];
         for(auto i = 0; i < m_conditions.m_items.size(); ++i) {
             const auto& condition = m_conditions.m_items[i];
 
             if(condition.match(y)) {
+                if(condition.m_eliminateSpikes) {
+                    auto left = index - 1;
+                    auto right = index + 1;
+
+                    bool leftMatched = left >= 0 && condition.match(yData[left]);
+                    bool rightMatched = right < size() && condition.match(yData[right]);
+
+                    if(!leftMatched && !rightMatched)
+                        continue;
+                }
                 m_lastCondition = &condition;
                 return 1.0;
             }
@@ -157,8 +169,8 @@ public:
         return 0.0;
     }
 
-    double toBarchart(double y, double globalMax) const {
-        auto value = toBarchart(y);
+    double toBarchart(double* yData, int index, double globalMax) const {
+        auto value = toBarchart(yData, index);
 
         auto min = globalMax * (m_curveIndex) / m_curvesCount;
         auto max = globalMax * (m_curveIndex + 1) / m_curvesCount;
@@ -170,10 +182,10 @@ public:
 
     struct Condition
     {
-        Condition() : m_engine(nullptr) {
+        Condition() : m_engine(nullptr), m_eliminateSpikes(false) {
         }
 
-        Condition(QJSEngine* engine, CommonStats* stats, size_t plotGroup) : m_engine(engine), m_stats(stats), m_plotGroup(plotGroup) {
+        Condition(QJSEngine* engine, CommonStats* stats, size_t plotGroup) : m_engine(engine), m_stats(stats), m_plotGroup(plotGroup), m_eliminateSpikes(false) {
         }
 
         Condition(const Condition& other) = default;
@@ -188,6 +200,7 @@ public:
         QColor m_color;
         QString m_label;
         QString m_conditionString;
+        bool m_eliminateSpikes;
         mutable QJSValue m_conditionFunction;
 
         bool match(double y) const {
@@ -206,11 +219,12 @@ public:
             return makeConditionFunction(m_engine, condition);
         }
 
-        void update(const QString& conditionString, const QColor& color, const QString& label) {
+        void update(const QString& conditionString, const QColor& color, const QString& label, bool eliminateSpikes) {
 
             m_color = color;
             m_label = label;
             m_conditionString = conditionString;
+            m_eliminateSpikes = eliminateSpikes;
 
             update();
         }
@@ -242,6 +256,7 @@ public:
                 conditionObject.insert("color", condition.m_color.name());
                 conditionObject.insert("value", condition.m_conditionString);
                 conditionObject.insert("label", condition.m_label);
+                conditionObject.insert("eliminateSpikes", condition.m_eliminateSpikes);
 
                 curveConditons.append(conditionObject);
             }
@@ -254,9 +269,9 @@ public:
             m_items.clear();
         }
 
-        void add(const QString& value, const QColor& color, const QString& label) {
+        void add(const QString& value, const QColor& color, const QString& label, bool eliminateSpikes) {
             m_items.append(Condition(&m_engine, m_stats, m_plotGroup));
-            m_items.back().update(value, color, label);
+            m_items.back().update(value, color, label, eliminateSpikes);
         }
 
         void add() {
@@ -267,10 +282,10 @@ public:
             m_items.removeLast();
         }
 
-        void update(int i, const QString& conditionString, const QColor& color, const QString& label) {
+        void update(int i, const QString& conditionString, const QColor& color, const QString& label, bool eliminateSpike) {
             auto & condition = m_items[i];
-            qDebug() << "updateCondition: " << i << ", string = " << conditionString << ", color = " << color << ", label = " << label;
-            condition.update(conditionString, color, label);
+            qDebug() << "updateCondition: " << i << ", string = " << conditionString << ", color = " << color << ", label = " << label << ", eliminate spike = " << eliminateSpike;
+            condition.update(conditionString, color, label, eliminateSpike);
         }
 
         void updateAll(int bitdepth)
