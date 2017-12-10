@@ -31,6 +31,7 @@
 #include <QDebug>
 #include <QMetaEnum>
 #include <QMessageBox>
+#include <QJsonDocument>
 
 #include "GUI/draggablechildrenbehaviour.h"
 #include "GUI/config.h"
@@ -912,7 +913,15 @@ size_t MainWindow::getFilesCurrentPos() const
 
 void MainWindow::setFilesCurrentPos(const size_t &value)
 {
-    files_CurrentPos = value;
+    bool fileWasSelected = isFileSelected();
+
+    if(files_CurrentPos != value) {
+        files_CurrentPos = value;
+
+        if(fileWasSelected != isFileSelected())
+            Q_EMIT(fileSelected(isFileSelected()));
+    }
+
     ui->actionReveal_file_location->setEnabled(isFileSelected());
     ui->actionFiltersLayout->setEnabled(isFileSelected());
 }

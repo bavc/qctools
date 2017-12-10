@@ -25,6 +25,9 @@
         <file>signalserver_success.png</file>
         <file>signalserver_upload.png</file>
         <file>signalserver_uploading.png</file>
+        <file>settings.png</file>
+        <file>bar_chart.png</file>
+        <file>chart_chart.png</file>
     </qresource>
     <qresource prefix="/">
         <file alias="Help/About.html">../../License.html</file>
@@ -35,5 +38,6 @@
         <file alias="Help/data_format.md">../../docs/data_format.md</file>
         <file alias="Help/recording.md">../../docs/recording.md</file>
         <file>Anonymous_Pro_B.ttf</file>
+        <file>barchart_profiles/default.json</file>
     </qresource>
 </RCC>

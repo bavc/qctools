@@ -96,6 +96,15 @@ static inline QRectF qwtIntersectedClipRect( const QRectF &rect, QPainter *paint
     return clipRect;
 }
 
+static int indexLower( double x, const QwtSeriesData<QPointF> &data )
+{
+    int index = qwtUpperSampleIndex<QPointF>( data, x, compareX() );
+    if ( index == -1 )
+        index = data.size();
+
+    return index - 1;
+}
+
 class CommentsPlotCurve : public QwtPlotCurve {
     // QwtPlotCurve interface
 public:

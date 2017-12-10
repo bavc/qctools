@@ -8,11 +8,11 @@ CONFIG += staticlib
 include(../brew.pri)
 include(../ffmpeg.pri)
 
-SOURCES_PATH = $$PWD/../../../Source
-message("qctools-lib: SOURCES_PATH = " $$absolute_path($$SOURCES_PATH))
+SOURCES_PATH = $$absolute_path($$PWD/../../../Source)
+message("qctools-lib: SOURCES_PATH = " $$SOURCES_PATH)
 
 THIRD_PARTY_PATH = $$absolute_path($$SOURCES_PATH/../..)
-message("qctools-lib: THIRD_PARTY_PATH = " $$absolute_path($$THIRD_PARTY_PATH))
+message("qctools-lib: THIRD_PARTY_PATH = " $$THIRD_PARTY_PATH)
 
 INCLUDEPATH += $$SOURCES_PATH
 INCLUDEPATH += $$SOURCES_PATH/ThirdParty/tinyxml2
@@ -61,7 +61,15 @@ SOURCES = \
     $$SOURCES_PATH/Core/Preferences.cpp
 
 win32 {
-    INCLUDEPATH += $$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib
+    greaterThan(QT_MAJOR_VERSION, 4): {
+        greaterThan(QT_MINOR_VERSION, 8): {
+            ZLIB_INCLUDE_PATH = $$absolute_path($$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib/src)
+        } else {
+            ZLIB_INCLUDE_PATH = $$absolute_path($$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib)
+        }
+    }
+    message("qctools-lib: ZLIB_INCLUDE_PATH = " $$ZLIB_INCLUDE_PATH)
+    INCLUDEPATH += $$ZLIB_INCLUDE_PATH
 }
 
 include(../blackmagic.pri)

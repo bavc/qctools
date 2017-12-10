@@ -103,6 +103,12 @@ public:
     void                        adjustGroupMax(int group, int bitsPerRawSample);
     void                        changeOrder(QList<std::tuple<int, int>> filterSelectorsInfo);
 
+    QJsonObject                 saveBarchartsProfile();
+    void                        loadBarchartsProfile(const QJsonObject& profile);
+
+Q_SIGNALS:
+    void                        barchartProfileChanged();
+
 public Q_SLOTS:
     void                        onCurrentFrameChanged();
 
@@ -114,8 +120,6 @@ private:
     void                        replotAll();
 
     void                        initAxisFormat( int index );
-
-    void                        initYAxis( Plot* );
     void                        updateSamples( Plot* );
     void                        setCursorPos( int framePos );
 

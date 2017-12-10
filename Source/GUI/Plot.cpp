@@ -17,10 +17,14 @@
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_marker.h>
 #include <qwt_series_data.h>
+#include <qwt_symbol.h>
 #include <QResizeEvent>
+#include <qwt_point_mapper.h>
+#include <qwt_painter.h>
+#include <qwt_symbol.h>
 
 #include "Core/FileInformation.h"
-#include "Core/VideoCore.h"
+#include <cassert>
 
 static double stepSize( double distance, int numSteps )
 {
@@ -38,11 +42,12 @@ static double stepSize( double distance, int numSteps )
 class PlotPicker: public QwtPlotPicker
 {
 public:
-    PlotPicker( QWidget *canvas , const struct stream_info* streamInfo, const size_t group, const QVector<QwtPlotCurve*>* curves, const FileInformation* fileInformation):
+    PlotPicker( Plot *plot, const struct stream_info* streamInfo, const size_t group, const QVector<QwtPlotCurve*>* curves, const FileInformation* fileInformation):
+        m_plot(plot),
         m_streamInfo( streamInfo ),
         m_group( group ),
         m_curves( curves ),
-        QwtPlotPicker( canvas ),
+        QwtPlotPicker(plot->canvas()),
         m_fileInformation(fileInformation)
     {
         setAxis( QwtPlot::xBottom, QwtPlot::yLeft );
@@ -67,16 +72,32 @@ public:
         const int idx = dynamic_cast<const Plot*>( plot() )->frameAt( pos.x() );
         if ( idx >= 0 )
         {
-            text = infoText( idx );
+            text = QwtText(infoText( text.font(), idx ), QwtText::RichText);
             text.setBackgroundBrush( QBrush( bg ) );
         }
 
         return text;
     }
 
-protected:
-    virtual QString infoText( int index ) const
+    virtual QRect trackerRect( const QFont & font) const {
+        QRect rect = QwtPlotPicker::trackerRect(font);
+
+        return rect;
+    }
+
+    virtual void drawTracker( QPainter *painter ) const
     {
+        QRect rect = trackerRect(painter->font());
+
+        QwtPlotPicker::drawTracker(painter);
+    }
+
+protected:
+    virtual QString infoText(const QFont& font, int index ) const
+    {
+        QFontMetrics metrics(font);
+        auto fontHeight = metrics.height();
+
         QString info = QString( "Frame %1 [%2]" ).arg(index).arg(m_fileInformation ? m_fileInformation->Frame_Type_Get(-1, index) : "");
         for( unsigned i = 0; i < m_streamInfo->PerGroup[m_group].Count; ++i )
         {
@@ -87,14 +108,36 @@ protected:
             info += "=";
 
             if ((*m_curves)[i]->dataSize() != 0)
-                info += QString::number((*m_curves)[i]->sample(index).ry(), 'f', itemInfo.DigitsAfterComma);
+                info += QString::number(static_cast<PlotSeriesData*>((*m_curves)[i]->data())->originalSample(index).ry(), 'f', itemInfo.DigitsAfterComma);
             else
                 info += QString("n/a");
+        }
+
+        if(m_plot->isBarchart())
+        {
+            for( unsigned i = 0; i < m_streamInfo->PerGroup[m_group].Count; ++i )
+            {
+                auto curve = (*m_curves)[i];
+                auto sample = static_cast<PlotSeriesData*>(curve->data())->sample(index);
+                Q_UNUSED(sample);
+
+                const per_item &itemInfo = m_streamInfo->PerItem[m_streamInfo->PerGroup[m_group].Start + i];
+                auto curveData = static_cast<PlotSeriesData*>((*m_curves)[i]->data());
+                if(curveData->getLastCondition()) {
+                    info += QString("\n<table><tr><td width=%1 bgcolor=%2>&nbsp;</td><td>&nbsp;-&nbsp;%3</td><td>(%4)</td</tr></table>")
+                            .arg(fontHeight)
+                            .arg(curveData->getLastCondition()->m_color.name())
+                            .arg(curveData->getLastCondition()->m_label)
+                            .arg(curve->title().text());
+                }
+            }
+
         }
 
         return info;
     }
 
+    const Plot*                     m_plot;
     const struct stream_info*       m_streamInfo; 
     const size_t                    m_group;
     const QVector<QwtPlotCurve*>*   m_curves;
@@ -143,6 +186,101 @@ void Plot_AddHLine(QwtPlot* plot, double value , double r , double g, double b)
     marker->setYValue( value );
 }
 
+static inline QRectF qwtIntersectedClipRect( const QRectF &rect, QPainter *painter )
+{
+    QRectF clipRect = rect;
+    if ( painter->hasClipping() )
+    {
+#if QT_VERSION >= 0x040800
+        const QRectF r = painter->clipBoundingRect();
+#else
+        const QRectF r = painter->clipRegion().boundingRect();
+#endif
+        clipRect &= r;
+    }
+
+    return clipRect;
+}
+
+class PlotSymbol : public QwtSymbol {
+    // QwtSymbol interface
+public:
+    PlotSymbol() : QwtSymbol(QwtSymbol::Rect) {
+
+    }
+    QRect boundingRect() const {
+        QRect rect = QwtSymbol::boundingRect();
+        // rect.moveCenter(QPoint(0, -rect.top()));
+        return rect;
+    }
+protected:
+    void renderSymbols(QPainter *painter, const QPointF *points, int numPoints) const {
+        const QSize size = this->size();
+
+        for ( int i = 0; i < numPoints; i++ )
+        {
+            const QPointF &pos = points[i];
+
+            const double x1 = pos.x() - 0.5 * size.width();
+            const double y1 = pos.y(); //  - 0.5 * size.height();
+
+            QwtPainter::drawRect(painter, x1, y1, size.width(), size.height());
+        }
+    }
+};
+
+class PlotCurve : public QwtPlotCurve {
+    // QwtPlotCurve interface
+public:
+    explicit PlotCurve( const QString &title = QString::null ) : QwtPlotCurve(title), m_index(0), m_count(0) {
+
+    }
+    explicit PlotCurve( const QwtText &title ) : QwtPlotCurve(title), m_index(0), m_count(0) {
+
+    }
+
+    void setIndex(int index, int count) {
+        m_index = index;
+        m_count = count;
+    }
+
+protected:
+    void drawSymbols(QPainter *p, const QwtSymbol &s, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to) const {
+
+        QwtPointMapper mapper;
+        mapper.setFlag( QwtPointMapper::RoundPoints,
+            QwtPainter::roundingAlignment( p ) );
+        mapper.setFlag( QwtPointMapper::WeedOutPoints,
+            testPaintAttribute( QwtPlotCurve::FilterPoints ) );
+
+        const QRectF clipRect = qwtIntersectedClipRect( canvasRect, p );
+        mapper.setBoundingRect( clipRect );
+
+        double barchartZero = double(m_index) / m_count;
+        p->setPen(Qt::NoPen);
+
+        for ( int i = from; i <= to; ++i )
+        {
+            auto y = data()->sample(i).ry();
+            if(!qFuzzyCompare(y, barchartZero))
+            {
+                const QPolygonF points = mapper.toPointsF(xMap, yMap,
+                        data(), i, i);
+
+                const PlotSeriesData* plotSeriesData = static_cast<const PlotSeriesData*>(data());
+                const PlotSeriesData::Condition* lastCondition = plotSeriesData->getLastCondition();
+                assert(lastCondition);
+                p->setBrush(lastCondition->m_color);
+                s.drawSymbols( p, points );
+            }
+        }
+    }
+
+private:
+    int m_index;
+    int m_count;
+};
+
 //***************************************************************************
 // Constructor / Destructor
 //***************************************************************************
@@ -176,12 +314,127 @@ void Plot::addGuidelines(int bitsPerRawSample)
     }
 }
 
+void Plot::setVisible(bool visible)
+{
+    if(isVisible() != visible)
+    {
+        QWidget::setVisible(visible);
+        Q_EMIT visibilityChanged(visible);
+    }
+}
+
+void Plot::initYAxis()
+{
+    if(m_barchart)
+    {
+        setYAxis(0.0, 1.0, 1);
+
+        auto streamInfo = PerStreamType[m_type];
+        CommonStats* stat = stats( streamPos() );
+
+        for(size_t j = 0; j < streamInfo.PerGroup[m_group].Count; ++j)
+        {
+            PlotSeriesData* data = getData(j);
+            data->mutableConditions().updateAll(m_fileInformation->BitsPerRawSample());
+        }
+    }
+    else
+    {
+        const size_t plotType = type();
+        const size_t plotGroup = group();
+
+        CommonStats* stat = stats( streamPos() );
+        const struct per_group& group = PerStreamType[plotType].PerGroup[plotGroup];
+
+        double yMin = stat->y_Min[plotGroup];
+        double yMax = stat->y_Max[plotGroup];
+
+        if ( ( group.Min != group.Max ) && ( yMax - yMin >= ( group.Max - group.Min) / 2 ) )
+            yMax = group.Max;
+
+        if ( yMin != yMax )
+        {
+            setYAxis( yMin, yMax, group.StepsCount );
+        }
+        else
+        {
+            //Special case, in order to force a scale of 0 to 1
+            setYAxis( 0.0, 1.0, 1 );
+        }
+    }
+}
+
+void Plot::updateSymbols()
+{
+    if(m_barchart)
+    {
+        for(auto curve : m_curves)
+        {
+            curve->setStyle(QwtPlotCurve::Dots);
+
+            QwtSymbol *symbol = new PlotSymbol();
+            symbol->setCachePolicy(QwtSymbol::NoCache);
+            symbol->setBrush(curve->pen().color());
+            symbol->setPen(Qt::transparent);
+
+            QwtPointMapper mapper;
+            mapper.setBoundingRect(this->canvas()->rect());
+
+            int symbolWidth = 0;
+            auto curveData = curve->data();
+            if(curveData->size() > 1) {
+                auto map = canvasMap(QwtPlot::xBottom);
+
+                double transformed1 = map.transform(curve->data()->sample(0).x());
+                double transformed2 = map.transform(curve->data()->sample(1).x());
+
+                double dt = transformed2 - transformed1;
+
+                symbolWidth = qRound(dt * 1.1f); // for some reasons qwt add some spacing between samples so * 1.1 is just workaround for it
+            }
+            if(symbolWidth == 0)
+                symbolWidth = 1;
+
+            auto symbolHeight = int(double(canvas()->size().height()) / m_curves.size() * 0.8);
+
+            symbol->setSize(QSize(symbolWidth, symbolHeight));
+            curve->setSymbol( symbol );
+        }
+    }
+    else
+    {
+        for(auto curve : m_curves)
+        {
+            curve->setStyle(QwtPlotCurve::Lines);
+            curve->setSymbol(nullptr);
+        }
+    }
+}
+
+bool Plot::isBarchart() const
+{
+    return m_barchart;
+}
+
+void Plot::setBarchart(bool value)
+{
+    if(m_barchart != value)
+    {
+        m_barchart = value;
+
+        updateSymbols();
+        initYAxis();
+        replot();
+    }
+}
+
 Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* fileInformation, QWidget *parent ) :
     QwtPlot( parent ),
     m_streamPos( streamPos ),
     m_type( Type ),
     m_group( Group ),
-    m_fileInformation( fileInformation )
+    m_fileInformation( fileInformation ),
+    m_barchart (false)
 {
     setAutoReplot( false );
 
@@ -217,10 +470,11 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
     m_cursor->setPosition( 0 );
 
     // curves
+    m_curves.reserve(PerStreamType[m_type].PerGroup[m_group].Count);
 
     for( unsigned j = 0; j < PerStreamType[m_type].PerGroup[m_group].Count; ++j )
     {
-        QwtPlotCurve* curve = new QwtPlotCurve( PerStreamType[m_type].PerItem[PerStreamType[m_type].PerGroup[m_group].Start + j].Name );
+        PlotCurve* curve = new PlotCurve( PerStreamType[m_type].PerItem[PerStreamType[m_type].PerGroup[m_group].Start + j].Name );
         switch (m_group)
         {
             case Group_IDET_S :
@@ -233,12 +487,13 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
         }
         curve->setRenderHint( QwtPlotItem::RenderAntialiased );
         curve->setZ( curve->z() - j ); //Invert data order (e.g. MAX before MIN)
+        curve->setIndex(j, PerStreamType[m_type].PerGroup[m_group].Count);
         curve->attach( this );
 
         m_curves += curve;
     }
 
-    PlotPicker* picker = new PlotPicker( canvas, &PerStreamType[m_type], m_group, &m_curves, fileInformation );
+    PlotPicker* picker = new PlotPicker( this, &PerStreamType[m_type], m_group, &m_curves, fileInformation );
     connect( picker, SIGNAL( moved( const QPointF& ) ), SLOT( onPickerMoved( const QPointF& ) ) );
     connect( picker, SIGNAL( selected( const QPointF& ) ), SLOT( onPickerMoved( const QPointF& ) ) );
 
@@ -257,6 +512,20 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
 Plot::~Plot()
 {
     delete m_legend;
+}
+
+const CommonStats *Plot::stats(size_t statsPos) const {
+    if ( statsPos == (size_t)-1 )
+        return m_fileInformation->ReferenceStat();
+    else
+        return m_fileInformation->Stats[statsPos];
+}
+
+CommonStats *Plot::stats(size_t statsPos) {
+    if ( statsPos == (size_t)-1 )
+        return m_fileInformation->ReferenceStat();
+    else
+        return m_fileInformation->Stats[statsPos];
 }
 
 QSize Plot::sizeHint() const
@@ -286,13 +555,6 @@ const QwtPlotCurve* Plot::curve( int index ) const
     return NULL;
 }   
 
-void Plot::setCurveSamples( int index,
-    const double *xData, const double *yData, int size )
-{
-    if ( index >= 0 && index < m_curves.size() )
-        m_curves[index]->setRawSamples( xData, yData, size );
-}
-
 void Plot::setYAxis( double min, double max, int numSteps )
 {
     setAxisScale( QwtPlot::yLeft, min, max, ::stepSize( max - min, numSteps ) );
@@ -301,6 +563,31 @@ void Plot::setYAxis( double min, double max, int numSteps )
 void Plot::setCursorPos( double x )
 {
     m_cursor->setPosition( x );
+}
+
+void Plot::setData(size_t curveIndex, PlotSeriesData *series)
+{
+    m_curves[curveIndex]->setData(series);
+}
+
+const PlotSeriesData* Plot::getData(size_t curveIndex) const
+{
+    return static_cast<PlotSeriesData*> (m_curves[curveIndex]->data());
+}
+
+PlotSeriesData *Plot::getData(size_t curveIndex)
+{
+    return static_cast<PlotSeriesData*> (m_curves[curveIndex]->data());
+}
+
+const QwtPlotCurve* Plot::getCurve(size_t curveIndex) const
+{
+    return m_curves[curveIndex];
+}
+
+int Plot::curvesCount() const
+{
+    return m_curves.size();
 }
 
 QColor Plot::curveColor( int index ) const
@@ -418,6 +705,15 @@ void Plot::onPickerMoved( const QPointF& pos )
     const int idx = frameAt( pos.x() );
     if ( idx >= 0 )
         Q_EMIT cursorMoved( idx );
+}
+
+static int indexLower( double x, const QwtSeriesData<QPointF> &data )
+{
+    int index = qwtUpperSampleIndex<QPointF>( data, x, compareX() );
+    if ( index == -1 )
+        index = data.size();
+
+    return index - 1;
 }
 
 int Plot::frameAt( double x ) const

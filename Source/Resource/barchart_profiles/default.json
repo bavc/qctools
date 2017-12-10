@@ -1,0 +1,510 @@
+{
+    "profileFormulas": [
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "Y MIN",
+                    "formulas": [
+                        {
+                            "color": "#ff0000",
+                            "eliminateSpikes": false,
+                            "label": "",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "Y LOW",
+                    "formulas": [
+                        {
+                            "color": "#006600",
+                            "eliminateSpikes": false,
+                            "label": "",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "chartIndex": 2,
+                    "chartTitle": "Y AVG",
+                    "formulas": [
+                        {
+                            "color": "#000000",
+                            "eliminateSpikes": false,
+                            "label": "",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "chartIndex": 3,
+                    "chartTitle": "Y HIGH",
+                    "formulas": [
+                        {
+                            "color": "#00ff00",
+                            "eliminateSpikes": false,
+                            "label": "",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "chartIndex": 4,
+                    "chartTitle": "Y MAX",
+                    "formulas": [
+                        {
+                            "color": "#2815ff",
+                            "eliminateSpikes": false,
+                            "label": "cool",
+                            "value": "y < yHalf"
+                        },
+                        {
+                            "color": "#ffff5e",
+                            "eliminateSpikes": false,
+                            "label": "even more cool",
+                            "value": "y > yHalf"
+                        },
+                        {
+                            "color": "#ff0000",
+                            "eliminateSpikes": false,
+                            "label": "the very best",
+                            "value": ""
+                        }
+                    ]
+                }
+            ],
+            "plotGroup": 0,
+            "plotTitle": "Y",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "U MIN",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "U LOW",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 2,
+                    "chartTitle": "U AVG",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 3,
+                    "chartTitle": "U HIGH",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 4,
+                    "chartTitle": "U MAX",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 1,
+            "plotTitle": "U",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "V MIN",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "V LOW",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 2,
+                    "chartTitle": "V AVG",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 3,
+                    "chartTitle": "V HIGH",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 4,
+                    "chartTitle": "V MAX",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 2,
+            "plotTitle": "V",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "Y DIF",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 3,
+            "plotTitle": "YDiff",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "U DIF",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 4,
+            "plotTitle": "UDiff",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "V DIF",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 5,
+            "plotTitle": "VDiff",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "V DIF",
+                    "formulas": [
+                        {
+                            "color": "#800000",
+                            "eliminateSpikes": false,
+                            "label": "",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "U DIF",
+                    "formulas": [
+                        {
+                            "color": "#000080",
+                            "eliminateSpikes": false,
+                            "label": "",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "chartIndex": 2,
+                    "chartTitle": "Y DIF",
+                    "formulas": [
+                        {
+                            "color": "#008000",
+                            "eliminateSpikes": true,
+                            "label": "condition1",
+                            "value": "y > 10"
+                        },
+                        {
+                            "color": "#ffaa00",
+                            "eliminateSpikes": false,
+                            "label": "condition2",
+                            "value": "y > 12"
+                        }
+                    ]
+                }
+            ],
+            "plotGroup": 6,
+            "plotTitle": "Diffs",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "SAT MIN",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "SAT LOW",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 2,
+                    "chartTitle": "SAT AVG",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 3,
+                    "chartTitle": "SAT HIGH",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 4,
+                    "chartTitle": "SAT MAX",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 7,
+            "plotTitle": "Sat",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "HUE MED",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "HUE AVG",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 8,
+            "plotTitle": "Hue",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "TOUT",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 9,
+            "plotTitle": "TOUT",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "VREP",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 10,
+            "plotTitle": "VREP",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "BRNG",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 11,
+            "plotTitle": "BRNG",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "MSEf V",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "MSEf U",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 2,
+                    "chartTitle": "MSEf Y",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 15,
+            "plotTitle": "MSEf",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "PSNRf V",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "PSNRf U",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 2,
+                    "chartTitle": "PSNRf Y",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 16,
+            "plotTitle": "PSNRf",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "pkt_duration_time",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 22,
+            "plotTitle": "pkt_duration_time",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "pkt_size",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 23,
+            "plotTitle": "pkt_size",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "DC Offset",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "Min Level",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 2,
+                    "chartTitle": "Max Level",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 2,
+            "plotTitle": "Levels",
+            "plotType": 1,
+            "streamPos": 1
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "ADIF Min",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "ADIF Max",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 2,
+                    "chartTitle": "ADIF Mean",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 3,
+            "plotTitle": "Aud Diffs",
+            "plotType": 1,
+            "streamPos": 1
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "Peak Level",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "RMS Peak",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 2,
+                    "chartTitle": "RMS Trough",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 4,
+            "plotTitle": "RMS",
+            "plotType": 1,
+            "streamPos": 1
+        }
+    ]
+}

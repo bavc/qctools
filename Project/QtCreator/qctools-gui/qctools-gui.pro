@@ -1,5 +1,5 @@
 QT       += core gui network
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport qml
 
 TARGET = QCTools
 TEMPLATE = app
@@ -23,11 +23,13 @@ else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PW
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../qctools-lib/debug/qctools.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../qctools-lib/libqctools.a
 
-SOURCES_PATH = $$PWD/../../../Source
-message("qctools: SOURCES_PATH = " $$absolute_path($$SOURCES_PATH))
+SOURCES_PATH = $$absolute_path($$PWD/../../../Source)
+message("qctools: SOURCES_PATH = " $$SOURCES_PATH)
 
 THIRD_PARTY_PATH = $$absolute_path($$SOURCES_PATH/../..)
-message("qctools: THIRD_PARTY_PATH = " $$absolute_path($$THIRD_PARTY_PATH))
+message("qctools: THIRD_PARTY_PATH = " $$THIRD_PARTY_PATH)
+
+INCLUDEPATH += $$SOURCES_PATH/GUI
 
 HEADERS += \
     $$SOURCES_PATH/GUI/BigDisplay.h \
@@ -48,7 +50,11 @@ HEADERS += \
     $$SOURCES_PATH/GUI/Imagelabel.h \
     $$SOURCES_PATH/GUI/config.h \
     $$SOURCES_PATH/GUI/draggablechildrenbehaviour.h \
-    $$SOURCES_PATH/ThirdParty/cqmarkdown/CMarkdown.h
+    $$SOURCES_PATH/ThirdParty/cqmarkdown/CMarkdown.h \
+    $$SOURCES_PATH/GUI/barchartconditioneditor.h \
+    $$SOURCES_PATH/GUI/barchartconditioninput.h \
+    $$SOURCES_PATH/GUI/managebarchartconditions.h \
+    $$SOURCES_PATH/GUI/barchartprofilesmodel.h
 
 SOURCES += \
     $$SOURCES_PATH/GUI/BigDisplay.cpp \
@@ -73,10 +79,22 @@ SOURCES += \
     $$SOURCES_PATH/GUI/Imagelabel.cpp \
     $$SOURCES_PATH/GUI/config.cpp \
     $$SOURCES_PATH/GUI/draggablechildrenbehaviour.cpp \
-    $$SOURCES_PATH/ThirdParty/cqmarkdown/CMarkdown.cpp
+    $$SOURCES_PATH/ThirdParty/cqmarkdown/CMarkdown.cpp \
+    $$SOURCES_PATH/GUI/barchartconditioneditor.cpp \
+    $$SOURCES_PATH/GUI/barchartconditioninput.cpp \
+    $$SOURCES_PATH/GUI/managebarchartconditions.cpp \
+    $$SOURCES_PATH/GUI/barchartprofilesmodel.cpp
 
 win32 {
-    INCLUDEPATH += $$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib
+    greaterThan(QT_MAJOR_VERSION, 4): {
+        greaterThan(QT_MINOR_VERSION, 8): {
+            ZLIB_INCLUDE_PATH = $$absolute_path($$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib/src)
+        } else {
+            ZLIB_INCLUDE_PATH = $$absolute_path($$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib)
+        }
+    }
+    message("qctools: ZLIB_INCLUDE_PATH = " $$ZLIB_INCLUDE_PATH)
+    INCLUDEPATH += $$ZLIB_INCLUDE_PATH
 }
 
 FORMS += \
@@ -84,7 +102,10 @@ FORMS += \
     $$SOURCES_PATH/GUI/preferences.ui \
     $$SOURCES_PATH/GUI/CommentsEditor.ui \
     $$SOURCES_PATH/GUI/blackmagicdecklink_userinput.ui \
-    $$SOURCES_PATH/GUI/imagelabel.ui
+    $$SOURCES_PATH/GUI/imagelabel.ui \
+    $$SOURCES_PATH/GUI/barchartconditioneditor.ui \
+    $$SOURCES_PATH/GUI/barchartconditioninput.ui \
+    $$SOURCES_PATH/GUI/managebarchartconditions.ui
 
 RESOURCES += \
     $$SOURCES_PATH/Resource/Resources.qrc

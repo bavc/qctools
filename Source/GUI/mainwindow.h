@@ -13,6 +13,7 @@
 #include <QByteArray>
 #include <QMutex>
 #include <QPushButton>
+#include <QJsonDocument>
 
 #include <vector>
 using namespace std;
@@ -140,8 +141,14 @@ public:
     void setFilesCurrentPos(const size_t &value);
     bool isFileSelected() const;
 
+Q_SIGNALS:
+    void fileSelected(bool selected);
+
 public Q_SLOTS:
 	void Update();
+    void applyBarchartsProfile();
+    void loadBarchartsProfile(const QString& profile);
+    void saveBarchartsProfile(const QString& profile);
 
 private Q_SLOTS:
 
@@ -270,6 +277,9 @@ private:
     SignalServerConnectionChecker* connectionChecker;
     QWidget* connectionIndicator;
     size_t files_CurrentPos;
+
+    QJsonDocument m_barchartsProfile;
+    QComboBox* m_profileSelectorCombobox;
 
     Ui::MainWindow *ui;
 };

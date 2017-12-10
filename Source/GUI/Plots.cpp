@@ -12,6 +12,8 @@
 #include "GUI/PlotScaleWidget.h"
 #include "GUI/Comments.h"
 #include "GUI/CommentsEditor.h"
+#include "GUI/barchartconditioneditor.h"
+#include "GUI/barchartconditioninput.h"
 #include "Core/Core.h"
 #include "Core/VideoCore.h"
 #include <QComboBox>
@@ -25,6 +27,9 @@
 #include <QInputDialog>
 #include <QTextDocument>
 #include <QPushButton>
+#include <QCheckBox>
+#include <QToolButton>
+#include <qwt_plot_curve.h>
 
 //---------------------------------------------------------------------------
 
@@ -80,6 +85,13 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                 if (m_fileInfoData->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
                 {
                     Plot* plot = new Plot( streamPos, type, group, fileInformation, this );
+
+                    const size_t plotType = plot->type();
+                    const size_t plotGroup = plot->group();
+                    const CommonStats* stat = stats( plot->streamPos() );
+
+                    auto streamInfo = PerStreamType[plotType];
+
                     plot->addGuidelines(m_fileInfoData->BitsPerRawSample());
 
                     if(type == Type_Video)
@@ -89,7 +101,8 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                     plot->plotLayout()->setAlignCanvasToScales(false);
                     plot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
                     plot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
-                    initYAxis( plot );
+                    plot->initYAxis();
+
                     updateSamples( plot );
 
                     connect( plot, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
@@ -97,7 +110,116 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                     plot->canvas()->installEventFilter( this );
 
                     layout->addWidget( plot, m_plotsCount, 0 );
-                    layout->addWidget( plot->legend(), m_plotsCount, 1 );
+                    QVBoxLayout* legendLayout = new QVBoxLayout();
+                    legendLayout->setContentsMargins(5, 0, 5, 0);
+                    legendLayout->setSpacing(10);
+                    legendLayout->setAlignment(Qt::AlignVCenter);
+
+                    QToolButton* barchartConfigButton = new QToolButton();
+                    connect(plot, SIGNAL(visibilityChanged(bool)), barchartConfigButton, SLOT(setVisible(bool)));
+                    connect(barchartConfigButton, &QToolButton::clicked, this, [=] {
+                        QDialog dialog;
+                        dialog.setWindowTitle("Edit barchart conditions");
+                        QVBoxLayout* grid = new QVBoxLayout;
+                        dialog.setLayout(grid);
+
+                        QList<QPair<PlotSeriesData*, BarchartConditionEditor*>> pairs;
+
+                        int j = streamInfo.PerGroup[plotGroup].Count;
+                        while(j-- > 0)
+                        {
+                            auto conditionEditor = new BarchartConditionEditor(nullptr);
+                            PlotSeriesData* data = plot->getData(j);
+
+                            data->mutableConditions().updateAll(m_fileInfoData->BitsPerRawSample());
+                            auto curve = dynamic_cast<const QwtPlotCurve*>( plot->getCurve(j) );
+
+                            QString title = curve->title().text();
+
+                            conditionEditor->setLabel(title);
+                            conditionEditor->setDefaultColor(curve->pen().color());
+                            conditionEditor->setConditions(data->conditions());
+                            connect(data, SIGNAL(conditionsUpdated()), conditionEditor, SLOT(onConditionsUpdated()));
+
+                            grid->addWidget(conditionEditor, streamInfo.PerGroup[plotGroup].Count - 1 - j);
+
+                            pairs.append(QPair<PlotSeriesData*, BarchartConditionEditor*>(data, conditionEditor));
+                        }
+
+                        auto dialogButtonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
+                        connect(dialogButtonBox->button(QDialogButtonBox::Save), SIGNAL(clicked()), &dialog, SLOT(accept()));
+                        connect(dialogButtonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), &dialog, SLOT(reject()));
+
+                        grid->addWidget(dialogButtonBox, streamInfo.PerGroup[plotGroup].Count);
+                        if(QDialog::Accepted == dialog.exec())
+                        {
+                            for(auto pair : pairs) {
+                                auto data = pair.first;
+                                auto editor = pair.second;
+
+                                if(data->conditions().m_items.size() != editor->conditionsCount())
+                                {
+                                    if(data->conditions().m_items.size() > editor->conditionsCount())
+                                    {
+                                        while(data->conditions().m_items.size() > editor->conditionsCount())
+                                            data->mutableConditions().remove();
+                                    }
+                                    else
+                                    {
+                                        while(data->conditions().m_items.size() < editor->conditionsCount())
+                                            data->mutableConditions().add();
+                                    }
+                                }
+
+                                for(auto i = 0; i < editor->conditionsCount(); ++i)
+                                {
+                                    auto conditionInput = editor->getCondition(i);
+                                    data->mutableConditions().update(i, conditionInput->getCondition(), conditionInput->getColor(),
+                                                                     conditionInput->getName(), conditionInput->getEliminateSpikes());
+                                }
+                            }
+
+                            plot->updateSymbols();
+                            plot->replot();
+
+                            Q_EMIT barchartProfileChanged();
+                        }
+                    });
+
+                    QToolButton* barchartPlotSwitch = new QToolButton();
+                    barchartPlotSwitch->setIcon(QIcon(":/icon/bar_chart.png"));
+                    barchartPlotSwitch->setCheckable(true);
+
+                    connect(plot, SIGNAL(visibilityChanged(bool)), barchartPlotSwitch, SLOT(setVisible(bool)));
+
+                    for(size_t j = 0; j < streamInfo.PerGroup[plotGroup].Count; ++j)
+                    {
+                        size_t yIndex = streamInfo.PerGroup[plotGroup].Start + j;
+
+                        auto seriesData = new PlotSeriesData(stats(plot->streamPos()), plot->getCurve(j)->title().text(), m_fileInfoData->BitsPerRawSample(),
+                                                             m_dataTypeIndex, yIndex, plotGroup, j, streamInfo.PerGroup[plotGroup].Count);
+                        plot->setData(j, seriesData);
+                        connect(barchartPlotSwitch, SIGNAL(toggled(bool)), seriesData, SLOT(setBarchart(bool)));
+                    }
+
+                    connect(barchartPlotSwitch, SIGNAL(toggled(bool)), plot, SLOT(setBarchart(bool)));
+                    connect(barchartPlotSwitch, &QToolButton::toggled, this, [=](bool toggled) {
+                        barchartPlotSwitch->setIcon(toggled ? QIcon(":/icon/chart_chart.png") : QIcon(":/icon/bar_chart.png"));
+                    });
+
+                    QHBoxLayout* barchartAndConfigurationLayout = new QHBoxLayout();
+                    barchartAndConfigurationLayout->setAlignment(Qt::AlignLeft);
+                    barchartAndConfigurationLayout->setSpacing(5);
+                    barchartAndConfigurationLayout->addWidget(barchartPlotSwitch);
+                    barchartAndConfigurationLayout->addWidget(barchartConfigButton);
+
+                    legendLayout->addItem(barchartAndConfigurationLayout);
+                    legendLayout->addWidget(plot->legend());
+                    layout->addLayout(legendLayout, m_plotsCount, 1);
+
+                    int height = barchartPlotSwitch->sizeHint().height();
+                    barchartConfigButton->setIcon(QIcon(":/icon/settings.png"));
+                    barchartConfigButton->setMaximumSize(QSize(height, height));
 
                     m_plots[streamPos][group] = plot;
 
@@ -127,7 +249,14 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     if(m_commentsPlot)
     {
         layout->addWidget(m_commentsPlot, m_plotsCount, 0);
-        layout->addWidget( m_commentsPlot->legend(), m_plotsCount, 1 );
+
+        QVBoxLayout* legendLayout = new QVBoxLayout();
+        legendLayout->setContentsMargins(5, 0, 5, 0);
+        legendLayout->setSpacing(10);
+        legendLayout->setAlignment(Qt::AlignVCenter);
+        legendLayout->addWidget(m_commentsPlot->legend());
+
+        layout->addLayout(legendLayout, m_plotsCount, 1 );
     }
 
     layout->addWidget( m_scaleWidget, m_plotsCount + 1, 0, 1, 2 );
@@ -173,15 +302,16 @@ void Plots::refresh()
         {
             size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
             for ( int i = 0; i < PerStreamType[type].CountOfGroups; i++ )
-                if (m_plots[streamPos][i])
+                if (m_plots[streamPos][i] && m_plots[streamPos][i]->isVisible())
             {
-                initYAxis( m_plots[streamPos][i] );
+                m_plots[streamPos][i]->initYAxis();
                 updateSamples( m_plots[streamPos][i] );
             }
         }
 
     setCursorPos( framePos() );
     replotAll();
+
 }
 
 //---------------------------------------------------------------------------
@@ -259,33 +389,6 @@ void Plots::setCursorPos( int newFramePos )
 }
 
 //---------------------------------------------------------------------------
-void Plots::initYAxis( Plot* plot )
-{
-    const size_t plotType = plot->type();
-    const size_t plotGroup = plot->group();
-
-    CommonStats* stat = stats( plot->streamPos() );
-    const struct per_group& group = PerStreamType[plotType].PerGroup[plotGroup];
-
-    double yMin = stat->y_Min[plotGroup];
-    double yMax = stat->y_Max[plotGroup];
-
-    if ( ( group.Min != group.Max ) && ( yMax - yMin >= ( group.Max - group.Min) / 2 ) )
-        yMax = group.Max;
-
-    if ( yMin != yMax )
-    {
-        plot->setYAxis( yMin, yMax, group.StepsCount );
-    }
-    else
-    {
-        //Special case, in order to force a scale of 0 to 1
-        plot->setYAxis( 0.0, 1.0, 1 );
-    }
-
-}
-
-//---------------------------------------------------------------------------
 void Plots::updateSamples( Plot* plot )
 {
     const size_t plotType = plot->type();
@@ -296,11 +399,7 @@ void Plots::updateSamples( Plot* plot )
 
     for(auto j = 0; j < streamInfo.PerGroup[plotGroup].Count; ++j)
     {
-        auto xData = stat->x[m_dataTypeIndex];
-        auto yIndex = streamInfo.PerGroup[plotGroup].Start + j;
-        auto yData = stat->y[yIndex];
-
-        plot->setCurveSamples( j, xData, yData, stat->x_Current );
+        plot->replot();
     }
 }
 
@@ -574,22 +673,22 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
                     qDebug() << "i: " << i << ", j: " << j;
 
                     auto plotWidget = gridLayout->itemAtPosition(j, 0)->widget();
-                    auto legendWidget = gridLayout->itemAtPosition(j, 1)->widget();
+                    auto legendItem = gridLayout->itemAtPosition(j, 1);
 
                     auto swapPlotWidget = gridLayout->itemAtPosition(i, 0)->widget();
-                    auto swapLegendWidget = gridLayout->itemAtPosition(i, 1)->widget();
+                    auto swapLegendItem = gridLayout->itemAtPosition(i, 1);
 
                     gridLayout->removeWidget(plotWidget);
-                    gridLayout->removeWidget(legendWidget);
+                    gridLayout->removeItem(legendItem);
 
                     gridLayout->removeWidget(swapPlotWidget);
-                    gridLayout->removeWidget(swapLegendWidget);
+                    gridLayout->removeItem(swapLegendItem);
 
                     gridLayout->addWidget(plotWidget, i, 0);
-                    gridLayout->addWidget(legendWidget, i, 1);
+                    gridLayout->addItem(legendItem, i, 1);
 
                     gridLayout->addWidget(swapPlotWidget, j, 0);
-                    gridLayout->addWidget(swapLegendWidget, j, 1);
+                    gridLayout->addItem(swapLegendItem, j, 1);
 
                     currentOrderedPlotsInfo[j] = currentOrderedPlotsInfo[i];
                     currentOrderedPlotsInfo[i] = expectedOrderedPlotsInfo[i];
@@ -601,6 +700,114 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
     }
 
     Q_ASSERT(rowsCount == gridLayout->rowCount());
+}
+
+QJsonObject Plots::saveBarchartsProfile()
+{
+    QJsonObject conditionsObject;
+    QJsonArray conditionsArray;
+
+    for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
+    {
+        if ( m_fileInfoData->Stats[streamPos] && m_plots[streamPos] )
+        {
+            auto type = m_fileInfoData->Stats[streamPos]->Type_Get();
+
+            for ( size_t group = 0; group < PerStreamType[type].CountOfGroups; group++ )
+                if (m_plots[streamPos][group]) {
+                    auto plot = m_plots[streamPos][group];
+                    QJsonObject plotObject;
+
+                    plotObject.insert("streamPos", (int) plot->streamPos());
+                    plotObject.insert("plotType", (int) plot->type());
+                    plotObject.insert("plotGroup", (int) plot->group());
+                    plotObject.insert("plotTitle", PerStreamType[plot->type()].PerGroup[plot->group()].Name);
+
+                    QJsonArray plotFormulas;
+                    auto streamInfo = PerStreamType[plot->type()];
+                    for(size_t j = 0; j < streamInfo.PerGroup[plot->group()].Count; ++j)
+                    {
+                        auto curveData = static_cast<const PlotSeriesData*>(plot->getData(j));
+                        plotFormulas.append(curveData->conditions().toJson());
+                    }
+
+                    plotObject.insert("plotFormulas", plotFormulas);
+                    conditionsArray.append(plotObject);
+                }
+        }
+    }
+
+    conditionsObject.insert("profileFormulas", conditionsArray);
+    return conditionsObject;
+}
+
+void Plots::loadBarchartsProfile(const QJsonObject& profile)
+{
+    QJsonArray conditions = profile.value("profileFormulas").toArray();
+
+    for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
+    {
+        if ( m_fileInfoData->Stats[streamPos] && m_plots[streamPos] ) {
+            auto type = m_fileInfoData->Stats[streamPos]->Type_Get();
+
+            for ( size_t group = 0; group < PerStreamType[type].CountOfGroups; group++ ) {
+                if (m_plots[streamPos][group]) {
+                    auto plot = m_plots[streamPos][group];
+
+                    auto streamInfo = PerStreamType[plot->type()];
+                    for(size_t j = 0; j < streamInfo.PerGroup[plot->group()].Count; ++j)
+                    {
+                        auto curveData = plot->getData(j);
+                        curveData->mutableConditions().clear();
+                    }
+
+                    if(conditions.empty() && plot->isBarchart())
+                        plot->replot();
+                }
+            }
+        }
+    }
+
+    for(auto condition : conditions) {
+        auto conditionObject = condition.toObject();
+        auto plotGroup = conditionObject.value("plotGroup").toInt();
+        auto plotType = conditionObject.value("plotType").toInt();
+        auto streamPos = conditionObject.value("streamPos").toInt();
+        auto plotTitle = conditionObject.value("plotTitle").toString();
+
+        auto plotFormulas = conditionObject.value("plotFormulas").toArray();
+
+        if(streamPos < m_fileInfoData->Stats.size() && m_fileInfoData->Stats[streamPos] && m_plots[streamPos]) {
+            if(plotType == m_fileInfoData->Stats[streamPos]->Type_Get() && plotGroup < PerStreamType[plotType].CountOfGroups) {
+                if (m_plots[streamPos][plotGroup]) {
+                    auto plot = m_plots[streamPos][plotGroup];
+
+                    for(auto plotCondition : plotFormulas) {
+                        auto plotConditionObject = plotCondition.toObject();
+
+                        auto curveIndex = plotConditionObject.value("chartIndex").toInt();
+                        if(curveIndex < plot->curvesCount()) {
+                            auto curveData = plot->getData(curveIndex);
+                            auto formulas = plotConditionObject.value("formulas").toArray();
+
+                            for(auto formula : formulas) {
+                                auto formulaObject = formula.toObject();
+                                auto value = formulaObject.value("value").toString();
+                                auto color = QColor(formulaObject.value("color").toString());
+                                auto label = formulaObject.value("label").toString();
+                                auto eliminateSpikes = formulaObject.value("eliminateSpikes").toBool();
+
+                                curveData->mutableConditions().add(value, color, label, eliminateSpikes);
+                            }
+                        }
+                    }
+
+                    if(plot->isBarchart())
+                        plot->replot();
+                }
+            }
+        }
+    }
 }
 
 void Plots::alignXAxis( const QwtPlot* plot )
@@ -693,14 +900,14 @@ void Plots::zoomXAxis( ZoomTypes zoomType )
         m_zoomFactor--;
     else if ( zoomType == ZoomOneToOne)
         m_zoomFactor = 0;
-        
+
     qDebug() << "m_zoomFactor: " << m_zoomFactor;
     int numVisibleFrames = m_fileInfoData->Frames_Count_Get() >> m_zoomFactor;
 
     if(m_zoomType == ZoomOneToOne)
     {
         numVisibleFrames = plot(0, 0)->canvas()->contentsRect().width();
-        m_zoomFactor = log(m_fileInfoData->Frames_Count_Get() / numVisibleFrames) / log(2);
+        m_zoomFactor = log(double(m_fileInfoData->Frames_Count_Get()) / numVisibleFrames) / log(2);
     }
 
     int to = qMin( framePos() + numVisibleFrames / 2, numFrames() );
@@ -710,22 +917,25 @@ void Plots::zoomXAxis( ZoomTypes zoomType )
 
     setVisibleFrames( from, to );
 
+    m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
+
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
+    {
         if ( m_fileInfoData->Stats[streamPos] && m_plots[streamPos] )
         {
-		    size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+            auto type = m_fileInfoData->Stats[streamPos]->Type_Get();
 
-            for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ )
-                if (m_plots[streamPos][group])
-                m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
+            for ( size_t group = 0; group < PerStreamType[type].CountOfGroups; group++ )
+                if (m_plots[streamPos][group]) {
+                    m_plots[streamPos][group]->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
+                    m_plots[streamPos][group]->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
+                    m_plots[streamPos][group]->updateSymbols();
+                }
         }
+    }
 
     if(m_commentsPlot)
         m_commentsPlot->setAxisScale( QwtPlot::xBottom, m_timeInterval.from, m_timeInterval.to );
-
-    m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
-
-    refresh();
 
     m_scaleWidget->update();
 

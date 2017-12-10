@@ -22,6 +22,7 @@
 #include "GUI/blackmagicdecklink_userinput.h"
 #include "GUI/preferences.h"
 #include "GUI/BigDisplay.h"
+#include "GUI/barchartprofilesmodel.h"
 
 //---------------------------------------------------------------------------
 
@@ -358,6 +359,16 @@ void MainWindow::createGraphsLayout()
         ui->fileNamesBox->show();
 
     PlotsArea=Files[getFilesCurrentPos()]->Stats.empty()?NULL:new Plots(this, Files[getFilesCurrentPos()]);
+    connect(PlotsArea, &Plots::barchartProfileChanged, this, [&] {
+        auto selectedProfileFileName = m_profileSelectorCombobox->itemData(m_profileSelectorCombobox->currentIndex(), BarchartProfilesModel::Data).toString();
+        auto isSystem = m_profileSelectorCombobox->itemData(m_profileSelectorCombobox->currentIndex(), BarchartProfilesModel::IsSystem).toBool();
+
+        if(!isSystem) {
+            saveBarchartsProfile(selectedProfileFileName);
+        }
+    });
+
+    applyBarchartsProfile();
 
     auto filtersInfo = Prefs->loadFilterSelectorsOrder();
     changeFilterSelectorsOrder(filtersInfo);
@@ -529,5 +540,41 @@ void MainWindow::Update()
 		ControlArea->Update();
 
 	if(InfoArea)
-		InfoArea->Update();
+        InfoArea->Update();
+}
+
+void MainWindow::applyBarchartsProfile()
+{
+    if(PlotsArea) {
+        PlotsArea->loadBarchartsProfile(m_barchartsProfile.object());
+    }
+}
+
+void MainWindow::loadBarchartsProfile(const QString &profile)
+{
+    QFile file(profile);
+    if(!file.exists(profile)) {
+        return;
+    }
+    if(!file.open(QIODevice::ReadOnly)) {
+        return;
+    }
+
+    auto bytes = file.readAll();
+    if(m_barchartsProfile.isEmpty())
+        qDebug() << "m_barchartsProfile is empty";
+
+    m_barchartsProfile = QJsonDocument::fromJson(bytes);
+    applyBarchartsProfile();
+}
+
+void MainWindow::saveBarchartsProfile(const QString &profileName)
+{
+    if(PlotsArea) {
+        auto json = QJsonDocument(PlotsArea->saveBarchartsProfile()).toJson();
+        QFile profile(profileName);
+        if(profile.open(QIODevice::WriteOnly))  {
+            profile.write(json);
+        }
+    }
 }
