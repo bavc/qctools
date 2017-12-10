@@ -12,18 +12,18 @@ QCTools is written in C++ using the Qt framework [under the GPLv3 License](https
 
 ## Testing your contributions locally
 
-In case you don't have qmake version 5 run:
-`brew install qt5`
-`brew link --force qt5`
+In case you don't have qmake version 5 run:  
+`brew install qt5`  
+`brew link --force qt5`  
 
-Get a QCTools repo (or use your own copy):
+Get a QCTools repo (or use your own copy):  
 
-`git clone https://github.com/bavc/qctools.git`
-`cd qctools`
+`git clone https://github.com/bavc/qctools.git`  
+`cd qctools`  
 
-Build QCTools via homebrew install process:
-`cd Project/QtCreator/`
-`export QCTOOLS_USE_BREW=true && qmake && make`
-`open QCTools.app`
+Build QCTools via homebrew install process:  
+`cd Project/QtCreator/`  
+`export QCTOOLS_USE_BREW=true && qmake && make`  
+`open QCTools.app`  
 
 After testing, push your changes to your fork/branch and [submit a pull request](https://github.com/bavc/qctools/compare?expand=1) and describe your proposed changes. Then you will have to wait for a maintainer to review your code.
