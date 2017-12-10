@@ -1902,8 +1902,16 @@ string FFmpeg_Glue::SAR_Get()
     if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
         return string();
 
-    if (InputData->Stream->codec->sample_aspect_ratio.num==0)
-        return "Und";
+    if (InputData->Stream->sample_aspect_ratio.num && InputData->Stream->sample_aspect_ratio.num==0)
+      return "Und";
+    else if (InputData->Stream->sample_aspect_ratio.num)
+    {
+        ostringstream convert;
+        convert << InputData->Stream->sample_aspect_ratio.num << "/" << InputData->Stream->sample_aspect_ratio.den;
+        return convert.str();
+    }
+    else if (InputData->Stream->codec->sample_aspect_ratio.num && InputData->Stream->codec->sample_aspect_ratio.num==0)
+      return "Und";
     else
     {
         ostringstream convert;
