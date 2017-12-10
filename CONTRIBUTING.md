@@ -1,3 +1,7 @@
+# Contributing
+
+General non-code contributions can be made by way of filing bug reports in our [Issue tracker](https://github.com/bavc/qctools/issues). When filing a bug report, please be sure to note a description of the problem, your current edition, your operating system, and steps that can be taken to reproduce this issue.
+ 
 # Contributing to Documentation
 
 QCTools documentation lives within the application and is mirrored online [here](http://bavc.github.io/qctools/). The documentation is written in Markdown and converted to HTML automatically. Contributions can be made by cloning and forking the repository and editing the Markdown files found in the `/docs` folder.
