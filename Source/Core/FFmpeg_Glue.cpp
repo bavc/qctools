@@ -2395,10 +2395,10 @@ int FFmpeg_Glue::SamplingRate_Get()
             break;
         }
 
-    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->time_base.den==0)
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec->sample_rate==0)
         return 0;
 
-    return InputData->Stream->time_base.den;
+    return InputData->Stream->codec->sample_rate;
 }
 
 //---------------------------------------------------------------------------
