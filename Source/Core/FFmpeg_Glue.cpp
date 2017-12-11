@@ -1859,10 +1859,10 @@ string FFmpeg_Glue::FieldOrder_Get()
     {
         case AV_FIELD_UNKNOWN: return "unknown";
         case AV_FIELD_PROGRESSIVE: return "progressive";
-        case AV_FIELD_TT:   return "TFF: top coded first, top displayed first";
-        case AV_FIELD_BB:   return "BFF: bottom coded_first, bottom displayed first";
-        case AV_FIELD_TB:   return "TFF: top coded_first, bottom displayed first";
-        case AV_FIELD_BT:   return "BFF: bottom coded_first, top displayed first";
+        case AV_FIELD_TT:   return "TFF: top displayed first, top coded first";
+        case AV_FIELD_BB:   return "BFF: bottom displayed first, bottom coded first";
+        case AV_FIELD_TB:   return "TFF: top displayed first, coded interleaved";
+        case AV_FIELD_BT:   return "BFF: bottom displayed first, coded interleaved";
         default: return string();
     }
 }
