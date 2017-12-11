@@ -270,7 +270,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     int axisBoxRow = layout->rowCount() - 1;
 #if 1
     // one row below to have space enough for bottom scale tick labels
-    layout->addWidget( xAxisBox, m_plotsCount + 2, 1 );
+    layout->addWidget( xAxisBox, m_plotsCount + 1, 1 );
 #else
     layout->addWidget( xAxisBox, layout_y, 1 );
 #endif
