@@ -58,7 +58,7 @@
       </size>
      </property>
      <property name="placeholderText">
-      <string>type you condition here (ex: y &lt; yHalf)</string>
+      <string>type your condition here (ex: y &lt; yHalf)</string>
      </property>
     </widget>
    </item>
