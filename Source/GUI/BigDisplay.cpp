@@ -1745,6 +1745,8 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, Q
                                             BitsPerRawSample = 8; //Workaround when BitsPerRawSample is unknown, we hope it is 8-bit.
                                         }
                                         Max = pow(2, BitsPerRawSample) - 1;
+                                        if (Filters[FilterPos].Args[OptionPos].Name && string(Filters[FilterPos].Args[OptionPos].Name)=="Max")
+                                            PreviousValues[Pos][FilterPos].Values[OptionPos]=pow(2, BitsPerRawSample) - 1;
                                     } else
                                     if (MaxTemp == "Line")
                                     {
