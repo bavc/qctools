@@ -5,6 +5,7 @@
 *   [Load Video Files](#load)
 *   [Select Graph Filters](#select)
 *   [View and Navigate Graphs](#view)
+*   [Bar or Graph Charts](#bar)
 *   [Playback and Visual Analysis](#playback)
 *   [Create/Export a Report](#create)
 *   [Parts of the Tool](#parts)
@@ -87,6 +88,19 @@ Some helpful **keyboard shortcuts** you may want to use are:
 *   `CTRL+,` (Mac: `command+,`) - Jump to previous comment frame
 *   `CTRL+.` (Mac: `command+.`) - Jump to next comment frame
 *   `CTRL+C` (Mac: `command+C`) - Copy the current timestamp to the clipboard
+
+## Bar or Graph Charts {#bar}
+
+On the right-hand side, users have the ability to toggle between the default graph view and the bar view. Settings may be configured using the "gear" icon to the right of the toggle button.
+
+* y = y value of chart 
+* yMax = (plot max - plot min) / 2
+* pow2 = pow2(exponent)
+* pow = pow(base, exponent)
+
+To set multiple conditions on one line, use the double-ampersand (`&&`) between conditions.
+
+Settings can also be configured to hide spikes caused by scene cuts.
 
 ## Playback and Visual Analysis {#playback}
 
