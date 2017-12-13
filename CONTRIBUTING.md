@@ -1,6 +1,6 @@
 # Contributing
 
-General non-code contributions can be made by way of filing bug reports in our [Issue tracker](https://github.com/bavc/qctools/issues). When filing a bug report, please be sure to note a description of the problem, your current edition, your operating system, and steps that can be taken to reproduce this issue.
+General non-code contributions can be made by way of filing bug reports in our [Issue tracker](https://github.com/bavc/qctools/issues). When filing a bug report, please be sure to note a description of the problem, your current QCTools version (listed under QCTools > About QCTools), your operating system, and steps that can be taken to reproduce this issue.
  
 # Contributing to Documentation
 
