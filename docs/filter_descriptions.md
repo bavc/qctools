@@ -189,7 +189,7 @@ Crop Height charts Top and Bottom crop.
 
 ## Crop Frame (CropF) {#cropf}
 
-Crop Frame charts Height and Width.
+Presents the total number of rows (Crop Height) and columns (Crop Width) which could be removed from the edges to only remove black pixels.
 
 ## Peak Signal to Noise Ratio (PSNRf) {#psnrf}
 
