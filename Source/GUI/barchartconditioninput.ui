@@ -65,7 +65,7 @@
    <item>
     <widget class="QCheckBox" name="eliminateSpikes_checkBox">
      <property name="text">
-      <string>Eliminate spikes</string>
+      <string>Hide spikes</string>
      </property>
     </widget>
    </item>
