@@ -10,7 +10,8 @@
 [Vertical Line Repetitions](#vrep)  
 [Broadcast Range](#brng)  
 [Crop Width (CropW)](#cropw)  
-[Crop Height (CropH)](#croph)  
+[Crop Height (CropH)](#croph) 
+[Crop Frame (CropF)](#cropf)  
 [Peak Signal to Noise Ratio (PSNRf)](#psnrf)  
 [Packet Duration Time (pkt_duration_time)](#pkd)  
 [Packet Size (pkt_size)](#ps)  
@@ -182,9 +183,17 @@ BRNG = Broadcast Range
 
 This filter detects portions on either side of your video which may contain not contain any picture data. In the case of pillarboxing, for example, you'll have black bars on the left and right sides of your video. This filter will detect and present that information in the graph reading.
 
+Crop Width charts Right and Left crop.
+
 ## Crop Height (CropH) {#croph}
 
 This filter enables you to view which parts, if any, of your video which contain no picture data. In the case of letterboxing, for example, you'll have black bars both above and below your picture. This filter would detect and present that in the graph reading.
+
+Crop Height charts Top and Bottom crop.
+
+## Crop Frame (CropF) {#cropf}
+
+Presents the total number of rows (Crop Height) and columns (Crop Width) which could be removed from the edges to only remove black pixels.
 
 ## Peak Signal to Noise Ratio (PSNRf) {#psnrf}
 
