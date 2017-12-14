@@ -134,7 +134,11 @@ The saturation graph offers two plot lines to denote specific ranges of saturati
 | Filter Domain | Filter Name(s) | Range |
 | Hue | Hue | 0-360 |
 
-'Hue' is a term used to describe color; "Blue" or "Red" can be thought of as Hues (see also 'Saturation'). In analyzing video, skin tone is often a good baseline against which to measure appropriate color representation. Skin tone should fall in the 147 range; if skin tone registers significantly above or below that number, it's likely an indication that your video isn't accurately storing or displaying color data accurately. For reference the hue filter measures green at 38 degrees, yellow at 99 degrees, red at 161 degrees, magenta at 218 degrees, blue at 279 degrees, and cyan at 341 degrees.
+'Hue' is a term used to describe color; "Blue" or "Red" can be thought of as Hues (see also 'Saturation'). 
+
+The hue filter shows the average (AVG) and median (MED) hue. The hue filter quantifies hue in radians from 0-360 with green at 38 degrees, yellow at 99 degrees, red at 161 degrees, magenta at 218 degrees, blue at 279 degrees, and cyan at 341 degrees.
+
+In analyzing video, human skin is often a good baseline against which to measure appropriate color representation. Skin hue should fall in the 143-148 range; if skin registers significantly above or below that range, it's likely an indication that your video isn't accurately storing or displaying color data accurately. 
 
 ## Temporal Outliers (TOUT) {#tout}
 
