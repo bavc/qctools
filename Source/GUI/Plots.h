@@ -111,6 +111,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     void                        onCurrentFrameChanged();
+    void                        alignYAxes();
 
 private Q_SLOTS:
     void                        onCursorMoved( int index );
@@ -124,7 +125,6 @@ private:
     void                        setCursorPos( int framePos );
 
     void                        alignXAxis( const QwtPlot* );
-    void                        alignYAxes();
 
     void                        setVisibleFrames( int from, int to, bool force = false );
 
