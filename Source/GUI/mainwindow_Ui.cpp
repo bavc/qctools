@@ -570,12 +570,14 @@ void MainWindow::refreshDisplay()
 {
     if (PlotsArea)
     {
+        PlotsArea->commentsPlot()->setVisible(m_commentsCheckbox->isChecked());
+        PlotsArea->commentsPlot()->legend()->setVisible(m_commentsCheckbox->isChecked());
+
         for (size_t type = 0; type<Type_Max; type++)
             for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
                 PlotsArea->setPlotVisible( type, group, CheckBoxes[type][group]->isChecked() );
 
-        PlotsArea->commentsPlot()->setVisible(m_commentsCheckbox->isChecked());
-        PlotsArea->commentsPlot()->legend()->setVisible(m_commentsCheckbox->isChecked());
+        PlotsArea->alignYAxes();
     }
 }
 

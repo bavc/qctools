@@ -461,8 +461,13 @@ void Plots::alignYAxes()
             maxExtent += 3; // margin
         }
 
-    if(m_commentsPlot)
-        m_commentsPlot->axisWidget(QwtPlot::yLeft)->scaleDraw()->setMinimumExtent( 0.0 );
+    if(m_commentsPlot) {
+        QwtScaleWidget *scaleWidget = m_commentsPlot->axisWidget(QwtPlot::yLeft);
+        QwtScaleDraw* scaleDraw = scaleWidget->scaleDraw();
+
+        const double extent = scaleDraw->extent( scaleWidget->font() );
+        maxExtent = qMax( extent, maxExtent );
+    }
 
     for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
         if ( m_fileInfoData->Stats[streamPos] && m_plots[streamPos] )
@@ -885,8 +890,6 @@ void Plots::setPlotVisible( size_t type, size_t group, bool on )
                 m_plots[streamPos][group]->legend()->setVisible( on );
             }
         }
-
-    alignYAxes();
 }
 
 //---------------------------------------------------------------------------
