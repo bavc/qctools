@@ -76,6 +76,20 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QCheckBox" name="Filters_Video_Entropy">
+                <property name="text">
+                 <string>entropy (graylevel entropy in histogram of color channels)</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="Filters_Video_EntropyDiff">
+                <property name="text">
+                 <string>entropy-diff (frame-to-frame difference in graylevel entropy in histogram of color channels)</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
            </layout>
@@ -347,6 +361,8 @@
   <tabstop>Filters_Video_Ssim</tabstop>
   <tabstop>Filters_Video_Idet</tabstop>
   <tabstop>Filters_Video_Deflicker</tabstop>
+  <tabstop>Filters_Video_Entropy</tabstop>
+  <tabstop>Filters_Video_EntropyDiff</tabstop>
   <tabstop>Filters_Audio_astats</tabstop>
   <tabstop>Filters_Audio_EbuR128</tabstop>
   <tabstop>Filters_Audio_aphasemeter</tabstop>

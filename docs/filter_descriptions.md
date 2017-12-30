@@ -20,6 +20,8 @@
 [Interlacement Detection (single frame)](#singleframe)  
 [Interlacement Detection (multiple frames)](#multiframe)  
 [Interlacement Detection (repeated fields)](#repeated)  
+[Entropy](#entropy)
+[Entropy Diff](#entropy-diff)
 
 ### Audio
 
@@ -238,6 +240,14 @@ This plots uses an assessment that tries and detects fields that are repeated be
 ## Deflicker {#deflicker}
 
 This plots quantifies temporal frame luminance variations as the average mean of 5 frames at a time. See [http://ffmpeg.org/ffmpeg-filters.html#deflicker](http://ffmpeg.org/ffmpeg-filters.html#deflicker) for more information.
+
+## Entropy {#entropy}
+
+Plots the graylevel entropy of the histogram of the color channels. A color channel with only a single shade will have entropy of 0, while a channel using all shades will be 1.
+
+## Entropy Diff {#entropy-diff}
+
+Plots the frame-to-frame difference in the graylevel entropy in the histogram of each color channel of the video frames. Incoherancy in plotted values may help indicate a damaged digital tape source (such as scratched D5 tape) or highlight digital manipulation of the image. The values should correspond to chaos or discontinuity in the histogram plot.
 
 ## Audio
 
