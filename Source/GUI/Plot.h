@@ -336,6 +336,18 @@ public:
 
                 engine.globalObject().setProperty("broadcastminval", 16 * (::pow(2, bitdepth - 8)));
                 autocomplete << QPair<QString, QString>("broadcastminval", QString("16 * (2^(bitdepth - 8)) = %1").arg(engine.globalObject().property("broadcastminval").toInt()));
+            } else if(plotGroup == Group_Sat)
+            {
+                engine.globalObject().setProperty("satmax", sqrt(2 * ::pow(::pow(2, bitdepth)/2,2)   ));
+                autocomplete << QPair<QString, QString>("satmax", QString("sqrt(2*((2^bitdepth)/2)^2) = %1").arg(engine.globalObject().property("satmax").toInt()));
+
+                /* use the hypotenuse of green plotted in Cb/Cr based on ITU BT.601 values as the satyuvmax */
+                engine.globalObject().setProperty("satyuvmax", sqrt(::pow(-74.203,2)+::pow(93.786,2)) * (::pow(2, bitdepth - 8)));
+                autocomplete << QPair<QString, QString>("satyuvmax", QString("sqrt(-74.203^2+93.786^2) * (2^(bitdepth - 8)) = %1").arg(engine.globalObject().property("satyuvmax").toInt()));
+
+                /* 75% of satyuvmax as satbroadcastmax */
+                engine.globalObject().setProperty("satbroadcastmax", sqrt(::pow(-74.203,2)+::pow(93.786,2)) * (::pow(2, bitdepth - 8)) * 0.75);
+                autocomplete << QPair<QString, QString>("satbroadcastmax", QString("sqrt(-74.203^2+93.786^2) * (2^(bitdepth - 8)) * 0.75 = %1").arg(engine.globalObject().property("satbroadcastmax").toInt()));
             }
 
             engine.setProperty("autocomplete", QVariant::fromValue(autocomplete));
