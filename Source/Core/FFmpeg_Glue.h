@@ -89,6 +89,7 @@ public:
         }
     };
 
+    AVPacket*                   ThumbnailPacket_Get(size_t Pos, size_t FramePos);
     QByteArray                  Thumbnail_Get(size_t Pos, size_t FramePos);
     size_t                      Thumbnails_Size(size_t Pos);
     
@@ -123,6 +124,10 @@ public:
 
     int                         OutputFilterWidth_Get(int Pos);
     int                         OutputFilterHeight_Get(int Pos);
+
+    int                         OutputThumbnailWidth_Get() const;
+    int                         OutputThumbnailHeight_Get() const;
+    int                         OutputThumbnailBitRate_Get() const;
 
     QString                     FrameType_Get() const;
     string                      PixFormat_Get();
@@ -263,12 +268,16 @@ private:
 
         // FFmpeg pointers - Output
         AVCodecContext*         JpegOutput_CodecContext;
-        AVPacket*               JpegOutput_Packet;
 
         // Out
         outputmethod            OutputMethod;
         Image                   image;
-        std::vector<bytes*>     Thumbnails;
+
+        struct AVPacketDeleter {
+            void operator()(AVPacket* packet);
+        };
+
+        std::vector<std::unique_ptr<AVPacket, AVPacketDeleter>>  Thumbnails;
         size_t                  Thumbnails_Modulo;
         CommonStats*            Stats;
 

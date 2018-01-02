@@ -15,6 +15,8 @@
 #include "Core/FormatStats.h"
 #include "Core/StreamsStats.h"
 
+#include "FFmpegVideoEncoder.h"
+
 #include <QProcess>
 #include <QFileInfo>
 #include <QDebug>
@@ -28,6 +30,7 @@
 #include <sstream>
 #include <cassert>
 #ifdef _WIN32
+#include <QEventLoop>
     #include <algorithm>
 #endif
 
@@ -600,6 +603,29 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName, const activef
 
     Q_EMIT statsFileGenerated(file, name);
     m_commentsUpdated = false;
+}
+
+void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const activefilters &filters)
+{
+    FFmpegVideoEncoder encoder;
+    int thumbnailsCount = Glue->Thumbnails_Size(0);
+    int thumbnailIndex = 0;
+
+    encoder.makeVideo(ExportFileName, Glue->OutputThumbnailWidth_Get(), Glue->OutputThumbnailHeight_Get(), Glue->OutputThumbnailBitRate_Get(), [&]() -> AVPacket* {
+
+        bool hasNext = thumbnailIndex < thumbnailsCount;
+
+        if(!hasNext)
+            return nullptr;
+
+        return Glue->ThumbnailPacket_Get(0, thumbnailIndex++);
+    });
+
+    connect(this, &FileInformation::statsFileGenerated, [&](SharedFile statsFile, const QString& name) {
+        qDebug() << "fileName: " << statsFile.data()->fileName();
+    });
+
+    Export_XmlGz(QString(), filters);
 }
 
 //---------------------------------------------------------------------------

@@ -296,6 +296,19 @@ void MainWindow::on_actionExport_XmlGz_Prompt_triggered()
     statusBar()->showMessage("Exported to "+FileName);
 }
 
+void MainWindow::on_actionExport_Mkv_Prompt_triggered()
+{
+    if (getFilesCurrentPos()>=Files.size() || !Files[getFilesCurrentPos()])
+        return;
+
+    QString FileName=QFileDialog::getSaveFileName(this, "Export to .qctools.mkv", Files[getFilesCurrentPos()]->fileName() + ".qctools.mkv", "Statistic files (*.qctools.mkv)", 0, QFileDialog::DontUseNativeDialog);
+    if (FileName.size()==0)
+        return;
+
+    Files[getFilesCurrentPos()]->Export_QCTools_Mkv(FileName, Prefs->ActiveFilters);
+    statusBar()->showMessage("Exported to "+FileName);
+}
+
 //---------------------------------------------------------------------------
 void MainWindow::on_actionExport_XmlGz_Sidecar_triggered()
 {

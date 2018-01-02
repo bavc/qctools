@@ -139,6 +139,7 @@
      <bool>true</bool>
     </property>
     <addaction name="actionExport_XmlGz_Prompt"/>
+    <addaction name="actionExport_Mkv_Prompt"/>
     <addaction name="actionExport_XmlGz_Sidecar"/>
     <addaction name="actionExport_XmlGz_SidecarAll"/>
     <addaction name="actionExport_XmlGz_Custom"/>
@@ -553,6 +554,11 @@
   <action name="actionReveal_file_location">
    <property name="text">
     <string>Reveal file location</string>
+   </property>
+  </action>
+  <action name="actionExport_Mkv_Prompt">
+   <property name="text">
+    <string>To .qctools.mkv..</string>
    </property>
   </action>
  </widget>
