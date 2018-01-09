@@ -36,22 +36,14 @@ FFmpegVideoEncoder::FFmpegVideoEncoder(QObject *parent) : QObject(parent)
 void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, int bitrate, std::function<AVPacket* ()> getPacket)
 {
     auto filename = video.toStdString();
+    AVFormatContext *oc;
 
-    auto pOutputFormat = av_guess_format(NULL, filename.c_str(), NULL);
-    if (!pOutputFormat) {
-       printf("Could not deduce output format from file extension: using mkv.\n");
-       pOutputFormat = av_guess_format("mkv", NULL, NULL);
+    /* allocate the output media context */
+    avformat_alloc_output_context2(&oc, NULL, NULL, filename.c_str());
+    if (!oc) {
+        qDebug() << "Could not deduce output format from file extension: using MKV.\n";
+        avformat_alloc_output_context2(&oc, NULL, "mkv", filename.c_str());
     }
-
-    std::unique_ptr<AVFormatContext, std::function<void (AVFormatContext *)>> pFormatCtx(avformat_alloc_context(), avformat_free_context);
-    if(!pFormatCtx)
-    {
-       qDebug() << "Error allocating format context\n";
-       return;
-    }
-
-    pFormatCtx->oformat = pOutputFormat;
-    snprintf(pFormatCtx->filename, sizeof(pFormatCtx->filename), "%s", filename.c_str());
 
     // Add the AV_CODEC_ID_MJPEG video stream
     auto codec = avcodec_find_encoder(AV_CODEC_ID_MJPEG);
@@ -61,19 +53,18 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
         return;
     }
 
-    std::unique_ptr<AVStream, std::function<void (void*)>> pVideoStream(avformat_new_stream(pFormatCtx.get(), codec), av_freep);
-    if(!pVideoStream )
-    {
-       qDebug() << "Could not allocate stream\n";
-       return;
+    AVStream* videoStream = avformat_new_stream(oc, codec);
+    if (!videoStream) {
+        qDebug() << "Could not allocate stream\n";
+        return;
     }
 
-    pVideoStream->id = pFormatCtx->nb_streams - 1;
+    videoStream->id = oc->nb_streams-1;
 
     auto c = avcodec_alloc_context3(codec);
     if (!c) {
-        fprintf(stderr, "Could not alloc an encoding context\n");
-        exit(1);
+        qDebug() << "Could not alloc an encoding context\n";
+        return;
     }
 
     auto enc = c;
@@ -90,9 +81,10 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
      * of which frame timestamps are represented. For fixed-fps content,
      * timebase should be 1/framerate and timestamp increments should be
      * identical to 1. */
-    pVideoStream->time_base.num = 1;
-    pVideoStream->time_base.den = 1;
-    c->time_base       = pVideoStream->time_base;
+
+    videoStream->time_base.num = 1;
+    videoStream->time_base.den = 1;
+    c->time_base = videoStream->time_base;
 
     c->gop_size      = 1; /* emit one intra frame every twelve frames at most */
     c->pix_fmt       = AV_PIX_FMT_YUVJ422P;
@@ -110,7 +102,7 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
     }
 
     /* Some formats want stream headers to be separate. */
-    if (pFormatCtx->oformat->flags & AVFMT_GLOBALHEADER)
+    if (oc->oformat->flags & AVFMT_GLOBALHEADER)
         c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
     int ret = avcodec_open2(c, codec, NULL);
@@ -121,93 +113,46 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
         return;
     }
 
-    std::unique_ptr<AVFrame, std::function<void (AVFrame*)>> frame(av_frame_alloc(), [&](AVFrame* frame) { av_frame_free(&frame); });
+    /* copy the stream parameters to the muxer */
+    ret = avcodec_parameters_from_context(videoStream->codecpar, c);
 
-    frame->format = AV_PIX_FMT_RGB24;
-    frame->width  = c->width;
-    frame->height = c->height;
+    av_dump_format(oc, 0, filename.c_str(), 1);
 
-    av_image_alloc(frame->data, frame->linesize, frame->width, frame->height, c->pix_fmt, 32);
-
-    auto f = fopen(pFormatCtx->filename, "wb");
-    if (!f) {
-        qDebug() << "Could not open" << pFormatCtx->filename << "\n";
+    /* open the output file, if needed */
+    ret = avio_open(&oc->pb, filename.c_str(), AVIO_FLAG_WRITE);
+    if (ret < 0) {
+        char errbuf[255];
+        fprintf(stderr, "Could not open '%s': %s\n", filename.c_str(), av_make_error_string(errbuf, sizeof errbuf, ret));
         return;
     }
 
-    int got_output = 0;
+    /* Write the stream header, if any. */
+    ret = avformat_write_header(oc, NULL);
+
+    int i = 0;
 
     while(true)  {
         if(!getPacket)
             break;
 
-        auto packet = getPacket();
+        AVPacket* packet = getPacket();
         if(!packet)
             break;
 
-        fwrite(packet->data, 1, packet->size, f);
+        // packet->flags |= AV_PKT_FLAG_KEY;
+        packet->stream_index = videoStream->index;
 
-        /* prepare a dummy image */
-        /* Y */
         /*
-        for (int y = 0; y < c->height; y++) {
-            for (int x = 0; x < c->width; x++) {
-                frame->data[0][y * frame->linesize[0] + x] = x + y + i * 3;
-            }
-        }
+        packet->pts = i;
+        packet->dts = i;
         */
 
-        /* Cb and Cr */
-        /*
-        for (int y = 0; y < c->height/2; y++) {
-            for (int x = 0; x < c->width/2; x++) {
-                frame->data[1][y * frame->linesize[1] + x] = 128 + y + i * 2;
-                frame->data[2][y * frame->linesize[2] + x] = 64 + x + i * 5;
-            }
-        }
-
-        /* Which frame is it ? */
-        /*
-        frame->pts = i;
-        */
-
-        /* encode the image */
-        /*
-        auto ret = avcodec_encode_video2(c, &pkt, frame.get(), &got_output);
-        if (ret < 0) {
-            qDebug() << "Error encoding frame\n";
-            return;
-        }
-        */
-
-        if (got_output) {
-            fwrite(packet->data, 1, packet->size, f);
-        }
+        ++i;
+        // av_write_frame(oc, packet);
+        av_interleaved_write_frame(oc, packet);
     }
 
-    /* get the delayed frames */
-    AVPacket pkt;
-    av_init_packet(&pkt);
-
-    pkt.data = NULL;    // packet data will be allocated by the encoder
-    pkt.size = 0;
-
-    got_output = 1;
-    ret = avcodec_encode_video2(c, &pkt, NULL, &got_output);
-    if (ret < 0) {
-        qDebug() << "Error encoding frame\n";
-        return;
-    }
-
-    if (got_output) {
-        fwrite(pkt.data, 1, pkt.size, f);
-        av_packet_unref(&pkt);
-    }
-
-    uint8_t endcode[] = { 0, 0, 1, 0xb7 };
-
-    /* add sequence end code to have a real mpeg file */
-    fwrite(endcode, 1, sizeof(endcode), f);
-    fclose(f);
+    /* free the stream */
+    avformat_free_context(oc);
 }
 
