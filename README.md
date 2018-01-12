@@ -78,7 +78,7 @@ In conjunction with using QCTools, consider using the [A/V Artifacts Atlas](http
 
 # contributing
 
-Please read our contributing guidelines in [this dedicated document](https://github.com/bavc/qctools/blob/master/CONTRIBUTING.md).
+Please read our contributing guidelines in [this dedicated document](https://github.com/bavc/qctools/blob/master/CONTRIBUTING.md). QCTools is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md), and by participating in this project, you agree to abide by its terms.
 
 # license
 
