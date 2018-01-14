@@ -135,10 +135,9 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
 
     attachementEncCtx->codec_type = AVMEDIA_TYPE_ATTACHMENT;
     attachementEncCtx->codec_id = AV_CODEC_ID_BIN_DATA;
-    attachementEncCtx->extradata = reinterpret_cast<uint8_t*> (const_cast<char*> (attachment.data()));
     attachementEncCtx->extradata_size = attachment.size();
-    attachementEncCtx->subtitle_header = nullptr;
-    attachementEncCtx->subtitle_header_size = 0;
+    attachementEncCtx->extradata = static_cast<uint8_t*> (av_malloc(attachementEncCtx->extradata_size));
+    memcpy(attachementEncCtx->extradata, attachment.data(), attachementEncCtx->extradata_size);
 
     /* copy the stream parameters to the muxer */
     ret = avcodec_parameters_from_context(attachmentStream->codecpar, attachementEncCtx);
@@ -242,6 +241,10 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
     avcodec_free_context(&videoEncCtx);
 
     // dispose attachment encoder
+    avcodec_free_context(&attachementEncCtx);
+
+    /*
+    // dispose attachment encoder
     // can't do avcodec_free_context as we didn't allocate 'extradata' in ffmpeg way, so shouldn't dispose it
     // ... so just execute internals for avcodec_free_context one-by-one
 
@@ -252,6 +255,7 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
     av_freep(&attachementEncCtx->inter_matrix);
     av_freep(&attachementEncCtx->rc_override);
     av_freep(&attachementEncCtx);
+    */
 
     /* Close the output file. */
     avio_closep(&oc->pb);
