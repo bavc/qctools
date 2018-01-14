@@ -607,6 +607,17 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName, const activef
 
 void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const activefilters &filters)
 {
+    QByteArray attachment;
+    QString attachmentFileName;
+
+    connect(this, &FileInformation::statsFileGenerated, [&](SharedFile statsFile, const QString& name) {
+        qDebug() << "fileName: " << statsFile.data()->fileName();
+        attachment = statsFile->readAll();
+        attachmentFileName = name + "_";
+    });
+
+    Export_XmlGz(QString(), filters);
+
     FFmpegVideoEncoder encoder;
     int thumbnailsCount = Glue->Thumbnails_Size(0);
     int thumbnailIndex = 0;
@@ -619,13 +630,7 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
             return nullptr;
 
         return Glue->ThumbnailPacket_Get(0, thumbnailIndex++);
-    });
-
-    connect(this, &FileInformation::statsFileGenerated, [&](SharedFile statsFile, const QString& name) {
-        qDebug() << "fileName: " << statsFile.data()->fileName();
-    });
-
-    Export_XmlGz(QString(), filters);
+    }, attachment, attachmentFileName);
 }
 
 //---------------------------------------------------------------------------

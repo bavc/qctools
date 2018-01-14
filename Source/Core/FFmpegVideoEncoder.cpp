@@ -25,6 +25,7 @@ extern "C"
 #endif
 }
 
+#include <cassert>
 #include <functional>
 #include <QDebug>
 
@@ -33,7 +34,8 @@ FFmpegVideoEncoder::FFmpegVideoEncoder(QObject *parent) : QObject(parent)
     av_register_all();
 }
 
-void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, int bitrate, std::function<AVPacket* ()> getPacket)
+void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, int bitrate, std::function<AVPacket* ()> getPacket,
+                                   const QByteArray& attachment, const QString& attachmentName)
 {
     auto filename = video.toStdString();
     AVFormatContext *oc;
@@ -47,8 +49,7 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
 
     // Add the AV_CODEC_ID_MJPEG video stream
     auto codec = avcodec_find_encoder(AV_CODEC_ID_MJPEG);
-    if(!codec)
-    {
+    if(!codec) {
         qDebug() << "Error resolving AV_CODEC_ID_MJPEG codec";
         return;
     }
@@ -61,21 +62,16 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
 
     videoStream->id = oc->nb_streams-1;
 
-    auto c = avcodec_alloc_context3(codec);
-    if (!c) {
+    auto videoEncCtx = avcodec_alloc_context3(codec);
+    if (!videoEncCtx) {
         qDebug() << "Could not alloc an encoding context\n";
         return;
     }
 
-    auto enc = c;
-
-    c->codec_id = AV_CODEC_ID_MJPEG;
-    c->codec_type = AVMEDIA_TYPE_VIDEO;
-
-    c->bit_rate = bitrate;
+    videoEncCtx->bit_rate = bitrate;
     /* Resolution must be a multiple of two. */
-    c->width    = width;
-    c->height   = height;
+    videoEncCtx->width    = width;
+    videoEncCtx->height   = height;
 
     /* timebase: This is the fundamental unit of time (in seconds) in terms
      * of which frame timestamps are represented. For fixed-fps content,
@@ -84,39 +80,73 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
 
     videoStream->time_base.num = 1;
     videoStream->time_base.den = 1;
-    c->time_base = videoStream->time_base;
+    videoEncCtx->time_base = videoStream->time_base;
 
-    c->gop_size      = 1; /* emit one intra frame every twelve frames at most */
-    c->pix_fmt       = AV_PIX_FMT_YUVJ422P;
-    c->max_b_frames  = 0;
+    videoEncCtx->gop_size      = 1; /* emit one intra frame every twelve frames at most */
+    videoEncCtx->pix_fmt       = AV_PIX_FMT_YUVJ422P;
+    videoEncCtx->max_b_frames  = 0;
 
-    if (c->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
+    if (videoEncCtx->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
         /* just for testing, we also add B-frames */
-        c->max_b_frames = 2;
+        videoEncCtx->max_b_frames = 2;
     }
-    if (c->codec_id == AV_CODEC_ID_MPEG1VIDEO) {
+    if (videoEncCtx->codec_id == AV_CODEC_ID_MPEG1VIDEO) {
         /* Needed to avoid using macroblocks in which some coeffs overflow.
          * This does not happen with normal video, it just happens here as
          * the motion of the chroma plane does not match the luma plane. */
-        c->mb_decision = 2;
+        videoEncCtx->mb_decision = 2;
     }
 
     /* Some formats want stream headers to be separate. */
     if (oc->oformat->flags & AVFMT_GLOBALHEADER)
-        c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+        videoEncCtx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
-    int ret = avcodec_open2(c, codec, NULL);
-    if(ret < 0)
-    {
+    int ret =  0;
+
+    ret = avcodec_open2(videoEncCtx, codec, NULL);
+    if(ret < 0) {
         char errbuf[255];
         qDebug() << "Could not open codec: " << av_make_error_string(errbuf, sizeof errbuf, ret) << "\n";
         return;
     }
 
     /* copy the stream parameters to the muxer */
-    ret = avcodec_parameters_from_context(videoStream->codecpar, c);
+    ret = avcodec_parameters_from_context(videoStream->codecpar, videoEncCtx);
 
     av_dump_format(oc, 0, filename.c_str(), 1);
+
+    ///////////////////////////////
+    /// attachements
+
+#if 1
+    AVStream* attachmentStream = avformat_new_stream(oc, NULL);
+    if (!attachmentStream) {
+        qDebug() << "Could not allocate attachment stream\n";
+        return;
+    }
+
+    attachmentStream->id = oc->nb_streams-1;
+
+    AVCodecContext* attachementEncCtx = avcodec_alloc_context3(NULL);
+    if (!attachementEncCtx) {
+        qDebug() << "Error allocating the encoding context.\n";
+        return;
+    }
+
+    attachementEncCtx->codec_type = AVMEDIA_TYPE_ATTACHMENT;
+    attachementEncCtx->codec_id = AV_CODEC_ID_BIN_DATA;
+    attachementEncCtx->extradata = reinterpret_cast<uint8_t*> (const_cast<char*> (attachment.data()));
+    attachementEncCtx->extradata_size = attachment.size();
+    attachementEncCtx->subtitle_header = nullptr;
+    attachementEncCtx->subtitle_header_size = 0;
+
+    /* copy the stream parameters to the muxer */
+    ret = avcodec_parameters_from_context(attachmentStream->codecpar, attachementEncCtx);
+
+    auto attachmentFileName = attachmentName.toStdString();
+    const char* p = strrchr(attachmentFileName.c_str(), '/');
+    av_dict_set(&attachmentStream->metadata, "filename", (p && *p) ? p + 1 : attachmentFileName.c_str(), AV_DICT_DONT_OVERWRITE);
+#endif //
 
     /* open the output file, if needed */
     ret = avio_open(&oc->pb, filename.c_str(), AVIO_FLAG_WRITE);
@@ -131,6 +161,8 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
 
     int i = 0;
 
+    AVPacket newPacket;
+
     while(true)  {
         if(!getPacket)
             break;
@@ -139,8 +171,11 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
         if(!packet)
             break;
 
+        av_init_packet(&newPacket);
+        av_packet_ref(&newPacket, packet);
+
         // packet->flags |= AV_PKT_FLAG_KEY;
-        packet->stream_index = videoStream->index;
+        newPacket.stream_index = videoStream->index;
 
         /*
         packet->pts = i;
@@ -148,9 +183,78 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
         */
 
         ++i;
+
         // av_write_frame(oc, packet);
-        av_interleaved_write_frame(oc, packet);
+        av_interleaved_write_frame(oc, &newPacket);
+        av_packet_unref(&newPacket);
     }
+
+    struct Local {
+        static int writeFrame(AVFormatContext *fmt_ctx, const AVRational *time_base, AVStream *st, AVPacket *pkt) {
+            /* rescale output packet timestamp values from codec to stream timebase */
+            av_packet_rescale_ts(pkt, *time_base, st->time_base);
+            pkt->stream_index = st->index;
+
+            /* Write the compressed frame to the media file. */
+            // log_packet(fmt_ctx, pkt);
+
+            return av_interleaved_write_frame(fmt_ctx, pkt);
+        }
+        static void flushStream(AVFormatContext* oc, AVCodecContext* enc, AVStream* st) {
+            int ret;
+                AVPacket pkt = { 0 };
+                av_init_packet(&pkt);
+
+                ret = avcodec_send_frame(enc, NULL);
+                if (ret < 0) {
+                    char errbuf[255];
+                    qDebug() << "Error encoding video frame: " << av_make_error_string(errbuf, sizeof errbuf, ret);
+                    return;
+                }
+
+                do {
+                    ret = avcodec_receive_packet(enc, &pkt);
+                    if (ret == 0) {
+                        ret = writeFrame(oc, &enc->time_base, st, &pkt);
+                        if (ret < 0) {
+                            char errbuf[255];
+                            fprintf(stderr, "Error while writing video frame: %s\n", av_make_error_string(errbuf, sizeof errbuf, ret));
+                            return;
+                        }
+                    }
+                    else if (ret == AVERROR(EINVAL)) {
+                        char errbuf[255];
+                        fprintf(stderr, "Error while getting video packet: %s\n", av_make_error_string(errbuf, sizeof errbuf, ret));
+                        return;
+                    }
+                }
+                while (ret != AVERROR_EOF) ;
+            }
+    };
+
+    Local::flushStream(oc, videoEncCtx, videoStream);
+    Local::flushStream(oc, attachementEncCtx, attachmentStream);
+
+    //Write file trailer
+    av_write_trailer(oc);
+
+    // dispoe video encoder
+    avcodec_free_context(&videoEncCtx);
+
+    // dispose attachment encoder
+    // can't do avcodec_free_context as we didn't allocate 'extradata' in ffmpeg way, so shouldn't dispose it
+    // ... so just execute internals for avcodec_free_context one-by-one
+
+    avcodec_close(attachementEncCtx);
+    // av_freep(&avctx->extradata); // do not touch 'extradata' !
+    av_freep(&attachementEncCtx->subtitle_header);
+    av_freep(&attachementEncCtx->intra_matrix);
+    av_freep(&attachementEncCtx->inter_matrix);
+    av_freep(&attachementEncCtx->rc_override);
+    av_freep(&attachementEncCtx);
+
+    /* Close the output file. */
+    avio_closep(&oc->pb);
 
     /* free the stream */
     avformat_free_context(oc);
