@@ -113,8 +113,6 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
     /* copy the stream parameters to the muxer */
     ret = avcodec_parameters_from_context(videoStream->codecpar, videoEncCtx);
 
-    av_dump_format(oc, 0, filename.c_str(), 1);
-
     ///////////////////////////////
     /// attachements
 
@@ -146,6 +144,8 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
     const char* p = strrchr(attachmentFileName.c_str(), '/');
     av_dict_set(&attachmentStream->metadata, "filename", (p && *p) ? p + 1 : attachmentFileName.c_str(), AV_DICT_DONT_OVERWRITE);
 #endif //
+
+    av_dump_format(oc, 0, filename.c_str(), 1);
 
     /* open the output file, if needed */
     ret = avio_open(&oc->pb, filename.c_str(), AVIO_FLAG_WRITE);
@@ -183,56 +183,10 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
 
         ++i;
 
-        // av_write_frame(oc, packet);
-        av_interleaved_write_frame(oc, &newPacket);
+        av_write_frame(oc, packet);
+        // av_interleaved_write_frame(oc, &newPacket);
         av_packet_unref(&newPacket);
     }
-
-    struct Local {
-        static int writeFrame(AVFormatContext *fmt_ctx, const AVRational *time_base, AVStream *st, AVPacket *pkt) {
-            /* rescale output packet timestamp values from codec to stream timebase */
-            av_packet_rescale_ts(pkt, *time_base, st->time_base);
-            pkt->stream_index = st->index;
-
-            /* Write the compressed frame to the media file. */
-            // log_packet(fmt_ctx, pkt);
-
-            return av_interleaved_write_frame(fmt_ctx, pkt);
-        }
-        static void flushStream(AVFormatContext* oc, AVCodecContext* enc, AVStream* st) {
-            int ret;
-                AVPacket pkt = { 0 };
-                av_init_packet(&pkt);
-
-                ret = avcodec_send_frame(enc, NULL);
-                if (ret < 0) {
-                    char errbuf[255];
-                    qDebug() << "Error encoding video frame: " << av_make_error_string(errbuf, sizeof errbuf, ret);
-                    return;
-                }
-
-                do {
-                    ret = avcodec_receive_packet(enc, &pkt);
-                    if (ret == 0) {
-                        ret = writeFrame(oc, &enc->time_base, st, &pkt);
-                        if (ret < 0) {
-                            char errbuf[255];
-                            fprintf(stderr, "Error while writing video frame: %s\n", av_make_error_string(errbuf, sizeof errbuf, ret));
-                            return;
-                        }
-                    }
-                    else if (ret == AVERROR(EINVAL)) {
-                        char errbuf[255];
-                        fprintf(stderr, "Error while getting video packet: %s\n", av_make_error_string(errbuf, sizeof errbuf, ret));
-                        return;
-                    }
-                }
-                while (ret != AVERROR_EOF) ;
-            }
-    };
-
-    Local::flushStream(oc, videoEncCtx, videoStream);
-    Local::flushStream(oc, attachementEncCtx, attachmentStream);
 
     //Write file trailer
     av_write_trailer(oc);
