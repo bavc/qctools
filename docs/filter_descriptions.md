@@ -225,7 +225,7 @@ This filter plots the Structural SImilarity Metric between the video in field 1 
 
 ## Interlacement Detection (single frame) {#singleframe}
 
-This filter plots a determined on if the frame appears to be bottom field first (bff), top first field (tff), progressive (prog), or undetermined (und). This assessment uses only adjacent frames to determine the interlacement characteristic. The value is plotted with a half-life of 1, so each frame's interlacement characteric is halved (i.e., it contributes only 0.5 to it's classification) and then plotted. See [http://ffmpeg.org/ffmpeg-filters.html#idet](http://ffmpeg.org/ffmpeg-filters.html#psnr) for more information.
+This filter plots a determined on if the frame appears to be bottom field first (bff), top first field (tff), progressive (prog), or undetermined (und). This assessment uses only adjacent frames to determine the interlacement characteristic. The value is plotted with a half-life of 1, so each frame's interlacement characteristic is halved (i.e., it contributes only 0.5 to it's classification) and then plotted. See [http://ffmpeg.org/ffmpeg-filters.html#idet](http://ffmpeg.org/ffmpeg-filters.html#psnr) for more information.
 
 ## Interlacement Detection (multiple frames) {#multiframe}
 
