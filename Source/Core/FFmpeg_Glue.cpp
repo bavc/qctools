@@ -465,6 +465,8 @@ void FFmpeg_Glue::outputdata::ApplyFilter(const AVFramePtr& sourceFrame)
 
     // Pull filtered frames from the filtergraph 
     FilteredFrame = AVFramePtr(av_frame_alloc(), FilteredFrameDeleter::free);
+    av_frame_copy_props(FilteredFrame.get(), sourceFrame.get());
+
     int GetAnswer = av_buffersink_get_frame(FilterGraph_Sink_Context, FilteredFrame.get()); //TODO: handling of multiple output per input
     if (GetAnswer==AVERROR(EAGAIN) || GetAnswer==AVERROR_EOF)
     {
@@ -509,6 +511,8 @@ void FFmpeg_Glue::outputdata::ApplyScale(const AVFramePtr& sourceFrame)
     };
 
     ScaledFrame = AVFramePtr(av_frame_alloc(), ScaledFrameDeleter::free);
+    av_frame_copy_props(ScaledFrame.get(), sourceFrame.get());
+
     ScaledFrame->width=Width;
     ScaledFrame->height=Height;
 
