@@ -15,7 +15,7 @@ public:
 signals:
 
 public slots:
-    void makeVideo(const QString& video, int width, int height, int bitrate, std::function<AVPacket* ()> getPacket, const QByteArray& attachment, const QString& attachmentName);
+    void makeVideo(const QString& video, int width, int height, int bitrate, int num, int den, std::function<AVPacket* ()> getPacket, const QByteArray& attachment, const QString& attachmentName);
 };
 
 #endif // FFMPEGVIDEOENCODER_H

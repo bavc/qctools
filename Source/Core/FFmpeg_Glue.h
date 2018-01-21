@@ -128,6 +128,7 @@ public:
     int                         OutputThumbnailWidth_Get() const;
     int                         OutputThumbnailHeight_Get() const;
     int                         OutputThumbnailBitRate_Get() const;
+    void                        OutputThumbnailTimeBase_Get(int& num, int& den) const;
 
     QString                     FrameType_Get() const;
     string                      PixFormat_Get();

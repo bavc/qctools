@@ -610,7 +610,7 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
     QByteArray attachment;
     QString attachmentFileName;
 
-    connect(this, &FileInformation::statsFileGenerated, [&](SharedFile statsFile, const QString& name) {
+    auto connection = connect(this, &FileInformation::statsFileGenerated, [&](SharedFile statsFile, const QString& name) {
         qDebug() << "fileName: " << statsFile.data()->fileName();
         attachment = statsFile->readAll();
         attachmentFileName = name + "_";
@@ -622,7 +622,13 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
     int thumbnailsCount = Glue->Thumbnails_Size(0);
     int thumbnailIndex = 0;
 
-    encoder.makeVideo(ExportFileName, Glue->OutputThumbnailWidth_Get(), Glue->OutputThumbnailHeight_Get(), Glue->OutputThumbnailBitRate_Get(), [&]() -> AVPacket* {
+    int num = 0;
+    int den = 0;
+
+    Glue->OutputThumbnailTimeBase_Get(num, den);
+
+    encoder.makeVideo(ExportFileName, Glue->OutputThumbnailWidth_Get(), Glue->OutputThumbnailHeight_Get(), Glue->OutputThumbnailBitRate_Get(), num, den,
+                      [&]() -> AVPacket* {
 
         bool hasNext = thumbnailIndex < thumbnailsCount;
 
@@ -631,6 +637,8 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
 
         return Glue->ThumbnailPacket_Get(0, thumbnailIndex++);
     }, attachment, attachmentFileName);
+
+    disconnect(connection);
 }
 
 //---------------------------------------------------------------------------

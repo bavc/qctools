@@ -2034,6 +2034,19 @@ int FFmpeg_Glue::OutputThumbnailBitRate_Get() const
     return 0;
 }
 
+void FFmpeg_Glue::OutputThumbnailTimeBase_Get(int &num, int &den) const
+{
+    outputdata* OutputData=OutputDatas[0];
+    num = 0;
+    den = 1;
+
+    if (OutputData)
+    {
+        num = OutputData->JpegOutput_CodecContext->time_base.num;
+        den = OutputData->JpegOutput_CodecContext->time_base.den;
+    }
+}
+
 //---------------------------------------------------------------------------
 string FFmpeg_Glue::PixFormat_Get()
 {
