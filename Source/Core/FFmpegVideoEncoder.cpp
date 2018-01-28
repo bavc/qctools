@@ -106,7 +106,8 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
         return;
     }
 
-    videoStream->time_base = videoEncCtx->time_base;
+    videoStream->avg_frame_rate.den = videoEncCtx->time_base.num;
+    videoStream->avg_frame_rate.num = videoEncCtx->time_base.den;
 
     ret = avcodec_open2(videoEncCtx, videoCodec, NULL);
     if(ret < 0) {
