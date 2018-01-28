@@ -275,7 +275,10 @@ void MainWindow::on_Toolbar_visibilityChanged(bool visible)
 //---------------------------------------------------------------------------
 void MainWindow::on_actionImport_XmlGz_Prompt_triggered()
 {
-    QString FileName=QFileDialog::getOpenFileName(this, "Import from .qctools.xml.gz", "", "Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml)", 0, QFileDialog::DontUseNativeDialog);
+    QString FileName=QFileDialog::getOpenFileName(this, "Import from .qctools.xml.gz / .qctools.mkv", "",
+                                                  "Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml);;\
+                                                   Statistic files with thumbnails (*.qctools.mkv)",
+                                                   0, QFileDialog::DontUseNativeDialog);
     if (FileName.size()==0)
         return;
 

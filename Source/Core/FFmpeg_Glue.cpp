@@ -2588,6 +2588,36 @@ string FFmpeg_Glue::FFmpeg_LibsVersion()
     return LibsVersion.str();
 }
 
+QByteArray FFmpeg_Glue::getAttachment(const QString &fileName, QString& attachmentFileName)
+{
+    QByteArray attachment;
+
+    // Open file
+    AVFormatContext* formatContext = nullptr;
+
+    if (avformat_open_input(&formatContext, fileName.toStdString().c_str(), NULL, NULL)>=0)
+    {
+        if (avformat_find_stream_info(formatContext, NULL)>=0)
+        {
+            if(formatContext->nb_streams == 2) {
+                if(formatContext->streams[0]->codec->codec_type == AVMEDIA_TYPE_VIDEO && formatContext->streams[1]->codec->codec_type == AVMEDIA_TYPE_ATTACHMENT) {
+                    auto st = formatContext->streams[1];
+                    if(st->codecpar->extradata_size != 0) {
+                        attachment = QByteArray((const char*) st->codecpar->extradata, st->codecpar->extradata_size);
+                        AVDictionaryEntry *e = av_dict_get(st->metadata, "filename", NULL, 0);
+                        if(e) {
+                            attachmentFileName = e->value;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    avformat_close_input(&formatContext);
+
+    return attachment;
+}
 
 FFmpeg_Glue::Image::Image()
 {

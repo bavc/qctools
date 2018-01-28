@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include <QByteArray>
 #include <QMutex>
+#include <QString>
 using namespace std;
 
 struct AVFormatContext;
@@ -149,7 +150,9 @@ public:
     static string               FFmpeg_Compiler();
     static string               FFmpeg_Configuration();
     static string               FFmpeg_LibsVersion();
- 
+
+    static QByteArray           getAttachment(const QString& fileName, QString& attachmentFileName);
+
     // Actions
     void                        AddInput_Video(size_t FrameCount, int time_base_num, int time_base_den, int Width, int Height, int BitDepth, bool Compression, int TimecodeBCD=-1);
     void                        AddInput_Audio(size_t FrameCount, int time_base_num, int time_base_den, int Samplerate, int BitDepth, int OutputBitDepth, int Channels);

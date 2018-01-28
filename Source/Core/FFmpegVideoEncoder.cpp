@@ -191,7 +191,7 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
     //Write file trailer
     av_write_trailer(oc);
 
-    // dispoe video encoder
+    // dispose video encoder
     avcodec_free_context(&videoEncCtx);
 
     // dispose attachment encoder

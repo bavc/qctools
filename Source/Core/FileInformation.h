@@ -49,7 +49,7 @@ public:
     JobTypes jobType() const;
 
     // Constructor/Destructor
-                                FileInformation             (SignalServer* signalServer, const QString &FileName, activefilters ActiveFilters, activealltracks ActiveAllTracks,
+                                FileInformation             (SignalServer* signalServer, const QString &fileName, activefilters ActiveFilters, activealltracks ActiveAllTracks,
 #ifdef BLACKMAGICDECKLINK_YES
                                                              BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue=NULL,
 #endif //BLACKMAGICDECKLINK_YES
@@ -139,6 +139,8 @@ public:
 
     void setExportFilters(const activefilters& exportFilters);
     bool commentsUpdated() const;
+
+    void readStats(QIODevice& StatsFromExternalData_FileName, bool StatsFromExternalData_FileName_IsCompressed);
 
 public Q_SLOTS:
 
