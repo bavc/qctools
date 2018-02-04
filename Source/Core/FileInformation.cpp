@@ -352,6 +352,10 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         {
             StatsFromExternalData_FileName=FileName + dotXml;
         }
+        else if (QFile::exists(FileName + dotQctoolsDotMkv))
+        {
+            attachment = FFmpeg_Glue::getAttachment(FileName + dotQctoolsDotMkv, StatsFromExternalData_FileName);
+        }
     }
 
     QString shortFileName;
