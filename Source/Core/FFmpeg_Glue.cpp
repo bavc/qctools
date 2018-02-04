@@ -749,6 +749,20 @@ double FFmpeg_Glue::outputdata::GetDAR()
     return 4.0/3.0;
 }
 
+void ensureFFMpegInitialized() {
+    static bool initialized = false;
+
+    if(!initialized)  {
+        qDebug() << "initializing ffmpeg.. .";
+
+        // FFmpeg init
+        av_register_all();
+        avfilter_register_all();
+
+        initialized = true;
+    }
+}
+
 //***************************************************************************
 // Constructor / Destructor
 //***************************************************************************
@@ -763,9 +777,8 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, activealltracks ActiveAllTrac
     // Encode
     Encode_FormatContext(NULL)
 {
-    // FFmpeg init
-    av_register_all();
-    avfilter_register_all();
+    ensureFFMpegInitialized();
+
     //av_log_set_callback(avlog_cb);
     av_log_set_level(AV_LOG_QUIET);
 
@@ -2590,12 +2603,16 @@ string FFmpeg_Glue::FFmpeg_LibsVersion()
 
 QByteArray FFmpeg_Glue::getAttachment(const QString &fileName, QString& attachmentFileName)
 {
+    ensureFFMpegInitialized();
+
     QByteArray attachment;
 
     // Open file
     AVFormatContext* formatContext = nullptr;
+    auto fileNameString = fileName.toStdString();
 
-    if (avformat_open_input(&formatContext, fileName.toStdString().c_str(), NULL, NULL)>=0)
+    auto result = avformat_open_input(&formatContext, fileNameString.c_str(), NULL, NULL);
+    if (result >= 0)
     {
         if (avformat_find_stream_info(formatContext, NULL)>=0)
         {
@@ -2612,6 +2629,9 @@ QByteArray FFmpeg_Glue::getAttachment(const QString &fileName, QString& attachme
                 }
             }
         }
+    } else {
+        char errbuf[255];
+        qDebug() << "Could not open file: " << av_make_error_string(errbuf, sizeof errbuf, result) << "\n";
     }
 
     avformat_close_input(&formatContext);
