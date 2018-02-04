@@ -199,6 +199,27 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "change in luminance that would be used by libavfilter's deflicker filter.",
         ActiveFilter_Video_Deflicker,
     },
+    //entropy
+    {
+        Item_ENTR_Y,     3,    0,    1,  4,  "entr", true,
+        "Entropy\n"
+        "Plots the graylevel entropy of the histogram of the color channels.\n"
+        "A color channel with only a single shade will have entropy of 0,\n"
+        "while a channel using all shades will be 1.",
+        ActiveFilter_Video_Entropy,
+    },
+    //entropy-diff
+    {
+        Item_ENTR_Y_D,   3,    0,    1,  4,  "entr diff", true,
+        "Entropy Difference\n"
+        "Plots the frame-to-frame difference in the graylevel entropy\n"
+        "of the histogram of the color channels. Incoherancy in plotted\n"
+        "values may help indicate a damaged digital tape source (such as\n"
+        "scratched D5 tape) or highlight digital manipulation of the image.\n"
+        "The values should correspond to chaos or discontinuity in the\n"
+        "histogram plot.",
+        ActiveFilter_Video_EntropyDiff,
+    },
     //Item_pkt_duration_time
     {
         Item_pkt_duration_time,     1,    0,    2,  4,  "pkt_duration_time", false,
@@ -299,6 +320,14 @@ const struct per_item VideoPerItem [Item_VideoMax]=
     { Group_IDET_R,    Group_VideoMax,     "neither",       "lavfi.idet.repeated.neither",     2,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_Idet  },
     //DEFL
     { Group_DEFL,      Group_VideoMax,     "flicker",       "lavfi.deflicker.relative_change",     5,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_Deflicker  },
+    //ENTR
+    { Group_ENTR,      Group_VideoMax,     "V ENT",         "lavfi.entropy.normalized_entropy.normal.V",  5,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_Entropy  },
+    { Group_ENTR,      Group_VideoMax,     "U ENT",         "lavfi.entropy.normalized_entropy.normal.U",  5,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_Entropy  },
+    { Group_ENTR,      Group_VideoMax,     "Y ENT",         "lavfi.entropy.normalized_entropy.normal.Y",  5,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_Entropy  },
+    //ENTR-DIFF
+    { Group_ENTRD,     Group_VideoMax,     "V ENT DIF",     "lavfi.entropy.normalized_entropy.diff.V",  5,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_EntropyDiff  },
+    { Group_ENTRD,     Group_VideoMax,     "U ENT DIF",     "lavfi.entropy.normalized_entropy.diff.U",  5,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_EntropyDiff  },
+    { Group_ENTRD,     Group_VideoMax,     "Y ENT DIF",     "lavfi.entropy.normalized_entropy.diff.Y",  5,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_EntropyDiff  },
     // pkt_duration_time & pkt_size
     { Group_pkt_duration_time, Group_VideoMax,     "pkt_duration_time",        "pkt_duration_time", 5,  false,   DBL_MAX, DBL_MAX, (activefilter) -1 },
     { Group_pkt_size,  Group_VideoMax,     "pkt_size",      "pkt_size",                  0,  false,   DBL_MAX, DBL_MAX, (activefilter) -1 },

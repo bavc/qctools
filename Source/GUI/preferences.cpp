@@ -96,6 +96,8 @@ void PreferencesDialog::Load()
     ui->Filters_Video_Ssim->setChecked(ActiveFilters[ActiveFilter_Video_Ssim]);
     ui->Filters_Video_Idet->setChecked(ActiveFilters[ActiveFilter_Video_Idet]);
     ui->Filters_Video_Deflicker->setChecked(ActiveFilters[ActiveFilter_Video_Deflicker]);
+    ui->Filters_Video_Entropy->setChecked(ActiveFilters[ActiveFilter_Video_Entropy]);
+    ui->Filters_Video_EntropyDiff->setChecked(ActiveFilters[ActiveFilter_Video_EntropyDiff]);
     ui->Filters_Audio_EbuR128->setChecked(ActiveFilters[ActiveFilter_Audio_EbuR128]);
     ui->Filters_Audio_aphasemeter->setChecked(ActiveFilters[ActiveFilter_Audio_aphasemeter]);
     ui->Filters_Audio_astats->setChecked(ActiveFilters[ActiveFilter_Audio_astats]);
@@ -145,6 +147,10 @@ void PreferencesDialog::OnAccepted()
         ActiveFilters.set(ActiveFilter_Video_Idet);
     if (ui->Filters_Video_Deflicker->isChecked())
         ActiveFilters.set(ActiveFilter_Video_Deflicker);
+    if (ui->Filters_Video_Entropy->isChecked())
+        ActiveFilters.set(ActiveFilter_Video_Entropy);
+    if (ui->Filters_Video_EntropyDiff->isChecked())
+        ActiveFilters.set(ActiveFilter_Video_EntropyDiff);
     if (ui->Filters_Audio_EbuR128->isChecked())
         ActiveFilters.set(ActiveFilter_Audio_EbuR128);
     if (ui->Filters_Audio_aphasemeter->isChecked())

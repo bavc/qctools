@@ -95,6 +95,8 @@ int Cli::exec(QCoreApplication &a)
                 << "            ssim" << std::endl
                 << "            idet" << std::endl
                 << "            deflicker" << std::endl
+                << "            entropy" << std::endl
+                << "            entropy-diff" << std::endl
                 << std::endl
                 << "-y" << std::endl
                 << "    Force creation of <qctools-report> even if it already exists" << std::endl
@@ -220,6 +222,10 @@ int Cli::exec(QCoreApplication &a)
                 filters |= 1 << ActiveFilter_Video_Idet;
             else if(filterString == "deflicker")
                 filters |= 1 << ActiveFilter_Video_Deflicker;
+            else if(filterString == "entropy")
+                filters |= 1 << ActiveFilter_Video_Entropy;
+            else if(filterString == "entropy-diff")
+                filters |= 1 << ActiveFilter_Video_EntropyDiff;
         }
 
         std::cout << "filters selected: ";
@@ -241,6 +247,10 @@ int Cli::exec(QCoreApplication &a)
             std::cout << "idet" << " ";
         if(filters.test(ActiveFilter_Video_Deflicker))
             std::cout << "deflicker" << " ";
+        if(filters.test(ActiveFilter_Video_Entropy))
+            std::cout << "entropy" << " ";
+        if(filters.test(ActiveFilter_Video_EntropyDiff))
+            std::cout << "entropy-diff" << " ";
 
         std::cout << std::endl;
     }
