@@ -17,6 +17,9 @@
 
 extern const char* Version;
 
+#define NOT_AVAILABLE "N/A"
+bool isNotAvailable(const char* value);
+
 enum activefilter
 {
     ActiveFilter_Video_signalstats,

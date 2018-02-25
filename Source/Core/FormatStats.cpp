@@ -1,3 +1,4 @@
+#include "Core/Core.h"
 #include "Core/FormatStats.h"
 
 extern "C"
@@ -75,8 +76,8 @@ void FormatStats::writeToXML(QXmlStreamWriter *writer)
     writer->writeAttribute("format_long_name", QString::fromStdString(getFormat_long_name()));
     writer->writeAttribute("start_time", QString::fromStdString(getStart_time()));
     writer->writeAttribute("duration", QString::fromStdString(getDuration()));
-    writer->writeAttribute("size", getSize() > 0 ? QString::number(getSize()) : "N/A");
-    writer->writeAttribute("bit_rate", getBit_rate() > 0 ? QString::number(getBit_rate()) : "N/A");
+    writer->writeAttribute("size", getSize() > 0 ? QString::number(getSize()) : NOT_AVAILABLE);
+    writer->writeAttribute("bit_rate", getBit_rate() > 0 ? QString::number(getBit_rate()) : NOT_AVAILABLE);
     writer->writeAttribute("probe_score", QString::number(getProbe_score()));
 
     writeMetadataToXML(writer);
@@ -230,11 +231,11 @@ bool FormatStats::readFromXML(const char *Data, size_t Size)
                 setStart_time(start_time);
 
             const char* size = format->Attribute("size");
-            if(size)
+            if(size && !isNotAvailable(size))
                 setSize(std::stoi(size));
 
             const char* bit_rate = format->Attribute("bit_rate");
-            if(bit_rate)
+            if(bit_rate && !isNotAvailable(bit_rate))
                 setBit_rate(std::stoi(bit_rate));
 
             const char* probe_score = format->Attribute("probe_score");
