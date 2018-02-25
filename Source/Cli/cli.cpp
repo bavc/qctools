@@ -83,7 +83,8 @@ int Cli::exec(QCoreApplication &a)
                 << "    declared, qctools will create an output named after the input file, suffixed" << std::endl
                 << "    with \".qctools.xml.gz\"." << std::endl
                 << "-f" << std::endl
-                << "    The filters used in " << appName << " may be declared via the qctools-gui (see the" << std::endl
+                << "    Specifies '+'-separated string of filters used. Example: -f signalstats+cropdetect" << std::endl
+                << "    The filters used in " << appName << " may also be declared via the qctools-gui (see the" << std::endl
                 << "    Preferences panel)." << std::endl
                 << "        Available filters: " << std::endl
                 << "            signalstats" << std::endl
