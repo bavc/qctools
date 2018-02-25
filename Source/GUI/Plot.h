@@ -296,8 +296,8 @@ public:
             auto & engine = m_engine;
             auto plotGroup = m_plotGroup;
 
-            engine.globalObject().setProperty("yHalf", (m_stats->y_Max[m_plotGroup] - m_stats->y_Min[m_plotGroup]) / 2);
-            autocomplete << QPair<QString, QString>("yHalf", QString("(plot max - plot min) / 2 = %1").arg(engine.globalObject().property("yHalf").toInt()));
+            engine.globalObject().setProperty("yHalf", (::pow(2, bitdepth)) / 2);
+            autocomplete << QPair<QString, QString>("yHalf", QString("2^(bitdepth) / 2 = %1").arg(engine.globalObject().property("yHalf").toInt()));
 
             auto pow2 = engine.evaluate("function(value) { return Math.pow(value, 2); }");
             engine.globalObject().setProperty("pow2", pow2);
