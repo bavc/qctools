@@ -228,33 +228,33 @@ int Cli::exec(QCoreApplication &a)
             else if(filterString == "entropy-diff")
                 filters |= 1 << ActiveFilter_Video_EntropyDiff;
         }
-
-        std::cout << "filters selected: ";
-        if(filters.test(ActiveFilter_Video_signalstats))
-            std::cout << "signalstats" << " ";
-        if(filters.test(ActiveFilter_Video_cropdetect))
-            std::cout << "cropdetect" << " ";
-        if(filters.test(ActiveFilter_Video_Psnr))
-            std::cout << "psnr" << " ";
-        if(filters.test(ActiveFilter_Audio_EbuR128))
-            std::cout << "ebur128" << " ";
-        if(filters.test(ActiveFilter_Audio_aphasemeter))
-            std::cout << "aphasemeter" << " ";
-        if(filters.test(ActiveFilter_Audio_astats))
-            std::cout << "astats" << " ";
-        if(filters.test(ActiveFilter_Video_Ssim))
-            std::cout << "ssim" << " ";
-        if(filters.test(ActiveFilter_Video_Idet))
-            std::cout << "idet" << " ";
-        if(filters.test(ActiveFilter_Video_Deflicker))
-            std::cout << "deflicker" << " ";
-        if(filters.test(ActiveFilter_Video_Entropy))
-            std::cout << "entropy" << " ";
-        if(filters.test(ActiveFilter_Video_EntropyDiff))
-            std::cout << "entropy-diff" << " ";
-
-        std::cout << std::endl;
     }
+
+    std::cout << "filters selected: ";
+    if(filters.test(ActiveFilter_Video_signalstats))
+        std::cout << "signalstats" << " ";
+    if(filters.test(ActiveFilter_Video_cropdetect))
+        std::cout << "cropdetect" << " ";
+    if(filters.test(ActiveFilter_Video_Psnr))
+        std::cout << "psnr" << " ";
+    if(filters.test(ActiveFilter_Audio_EbuR128))
+        std::cout << "ebur128" << " ";
+    if(filters.test(ActiveFilter_Audio_aphasemeter))
+        std::cout << "aphasemeter" << " ";
+    if(filters.test(ActiveFilter_Audio_astats))
+        std::cout << "astats" << " ";
+    if(filters.test(ActiveFilter_Video_Ssim))
+        std::cout << "ssim" << " ";
+    if(filters.test(ActiveFilter_Video_Idet))
+        std::cout << "idet" << " ";
+    if(filters.test(ActiveFilter_Video_Deflicker))
+        std::cout << "deflicker" << " ";
+    if(filters.test(ActiveFilter_Video_Entropy))
+        std::cout << "entropy" << " ";
+    if(filters.test(ActiveFilter_Video_EntropyDiff))
+        std::cout << "entropy-diff" << " ";
+
+    std::cout << std::endl;
 
     info = std::unique_ptr<FileInformation>(new FileInformation(signalServer.get(), input, filters, prefs.activeAllTracks()));
     info->setAutoCheckFileUploaded(false);
