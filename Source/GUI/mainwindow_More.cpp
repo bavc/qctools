@@ -571,7 +571,8 @@ void MainWindow::loadBarchartsProfile(const QString &profile)
 void MainWindow::saveBarchartsProfile(const QString &profileName)
 {
     if(PlotsArea) {
-        auto json = QJsonDocument(PlotsArea->saveBarchartsProfile()).toJson();
+        m_barchartsProfile = QJsonDocument(PlotsArea->saveBarchartsProfile());
+        auto json = m_barchartsProfile.toJson();
         QFile profile(profileName);
         if(profile.open(QIODevice::WriteOnly))  {
             profile.write(json);

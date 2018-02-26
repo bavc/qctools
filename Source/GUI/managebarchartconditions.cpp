@@ -7,7 +7,7 @@
 #include <QMessageBox>
 #include <QUrl>
 
-ManageBarchartConditions::ManageBarchartConditions(BarchartProfilesModel *model, QWidget *parent) :
+ManageBarchartConditions::ManageBarchartConditions(BarchartProfilesModel *model, const QModelIndex& selected, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ManageBarchartConditions)
 {
@@ -15,6 +15,23 @@ ManageBarchartConditions::ManageBarchartConditions(BarchartProfilesModel *model,
     ui->listView->setModel(model);
     ui->profileLocationUrl_label->setText(QString("<a href='%1'>%2</a>")
                                           .arg(QUrl::fromLocalFile(model->absoluteProfilesPath()).toString()).arg(model->absoluteProfilesPath()));
+
+    connect(ui->listView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [&](const QItemSelection &selected, const QItemSelection &deselected) {
+        bool hasSelected = !selected.indexes().isEmpty();
+
+        ui->remove_pushButton->setEnabled(hasSelected);
+        ui->copy_pushButton->setEnabled(hasSelected);
+        ui->rename_pushButton->setEnabled(hasSelected);
+
+        if(hasSelected) {
+            auto isSystem = ui->listView->model()->data(selected.indexes().first(), BarchartProfilesModel::IsSystem).toBool();
+            if(isSystem) {
+                ui->remove_pushButton->setEnabled(false);
+            }
+        }
+    });
+
+    ui->listView->selectionModel()->select(selected, QItemSelectionModel::Select);
 }
 
 ManageBarchartConditions::~ManageBarchartConditions()
@@ -84,7 +101,7 @@ void ManageBarchartConditions::on_add_pushButton_clicked()
     if(profileFileName.isEmpty())
         return;
 
-    if(QFileInfo(profileFileName).exists()) {
+    if(QFileInfo(profileFilePath).exists()) {
         auto answer = QMessageBox::question(this, "Warning", QString("Profile %1 already exists. Do you want to overwrite it?").arg(profileFileName));
         if(answer == QMessageBox::Yes) {
             QFile file(profileFileName);
