@@ -14,7 +14,7 @@ class ManageBarchartConditions : public QDialog
     Q_OBJECT
 
 public:
-    explicit ManageBarchartConditions(BarchartProfilesModel* model, QWidget *parent = 0);
+    explicit ManageBarchartConditions(BarchartProfilesModel* model, const QModelIndex& selected, QWidget *parent = 0);
     ~ManageBarchartConditions();
 
     QString pickDefaultProfileName();

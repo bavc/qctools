@@ -135,7 +135,9 @@ void MainWindow::Ui_Init()
 
     connect(this, &MainWindow::fileSelected, manageBarchartProfiles, &QToolButton::setEnabled);
     connect(manageBarchartProfiles, &QToolButton::clicked, [this, profilesModel] {
-        ManageBarchartConditions manageDialog(profilesModel);
+
+        auto selectionIndex = m_profileSelectorCombobox->model()->index(m_profileSelectorCombobox->currentIndex(), 0);
+        ManageBarchartConditions manageDialog(profilesModel, selectionIndex);
         connect(&manageDialog, &ManageBarchartConditions::newProfile, this, [&](const QString& profileFilePath) {
             auto currentProfileFilePath = m_profileSelectorCombobox->currentData(BarchartProfilesModel::Data).toString();
 
