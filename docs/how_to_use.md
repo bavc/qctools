@@ -94,7 +94,7 @@ Some helpful **keyboard shortcuts** you may want to use are:
 On the right-hand side, users have the ability to toggle between the default graph view and the bar view. Settings may be configured using the "gear" icon to the right of the toggle button.
 
 * y = y value of chart 
-* yMax = (plot max - plot min) / 2
+* yHalf = (2^bitdepth) / 2
 * pow2 = pow2(exponent)
 * pow = pow(base, exponent)
 
