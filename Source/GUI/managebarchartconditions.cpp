@@ -101,7 +101,7 @@ void ManageBarchartConditions::on_add_pushButton_clicked()
     if(profileFileName.isEmpty())
         return;
 
-    if(QFileInfo(profileFileName).exists()) {
+    if(QFileInfo(profileFilePath).exists()) {
         auto answer = QMessageBox::question(this, "Warning", QString("Profile %1 already exists. Do you want to overwrite it?").arg(profileFileName));
         if(answer == QMessageBox::Yes) {
             QFile file(profileFileName);
