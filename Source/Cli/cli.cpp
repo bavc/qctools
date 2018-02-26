@@ -277,7 +277,7 @@ int Cli::exec(QCoreApplication &a)
             indexOfStreamWithKnownTotal = framesCountForAllStreams[i];
     }
 
-    if(!info->hasStats())
+    if(!info->hasStats() || forceOutput)
     {
         // parse
 
