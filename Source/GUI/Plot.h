@@ -471,6 +471,8 @@ private:
     const FileInformation*  m_fileInformation;
 
     bool                    m_barchart;
+    QColor                  m_charBackground;
+    QColor                  m_barchartBackground;
 };
 
 #endif // GUI_Plot_H

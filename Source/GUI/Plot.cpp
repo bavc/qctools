@@ -422,6 +422,8 @@ void Plot::setBarchart(bool value)
     {
         m_barchart = value;
 
+        canvas()->setPalette(m_barchart ? m_barchartBackground : m_charBackground);
+
         updateSymbols();
         initYAxis();
         replot();
@@ -434,8 +436,15 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
     m_type( Type ),
     m_group( Group ),
     m_fileInformation( fileInformation ),
-    m_barchart (false)
+    m_barchart (false),
+    m_charBackground(QColor("Cornsilk"))
 {
+    int h = m_charBackground.hue();
+    int s = m_charBackground.saturation();
+    int v = m_charBackground.value();
+
+    m_barchartBackground = QColor::fromHsv(h + 30, s, v);
+
     setAutoReplot( false );
 
     QwtPlotCanvas* canvas = dynamic_cast<QwtPlotCanvas*>( this->canvas() );
@@ -443,9 +452,7 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
     {
         canvas->setFrameStyle( QFrame::Plain | QFrame::Panel );
         canvas->setLineWidth( 1 );
-#if 1
-        canvas->setPalette( QColor("Cornsilk") );
-#endif
+        canvas->setPalette(m_charBackground);
     }
 
     setAxisMaxMajor( QwtPlot::yLeft, 0 );
