@@ -50,6 +50,76 @@ public:
 };
 
 //---------------------------------------------------------------------------
+void Plots::showEditBarchartProfileDialog(const size_t plotGroup, Plot* plot, const stream_info& streamInfo)
+{
+    QDialog dialog;
+    dialog.setWindowTitle("Edit barchart conditions");
+    QVBoxLayout* grid = new QVBoxLayout;
+    dialog.setLayout(grid);
+
+    QList<QPair<PlotSeriesData*, BarchartConditionEditor*>> pairs;
+
+    int j = streamInfo.PerGroup[plotGroup].Count;
+    while(j-- > 0)
+    {
+        auto conditionEditor = new BarchartConditionEditor(nullptr);
+        PlotSeriesData* data = plot->getData(j);
+
+        data->mutableConditions().updateAll(m_fileInfoData->BitsPerRawSample());
+        auto curve = dynamic_cast<const QwtPlotCurve*>( plot->getCurve(j) );
+
+        QString title = curve->title().text();
+
+        conditionEditor->setLabel(title);
+        conditionEditor->setDefaultColor(curve->pen().color());
+        conditionEditor->setConditions(data->conditions());
+        connect(data, SIGNAL(conditionsUpdated()), conditionEditor, SLOT(onConditionsUpdated()));
+
+        grid->addWidget(conditionEditor, streamInfo.PerGroup[plotGroup].Count - 1 - j);
+
+        pairs.append(QPair<PlotSeriesData*, BarchartConditionEditor*>(data, conditionEditor));
+    }
+
+    auto dialogButtonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
+    connect(dialogButtonBox->button(QDialogButtonBox::Save), SIGNAL(clicked()), &dialog, SLOT(accept()));
+    connect(dialogButtonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), &dialog, SLOT(reject()));
+
+    grid->addWidget(dialogButtonBox, streamInfo.PerGroup[plotGroup].Count);
+    if(QDialog::Accepted == dialog.exec())
+    {
+        for(auto pair : pairs) {
+            auto data = pair.first;
+            auto editor = pair.second;
+
+            if(data->conditions().m_items.size() != editor->conditionsCount())
+            {
+                if(data->conditions().m_items.size() > editor->conditionsCount())
+                {
+                    while(data->conditions().m_items.size() > editor->conditionsCount())
+                        data->mutableConditions().remove();
+                }
+                else
+                {
+                    while(data->conditions().m_items.size() < editor->conditionsCount())
+                        data->mutableConditions().add();
+                }
+            }
+
+            for(auto i = 0; i < editor->conditionsCount(); ++i)
+            {
+                auto conditionInput = editor->getCondition(i);
+                data->mutableConditions().update(i, conditionInput->getCondition(), conditionInput->getColor(),
+                                                 conditionInput->getName(), conditionInput->getEliminateSpikes());
+            }
+        }
+
+        plot->updateSymbols();
+        plot->replot();
+
+        Q_EMIT barchartProfileChanged();
+    }
+}
+
 Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     QWidget( parent ),
     m_zoomFactor ( 0 ),
@@ -117,73 +187,8 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
 
                     QToolButton* barchartConfigButton = new QToolButton();
                     connect(plot, SIGNAL(visibilityChanged(bool)), barchartConfigButton, SLOT(setVisible(bool)));
-                    connect(barchartConfigButton, &QToolButton::clicked, this, [=] {
-                        QDialog dialog;
-                        dialog.setWindowTitle("Edit barchart conditions");
-                        QVBoxLayout* grid = new QVBoxLayout;
-                        dialog.setLayout(grid);
-
-                        QList<QPair<PlotSeriesData*, BarchartConditionEditor*>> pairs;
-
-                        int j = streamInfo.PerGroup[plotGroup].Count;
-                        while(j-- > 0)
-                        {
-                            auto conditionEditor = new BarchartConditionEditor(nullptr);
-                            PlotSeriesData* data = plot->getData(j);
-
-                            data->mutableConditions().updateAll(m_fileInfoData->BitsPerRawSample());
-                            auto curve = dynamic_cast<const QwtPlotCurve*>( plot->getCurve(j) );
-
-                            QString title = curve->title().text();
-
-                            conditionEditor->setLabel(title);
-                            conditionEditor->setDefaultColor(curve->pen().color());
-                            conditionEditor->setConditions(data->conditions());
-                            connect(data, SIGNAL(conditionsUpdated()), conditionEditor, SLOT(onConditionsUpdated()));
-
-                            grid->addWidget(conditionEditor, streamInfo.PerGroup[plotGroup].Count - 1 - j);
-
-                            pairs.append(QPair<PlotSeriesData*, BarchartConditionEditor*>(data, conditionEditor));
-                        }
-
-                        auto dialogButtonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
-                        connect(dialogButtonBox->button(QDialogButtonBox::Save), SIGNAL(clicked()), &dialog, SLOT(accept()));
-                        connect(dialogButtonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), &dialog, SLOT(reject()));
-
-                        grid->addWidget(dialogButtonBox, streamInfo.PerGroup[plotGroup].Count);
-                        if(QDialog::Accepted == dialog.exec())
-                        {
-                            for(auto pair : pairs) {
-                                auto data = pair.first;
-                                auto editor = pair.second;
-
-                                if(data->conditions().m_items.size() != editor->conditionsCount())
-                                {
-                                    if(data->conditions().m_items.size() > editor->conditionsCount())
-                                    {
-                                        while(data->conditions().m_items.size() > editor->conditionsCount())
-                                            data->mutableConditions().remove();
-                                    }
-                                    else
-                                    {
-                                        while(data->conditions().m_items.size() < editor->conditionsCount())
-                                            data->mutableConditions().add();
-                                    }
-                                }
-
-                                for(auto i = 0; i < editor->conditionsCount(); ++i)
-                                {
-                                    auto conditionInput = editor->getCondition(i);
-                                    data->mutableConditions().update(i, conditionInput->getCondition(), conditionInput->getColor(),
-                                                                     conditionInput->getName(), conditionInput->getEliminateSpikes());
-                                }
-                            }
-
-                            plot->updateSymbols();
-                            plot->replot();
-
-                            Q_EMIT barchartProfileChanged();
-                        }
+                    connect(barchartConfigButton, &QToolButton::clicked, [=]() {
+                        showEditBarchartProfileDialog(plotGroup, plot, streamInfo);
                     });
 
                     QToolButton* barchartPlotSwitch = new QToolButton();
@@ -192,19 +197,56 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
 
                     connect(plot, SIGNAL(visibilityChanged(bool)), barchartPlotSwitch, SLOT(setVisible(bool)));
 
+                    QVector<PlotSeriesData*> series;
+                    series.reserve(streamInfo.PerGroup[plotGroup].Count);
+
                     for(size_t j = 0; j < streamInfo.PerGroup[plotGroup].Count; ++j)
                     {
                         size_t yIndex = streamInfo.PerGroup[plotGroup].Start + j;
 
                         auto seriesData = new PlotSeriesData(stats(plot->streamPos()), plot->getCurve(j)->title().text(), m_fileInfoData->BitsPerRawSample(),
                                                              m_dataTypeIndex, yIndex, plotGroup, j, streamInfo.PerGroup[plotGroup].Count);
+                        series.append(seriesData);
                         plot->setData(j, seriesData);
-                        connect(barchartPlotSwitch, SIGNAL(toggled(bool)), seriesData, SLOT(setBarchart(bool)));
                     }
 
-                    connect(barchartPlotSwitch, SIGNAL(toggled(bool)), plot, SLOT(setBarchart(bool)));
-                    connect(barchartPlotSwitch, &QToolButton::toggled, this, [=](bool toggled) {
-                        barchartPlotSwitch->setIcon(toggled ? QIcon(":/icon/chart_chart.png") : QIcon(":/icon/bar_chart.png"));
+                    connect(barchartPlotSwitch, &QToolButton::toggled, [=](bool toggled) {
+
+                        bool switchToBarcharts = toggled;
+                        if(switchToBarcharts) {
+                            bool empty = true;
+                            for(PlotSeriesData* seriesData : series) {
+                                if(!seriesData->conditions().isEmpty()) {
+                                    empty = false;
+                                    break;
+                                }
+                            }
+
+                            if(empty) {
+                                switchToBarcharts = false;
+                                showEditBarchartProfileDialog(plotGroup, plot, streamInfo);
+
+                                for(PlotSeriesData* seriesData : series) {
+                                    if(!seriesData->conditions().isEmpty()) {
+                                        switchToBarcharts = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if(switchToBarcharts != toggled) {
+                            barchartPlotSwitch->blockSignals(true);
+                            barchartPlotSwitch->setChecked(switchToBarcharts);
+                            barchartPlotSwitch->blockSignals(false);
+                        }
+
+                        for(auto& seriesData : series) {
+                            seriesData->setBarchart(switchToBarcharts);
+                        }
+
+                        plot->setBarchart(switchToBarcharts);
+                        barchartPlotSwitch->setIcon(switchToBarcharts ? QIcon(":/icon/chart_chart.png") : QIcon(":/icon/bar_chart.png"));
                     });
 
                     QHBoxLayout* barchartAndConfigurationLayout = new QHBoxLayout();

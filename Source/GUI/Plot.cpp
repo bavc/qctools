@@ -269,8 +269,10 @@ protected:
 
                 const PlotSeriesData* plotSeriesData = static_cast<const PlotSeriesData*>(data());
                 const PlotSeriesData::Condition* lastCondition = plotSeriesData->getLastCondition();
-                assert(lastCondition);
-                p->setBrush(lastCondition->m_color);
+
+                if(lastCondition)
+                    p->setBrush(lastCondition->m_color);
+
                 s.drawSymbols( p, points );
             }
         }
