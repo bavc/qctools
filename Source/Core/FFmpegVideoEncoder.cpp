@@ -28,6 +28,7 @@ extern "C"
 #include <cassert>
 #include <functional>
 #include <QDebug>
+#include <QFileInfo>
 
 FFmpegVideoEncoder::FFmpegVideoEncoder(QObject *parent) : QObject(parent)
 {
@@ -163,6 +164,11 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
     }
 
     /* Write the stream header, if any. */
+    AVDictionary *opts = NULL;
+    QFileInfo file(video);
+    auto fileName = file.fileName().toStdString();
+    av_dict_set(&opts, "title", (std::string("QCTools Report for ") + fileName).c_str(), 0);
+    oc->metadata = opts;
     ret = avformat_write_header(oc, NULL);
 
     int i = 0;
