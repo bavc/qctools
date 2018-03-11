@@ -445,7 +445,7 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
     int s = m_charBackground.saturation();
     int v = m_charBackground.value();
 
-    m_barchartBackground = QColor::fromHsv(h + 30, s, v);
+    m_barchartBackground = QColor::fromHsv(h + 60, s, v);
 
     setAutoReplot( false );
 
