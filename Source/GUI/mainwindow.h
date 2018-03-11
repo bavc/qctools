@@ -259,6 +259,8 @@ private Q_SLOTS:
 
     void on_actionReveal_file_location_triggered();
 
+    void on_actionExport_Mkv_Prompt_triggered();
+
 protected:
     void closeEvent(QCloseEvent* event);
     void resizeEvent(QResizeEvent* event);

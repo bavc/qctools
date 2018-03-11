@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include <QByteArray>
 #include <QMutex>
+#include <QString>
 using namespace std;
 
 struct AVFormatContext;
@@ -89,6 +90,7 @@ public:
         }
     };
 
+    AVPacket*                   ThumbnailPacket_Get(size_t Pos, size_t FramePos);
     QByteArray                  Thumbnail_Get(size_t Pos, size_t FramePos);
     size_t                      Thumbnails_Size(size_t Pos);
     
@@ -124,6 +126,11 @@ public:
     int                         OutputFilterWidth_Get(int Pos);
     int                         OutputFilterHeight_Get(int Pos);
 
+    int                         OutputThumbnailWidth_Get() const;
+    int                         OutputThumbnailHeight_Get() const;
+    int                         OutputThumbnailBitRate_Get() const;
+    void                        OutputThumbnailTimeBase_Get(int& num, int& den) const;
+
     QString                     FrameType_Get() const;
     string                      PixFormat_Get();
     string                      ColorSpace_Get();
@@ -143,7 +150,9 @@ public:
     static string               FFmpeg_Compiler();
     static string               FFmpeg_Configuration();
     static string               FFmpeg_LibsVersion();
- 
+
+    static QByteArray           getAttachment(const QString& fileName, QString& attachmentFileName);
+
     // Actions
     void                        AddInput_Video(size_t FrameCount, int time_base_num, int time_base_den, int Width, int Height, int BitDepth, bool Compression, int TimecodeBCD=-1);
     void                        AddInput_Audio(size_t FrameCount, int time_base_num, int time_base_den, int Samplerate, int BitDepth, int OutputBitDepth, int Channels);
@@ -263,12 +272,16 @@ private:
 
         // FFmpeg pointers - Output
         AVCodecContext*         JpegOutput_CodecContext;
-        AVPacket*               JpegOutput_Packet;
 
         // Out
         outputmethod            OutputMethod;
         Image                   image;
-        std::vector<bytes*>     Thumbnails;
+
+        struct AVPacketDeleter {
+            void operator()(AVPacket* packet);
+        };
+
+        std::vector<std::unique_ptr<AVPacket, AVPacketDeleter>>  Thumbnails;
         size_t                  Thumbnails_Modulo;
         CommonStats*            Stats;
 

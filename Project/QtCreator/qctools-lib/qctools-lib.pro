@@ -37,7 +37,8 @@ HEADERS = \
     $$SOURCES_PATH/Core/FileInformation.h \
     $$SOURCES_PATH/Core/SignalServerConnectionChecker.h \
     $$SOURCES_PATH/Core/SignalServer.h \
-    $$SOURCES_PATH/Core/Preferences.h
+    $$SOURCES_PATH/Core/Preferences.h \
+    $$SOURCES_PATH/Core/FFmpegVideoEncoder.h
 
 
 SOURCES = \
@@ -58,7 +59,8 @@ SOURCES = \
     $$SOURCES_PATH/Core/FileInformation.cpp \
     $$SOURCES_PATH/Core/SignalServerConnectionChecker.cpp \
     $$SOURCES_PATH/Core/SignalServer.cpp \
-    $$SOURCES_PATH/Core/Preferences.cpp
+    $$SOURCES_PATH/Core/Preferences.cpp \
+    $$SOURCES_PATH/Core/FFmpegVideoEncoder.cpp
 
 win32 {
     greaterThan(QT_MAJOR_VERSION, 4): {

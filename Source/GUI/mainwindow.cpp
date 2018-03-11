@@ -275,7 +275,10 @@ void MainWindow::on_Toolbar_visibilityChanged(bool visible)
 //---------------------------------------------------------------------------
 void MainWindow::on_actionImport_XmlGz_Prompt_triggered()
 {
-    QString FileName=QFileDialog::getOpenFileName(this, "Import from .qctools.xml.gz", "", "Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml)", 0, QFileDialog::DontUseNativeDialog);
+    QString FileName=QFileDialog::getOpenFileName(this, "Import from .qctools.xml.gz / .qctools.mkv", "",
+                                                  "Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml);;\
+                                                   Statistic files with thumbnails (*.qctools.mkv)",
+                                                   0, QFileDialog::DontUseNativeDialog);
     if (FileName.size()==0)
         return;
 
@@ -293,6 +296,19 @@ void MainWindow::on_actionExport_XmlGz_Prompt_triggered()
         return;
 
     Files[getFilesCurrentPos()]->Export_XmlGz(FileName, Prefs->ActiveFilters);
+    statusBar()->showMessage("Exported to "+FileName);
+}
+
+void MainWindow::on_actionExport_Mkv_Prompt_triggered()
+{
+    if (getFilesCurrentPos()>=Files.size() || !Files[getFilesCurrentPos()])
+        return;
+
+    QString FileName=QFileDialog::getSaveFileName(this, "Export to .qctools.mkv", Files[getFilesCurrentPos()]->fileName() + ".qctools.mkv", "Statistic files (*.qctools.mkv)", 0, QFileDialog::DontUseNativeDialog);
+    if (FileName.size()==0)
+        return;
+
+    Files[getFilesCurrentPos()]->Export_QCTools_Mkv(FileName, Prefs->ActiveFilters);
     statusBar()->showMessage("Exported to "+FileName);
 }
 

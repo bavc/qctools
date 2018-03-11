@@ -1,5 +1,6 @@
 #include "cli.h"
 #include "version.h"
+#include "Core/FFmpegVideoEncoder.h"
 
 Cli::Cli() : indexOfStreamWithKnownFrameCount(0), statsFileBytesWritten(0), statsFileBytesTotal(0), statsFileBytesUploaded(0), statsFileBytesToUpload(0)
 {
@@ -181,7 +182,10 @@ int Cli::exec(QCoreApplication &a)
             output = input + ".qctools.xml.gz";
     }
 
-    if(!output.isEmpty() && !output.endsWith(".xml.gz"))
+    bool mkvReport = output.endsWith(".qctools.mkv");
+    bool xmlGzReport = output.endsWith(".xml.gz");
+
+    if(!output.isEmpty() && !xmlGzReport && !mkvReport)
     {
         std::cout << "warning: non-standard extension (not *.xml.gz) has been specified for output file. " << std::endl;
     }
@@ -306,10 +310,54 @@ int Cli::exec(QCoreApplication &a)
         progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
         progress->setValue(0);
 
-        QObject::connect(info.get(), SIGNAL(statsFileGenerationProgress(quint64, quint64)), this, SLOT(onStatsFileGenerationProgress(quint64, quint64)));
-        QObject::connect(info.get(), SIGNAL(statsFileGenerated(SharedFile, const QString&)), &a, SLOT(quit()));
+        QObject::connect(info.get(), &FileInformation::statsFileGenerationProgress, this, &Cli::onStatsFileGenerationProgress);
+        QObject::connect(info.get(), &FileInformation::statsFileGenerated, [&](SharedFile statsFile, const QString& name) {
+            if(mkvReport) {
+                QByteArray attachment;
+                QString attachmentFileName;
+
+                qDebug() << "fileName: " << statsFile.data()->fileName();
+                attachment = statsFile->readAll();
+                attachmentFileName = name;
+
+                FFmpegVideoEncoder encoder;
+                int thumbnailsCount = info->Glue->Thumbnails_Size(0);
+                int thumbnailIndex = 0;
+
+                int num = 0;
+                int den = 0;
+
+                std::cout << std::endl << "generating QCTools report with thumbnails... " << std::endl;
+
+                progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
+                progress->setValue(0);
+
+                info->Glue->OutputThumbnailTimeBase_Get(num, den);
+
+                encoder.makeVideo(output, info->Glue->OutputThumbnailWidth_Get(), info->Glue->OutputThumbnailHeight_Get(), info->Glue->OutputThumbnailBitRate_Get(), num, den,
+                                  [&]() -> AVPacket* {
+
+                    bool hasNext = thumbnailIndex < thumbnailsCount;
+
+                    progress->setValue(100 * thumbnailIndex/ thumbnailsCount);
+                    QCoreApplication::processEvents();
+
+                    if(!hasNext)
+                        return nullptr;
+
+                    return info->Glue->ThumbnailPacket_Get(0, thumbnailIndex++);
+                }, attachment, attachmentFileName);
+            }
+
+            a.quit();
+        });
         info->setExportFilters(filters);
-        info->startExport(output);
+
+        if(mkvReport) {
+            info->startExport();
+        } else {
+            info->startExport(output);
+        }
         a.exec();
 
         QObject::disconnect(info.get(), SIGNAL(statsFileGenerationProgress(quint64, quint64)), this, SLOT(onStatsFileGenerationProgress(quint64, quint64)));
@@ -403,8 +451,6 @@ void Cli::onSignalServerUploadProgressChanged(qint64 written, qint64 total)
         progress->setValue(value);
     }
 }
-
-#include "cli.h"
 
 int ProgressBar::getMax() const
 {
