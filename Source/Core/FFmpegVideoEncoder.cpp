@@ -169,6 +169,7 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
     QFileInfo file(video);
     auto fileName = file.fileName().toStdString();
     av_dict_set(&opts, "title", (std::string("QCTools Report for ") + fileName).c_str(), 0);
+    av_dict_set(&opts, "creation_time", "now", 0);
     oc->metadata = opts;
     ret = avformat_write_header(oc, NULL);
 
