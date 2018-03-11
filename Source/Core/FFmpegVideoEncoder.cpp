@@ -151,6 +151,7 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
     auto attachmentFileName = attachmentName.toStdString();
     const char* p = strrchr(attachmentFileName.c_str(), '/');
     av_dict_set(&attachmentStream->metadata, "filename", (p && *p) ? p + 1 : attachmentFileName.c_str(), AV_DICT_DONT_OVERWRITE);
+    av_dict_set(&attachmentStream->metadata, "mimetype", (p && *p) ? p + 1 : "application/x-gzip", AV_DICT_DONT_OVERWRITE);
 #endif //
 
     av_dump_format(oc, 0, filename.c_str(), 1);
