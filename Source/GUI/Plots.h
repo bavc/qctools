@@ -106,6 +106,8 @@ public:
     QJsonObject                 saveBarchartsProfile();
     void                        loadBarchartsProfile(const QJsonObject& profile);
 
+    void showEditBarchartProfileDialog(const size_t plotGroup, Plot* plot, const stream_info& streamInfo);
+
 Q_SIGNALS:
     void                        barchartProfileChanged();
 
