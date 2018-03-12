@@ -35,6 +35,11 @@ FFmpegVideoEncoder::FFmpegVideoEncoder(QObject *parent) : QObject(parent)
     av_register_all();
 }
 
+void FFmpegVideoEncoder::setMetadata(const Metadata &metadata)
+{
+    m_metadata = metadata;
+}
+
 void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, int bitrate, int num, int den, std::function<AVPacket* ()> getPacket,
                                    const QByteArray& attachment, const QString& attachmentName)
 {
@@ -124,7 +129,6 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
     ///////////////////////////////
     /// attachements
 
-#if 1
     AVStream* attachmentStream = avformat_new_stream(oc, NULL);
     if (!attachmentStream) {
         qDebug() << "Could not allocate attachment stream\n";
@@ -151,8 +155,7 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
     auto attachmentFileName = attachmentName.toStdString();
     const char* p = strrchr(attachmentFileName.c_str(), '/');
     av_dict_set(&attachmentStream->metadata, "filename", (p && *p) ? p + 1 : attachmentFileName.c_str(), AV_DICT_DONT_OVERWRITE);
-    av_dict_set(&attachmentStream->metadata, "mimetype", (p && *p) ? p + 1 : "application/x-gzip", AV_DICT_DONT_OVERWRITE);
-#endif //
+    av_dict_set(&attachmentStream->metadata, "mimetype", "application/x-gzip", AV_DICT_DONT_OVERWRITE);
 
     av_dump_format(oc, 0, filename.c_str(), 1);
 
@@ -164,13 +167,11 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
         return;
     }
 
+    for(auto & entry : m_metadata) {
+        av_dict_set(&oc->metadata, entry.first.toStdString().c_str(), entry.second.toStdString().c_str(), 0);
+    }
+
     /* Write the stream header, if any. */
-    AVDictionary *opts = NULL;
-    QFileInfo file(video);
-    auto fileName = file.fileName().toStdString();
-    av_dict_set(&opts, "title", (std::string("QCTools Report for ") + fileName).c_str(), 0);
-    av_dict_set(&opts, "creation_time", "now", 0);
-    oc->metadata = opts;
     ret = avformat_write_header(oc, NULL);
 
     int i = 0;

@@ -24,6 +24,7 @@
 #include <QXmlStreamWriter>
 #include <QUrl>
 #include <QBuffer>
+#include <QPair>
 #include <zlib.h>
 #include <zconf.h>
 
@@ -662,6 +663,11 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
 
     Glue->OutputThumbnailTimeBase_Get(num, den);
 
+    FFmpegVideoEncoder::Metadata metadata;
+    metadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString("QCTools Report for %1").arg(QFileInfo(fileName()).fileName()));
+    metadata << FFmpegVideoEncoder::MetadataEntry(QString("creation_time"), QString("now"));
+
+    encoder.setMetadata(metadata);
     encoder.makeVideo(ExportFileName, Glue->OutputThumbnailWidth_Get(), Glue->OutputThumbnailHeight_Get(), Glue->OutputThumbnailBitRate_Get(), num, den,
                       [&]() -> AVPacket* {
 
