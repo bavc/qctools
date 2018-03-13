@@ -273,6 +273,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     m_jobType(Parsing),
 	streamsStats(NULL),
     formatStats(NULL),
+    m_parsed(false),
     m_autoCheckFileUploaded(true),
     m_autoUpload(true),
     m_hasStats(false),

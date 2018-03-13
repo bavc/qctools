@@ -417,6 +417,8 @@ void MainWindow::addFile(const QString &FileName)
     // Launch analysis
     FileInformation* Temp=new FileInformation(signalServer, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks);
     connect(Temp, SIGNAL(positionChanged()), this, SLOT(Update()), Qt::DirectConnection); // direct connection is required here to get Update called from separate thread
+    connect(Temp, SIGNAL(parsingCompleted(bool)), this, SLOT(updateExportAllAction()));
+
     Temp->setIndex(Files.size());
     Temp->setExportFilters(Prefs->ActiveFilters);
 
@@ -440,6 +442,8 @@ void MainWindow::addFile(
 #endif // BLACKMAGICDECKLINK_YES
                                               FrameCount, Encoding_FileName, Encoding_Format);
     connect(Temp, SIGNAL(positionChanged()), this, SLOT(Update()), Qt::DirectConnection); // direct connection is required here to get Update called from separate thread
+    connect(Temp, SIGNAL(parsingCompleted(bool)), this, SLOT(updateExportAllAction()));
+
     Temp->setIndex(Files.size());
     Temp->setExportFilters(Prefs->ActiveFilters);
 
@@ -456,10 +460,16 @@ void MainWindow::addFile_finish()
     {
         FilesListArea->UpdateAll();
         FilesListArea->show();
+
+        updateExportActions();
+        updateExportAllAction();
     }
     if (Files.size()>1)
     {
         ui->actionFilesList->trigger();
+
+        updateExportActions();
+        updateExportAllAction();
     }
     else
     {
@@ -480,6 +490,9 @@ void MainWindow::selectFile(int NewFilePos)
 {
     setFilesCurrentPos(NewFilePos);
 
+    updateExportActions();
+    updateExportAllAction();
+
     for(int i = 0; i < Files.size(); ++i)
     {
         FileInformation* file = Files[i];
@@ -488,10 +501,12 @@ void MainWindow::selectFile(int NewFilePos)
             connect(file, SIGNAL(signalServerCheckUploadedStatusChanged()), this, SLOT(updateSignalServerCheckUploadedStatus()));
             connect(file, SIGNAL(signalServerUploadStatusChanged()), this, SLOT(updateSignalServerUploadStatus()));
             connect(file, SIGNAL(signalServerUploadProgressChanged(qint64, qint64)), this, SLOT(updateSignalServerUploadProgress(qint64, qint64)));
+            connect(file, SIGNAL(parsingCompleted(bool)), this, SLOT(updateExportActions()));
         } else {
             disconnect(file, SIGNAL(signalServerCheckUploadedStatusChanged()), this, SLOT(updateSignalServerCheckUploadedStatus()));
             disconnect(file, SIGNAL(signalServerUploadStatusChanged()), this, SLOT(updateSignalServerUploadStatus()));
             disconnect(file, SIGNAL(signalServerUploadProgressChanged(qint64, qint64)), this, SLOT(updateSignalServerUploadProgress(qint64, qint64)));
+            disconnect(file, SIGNAL(parsingCompleted(bool)), this, SLOT(updateExportActions()));
         }
     }
 

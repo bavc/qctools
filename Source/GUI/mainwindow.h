@@ -249,6 +249,9 @@ private Q_SLOTS:
     void updateSignalServerUploadStatus();
     void updateSignalServerUploadProgress(qint64, qint64);
 
+    void updateExportActions();
+    void updateExportAllAction();
+
     void on_actionNavigateNextComment_triggered();
 
     void on_actionNavigatePreviousComment_triggered();

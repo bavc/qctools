@@ -834,6 +834,37 @@ void MainWindow::updateSignalServerUploadProgress(qint64 value, qint64 total)
     ui->actionSignalServer_status->setText(QString("Uploading: %1 / %2").arg(value).arg(total));
 }
 
+void MainWindow::updateExportActions()
+{
+    if (getFilesCurrentPos() != (size_t)-1)
+    {
+        auto file = Files[getFilesCurrentPos()];
+        bool parsed = file->parsed();
+        bool hasStats = file->hasStats();
+        bool exportEnabled = hasStats || parsed;
+
+        ui->actionExport_Mkv_Prompt->setEnabled(exportEnabled);
+        ui->actionExport_XmlGz_Custom->setEnabled(exportEnabled);
+        ui->actionExport_XmlGz_Prompt->setEnabled(exportEnabled);
+        ui->actionExport_XmlGz_Sidecar->setEnabled(exportEnabled);
+        ui->actionCSV->setEnabled(exportEnabled);
+    }
+}
+
+void MainWindow::updateExportAllAction()
+{
+    bool allParsedOrHaveStats = true;
+    for(auto i = 0; i < Files.size(); ++i) {
+        bool parsedOrHasStats = Files[i]->parsed() || Files[i]->hasStats();
+        if(!parsedOrHasStats) {
+            allParsedOrHaveStats = parsedOrHasStats;
+            break;
+        }
+    }
+
+    ui->actionExport_XmlGz_SidecarAll->setEnabled(allParsedOrHaveStats);
+}
+
 void MainWindow::on_actionNavigateNextComment_triggered()
 {
     if (getFilesCurrentPos()>=Files.size())
