@@ -1134,7 +1134,9 @@ void FFmpeg_Glue::Seek(size_t FramePos)
             {
                 Seek_TimeStamp=FramePos;
                 Seek_TimeStamp*=InputData->Stream->duration;
-                Seek_TimeStamp/=InputData->FrameCount;  // TODO: seek based on time stamp
+
+                if(InputData->FrameCount != 0)
+                    Seek_TimeStamp/=InputData->FrameCount;  // TODO: seek based on time stamp
             }
     
             // Seek
