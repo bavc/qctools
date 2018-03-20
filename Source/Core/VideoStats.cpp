@@ -470,7 +470,7 @@ int VideoStats::getWidth() const
 
 void VideoStats::setWidth(int width)
 {
-    width = width;
+    this->width = width;
 }
 
 int VideoStats::getHeight() const
@@ -480,7 +480,7 @@ int VideoStats::getHeight() const
 
 void VideoStats::setHeight(int height)
 {
-    height = height;
+    this->height = height;
 }
 
 //---------------------------------------------------------------------------

@@ -1134,7 +1134,9 @@ void FFmpeg_Glue::Seek(size_t FramePos)
             {
                 Seek_TimeStamp=FramePos;
                 Seek_TimeStamp*=InputData->Stream->duration;
-                Seek_TimeStamp/=InputData->FrameCount;  // TODO: seek based on time stamp
+
+                if(InputData->FrameCount != 0)
+                    Seek_TimeStamp/=InputData->FrameCount;  // TODO: seek based on time stamp
             }
     
             // Seek
@@ -2637,6 +2639,12 @@ QByteArray FFmpeg_Glue::getAttachment(const QString &fileName, QString& attachme
     avformat_close_input(&formatContext);
 
     return attachment;
+}
+
+int FFmpeg_Glue::pixelFormatBPP(int pixelFormat)
+{
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get((AVPixelFormat) pixelFormat);
+    return av_get_bits_per_pixel(desc);
 }
 
 FFmpeg_Glue::Image::Image()
