@@ -2639,6 +2639,12 @@ QByteArray FFmpeg_Glue::getAttachment(const QString &fileName, QString& attachme
     return attachment;
 }
 
+int FFmpeg_Glue::pixelFormatBPP(int pixelFormat)
+{
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get((AVPixelFormat) pixelFormat);
+    return av_get_bits_per_pixel(desc);
+}
+
 FFmpeg_Glue::Image::Image()
 {
 
