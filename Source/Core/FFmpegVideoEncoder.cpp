@@ -28,10 +28,16 @@ extern "C"
 #include <cassert>
 #include <functional>
 #include <QDebug>
+#include <QFileInfo>
 
 FFmpegVideoEncoder::FFmpegVideoEncoder(QObject *parent) : QObject(parent)
 {
     av_register_all();
+}
+
+void FFmpegVideoEncoder::setMetadata(const Metadata &metadata)
+{
+    m_metadata = metadata;
 }
 
 void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, int bitrate, int num, int den, std::function<AVPacket* ()> getPacket,
@@ -123,7 +129,6 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
     ///////////////////////////////
     /// attachements
 
-#if 1
     AVStream* attachmentStream = avformat_new_stream(oc, NULL);
     if (!attachmentStream) {
         qDebug() << "Could not allocate attachment stream\n";
@@ -150,7 +155,7 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
     auto attachmentFileName = attachmentName.toStdString();
     const char* p = strrchr(attachmentFileName.c_str(), '/');
     av_dict_set(&attachmentStream->metadata, "filename", (p && *p) ? p + 1 : attachmentFileName.c_str(), AV_DICT_DONT_OVERWRITE);
-#endif //
+    av_dict_set(&attachmentStream->metadata, "mimetype", "application/x-gzip", AV_DICT_DONT_OVERWRITE);
 
     av_dump_format(oc, 0, filename.c_str(), 1);
 
@@ -160,6 +165,10 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, int width, int height, 
         char errbuf[255];
         fprintf(stderr, "Could not open '%s': %s\n", filename.c_str(), av_make_error_string(errbuf, sizeof errbuf, ret));
         return;
+    }
+
+    for(auto & entry : m_metadata) {
+        av_dict_set(&oc->metadata, entry.first.toStdString().c_str(), entry.second.toStdString().c_str(), 0);
     }
 
     /* Write the stream header, if any. */
