@@ -59,7 +59,8 @@ static CommonStreamStats::Metadata extractMetadata(AVDictionary *tags)
 CommonStreamStats::CommonStreamStats(XMLElement *streamElement) :
     stream_index(0),
     codec_tag(0),
-    disposition(0)
+    disposition(0),
+    bits_per_raw_sample(0)
 {
     const char* stream_index_value = streamElement->Attribute("index");
     if(stream_index_value)
@@ -141,6 +142,11 @@ CommonStreamStats::CommonStreamStats(XMLElement *streamElement) :
         }
     }
 
+    const char* bits_per_raw_sample_value = streamElement->Attribute("bits_per_raw_sample");
+    if(bits_per_raw_sample_value) {
+        bits_per_raw_sample = atoi(bits_per_raw_sample_value);
+    }
+
     XMLElement* tag = streamElement->FirstChildElement("tag");
 
     while(tag != NULL)
@@ -169,6 +175,7 @@ CommonStreamStats::CommonStreamStats(AVStream* stream) :
     start_time(stream != NULL ? std::to_string(stream->start_time * av_q2d(stream->time_base)) : ""),
     codec_time_base(stream ? rational_to_string(stream->codec->time_base, '/') : ""),
     disposition(stream ? stream->disposition : 0),
+    bits_per_raw_sample(stream ? stream->codec->bits_per_raw_sample : 0),
     metadata(stream ? extractMetadata(stream->metadata) : Metadata())
 {
 
@@ -299,6 +306,8 @@ void CommonStreamStats::writeStreamInfoToXML(QXmlStreamWriter* writer)
     char buffer[32];
     snprintf(buffer, sizeof(buffer), "0x%04x", getCodec_Tag());
     writer->writeAttribute("codec_tag", QString::fromLatin1(buffer));
+
+    writer->writeAttribute("bits_per_raw_sample", QString::number(getBitsPerRawSample()));
 }
 
 void CommonStreamStats::writeDispositionInfoToXML(QXmlStreamWriter *writer)
@@ -341,4 +350,14 @@ int CommonStreamStats::getDisposition() const
 void CommonStreamStats::setDisposition(int value)
 {
     disposition = value;
+}
+
+int CommonStreamStats::getBitsPerRawSample() const
+{
+    return bits_per_raw_sample;
+}
+
+void CommonStreamStats::setBitsPerRawSample(int value)
+{
+    bits_per_raw_sample = value;
 }
