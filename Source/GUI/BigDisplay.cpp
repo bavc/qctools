@@ -209,7 +209,7 @@ const filter Filters[]=
             { Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
             { Args_Type_YuvA,     0,   0,   0,   0, "Plane" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Vertical" },
-            { Args_Type_Slider,   0,   0,   5,   1, "Filter" },
+            { Args_Type_Slider,   0,   0,   6,   1, "Filter" },
             { Args_Type_Slider,   0,   0,   2,   1, "Scale" },
             { Args_Type_None,     0,   0,   0,   0, },
         },
@@ -1389,6 +1389,8 @@ QString DoubleSpinBoxWithSlider::textFromValue (double value) const
         return "color";
     else if (IsFilter && value==5)
         return "acolor";
+    else if (IsFilter && value==6)
+        return "xflat";
     else if (IsPeak && value==0)
         return "none";
     else if (IsPeak && value==1)
