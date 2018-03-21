@@ -2641,10 +2641,138 @@ QByteArray FFmpeg_Glue::getAttachment(const QString &fileName, QString& attachme
     return attachment;
 }
 
-int FFmpeg_Glue::pixelFormatBPP(int pixelFormat)
+int FFmpeg_Glue::guessBitsPerRawSampleFromFormat(int pixelFormat)
 {
-    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get((AVPixelFormat) pixelFormat);
-    return av_get_bits_per_pixel(desc);
+    switch(pixelFormat) {
+        case AV_PIX_FMT_MONOWHITE:
+        case AV_PIX_FMT_MONOBLACK:
+            return 1;
+
+        case AV_PIX_FMT_RGB444LE:
+        case AV_PIX_FMT_RGB444BE:
+        case AV_PIX_FMT_BGR444LE:
+        case AV_PIX_FMT_BGR444BE:
+            return 4;
+
+        case AV_PIX_FMT_RGB565BE:
+        case AV_PIX_FMT_RGB565LE:
+        case AV_PIX_FMT_RGB555BE:
+        case AV_PIX_FMT_RGB555LE:
+        case AV_PIX_FMT_BGR565BE:
+        case AV_PIX_FMT_BGR565LE:
+        case AV_PIX_FMT_BGR555BE:
+        case AV_PIX_FMT_BGR555LE:
+            return 6;
+
+        case AV_PIX_FMT_YUV420P9BE:
+        case AV_PIX_FMT_YUV420P9LE:
+        case AV_PIX_FMT_YUV444P9BE:
+        case AV_PIX_FMT_YUV444P9LE:
+        case AV_PIX_FMT_YUV422P9BE:
+        case AV_PIX_FMT_YUV422P9LE:
+        case AV_PIX_FMT_GBRP9BE:
+        case AV_PIX_FMT_GBRP9LE:
+        case AV_PIX_FMT_YUVA420P9BE:
+        case AV_PIX_FMT_YUVA420P9LE:
+        case AV_PIX_FMT_YUVA422P9BE:
+        case AV_PIX_FMT_YUVA422P9LE:
+        case AV_PIX_FMT_YUVA444P9BE:
+        case AV_PIX_FMT_YUVA444P9LE:
+        case AV_PIX_FMT_GRAY9BE:
+        case AV_PIX_FMT_GRAY9LE:
+            return 9;
+
+        case AV_PIX_FMT_YUV420P10BE:
+        case AV_PIX_FMT_YUV420P10LE:
+        case AV_PIX_FMT_YUV422P10BE:
+        case AV_PIX_FMT_YUV422P10LE:
+        case AV_PIX_FMT_YUV444P10BE:
+        case AV_PIX_FMT_YUV444P10LE:
+        case AV_PIX_FMT_GBRP10BE:
+        case AV_PIX_FMT_GBRP10LE:
+        case AV_PIX_FMT_YUVA420P10BE:
+        case AV_PIX_FMT_YUVA420P10LE:
+        case AV_PIX_FMT_YUVA422P10BE:
+        case AV_PIX_FMT_YUVA422P10LE:
+        case AV_PIX_FMT_YUVA444P10BE:
+        case AV_PIX_FMT_YUVA444P10LE:
+        case AV_PIX_FMT_YUV440P10LE:
+        case AV_PIX_FMT_YUV440P10BE:
+        case AV_PIX_FMT_GBRAP10BE:
+        case AV_PIX_FMT_GBRAP10LE:
+        case AV_PIX_FMT_GRAY10BE:
+        case AV_PIX_FMT_GRAY10LE:
+            return 10;
+
+        case AV_PIX_FMT_XYZ12LE:
+        case AV_PIX_FMT_XYZ12BE:
+        case AV_PIX_FMT_YUV420P12BE:
+        case AV_PIX_FMT_YUV420P12LE:
+        case AV_PIX_FMT_YUV422P12BE:
+        case AV_PIX_FMT_YUV422P12LE:
+        case AV_PIX_FMT_YUV444P12BE:
+        case AV_PIX_FMT_YUV444P12LE:
+        case AV_PIX_FMT_GBRP12BE:
+        case AV_PIX_FMT_GBRP12LE:
+        case AV_PIX_FMT_YUV440P12LE:
+        case AV_PIX_FMT_YUV440P12BE:
+        case AV_PIX_FMT_GBRAP12BE:
+        case AV_PIX_FMT_GBRAP12LE:
+        case AV_PIX_FMT_GRAY12BE:
+        case AV_PIX_FMT_GRAY12LE:
+            return 12;
+
+        case AV_PIX_FMT_YUV420P14BE:
+        case AV_PIX_FMT_YUV420P14LE:
+        case AV_PIX_FMT_YUV422P14BE:
+        case AV_PIX_FMT_YUV422P14LE:
+        case AV_PIX_FMT_YUV444P14BE:
+        case AV_PIX_FMT_YUV444P14LE:
+        case AV_PIX_FMT_GBRP14BE:
+        case AV_PIX_FMT_GBRP14LE:
+            return 14;
+
+        case AV_PIX_FMT_GRAY16BE:
+        case AV_PIX_FMT_YUV420P16LE:
+        case AV_PIX_FMT_YUV420P16BE:
+        case AV_PIX_FMT_YUV422P16LE:
+        case AV_PIX_FMT_YUV422P16BE:
+        case AV_PIX_FMT_YUV444P16LE:
+        case AV_PIX_FMT_YUV444P16BE:
+        case AV_PIX_FMT_GRAY16LE:
+        case AV_PIX_FMT_RGB48BE:
+        case AV_PIX_FMT_RGB48LE:
+        case AV_PIX_FMT_BGR48BE:
+        case AV_PIX_FMT_BGR48LE:
+        case AV_PIX_FMT_GBRP16BE:
+        case AV_PIX_FMT_GBRP16LE:
+        case AV_PIX_FMT_YUVA420P16BE:
+        case AV_PIX_FMT_YUVA420P16LE:
+        case AV_PIX_FMT_YUVA422P16BE:
+        case AV_PIX_FMT_YUVA422P16LE:
+        case AV_PIX_FMT_YUVA444P16BE:
+        case AV_PIX_FMT_YUVA444P16LE:
+        case AV_PIX_FMT_RGBA64BE:
+        case AV_PIX_FMT_RGBA64LE:
+        case AV_PIX_FMT_BGRA64BE:
+        case AV_PIX_FMT_BGRA64LE:
+        case AV_PIX_FMT_YA16BE:
+        case AV_PIX_FMT_YA16LE:
+        case AV_PIX_FMT_GBRAP16BE:
+        case AV_PIX_FMT_GBRAP16LE:
+        case AV_PIX_FMT_BAYER_BGGR16LE:
+        case AV_PIX_FMT_BAYER_BGGR16BE:
+        case AV_PIX_FMT_BAYER_RGGB16LE:
+        case AV_PIX_FMT_BAYER_RGGB16BE:
+        case AV_PIX_FMT_BAYER_GBRG16LE:
+        case AV_PIX_FMT_BAYER_GBRG16BE:
+        case AV_PIX_FMT_BAYER_GRBG16LE:
+        case AV_PIX_FMT_BAYER_GRBG16BE:
+        case AV_PIX_FMT_AYUV64LE:
+            return 16;
+        default:
+            return 8;
+    }
 }
 
 FFmpeg_Glue::Image::Image()

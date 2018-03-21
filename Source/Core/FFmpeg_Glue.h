@@ -152,7 +152,7 @@ public:
     static string               FFmpeg_LibsVersion();
 
     static QByteArray           getAttachment(const QString& fileName, QString& attachmentFileName);
-    static int                  pixelFormatBPP(int pixelFormat);
+    static int                  guessBitsPerRawSampleFromFormat(int pixelFormat);
 
     // Actions
     void                        AddInput_Video(size_t FrameCount, int time_base_num, int time_base_den, int Width, int Height, int BitDepth, bool Compression, int TimecodeBCD=-1);
