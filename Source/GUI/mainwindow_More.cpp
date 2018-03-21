@@ -53,7 +53,6 @@ void MainWindow::openFile()
     if (List.empty())
         return;
 
-    clearFiles();
     for (int Pos=0; Pos<List.size(); Pos++)
     {
         addFile(List[Pos]);
