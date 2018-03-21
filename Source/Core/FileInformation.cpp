@@ -296,7 +296,6 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     static const QString dotQctoolsDotXmlDotGz = ".qctools.xml.gz";
     static const QString dotQctoolsDotXml = ".qctools.xml";
     static const QString dotXmlDotGz = ".xml.gz";
-    static const QString dotXml = ".xml";
     static const QString dotQctoolsDotMkv = ".qctools.mkv";
 
     QByteArray attachment;
@@ -318,11 +317,6 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         StatsFromExternalData_FileName=FileName;
         FileName.resize(FileName.length() - dotXmlDotGz.length());
         StatsFromExternalData_FileName_IsCompressed=true;
-    }
-    else if (FileName.endsWith(dotXml))
-    {
-        StatsFromExternalData_FileName=FileName;
-        FileName.resize(FileName.length() - dotXml.length());
     }
     else if (FileName.endsWith(dotQctoolsDotMkv))
     {
@@ -349,10 +343,6 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         {
             StatsFromExternalData_FileName=FileName + dotXmlDotGz;
             StatsFromExternalData_FileName_IsCompressed=true;
-        }
-        else if (QFile::exists(FileName + dotXml))
-        {
-            StatsFromExternalData_FileName=FileName + dotXml;
         }
         else if (QFile::exists(FileName + dotQctoolsDotMkv))
         {
