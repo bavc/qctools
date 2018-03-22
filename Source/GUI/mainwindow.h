@@ -73,7 +73,6 @@ public:
     void                        Zoom_Move                   (size_t Begin);
     void                        Zoom_In                     ();
     void                        Zoom_Out                    ();
-    void                        Export_CSV                  ();
     void                        Export_PDF                  ();
     void                        refreshDisplay              ();
     void                        Options_Preferences         ();
@@ -186,8 +185,6 @@ private Q_SLOTS:
     void on_actionExport_XmlGz_SidecarAll_triggered();
 
     void on_actionExport_XmlGz_Custom_triggered();
-
-    void on_actionCSV_triggered();
 
     void on_actionPrint_triggered();
 

@@ -352,12 +352,6 @@ void MainWindow::on_actionExport_XmlGz_Custom_triggered()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_actionCSV_triggered()
-{
-    Export_CSV();
-}
-
-//---------------------------------------------------------------------------
 void MainWindow::on_actionPrint_triggered()
 {
     Export_PDF();
@@ -374,8 +368,6 @@ void MainWindow::on_actionFilesList_triggered()
         ui->actionExport_XmlGz_Sidecar->setVisible(false);
     if (ui->actionExport_XmlGz_Custom)
         ui->actionExport_XmlGz_Custom->setVisible(false);
-    if (ui->actionCSV)
-        ui->actionCSV->setVisible(false);
     if (ui->actionPrint)
         ui->actionPrint->setVisible(false);
     if (ui->actionZoomIn)
@@ -416,8 +408,6 @@ void MainWindow::on_actionGraphsLayout_triggered()
         ui->actionExport_XmlGz_Sidecar->setVisible(true);
     //if (ui->actionExport_XmlGz_Custom) // Not implemented action
     //    ui->actionExport_XmlGz_Custom->setVisible(true);
-    if (ui->actionCSV)
-        ui->actionCSV->setVisible(true);
     if (ui->actionExport_XmlGz_Prompt)
         ui->actionExport_XmlGz_Prompt->setVisible(true);
     //if (ui->actionPrint)
@@ -847,7 +837,6 @@ void MainWindow::updateExportActions()
         ui->actionExport_XmlGz_Custom->setEnabled(exportEnabled);
         ui->actionExport_XmlGz_Prompt->setEnabled(exportEnabled);
         ui->actionExport_XmlGz_Sidecar->setEnabled(exportEnabled);
-        ui->actionCSV->setEnabled(exportEnabled);
     }
 }
 

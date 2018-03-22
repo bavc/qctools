@@ -148,8 +148,6 @@
     <addaction name="actionUploadToSignalServer"/>
     <addaction name="actionUploadToSignalServerAll"/>
     <addaction name="separator"/>
-    <addaction name="actionCSV"/>
-    <addaction name="separator"/>
     <addaction name="actionPrint"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
@@ -303,14 +301,6 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
-   </property>
-  </action>
-  <action name="actionCSV">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>CSV</string>
    </property>
   </action>
   <action name="actionGoTo">

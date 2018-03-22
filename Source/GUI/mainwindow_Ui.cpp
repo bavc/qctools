@@ -94,7 +94,6 @@ void MainWindow::Ui_Init()
     // Icons
     ui->actionOpen->setIcon(QIcon(":/icon/document-open.png"));
     ui->actionBlackmagicDeckLinkCapture->setIcon(QIcon(":/icon/capture_layout.png"));
-    ui->actionCSV->setIcon(QIcon(":/icon/export_csv.png"));
     ui->actionExport_XmlGz_Prompt->setIcon(QIcon(":/icon/export_xml.png"));
     ui->actionPrint->setIcon(QIcon(":/icon/document-print.png"));
     ui->actionZoomIn->setIcon(QIcon(":/icon/zoom-in.png"));
@@ -383,7 +382,6 @@ void MainWindow::configureZoom()
         ui->actionExport_XmlGz_Prompt->setEnabled(!Files.empty());
         ui->actionExport_XmlGz_Sidecar->setEnabled(!Files.empty());
         ui->actionExport_XmlGz_Custom->setEnabled(!Files.empty());
-        ui->actionCSV->setEnabled(!Files.empty());
         //ui->actionPrint->setEnabled(!Files.empty());
         return;
     }
@@ -395,7 +393,6 @@ void MainWindow::configureZoom()
     ui->actionExport_XmlGz_Prompt->setEnabled(true);
     ui->actionExport_XmlGz_Sidecar->setEnabled(true);
     ui->actionExport_XmlGz_Custom->setEnabled(true);
-    ui->actionCSV->setEnabled(true);
     //ui->actionPrint->setEnabled(true);
 }
 
@@ -531,15 +528,6 @@ void MainWindow::updateScrollBar( bool blockSignals )
 
         sb->show();
     }
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::Export_CSV()
-{
-    if (getFilesCurrentPos()>=Files.size() || !Files[getFilesCurrentPos()])
-        return;
-
-    Files[getFilesCurrentPos()]->Export_CSV(QFileDialog::getSaveFileName(this, "Export to CSV", Files[getFilesCurrentPos()]->fileName() + ".qctools.csv", "Statistic files (*.csv)", 0, QFileDialog::DontUseNativeDialog));
 }
 
 //---------------------------------------------------------------------------

@@ -673,20 +673,6 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
     disconnect(connection);
 }
 
-//---------------------------------------------------------------------------
-void FileInformation::Export_CSV (const QString &ExportFileName)
-{
-    if (ExportFileName.isEmpty())
-        return;
-
-    string StatsToExternalData=ReferenceStat()->StatsToCSV(m_exportFilters);
-
-    QFile F(ExportFileName);
-    F.open(QIODevice::WriteOnly|QIODevice::Truncate);
-    F.write(StatsToExternalData.c_str(), StatsToExternalData.size());
-}
-
-
 //***************************************************************************
 // Info
 //***************************************************************************
