@@ -869,7 +869,17 @@ bool FileInformation::isValid() const
 
 int FileInformation::BitsPerRawSample() const
 {
-    return ReferenceStat() ? FFmpeg_Glue::pixelFormatBPP(*ReferenceStat()->pix_fmt) : Glue ? Glue->BitsPerRawSample_Get() : 0;
+    int streamBitsPerRawSample = streamsStats ? streamsStats->bitsPerRawSample() : 0;
+    if(streamBitsPerRawSample != 0)
+        return streamBitsPerRawSample;
+
+    if(Glue)
+        return Glue->BitsPerRawSample_Get();
+
+    if(ReferenceStat())
+        return FFmpeg_Glue::guessBitsPerRawSampleFromFormat(*ReferenceStat()->pix_fmt);
+
+    return 0;
 }
 
 FileInformation::SignalServerCheckUploadedStatus FileInformation::signalServerCheckUploadedStatus() const

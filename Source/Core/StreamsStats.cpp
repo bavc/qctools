@@ -97,3 +97,13 @@ void StreamsStats::writeToXML(QXmlStreamWriter *writer)
     writer->writeEndElement();
 
 }
+
+int StreamsStats::bitsPerRawSample() const
+{
+    for(auto& stream : streams) {
+        if(stream->getBitsPerRawSample() != 0)
+            return stream->getBitsPerRawSample();
+    }
+
+    return 0;
+}

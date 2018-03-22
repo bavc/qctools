@@ -56,6 +56,9 @@ public:
     int getDisposition() const;
     void setDisposition(int value);
 
+    int getBitsPerRawSample() const;
+    void setBitsPerRawSample(int value);
+
     typedef std::list<std::pair<std::string, std::string>> Metadata;
     const Metadata& getMetadata() const;
     void setMetadata(const Metadata &value);
@@ -82,6 +85,7 @@ protected:
     std::string start_time;
 
     int disposition;
+    int bits_per_raw_sample;
     Metadata metadata;
 };
 
