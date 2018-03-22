@@ -63,7 +63,6 @@ public:
     // Dumps
     void                        Export_XmlGz                (const QString &ExportFileName, const activefilters& filters);
     void                        Export_QCTools_Mkv          (const QString &ExportFileName, const activefilters& filters);
-    void                        Export_CSV                  (const QString &ExportFileName);
 
     // Infos
     QByteArray Picture_Get (size_t Pos);
