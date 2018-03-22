@@ -95,6 +95,9 @@
      </item>
      <item>
       <widget class="QSpinBox" name="scalePercentage_spinBox">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
        </property>
