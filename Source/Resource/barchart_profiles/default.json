@@ -9,8 +9,26 @@
                         {
                             "color": "#ff0000",
                             "eliminateSpikes": false,
-                            "label": "",
-                            "value": ""
+                            "label": "At maximum value",
+                            "value": "y == maxval"
+                        },
+                        {
+                            "color": "#0000ff",
+                            "eliminateSpikes": false,
+                            "label": "At minimum value",
+                            "value": "y == minval"
+                        },
+                        {
+                            "color": "#20ffff",
+                            "eliminateSpikes": false,
+                            "label": "Below broadcast range",
+                            "value": "y < broadcastminval"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Above broadcast range",
+                            "value": "y > broadcastmaxval"
                         }
                     ]
                 },
@@ -19,10 +37,28 @@
                     "chartTitle": "Y LOW",
                     "formulas": [
                         {
-                            "color": "#006600",
+                            "color": "#ff0000",
                             "eliminateSpikes": false,
-                            "label": "",
-                            "value": ""
+                            "label": "At maximum value",
+                            "value": "y == maxval"
+                        },
+                        {
+                            "color": "#0000ff",
+                            "eliminateSpikes": false,
+                            "label": "At minimum value",
+                            "value": "y == minval"
+                        },
+                        {
+                            "color": "#20ffff",
+                            "eliminateSpikes": false,
+                            "label": "Below broadcast range",
+                            "value": "y < broadcastminval"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Above broadcast range",
+                            "value": "y > broadcastmaxval"
                         }
                     ]
                 },
@@ -33,8 +69,14 @@
                         {
                             "color": "#000000",
                             "eliminateSpikes": false,
-                            "label": "",
-                            "value": ""
+                            "label": "Very dark",
+                            "value": "y < ( broadcastminval + broadcastminval )"
+                        },
+                        {
+                            "color": "#ffffff",
+                            "eliminateSpikes": false,
+                            "label": "Very bright",
+                            "value": "y > ( broadcastmaxval - broadcastminval )"
                         }
                     ]
                 },
@@ -43,10 +85,28 @@
                     "chartTitle": "Y HIGH",
                     "formulas": [
                         {
-                            "color": "#00ff00",
+                            "color": "#ff0000",
                             "eliminateSpikes": false,
-                            "label": "",
-                            "value": ""
+                            "label": "At maximum value",
+                            "value": "y == maxval"
+                        },
+                        {
+                            "color": "#0000ff",
+                            "eliminateSpikes": false,
+                            "label": "At minimum value",
+                            "value": "y == minval"
+                        },
+                        {
+                            "color": "#20ffff",
+                            "eliminateSpikes": false,
+                            "label": "Below broadcast range",
+                            "value": "y < broadcastminval"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Above broadcast range",
+                            "value": "y > broadcastmaxval"
                         }
                     ]
                 },
@@ -55,22 +115,28 @@
                     "chartTitle": "Y MAX",
                     "formulas": [
                         {
-                            "color": "#2815ff",
-                            "eliminateSpikes": false,
-                            "label": "cool",
-                            "value": "y < yHalf"
-                        },
-                        {
-                            "color": "#ffff5e",
-                            "eliminateSpikes": false,
-                            "label": "even more cool",
-                            "value": "y > yHalf"
-                        },
-                        {
                             "color": "#ff0000",
                             "eliminateSpikes": false,
-                            "label": "the very best",
-                            "value": ""
+                            "label": "At maximum value",
+                            "value": "y == maxval"
+                        },
+                        {
+                            "color": "#0000ff",
+                            "eliminateSpikes": false,
+                            "label": "At minimum value",
+                            "value": "y == minval"
+                        },
+                        {
+                            "color": "#20ffff",
+                            "eliminateSpikes": false,
+                            "label": "Below broadcast range",
+                            "value": "y < broadcastminval"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Above broadcast range",
+                            "value": "y > broadcastmaxval"
                         }
                     ]
                 }
@@ -86,30 +152,150 @@
                     "chartIndex": 0,
                     "chartTitle": "U MIN",
                     "formulas": [
+                        {
+                            "color": "#ff0000",
+                            "eliminateSpikes": false,
+                            "label": "At maximum value",
+                            "value": "y == maxval"
+                        },
+                        {
+                            "color": "#0000ff",
+                            "eliminateSpikes": false,
+                            "label": "At minimum value",
+                            "value": "y == minval"
+                        },
+                        {
+                            "color": "#20ffff",
+                            "eliminateSpikes": false,
+                            "label": "Below broadcast range",
+                            "value": "y < broadcastminval"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Above broadcast range",
+                            "value": "y > broadcastmaxval"
+                        }
                     ]
                 },
                 {
                     "chartIndex": 1,
                     "chartTitle": "U LOW",
                     "formulas": [
+                        {
+                            "color": "#ff0000",
+                            "eliminateSpikes": false,
+                            "label": "At maximum value",
+                            "value": "y == maxval"
+                        },
+                        {
+                            "color": "#0000ff",
+                            "eliminateSpikes": false,
+                            "label": "At minimum value",
+                            "value": "y == minval"
+                        },
+                        {
+                            "color": "#20ffff",
+                            "eliminateSpikes": false,
+                            "label": "Below broadcast range",
+                            "value": "y < broadcastminval"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Above broadcast range",
+                            "value": "y > broadcastmaxval"
+                        }
                     ]
                 },
                 {
                     "chartIndex": 2,
                     "chartTitle": "U AVG",
                     "formulas": [
+                        {
+                            "color": "#ff0000",
+                            "eliminateSpikes": false,
+                            "label": "At maximum value",
+                            "value": "y == maxval"
+                        },
+                        {
+                            "color": "#0000ff",
+                            "eliminateSpikes": false,
+                            "label": "At minimum value",
+                            "value": "y == minval"
+                        },
+                        {
+                            "color": "#20ffff",
+                            "eliminateSpikes": false,
+                            "label": "Below broadcast range",
+                            "value": "y < broadcastminval"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Above broadcast range",
+                            "value": "y > broadcastmaxval"
+                        }
                     ]
                 },
                 {
                     "chartIndex": 3,
                     "chartTitle": "U HIGH",
                     "formulas": [
+                        {
+                            "color": "#ff0000",
+                            "eliminateSpikes": false,
+                            "label": "At maximum value",
+                            "value": "y == maxval"
+                        },
+                        {
+                            "color": "#0000ff",
+                            "eliminateSpikes": false,
+                            "label": "At minimum value",
+                            "value": "y == minval"
+                        },
+                        {
+                            "color": "#20ffff",
+                            "eliminateSpikes": false,
+                            "label": "Below broadcast range",
+                            "value": "y < broadcastminval"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Above broadcast range",
+                            "value": "y > broadcastmaxval"
+                        }
                     ]
                 },
                 {
                     "chartIndex": 4,
                     "chartTitle": "U MAX",
                     "formulas": [
+                        {
+                            "color": "#ff0000",
+                            "eliminateSpikes": false,
+                            "label": "At maximum value",
+                            "value": "y == maxval"
+                        },
+                        {
+                            "color": "#0000ff",
+                            "eliminateSpikes": false,
+                            "label": "At minimum value",
+                            "value": "y == minval"
+                        },
+                        {
+                            "color": "#20ffff",
+                            "eliminateSpikes": false,
+                            "label": "Below broadcast range",
+                            "value": "y < broadcastminval"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Above broadcast range",
+                            "value": "y > broadcastmaxval"
+                        }
                     ]
                 }
             ],
@@ -124,30 +310,150 @@
                     "chartIndex": 0,
                     "chartTitle": "V MIN",
                     "formulas": [
+                        {
+                            "color": "#ff0000",
+                            "eliminateSpikes": false,
+                            "label": "At maximum value",
+                            "value": "y == maxval"
+                        },
+                        {
+                            "color": "#0000ff",
+                            "eliminateSpikes": false,
+                            "label": "At minimum value",
+                            "value": "y == minval"
+                        },
+                        {
+                            "color": "#20ffff",
+                            "eliminateSpikes": false,
+                            "label": "Below broadcast range",
+                            "value": "y < broadcastminval"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Above broadcast range",
+                            "value": "y > broadcastmaxval"
+                        }
                     ]
                 },
                 {
                     "chartIndex": 1,
                     "chartTitle": "V LOW",
                     "formulas": [
+                        {
+                            "color": "#ff0000",
+                            "eliminateSpikes": false,
+                            "label": "At maximum value",
+                            "value": "y == maxval"
+                        },
+                        {
+                            "color": "#0000ff",
+                            "eliminateSpikes": false,
+                            "label": "At minimum value",
+                            "value": "y == minval"
+                        },
+                        {
+                            "color": "#20ffff",
+                            "eliminateSpikes": false,
+                            "label": "Below broadcast range",
+                            "value": "y < broadcastminval"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Above broadcast range",
+                            "value": "y > broadcastmaxval"
+                        }
                     ]
                 },
                 {
                     "chartIndex": 2,
                     "chartTitle": "V AVG",
                     "formulas": [
+                        {
+                            "color": "#ff0000",
+                            "eliminateSpikes": false,
+                            "label": "At maximum value",
+                            "value": "y == maxval"
+                        },
+                        {
+                            "color": "#0000ff",
+                            "eliminateSpikes": false,
+                            "label": "At minimum value",
+                            "value": "y == minval"
+                        },
+                        {
+                            "color": "#20ffff",
+                            "eliminateSpikes": false,
+                            "label": "Below broadcast range",
+                            "value": "y < broadcastminval"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Above broadcast range",
+                            "value": "y > broadcastmaxval"
+                        }
                     ]
                 },
                 {
                     "chartIndex": 3,
                     "chartTitle": "V HIGH",
                     "formulas": [
+                        {
+                            "color": "#ff0000",
+                            "eliminateSpikes": false,
+                            "label": "At maximum value",
+                            "value": "y == maxval"
+                        },
+                        {
+                            "color": "#0000ff",
+                            "eliminateSpikes": false,
+                            "label": "At minimum value",
+                            "value": "y == minval"
+                        },
+                        {
+                            "color": "#20ffff",
+                            "eliminateSpikes": false,
+                            "label": "Below broadcast range",
+                            "value": "y < broadcastminval"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Above broadcast range",
+                            "value": "y > broadcastmaxval"
+                        }
                     ]
                 },
                 {
                     "chartIndex": 4,
                     "chartTitle": "V MAX",
                     "formulas": [
+                        {
+                            "color": "#ff0000",
+                            "eliminateSpikes": false,
+                            "label": "At maximum value",
+                            "value": "y == maxval"
+                        },
+                        {
+                            "color": "#0000ff",
+                            "eliminateSpikes": false,
+                            "label": "At minimum value",
+                            "value": "y == minval"
+                        },
+                        {
+                            "color": "#20ffff",
+                            "eliminateSpikes": false,
+                            "label": "Below broadcast range",
+                            "value": "y < broadcastminval"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Above broadcast range",
+                            "value": "y > broadcastmaxval"
+                        }
                     ]
                 }
             ],
@@ -162,6 +468,30 @@
                     "chartIndex": 0,
                     "chartTitle": "Y DIF",
                     "formulas": [
+                        {
+                            "color": "#800080",
+                            "eliminateSpikes": true,
+                            "label": "Extreme Differences",
+                            "value": "y > 120"
+                        },
+                        {
+                            "color": "#fc0107",
+                            "eliminateSpikes": true,
+                            "label": "Lots of Differences",
+                            "value": "y > 90"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": true,
+                            "label": "So Many Differences",
+                            "value": "y > 60"
+                        },
+                        {
+                            "color": "#fd8008",
+                            "eliminateSpikes": true,
+                            "label": "Differences",
+                            "value": "y > 30"
+                        }
                     ]
                 }
             ],
@@ -176,6 +506,30 @@
                     "chartIndex": 0,
                     "chartTitle": "U DIF",
                     "formulas": [
+                        {
+                            "color": "#800080",
+                            "eliminateSpikes": true,
+                            "label": "Extreme Differences",
+                            "value": "y > 120"
+                        },
+                        {
+                            "color": "#fc0107",
+                            "eliminateSpikes": true,
+                            "label": "Lots of Differences",
+                            "value": "y > 90"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": true,
+                            "label": "So Many Differences",
+                            "value": "y > 60"
+                        },
+                        {
+                            "color": "#fd8008",
+                            "eliminateSpikes": true,
+                            "label": "Differences",
+                            "value": "y > 30"
+                        }
                     ]
                 }
             ],
@@ -190,6 +544,30 @@
                     "chartIndex": 0,
                     "chartTitle": "V DIF",
                     "formulas": [
+                        {
+                            "color": "#800080",
+                            "eliminateSpikes": true,
+                            "label": "Extreme Differences",
+                            "value": "y > 120"
+                        },
+                        {
+                            "color": "#fc0107",
+                            "eliminateSpikes": true,
+                            "label": "Lots of Differences",
+                            "value": "y > 90"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": true,
+                            "label": "So Many Differences",
+                            "value": "y > 60"
+                        },
+                        {
+                            "color": "#fd8008",
+                            "eliminateSpikes": true,
+                            "label": "Differences",
+                            "value": "y > 30"
+                        }
                     ]
                 }
             ],
@@ -205,10 +583,28 @@
                     "chartTitle": "V DIF",
                     "formulas": [
                         {
-                            "color": "#800000",
-                            "eliminateSpikes": false,
-                            "label": "",
-                            "value": ""
+                            "color": "#800080",
+                            "eliminateSpikes": true,
+                            "label": "Extreme Differences",
+                            "value": "y > 120"
+                        },
+                        {
+                            "color": "#fc0107",
+                            "eliminateSpikes": true,
+                            "label": "Lots of Differences",
+                            "value": "y > 90"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": true,
+                            "label": "So Many Differences",
+                            "value": "y > 60"
+                        },
+                        {
+                            "color": "#fd8008",
+                            "eliminateSpikes": true,
+                            "label": "Differences",
+                            "value": "y > 30"
                         }
                     ]
                 },
@@ -217,10 +613,28 @@
                     "chartTitle": "U DIF",
                     "formulas": [
                         {
-                            "color": "#000080",
-                            "eliminateSpikes": false,
-                            "label": "",
-                            "value": ""
+                            "color": "#800080",
+                            "eliminateSpikes": true,
+                            "label": "Extreme Differences",
+                            "value": "y > 120"
+                        },
+                        {
+                            "color": "#fc0107",
+                            "eliminateSpikes": true,
+                            "label": "Lots of Differences",
+                            "value": "y > 90"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": true,
+                            "label": "So Many Differences",
+                            "value": "y > 60"
+                        },
+                        {
+                            "color": "#fd8008",
+                            "eliminateSpikes": true,
+                            "label": "Differences",
+                            "value": "y > 30"
                         }
                     ]
                 },
@@ -229,16 +643,28 @@
                     "chartTitle": "Y DIF",
                     "formulas": [
                         {
-                            "color": "#008000",
+                            "color": "#800080",
                             "eliminateSpikes": true,
-                            "label": "condition1",
-                            "value": "y > 10"
+                            "label": "Extreme Differences",
+                            "value": "y > 120"
                         },
                         {
-                            "color": "#ffaa00",
-                            "eliminateSpikes": false,
-                            "label": "condition2",
-                            "value": "y > 12"
+                            "color": "#fc0107",
+                            "eliminateSpikes": true,
+                            "label": "Lots of Differences",
+                            "value": "y > 90"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": true,
+                            "label": "So Many Differences",
+                            "value": "y > 60"
+                        },
+                        {
+                            "color": "#fd8008",
+                            "eliminateSpikes": true,
+                            "label": "Differences",
+                            "value": "y > 30"
                         }
                     ]
                 }
@@ -254,30 +680,150 @@
                     "chartIndex": 0,
                     "chartTitle": "SAT MIN",
                     "formulas": [
+                        {
+                            "color": "#ff0000",
+                            "eliminateSpikes": false,
+                            "label": "Maximum Saturation",
+                            "value": "y == satmax"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Illegal Saturation",
+                            "value": "y > satyuvmax"
+                        },
+                        {
+                            "color": "#fd8008",
+                            "eliminateSpikes": false,
+                            "label": "Out of Broadcast Range",
+                            "value": "y > satbroadcastmax"
+                        },
+                        {
+                            "color": "#b3b3b3",
+                            "eliminateSpikes": false,
+                            "label": "No color (black and white)",
+                            "value": "y == 0"
+                        }
                     ]
                 },
                 {
                     "chartIndex": 1,
                     "chartTitle": "SAT LOW",
                     "formulas": [
+                        {
+                            "color": "#ff0000",
+                            "eliminateSpikes": false,
+                            "label": "Maximum Saturation",
+                            "value": "y == satmax"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Illegal Saturation",
+                            "value": "y > satyuvmax"
+                        },
+                        {
+                            "color": "#fd8008",
+                            "eliminateSpikes": false,
+                            "label": "Out of Broadcast Range",
+                            "value": "y > satbroadcastmax"
+                        },
+                        {
+                            "color": "#b3b3b3",
+                            "eliminateSpikes": false,
+                            "label": "No color (black and white)",
+                            "value": "y == 0"
+                        }
                     ]
                 },
                 {
                     "chartIndex": 2,
                     "chartTitle": "SAT AVG",
                     "formulas": [
+                        {
+                            "color": "#ff0000",
+                            "eliminateSpikes": false,
+                            "label": "Maximum Saturation",
+                            "value": "y == satmax"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Illegal Saturation",
+                            "value": "y > satyuvmax"
+                        },
+                        {
+                            "color": "#fd8008",
+                            "eliminateSpikes": false,
+                            "label": "Out of Broadcast Range",
+                            "value": "y > satbroadcastmax"
+                        },
+                        {
+                            "color": "#b3b3b3",
+                            "eliminateSpikes": false,
+                            "label": "No color (black and white)",
+                            "value": "y == 0"
+                        }
                     ]
                 },
                 {
                     "chartIndex": 3,
                     "chartTitle": "SAT HIGH",
                     "formulas": [
+                        {
+                            "color": "#ff0000",
+                            "eliminateSpikes": false,
+                            "label": "Maximum Saturation",
+                            "value": "y == satmax"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Illegal Saturation",
+                            "value": "y > satyuvmax"
+                        },
+                        {
+                            "color": "#fd8008",
+                            "eliminateSpikes": false,
+                            "label": "Out of Broadcast Range",
+                            "value": "y > satbroadcastmax"
+                        },
+                        {
+                            "color": "#b3b3b3",
+                            "eliminateSpikes": false,
+                            "label": "No color (black and white)",
+                            "value": "y == 0"
+                        }
                     ]
                 },
                 {
                     "chartIndex": 4,
                     "chartTitle": "SAT MAX",
                     "formulas": [
+                        {
+                            "color": "#ff0000",
+                            "eliminateSpikes": false,
+                            "label": "Maximum Saturation",
+                            "value": "y == satmax"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Illegal Saturation",
+                            "value": "y > satyuvmax"
+                        },
+                        {
+                            "color": "#fd8008",
+                            "eliminateSpikes": false,
+                            "label": "Out of Broadcast Range",
+                            "value": "y > satbroadcastmax"
+                        },
+                        {
+                            "color": "#b3b3b3",
+                            "eliminateSpikes": false,
+                            "label": "No color (black and white)",
+                            "value": "y == 0"
+                        }
                     ]
                 }
             ],
@@ -292,12 +838,84 @@
                     "chartIndex": 0,
                     "chartTitle": "HUE MED",
                     "formulas": [
+                        {
+                            "color": "#21ff06",
+                            "eliminateSpikes": false,
+                            "label": "Near green",
+                            "value": "y>8 && y<=68"
+                        },
+                        {
+                            "color": "#ffff0a",
+                            "eliminateSpikes": false,
+                            "label": "Near yellow",
+                            "value": "y>68 && y<=130"
+                        },
+                        {
+                            "color": "#fc0107",
+                            "eliminateSpikes": false,
+                            "label": "Near red",
+                            "value": "y>130 && y<=189"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Near magenta",
+                            "value": "y>189 && y<=248"
+                        },
+                        {
+                            "color": "#0000ff",
+                            "eliminateSpikes": false,
+                            "label": "Near blue",
+                            "value": "y>248 && y<=310"
+                        },
+                        {
+                            "color": "#20ffff",
+                            "eliminateSpikes": false,
+                            "label": "Near cyan",
+                            "value": "( y>310 && y<=360 ) || y<=8"
+                        }
                     ]
                 },
                 {
                     "chartIndex": 1,
                     "chartTitle": "HUE AVG",
                     "formulas": [
+                        {
+                            "color": "#21ff06",
+                            "eliminateSpikes": false,
+                            "label": "Near green",
+                            "value": "y>8 && y<=68"
+                        },
+                        {
+                            "color": "#ffff0a",
+                            "eliminateSpikes": false,
+                            "label": "Near yellow",
+                            "value": "y>68 && y<=130"
+                        },
+                        {
+                            "color": "#fc0107",
+                            "eliminateSpikes": false,
+                            "label": "Near red",
+                            "value": "y>130 && y<=189"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Near magenta",
+                            "value": "y>189 && y<=248"
+                        },
+                        {
+                            "color": "#0000ff",
+                            "eliminateSpikes": false,
+                            "label": "Near blue",
+                            "value": "y>248 && y<=310"
+                        },
+                        {
+                            "color": "#20ffff",
+                            "eliminateSpikes": false,
+                            "label": "Near cyan",
+                            "value": "( y>310 && y<=360 ) || y<=8"
+                        }
                     ]
                 }
             ],
@@ -340,11 +958,89 @@
                     "chartIndex": 0,
                     "chartTitle": "BRNG",
                     "formulas": [
+                        {
+                            "color": "#20ffff",
+                            "eliminateSpikes": false,
+                            "label": "All in broadcast range",
+                            "value": "y == 0"
+                        },
+                        {
+                            "color": "#fc0107",
+                            "eliminateSpikes": false,
+                            "label": "All out of broadcast range",
+                            "value": "y == 1"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Over 2% out of broadcast range",
+                            "value": "y > 0.2"
+                        }
                     ]
                 }
             ],
             "plotGroup": 11,
             "plotTitle": "BRNG",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "Crop Left",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "Crop Right",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 12,
+            "plotTitle": "CropW",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "Crop Top",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "Crop Bottom",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 13,
+            "plotTitle": "CropH",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "Crop Width",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "Crop Height",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 14,
+            "plotTitle": "CropF",
             "plotType": 0,
             "streamPos": 0
         },
@@ -404,12 +1100,186 @@
             "plotFormulas": [
                 {
                     "chartIndex": 0,
-                    "chartTitle": "pkt_duration_time",
+                    "chartTitle": "SSIMf All",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "SSIMf V",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 2,
+                    "chartTitle": "SSIMf U",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 3,
+                    "chartTitle": "SSIMf Y",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 17,
+            "plotTitle": "SSIMf",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "s.bff",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "s.tff",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 2,
+                    "chartTitle": "s.prog",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 3,
+                    "chartTitle": "s.und",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 18,
+            "plotTitle": "idet S",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "m.bff",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "m.tff",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 2,
+                    "chartTitle": "m.prog",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 3,
+                    "chartTitle": "m.und",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 19,
+            "plotTitle": "idet M",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "bottom",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "top",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 2,
+                    "chartTitle": "neither",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 20,
+            "plotTitle": "idet R",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "V ENT",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "U ENT",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 2,
+                    "chartTitle": "Y ENT",
                     "formulas": [
                     ]
                 }
             ],
             "plotGroup": 22,
+            "plotTitle": "entr",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "V ENT DIF",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 1,
+                    "chartTitle": "U ENT DIF",
+                    "formulas": [
+                    ]
+                },
+                {
+                    "chartIndex": 2,
+                    "chartTitle": "Y ENT DIF",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 23,
+            "plotTitle": "entr diff",
+            "plotType": 0,
+            "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "pkt_duration_time",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 24,
             "plotTitle": "pkt_duration_time",
             "plotType": 0,
             "streamPos": 0
@@ -423,10 +1293,62 @@
                     ]
                 }
             ],
-            "plotGroup": 23,
+            "plotGroup": 25,
             "plotTitle": "pkt_size",
             "plotType": 0,
             "streamPos": 0
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "R128.M",
+                    "formulas": [
+                    ]
+                }
+            ],
+            "plotGroup": 0,
+            "plotTitle": "R.128",
+            "plotType": 1,
+            "streamPos": 1
+        },
+        {
+            "plotFormulas": [
+                {
+                    "chartIndex": 0,
+                    "chartTitle": "Phase",
+                    "formulas": [
+                        {
+                            "color": "#21ff06",
+                            "eliminateSpikes": false,
+                            "label": "Dual Mono",
+                            "value": "y == 1"
+                        },
+                        {
+                            "color": "#fc0107",
+                            "eliminateSpikes": false,
+                            "label": "180 degree out of phase",
+                            "value": "y == -1"
+                        },
+                        {
+                            "color": "#fc02ff",
+                            "eliminateSpikes": false,
+                            "label": "Very out of phase",
+                            "value": "y < -0.1"
+                        },
+                        {
+                            "color": "#996633",
+                            "eliminateSpikes": false,
+                            "label": "Near 90 out of phase",
+                            "value": "y > -0.1 && y < 0.1"
+                        }
+                    ]
+                }
+            ],
+            "plotGroup": 1,
+            "plotTitle": "Audio Phase",
+            "plotType": 1,
+            "streamPos": 1
         },
         {
             "plotFormulas": [
