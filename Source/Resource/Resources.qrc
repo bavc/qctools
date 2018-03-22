@@ -3,7 +3,6 @@
         <file alias="capture_layout.png">capture_layout.png</file>
         <file alias="capture_stop.png">capture_stop.png</file>
         <file alias="document-open.png">document-open.png</file>
-        <file alias="export_csv.png">export_csv.png</file>
         <file alias="export_xml.png">export_xml.png</file>
         <file alias="document-print.png">document-print.png</file>
         <file alias="help.png">help.png</file>

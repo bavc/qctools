@@ -300,43 +300,6 @@ void AudioStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
 }
 
 //---------------------------------------------------------------------------
-string AudioStats::StatsToCSV(const activefilters& filters)
-{
-    stringstream Value;
-    Value<<",,,,,,pts,,,,,,,,,,,,,,,YMIN,YLOW,YAVG,YHIGH,YMAX,UMIN,ULOW,UAVG,UHIGH,UMAX,VMIN,VLOW,VAVG,VHIGH,VMAX,YDIF,UDIF,VDIF,SATMIN,SATLOW,SATAVG,SATHIGH,SATMAX,HUEMED,HUEAVG,TOUT,VREP,BRNG,CROPx1,CROPx2,CROPy1,CROPy2,CROPw,CROPh,MSEy,MSEu,MSEv,PSNRy,PSNRu,PSNRv";
-    #ifdef _WIN32
-        Value<<"\r\n";
-    #else
-        #if defined(__APPLE__) && defined(__MACH__)
-            Value<<"\r";
-        #else
-            Value<<"\n";
-        #endif
-    #endif
-    for (size_t Pos=0; Pos<x_Current; Pos++)
-    {
-        Value<<",,,,,,";
-        Value<<fixed<<setprecision(6)<<x[1][Pos];
-        Value<<",,,,,,,,,,,,,,";
-        for (size_t Pos2=0; Pos2<Item_AudioMax; Pos2++)
-        {
-            Value<<','<<fixed<<setprecision(PerItem[Pos2].DigitsAfterComma)<<y[Pos2][Pos];
-        }
-        #ifdef _WIN32
-            Value<<"\r\n";
-        #else
-            #if defined(__APPLE__) && defined(__MACH__)
-                Value<<"\r";
-            #else
-                Value<<"\n";
-            #endif
-        #endif
-    }
-
-    return Value.str();
-}
-
-//---------------------------------------------------------------------------
 string AudioStats::StatsToXML (const activefilters& filters)
 {
     stringstream Data;

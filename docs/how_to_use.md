@@ -113,11 +113,11 @@ Under situations where QCTools is not able to play back the video in real-time (
 ## Create/Export a Report {#create}
 
 When an analysis (which may be time consuming, depending on the length of the file) is complete the analysis data may then be exported to a compressed XML file for future use. At a later point, the video may be reviewed again simply by opening the XML file--using the **Import** menu, or dragging and dropping the XML into QCTools--instead of having to reload/ reanalyze the video file itself; this process will take considerably less time. Additionally, this file may be opened in other environments such as standard spreadsheet or database applications.
-QCTools also can export analytical metadata per frame in a [CSV](http://en.wikipedia.org/wiki/Comma-separated_values) document but the compressed [XML](http://en.wikipedia.org/wiki/XML) report is recommended since it can be reloaded into QCTools. Please see 'Data Format' tab for more information on the XML file compression and resulting file.
+Please see 'Data Format' tab for more information on the XML file compression and resulting file.
 To **Export**:
 
-*   Navigate to: Export-->To .qctools.xml.gz.../CSV, etc.
-*   Click the 'CSV' icon in the toolbox section of the application.
+*   Navigate to: Export-->To .qctools.xml.gz.
+*   Click the 'XML' icon in the toolbox section of the application.
 
 Both options will prompt you to name your file and select a select a location.
 To **Import**:
