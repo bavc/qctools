@@ -303,8 +303,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     if (FileName.endsWith(dotQctoolsDotXmlDotGz))
     {
         StatsFromExternalData_FileName=FileName;
-
-        StatsFromExternalData_FileName.resize(FileName.length() - dotQctoolsDotXmlDotGz.length());
+        FileName.resize(FileName.length() - dotQctoolsDotXmlDotGz.length());
         StatsFromExternalData_FileName_IsCompressed=true;
     }
     else if (FileName.endsWith(dotQctoolsDotXml))
