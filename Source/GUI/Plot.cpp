@@ -348,11 +348,8 @@ void Plot::initYAxis()
         CommonStats* stat = stats( streamPos() );
         const struct per_group& group = PerStreamType[plotType].PerGroup[plotGroup];
 
-        double yMin = stat->y_Min[plotGroup];
-        double yMax = stat->y_Max[plotGroup];
-
-        if ( ( group.Min != group.Max ) && ( yMax - yMin >= ( group.Max - group.Min) / 2 ) )
-            yMax = group.Max;
+        auto yMin = group.Min;
+        auto yMax = group.Max;
 
         if ( yMin != yMax )
         {
