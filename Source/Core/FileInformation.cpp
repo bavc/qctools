@@ -858,13 +858,16 @@ int FileInformation::BitsPerRawSample() const
     if(streamBitsPerRawSample != 0)
         return streamBitsPerRawSample;
 
-    if(Glue)
+    if(Glue && Glue->BitsPerRawSample_Get() != 0)
         return Glue->BitsPerRawSample_Get();
 
-    if(ReferenceStat())
-        return FFmpeg_Glue::guessBitsPerRawSampleFromFormat(*ReferenceStat()->pix_fmt);
+    if(ReferenceStat()) {
+        auto guessedBitsPerRawSample = FFmpeg_Glue::guessBitsPerRawSampleFromFormat(*ReferenceStat()->pix_fmt);
+        if(guessedBitsPerRawSample != 0)
+            return guessedBitsPerRawSample;
+    }
 
-    return 0;
+    return 8;
 }
 
 FileInformation::SignalServerCheckUploadedStatus FileInformation::signalServerCheckUploadedStatus() const
