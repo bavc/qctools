@@ -154,7 +154,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
             {
                 if (m_fileInfoData->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
                 {
-                    Plot* plot = new Plot( streamPos, type, group, fileInformation, this );
+                    Plot* plot = new Plot( streamPos, type, group, m_fileInfoData, this );
 
                     const size_t plotType = plot->type();
                     const size_t plotGroup = plot->group();
@@ -163,9 +163,6 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                     auto streamInfo = PerStreamType[plotType];
 
                     plot->addGuidelines(m_fileInfoData->BitsPerRawSample());
-
-                    if(type == Type_Video)
-                        adjustGroupMax(group, m_fileInfoData->BitsPerRawSample());
 
                     // we allow to shrink the plot below height of the size hint
                     plot->plotLayout()->setAlignCanvasToScales(false);
@@ -621,22 +618,6 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
     }
 
     return QWidget::eventFilter( object, event );
-}
-
-void Plots::adjustGroupMax(int group, int bitsPerRawSample)
-{
-    int defaultBitsPerRawSample = 8;
-    if(bitsPerRawSample == 0)
-        bitsPerRawSample = defaultBitsPerRawSample;
-
-    if(group == Group_Y || group == Group_U || group == Group_V || group == Group_YDiff || group == Group_UDiff || group == Group_VDiff)
-    {
-        PerStreamType[Type_Video].GetPerGroup(group)->setMax((1 << bitsPerRawSample) - 1);
-    }
-    if(group == Group_Sat)
-    {
-        PerStreamType[Type_Video].GetPerGroup(group)->setMax(sqrt(2) * (1 << bitsPerRawSample) / 2);
-    }
 }
 
 void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)

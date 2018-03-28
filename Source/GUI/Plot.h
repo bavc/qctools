@@ -473,6 +473,9 @@ private:
     const QwtPlotCurve* curve( int index ) const;
     QColor curveColor( int index ) const;
 
+    QJSValue                m_maxValue;
+    QJSValue                m_minValue;
+    QJSEngine               m_engine;
     const size_t            m_streamPos;
     const size_t            m_type;
     const size_t            m_group;

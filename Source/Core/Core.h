@@ -41,18 +41,15 @@ struct per_group
 {
     const   std::size_t Start; //Item
     const   std::size_t Count;
-    const   double      Min;
-    const   double      Max;
+    const   char*       MinFormula;
+    const   char*       MaxFormula;
     const   double      StepsCount;
     const   char*       Name;
     const   bool        CheckedByDefault;
     const   char*       Description;
     activefilter        ActiveFilterGroup;
-
-    void    setMax(double value) {
-        (const_cast<double&> (Max)) = value;
-    }
 };
+
 struct per_item
 {
     const   std::size_t Group1; //Group
