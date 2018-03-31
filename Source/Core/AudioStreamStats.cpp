@@ -35,8 +35,7 @@ using namespace tinyxml2;
 AudioStreamStats::AudioStreamStats(XMLElement *streamElement) : CommonStreamStats(streamElement),
     sample_rate(0),
     channels(0),
-    bits_per_sample(0),
-    bits_per_raw_sample(0)
+    bits_per_sample(0)
 {
     codec_type = "audio";
 
@@ -59,10 +58,6 @@ AudioStreamStats::AudioStreamStats(XMLElement *streamElement) : CommonStreamStat
     const char* bits_per_sample_value = streamElement->Attribute("bits_per_sample");
     if(bits_per_sample_value)
         bits_per_sample = std::stoi(bits_per_sample_value);
-
-    const char* bits_per_raw_sample_value = streamElement->Attribute("bits_per_raw_sample");
-    if(bits_per_raw_sample_value)
-        bits_per_raw_sample = std::stoi(bits_per_raw_sample_value);
 }
 
 AudioStreamStats::AudioStreamStats(AVStream* stream, AVFormatContext *context) : CommonStreamStats(stream),
@@ -70,8 +65,7 @@ AudioStreamStats::AudioStreamStats(AVStream* stream, AVFormatContext *context) :
     sample_rate(stream != NULL ? stream->codecpar->sample_rate : 0),
     channels(stream != NULL ? stream->codecpar->channels : 0),
     channel_layout(""),
-    bits_per_sample(stream != NULL ? av_get_bits_per_sample(stream->codecpar->codec_id) : 0),
-    bits_per_raw_sample(stream != NULL ? stream->codecpar->bits_per_raw_sample : 0)
+    bits_per_sample(stream != NULL ? av_get_bits_per_sample(stream->codecpar->codec_id) : 0)
 {
     Q_UNUSED(context);
 
@@ -116,7 +110,6 @@ void AudioStreamStats::writeStreamInfoToXML(QXmlStreamWriter *writer)
     writer->writeAttribute("time_base", QString::fromStdString(getTime_base()));
     writer->writeAttribute("start_pts", QString::fromStdString(getStart_pts()));
     writer->writeAttribute("start_time", QString::fromStdString(getStart_time()));
-    writer->writeAttribute("bits_per_raw_sample", QString::number(getBits_per_raw_sample()));
 
     CommonStreamStats::writeDispositionInfoToXML(writer);
     CommonStreamStats::writeMetadataToXML(writer);
@@ -170,14 +163,4 @@ int AudioStreamStats::getBits_per_sample() const
 void AudioStreamStats::setBits_per_sample(int value)
 {
     bits_per_sample = value;
-}
-
-int AudioStreamStats::getBits_per_raw_sample() const
-{
-    return bits_per_raw_sample;
-}
-
-void AudioStreamStats::setBits_per_raw_sample(int value)
-{
-    bits_per_raw_sample = value;
 }

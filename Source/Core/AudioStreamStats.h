@@ -41,16 +41,12 @@ public:
     int getBits_per_sample() const;
     void setBits_per_sample(int value);
 
-    int getBits_per_raw_sample() const;
-    void setBits_per_raw_sample(int value);
-
 private:
     std::string sample_fmt;
     int sample_rate;
     int channels;
     std::string channel_layout;
     int bits_per_sample;
-    int bits_per_raw_sample;
 };
 
 #endif // AudioStreamStats_H
