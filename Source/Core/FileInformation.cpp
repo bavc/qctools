@@ -454,7 +454,6 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
             break;
     if (ReferenceStream_Pos>=Stats.size())
     {
-        Stats.clear();
         ReferenceStream_Pos = 0;
         for (; ReferenceStream_Pos<Stats.size(); ReferenceStream_Pos++)
             if (Stats[ReferenceStream_Pos] && Stats[ReferenceStream_Pos]->Type_Get()==1) //Audio
