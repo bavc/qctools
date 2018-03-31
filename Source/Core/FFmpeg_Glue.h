@@ -135,11 +135,12 @@ public:
     string                      PixFormat_Get();
     string                      ColorSpace_Get();
     string                      ColorRange_Get();
-    int                         BitsPerRawSample_Get();
+    int                         BitsPerRawSample_Get(int streamType = Type_Video);
 
     // Audio information
     string                      AudioFormat_Get();
     string                      SampleFormat_Get();
+    int                         sampleFormat();
     int                         SamplingRate_Get();
     string                      ChannelLayout_Get();
     int                         ABitDepth_Get();
@@ -153,6 +154,10 @@ public:
 
     static QByteArray           getAttachment(const QString& fileName, QString& attachmentFileName);
     static int                  guessBitsPerRawSampleFromFormat(int pixelFormat);
+    static int                  bitsPerAudioSample(int audioFormat);
+    static bool                 isFloatAudioSampleFormat(int audioFormat);
+    static bool                 isSignedAudioSampleFormat(int audioFormat);
+    static bool                 isUnsignedAudioSampleFormat(int audioFormat);
 
     // Actions
     void                        AddInput_Video(size_t FrameCount, int time_base_num, int time_base_den, int Width, int Height, int BitDepth, bool Compression, int TimecodeBCD=-1);

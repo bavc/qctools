@@ -460,11 +460,17 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
     int v = m_charBackground.value();
 
     const struct per_group& group = PerStreamType[m_type].PerGroup[m_group];
-    auto bitsPerRawSample = m_fileInformation->BitsPerRawSample();
+    auto bitsPerRawSample = m_fileInformation->BitsPerRawSample(type());
 
     m_engine.globalObject().setProperty("bitsPerRawSample", bitsPerRawSample);
     m_engine.globalObject().setProperty("two_pow_bitsPerRawSample_minus_one", (1 << bitsPerRawSample) - 1);
     m_engine.globalObject().setProperty("sqrt_pow_bitsPerRawSample_2", sqrt(2) * (1 << bitsPerRawSample) / 2);
+
+    if(m_type == Type_Audio) {
+        auto ranges = m_fileInformation->audioRanges();
+        m_engine.globalObject().setProperty("audio_min", ranges.first);
+        m_engine.globalObject().setProperty("audio_max", ranges.second);
+    }
 
     m_minValue = m_engine.evaluate(group.MinFormula);
     bool isValid = m_minValue.isCallable();

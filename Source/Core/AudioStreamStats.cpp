@@ -38,10 +38,13 @@ AudioStreamStats::AudioStreamStats(XMLElement *streamElement) : CommonStreamStat
     bits_per_sample(0)
 {
     codec_type = "audio";
+    stream_type = AVMEDIA_TYPE_AUDIO;
 
     const char* sample_fmt_value = streamElement->Attribute("sample_fmt");
-    if(sample_fmt_value)
-        sample_fmt = sample_fmt_value;
+    if(sample_fmt_value) {
+        sample_fmt = av_get_sample_fmt(sample_fmt_value);
+        sample_fmt_string = sample_fmt_value;
+    }
 
     const char* sample_rate_value = streamElement->Attribute("sample_rate");
     if(sample_rate_value)
@@ -61,7 +64,7 @@ AudioStreamStats::AudioStreamStats(XMLElement *streamElement) : CommonStreamStat
 }
 
 AudioStreamStats::AudioStreamStats(AVStream* stream, AVFormatContext *context) : CommonStreamStats(stream),
-    sample_fmt(""),
+    sample_fmt_string(""),
     sample_rate(stream != NULL ? stream->codecpar->sample_rate : 0),
     channels(stream != NULL ? stream->codecpar->channels : 0),
     channel_layout(""),
@@ -70,14 +73,16 @@ AudioStreamStats::AudioStreamStats(AVStream* stream, AVFormatContext *context) :
     Q_UNUSED(context);
 
     codec_type = "audio";
+    stream_type = AVMEDIA_TYPE_AUDIO;
 
     if(stream)
     {
-        const char* s = av_get_sample_fmt_name((AVSampleFormat) stream->codecpar->format);
+        sample_fmt = stream->codecpar->format;
+        const char* s = av_get_sample_fmt_name((AVSampleFormat) sample_fmt);
         if (s)
-            sample_fmt = s;
+            sample_fmt_string = s;
         else
-            sample_fmt = "unknown";
+            sample_fmt_string = "unknown";
 
         AVBPrint pbuf;
         av_bprint_init(&pbuf, 1, AV_BPRINT_SIZE_UNLIMITED);
@@ -100,7 +105,7 @@ void AudioStreamStats::writeStreamInfoToXML(QXmlStreamWriter *writer)
 
     assert(writer);
 
-    writer->writeAttribute("sample_fmt", QString::fromStdString(getSample_fmt()));
+    writer->writeAttribute("sample_fmt", QString::fromStdString(getSample_fmt_string()));
     writer->writeAttribute("sample_rate", QString::number(getSample_rate()));
     writer->writeAttribute("channels", QString::number(getChannels()));
     writer->writeAttribute("channel_layout", QString::fromStdString(getChannel_layout()));
@@ -115,14 +120,19 @@ void AudioStreamStats::writeStreamInfoToXML(QXmlStreamWriter *writer)
     CommonStreamStats::writeMetadataToXML(writer);
 }
 
-std::string AudioStreamStats::getSample_fmt() const
+int AudioStreamStats::getSample_fmt() const
 {
     return sample_fmt;
 }
 
-void AudioStreamStats::setSample_fmt(const std::string &value)
+std::string AudioStreamStats::getSample_fmt_string() const
 {
-    sample_fmt = value;
+    return sample_fmt_string;
+}
+
+void AudioStreamStats::setSample_fmt_string(const std::string &value)
+{
+    sample_fmt_string = value;
 }
 
 int AudioStreamStats::getSample_rate() const

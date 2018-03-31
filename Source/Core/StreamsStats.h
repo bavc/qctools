@@ -30,7 +30,8 @@ public:
     bool readFromXML(const char* data, size_t size);
     void writeToXML(QXmlStreamWriter* writer);
 
-    int bitsPerRawSample() const;
+    int bitsPerRawVideoSample() const;
+    int avSampleFormat() const;
 
 private:
     std::list<CommonStreamStatsPtr> streams;

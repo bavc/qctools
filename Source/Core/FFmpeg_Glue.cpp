@@ -2408,11 +2408,11 @@ string FFmpeg_Glue::ColorRange_Get()
     }
 }
 
-int FFmpeg_Glue::BitsPerRawSample_Get()
+int FFmpeg_Glue::BitsPerRawSample_Get(int streamType)
 {
     inputdata* InputData=NULL;
     for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
-        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==streamType)
         {
             InputData=InputDatas[Pos];
             break;
@@ -2470,7 +2470,23 @@ string FFmpeg_Glue::SampleFormat_Get()
             case AV_SAMPLE_FMT_NB: return "number of sample formats";
             default: return string();
         }
-    }
+}
+
+int FFmpeg_Glue::sampleFormat()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_AUDIO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
+        return AV_SAMPLE_FMT_NONE;
+
+    return InputData->Stream->codec->sample_fmt;
+}
 
 //---------------------------------------------------------------------------
 int FFmpeg_Glue::SamplingRate_Get()
@@ -2773,6 +2789,35 @@ int FFmpeg_Glue::guessBitsPerRawSampleFromFormat(int pixelFormat)
         default:
             return 8;
     }
+}
+
+int FFmpeg_Glue::bitsPerAudioSample(int audioFormat)
+{
+    return av_get_bytes_per_sample((AVSampleFormat) audioFormat);
+}
+
+bool FFmpeg_Glue::isFloatAudioSampleFormat(int audioFormat)
+{
+    return audioFormat == AV_SAMPLE_FMT_FLT
+            || audioFormat == AV_SAMPLE_FMT_FLTP
+            || audioFormat == AV_SAMPLE_FMT_DBL
+            || audioFormat == AV_SAMPLE_FMT_DBLP;
+}
+
+bool FFmpeg_Glue::isSignedAudioSampleFormat(int audioFormat)
+{
+    return audioFormat == AV_SAMPLE_FMT_S16
+            || audioFormat == AV_SAMPLE_FMT_S16P
+            || audioFormat == AV_SAMPLE_FMT_S32
+            || audioFormat == AV_SAMPLE_FMT_S32P
+            || audioFormat == AV_SAMPLE_FMT_S64
+            || audioFormat == AV_SAMPLE_FMT_S64P;
+}
+
+bool FFmpeg_Glue::isUnsignedAudioSampleFormat(int audioFormat)
+{
+    return audioFormat == AV_SAMPLE_FMT_U8
+            || audioFormat == AV_SAMPLE_FMT_U8P;
 }
 
 FFmpeg_Glue::Image::Image()
