@@ -71,7 +71,7 @@ macx:LIBS += -liconv \
              -framework CoreFoundation \
              -framework Foundation \
              -framework AppKit \
-             -framework AudioToolBox \
+             -framework AudioToolbox \
              -framework QuartzCore \
              -framework CoreGraphics \
              -framework CoreAudio \
