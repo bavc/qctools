@@ -97,7 +97,9 @@ public:
     FormatStats*                formatStats;
     CommonStats*                ReferenceStat               () const {if (ReferenceStream_Pos<Stats.size()) return Stats[ReferenceStream_Pos]; else return NULL;}
 
-    int                         BitsPerRawSample            () const;
+    int                         BitsPerRawSample            (int streamType = Type_Video) const;
+    int audioSampleFormat() const;
+    QPair<int, int> audioRanges() const;
 
     enum SignalServerCheckUploadedStatus {
         NotChecked,

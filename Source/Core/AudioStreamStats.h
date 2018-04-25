@@ -26,8 +26,10 @@ public:
 
     virtual void writeStreamInfoToXML(QXmlStreamWriter* writer);
 
-    std::string getSample_fmt() const;
-    void setSample_fmt(const std::string &value);
+    int getSample_fmt() const;
+
+    std::string getSample_fmt_string() const;
+    void setSample_fmt_string(const std::string &value);
 
     int getSample_rate() const;
     void setSample_rate(const int &value);
@@ -41,16 +43,13 @@ public:
     int getBits_per_sample() const;
     void setBits_per_sample(int value);
 
-    int getBits_per_raw_sample() const;
-    void setBits_per_raw_sample(int value);
-
 private:
-    std::string sample_fmt;
+    std::string sample_fmt_string;
+    int sample_fmt;
     int sample_rate;
     int channels;
     std::string channel_layout;
     int bits_per_sample;
-    int bits_per_raw_sample;
 };
 
 #endif // AudioStreamStats_H

@@ -207,6 +207,11 @@ std::string CommonStreamStats::getCodec_Type() const
     return codec_type;
 }
 
+int CommonStreamStats::getType() const
+{
+    return stream_type;
+}
+
 std::string CommonStreamStats::getCodec_Time_Base() const
 {
     return codec_time_base;

@@ -12,7 +12,7 @@ struct per_group AudioPerGroup [Group_AudioMax]=
 {
     //R128
     {
-        Item_R128M,             1,  -70,    0,  3,  "R.128",  false,
+        Item_R128M,             1,  "-70",    "0",  3,  "R.128",  false,
         "R 128 refers to a European Broadcasting Union (EBU) specification\n"
         "document governing several loudness parameters, including momentary,\n"
         "integrated, and short-term loudness. QCTools specifically examines momentary\n"
@@ -23,7 +23,7 @@ struct per_group AudioPerGroup [Group_AudioMax]=
     },
     //aphasemeter
     {
-        Item_aphasemeter,       1,  -1,    1,  3,  "Audio Phase",  false,
+        Item_aphasemeter,       1,  "-1",    "1",  3,  "Audio Phase",  false,
         "The audio phase value represents the mean phase of current audio frame. Value is\n"
         "in range [-1, 1]. The -1 means left and right channels are completely out of\n"
         "phase and 1 means channels are in phase.",
@@ -31,7 +31,7 @@ struct per_group AudioPerGroup [Group_AudioMax]=
     },
     //astats levels
     {
-        Item_DC_offset,             3,   -1,    1,  3,  "Levels",  true,
+        Item_DC_offset,             3,   "-1",    "1",  3,  "Levels",  true,
         "For selected audio tracks this graph plots the DC offset (mean\n"
         "amplitude displacement from zero), minimal sample level, and \n"
         "maximum sample level. Note that this value is plotted per audio\n"
@@ -40,7 +40,7 @@ struct per_group AudioPerGroup [Group_AudioMax]=
     },
     //astats diff
     {
-        Item_Min_difference,        3,    0,    1,  3,  "Aud Diffs", false,
+        Item_Min_difference,        3,    "0",    "1",  3,  "Aud Diffs", false,
         "For selected audio tracks this graph plots the minimal difference\n"
         "between two consecutive samples, maximal difference between two\n"
         "consecutive samples. and the mean difference between two consecutive\n"
@@ -52,7 +52,7 @@ struct per_group AudioPerGroup [Group_AudioMax]=
     },
     //astats rms
     {
-        Item_Peak_level,            3,  -70,    0,  3,  "RMS",      false,
+        Item_Peak_level,            3,  "-70",    "0",  3,  "RMS",      false,
         "For selected audio tracks this graph plots the Standard peak and RMS\n"
         "level measured in dBFS and the Peak and trough values for RMS level\n"
         "measured over a short window.  Note that this value is plotted per\n"

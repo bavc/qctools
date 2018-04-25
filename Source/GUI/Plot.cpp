@@ -348,11 +348,25 @@ void Plot::initYAxis()
         CommonStats* stat = stats( streamPos() );
         const struct per_group& group = PerStreamType[plotType].PerGroup[plotGroup];
 
-        double yMin = stat->y_Min[plotGroup];
-        double yMax = stat->y_Max[plotGroup];
+        auto yMin = 0;
+        if(m_minValue.isNull() || m_minValue.isError() || m_minValue.isUndefined()) {
+            yMin = stat->y_Min[plotGroup]; // auto-select min
+        } else {
+            if(m_minValue.isNumber())
+                yMin = m_minValue.toNumber();
+            else if(m_minValue.isCallable())
+                yMin = m_minValue.call().toNumber();
+        }
 
-        if ( ( group.Min != group.Max ) && ( yMax - yMin >= ( group.Max - group.Min) / 2 ) )
-            yMax = group.Max;
+        auto yMax = 0;
+        if(m_maxValue.isNull() || m_maxValue.isError() || m_maxValue.isUndefined()) {
+            yMax = stat->y_Max[plotGroup]; // auto-select min
+        } else {
+            if(m_maxValue.isNumber())
+                yMax = m_maxValue.toNumber();
+            else if(m_maxValue.isCallable())
+                yMax = m_maxValue.call().toNumber();
+        }
 
         if ( yMin != yMax )
         {
@@ -444,6 +458,26 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
     int h = m_charBackground.hue();
     int s = m_charBackground.saturation();
     int v = m_charBackground.value();
+
+    const struct per_group& group = PerStreamType[m_type].PerGroup[m_group];
+    auto bitsPerRawSample = m_fileInformation->BitsPerRawSample(type());
+
+    m_engine.globalObject().setProperty("bitsPerRawSample", bitsPerRawSample);
+    m_engine.globalObject().setProperty("two_pow_bitsPerRawSample_minus_one", (1 << bitsPerRawSample) - 1);
+    m_engine.globalObject().setProperty("sqrt_pow_bitsPerRawSample_2", sqrt(2) * (1 << bitsPerRawSample) / 2);
+
+    if(m_type == Type_Audio) {
+        auto ranges = m_fileInformation->audioRanges();
+        m_engine.globalObject().setProperty("audio_min", ranges.first);
+        m_engine.globalObject().setProperty("audio_max", ranges.second);
+    }
+
+    m_minValue = m_engine.evaluate(group.MinFormula);
+    bool isValid = m_minValue.isCallable();
+    isValid = m_minValue.isError();
+    isValid = m_minValue.isUndefined();
+
+    m_maxValue = m_engine.evaluate(group.MaxFormula);
 
     m_barchartBackground = QColor::fromHsv(h + 60, s, v);
 

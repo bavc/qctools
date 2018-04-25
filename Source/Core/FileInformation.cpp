@@ -851,19 +851,62 @@ bool FileInformation::isValid() const
     return Glue != 0;
 }
 
-int FileInformation::BitsPerRawSample() const
+int FileInformation::BitsPerRawSample(int streamType) const
 {
-    int streamBitsPerRawSample = streamsStats ? streamsStats->bitsPerRawSample() : 0;
-    if(streamBitsPerRawSample != 0)
-        return streamBitsPerRawSample;
+    if(streamType == Type_Video) {
+        int streamBitsPerRawSample = streamsStats ? streamsStats->bitsPerRawVideoSample() : 0;
+        if(streamBitsPerRawSample != 0)
+            return streamBitsPerRawSample;
 
-    if(Glue)
-        return Glue->BitsPerRawSample_Get();
+        if(Glue && Glue->BitsPerRawSample_Get() != 0)
+            return Glue->BitsPerRawSample_Get();
 
-    if(ReferenceStat())
-        return FFmpeg_Glue::guessBitsPerRawSampleFromFormat(*ReferenceStat()->pix_fmt);
+        if(ReferenceStat()) {
+            auto guessedBitsPerRawSample = FFmpeg_Glue::guessBitsPerRawSampleFromFormat(*ReferenceStat()->pix_fmt);
+            if(guessedBitsPerRawSample != 0)
+                return guessedBitsPerRawSample;
+        }
+
+        return 8;
+    } else if(streamType == Type_Audio) {
+
+        int avSampleFormat = streamsStats ? streamsStats->avSampleFormat() : 0;
+        if(avSampleFormat != -1)
+            return FFmpeg_Glue::bitsPerAudioSample(avSampleFormat) * 8;
+
+        if(Glue && Glue->sampleFormat() != -1)
+            return FFmpeg_Glue::bitsPerAudioSample(Glue->sampleFormat()) * 8;
+    }
 
     return 0;
+}
+
+int FileInformation::audioSampleFormat() const
+{
+    int avSampleFormat = streamsStats ? streamsStats->avSampleFormat() : 0;
+    if(avSampleFormat != -1)
+        return avSampleFormat;
+
+    if(Glue && Glue->sampleFormat() != -1)
+        return Glue->sampleFormat();
+
+    return -1;
+}
+
+QPair<int, int> FileInformation::audioRanges() const
+{
+    auto sampleFormat = audioSampleFormat();
+    if(FFmpeg_Glue::isFloatAudioSampleFormat(sampleFormat)) {
+        return QPair<int, int>(-1, 1);
+    } else if(FFmpeg_Glue::isSignedAudioSampleFormat(sampleFormat)) {
+        auto bprs = BitsPerRawSample(Type_Audio);
+        return QPair<int, int>(-pow(2, bprs - 1) - 1, pow(2, bprs - 1));
+    } else if(FFmpeg_Glue::isUnsignedAudioSampleFormat(sampleFormat)) {
+        auto bprs = BitsPerRawSample(Type_Audio);
+        return QPair<int, int>(0, pow(2, bprs));
+    }
+
+    return QPair<int, int>(0, 0);
 }
 
 FileInformation::SignalServerCheckUploadedStatus FileInformation::signalServerCheckUploadedStatus() const

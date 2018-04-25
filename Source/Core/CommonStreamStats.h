@@ -33,6 +33,7 @@ public:
     std::string getCodec_Name() const;
     std::string getCodec_Long_Name() const;
     std::string getCodec_Type() const;
+    int getType() const;
     std::string getCodec_Time_Base() const;
     std::string getCodec_TagString() const;
 
@@ -75,6 +76,7 @@ protected:
     std::string codec_name;
     std::string codec_long_name;
     std::string codec_type;
+    int stream_type;
     std::string codec_time_base;
     int codec_tag;
 

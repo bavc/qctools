@@ -54,6 +54,7 @@ static std::string rational_to_string(AVRational r, char sep) {
 VideoStreamStats::VideoStreamStats(XMLElement *streamElement) : CommonStreamStats(streamElement)
 {
     codec_type = "video";
+    stream_type = AVMEDIA_TYPE_VIDEO;
 
     const char* width_value = streamElement->Attribute("width");
     if(width_value)
@@ -138,6 +139,7 @@ VideoStreamStats::VideoStreamStats(AVStream* stream, AVFormatContext *context) :
     }
 
     codec_type = "video";
+    stream_type = AVMEDIA_TYPE_VIDEO;
 }
 
 void VideoStreamStats::writeStreamInfoToXML(QXmlStreamWriter *writer)

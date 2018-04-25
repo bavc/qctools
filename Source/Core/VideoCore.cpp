@@ -12,7 +12,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
 {
     //Y
     {
-        Item_YMIN,      5,    0,  255,  3,  "Y",  true,
+        Item_YMIN,      5,    "function() { return bitsPerRawSample * 20; }",  nullptr,  3,  "Y",  true,
         "For all samples of the Y plane, plot the MAXimum, MIVimum, AVeraGe,\n"
         "LOW (10th percentile), and HIGH (90th percentile) values for each frame.\n"
         "The Y plane provides information about video brightness or luminance.",
@@ -20,7 +20,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //U
     {
-        Item_UMIN,      5,    0,  255,  3,  "U",  true,
+        Item_UMIN,      5,    "0",  "255",  3,  "U",  true,
         "For all samples of the U plane, plot the MAXimum, MIVimum, AVeraGe,\n"
         "LOW (10th percentile), and HIGH (90th percentile) values for each frame.\n"
         "The U plane (along with V) provides information about video color.",
@@ -28,7 +28,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //V
     {
-        Item_VMIN,      5,    0,  255,  3,  "V",  true,
+        Item_VMIN,      5,    "0",  "bitsPerRawSample < 10",  3,  "V",  true,
         "For all samples of the V plane, plot the MAXimum, MIVimum, AVeraGe,\n"
         "LOW (10th percentile), and HIGH (90th percentile) values for each frame.\n"
         "The V plane (along with U) provides information about video color.",
@@ -36,7 +36,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //YDiff
     {
-        Item_YDIF,      1,    0,  255,  3,  "YDiff", false,
+        Item_YDIF,      1,    "0",  "255",  3,  "YDiff", false,
         "YDIF plots the amount of differences between the Y plane of the current\n"
         "frame and the preceding one. It indicates the extent of visual change\n"
         "from one frame to the next.",
@@ -44,7 +44,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //UDiff
     {
-        Item_UDIF,      1,    0,  255,  3,  "UDiff", false,
+        Item_UDIF,      1,    "0",  "255",  3,  "UDiff", false,
         "UDIF plots the amount of differences between the U plane of the current\n"
         "frame and the preceding one. It indicates the extent of visual change\n"
         "from one frame to the next.",
@@ -52,7 +52,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //VDiff
     {
-        Item_VDIF,      1,    0,  255,  3,  "VDiff", false,
+        Item_VDIF,      1,    "0",  "255",  3,  "VDiff", false,
         "VDIF plots the amount of differences between the V plane of the current\n"
         "frame and the preceding one. It indicates the extent of visual change\n"
         "from one frame to the next.",
@@ -60,13 +60,13 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //Diffs
     {
-        Item_VDIF,      3,    0,  255,  3,  "Diffs",  true,
+        Item_VDIF,      3,    "0",  "255",  3,  "Diffs",  true,
         "Plots YDIF, UDIF, and VDIF all together.",
         ActiveFilter_Video_signalstats,
     },
     //Sat
     {
-        Item_SATMIN,    5,    0,  180,  4,  "Sat", true,
+        Item_SATMIN,    5,    "0",  "180",  4,  "Sat", true,
         "This filter does the equivalent of plotting all pixels in a vectorscope\n"
         "and measuring the distance from that plotted points to the center of the\n"
         "vectorscope. The MAXimum, MIVimum, AVeraGe, LOW (10th percentile), and\n"
@@ -82,7 +82,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //Hue
     {
-        Item_HUEMED,    2,    0,  360,  4,  "Hue", false,
+        Item_HUEMED,    2,    "0",  "360",  4,  "Hue", false,
         "The hue filter expresses the average color hue in degrees from 0 to 360.\n"
         "Degrees are measured clockwise starting from 0 at the bottom side of a\n"
         "vectorscope. Skin tone is 147 degrees. Hue is plotted via median and average.",
@@ -90,7 +90,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //TOUT
     {
-        Item_TOUT,      1,    0,  0.9,  4,  "TOUT", false,
+        Item_TOUT,      1,    "0",  "0.9",  4,  "TOUT", false,
         "Pixels are labeled as temporal outliers (TOUT) if they are unlike the corresponding\n"
         "pixels of the previous and subsequent frames. Peaks in TOUT can show areas with\n"
         "skew or tracking issues which cause white speckle in the video. It can also\n"
@@ -99,7 +99,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //VREP
     {
-        Item_VREP,      1,    0,    1,  4,  "VREP", false,
+        Item_VREP,      1,    "0",    "1",  4,  "VREP", false,
         "Vertical Line Repetitions, or the VREP filter, is useful in detecting\n"
         "the use of a dropout compensator in the digitization of analog video. VREP\n"
         "plots the number of repeated horizontal lines which is untypical for an analog\n"
@@ -109,7 +109,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //BRNG
     {
-        Item_BRNG,      1,    0,    1,  4,  "BRNG", false,
+        Item_BRNG,      1,    "0",    "1",  4,  "BRNG", false,
         "The BRNG filter is one that identifies the amount of pixels that fall\n"
         "outside the standard video broadcast range of 16-235 pixels for Y or\n"
         "16-240 for U and V.",
@@ -117,7 +117,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //CropW
     {
-        Item_Crop_x1,   2,    0,    0,  4,  "CropW", false,
+        Item_Crop_x1,   2,    "0",    "0",  4,  "CropW", false,
         "CropW plots the number of columns of pixels would could be safely removed\n"
         "from the left or right side of the image without removing any non-black\n"
         "pixels. It would detect video frames with pillarboxing.",
@@ -125,7 +125,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //CropH
     {
-        Item_Crop_y1,   2,    0,    0,  4,  "CropH", false,
+        Item_Crop_y1,   2,    "0",    "0",  4,  "CropH", false,
         "CropW plots the number of row of pixels would could be safely removed\n"
         "from the top or bottom side of the image without removing any non-black\n"
         "pixels. It would detect video frames with letterboxing.",
@@ -133,14 +133,14 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //CropF
     {
-        Item_Crop_w,   2,    0,    0,  4,  "CropF", false,
+        Item_Crop_w,   2,    "0",    "0",  4,  "CropF", false,
         "Presents the total number of rows (Crop Height) and columns (Crop Width)\n"
         "which could be removed from the edges to only remove black pixels.",
         ActiveFilter_Video_cropdetect,
     },
     //MSEf
     {
-        Item_MSE_v,     3,    0,    0,  4,  "MSEf", false,
+        Item_MSE_v,     3,    "0",    "0",  4,  "MSEf", false,
         "Plots an assessment of visual difference of field 1 versus field 2 via\n"
         "Mean Square Error for each plane (Y, U, and V). Higher values may be\n"
         "indicative of differences between the images of field 1 and field 2 as\n"
@@ -149,7 +149,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //PSNRf
     {
-        Item_PSNR_v,    3,    0,    0,  4,  "PSNRf", false,
+        Item_PSNR_v,    3,    "0",    "0",  4,  "PSNRf", false,
         "Plots an assessment of visual difference of field 1 versus field 2 via\n"
         "Peak Signal to Noise Ratio for each plane (Y, U, and V). Lower values may\n"
         "be indicative of differences between the images of field 1 and field 2 as\n"
@@ -158,7 +158,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //SSIMf
     {
-        Item_SSIM_Y,    4,    0,    0,  4,  "SSIMf", false,
+        Item_SSIM_Y,    4,    "0",    "0",  4,  "SSIMf", false,
         "Plots an assessment of visual difference of field 1 versus field 2 via\n"
         "SSIM (Structural SImilarity Metric) for each plane (Y, U, and V). Lower values may\n"
         "be indicative of differences between the images of field 1 and field 2 as\n"
@@ -167,7 +167,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //idet.single
     {
-        Item_IDET_S_BFF,    4,    0,    2,  4,  "idet S", false,
+        Item_IDET_S_BFF,    4,    "0",    "2",  4,  "idet S", false,
         "Plots an interpretation of the interlacement pattern of the visual image.\n"
         "This version uses single frame detection which considers only immediately\n"
         "adjacent frames when classifying each frame. Each frame's classification is\n"
@@ -176,7 +176,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //idet.multiple
     {
-        Item_IDET_M_BFF,    4,    0,    2,  4,  "idet M", false,
+        Item_IDET_M_BFF,    4,    "0",    "2",  4,  "idet M", false,
         "Plots an interpretation of the interlacement pattern of the visual image.\n"
         "This version uses multiple frame detection which incorporates the classification\n"
         "history of previous frames. Each frame's classification is plotted with a\n"
@@ -185,7 +185,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //idet.repeat
     {
-        Item_IDET_R_B,     3,    0,    2,  4,  "idet R", false,
+        Item_IDET_R_B,     3,    "0",    "2",  4,  "idet R", false,
         "Plots an interpretation of the interlacement pattern of the visual image.\n"
         "This plot shows fields that are repeated between adjacent frames (a sign\n"
         "of telecine). Each frame's classification is plotted with a half-life of 1.",
@@ -193,7 +193,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //deflicker
     {
-        Item_DEFL,     1,    -1,    1,  4,  "flicker", false,
+        Item_DEFL,     1,    "-1",    "1",  4,  "flicker", false,
         "Plots a quantification of the temporal frame luminance variation by an\n"
         "arithmetric mean of sets of 5 frames. The plotted value shows the relative\n"
         "change in luminance that would be used by libavfilter's deflicker filter.",
@@ -201,7 +201,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //entropy
     {
-        Item_ENTR_Y,     3,    0,    1,  4,  "entr", true,
+        Item_ENTR_Y,     3,    "0",    "1",  4,  "entr", true,
         "Entropy\n"
         "Plots the graylevel entropy of the histogram of the color channels.\n"
         "A color channel with only a single shade will have entropy of 0,\n"
@@ -210,7 +210,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //entropy-diff
     {
-        Item_ENTR_Y_D,   3,    0,    1,  4,  "entr diff", true,
+        Item_ENTR_Y_D,   3,    "0",    "1",  4,  "entr diff", true,
         "Entropy Difference\n"
         "Plots the frame-to-frame difference in the graylevel entropy\n"
         "of the histogram of the color channels. Incoherancy in plotted\n"
@@ -222,14 +222,14 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //Item_pkt_duration_time
     {
-        Item_pkt_duration_time,     1,    0,    2,  4,  "pkt_duration_time", false,
+        Item_pkt_duration_time,     1,    "0",    "2",  4,  "pkt_duration_time", false,
         "Plots the duration in seconds of each frame. If the file is of constant\n"
         "frame rate than this should be a straight line.",
         ActiveFilter_Video_signalstats,
     },
     //Item_pkt_size
     {
-        Item_pkt_size,     1,    0,    0,  4,  "pkt_size", false,
+        Item_pkt_size,     1,    "0",    "0",  4,  "pkt_size", false,
         "Plots the size in bytes of each frame. If the file is of uncompressed\n"
         "frame rate than this should be a straight line, but a lossless or\n"
         "lossy file should show the variety of frame sizes.",

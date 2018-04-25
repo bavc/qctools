@@ -98,12 +98,22 @@ void StreamsStats::writeToXML(QXmlStreamWriter *writer)
 
 }
 
-int StreamsStats::bitsPerRawSample() const
+int StreamsStats::bitsPerRawVideoSample() const
 {
     for(auto& stream : streams) {
-        if(stream->getBitsPerRawSample() != 0)
+        if(stream->getType() == AVMEDIA_TYPE_VIDEO && stream->getBitsPerRawSample() != 0)
             return stream->getBitsPerRawSample();
     }
 
     return 0;
+}
+
+int StreamsStats::avSampleFormat() const
+{
+    for(auto& stream : streams) {
+        if(stream->getType() == AVMEDIA_TYPE_AUDIO && (static_cast<AudioStreamStats*> (stream.get()))->getSample_fmt() != AV_SAMPLE_FMT_NONE)
+            return (static_cast<AudioStreamStats*> (stream.get()))->getSample_fmt();
+    }
+
+    return AV_SAMPLE_FMT_NONE;
 }
