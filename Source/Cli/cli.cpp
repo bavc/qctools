@@ -278,7 +278,7 @@ int Cli::exec(QCoreApplication &a)
     for(size_t i = 0; i < framesCountForAllStreams.size(); ++i)
     {
         if(framesCountForAllStreams[i] > framesCountForAllStreams[indexOfStreamWithKnownTotal])
-            indexOfStreamWithKnownTotal = framesCountForAllStreams[i];
+            indexOfStreamWithKnownTotal = i;
     }
 
     if(!info->hasStats() || forceOutput)
