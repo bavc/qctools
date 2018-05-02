@@ -41,11 +41,17 @@ CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t Cou
     PerItem(PerItem_),
     Type(Type_),
     CountOfGroups(CountOfGroups_),
-    CountOfItems(CountOfItems_)
+    CountOfItems(CountOfItems_),
+    additionalDoubleStats(nullptr),
+    additionalIntStats(nullptr),
+    additionalStringStats(nullptr)
 {
     // Adaptation for having a graph even with 1 frame
     if (FrameCount<2)
         FrameCount=2;
+
+    int sizeOfLastStatsIndex = sizeof lastStatsIndexByValueType;
+    memset(lastStatsIndexByValueType, 0, sizeOfLastStatsIndex);
 
     // Status
     IsComplete=false;
@@ -157,6 +163,64 @@ CommonStats::~CommonStats()
         delete [] comments[j];
 
     delete [] comments;
+
+    auto numberOfAdditionalStrings = lastStatsIndexByValueType[StatsValueInfo::String];
+    for(auto i = 0; i < numberOfAdditionalStrings; ++i) {
+        free(additionalStringStats[i]);
+    }
+
+    delete [] additionalStringStats;
+    delete [] additionalIntStats;
+    delete [] additionalDoubleStats;
+}
+
+void CommonStats::processAdditionalStats(const char* key, const char* value, bool statsMapInitialized)
+{
+    if(!statsMapInitialized) {
+        auto type = StatsValueInfo::typeFromKey(key);
+        auto stats = StatsValueInfo {
+            lastStatsIndexByValueType[type]++, type, value
+        };
+        statsValueInfoByKeys[key] = stats;
+        statsKeysByIndexByValueType[type][stats.index] = key;
+    } else {
+        auto stats = statsValueInfoByKeys[key];
+        if(stats.type == StatsValueInfo::Int) {
+            additionalIntStats[stats.index] = std::stoi(value);
+        } else if(stats.type == StatsValueInfo::Double) {
+            additionalDoubleStats[stats.index] = std::stod(value);
+        } else {
+            additionalStringStats[stats.index] = strdup(value);
+        }
+        statsKeysByIndexByValueType[stats.type][stats.index] = key;
+    }
+}
+
+void CommonStats::initializeAdditionalStats()
+{
+    auto numberOfIntValues = lastStatsIndexByValueType[StatsValueInfo::Int];
+    if(numberOfIntValues != 0) {
+        additionalIntStats = new int[numberOfIntValues];
+    }
+    auto numberOfDoubleValues = lastStatsIndexByValueType[StatsValueInfo::Double];
+    if(numberOfDoubleValues != 0) {
+        additionalDoubleStats = new double[numberOfDoubleValues];
+    }
+    auto numberOfStringValues = lastStatsIndexByValueType[StatsValueInfo::String];
+    if(numberOfStringValues != 0) {
+        additionalStringStats = new char*[numberOfStringValues];
+    }
+
+    for(auto entry : statsValueInfoByKeys) {
+        auto& stats = entry.second;
+        if(stats.type == StatsValueInfo::Int) {
+            additionalIntStats[stats.index] = std::stoi(stats.initialValue);
+        } else if(stats.type == StatsValueInfo::Double) {
+            additionalDoubleStats[stats.index] = std::stod(stats.initialValue);
+        } else {
+            additionalStringStats[stats.index] = strdup(stats.initialValue.c_str());
+        }
+    }
 }
 
 //***************************************************************************
