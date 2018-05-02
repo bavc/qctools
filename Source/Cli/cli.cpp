@@ -311,7 +311,7 @@ int Cli::exec(QCoreApplication &a)
         progress->setValue(0);
 
         QObject::connect(info.get(), &FileInformation::statsFileGenerationProgress, this, &Cli::onStatsFileGenerationProgress);
-        QObject::connect(info.get(), &FileInformation::statsFileGenerated, [&](SharedFile statsFile, const QString& name) {
+        QObject::connect(info.get(), &FileInformation::statsFileGenerated, this, [&](SharedFile statsFile, const QString& name) {
             if(mkvReport) {
                 QByteArray attachment;
                 QString attachmentFileName;
