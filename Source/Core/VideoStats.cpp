@@ -68,6 +68,8 @@ void VideoStats::StatsFromExternalData (const char* Data, size_t Size)
             XMLElement* Frame=Frames->FirstChildElement();
             while (Frame)
             {
+                bool statsMapInitialized = !statsValueInfoByKeys.empty();
+
                 if (!strcmp(Frame->Value(), "frame"))
                 {
                     const char* media_type=Frame->Attribute("media_type");
@@ -207,7 +209,6 @@ void VideoStats::StatsFromExternalData (const char* Data, size_t Size)
                                                 break;
                                             }
                                     }
-
                                 }
 
                                 if (j!=Item_VideoMax)
@@ -249,14 +250,14 @@ void VideoStats::StatsFromExternalData (const char* Data, size_t Size)
                                         if (PerItem[j].DefaultLimit2!=DBL_MAX && y[j][x_Current]>PerItem[j].DefaultLimit2)
                                             Stats_Counts2[j]++;
                                     }
+                                } else {
+                                    auto value = Tag->Attribute("value");
+                                    processAdditionalStats(key, value ? value : "", statsMapInitialized);
                                 }
                             }
 
                             Tag=Tag->NextSiblingElement();
                         }
-
-
-
 
                         if (x_Max[0]<=x[0][x_Current])
                         {
@@ -271,6 +272,10 @@ void VideoStats::StatsFromExternalData (const char* Data, size_t Size)
                     }
                 }
 
+                if(!statsMapInitialized) {
+                    initializeAdditionalStats();
+                }
+
                 Frame=Frame->NextSiblingElement();
             }
         }
@@ -278,11 +283,13 @@ void VideoStats::StatsFromExternalData (const char* Data, size_t Size)
 }
 
 //---------------------------------------------------------------------------
+
 void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
 {
     AVDictionary * m=av_frame_get_metadata (Frame);
     AVDictionaryEntry* e=NULL;
-    string A;
+    bool statsMapInitialized = !statsValueInfoByKeys.empty();
+
     for (;;)
     {
         e=av_dict_get     (m, "", e, AV_DICT_IGNORE_SUFFIX);
@@ -329,14 +336,18 @@ void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
                 if (PerItem[j].DefaultLimit2!=DBL_MAX && y[j][x_Current]>PerItem[j].DefaultLimit2)
                     Stats_Counts2[j]++;
             }
-        }
+        } else {
 
-        /*
-        A+=e->key;
-        A+=',';
-        A+=e->value;
-        A+="\r\n";
-        */
+            // not found among plot groups
+            auto key = e->key;
+            auto value = e->value;
+
+            processAdditionalStats(key, value, statsMapInitialized);
+        }
+    }
+
+    if(!statsMapInitialized) {
+        initializeAdditionalStats();
     }
 
     y[Item_pkt_duration_time][x_Current] = durations[x_Current];
@@ -505,6 +516,33 @@ string VideoStats::StatsToXML (const activefilters& filters)
             }
 
             Data<<"            <tag key=\""+key+"\" value=\""+value.str()+"\"/>\n";
+        }
+
+        if(additionalIntStats) {
+            for(auto i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::Int].size(); ++i) {
+                auto key = statsKeysByIndexByValueType[StatsValueInfo::Int][i];
+                auto value = additionalIntStats[i];
+
+                Data<<"            <tag key=\"" << key << "\" value=\"" << value << "\"/>\n";
+            }
+        }
+
+        if(additionalDoubleStats) {
+            for(auto i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::Double].size(); ++i) {
+                auto key = statsKeysByIndexByValueType[StatsValueInfo::Double][i];
+                auto value = additionalDoubleStats[i];
+
+                Data<<"            <tag key=\"" << key << "\" value=\"" << value << "\"/>\n";
+            }
+        }
+
+        if(additionalStringStats) {
+            for(auto i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::String].size(); ++i) {
+                auto key = statsKeysByIndexByValueType[StatsValueInfo::String][i];
+                auto value = additionalStringStats[i];
+
+                Data<<"            <tag key=\"" << key << "\" value=\"" << value << "\"/>\n";
+            }
         }
 
         if(comments[x_Pos])

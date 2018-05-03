@@ -10,7 +10,9 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include <stdint.h>
+#include <algorithm>
 #include <Core/Core.h>
 
 using namespace std;
@@ -44,6 +46,10 @@ public:
     double                      FirstTimeStamp;             // Time stamp of the first frame
     char**                      comments;                   // Comments per frame (utf-8)
 
+    int*                        additionalIntStats;
+    double*                     additionalDoubleStats;
+    char**                      additionalStringStats;
+
     // Status
     int                         Type_Get();
     double                      State_Get();
@@ -63,7 +69,62 @@ public:
     virtual void                StatsFinish();
     virtual string              StatsToXML(const activefilters& filters) = 0;
 
+    struct StatsValueInfo {
+        int index;
+        enum Type {
+            Int,
+            Double,
+            String
+        } type;
+        std::string initialValue;
+
+        static bool endsWith(const std::string& value, const std::string& ending) {
+            if(ending.size() > value.size())
+                return false;
+
+            return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+        }
+
+        static Type typeFromKey(const std::string& key) {
+            static const char* IntEndings[] = {
+                "MIN",
+                "LOW",
+                "HIGH",
+                "MAX",
+                "BITDEPTH",
+                ".x1",
+                ".x2",
+                ".y1",
+                ".y2",
+                ".w",
+                ".h",
+                ".x",
+                ".y"
+            };
+
+            for(auto ending : IntEndings) {
+                if(endsWith(key, ending)) {
+                    return Int;
+                }
+            }
+
+            if(key.find(".idet") != -1) {
+                return String;
+            }
+
+            return Double;
+        }
+    };
+    typedef std::string StringStatsKey;
+
+    void initializeAdditionalStats();
+    void processAdditionalStats(const char* key, const char* value, bool statsMapInitialized);
+
 protected:
+    int lastStatsIndexByValueType[3];
+    std::map<StringStatsKey, StatsValueInfo> statsValueInfoByKeys;
+    std::map<int, StringStatsKey> statsKeysByIndexByValueType[3];
+
     // Status
     bool                        IsComplete;
 

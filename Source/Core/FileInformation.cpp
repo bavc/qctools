@@ -30,6 +30,7 @@
 
 #include <string>
 #include <sstream>
+#include <iostream>
 #include <cassert>
 #ifdef _WIN32
 #include <QEventLoop>
@@ -594,33 +595,55 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName, const activef
         name = info.fileName();
     }
 
-    if (file->open(QIODevice::ReadWrite))
-    {
-        string DataS=Data.str();
-        uLongf Buffer_Size=65536;
-        char* Buffer=new char[Buffer_Size];
-        z_stream strm;
-        strm.next_in = (Bytef *) DataS.c_str();
-        strm.avail_in = DataS.size() ;
-        strm.total_out = 0;
-        strm.zalloc = Z_NULL;
-        strm.zfree = Z_NULL;
-        if (deflateInit2(&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY)>=0) // 15 + 16 are magic values for gzip
-        {
-            do
-            {
-                strm.next_out = (unsigned char*) Buffer;
-                strm.avail_out = Buffer_Size;
-                if (deflate(&strm, Z_FINISH)<0)
-                    break;
-                file->write(Buffer, Buffer_Size-strm.avail_out);
+    string DataS=Data.str();
+    uLongf Buffer_Size=65536;
 
-                Q_EMIT statsFileGenerationProgress((char*) strm.next_in - DataS.c_str(), DataS.size());
+    if(file->open(QIODevice::ReadWrite))
+    {
+        if(name.endsWith(".qctools.xml"))
+        {
+            auto bytesLeft = Data.str().size();
+            auto writePtr = DataS.c_str();
+            auto totalBytesWritten = 0;
+
+            while(bytesLeft) {
+                auto bytesToWrite = std::min(size_t(Buffer_Size), bytesLeft);
+                auto bytesWritten = file->write(writePtr, bytesToWrite);
+                totalBytesWritten += bytesWritten;
+
+                Q_EMIT statsFileGenerationProgress(totalBytesWritten, DataS.size());
+
+                writePtr += bytesToWrite;
+                bytesLeft -= bytesWritten;
+
+                if(bytesWritten != bytesToWrite)
+                    break;
             }
-            while (strm.avail_out == 0);
-            deflateEnd (&strm);
+        } else {
+            char* Buffer=new char[Buffer_Size];
+            z_stream strm;
+            strm.next_in = (Bytef *) DataS.c_str();
+            strm.avail_in = DataS.size() ;
+            strm.total_out = 0;
+            strm.zalloc = Z_NULL;
+            strm.zfree = Z_NULL;
+            if (deflateInit2(&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY)>=0) // 15 + 16 are magic values for gzip
+            {
+                do
+                {
+                    strm.next_out = (unsigned char*) Buffer;
+                    strm.avail_out = Buffer_Size;
+                    if (deflate(&strm, Z_FINISH)<0)
+                        break;
+                    file->write(Buffer, Buffer_Size-strm.avail_out);
+
+                    Q_EMIT statsFileGenerationProgress((char*) strm.next_in - DataS.c_str(), DataS.size());
+                }
+                while (strm.avail_out == 0);
+                deflateEnd (&strm);
+            }
+            delete[] Buffer;
         }
-        delete[] Buffer;
 
         file->flush();
         file->seek(0);
