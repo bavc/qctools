@@ -1,6 +1,7 @@
 #include "cli.h"
 #include "version.h"
 #include "Core/FFmpegVideoEncoder.h"
+#include "Core/FFmpeg_Glue.h"
 
 Cli::Cli() : indexOfStreamWithKnownFrameCount(0), statsFileBytesWritten(0), statsFileBytesTotal(0), statsFileBytesUploaded(0), statsFileBytesToUpload(0)
 {
@@ -18,6 +19,7 @@ int Cli::exec(QCoreApplication &a)
     bool forceOutput = false;
     bool showLongHelp = false;
     bool showShortHelp = false;
+    bool showVersion = false;
 
     bool uploadToSignalServer = false;
     bool forceUploadToSignalServer = false;
@@ -53,6 +55,9 @@ int Cli::exec(QCoreApplication &a)
         } else if(a.arguments().at(i) == "-h")
         {
             showLongHelp = true;
+        } else if(a.arguments().at(i) == "-v")
+        {
+            showVersion = true;
         }
     }
 
@@ -60,6 +65,15 @@ int Cli::exec(QCoreApplication &a)
     {
         if(a.arguments().length() == 1 || (checkUploadFileName.isEmpty() && input.isEmpty()))
             showShortHelp = true;
+    }
+
+    if(showVersion) {
+        std::cout << appName << " " << (VERSION) << std::endl << std::endl;
+        std::cout << "FFMpeg version: " << FFmpeg_Glue::FFmpeg_Version() << std::endl;
+        std::cout << "FFMpeg configuration: " << FFmpeg_Glue::FFmpeg_Configuration() << std::endl;
+        std::cout << "FFMpeg libraries: " << FFmpeg_Glue::FFmpeg_LibsVersion() << std::endl;
+
+        return Success;
     }
 
     if(showLongHelp || showShortHelp)
