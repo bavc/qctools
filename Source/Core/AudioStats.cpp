@@ -357,6 +357,33 @@ string AudioStats::StatsToXML (const activefilters& filters)
             Data<<"            <tag key=\""+key+"\" value=\""+value.str()+"\"/>\n";
         }
 
+        if(additionalIntStats) {
+            for(auto i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::Int].size(); ++i) {
+                auto key = statsKeysByIndexByValueType[StatsValueInfo::Int][i];
+                auto value = additionalIntStats[i];
+
+                Data<<"            <tag key=\"" << key << "\" value=\"" << value << "\"/>\n";
+            }
+        }
+
+        if(additionalDoubleStats) {
+            for(auto i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::Double].size(); ++i) {
+                auto key = statsKeysByIndexByValueType[StatsValueInfo::Double][i];
+                auto value = additionalDoubleStats[i];
+
+                Data<<"            <tag key=\"" << key << "\" value=\"" << value << "\"/>\n";
+            }
+        }
+
+        if(additionalStringStats) {
+            for(auto i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::String].size(); ++i) {
+                auto key = statsKeysByIndexByValueType[StatsValueInfo::String][i];
+                auto value = additionalStringStats[i];
+
+                Data<<"            <tag key=\"" << key << "\" value=\"" << value << "\"/>\n";
+            }
+        }
+
         Data<<"        </frame>\n";
     }
 
