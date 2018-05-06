@@ -46,9 +46,9 @@ public:
     double                      FirstTimeStamp;             // Time stamp of the first frame
     char**                      comments;                   // Comments per frame (utf-8)
 
-    int*                        additionalIntStats;
-    double*                     additionalDoubleStats;
-    char**                      additionalStringStats;
+    int**                       additionalIntStats;
+    double**                    additionalDoubleStats;
+    char***                     additionalStringStats;
 
     // Status
     int                         Type_Get();
@@ -119,6 +119,7 @@ public:
 
     void initializeAdditionalStats();
     void processAdditionalStats(const char* key, const char* value, bool statsMapInitialized);
+    void writeAdditionalStats(std::stringstream& stream, size_t index);
 
 protected:
     int lastStatsIndexByValueType[3];

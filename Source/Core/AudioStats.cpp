@@ -313,6 +313,7 @@ void AudioStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
 }
 
 //---------------------------------------------------------------------------
+
 string AudioStats::StatsToXML (const activefilters& filters)
 {
     stringstream Data;
@@ -346,43 +347,12 @@ string AudioStats::StatsToXML (const activefilters& filters)
                 continue;
 
             const std::string& key = PerItem[Plot_Pos].FFmpeg_Name;
+            auto value = std::to_string(y[Plot_Pos][x_Pos]);
 
-            stringstream value;
-            //switch (Plot_Pos)
-            //{
-            //    default:
-            value<<y[Plot_Pos][x_Pos];
-            //}
-
-            Data<<"            <tag key=\""+key+"\" value=\""+value.str()+"\"/>\n";
+            Data<<"            <tag key=\""+key+"\" value=\""+value+"\"/>\n";
         }
 
-        if(additionalIntStats) {
-            for(auto i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::Int].size(); ++i) {
-                auto key = statsKeysByIndexByValueType[StatsValueInfo::Int][i];
-                auto value = additionalIntStats[i];
-
-                Data<<"            <tag key=\"" << key << "\" value=\"" << value << "\"/>\n";
-            }
-        }
-
-        if(additionalDoubleStats) {
-            for(auto i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::Double].size(); ++i) {
-                auto key = statsKeysByIndexByValueType[StatsValueInfo::Double][i];
-                auto value = additionalDoubleStats[i];
-
-                Data<<"            <tag key=\"" << key << "\" value=\"" << value << "\"/>\n";
-            }
-        }
-
-        if(additionalStringStats) {
-            for(auto i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::String].size(); ++i) {
-                auto key = statsKeysByIndexByValueType[StatsValueInfo::String][i];
-                auto value = additionalStringStats[i];
-
-                Data<<"            <tag key=\"" << key << "\" value=\"" << value << "\"/>\n";
-            }
-        }
+        writeAdditionalStats(Data, x_Pos);
 
         Data<<"        </frame>\n";
     }

@@ -497,53 +497,28 @@ string VideoStats::StatsToXML (const activefilters& filters)
                 continue;
 
             const std::string& key = PerItem[Plot_Pos].FFmpeg_Name;
+            std::string value;
 
-            stringstream value;
             switch (Plot_Pos)
             {
             case Item_Crop_x2 :
             case Item_Crop_w :
                 // Special case, values are from width
-                value<<width-y[Plot_Pos][x_Pos];
+                value = std::to_string(width-y[Plot_Pos][x_Pos]);
                 break;
             case Item_Crop_y2 :
             case Item_Crop_h :
                 // Special case, values are from height
-                value<<height-y[Plot_Pos][x_Pos];
+                value = std::to_string(height-y[Plot_Pos][x_Pos]);
                 break;
             default:
-                value<<y[Plot_Pos][x_Pos];
+                value = std::to_string(y[Plot_Pos][x_Pos]);
             }
 
-            Data<<"            <tag key=\""+key+"\" value=\""+value.str()+"\"/>\n";
+            Data<<"            <tag key=\""+key+"\" value=\""+value+"\"/>\n";
         }
 
-        if(additionalIntStats) {
-            for(auto i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::Int].size(); ++i) {
-                auto key = statsKeysByIndexByValueType[StatsValueInfo::Int][i];
-                auto value = additionalIntStats[i];
-
-                Data<<"            <tag key=\"" << key << "\" value=\"" << value << "\"/>\n";
-            }
-        }
-
-        if(additionalDoubleStats) {
-            for(auto i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::Double].size(); ++i) {
-                auto key = statsKeysByIndexByValueType[StatsValueInfo::Double][i];
-                auto value = additionalDoubleStats[i];
-
-                Data<<"            <tag key=\"" << key << "\" value=\"" << value << "\"/>\n";
-            }
-        }
-
-        if(additionalStringStats) {
-            for(auto i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::String].size(); ++i) {
-                auto key = statsKeysByIndexByValueType[StatsValueInfo::String][i];
-                auto value = additionalStringStats[i];
-
-                Data<<"            <tag key=\"" << key << "\" value=\"" << value << "\"/>\n";
-            }
-        }
+        writeAdditionalStats(Data, x_Pos);
 
         if(comments[x_Pos])
             Data<<"            <tag key=\"qctools.comment\" value=\"" << comments[x_Pos] << "\"/>\n";
