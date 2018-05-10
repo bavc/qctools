@@ -41,11 +41,17 @@ CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t Cou
     PerItem(PerItem_),
     Type(Type_),
     CountOfGroups(CountOfGroups_),
-    CountOfItems(CountOfItems_)
+    CountOfItems(CountOfItems_),
+    additionalDoubleStats(nullptr),
+    additionalIntStats(nullptr),
+    additionalStringStats(nullptr)
 {
     // Adaptation for having a graph even with 1 frame
     if (FrameCount<2)
         FrameCount=2;
+
+    int sizeOfLastStatsIndex = sizeof lastStatsIndexByValueType;
+    memset(lastStatsIndexByValueType, 0, sizeOfLastStatsIndex);
 
     // Status
     IsComplete=false;
@@ -157,6 +163,121 @@ CommonStats::~CommonStats()
         delete [] comments[j];
 
     delete [] comments;
+
+    auto numberOfIntValues = lastStatsIndexByValueType[StatsValueInfo::Int];
+
+    for (size_t  j = 0; j < numberOfIntValues; ++j) {
+        delete[] additionalIntStats[j];
+    }
+    delete[] additionalIntStats;
+
+    auto numberOfDoubleValues = lastStatsIndexByValueType[StatsValueInfo::Double];
+
+    for (size_t  j = 0; j < numberOfDoubleValues; ++j) {
+        delete[] additionalDoubleStats[j];
+    }
+    delete[] additionalDoubleStats;
+
+    auto numberOfStringValues = lastStatsIndexByValueType[StatsValueInfo::String];
+
+    for (size_t  j = 0; j < numberOfStringValues; ++j) {
+        for(auto i = 0; i < Data_Reserved; ++i) {
+            free(additionalStringStats[j][i]);
+        }
+
+        delete[] additionalStringStats[j];
+    }
+    delete[] additionalStringStats;
+}
+
+void CommonStats::processAdditionalStats(const char* key, const char* value, bool statsMapInitialized)
+{
+    if(!statsMapInitialized) {
+        auto type = StatsValueInfo::typeFromKey(key);
+        auto stats = StatsValueInfo {
+            lastStatsIndexByValueType[type]++, type, value
+        };
+        statsValueInfoByKeys[key] = stats;
+        statsKeysByIndexByValueType[type][stats.index] = key;
+    } else {
+        auto stats = statsValueInfoByKeys[key];
+        if(stats.type == StatsValueInfo::Int) {
+            additionalIntStats[stats.index][x_Current] = std::stoi(value);
+        } else if(stats.type == StatsValueInfo::Double) {
+            additionalDoubleStats[stats.index][x_Current] = std::stod(value);
+        } else {
+            additionalStringStats[stats.index][x_Current] = strdup(value);
+        }
+        statsKeysByIndexByValueType[stats.type][stats.index] = key;
+    }
+}
+
+void CommonStats::writeAdditionalStats(stringstream &stream, size_t index)
+{
+    if(additionalIntStats) {
+        for(auto i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::Int].size(); ++i) {
+            auto key = statsKeysByIndexByValueType[StatsValueInfo::Int][i];
+            auto value = additionalIntStats[i][index];
+
+            stream<<"            <tag key=\"" << key << "\" value=\"" << value << "\"/>\n";
+        }
+    }
+
+    if(additionalDoubleStats) {
+        for(auto i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::Double].size(); ++i) {
+            auto key = statsKeysByIndexByValueType[StatsValueInfo::Double][i];
+            auto value = additionalDoubleStats[i][index];
+
+            stream<<"            <tag key=\"" << key << "\" value=\"" << std::to_string(value) << "\"/>\n";
+        }
+    }
+
+    if(additionalStringStats) {
+        for(auto i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::String].size(); ++i) {
+            auto key = statsKeysByIndexByValueType[StatsValueInfo::String][i];
+            auto value = additionalStringStats[i][index];
+
+            stream<<"            <tag key=\"" << key << "\" value=\"" << value << "\"/>\n";
+        }
+    }
+}
+
+void CommonStats::initializeAdditionalStats()
+{
+    auto numberOfIntValues = lastStatsIndexByValueType[StatsValueInfo::Int];
+    if(numberOfIntValues != 0) {
+        additionalIntStats = new int*[numberOfIntValues];
+        for(int i = 0; i < numberOfIntValues; ++i) {
+            additionalIntStats[i] = new int[Data_Reserved];
+        }
+    }
+    auto numberOfDoubleValues = lastStatsIndexByValueType[StatsValueInfo::Double];
+    if(numberOfDoubleValues != 0) {
+        additionalDoubleStats = new double*[numberOfDoubleValues];
+        for(int i = 0; i < numberOfDoubleValues; ++i) {
+            additionalDoubleStats[i] = new double[Data_Reserved];
+        }
+    }
+    auto numberOfStringValues = lastStatsIndexByValueType[StatsValueInfo::String];
+    if(numberOfStringValues != 0) {
+        additionalStringStats = new char**[numberOfStringValues];
+        for(int i = 0; i < numberOfStringValues; ++i) {
+            additionalStringStats[i] = new char*[Data_Reserved];
+            memset(additionalStringStats[i], 0, sizeof(char*) * Data_Reserved);
+        }
+    }
+
+    for(auto entry : statsValueInfoByKeys) {
+        auto& stats = entry.second;
+        if(stats.type == StatsValueInfo::Int) {
+            additionalIntStats[stats.index][x_Current] = std::stoi(stats.initialValue);
+        } else if(stats.type == StatsValueInfo::Double) {
+            auto doubleValue = std::stod(stats.initialValue);
+            additionalDoubleStats[stats.index][x_Current] = doubleValue;
+        } else {
+            additionalStringStats[stats.index][x_Current] = strdup(stats.initialValue.c_str());
+        }
+    }
 }
 
 //***************************************************************************
@@ -301,6 +422,10 @@ void CommonStats::Data_Reserve(size_t NewValue)
     char*                       pict_type_char_Old = pict_type_char;
     char**                      comments_Old = comments;
 
+    auto                        additionalIntStats_Old = additionalIntStats;
+    auto                        additionalDoubleStats_Old = additionalDoubleStats;
+    auto                        additionalStringStats_Old = additionalStringStats;
+
     // Computing new value
     while (Data_Reserved < NewValue + (1 << 18)) //We reserve extra space, minimum 2^18 frames added
         Data_Reserved <<= 1;
@@ -358,6 +483,36 @@ void CommonStats::Data_Reserve(size_t NewValue)
     comments = new char*[Data_Reserved];
     memcpy(comments, comments_Old, Data_Reserved_Old * sizeof(char*));
     memset(&comments[Data_Reserved_Old], 0x00, diff * sizeof(char*));
+
+    auto numberOfIntValues = lastStatsIndexByValueType[StatsValueInfo::Int];
+    additionalIntStats = new int*[numberOfIntValues];
+    for (size_t j = 0; j < numberOfIntValues; ++j)
+    {
+        additionalIntStats[j] = new int[Data_Reserved];
+        memcpy(additionalIntStats[j], additionalIntStats_Old[j], Data_Reserved_Old * sizeof(int));
+        memset(&additionalIntStats[j][Data_Reserved_Old], 0x00, diff * sizeof(int));
+        delete[] additionalIntStats_Old[j];
+    }
+
+    auto numberOfDoubleValues = lastStatsIndexByValueType[StatsValueInfo::Double];
+    additionalDoubleStats = new double*[numberOfDoubleValues];
+    for (size_t j = 0; j < numberOfDoubleValues; ++j)
+    {
+        additionalDoubleStats[j] = new double[Data_Reserved];
+        memcpy(additionalDoubleStats[j], additionalDoubleStats_Old[j], Data_Reserved_Old * sizeof(double));
+        memset(&additionalDoubleStats[j][Data_Reserved_Old], 0x00, diff * sizeof(double));
+        delete[] additionalDoubleStats_Old[j];
+    }
+
+    auto numberOfStringValues = lastStatsIndexByValueType[StatsValueInfo::String];
+    additionalStringStats = new char**[numberOfStringValues];
+    for (size_t j = 0; j < numberOfStringValues; ++j)
+    {
+        additionalStringStats[j] = new char*[Data_Reserved];
+        memcpy(additionalStringStats[j], additionalStringStats_Old[j], Data_Reserved_Old * sizeof(char*));
+        memset(&additionalStringStats[j][Data_Reserved_Old], 0x00, diff * sizeof(char*));
+        delete[] additionalStringStats_Old[j];
+    }
 
     delete[] x_Old;
     delete[] y_Old;
