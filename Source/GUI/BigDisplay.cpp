@@ -430,6 +430,25 @@ const filter Filters[]=
         },
     },
     {
+        "Amplify",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_YuvA,     1,   0,   7,   0, "Plane"},
+            { Args_Type_Slider,   1,   1,   5,   1, "radius" },
+            { Args_Type_Slider,  20,   0,1023,   1, "factor" },
+            { Args_Type_Slider,  10,   0,1023,   1, "threshold"},
+            { Args_Type_Slider,   0,   0,1023,   1, "low"},
+            { Args_Type_Slider,1023,   0,1023,   1, "high"},
+        },
+        {
+            "amplify=planes=${2}:radius=${3}:factor=${4}:threshold=${5}:low=${6}:high=${7}",
+            "amplify=planes=${2}:radius=${3}:factor=${4}:threshold=${5}:low=${6}:high=${7}",
+            "il=l=d:c=d,amplify=planes=${2}:radius=${3}:factor=${4}:threshold=${5}:low=${6}:high=${7}",
+            "il=l=d:c=d,amplify=planes=${2}:radius=${3}:factor=${4}:threshold=${5}:low=${6}:high=${7}",
+        },
+    },
+    {
         "Extract Planes Equalized",
         0,
         {
