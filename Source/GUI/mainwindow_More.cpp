@@ -46,11 +46,11 @@ void MainWindow::openFile()
     options = QFileDialog::DontUseNativeDialog;
 #endif
 
-    QStringList List=QFileDialog::getOpenFileNames(this, "Open file", "", "Audio files (*.wav);;\
-                                                                           Video files (*.avi *.mkv *.mov *.mxf *.mp4 *.ts *.m2ts);;\
+    QStringList List=QFileDialog::getOpenFileNames(this, "Open file", "", "All (*.*);;\
+                                                                           Audio files (*.wav);;\
                                                                            Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml);;\
                                                                            Statistic files with thumbnails (*.qctools.mkv);;\
-                                                                           All (*.*)", 0, options);
+                                                                           Video files (*.avi *.mkv *.mov *.mxf *.mp4 *.ts *.m2ts)", 0, options);
     if (List.empty())
         return;
 
