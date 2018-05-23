@@ -91,16 +91,30 @@ Some helpful **keyboard shortcuts** you may want to use are:
 
 ## Bar or Graph Charts {#bar}
 
+In the upper navigation panel, users can select barchart profiles, with a default profile provided. New profiles may be added, deleted, and edited  by clicking on the "gear" icon to the right of the profile setting dropdown.
+
 On the right-hand side, users have the ability to toggle between the default graph view and the bar view. Settings may be configured using the "gear" icon to the right of the toggle button.
+
+Within the barchart settings, the following values (and definitions) are available for building assertions:  
 
 * y = y value of chart 
 * yHalf = (2^bitdepth) / 2
 * pow2 = pow2(exponent)
 * pow = pow(base, exponent)
+* maxval = 2^bitdepth
+* minval = 0
+* broadcastmaxval = 235 * (2^(bitdepth - 8))
+* broadcastminval = 16 * (2^(bitdepth - 8))
 
-To set multiple conditions on one line, use the double-ampersand (`&&`) between conditions.
+Hovering over the conditions bar will provide a tool tip with these values, as well as their calculated values for the current file. These values will be different depending on the bit depth of the video.
 
-Settings can also be configured to hide spikes caused by scene cuts.
+Multiple conditions can be set by clicking the plus sign box to the far right of each category. To set multiple conditions on one line, use the double-ampersand (`&&`) between conditions.
+
+If the equation is appropriate, it will display in green. If the equation isn't valid, it'll appear in red and return an error message on hover.
+
+Barchart colors can be modified by clicking on the associated color box. 
+
+Settings can also be configured to hide spikes caused by scene cuts by checking the "Hide spikes" checkbox.
 
 ## Playback and Visual Analysis {#playback}
 
