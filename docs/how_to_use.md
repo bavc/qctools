@@ -91,7 +91,7 @@ Some helpful **keyboard shortcuts** you may want to use are:
 
 ## Bar or Graph Charts {#bar}
 
-In the upper navigation panel, users can select barchart profiles, with a default profile provided. New profiles may be added, deleted, and edited  by clicking on the "gear" icon to the right of the profile setting dropdown.
+In the upper navigation panel, users can select barchart profiles, with a default profile provided. New profiles may be added, deleted, and edited by clicking on the "gear" icon to the right of the profile setting dropdown.
 
 On the right-hand side, users have the ability to toggle between the default graph view and the bar view. Settings may be configured using the "gear" icon to the right of the toggle button.
 
