@@ -297,7 +297,7 @@ public:
             auto plotGroup = m_plotGroup;
 
             engine.globalObject().setProperty("yHalf", (::pow(2, bitdepth)) / 2);
-            autocomplete << QPair<QString, QString>("yHalf", QString("2^(bitdepth) / 2 = %1").arg(engine.globalObject().property("yHalf").toInt()));
+            autocomplete << QPair<QString, QString>("yHalf", QString("2^(bitdepth) / 2 (Current value = %1)").arg(engine.globalObject().property("yHalf").toInt()));
 
             auto pow2 = engine.evaluate("function(value) { return Math.pow(value, 2); }");
             engine.globalObject().setProperty("pow2", pow2);
@@ -318,7 +318,7 @@ public:
             if(plotGroup == Group_Y || plotGroup == Group_U || plotGroup == Group_V || plotGroup == Group_YDiff || plotGroup == Group_UDiff || plotGroup == Group_VDiff)
             {
                 engine.globalObject().setProperty("maxval", ::pow(2, bitdepth));
-                autocomplete << QPair<QString, QString>("maxval", QString("2^bitdepth = %1").arg(engine.globalObject().property("maxval").toInt()));
+                autocomplete << QPair<QString, QString>("maxval", QString("2^bitdepth (Current value = %1)").arg(engine.globalObject().property("maxval").toInt()));
 
                 engine.globalObject().setProperty("minval", 0);
                 autocomplete << QPair<QString, QString>("minval", QString("0"));
@@ -326,28 +326,28 @@ public:
                 if(plotGroup == Group_Y || plotGroup == Group_YDiff)
                 {
                     engine.globalObject().setProperty("broadcastmaxval", 235 * (::pow(2, bitdepth - 8)));
-                    autocomplete << QPair<QString, QString>("broadcastmaxval", QString("235 * (2^(bitdepth - 8)) = %1").arg(engine.globalObject().property("broadcastmaxval").toInt()));
+                    autocomplete << QPair<QString, QString>("broadcastmaxval", QString("235 * (2^(bitdepth - 8)) (Current value = %1)").arg(engine.globalObject().property("broadcastmaxval").toInt()));
 
                 } else if(plotGroup == Group_U || plotGroup == Group_UDiff || plotGroup == Group_V || plotGroup == Group_VDiff)
                 {
                     engine.globalObject().setProperty("broadcastmaxval", 240 * (::pow(2, bitdepth - 8)));
-                    autocomplete << QPair<QString, QString>("broadcastmaxval", QString("240 * (2^(bitdepth - 8)) = %1").arg(engine.globalObject().property("broadcastmaxval").toInt()));
+                    autocomplete << QPair<QString, QString>("broadcastmaxval", QString("240 * (2^(bitdepth - 8)) (Current value = %1)").arg(engine.globalObject().property("broadcastmaxval").toInt()));
                 }
 
                 engine.globalObject().setProperty("broadcastminval", 16 * (::pow(2, bitdepth - 8)));
-                autocomplete << QPair<QString, QString>("broadcastminval", QString("16 * (2^(bitdepth - 8)) = %1").arg(engine.globalObject().property("broadcastminval").toInt()));
+                autocomplete << QPair<QString, QString>("broadcastminval", QString("16 * (2^(bitdepth - 8)) (Current value = %1)").arg(engine.globalObject().property("broadcastminval").toInt()));
             } else if(plotGroup == Group_Sat)
             {
                 engine.globalObject().setProperty("satmax", sqrt(2 * ::pow(::pow(2, bitdepth)/2,2)   ));
-                autocomplete << QPair<QString, QString>("satmax", QString("sqrt(2*((2^bitdepth)/2)^2) = %1").arg(engine.globalObject().property("satmax").toInt()));
+                autocomplete << QPair<QString, QString>("satmax", QString("sqrt(2*((2^bitdepth)/2)^2) (Current value = %1)").arg(engine.globalObject().property("satmax").toInt()));
 
                 /* use the hypotenuse of green plotted in Cb/Cr based on ITU BT.601 values as the satyuvmax */
                 engine.globalObject().setProperty("satyuvmax", sqrt(::pow(-74.203,2)+::pow(93.786,2)) * (::pow(2, bitdepth - 8)));
-                autocomplete << QPair<QString, QString>("satyuvmax", QString("sqrt(-74.203^2+93.786^2) * (2^(bitdepth - 8)) = %1").arg(engine.globalObject().property("satyuvmax").toInt()));
+                autocomplete << QPair<QString, QString>("satyuvmax", QString("sqrt(-74.203^2+93.786^2) * (2^(bitdepth - 8)) (Current value = %1)").arg(engine.globalObject().property("satyuvmax").toInt()));
 
                 /* 75% of satyuvmax as satbroadcastmax */
                 engine.globalObject().setProperty("satbroadcastmax", sqrt(::pow(-74.203,2)+::pow(93.786,2)) * (::pow(2, bitdepth - 8)) * 0.75);
-                autocomplete << QPair<QString, QString>("satbroadcastmax", QString("sqrt(-74.203^2+93.786^2) * (2^(bitdepth - 8)) * 0.75 = %1").arg(engine.globalObject().property("satbroadcastmax").toInt()));
+                autocomplete << QPair<QString, QString>("satbroadcastmax", QString("sqrt(-74.203^2+93.786^2) * (2^(bitdepth - 8)) * 0.75 (Current value = %1)").arg(engine.globalObject().property("satbroadcastmax").toInt()));
             }
 
             engine.setProperty("autocomplete", QVariant::fromValue(autocomplete));
