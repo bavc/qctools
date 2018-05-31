@@ -46,9 +46,6 @@ CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t Cou
     additionalIntStats(nullptr),
     additionalStringStats(nullptr)
 {
-    // Adaptation for having a graph even with 1 frame
-    if (FrameCount<2)
-        FrameCount=2;
 
     int sizeOfLastStatsIndex = sizeof lastStatsIndexByValueType;
     memset(lastStatsIndexByValueType, 0, sizeOfLastStatsIndex);
@@ -315,7 +312,6 @@ void CommonStats::StatsFinish ()
         x[3][1]=durations[0]?(durations[0]/3600):1; //forcing to 1 in case duration is not available
         for (size_t Plot_Pos=0; Plot_Pos<CountOfItems; Plot_Pos++)
             y[Plot_Pos][1]= y[Plot_Pos][0];
-        x_Current++;
     }
 
     // Forcing max values to the last real ones, in case max values were estimated
