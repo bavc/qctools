@@ -9,10 +9,12 @@
 #define CommonStats_H
 
 #include <string>
+#include <string.h>
 #include <vector>
 #include <map>
 #include <stdint.h>
 #include <algorithm>
+#include <cctype>
 #include <Core/Core.h>
 
 using namespace std;
@@ -85,7 +87,25 @@ public:
             return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
         }
 
-        static Type typeFromKey(const std::string& key) {
+        static bool is_number(const std::string& s)
+        {
+            int dotCount = 0;
+            if (s.empty())
+               return false;
+
+            for (char c : s )
+            {
+               if ( !(std::isdigit(c) || c == '.' ) && dotCount > 1 )
+               {
+                  return false;
+               }
+               dotCount += (c == '.');
+            }
+
+            return true;
+        }
+
+        static Type typeFromKey(const std::string& key, const char* value) {
             static const char* IntEndings[] = {
                 "MIN",
                 "LOW",
@@ -112,7 +132,28 @@ public:
                 return String;
             }
 
-            return Double;
+            // try to deduce type..
+            if(is_number(value)) {
+                if(strstr(value, ".") != nullptr) {
+                    try {
+                        std::stod(value);
+                        return Double;
+                    }
+                    catch(const std::exception& ex) {
+
+                    }
+                } else {
+                    try {
+                        std::stoi(value);
+                        return Int;
+                    }
+                    catch(const std::exception& ex) {
+
+                    }
+                }
+            }
+
+            return String;
         }
     };
     typedef std::string StringStatsKey;

@@ -190,7 +190,7 @@ CommonStats::~CommonStats()
 void CommonStats::processAdditionalStats(const char* key, const char* value, bool statsMapInitialized)
 {
     if(!statsMapInitialized) {
-        auto type = StatsValueInfo::typeFromKey(key);
+        auto type = StatsValueInfo::typeFromKey(key, value);
         auto stats = StatsValueInfo {
             lastStatsIndexByValueType[type]++, type, value
         };
