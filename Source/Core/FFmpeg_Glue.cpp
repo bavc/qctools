@@ -465,7 +465,10 @@ void FFmpeg_Glue::outputdata::ApplyFilter(const AVFramePtr& sourceFrame)
 
     // Pull filtered frames from the filtergraph 
     FilteredFrame = AVFramePtr(av_frame_alloc(), FilteredFrameDeleter::free);
-    av_frame_copy_props(FilteredFrame.get(), sourceFrame.get());
+
+    if(sourceFrame) {
+        av_frame_copy_props(FilteredFrame.get(), sourceFrame.get());
+    }
 
     int GetAnswer = av_buffersink_get_frame(FilterGraph_Sink_Context, FilteredFrame.get()); //TODO: handling of multiple output per input
     if (GetAnswer==AVERROR(EAGAIN) || GetAnswer==AVERROR_EOF)
@@ -1319,6 +1322,13 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
         {
             TempPacket->data+=TempPacket->size;
             TempPacket->size=0;
+
+            for (size_t OutputPos=0; OutputPos<OutputDatas.size(); OutputPos++)
+                if (OutputDatas[OutputPos] && OutputDatas[OutputPos]->Enabled && OutputDatas[OutputPos]->Stream==InputData->Stream) {
+                    if(!OutputDatas[OutputPos]->Filter.empty()) // flush delayed filtered frames
+                        OutputDatas[OutputPos]->Process(nullptr);
+                }
+
             return false;
         }
         TempPacket->data+=Bytes;
