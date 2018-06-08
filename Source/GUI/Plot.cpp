@@ -16,6 +16,7 @@
 #include <qwt_scale_widget.h>
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_marker.h>
+#include <qwt_plot_magnifier.h>
 #include <qwt_series_data.h>
 #include <qwt_symbol.h>
 #include <QResizeEvent>
@@ -549,6 +550,20 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
          m_legend, SLOT( updateLegend( const QVariant &, const QList<QwtLegendData> & ) ) );
 
     updateLegend();
+
+    // Setting Magnifier
+    QwtPlotMagnifier* zoom_x = new QwtPlotMagnifier(this->canvas());
+    QwtPlotMagnifier* zoom_y = new QwtPlotMagnifier(this->canvas());
+
+    // Shift+MouseWheel --> Magnifier x
+    zoom_x->setWheelModifiers(Qt::ShiftModifier);
+    zoom_x->setAxisEnabled(QwtPlot::xBottom, true);
+    zoom_x->setAxisEnabled(QwtPlot::yLeft, false);
+
+    // CTRL + MouseWheel --> Magnifier y
+    zoom_y->setWheelModifiers(Qt::ControlModifier);
+    zoom_y->setAxisEnabled(QwtPlot::xBottom,false);
+    zoom_y->setAxisEnabled(QwtPlot::yLeft,true);
 }
 
 //---------------------------------------------------------------------------
