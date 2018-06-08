@@ -17,6 +17,7 @@
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_magnifier.h>
+#include <qwt_plot_panner.h>
 #include <qwt_series_data.h>
 #include <qwt_symbol.h>
 #include <QResizeEvent>
@@ -564,6 +565,70 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
     zoom_y->setWheelModifiers(Qt::ControlModifier);
     zoom_y->setAxisEnabled(QwtPlot::xBottom,false);
     zoom_y->setAxisEnabled(QwtPlot::yLeft,true);
+
+    class CustomPanner: public QwtPlotPanner
+    {
+
+    public:
+        explicit CustomPanner(QWidget* parent) : QwtPlotPanner(parent){
+            connect(this, &CustomPanner::moved, [&](int dx, int dy) {
+                if(panning) {
+                    Q_EMIT panned(dx - lastMovePos.x(), dy - lastMovePos.y());
+                    lastMovePos = QPoint(dx, dy);
+                }
+            });
+        }
+
+    private:
+        bool panning;
+        QPoint lastMovePos;
+
+        virtual void paintEvent(QPaintEvent *) {
+        }
+
+        virtual bool eventFilter( QObject * object, QEvent * event)
+        {
+            if ( object == NULL || object != parentWidget() )
+                    return false;
+
+            switch ( event->type() )
+            {
+                case QEvent::MouseButtonPress:
+                {
+                    auto mousePress = static_cast<QMouseEvent *>(event);
+                    widgetMousePressEvent(mousePress);
+                    lastMovePos = QPoint(0, 0);
+
+                    Qt::MouseButton button;
+                    Qt::KeyboardModifiers modifiers;
+
+                    getMouseButton(button, modifiers);
+                    if(mousePress->button() == button && mousePress->modifiers() == modifiers) {
+                        panning = true;
+                    }
+                    break;
+                }
+                case QEvent::MouseMove:
+                {
+                    QMouseEvent * evr = static_cast<QMouseEvent *>( event );
+                    widgetMouseMoveEvent( evr );
+                    break;
+                }
+                case QEvent::MouseButtonRelease:
+                {
+                    panning = false;
+                    break;
+                }
+                default:;
+            }
+
+            return false;
+        }
+    };
+
+    QwtPlotPanner *panner = new CustomPanner( this->canvas() );
+    panner->setOrientations(Qt::Vertical);
+    panner->setMouseButton( Qt::MidButton );
 }
 
 //---------------------------------------------------------------------------
