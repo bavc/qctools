@@ -11,7 +11,7 @@ Cli::Cli() : indexOfStreamWithKnownFrameCount(0), statsFileBytesWritten(0), stat
 int Cli::exec(QCoreApplication &a)
 {
     std::string appName = "qcli";
-    std::string copyright = "Copyright (c) 2013-2017 BAVC";
+    std::string copyright = "Copyright (c) 2013-2018 BAVC";
 
     QString input;
     QString output;
