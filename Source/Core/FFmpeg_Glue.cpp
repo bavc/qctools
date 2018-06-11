@@ -2645,7 +2645,7 @@ QByteArray FFmpeg_Glue::getAttachment(const QString &fileName, QString& attachme
         if (avformat_find_stream_info(formatContext, NULL)>=0)
         {
             if(formatContext->nb_streams == 2) {
-                if(formatContext->streams[0]->codec->codec_type == AVMEDIA_TYPE_VIDEO && formatContext->streams[1]->codec->codec_type == AVMEDIA_TYPE_ATTACHMENT) {
+                if(formatContext->streams[0]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO && formatContext->streams[1]->codecpar->codec_type == AVMEDIA_TYPE_ATTACHMENT) {
                     auto st = formatContext->streams[1];
                     if(st->codecpar->extradata_size != 0) {
                         attachment = QByteArray((const char*) st->codecpar->extradata, st->codecpar->extradata_size);

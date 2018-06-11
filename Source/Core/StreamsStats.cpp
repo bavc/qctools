@@ -35,7 +35,7 @@ StreamsStats::StreamsStats(AVFormatContext *context)
     {
         for (size_t pos = 0; pos < context->nb_streams; ++pos)
         {
-            switch (context->streams[pos]->codec->codec_type)
+            switch (context->streams[pos]->codecpar->codec_type)
             {
                 case AVMEDIA_TYPE_VIDEO:
                     streams.push_back(std::unique_ptr<VideoStreamStats>(new VideoStreamStats(context->streams[pos], context)));
@@ -44,7 +44,7 @@ StreamsStats::StreamsStats(AVFormatContext *context)
                     streams.push_back(std::unique_ptr<AudioStreamStats>(new AudioStreamStats(context->streams[pos], context)));
                     break;
                 default:
-                    qDebug() << "only Audio / Video streams are supported for now.. skipping stream of index = " << pos << " and of type = " << context->streams[pos]->codec->codec_type;
+                    qDebug() << "only Audio / Video streams are supported for now.. skipping stream of index = " << pos << " and of type = " << context->streams[pos]->codecpar->codec_type;
             }
         }
     }
