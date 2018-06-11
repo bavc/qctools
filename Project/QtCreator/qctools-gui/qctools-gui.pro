@@ -101,7 +101,6 @@ FORMS += \
     $$SOURCES_PATH/GUI/mainwindow.ui \
     $$SOURCES_PATH/GUI/preferences.ui \
     $$SOURCES_PATH/GUI/CommentsEditor.ui \
-    $$SOURCES_PATH/GUI/blackmagicdecklink_userinput.ui \
     $$SOURCES_PATH/GUI/imagelabel.ui \
     $$SOURCES_PATH/GUI/barchartconditioneditor.ui \
     $$SOURCES_PATH/GUI/barchartconditioninput.ui \
@@ -216,16 +215,6 @@ macx:contains(DEFINES, USE_BREW) {
 INCLUDEPATH += $$SOURCES_PATH
 INCLUDEPATH += $$SOURCES_PATH/ThirdParty/cqmarkdown
 include(../ffmpeg.pri)
-include(../blackmagic.pri)
-
-equals(USE_BLACKMAGIC, true) {
-
-    HEADERS += \
-        $$SOURCES_PATH/GUI/blackmagicdecklink_userinput.h
-
-    SOURCES += \
-        $$SOURCES_PATH/GUI/blackmagicdecklink_userinput.cpp
-}
 
 !win32 {
     LIBS += -lz

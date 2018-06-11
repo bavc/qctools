@@ -8,8 +8,6 @@
 #include "Core/FileInformation.h"
 #include "Core/SignalServer.h"
 #include "Core/FFmpeg_Glue.h"
-#include "Core/BlackmagicDeckLink_Glue.h"
-
 #include "Core/VideoStats.h"
 #include "Core/AudioStats.h"
 #include "Core/FormatStats.h"
@@ -64,34 +62,6 @@ void FileInformation::runParse()
         checkFileUploaded(fileInfo.fileName());
     }
 
-#ifdef BLACKMAGICDECKLINK_YES
-    if (blackmagicDeckLink_Glue)
-    {
-        blackmagicDeckLink_Glue->Glue=Glue;
-
-        bool completed = false;
-        for (;;)
-        {
-            switch (blackmagicDeckLink_Glue->Config_Out.Status)
-            {
-                case BlackmagicDeckLink_Glue::instancied:
-                                                        blackmagicDeckLink_Glue->Start();
-                                                        break;
-                case BlackmagicDeckLink_Glue::finished:
-                                                        completed=true;
-                                                        break;
-                default : ;
-            }
-
-            if (WantToStop || completed)
-                break;
-            yieldCurrentThread();
-        }
-
-        delete blackmagicDeckLink_Glue; blackmagicDeckLink_Glue=NULL;
-    }
-    else
-#endif // BLACKMAGICDECKLINK_YES
     {
         int frameNumber = 1;
 
@@ -261,17 +231,11 @@ void FileInformation::readStats(QIODevice& StatsFromExternalData_File, bool Stat
 }
 
 FileInformation::FileInformation (SignalServer* signalServer, const QString &FileName_, activefilters ActiveFilters_, activealltracks ActiveAllTracks_,
-#ifdef BLACKMAGICDECKLINK_YES
-                                  BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue_,
-#endif // BLACKMAGICDECKLINK_YES
                                   int FrameCount, const string &Encoding_FileName, const std::string &Encoding_Format) :
     FileName(FileName_),
     ActiveFilters(ActiveFilters_),
     ActiveAllTracks(ActiveAllTracks_),
     signalServer(signalServer),
-#ifdef BLACKMAGICDECKLINK_YES
-    blackmagicDeckLink_Glue(blackmagicDeckLink_Glue_),
-#endif // BLACKMAGICDECKLINK_YES
     m_jobType(Parsing),
 	streamsStats(NULL),
     formatStats(NULL),
@@ -421,14 +385,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         fileName = "pipe:0";
 
     Glue=new FFmpeg_Glue(fileName, ActiveAllTracks, &Stats, &streamsStats, &formatStats, Stats.empty());
-    if (FileName_string.empty())
-    {
-#ifdef BLACKMAGICDECKLINK_YES
-        Glue->AddInput_Video(FrameCount, 1001, 30000, 720, 486, blackmagicDeckLink_Glue->Config_In.VideoBitDepth, blackmagicDeckLink_Glue->Config_In.VideoCompression, blackmagicDeckLink_Glue->Config_In.TC_in);
-        Glue->AddInput_Audio(FrameCount, 1001, 30000, 48000, blackmagicDeckLink_Glue->Config_In.AudioBitDepth, blackmagicDeckLink_Glue->Config_In.AudioTargetBitDepth, blackmagicDeckLink_Glue->Config_In.ChannelsCount);
-#endif // BLACKMAGICDECKLINK_YES
-    }
-    else if (Glue->ContainerFormat_Get().empty())
+    if (!FileName_string.empty() && Glue->ContainerFormat_Get().empty())
     {
         delete Glue;
         Glue=NULL;

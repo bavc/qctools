@@ -54,13 +54,11 @@ before_install:
 install:
   - if [[ $TRAVIS_OS_NAME == linux ]]; then source ./Project/BuildAllFromSource/init.sh; fi
   - if [[ $TRAVIS_OS_NAME == linux ]]; then cd ..; fi # go out of qctools folder
-  - if [[ $TRAVIS_OS_NAME == linux ]]; then source $SCRIPT_DIR/init_blackmagic.sh; fi
   - if [[ $TRAVIS_OS_NAME == linux ]]; then source $SCRIPT_DIR/init_ffmpeg.sh; fi
   - if [[ $TRAVIS_OS_NAME == linux ]]; then source $SCRIPT_DIR/init_qwt.sh; fi
 
   - if [[ $TRAVIS_OS_NAME == osx && $QCTOOLS_USE_BREW == false ]]; then source ./Project/BuildAllFromSource/init.sh; fi
   - if [[ $TRAVIS_OS_NAME == osx && $QCTOOLS_USE_BREW == false ]]; then cd ..; fi # go out of qctools folder
-  - if [[ $TRAVIS_OS_NAME == osx && $QCTOOLS_USE_BREW == false ]]; then source $SCRIPT_DIR/init_blackmagic.sh; fi
   - if [[ $TRAVIS_OS_NAME == osx && $QCTOOLS_USE_BREW == false ]]; then source $SCRIPT_DIR/init_ffmpeg.sh; fi
   - if [[ $TRAVIS_OS_NAME == osx && $QCTOOLS_USE_BREW == false ]]; then source $SCRIPT_DIR/init_qwt.sh; fi
 

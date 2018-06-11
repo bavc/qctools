@@ -74,5 +74,4 @@ win32 {
     INCLUDEPATH += $$ZLIB_INCLUDE_PATH
 }
 
-include(../blackmagic.pri)
 include($$SOURCES_PATH/ThirdParty/qblowfish/qblowfish.pri)

@@ -34,7 +34,6 @@ message("qctools: THIRD_PARTY_PATH = " $$absolute_path($$THIRD_PARTY_PATH))
 
 INCLUDEPATH += $$SOURCES_PATH
 include(../ffmpeg.pri)
-include(../blackmagic.pri)
 
 HEADERS += $$SOURCES_PATH/Cli/version.h \
            $$SOURCES_PATH/Cli/cli.h

@@ -101,11 +101,6 @@ void MainWindow::TimeOut ()
         CommonStats* Stats=Files[Files_Pos]->ReferenceStat();
         if (Stats && Stats->State_Get()>=1)
             Files_Completed++;
-
-#ifdef BLACKMAGICDECKLINK_YES
-        if (Files[Files_Pos]->blackmagicDeckLink_Glue)
-            DeckRunning_New=true;
-#endif // BLACKMAGICDECKLINK_YES
     }
 
     if (isFileSelected())
@@ -138,17 +133,6 @@ void MainWindow::TimeOut ()
 
     if (PlotsArea)
         PlotsArea->refresh();
-
-    // Deck
-    if (DeckRunning_New != DeckRunning)
-    {
-        if (DeckRunning_New)
-            ui->actionBlackmagicDeckLinkCapture->setIcon(QIcon(":/icon/capture_stop.png"));
-        else
-            ui->actionBlackmagicDeckLinkCapture->setIcon(QIcon(":/icon/capture_layout.png"));
-
-        DeckRunning=DeckRunning_New;
-    }
 }
 
 //---------------------------------------------------------------------------

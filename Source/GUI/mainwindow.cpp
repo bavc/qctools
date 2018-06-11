@@ -193,14 +193,6 @@ void MainWindow::on_actionOpen_triggered()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_actionBlackmagicDeckLinkCapture_triggered()
-{
-#ifdef BLACKMAGICDECKLINK_YES
-    openCapture();
-#endif // BLACKMAGICDECKLINK_YES
-}
-
-//---------------------------------------------------------------------------
 void MainWindow::on_actionClose_triggered()
 {
     closeFile();
