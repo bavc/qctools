@@ -45,8 +45,8 @@ public:
     JobTypes jobType() const;
 
     // Constructor/Destructor
-                                FileInformation             (SignalServer* signalServer, const QString &fileName, activefilters ActiveFilters, activealltracks ActiveAllTracks,
-                                                             int FrameCount=0, const std::string &Encoding_FileName=std::string(), const std::string &Encoding_Format=std::string());
+                                FileInformation             (SignalServer* signalServer, const QString &fileName,
+                                                             activefilters ActiveFilters, activealltracks ActiveAllTracks, int FrameCount=0);
                                 ~FileInformation            ();
 
     // Parsing

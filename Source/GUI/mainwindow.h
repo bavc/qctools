@@ -89,7 +89,6 @@ public:
     void                        clearGraphsLayout           ();
     void                        createGraphsLayout          ();
     void                        addFile                     (const QString &FileName);
-    void                        addFile                     (int FrameCount, const std::string &Encoding_FileName=std::string(), const std::string &Encoding_Format=std::string());
     void                        addFile_finish              ();
     void                        selectFile                  (int newFilePos);
     void                        selectDisplayFile           (int newFilePos);

@@ -125,14 +125,7 @@ FFmpeg_Glue::inputdata::inputdata()
 
     // Cache
     FramesCache(NULL),
-    FramesCache_Default(NULL),
-
-    // Encode
-    Encode_FormatContext(NULL),
-    Encode_CodecContext(NULL),
-    Encode_Stream(NULL),
-    Encode_Packet(NULL),
-    Encode_CodecID(AV_CODEC_ID_NONE)
+    FramesCache_Default(NULL)
 {
 }
 
@@ -141,9 +134,6 @@ FFmpeg_Glue::inputdata::~inputdata()
     // FFmpeg pointers - Input
     if (Stream)
         avcodec_close(Stream->codec);
-
-    // Encode
-    CloseEncode();
 
     // FramesCache
     if (FramesCache)
@@ -154,181 +144,6 @@ FFmpeg_Glue::inputdata::~inputdata()
         }
         delete FramesCache;
     }
-}
-
-//---------------------------------------------------------------------------
-bool FFmpeg_Glue::inputdata::InitEncode()
-{
-    if (Type==AVMEDIA_TYPE_VIDEO)
-    {
-        AVCodec *Encode_Codec;
-        if (Encode_CodecID==AV_CODEC_ID_NONE)
-            Encode_Codec=avcodec_find_encoder(Stream->codec->codec_id);
-        else
-            Encode_Codec=avcodec_find_encoder((AVCodecID)Encode_CodecID);
-        if (!Encode_Codec)
-            return false;
-
-        Encode_Stream=avformat_new_stream(Encode_FormatContext, Encode_Codec);
-        if (TimecodeBCD != -1)
-        {
-            char timecode[12];
-            timecode[ 0] = '0' + ((TimecodeBCD>>28)&0xF);
-            timecode[ 1] = '0' + ((TimecodeBCD>>24)&0xF);
-            timecode[ 2] = ':';
-            timecode[ 3] = '0' + ((TimecodeBCD>>20)&0xF);
-            timecode[ 4] = '0' + ((TimecodeBCD>>16)&0xF);
-            timecode[ 5] = ':';
-            timecode[ 6] = '0' + ((TimecodeBCD>>12)&0xF);
-            timecode[ 7] = '0' + ((TimecodeBCD>> 8)&0xF);
-            timecode[ 8] = ';';
-            timecode[ 9] = '0' + ((TimecodeBCD>> 4)&0xF);
-            timecode[10] = '0' + ( TimecodeBCD     &0xF);
-            timecode[11] = '\0';
-            av_dict_set(&Encode_Stream->metadata, "timecode", timecode, 0);
-        }
-        Encode_Stream->id=Encode_FormatContext->nb_streams-1;
-
-        Encode_CodecContext=Encode_Stream->codec;
-        if (!Encode_CodecContext)
-            return false;
-        Encode_CodecContext->flags         = AV_CODEC_FLAG_GLOBAL_HEADER;
-        Encode_CodecContext->width         = Stream->codec->width;
-        Encode_CodecContext->height        = Stream->codec->height;
-        if (Encode_CodecID==AV_CODEC_ID_NONE)
-            Encode_CodecContext->pix_fmt   = Stream->codec->pix_fmt;
-        else if (Stream->codec->bits_per_raw_sample==10)
-            Encode_CodecContext->pix_fmt   = AV_PIX_FMT_YUV422P10;
-        else
-            Encode_CodecContext->pix_fmt   = AV_PIX_FMT_YUV422P;
-        Encode_CodecContext->time_base.num = Stream->codec->time_base.num;
-        Encode_CodecContext->time_base.den = Stream->codec->time_base.den;
-        Encode_CodecContext->sample_aspect_ratio.num = 9;
-        Encode_CodecContext->sample_aspect_ratio.den = 10;
-        Encode_CodecContext->field_order   = AV_FIELD_BT;
-        if (avcodec_open2(Encode_CodecContext, Encode_Codec, NULL) < 0)
-            return false;
-    }
-
-    if (Type==AVMEDIA_TYPE_AUDIO)
-    {
-        AVCodec *Encode_Codec;
-        if (Encode_CodecID==AV_CODEC_ID_NONE)
-            Encode_Codec=avcodec_find_encoder(Stream->codec->codec_id);
-        else
-            Encode_Codec=avcodec_find_encoder((AVCodecID)Encode_CodecID);
-        if (!Encode_Codec)
-            return false;
-
-        Encode_Stream=avformat_new_stream(Encode_FormatContext, Encode_Codec);
-        Encode_Stream->id=Encode_FormatContext->nb_streams-1;
-
-        Encode_CodecContext=Encode_Stream->codec;
-        if (!Encode_CodecContext)
-            return false;
-        Encode_CodecContext->bits_per_raw_sample=Stream->codec->bits_per_raw_sample;
-        Encode_CodecContext->sample_rate   = Stream->codec->sample_rate;
-        Encode_CodecContext->channels      = Stream->codec->channels;
-        Encode_CodecContext->channel_layout= Stream->codec->channel_layout;
-        Encode_CodecContext->sample_fmt    =  Stream->codec->sample_fmt;
-        if (avcodec_open2(Encode_CodecContext, Encode_Codec, NULL) < 0)
-            return false;
-    }
-
-    return true;
-}
-
-//---------------------------------------------------------------------------
-void FFmpeg_Glue::inputdata::Encode(AVPacket* SourcePacket)
-{
-    if (!Encode_CodecContext && !InitEncode())
-    {
-        return;
-    }
-                                    
-    AVPacket TempPacket=*SourcePacket;
-    TempPacket.pts=AV_NOPTS_VALUE;
-    TempPacket.dts=AV_NOPTS_VALUE;
-
-    if (Encode_CodecID==AV_CODEC_ID_NONE)
-        av_interleaved_write_frame(Encode_FormatContext, &TempPacket);
-    else if (Encode_CodecID==AV_CODEC_ID_PCM_S24LE)
-    {
-        // 32 to 24-bit
-        TempPacket.size=SourcePacket->size*3/4;
-        TempPacket.data=new unsigned char[SourcePacket->size];
-        unsigned char* Source=SourcePacket->data;
-        unsigned char* Source_End=SourcePacket->data+SourcePacket->size;
-        unsigned char* Dest=TempPacket.data;
-        while (Source<Source_End)
-        {
-            ++Source;
-            *(Dest++)=*(Source++);
-            *(Dest++)=*(Source++);
-            *(Dest++)=*(Source++);
-        }
-        av_interleaved_write_frame(Encode_FormatContext, &TempPacket);
-    }
-    else if (Encode_CodecID==AV_CODEC_ID_FFV1)
-    {
-        // FFV1
-        AVFrame* SourceFrame = av_frame_alloc();
-        unsigned char* SourceFrame_Data = NULL;
-        int SourceFrame_Size = -1;
-        if (Stream->codec->bits_per_raw_sample==10)
-        {
-            int SourceFrame_Size = av_image_get_buffer_size(Stream->codec->pix_fmt, Stream->codec->width, Stream->codec->height, 1);
-            SourceFrame_Data = new unsigned char[SourceFrame_Size];
-            av_image_fill_arrays(SourceFrame->data, SourceFrame->linesize, SourceFrame_Data, Stream->codec->pix_fmt, Stream->codec->width, Stream->codec->height, 1);
-            int got_frame;
-            int Bytes=avcodec_decode_video2(Stream->codec, SourceFrame, &got_frame, SourcePacket);
-            got_frame=0;
-        }
-        else
-        {
-            SourceFrame->width = Stream->codec->width;
-            SourceFrame->height = Stream->codec->height;
-            SourceFrame->format = Stream->codec->pix_fmt;
-            av_image_fill_arrays(SourceFrame->data, SourceFrame->linesize, SourcePacket->data, (AVPixelFormat)SourceFrame->format, SourceFrame->width, SourceFrame->height, 1);
-        }
-
-        AVFrame* DestFrame = av_frame_alloc();
-        DestFrame->width = Stream->codec->width;
-        DestFrame->height = Stream->codec->height;
-        if (Stream->codec->bits_per_raw_sample==10)
-            DestFrame->format = AV_PIX_FMT_YUV422P10;
-        else
-            DestFrame->format = AV_PIX_FMT_YUV422P;
-        int DestFrame_Size = av_image_get_buffer_size((AVPixelFormat)DestFrame->format, DestFrame->width, DestFrame->height, 1);
-        unsigned char* DestFrame_Data = new unsigned char[DestFrame_Size];
-        av_image_fill_arrays(DestFrame->data, DestFrame->linesize, DestFrame_Data, (AVPixelFormat)DestFrame->format, DestFrame->width, DestFrame->height, 1);
-
-        struct SwsContext* Context = sws_getContext(SourceFrame->width, SourceFrame->height, (AVPixelFormat)SourceFrame->format, DestFrame->width, DestFrame->height, (AVPixelFormat)DestFrame->format, SWS_FAST_BILINEAR, NULL, NULL, NULL);
-        int Result = sws_scale(Context, SourceFrame->data, SourceFrame->linesize, 0, SourceFrame->height, DestFrame->data, DestFrame->linesize);
-
-        AVPacket TempPacket;
-
-        av_init_packet(&TempPacket);
-        TempPacket.data=NULL;
-        TempPacket.size=0;
-        TempPacket.stream_index=0;
-        int got_packet=0;
-        if (avcodec_encode_video2(Encode_CodecContext, &TempPacket, DestFrame, &got_packet) < 0 || !got_packet)
-        {
-            delete[] DestFrame_Data;
-            return;
-        }
-
-        av_interleaved_write_frame(Encode_FormatContext, &TempPacket);
-        delete[] SourceFrame_Data;
-        delete[] DestFrame_Data;
-    }
-}
-
-//---------------------------------------------------------------------------
-void FFmpeg_Glue::inputdata::CloseEncode()
-{
-    Encode_CodecContext=NULL;
 }
 
 //***************************************************************************
@@ -776,9 +591,7 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, activealltracks ActiveAllTrac
     WithStats(WithStats_),
     FileName(FileName_),
     InputDatas_Copy(false),
-    mutex(nullptr),
-    // Encode
-    Encode_FormatContext(NULL)
+    mutex(nullptr)
 {
     ensureFFMpegInitialized();
 
@@ -890,8 +703,6 @@ FFmpeg_Glue::FFmpeg_Glue (const string &FileName_, activealltracks ActiveAllTrac
 //---------------------------------------------------------------------------
 FFmpeg_Glue::~FFmpeg_Glue()
 {
-    CloseEncode();
-
     if (Packet)
     {
         //av_packet_unref(Packet);
@@ -955,101 +766,6 @@ size_t FFmpeg_Glue::Thumbnails_Size(size_t Pos)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::AddInput_Video(size_t FrameCount, int time_base_num, int time_base_den, int Width, int Height, int BitDepth, bool Compression, int TimecodeBCD)
-{
-    if (!FormatContext && avformat_alloc_output_context2(&FormatContext, NULL, "mpeg", NULL)<0)
-        return;
-
-    enum AVCodecID codec_id;
-    enum AVPixelFormat pix_fmt;
-    switch (BitDepth)
-    {
-        case  8: codec_id=AV_CODEC_ID_RAWVIDEO; pix_fmt=AV_PIX_FMT_UYVY422; break;
-        case 10: codec_id=AV_CODEC_ID_V210;     pix_fmt=AV_PIX_FMT_NONE; break;
-        default: return; // Not supported
-    }
-    inputdata* InputData=new inputdata;
-    InputData->Type=AVMEDIA_TYPE_VIDEO;
-    InputData->Stream=avformat_new_stream(FormatContext, NULL);
-    InputData->Stream->time_base.num=time_base_num;
-    InputData->Stream->time_base.den=time_base_den;
-    InputData->Stream->duration=FrameCount;
-    AVCodec* Codec=avcodec_find_decoder(codec_id);
-    AVCodecContext* CodecContext=avcodec_alloc_context3(Codec);
-    CodecContext->pix_fmt=pix_fmt;
-    CodecContext->width=Width;
-    CodecContext->height=Height;
-    CodecContext->time_base.num=time_base_num;
-    CodecContext->time_base.den=time_base_den;
-    CodecContext->field_order=AV_FIELD_BT;
-    if (avcodec_open2(CodecContext, Codec, NULL)<0)
-        return;
-    InputData->Stream->codec=CodecContext;
-
-    InputData->FrameCount=FrameCount;
-    InputData->Duration=((double)FrameCount)*time_base_num/time_base_den;
-    InputData->TimecodeBCD=TimecodeBCD;
-
-    // Stats
-    if (WithStats)
-        Stats->push_back(new VideoStats(InputData->FrameCount, InputData->Duration, InputData->Stream));
-
-    //
-    InputDatas.push_back(InputData);
-
-    // Encode
-    if (Compression)
-        InputData->Encode_CodecID=AV_CODEC_ID_FFV1;
-}
-
-//---------------------------------------------------------------------------
-void FFmpeg_Glue::AddInput_Audio(size_t FrameCount, int time_base_num, int time_base_den, int Samplerate, int BitDepth, int OutputBitDepth, int Channels)
-{
-    if (!FormatContext && avformat_alloc_output_context2(&FormatContext, NULL, "mpeg", NULL)<0)
-        return;
-
-    enum AVCodecID codec_id;
-    switch (BitDepth)
-    {
-        case 16: codec_id=AV_CODEC_ID_PCM_S16LE; break;
-        case 32: codec_id=AV_CODEC_ID_PCM_S32LE; break;
-        default: return; // Not supported
-    }
-
-    inputdata* InputData=new inputdata;
-    InputData->Type=AVMEDIA_TYPE_AUDIO;
-    InputData->Stream=avformat_new_stream(FormatContext, NULL);
-    InputData->Stream->time_base.num=time_base_num;
-    InputData->Stream->time_base.den=time_base_den;
-    InputData->Stream->duration=FrameCount;
-    AVCodec* Codec=avcodec_find_decoder(codec_id);
-    AVCodecContext* CodecContext=avcodec_alloc_context3(Codec);
-    CodecContext->sample_rate=Samplerate;
-    CodecContext->channels=Channels;
-    if (avcodec_open2(CodecContext, Codec, NULL)<0)
-        return;
-    InputData->Stream->codec=CodecContext;
-    InputData->Stream->codec->channel_layout=av_get_default_channel_layout(CodecContext->channels);
-
-    InputData->FrameCount=FrameCount;
-    InputData->Duration=((double)FrameCount)*time_base_num/time_base_den;
-
-    // Stats
-    if (WithStats)
-        Stats->push_back(new AudioStats(InputData->FrameCount, InputData->Duration, InputData->Stream));
-
-    //
-    InputDatas.push_back(InputData);
-
-    // Encode
-    switch (OutputBitDepth)
-    {
-        case 24: InputData->Encode_CodecID=AV_CODEC_ID_PCM_S24LE; break;
-        default: ;
-    }
- }
-
-//---------------------------------------------------------------------------
 void FFmpeg_Glue::AddOutput(size_t FilterPos, int Scale_Width, int Scale_Height, outputmethod OutputMethod, int FilterType, const string &Filter)
 {
     for (size_t InputPos=0; InputPos<InputDatas.size(); InputPos++)
@@ -1065,17 +781,8 @@ void FFmpeg_Glue::AddOutput(size_t FilterPos, int Scale_Width, int Scale_Height,
 }
 
 //---------------------------------------------------------------------------
-void FFmpeg_Glue::AddOutput(const string &FileName, const string &Format)
-{
-    Encode_FileName=FileName;
-    Encode_Format=Format;
-}
-
-//---------------------------------------------------------------------------
 void FFmpeg_Glue::CloseOutput()
 {
-    CloseEncode();
-
     // Complete
     if (WithStats)
         for (size_t Pos=0; Pos<Stats->size(); Pos++)
@@ -1295,15 +1002,6 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
     inputdata* InputData=InputDatas[TempPacket->stream_index];
     if (!InputData)
         return false;
-
-    // Encode
-    if (!Encode_FileName.empty())
-    {
-        if (!Encode_FormatContext)
-            InitEncode();
-        if (Encode_FormatContext)
-            InputData->Encode(TempPacket);
-    }
     
     // Decoding
     int got_frame;
@@ -1391,61 +1089,6 @@ bool FFmpeg_Glue::OutputFrame(unsigned char* Data, size_t Size, int stream_index
     Packet.stream_index=stream_index;
     Packet.pts=FramePos;
     return OutputFrame(&Packet);
-}
-
-//---------------------------------------------------------------------------
-bool FFmpeg_Glue::InitEncode()
-{
-    //
-    if (avformat_alloc_output_context2(&Encode_FormatContext, NULL, Encode_Format.c_str(), Encode_FileName.c_str())<0)
-        return false;
-
-    //
-    for (size_t InputPos=0; InputPos<InputDatas.size(); InputPos++)
-    {
-        inputdata* InputData=InputDatas[InputPos];
-
-        InputData->Encode_FormatContext=Encode_FormatContext;
-        InputData->InitEncode();
-    }
-
-    //
-    if (avio_open(&Encode_FormatContext->pb, Encode_FileName.c_str(), AVIO_FLAG_WRITE)<0)
-        return false;
-     if (avformat_write_header(Encode_FormatContext, NULL))
-    {
-        avio_close(Encode_FormatContext->pb);
-        avformat_free_context(Encode_FormatContext);
-        Encode_FormatContext=NULL;
-        return false;
-    }
-
-    // All is OK
-    return true;
-}
-
-
-//---------------------------------------------------------------------------
-void FFmpeg_Glue::CloseEncode()
-{
-    if (!Encode_FormatContext)
-        return;
-
-    av_write_trailer(Encode_FormatContext);
-
-    //
-    for (size_t InputPos=0; InputPos<InputDatas.size(); InputPos++)
-    {
-        inputdata* InputData=InputDatas[InputPos];
-
-        InputData->CloseEncode();
-    }
-
-    avio_close(Encode_FormatContext->pb);
-
-    avformat_free_context(Encode_FormatContext);
-
-    Encode_FormatContext=NULL;
 }
 
 //***************************************************************************

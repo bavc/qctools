@@ -26,6 +26,7 @@
 #include <zlib.h>
 #include <zconf.h>
 
+#include <cmath>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -231,7 +232,7 @@ void FileInformation::readStats(QIODevice& StatsFromExternalData_File, bool Stat
 }
 
 FileInformation::FileInformation (SignalServer* signalServer, const QString &FileName_, activefilters ActiveFilters_, activealltracks ActiveAllTracks_,
-                                  int FrameCount, const string &Encoding_FileName, const std::string &Encoding_Format) :
+                                  int FrameCount) :
     FileName(FileName_),
     ActiveFilters(ActiveFilters_),
     ActiveAllTracks(ActiveAllTracks_),
@@ -396,11 +397,6 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     if (Glue)
     {
         Glue->AddOutput(0, 72, 72, FFmpeg_Glue::Output_Jpeg);
-        if (!Encoding_FileName.empty())
-        {
-            Glue->AddOutput(Encoding_FileName, Encoding_Format);
-            FileName=QString::fromUtf8(Encoding_FileName.c_str());
-        }
         Glue->AddOutput(1, 0, 0, FFmpeg_Glue::Output_Stats, 0, Filters[0]);
         Glue->AddOutput(0, 0, 0, FFmpeg_Glue::Output_Stats, 1, Filters[1]);
     }

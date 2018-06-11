@@ -399,26 +399,6 @@ void MainWindow::addFile(const QString &FileName)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::addFile(
-        int FrameCount, const string &Encoding_FileName, const string &Encoding_Format)
-{
-    // Launch analysis
-    FileInformation* Temp=new FileInformation(signalServer, QString(), Prefs->ActiveFilters, Prefs->ActiveAllTracks,
-                                              FrameCount, Encoding_FileName, Encoding_Format);
-
-    connect(Temp, SIGNAL(positionChanged()), this, SLOT(Update()), Qt::DirectConnection); // direct connection is required here to get Update called from separate thread
-    connect(Temp, SIGNAL(parsingCompleted(bool)), this, SLOT(updateExportAllAction()));
-
-    Temp->setIndex(Files.size());
-    Temp->setExportFilters(Prefs->ActiveFilters);
-
-    Files.push_back(Temp);
-    ui->fileNamesBox->addItem(Temp->fileName());
-
-    updateRecentFiles(Temp->fileName());
-}
-
-//---------------------------------------------------------------------------
 void MainWindow::addFile_finish()
 {
     if (FilesListArea)
