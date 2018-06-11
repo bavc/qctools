@@ -332,8 +332,6 @@ void Plot::initYAxis()
         setYAxis(0.0, 1.0, 1);
 
         auto streamInfo = PerStreamType[m_type];
-        CommonStats* stat = stats( streamPos() );
-
         for(size_t j = 0; j < streamInfo.PerGroup[m_group].Count; ++j)
         {
             PlotSeriesData* data = getData(j);

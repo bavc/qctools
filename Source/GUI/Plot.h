@@ -155,7 +155,7 @@ public:
                     auto right = index + 1;
 
                     bool leftMatched = left >= 0 && condition.match(yData[left]);
-                    bool rightMatched = right < size() && condition.match(yData[right]);
+                    bool rightMatched = right < int(size()) && condition.match(yData[right]);
 
                     if(!leftMatched && !rightMatched)
                         continue;

@@ -323,7 +323,8 @@ string AudioStats::StatsToXML (const activefilters& filters)
     {
         stringstream pkt_pts_time; pkt_pts_time<<fixed<<setprecision(7)<<(x[1][x_Pos]+FirstTimeStamp);
         stringstream pkt_duration_time; pkt_duration_time<<fixed<<setprecision(7)<<durations[x_Pos];
-        stringstream key_frame; key_frame<<key_frames[x_Pos]?'1':'0';
+        stringstream key_frame; key_frame<< (key_frames[x_Pos]? '1' : '0');
+
         Data<<"        <frame media_type=\"audio\"";
         Data << " stream_index=\"" << streamIndex << "\"";
 
