@@ -18,10 +18,6 @@
 #include "Core/Core.h"
 #include "Core/VideoCore.h"
 
-#ifdef BLACKMAGICDECKLINK_YES
-#include "Core/BlackmagicDeckLink_Glue.h"
-#endif
-
 #include <QFileDialog>
 #include <QScrollBar>
 #include <QSizePolicy>
@@ -93,7 +89,6 @@ void MainWindow::Ui_Init()
 
     // Icons
     ui->actionOpen->setIcon(QIcon(":/icon/document-open.png"));
-    ui->actionBlackmagicDeckLinkCapture->setIcon(QIcon(":/icon/capture_layout.png"));
     ui->actionExport_XmlGz_Prompt->setIcon(QIcon(":/icon/export_xml.png"));
     ui->actionPrint->setIcon(QIcon(":/icon/document-print.png"));
     ui->actionZoomIn->setIcon(QIcon(":/icon/zoom-in.png"));
@@ -315,18 +310,6 @@ void MainWindow::Ui_Init()
     // Not implemented action
     if (ui->actionExport_XmlGz_Custom)
         ui->actionExport_XmlGz_Custom->setVisible(false);
-
-    #if defined(BLACKMAGICDECKLINK_YES)
-        // Deck menu
-        if (BlackmagicDeckLink_Glue::CardsList().empty())
-        {
-            ui->actionBlackmagicDeckLinkCapture->setVisible(false);
-            ui->menuBlackmagicDeckLink->menuAction()->setVisible(false);
-        }
-    #else
-        delete ui->actionBlackmagicDeckLinkCapture;
-        delete ui->menuBlackmagicDeckLink;
-    #endif //
 
     QStringList recentFiles = preferences->recentFiles();
 

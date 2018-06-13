@@ -38,7 +38,6 @@ echo "SCRIPT_DIR: " + $SCRIPT_DIR
 INSTALL_DIR=$(cd $(dirname "$0") && cd ../../.. && pwd)
 cd "$INSTALL_DIR"
 
-source $SCRIPT_DIR/init_blackmagic.sh
 source $SCRIPT_DIR/init_ffmpeg.sh
 source $SCRIPT_DIR/init_qwt.sh
 source $SCRIPT_DIR/build_qctools.sh

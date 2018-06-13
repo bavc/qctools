@@ -38,12 +38,12 @@ CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t Cou
     :
     Frequency(stream ? (((double)stream->time_base.den) / stream->time_base.num) : 0),
     streamIndex(stream ? stream->index : -1),
-    PerItem(PerItem_),
     Type(Type_),
+    PerItem(PerItem_),
     CountOfGroups(CountOfGroups_),
     CountOfItems(CountOfItems_),
-    additionalDoubleStats(nullptr),
     additionalIntStats(nullptr),
+    additionalDoubleStats(nullptr),
     additionalStringStats(nullptr)
 {
 
@@ -163,22 +163,22 @@ CommonStats::~CommonStats()
 
     auto numberOfIntValues = lastStatsIndexByValueType[StatsValueInfo::Int];
 
-    for (size_t  j = 0; j < numberOfIntValues; ++j) {
+    for (size_t j = 0; j < numberOfIntValues; ++j) {
         delete[] additionalIntStats[j];
     }
     delete[] additionalIntStats;
 
     auto numberOfDoubleValues = lastStatsIndexByValueType[StatsValueInfo::Double];
 
-    for (size_t  j = 0; j < numberOfDoubleValues; ++j) {
+    for (size_t j = 0; j < numberOfDoubleValues; ++j) {
         delete[] additionalDoubleStats[j];
     }
     delete[] additionalDoubleStats;
 
     auto numberOfStringValues = lastStatsIndexByValueType[StatsValueInfo::String];
 
-    for (size_t  j = 0; j < numberOfStringValues; ++j) {
-        for(auto i = 0; i < Data_Reserved; ++i) {
+    for (size_t j = 0; j < numberOfStringValues; ++j) {
+        for(size_t i = 0; i < Data_Reserved; ++i) {
             free(additionalStringStats[j][i]);
         }
 
@@ -212,7 +212,7 @@ void CommonStats::processAdditionalStats(const char* key, const char* value, boo
 void CommonStats::writeAdditionalStats(stringstream &stream, size_t index)
 {
     if(additionalIntStats) {
-        for(auto i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::Int].size(); ++i) {
+        for(size_t i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::Int].size(); ++i) {
             auto key = statsKeysByIndexByValueType[StatsValueInfo::Int][i];
             auto value = additionalIntStats[i][index];
 
@@ -221,7 +221,7 @@ void CommonStats::writeAdditionalStats(stringstream &stream, size_t index)
     }
 
     if(additionalDoubleStats) {
-        for(auto i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::Double].size(); ++i) {
+        for(size_t i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::Double].size(); ++i) {
             auto key = statsKeysByIndexByValueType[StatsValueInfo::Double][i];
             auto value = additionalDoubleStats[i][index];
 
@@ -230,7 +230,7 @@ void CommonStats::writeAdditionalStats(stringstream &stream, size_t index)
     }
 
     if(additionalStringStats) {
-        for(auto i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::String].size(); ++i) {
+        for(size_t i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::String].size(); ++i) {
             auto key = statsKeysByIndexByValueType[StatsValueInfo::String][i];
             auto value = additionalStringStats[i][index];
 
@@ -244,21 +244,21 @@ void CommonStats::initializeAdditionalStats()
     auto numberOfIntValues = lastStatsIndexByValueType[StatsValueInfo::Int];
     if(numberOfIntValues != 0) {
         additionalIntStats = new int*[numberOfIntValues];
-        for(int i = 0; i < numberOfIntValues; ++i) {
+        for(size_t i = 0; i < numberOfIntValues; ++i) {
             additionalIntStats[i] = new int[Data_Reserved];
         }
     }
     auto numberOfDoubleValues = lastStatsIndexByValueType[StatsValueInfo::Double];
     if(numberOfDoubleValues != 0) {
         additionalDoubleStats = new double*[numberOfDoubleValues];
-        for(int i = 0; i < numberOfDoubleValues; ++i) {
+        for(size_t i = 0; i < numberOfDoubleValues; ++i) {
             additionalDoubleStats[i] = new double[Data_Reserved];
         }
     }
     auto numberOfStringValues = lastStatsIndexByValueType[StatsValueInfo::String];
     if(numberOfStringValues != 0) {
         additionalStringStats = new char**[numberOfStringValues];
-        for(int i = 0; i < numberOfStringValues; ++i) {
+        for(size_t i = 0; i < numberOfStringValues; ++i) {
             additionalStringStats[i] = new char*[Data_Reserved];
             memset(additionalStringStats[i], 0, sizeof(char*) * Data_Reserved);
         }

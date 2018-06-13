@@ -48,10 +48,6 @@ public:
     double                      FirstTimeStamp;             // Time stamp of the first frame
     char**                      comments;                   // Comments per frame (utf-8)
 
-    int**                       additionalIntStats;
-    double**                    additionalDoubleStats;
-    char***                     additionalStringStats;
-
     // Status
     int                         Type_Get();
     double                      State_Get();
@@ -72,7 +68,7 @@ public:
     virtual string              StatsToXML(const activefilters& filters) = 0;
 
     struct StatsValueInfo {
-        int index;
+        size_t index;
         enum Type {
             Int,
             Double,
@@ -128,7 +124,7 @@ public:
                 }
             }
 
-            if(key.find(".idet") != -1) {
+            if(key.find(".idet") != std::string::npos) {
                 return String;
             }
 
@@ -163,7 +159,7 @@ public:
     void writeAdditionalStats(std::stringstream& stream, size_t index);
 
 protected:
-    int lastStatsIndexByValueType[3];
+    size_t lastStatsIndexByValueType[3];
     std::map<StringStatsKey, StatsValueInfo> statsValueInfoByKeys;
     std::map<int, StringStatsKey> statsKeysByIndexByValueType[3];
 
@@ -188,6 +184,10 @@ protected:
     const struct per_item*      PerItem;
     size_t                      CountOfGroups;
     size_t                      CountOfItems;
+
+    int**                       additionalIntStats;
+    double**                    additionalDoubleStats;
+    char***                     additionalStringStats;
 };
 
 #endif // Stats_H

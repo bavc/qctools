@@ -24,10 +24,6 @@ class StreamsStats;
 class FormatStats;
 class FFmpeg_Glue;
 
-#ifdef BLACKMAGICDECKLINK_YES
-class BlackmagicDeckLink_Glue;
-#endif // BLACKMAGICDECKLINK_YES
-
 typedef QSharedPointer<QFile> SharedFile;
 
 //---------------------------------------------------------------------------
@@ -49,11 +45,8 @@ public:
     JobTypes jobType() const;
 
     // Constructor/Destructor
-                                FileInformation             (SignalServer* signalServer, const QString &fileName, activefilters ActiveFilters, activealltracks ActiveAllTracks,
-#ifdef BLACKMAGICDECKLINK_YES
-                                                             BlackmagicDeckLink_Glue* blackmagicDeckLink_Glue=NULL,
-#endif //BLACKMAGICDECKLINK_YES
-                                                             int FrameCount=0, const std::string &Encoding_FileName=std::string(), const std::string &Encoding_Format=std::string());
+                                FileInformation             (SignalServer* signalServer, const QString &fileName,
+                                                             activefilters ActiveFilters, activealltracks ActiveAllTracks, int FrameCount=0);
                                 ~FileInformation            ();
 
     // Parsing
@@ -80,11 +73,6 @@ public:
     bool                        PlayBackFilters_Available   ();
 
     qreal                       averageFrameRate        () const;
-
-#ifdef BLACKMAGICDECKLINK_YES
-    // Deck control information
-    BlackmagicDeckLink_Glue*    blackmagicDeckLink_Glue;
-#endif //BLACKMAGICDECKLINK_YES
 
     bool isValid() const;
 

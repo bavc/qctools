@@ -160,8 +160,6 @@ public:
     static bool                 isUnsignedAudioSampleFormat(int audioFormat);
 
     // Actions
-    void                        AddInput_Video(size_t FrameCount, int time_base_num, int time_base_den, int Width, int Height, int BitDepth, bool Compression, int TimecodeBCD=-1);
-    void                        AddInput_Audio(size_t FrameCount, int time_base_num, int time_base_den, int Samplerate, int BitDepth, int OutputBitDepth, int Channels);
     void                        AddOutput(size_t FilterPos, int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, int FilterType=0, const string &Filter=string());
     void                        AddOutput(const string &FileName, const string &Format);
     void                        CloseOutput();
@@ -230,16 +228,6 @@ private:
         // Cache
         std::vector<AVFrame*>*  FramesCache;
         AVFrame*                FramesCache_Default;
-
-        // Encode
-        bool                    InitEncode();
-        void                    Encode(AVPacket* SourcePacket);
-        void                    CloseEncode();
-        AVFormatContext*        Encode_FormatContext;   // copy of pointer, do not delete
-        AVCodecContext*         Encode_CodecContext;
-        AVStream*               Encode_Stream;
-        AVPacket*               Encode_Packet;
-        int                     Encode_CodecID;
     };
     struct outputdata
     {
@@ -319,14 +307,6 @@ private:
     // In
     string                      FileName;
     bool                        WithStats;
-
-    // Encode
-    bool                        InitEncode();
-    void                        Encode();
-    void                        CloseEncode();
-    string                      Encode_FileName;
-    string                      Encode_Format;
-    AVFormatContext*            Encode_FormatContext;
 
     // Seek
     int64_t                     Seek_TimeStamp;

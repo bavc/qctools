@@ -19,7 +19,6 @@
 #include "Core/Core.h"
 #include "GUI/Plots.h"
 #include "GUI/draggablechildrenbehaviour.h"
-#include "GUI/blackmagicdecklink_userinput.h"
 #include "GUI/preferences.h"
 #include "GUI/BigDisplay.h"
 #include "GUI/barchartprofilesmodel.h"
@@ -62,35 +61,6 @@ void MainWindow::openFile()
     addFile_finish();
 }
 
-//---------------------------------------------------------------------------
-#ifdef BLACKMAGICDECKLINK_YES
-void MainWindow::openCapture()
-{
-    if (DeckRunning)
-    {
-        for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
-        {
-            if (Files[Files_Pos]->blackmagicDeckLink_Glue)
-                Files[Files_Pos]->blackmagicDeckLink_Glue->Stop();
-        }
-
-        ui->actionBlackmagicDeckLinkCapture->setIcon(QIcon(":/icon/capture_layout.png"));
-
-        DeckRunning=false;
-        return;
-    }
-        
-    BlackmagicDeckLink_UserInput* blackmagicDeckLink_UserInput=new BlackmagicDeckLink_UserInput();
-    if (!blackmagicDeckLink_UserInput->exec())
-        return;
-    
-    clearFiles();
-    addFile(blackmagicDeckLink_UserInput->Card, blackmagicDeckLink_UserInput->Card->Config_In.FrameCount, blackmagicDeckLink_UserInput->Encoding_FileName.toUtf8().data(), blackmagicDeckLink_UserInput->Encoding_Format.toUtf8().data());
-    addFile_finish();
-
-    delete blackmagicDeckLink_UserInput;
-}
-#endif // BLACKMAGICDECKLINK_YES
 //---------------------------------------------------------------------------
 bool MainWindow::canCloseFile(size_t index)
 {
@@ -426,31 +396,6 @@ void MainWindow::addFile(const QString &FileName)
     ui->fileNamesBox->addItem(Temp->fileName());
 
     updateRecentFiles(FileName);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::addFile(
-#ifdef BLACKMAGICDECKLINK_YES
-        BlackmagicDeckLink_Glue* BlackmagicDeckLink_Glue,
-#endif // BLACKMAGICDECKLINK_YES
-        int FrameCount, const string &Encoding_FileName, const string &Encoding_Format)
-{
-    // Launch analysis
-    FileInformation* Temp=new FileInformation(signalServer, QString(), Prefs->ActiveFilters, Prefs->ActiveAllTracks,
-#ifdef BLACKMAGICDECKLINK_YES
-                                              BlackmagicDeckLink_Glue,
-#endif // BLACKMAGICDECKLINK_YES
-                                              FrameCount, Encoding_FileName, Encoding_Format);
-    connect(Temp, SIGNAL(positionChanged()), this, SLOT(Update()), Qt::DirectConnection); // direct connection is required here to get Update called from separate thread
-    connect(Temp, SIGNAL(parsingCompleted(bool)), this, SLOT(updateExportAllAction()));
-
-    Temp->setIndex(Files.size());
-    Temp->setExportFilters(Prefs->ActiveFilters);
-
-    Files.push_back(Temp);
-    ui->fileNamesBox->addItem(Temp->fileName());
-
-    updateRecentFiles(Temp->fileName());
 }
 
 //---------------------------------------------------------------------------

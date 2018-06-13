@@ -43,7 +43,6 @@ class QCheckBox;
 class PerPicture;
 class PreferencesDialog;
 
-class BlackmagicDeckLink_Glue;
 class DraggableChildrenBehaviour;
 class SignalServer;
 class Preferences;
@@ -64,9 +63,6 @@ public:
     void                        Ui_Init                     ();
     void                        configureZoom               ();
     void                        openFile                    ();
-#ifdef BLACKMAGICDECKLINK_YES
-    void                        openCapture                 ();
-#endif // BLACKMAGICDECKLINK_YES
     bool                        canCloseFile                (size_t index);
     void                        closeFile                   ();
     void                        closeAllFiles               ();
@@ -93,11 +89,6 @@ public:
     void                        clearGraphsLayout           ();
     void                        createGraphsLayout          ();
     void                        addFile                     (const QString &FileName);
-    void                        addFile                     (
-#ifdef BLACKMAGICDECKLINK_YES
-                                                            BlackmagicDeckLink_Glue* BlackmagicDeckLink_Glue,
-#endif // BLACKMAGICDECKLINK_YES
-                                                            int FrameCount, const std::string &Encoding_FileName=std::string(), const std::string &Encoding_Format=std::string());
     void                        addFile_finish              ();
     void                        selectFile                  (int newFilePos);
     void                        selectDisplayFile           (int newFilePos);
@@ -157,8 +148,6 @@ private Q_SLOTS:
     void on_actionQuit_triggered();
 
     void on_actionOpen_triggered();
-
-    void on_actionBlackmagicDeckLinkCapture_triggered();
 
     void on_actionClose_triggered();
 
