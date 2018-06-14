@@ -348,7 +348,7 @@ void Plot::initYAxis()
         CommonStats* stat = stats( streamPos() );
         const struct per_group& group = PerStreamType[plotType].PerGroup[plotGroup];
 
-        auto yMin = 0;
+        auto yMin = 0.0;
         if(m_minValue.isNull() || m_minValue.isError() || m_minValue.isUndefined()) {
             yMin = stat->y_Min[plotGroup]; // auto-select min
         } else {
@@ -358,7 +358,7 @@ void Plot::initYAxis()
                 yMin = m_minValue.call().toNumber();
         }
 
-        auto yMax = 0;
+        auto yMax = 0.0;
         if(m_maxValue.isNull() || m_maxValue.isError() || m_maxValue.isUndefined()) {
             yMax = stat->y_Max[plotGroup]; // auto-select min
         } else {
@@ -368,15 +368,7 @@ void Plot::initYAxis()
                 yMax = m_maxValue.call().toNumber();
         }
 
-        if ( yMin != yMax )
-        {
-            setYAxis( yMin, yMax, group.StepsCount );
-        }
-        else
-        {
-            //Special case, in order to force a scale of 0 to 1
-            setYAxis( 0.0, 1.0, 1 );
-        }
+        setYAxis( yMin, yMax, group.StepsCount );
     }
 }
 
@@ -472,12 +464,8 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
         m_engine.globalObject().setProperty("audio_max", ranges.second);
     }
 
-    m_minValue = m_engine.evaluate(group.MinFormula);
-    bool isValid = m_minValue.isCallable();
-    isValid = m_minValue.isError();
-    isValid = m_minValue.isUndefined();
-
-    m_maxValue = m_engine.evaluate(group.MaxFormula);
+    m_minValue = m_engine.evaluate(group.MinFormula == nullptr ? "" : group.MinFormula);
+    m_maxValue = m_engine.evaluate(group.MaxFormula == nullptr ? "" : group.MaxFormula);
 
     m_barchartBackground = QColor::fromHsv(h + 60, s, v);
 
