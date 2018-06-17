@@ -179,6 +179,11 @@ void AudioStats::StatsFromExternalData(const char* Data, size_t Size)
                             Tag=Tag->NextSiblingElement();
                         }
 
+                        if(!statsMapInitialized) {
+                            initializeAdditionalStats();
+                            statsMapInitialized=true;
+                        }
+
                         if (x_Max[0]<=x[0][x_Current])
                         {
                             x_Max[0]=x[0][x_Current];
@@ -186,6 +191,7 @@ void AudioStats::StatsFromExternalData(const char* Data, size_t Size)
                             x_Max[2]=x[2][x_Current];
                             x_Max[3]=x[3][x_Current];
                         }
+
                         x_Current++;
                         if (x_Current_Max<=x_Current)
                             x_Current_Max=x_Current;
