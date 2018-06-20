@@ -35,15 +35,15 @@
 
 YUV refers to a particular a way of encoding color information in analog video where Y channels carry luma, or brightness information ([wikipedia.org/wiki/Luma](http://en.wikipedia.org/wiki/Luma_(video)), and U and V channels carry information about color, or chrominance ([wikipedia.org/wiki/Chrominance](http://en.wikipedia.org/wiki/Chrominance)). QCTools can analyze the YUV Values of a particular encoded video file in order to provide information about the appearance of the video. These filters examine every pixel in a given channel and records the Maximum, Minimum, and Average values.
 
-Each plot shows a dot-dash line to show the limits of broadcast range. In the Y graph there is a red dash-dot line at 235 (the equivalent of 100 IRE) to show broadcast white and a blue dash-dot line is at 16 (the equivalent of 7.5 IRE) to show broadcast black. All values plotted above the red dash-dot line should be decoded as white with all visual distinction in the values from 235-255 clipped to the same maximum value of white. Similarly values plotted from 0-16 would all be clipped and portrayed as black. The U and V graphs have similar lines at 16 and 240 to show the broadcast range limits of the chroma planes. Note: that these lines are only applicable to content that is decoded as broadcast range. Content marked as full range may appropriately exceed these limits.
+Each plot shows a dot-dash line to show the limits of broadcast range. Using an 8-bit video file as an example, in the Y graph there is a red dash-dot line at 235 (the equivalent of 100 IRE) to show broadcast white and a blue dash-dot line is at 16 (the equivalent of 7.5 IRE) to show broadcast black. All values plotted above the red dash-dot line should be decoded as white with all visual distinction in the values from 235-255 clipped to the same maximum value of white. Similarly values plotted from 0-16 would all be clipped and portrayed as black. The U and V graphs have similar lines at 16 and 240 to show the broadcast range limits of the chroma planes. Note: that these lines are only applicable to content that is decoded as broadcast range. Content marked as full range may appropriately exceed these limits.
 _(For in-depth descriptions of how luma and/or chroma noise -- and other types of artifacts-- may present, the **[A/V Artifact Atlas](https://bavc.github.io/avaa/index.html)** is an excellent reference.)_
 
 ### Y Value Filters: Y MIN, Y AVG, Y MAX
 
 | Filter Domain | Filter Name(s) | Values |
-| Y Channel | Y MIN, Y AVG, Y MAX | 0-255 |
+| Y Channel | Y MIN, Y AVG, Y MAX | 0-(2^bitdepth)-1 |
 
-Y Channels carry data about the brightness of a picture. Problematic variance in Y Channel values will manifest as a picture that is either too light or too dark, also known as containing luma noise. 8-bit video will have values falling in the range of 0-255 code values per pixel. A picture with well-balanced light levels will have an average, or mid-range Y Channel value of around 128 (Y AVG). Graph readings outside of that range will indicate a picture that is either too bright or too dark. A Y Value of 0 would indicate total blackness and a value of 255 would present as entirely white. In the range of values, reference black is at value 16, while reference white is at value 235\. Except during particular moments like scene changes where one might expect abrupt spikes , the average values of Y channels should remain relatively stable or constant with little variation. Portions of video showing extreme changes in average values (and not corresponding to a scene change or otherwise dramatic edit) likely indicate a picture error. Where you may expect luma spikes could be camera fade-ins/outs, or a sudden brightness in the picture, like a camera flash, for example.
+Y Channels carry data about the brightness of a picture. Problematic variance in Y Channel values will manifest as a picture that is either too light or too dark, also known as containing luma noise. An 8-bit video will have values falling in the range of 0-255 code values per pixel. A picture with well-balanced light levels will have an average, or mid-range Y Channel value of around 128 (Y AVG). Graph readings outside of that range will indicate a picture that is either too bright or too dark. A Y Value of 0 would indicate total blackness and a value of 255 would present as entirely white. In the range of values, reference black is at value 16, while reference white is at value 235\. Except during particular moments like scene changes where one might expect abrupt spikes , the average values of Y channels should remain relatively stable or constant with little variation. Portions of video showing extreme changes in average values (and not corresponding to a scene change or otherwise dramatic edit) likely indicate a picture error. Where you may expect luma spikes could be camera fade-ins/outs, or a sudden brightness in the picture, like a camera flash, for example.
 
 To demonstrate the borders of broadcast range, blue guidelines are plotted at 16 and 235 for Y and 16 and 240 for U and V. Note that these guidelines are only applicable for video encoding in broadcast range. For video encoded as full range the guidelines are not relevant.
 
@@ -63,10 +63,10 @@ The graph below illustrates a reading with many luma spikes in the Y LOW, Y AVG,
 
 ![luma spikes](media/YValues_293_0047_SKEW_ffv1_h264.jpg)
 
-| Filter Domain | Filter Name(s) | Values* |
-| Y Channel | Y LOW, Y HIGH | 16-235 |
-| U Channel | U LOW, U HIGH | 16-235 |
-| V Channel | V LOW, V HIGH | 0-255 |
+| Filter Domain | Filter Name(s) | Values |
+| Y Channel | Y LOW, Y HIGH | 16-235 (8-bit); 64-940 (10-bit) |
+| U Channel | U LOW, U HIGH | 16-235 (8-bit); 64-940 (10-bit) |
+| V Channel | V LOW, V HIGH | 0-(2^bitdepth)-1 |
 
 ### Y Value Filters: Y LOW, Y HIGH
 
@@ -79,8 +79,8 @@ This filter works in a similar fashion as the YUV \*MIN and \*MAX filters, but i
 ### U, V Value Filters: U MIN, U AVG, U MAX/ V MIN, V AVG, V MAX
 
 | Filter Domain | Filter Name(s) | Values |
-| U Channel | U MIN, U AVG, U MAX | 0-255 |
-| V Channel | V MIN, V AVG, V MAX | 0-255 |
+| U Channel | U MIN, U AVG, U MAX | 0-(2^bitdepth)-1 |
+| V Channel | V MIN, V AVG, V MAX | 0-(2^bitdepth)-1 |
 
 The U and V Channels represent the [chrominance](http://preservation.bavc.org/artifactatlas/index.php/Chrominance_Noise), or color differences of a picture. U and V filters act to detect color abnormalities in video. It can be difficult to derive meaning from U or V values on their own, but they provide supplementary information and can be good indicators of artifacts, especially when occurring in tandem with similar Y Value readings. Black and white video contains no chrominance information so should present flat-lines (or no data) for UV channels. Activity in UV Channels for black and white video content, however, would certainly be an indication of chrominance noise. Alternatively, a color video which shows flat-lines for these channels would be an indicator of a color drop-out scenario.
 
@@ -173,7 +173,7 @@ Vertical Line Repetitions, or the VREP filter, is useful in analyzing U-Matic ta
 | Filter Domain | Filter Name(s) | Range |
 | Broadcast Range | BRNG | 0-1 |
 
-The BRNG filter is one that identifies the number of pixels which fall outside the standard video [broadcast range](http://en.wikipedia.org/wiki/Broadcast_range) of 16-235 pixels. Normal, noise-free video would not trigger this filer, but noise occurring outside of these parameters would read as spikes in the graph. Typically anything with a value over 0.01 will read as an artifact. While the RANG filter is good at detecting the general presence of noise, it can be a bit non-specific in its identification of the causes.
+The BRNG filter is one that identifies the number of pixels which fall outside the standard video [broadcast range](http://en.wikipedia.org/wiki/Broadcast_range) of 16-235 (8-bit); 64-940 (10-bit) pixels. Normal, noise-free video would not trigger this filer, but noise occurring outside of these parameters would read as spikes in the graph. Typically anything with a value over 0.01 will read as an artifact. While the RANG filter is good at detecting the general presence of noise, it can be a bit non-specific in its identification of the causes.
 
 BRNG = Broadcast Range
 
