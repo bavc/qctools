@@ -116,13 +116,13 @@ Starting in QCTools version 0.7, QCTools has some audio support. This includes p
 
 ## What is this error called? {#error}
 
-You may be able to find the answer in the [A/V Artifact Atlas](http://preservation.bavc.org/artifactatlas/index.php/A/V_Artifact_Atlas), which is closely associated with QCTools. The AV Artifact Atlas is for use in the identification and definition of the technical issues and anomalies that can afflict audio and video signals.
+You may be able to find the answer in the [A/V Artifact Atlas](https://bavc.github.io/avaa/index.html), which is closely associated with QCTools. The AV Artifact Atlas is for use in the identification and definition of the technical issues and anomalies that can afflict audio and video signals.
 
 ## Are there additional resources that may be useful to me? {#resources}
 
 The [Glossary of Video Terms](http://en.wikipedia.org/wiki/Glossary_of_video_terms) is helpful for a general primer on common terms.
 
-The [AV Artifact Atlas](http://preservation.bavc.org/artifactatlas/index.php/A/V_Artifact_Atlas) is an especially good resource to find examples of video errors, with accompanying descriptions and visual references.
+The [AV Artifact Atlas](https://bavc.github.io/avaa/index.html) is an especially good resource to find examples of video errors, with accompanying descriptions and visual references.
 
 ## How can I provide feedback? {#feedback}
 
