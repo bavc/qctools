@@ -88,6 +88,8 @@ Some helpful **keyboard shortcuts** you may want to use are:
 *   `CTRL+,` (Mac: `command+,`) - Jump to previous comment frame
 *   `CTRL+.` (Mac: `command+.`) - Jump to next comment frame
 *   `CTRL+C` (Mac: `command+C`) - Copy the current timestamp to the clipboard
+*   `CTRL` + mouse-wheel (Mac: `command` + mouse-wheel) - Zooms in or out on Y axis
+*   `Shift` + mouse-wheel - Zooms in or out on X axis
 
 ## Bar or Graph Charts {#bar}
 
