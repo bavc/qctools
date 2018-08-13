@@ -163,10 +163,10 @@ void FileInformation::readStats(QIODevice& StatsFromExternalData_File, bool Stat
             {
                 //inflate
                 strm.next_out=(Bytef*)Xml_Pointer;
-                strm.avail_out=avail_out;
+                strm.avail_out= (avail_out - Xml_Size);
                 if ((inflate_Result=inflate(&strm, Z_NO_FLUSH))<0)
                     break;
-                Xml_Size+=avail_out-strm.avail_out;
+                Xml_Size+=(avail_out - Xml_Size) -strm.avail_out;
             }
             else
                 Xml_Size+=ReadSize;
