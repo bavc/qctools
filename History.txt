@@ -1,3 +1,40 @@
+1.0, 2018-04-09
++ Add possibility to wrap 'qctools.xml.gzip' report into 'mkv' to save thumbnails too
++ Add 'Entropy' and 'Entropy-diff' filters
++ Add 'Line Over Time' player
++ Add bar charts:
+  |- support of multiple colored conditions per chart
+  |- ability to specify condition using JS syntax
+  |- conditions editor with autocomplete and conditions validation
+  |- saving/loading charts conditions
+  |- predefined set of conditions
++ Introduce scriptable min/max for y-axis with JS syntax
++ Extract & save all the stats from each frame (eliminate the difference in output between ffmpeg & qcli)
++ Add xflat option to waveform
++ Polish UI (move filters view icon to the right, disable some menu items if no files selected, reduce space between thumbnails etc.)
++ Add 'Pixel Scope' player
++ Allow to jump into selected file's folder using 'reveal file location' menu item
++ Improve accuracy of grid overlay
++ Add 'Corners' player
++ Have QCTools open with the same filters that were selected when it was last closed
++ Show list of 20 recently opened files in 'File' menu
++ Add ability to zoom x/y axis and pan with mouse wheel & middle mouse button
++ Add code of conduct, update documentation, tooltips & contributing guidelines
+- Remove support for dotXml sidecars
+- Remove csv export
+- Remove experimental blackmagic integration
+~ Code cleanup
+x Add 'bits_per_raw_sample' to stream stats
+x Fix compatibility issues with the latest ffmpeg
+x Fix crash when there is no video stream and first stream is not audio either
+x Use correct labelling for interlacement values
+x Fix sample rate value in table
+x Fix sample aspect ratio in table
+x Fix limiter default max value for non 8-bit footage
+x Fix a few plots alignment issues
+x Fix 'Arrow keys do not page through frames in filter view' https://github.com/bavc/qctools/issues/417
+x Flush filtering pipeline to write stats for the last frame correctly
+
 0.9, 2017-08-15
 -----
 + Add scaling options for players (now with 100%, fit to window, and free scale)
