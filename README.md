@@ -22,10 +22,9 @@ Go to http://bavc.org/qctools or [Releases](https://github.com/bavc/qctools/rele
 
 ## via homebrew
 
-Of if you have homebrew, get the latest by running:
+Of if you have homebrew, get the latest release by running:
 ```
-brew install amiaopensource/amiaos/qctools
-brew linkapps qctools
+brew cask install qctools
 ```
 
 ## development builds via daily builds
