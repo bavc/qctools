@@ -443,7 +443,7 @@ const filter Filters[]=
         },
         {
             "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:intensity=${4}",
-            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:strength=${4}",
+            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:intensity=${4}",
         },
     },
     {
@@ -460,7 +460,7 @@ const filter Filters[]=
         },
         {
             "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,hstack,histeq=strength=${2}:intensity=${3}",
-            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,hstack,histeq=strength=${2}:strength=${3}",
+            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,hstack,histeq=strength=${2}:intensity=${3}",
         },
     },
     {
