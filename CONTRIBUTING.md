@@ -19,8 +19,7 @@ QCTools is written in C++ using the Qt framework [under the GPLv3 License](https
 ## Testing your contributions locally
 
 In case you don't have qmake version 5 run:  
-`brew install qt5`  
-`brew link --force qt5`  
+`brew install qt`  
 
 Get a QCTools repo (or use your own copy):  
 
