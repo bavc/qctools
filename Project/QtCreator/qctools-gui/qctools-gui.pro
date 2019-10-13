@@ -1,4 +1,10 @@
 QT       += core gui network
+
+QMAKEFEATURES = C:/Users/ai/Projects/qctools/qctools/Source/ThirdParty/QtAV/mkspecs/features
+message("!!! QMAKEFEATURES = " $$QMAKEFEATURES)
+
+#QT += avwidgets
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport qml
 
 TARGET = QCTools
@@ -16,6 +22,44 @@ else:unix: LIBS += -L$$OUT_PWD/../qctools-lib/ -lqctools
 
 INCLUDEPATH += $$PWD/../qctools-lib
 DEPENDPATH += $$PWD/../qctools-lib
+
+defineReplace(platformTargetSuffix) {
+    ios:CONFIG(iphonesimulator, iphonesimulator|iphoneos): \
+        suffix = _iphonesimulator
+    else: \
+        suffix =
+
+    CONFIG(debug, debug|release) {
+        !debug_and_release|build_pass {
+            mac: return($${suffix}_debug)
+            win32: return($${suffix}d)
+        }
+    }
+    return($$suffix)
+}
+
+win32: {
+    QTAVLIBFOLDER=lib_win_x86_64
+}
+linux: {
+    QTAVLIBFOLDER=lib_linux_x86_64
+}
+mac: {
+    QTAVLIBFOLDER=lib_osx_x86_64_llvm
+}
+
+message('QTAVLIBFOLDER: ' $$QTAVLIBFOLDER)
+INCLUDEPATH += $$absolute_path($$PWD/../QtAV/src) $$absolute_path($$PWD/../QtAV/src/QtAV)
+
+mac: {
+    QTAVLIBS = -F$$absolute_path($$OUT_PWD/../QtAV/$$QTAVLIBFOLDER) -framework QtAV$$platformTargetSuffix()
+} else {
+    QTAVLIBS += -L$$absolute_path($$OUT_PWD/../QtAV/$$QTAVLIBFOLDER) -lQtAV$$platformTargetSuffix()1
+}
+
+message('QTAVLIBS: ' $$QTAVLIBS)
+
+LIBS += $$QTAVLIBS
 
 win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../qctools-lib/release/libqctools.a
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../qctools-lib/debug/libqctools.a
@@ -54,7 +98,8 @@ HEADERS += \
     $$SOURCES_PATH/GUI/barchartconditioneditor.h \
     $$SOURCES_PATH/GUI/barchartconditioninput.h \
     $$SOURCES_PATH/GUI/managebarchartconditions.h \
-    $$SOURCES_PATH/GUI/barchartprofilesmodel.h
+    $$SOURCES_PATH/GUI/barchartprofilesmodel.h \
+    $$SOURCES_PATH/GUI/playerwindow.h
 
 SOURCES += \
     $$SOURCES_PATH/GUI/BigDisplay.cpp \
@@ -83,7 +128,8 @@ SOURCES += \
     $$SOURCES_PATH/GUI/barchartconditioneditor.cpp \
     $$SOURCES_PATH/GUI/barchartconditioninput.cpp \
     $$SOURCES_PATH/GUI/managebarchartconditions.cpp \
-    $$SOURCES_PATH/GUI/barchartprofilesmodel.cpp
+    $$SOURCES_PATH/GUI/barchartprofilesmodel.cpp \
+    $$SOURCES_PATH/GUI/playerwindow.cpp
 
 win32 {
     greaterThan(QT_MAJOR_VERSION, 4): {
@@ -104,7 +150,7 @@ FORMS += \
     $$SOURCES_PATH/GUI/imagelabel.ui \
     $$SOURCES_PATH/GUI/barchartconditioneditor.ui \
     $$SOURCES_PATH/GUI/barchartconditioninput.ui \
-    $$SOURCES_PATH/GUI/managebarchartconditions.ui
+    $$SOURCES_PATH/GUI/managebarchartconditions.ui \
 
 RESOURCES += \
     $$SOURCES_PATH/Resource/Resources.qrc
@@ -195,6 +241,8 @@ macx:contains(DEFINES, USE_BREW) {
     !win32 {
         include( $${QWT_ROOT}/qwtbuild.pri )
     }
+
+    message("using $${QWT_ROOT}/qwtfunctions.pri")
     include( $${QWT_ROOT}/qwtfunctions.pri )
 
     !win32 {

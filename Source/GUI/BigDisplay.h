@@ -16,6 +16,7 @@
 #include <QTimer>
 #include <string>
 
+class PlayerWindow;
 class FFmpeg_Glue;
 class Control;
 class Info;
@@ -152,7 +153,7 @@ protected:
     std::vector<previous_values>PreviousValues[2];
     Info*                       InfoArea;
 
-    ImageLabel*                 imageLabels[2];
+    PlayerWindow*               imageLabels[2];
     QSlider*                    Slider;
 
     // Temp

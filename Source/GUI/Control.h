@@ -47,6 +47,9 @@ public:
 Q_SIGNALS:
     void currentFrameChanged();
 
+    void playClicked();
+    void stopClicked();
+
 public Q_SLOTS:
     // Commands
     void                        Update();

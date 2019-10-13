@@ -49,6 +49,7 @@
 #include <QDir>
 #include <QSplitter>
 #include <qwt_scale_widget.h>
+#include "playerwindow.h"
 
 #include <sstream>
 //---------------------------------------------------------------------------
@@ -1571,17 +1572,18 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     // Players
     for (size_t Pos=0; Pos<2; Pos++)
     {
-        imageLabels[Pos] =new ImageLabel(&Picture, Pos + 1, this);
+        imageLabels[Pos] = new PlayerWindow();
+        imageLabels[Pos]->setFile(FileInformationData_->fileName());
 
         if(Config::instance().getDebug())
             imageLabels[Pos]->setStyleSheet("background: yellow");
 
         imageLabels[Pos]->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         imageLabels[Pos]->setMinimumSize(20, 20);
-        imageLabels[Pos]->showDebugOverlay(Config::instance().getDebug());
+//        imageLabels[Pos]->showDebugOverlay(Config::instance().getDebug());
 
         splitter->addWidget(imageLabels[Pos]);
-        imageLabels[Pos]->installEventFilter(this);
+//        imageLabels[Pos]->installEventFilter(this);
     }
 
     splitter->handle(1)->installEventFilter(this);
@@ -1632,6 +1634,12 @@ BigDisplay::BigDisplay(QWidget *parent, FileInformation* FileInformationData_) :
     // Control
     ControlArea=new Control(this, FileInfoData, true);
     Layout->addWidget(ControlArea, 4, 0, 1, 3, Qt::AlignBottom);
+
+    for (size_t Pos=0; Pos<2; Pos++)
+    {
+        connect(ControlArea, &Control::playClicked, imageLabels[Pos], &PlayerWindow::play);
+        connect(ControlArea, &Control::stopClicked, imageLabels[Pos], &PlayerWindow::pause);
+    }
 
     setLayout(Layout);
 
@@ -1994,7 +2002,7 @@ void BigDisplay::FiltersList_currentIndexChanged(size_t playerIndex, size_t Filt
     Picture_Current[playerIndex] = FilterPos;
     on_FiltersList_currentOptionChanged(playerIndex, FilterPos);
 
-    updateSelection(FilterPos, imageLabels[playerIndex], Options[playerIndex]);
+    // updateSelection(FilterPos, imageLabels[playerIndex], Options[playerIndex]);
 }
 
 //---------------------------------------------------------------------------
@@ -2297,7 +2305,9 @@ string BigDisplay::FiltersList_currentOptionChanged(size_t Pos, size_t Picture_C
     str.replace(QString("${height}"), QString::number(FileInfoData->Glue->Height_Get()));
     str.replace(QString("${dar}"), QString::number(FileInfoData->Glue->DAR_Get()));
 
-    QSize windowSize = imageLabels[Pos]->pixmapSize();
+//    QSize windowSize = imageLabels[Pos]->pixmapSize();
+    QSize windowSize = imageLabels[Pos]->size();
+
     str.replace(QString("${window_width}"), QString::number(windowSize.width()));
     str.replace(QString("${window_height}"), QString::number(windowSize.height()));
 
@@ -2340,8 +2350,11 @@ void BigDisplay::on_FiltersList_currentOptionChanged(size_t playerIndex, size_t 
 
     Picture->FrameAtPosition(Frames_Pos);
 
+    imageLabels[playerIndex]->setFilter(QString::fromStdString(Modified_String));
+    /*
     if(imageLabels[playerIndex]->isVisible())
         imageLabels[playerIndex]->adjustScale();
+        */
 }
 
 //***************************************************************************
@@ -2587,7 +2600,7 @@ void BigDisplay::setCurrentFilter(size_t playerIndex, size_t filterIndex)
         return;
     }
 
-    ImageLabel* imageLabel = imageLabels[playerIndex];
+    auto* imageLabel = imageLabels[playerIndex];
 
     // None
     if (filterIndex == 1)
@@ -2597,7 +2610,7 @@ void BigDisplay::setCurrentFilter(size_t playerIndex, size_t filterIndex)
     }
 
     FiltersList_currentIndexChanged(playerIndex, filterIndex);
-    updateSelection(filterIndex, imageLabel, Options[playerIndex]);
+    // updateSelection(filterIndex, imageLabel, Options[playerIndex]);
 }
 
 bool BigDisplay::eventFilter(QObject *watched, QEvent *event)
@@ -2662,11 +2675,13 @@ void BigDisplay::updateImagesAndSlider(const QPixmap &pixmap1, const QPixmap &pi
     if (Slider->sliderPosition() != sliderPos)
         Slider->setSliderPosition(sliderPos);
 
+    /*
     if(!pixmap1.isNull())
         imageLabels[0]->setPixmap(pixmap1);
 
     if(!pixmap2.isNull())
         imageLabels[1]->setPixmap(pixmap2);
+        */
 }
 
 void BigDisplay::on_FiltersList_currentIndexChanged(int Pos)
@@ -2703,11 +2718,13 @@ void BigDisplay::onAfterResize()
 
     Picture->FrameAtPosition(Frames_Pos);
 
+    /*
     for(int playerIndex = 0; playerIndex < 2; ++playerIndex)
     {
         if(imageLabels[playerIndex]->isVisible())
             imageLabels[playerIndex]->adjustScale(true);
     }
+    */
 }
 
 void BigDisplay::resizeEvent(QResizeEvent  *e)

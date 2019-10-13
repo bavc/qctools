@@ -1,0 +1,3 @@
+[submodule "Project/QtCreator/QtAV"]
+	path = Project/QtCreator/QtAV
+	url = https://github.com/wang-bin/QtAV.git

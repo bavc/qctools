@@ -18,12 +18,16 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QVector>
+#include "playerwindow.h"
 
+PlayerWindow* player;
 TinyDisplay::TinyDisplay(QWidget *parent, FileInformation* FileInformationData_)
     : QWidget(parent),
       lastWidth(0),
       FileInfoData(FileInformationData_)
 {
+    player = new PlayerWindow();
+
     // To update
     ControlArea = NULL;
 
@@ -246,6 +250,7 @@ void TinyDisplay::on_thumbnails_clicked(bool)
         }
     }
 
+    // player->show();
     LoadBigDisplay();
 }
 

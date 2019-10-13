@@ -163,7 +163,7 @@ Control::Control(QWidget *parent, FileInformation* FileInformationData_, bool Is
     Frames_Pos=-1;
     ShouldUpate=false;
 
-    Update();
+    // Update();
 
     QShortcut *shortcutCopy = new QShortcut(QKeySequence(QKeySequence::Copy), this);
     QObject::connect(shortcutCopy, SIGNAL(activated()), this, SLOT(copyTimeStamp()));
@@ -585,6 +585,7 @@ void Control::on_Pause_clicked(bool checked)
         TinyDisplayArea->BigDisplayArea->ControlArea->P2->setEnabled(P2->isEnabled());
     }
 
+    Q_EMIT stopClicked();
     stop();
 }
 
@@ -626,6 +627,7 @@ void Control::on_P0_clicked(bool checked)
         TinyDisplayArea->BigDisplayArea->ControlArea->P2->setEnabled(P2->isEnabled());
     }
 
+    Q_EMIT playClicked();
     TimeOut_Init();
 }
 
@@ -667,6 +669,7 @@ void Control::on_P1_clicked(bool checked)
         TinyDisplayArea->BigDisplayArea->ControlArea->P2->setEnabled(P2->isEnabled());
     }
 
+    Q_EMIT playClicked();
     TimeOut_Init();
 }
 
@@ -709,6 +712,7 @@ void Control::on_P2_clicked(bool checked)
         TinyDisplayArea->BigDisplayArea->ControlArea->P2->setEnabled(P2->isEnabled());
     }
 
+    Q_EMIT playClicked();
     TimeOut_Init();
 }
 
@@ -757,6 +761,7 @@ void Control::rewind(int frame)
 //---------------------------------------------------------------------------
 void Control::TimeOut_Init()
 {
+    /*
     stop();
 
     Time = QTime();
@@ -798,11 +803,13 @@ void Control::TimeOut_Init()
         Timer->moveToThread(Thread);
         Thread->start();
     }
+    */
 }
 
 //---------------------------------------------------------------------------
 void Control::TimeOut ()
 {
+    /*
     // qDebug() << "threadId: " << QThread::currentThreadId();
 
     if (Time_MinusPlus)
@@ -872,4 +879,5 @@ void Control::TimeOut ()
         qDebug() << "stopping timer...";
         Timer->stop();
     }
+    */
 }
