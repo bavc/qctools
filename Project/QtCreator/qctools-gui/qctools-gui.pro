@@ -51,10 +51,43 @@ mac: {
 message('QTAVLIBFOLDER: ' $$QTAVLIBFOLDER)
 INCLUDEPATH += $$absolute_path($$PWD/../QtAV/src) $$absolute_path($$PWD/../QtAV/src/QtAV)
 
+if(equals(MAKEFILE_GENERATOR, MSVC.NET)|equals(MAKEFILE_GENERATOR, MSBUILD)) {
+  TRY_COPY = $$QMAKE_COPY
+} else {
+  TRY_COPY = -$$QMAKE_COPY #makefile. or -\$\(COPY_FILE\)
+}
+
+message('TRY_COPY: ' $$TRY_COPY)
+
 mac: {
     QTAVLIBS = -F$$absolute_path($$OUT_PWD/../QtAV/$$QTAVLIBFOLDER) -framework QtAV$$platformTargetSuffix()
 } else {
-    QTAVLIBS += -L$$absolute_path($$OUT_PWD/../QtAV/$$QTAVLIBFOLDER) -lQtAV$$platformTargetSuffix()1
+    CONFIG(debug, debug|release) {
+        win32: BUILD_SUFFIX=d
+        win32: BUILD_DIR=/debug
+    } else:CONFIG(release, debug|release) {
+        win32: BUILD_SUFFIX=
+        win32: BUILD_DIR=/release
+    }
+
+    QTAVLIBS += -L$$absolute_path($$OUT_PWD/../QtAV/$$QTAVLIBFOLDER) -lQtAV$${BUILD_SUFFIX}1
+
+    qtavlibs.pattern = $$absolute_path($$OUT_PWD/../QtAV/$$QTAVLIBFOLDER/QtAV$${BUILD_SUFFIX}1*)
+    message('qtavlibs.pattern: ' $$qtavlibs.pattern)
+
+    qtavlibs.files = $$files($$qtavlibs.pattern)
+    message('qtavlibs.files: ' $$qtavlibs.files)
+
+    qtavlibs.path = $$absolute_path($$OUT_PWD$${BUILD_DIR})
+    for(f, qtavlibs.files) {
+      message('***: ' $$escape_expand(\\n\\t)$$TRY_COPY $$shell_path($$f) $$shell_path($$qtavlibs.path))
+      qtavlibs.commands += $$escape_expand(\\n\\t)$$TRY_COPY $$shell_path($$f) $$shell_path($$qtavlibs.path)
+    }
+
+    isEmpty(QMAKE_POST_LINK): QMAKE_POST_LINK = $$qtavlibs.commands
+    else: QMAKE_POST_LINK = $${QMAKE_POST_LINK}$$escape_expand(\\n\\t)$$qtavlibs.commands
+
+    message('QMAKE_POST_LINK: ' $${QMAKE_POST_LINK})
 }
 
 message('QTAVLIBS: ' $$QTAVLIBS)

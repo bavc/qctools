@@ -9,6 +9,9 @@ isEmpty(QTAV) {
 }
 
 message('QTAV: ' $$QTAV)
+message('QMAKE_COPY: ' $$QMAKE_COPY)
+message('QMAKE_COPY_FILE: ' $$QMAKE_COPY_FILE)
+message('QMAKE_MKDIR_CMD: ' $$QMAKE_MKDIR_CMD)
 
 FFMPEG = $$(FFMPEG)
 isEmpty(FFMPEG) {
