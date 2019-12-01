@@ -66,9 +66,31 @@ if(equals(MAKEFILE_GENERATOR, MSVC.NET)|equals(MAKEFILE_GENERATOR, MSBUILD)) {
 
 message('TRY_COPY: ' $$TRY_COPY)
 
-#mac: {
-#    QTAVLIBS = -F$$absolute_path($$OUT_PWD/../qctools-qtav/$$QTAVLIBFOLDER) -framework QtAV$$platformTargetSuffix()
-#} else {
+mac: {
+    QTAVLIBS = -F$$absolute_path($$OUT_PWD/../qctools-qtav/$$QTAVLIBFOLDER) -framework QtAV$$platformTargetSuffix()
+
+    qtavlibs.pattern = $$absolute_path($$OUT_PWD/../qctools-qtav/$$QTAVLIBFOLDER/$${QTAVLIBNAME}*)
+    message('qtavlibs.pattern: ' $$qtavlibs.pattern)
+
+    qtavlibs.files = $$files($$qtavlibs.pattern)
+    message('qtavlibs.files: ' $$qtavlibs.files)
+
+    qtavlibs.path = $$absolute_path($$OUT_PWD$${BUILD_DIR}/$${TARGET}.app/Contents/Frameworks)
+    message('qtavlibs.path: ' $$qtavlibs.path)
+
+    qtavlibs.commands += $$escape_expand(\\n\\t)$$QMAKE_MKDIR_CMD $$shell_path($$qtavlibs.path)
+
+    for(f, qtavlibs.files) {
+      message('***: ' $$escape_expand(\\n\\t)$$QMAKE_COPY_DIR $$shell_path($$f) $$shell_path($$qtavlibs.path))
+      qtavlibs.commands += $$escape_expand(\\n\\t)$$QMAKE_COPY_DIR $$shell_path($$f) $$shell_path($$qtavlibs.path)
+    }
+
+    isEmpty(QMAKE_POST_LINK): QMAKE_POST_LINK = $$qtavlibs.commands
+    else: QMAKE_POST_LINK = $${QMAKE_POST_LINK}$$escape_expand(\\n\\t)$$qtavlibs.commands
+
+    message('QMAKE_POST_LINK: ' $${QMAKE_POST_LINK})
+
+} else {
     win32: {
         CONFIG(debug, debug|release) {
             BUILD_SUFFIX=d
@@ -84,7 +106,7 @@ message('TRY_COPY: ' $$TRY_COPY)
     message('QTAVLIBNAME: ' $${QTAVLIBNAME})
 
     QTAVLIBS += -L$$absolute_path($$OUT_PWD/../qctools-qtav/$$QTAVLIBFOLDER) -l$${QTAVLIBNAME}
-    qtavlibs.pattern = $$absolute_path($$OUT_PWD/../qctools-qtav/$$QTAVLIBFOLDER/$${QTAVLIBNAME}*)
+    qtavlibs.pattern = $$absolute_path($$OUT_PWD/../qctools-qtav/$$QTAVLIBFOLDER/*.$$QMAKE_EXTENSION_SHLIB)
     message('qtavlibs.pattern: ' $$qtavlibs.pattern)
 
     qtavlibs.files = $$files($$qtavlibs.pattern)
@@ -100,7 +122,7 @@ message('TRY_COPY: ' $$TRY_COPY)
     else: QMAKE_POST_LINK = $${QMAKE_POST_LINK}$$escape_expand(\\n\\t)$$qtavlibs.commands
 
     message('QMAKE_POST_LINK: ' $${QMAKE_POST_LINK})
-#}
+}
 
 message('QTAVLIBS: ' $$QTAVLIBS)
 
