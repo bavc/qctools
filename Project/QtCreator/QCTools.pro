@@ -113,6 +113,8 @@ write_file($$QTAV/.qmake.conf, noTests, append)
 mac: {
 noVideoToolbox = "CONFIG*=no-videotoolbox"
 write_file($$QTAV/.qmake.conf, noVideoToolbox, append)
+noFramework = "CONFIG*=no-framework"
+write_file($$QTAV/.qmake.conf, noFramework, append)
 }
 
 #write_file(qctools-cli/.qmake.conf, ffmpegConfig)
