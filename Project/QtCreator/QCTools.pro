@@ -117,6 +117,9 @@ noFramework = "CONFIG*=no-framework"
 write_file($$QTAV/.qmake.conf, noFramework, append)
 }
 
+qtav = "QTAV=$$QTAV"
+write_file(qctools-gui/.qmake.conf, qtav)
+
 #write_file(qctools-cli/.qmake.conf, ffmpegConfig)
 #write_file(qctools-gui/.qmake.conf, ffmpegConfig)
 #write_file(qctools-lib/.qmake.conf, ffmpegConfig)

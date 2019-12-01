@@ -48,8 +48,15 @@ mac: {
     QTAVLIBFOLDER=lib_osx_x86_64_llvm
 }
 
+QTAV = $$QTAV
+isEmpty(QTAV) {
+    message('qctools-gui: using default location for QTAV: ' $$QTAV)
+    QTAV=$$absolute_path($$PWD/../qctools-qtav)
+}
+message('qctools-gui: QTAV: ' $$QTAV)
+
 message('QTAVLIBFOLDER: ' $$QTAVLIBFOLDER)
-INCLUDEPATH += $$absolute_path($$PWD/../QtAV/src) $$absolute_path($$PWD/../QtAV/src/QtAV)
+INCLUDEPATH += $$absolute_path($$QTAV/src) $$absolute_path($$QTAV/src/QtAV)
 
 if(equals(MAKEFILE_GENERATOR, MSVC.NET)|equals(MAKEFILE_GENERATOR, MSBUILD)) {
   TRY_COPY = $$QMAKE_COPY
@@ -59,20 +66,25 @@ if(equals(MAKEFILE_GENERATOR, MSVC.NET)|equals(MAKEFILE_GENERATOR, MSBUILD)) {
 
 message('TRY_COPY: ' $$TRY_COPY)
 
-mac: {
-    QTAVLIBS = -F$$absolute_path($$OUT_PWD/../QtAV/$$QTAVLIBFOLDER) -framework QtAV$$platformTargetSuffix()
-} else {
-    CONFIG(debug, debug|release) {
-        win32: BUILD_SUFFIX=d
-        win32: BUILD_DIR=/debug
-    } else:CONFIG(release, debug|release) {
-        win32: BUILD_SUFFIX=
-        win32: BUILD_DIR=/release
+#mac: {
+#    QTAVLIBS = -F$$absolute_path($$OUT_PWD/../qctools-qtav/$$QTAVLIBFOLDER) -framework QtAV$$platformTargetSuffix()
+#} else {
+    win32: {
+        CONFIG(debug, debug|release) {
+            BUILD_SUFFIX=d
+            BUILD_DIR=/debug
+        } else:CONFIG(release, debug|release) {
+            BUILD_SUFFIX=
+            BUILD_DIR=/release
+        }
+        QTAVLIBNAME = QtAV$${BUILD_SUFFIX}1
+    } else {
+        QTAVLIBNAME = QtAV$${BUILD_SUFFIX}
     }
+    message('QTAVLIBNAME: ' $${QTAVLIBNAME})
 
-    QTAVLIBS += -L$$absolute_path($$OUT_PWD/../QtAV/$$QTAVLIBFOLDER) -lQtAV$${BUILD_SUFFIX}1
-
-    qtavlibs.pattern = $$absolute_path($$OUT_PWD/../QtAV/$$QTAVLIBFOLDER/QtAV$${BUILD_SUFFIX}1*)
+    QTAVLIBS += -L$$absolute_path($$OUT_PWD/../qctools-qtav/$$QTAVLIBFOLDER) -l$${QTAVLIBNAME}
+    qtavlibs.pattern = $$absolute_path($$OUT_PWD/../qctools-qtav/$$QTAVLIBFOLDER/$${QTAVLIBNAME}*)
     message('qtavlibs.pattern: ' $$qtavlibs.pattern)
 
     qtavlibs.files = $$files($$qtavlibs.pattern)
@@ -88,7 +100,7 @@ mac: {
     else: QMAKE_POST_LINK = $${QMAKE_POST_LINK}$$escape_expand(\\n\\t)$$qtavlibs.commands
 
     message('QMAKE_POST_LINK: ' $${QMAKE_POST_LINK})
-}
+#}
 
 message('QTAVLIBS: ' $$QTAVLIBS)
 
