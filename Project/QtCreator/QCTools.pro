@@ -3,7 +3,7 @@ TEMPLATE = subdirs
 QTAV = $$(QTAV)
 isEmpty(QTAV) {
 #    QTAV=$$absolute_path(../../../QtAV) // the same level of folder as qctools
-    QTAV=$$absolute_path(QtAV)
+    QTAV=$$absolute_path(qctools-qtav)
 } else {
     QTAV=$$absolute_path($$QTAV)
 }
@@ -120,17 +120,16 @@ write_file($$QTAV/.qmake.conf, noVideoToolbox, append)
 #write_file(qctools-lib/.qmake.conf, ffmpegConfig)
 
 SUBDIRS = \
-        qtav \
+        qctools-qtav \
         qctools-lib \
         qctools-cli \
         qctools-gui
 
-#qtav.file = $$QTAV/QtAV.pro
-qtav.subdir = $$QTAV
+qctools-qtav.file = qctools-qtav/qtav.pro
 
 qctools-lib.subdir = qctools-lib
 qctools-cli.subdir = qctools-cli
 qctools-gui.subdir = qctools-gui
 
 qctools-cli.depends = qctools-lib
-qctools-gui.depends = qtav qctools-lib
+qctools-gui.depends = qctools-qtav qctools-lib
