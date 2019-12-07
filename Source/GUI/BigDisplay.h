@@ -15,6 +15,7 @@
 #include <QResizeEvent>
 #include <QTimer>
 #include <string>
+#include "doublespinboxwithslider.h"
 
 class PlayerWindow;
 class FFmpeg_Glue;
@@ -42,55 +43,6 @@ const size_t Args_Max=7;
 //---------------------------------------------------------------------------
 
 class BigDisplay;
-class DoubleSpinBoxWithSlider : public QDoubleSpinBox
-{
-    Q_OBJECT
-
-public:
-    explicit DoubleSpinBoxWithSlider (DoubleSpinBoxWithSlider** Others, int Min, int Max, int Divisor, int Current, const char* Name, BigDisplay* Display, size_t Pos, bool IsBitSlice, bool IsFilter, bool IsPeak, bool IsMode, bool IsScale, bool IsColorspace, bool IsDmode, bool IsSystem, QWidget *parent=NULL);
-    ~DoubleSpinBoxWithSlider();
-
-    bool IsBitSlice;
-    bool IsFilter;
-    bool IsPeak;
-    bool IsMode;
-    bool IsScale;
-    bool IsColorspace;
-    bool IsDmode;
-    bool IsSystem;
-    void ChangeMax(int Max);
-
-    void applyValue(double value, bool notify);
-
-protected:
-    void enterEvent (QEvent* event);
-    void leaveEvent (QEvent* event);
-    void keyPressEvent (QKeyEvent* event);
-    void moveEvent (QMoveEvent * event);
-
-    void hidePopup ();
-
-    void showEvent (QShowEvent* event);
-    QString textFromValue (double value) const;
-    double  valueFromText (const QString& text) const;
-
-private:
-    DoubleSpinBoxWithSlider**   Others;
-    QWidget*                    Popup;
-    QSlider*                    Slider;
-    int                         Min;
-    int                         Max;
-    int                         Divisor;
-    BigDisplay*                 Display;
-    size_t                      Pos;
-
-public Q_SLOTS:
-    void on_valueChanged(double);
-    void on_sliderMoved(int);
-
-Q_SIGNALS:
-    void controlValueChanged(double);
-};
 
 //***************************************************************************
 // Class
@@ -176,6 +128,7 @@ private:
     CommentsPlot* plot;
 
     void setCurrentFilter(size_t playerIndex, size_t filterIndex);
+    void hideOthersOnEntering(DoubleSpinBoxWithSlider* doubleSpinBox, DoubleSpinBoxWithSlider** others);
 
 protected:
     bool eventFilter(QObject *, QEvent *);
