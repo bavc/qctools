@@ -16,6 +16,7 @@
 #include <QTimer>
 #include <string>
 #include "doublespinboxwithslider.h"
+#include "filters.h"
 
 class PlayerWindow;
 class FFmpeg_Glue;
@@ -39,7 +40,6 @@ class QSplitter;
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-const size_t Args_Max=7;
 //---------------------------------------------------------------------------
 
 class BigDisplay;
