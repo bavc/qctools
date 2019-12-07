@@ -27,6 +27,9 @@ Project/QtCreator/qctools-lib/moc_*
 Source/Makefile
 Source/Source.pro
 Source/build
+build-*
+.qmake.conf
+*.user
 *.o
 
 docs/qctools.html
