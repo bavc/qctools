@@ -168,7 +168,8 @@ HEADERS += \
     $$SOURCES_PATH/GUI/barchartprofilesmodel.h \
     $$SOURCES_PATH/GUI/playerwindow.h \
     ../../../Source/GUI/doublespinboxwithslider.h \
-    ../../../Source/GUI/filters.h
+    ../../../Source/GUI/filters.h \
+    ../../../Source/GUI/filterselector.h
 
 SOURCES += \
     $$SOURCES_PATH/GUI/BigDisplay.cpp \
@@ -200,7 +201,8 @@ SOURCES += \
     $$SOURCES_PATH/GUI/barchartprofilesmodel.cpp \
     $$SOURCES_PATH/GUI/playerwindow.cpp \
     ../../../Source/GUI/doublespinboxwithslider.cpp \
-    ../../../Source/GUI/filters.cpp
+    ../../../Source/GUI/filters.cpp \
+    ../../../Source/GUI/filterselector.cpp
 
 win32 {
     greaterThan(QT_MAJOR_VERSION, 4): {

@@ -1066,4 +1066,6 @@ const filter Filters[] =
     },
 };
 
+extern int FiltersListDefault_Count;
+
 #endif // FILTERS_H

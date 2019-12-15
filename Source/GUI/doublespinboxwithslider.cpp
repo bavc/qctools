@@ -2,11 +2,11 @@
 #include <math.h>
 
 //---------------------------------------------------------------------------
-DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(int Min_, int Max_, int Divisor_, int Current, const char* Name, size_t Pos_, bool IsBitSlice_, bool IsFilter_, bool IsPeak_, bool IsMode_, bool IsScale_, bool IsColorspace_, bool IsDmode_, bool IsSystem_, QWidget *parent) :
+DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(QWidget *parent, int Min_, int Max_, int Divisor_, int Current, const char* Name, bool IsBitSlice_, bool IsFilter_, bool IsPeak_, bool IsMode_, bool IsScale_, bool IsColorspace_, bool IsDmode_, bool IsSystem_) :
+    QDoubleSpinBox(parent),
     Divisor(Divisor_),
     Min(Min_),
     Max(Max_),
-    Pos(Pos_),
     IsBitSlice(IsBitSlice_),
     IsFilter(IsFilter_),
     IsPeak(IsPeak_),
@@ -14,8 +14,7 @@ DoubleSpinBoxWithSlider::DoubleSpinBoxWithSlider(int Min_, int Max_, int Divisor
     IsScale(IsScale_),
     IsColorspace(IsColorspace_),
     IsDmode(IsDmode_),
-    IsSystem(IsSystem_),
-    QDoubleSpinBox(parent)
+    IsSystem(IsSystem_)
 {
     Popup=NULL;
     Slider=NULL;
