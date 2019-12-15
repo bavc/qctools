@@ -1,7 +1,9 @@
 #ifndef FILTERS_H
 #define FILTERS_H
 
-const size_t Args_Max=7;
+#include <cstddef>
+
+constexpr size_t Args_Max=7;
 
 //---------------------------------------------------------------------------
 enum args_type

@@ -6,6 +6,7 @@
 #include <QColorDialog>
 #include <QGridLayout>
 #include <string>
+#include <cmath>
 
 FilterSelector::FilterSelector(FileInformation* fileInformation, QWidget *parent) : QFrame(parent), FileInfoData(fileInformation)
 {
