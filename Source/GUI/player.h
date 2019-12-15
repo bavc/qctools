@@ -5,6 +5,7 @@
 #include <QtAV>
 
 class FileInformation;
+class FilterSelector;
 
 namespace Ui {
 class Player;
@@ -43,6 +44,8 @@ private Q_SLOTS:
 private:
     void setScaleSliderPercentage(int percents);
     void setScaleSpinboxPercentage(int percents);
+    void handleFilterChange(FilterSelector *filterSelector, int filterIndex);
+    void setFilter(const QString& filter);
 
 private:
     Ui::Player *ui;
@@ -56,6 +59,7 @@ private:
     QtAV::LibAVFilterAudio* m_audioFilter;
 
     FileInformation* m_fileInformation;
+    FilterSelector* m_filterSelector;
 };
 
 #endif // PLAYER_H

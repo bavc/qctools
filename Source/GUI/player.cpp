@@ -2,7 +2,9 @@
 #include "ui_player.h"
 #include "Core/FileInformation.h"
 #include "Core/FFmpeg_Glue.h"
-
+#include "GUI/filterselector.h"
+#include <QDir>
+#include <QStandardPaths>
 #include <QTimer>
 
 Player::Player(QWidget *parent) :
@@ -39,6 +41,13 @@ Player::Player(QWidget *parent) :
     connect(m_player, SIGNAL(positionChanged(qint64)), SLOT(updateSlider(qint64)));
     connect(m_player, SIGNAL(started()), SLOT(updateSlider()));
     connect(m_player, SIGNAL(notifyIntervalChanged()), SLOT(updateSliderUnit()));
+
+    m_filterSelector = new FilterSelector(this);
+    handleFilterChange(m_filterSelector, 0);
+
+    ui->filterFrame->setLayout(new QHBoxLayout);
+    ui->filterFrame->setMinimumHeight(100);
+    ui->filterFrame->layout()->addWidget(m_filterSelector);
 }
 
 Player::~Player()
@@ -50,6 +59,7 @@ void Player::setFile(FileInformation *fileInfo)
 {
     if(m_player->file() != fileInfo->fileName()) {
         m_fileInformation = fileInfo;
+        m_filterSelector->setFileInformation(m_fileInformation);
         m_player->setFile(fileInfo->fileName());
 
         std::shared_ptr<QMetaObject::Connection> pConnection = std::make_shared<QMetaObject::Connection>();
@@ -233,4 +243,60 @@ void Player::setScaleSpinboxPercentage(int percents)
     ui->scalePercentage_spinBox->blockSignals(true);
     ui->scalePercentage_spinBox->setValue(percents);
     ui->scalePercentage_spinBox->blockSignals(false);
+}
+
+void Player::handleFilterChange(FilterSelector *filterSelector, int filterIndex)
+{
+    connect(filterSelector, &FilterSelector::filterChanged, [this, filterIndex](const QString& filterString) {
+
+        QString str = filterString;
+
+        str.replace(QString("${width}"), QString::number(m_fileInformation->Glue->Width_Get()));
+        str.replace(QString("${height}"), QString::number(m_fileInformation->Glue->Height_Get()));
+        str.replace(QString("${dar}"), QString::number(m_fileInformation->Glue->DAR_Get()));
+
+        //    QSize windowSize = imageLabels[Pos]->pixmapSize();
+        QSize windowSize = ui->scrollArea->widget()->size();
+
+        str.replace(QString("${window_width}"), QString::number(windowSize.width()));
+        str.replace(QString("${window_height}"), QString::number(windowSize.height()));
+
+        QString tempLocation = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+        QDir tempDir(tempLocation);
+
+        QString qctoolsTmpSubDir = "qctools";
+        QString fontFileName = "Anonymous_Pro_B.ttf";
+
+        if(tempDir.exists())
+        {
+            QDir qctoolsTmpDir(tempLocation + "/" + qctoolsTmpSubDir);
+            if(!qctoolsTmpDir.exists())
+                tempDir.mkdir(qctoolsTmpSubDir);
+
+            QFile fontFile(qctoolsTmpDir.path() + "/" + fontFileName);
+            if(!fontFile.exists())
+            {
+                QFile::copy(":/" + fontFileName, fontFile.fileName());
+            }
+
+            if(fontFile.exists())
+            {
+                QString fontFileName(fontFile.fileName());
+                fontFileName = fontFileName.replace(":", "\\\\:"); // ":" is a reserved character, it must be escaped
+                str.replace(QString("${fontfile}"), fontFileName);
+            }
+        }
+
+        setFilter(str);
+    });
+}
+
+void Player::setFilter(const QString &filter)
+{
+    m_videoFilter->setOptions(filter);
+    m_audioFilter->setOptions(filter);
+
+    if(m_player->isPaused()) {
+        m_player->seek(m_player->position());
+    }
 }

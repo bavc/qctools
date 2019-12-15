@@ -8,7 +8,7 @@
 #include <string>
 #include <cmath>
 
-FilterSelector::FilterSelector(FileInformation* fileInformation, QWidget *parent) : QFrame(parent), FileInfoData(fileInformation)
+FilterSelector::FilterSelector(QWidget *parent) : QFrame(parent), FileInfoData(nullptr)
 {
     for (size_t OptionPos=0; OptionPos<Args_Max; OptionPos++)
     {
@@ -145,6 +145,11 @@ void FilterSelector::setCurrentFilter(int filterIndex, bool leftLayout)
 
     m_currentFilterIndex = filterIndex;
     on_FiltersList_currentOptionChanged(filterIndex);
+}
+
+void FilterSelector::setFileInformation(FileInformation *fileInformation)
+{
+    FileInfoData = fileInformation;
 }
 
 void FilterSelector::setCurrentIndex(int index)

@@ -16,7 +16,7 @@ class FilterSelector : public QFrame
 {
     Q_OBJECT
 public:
-    FilterSelector(FileInformation* fileInformation, QWidget* parent = nullptr);
+    FilterSelector(QWidget* parent = nullptr);
 
     // Content
     struct options
@@ -48,6 +48,7 @@ public:
         }
     };
 
+    void setFileInformation(FileInformation* fileInformation);
     void setCurrentIndex(int index);
 
 Q_SIGNALS:
