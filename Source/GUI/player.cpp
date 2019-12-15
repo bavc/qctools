@@ -161,12 +161,16 @@ void Player::updateVideoOutputSize()
 
 void Player::applyFilter()
 {
+    ui->plainTextEdit->clear();
+
     QStringList definedFilters;
     for(auto i = 0; i < MaxFilters; ++i) {
         auto empty = m_filters[i].isEmpty();
         if(!empty)
             definedFilters.append(m_filters[i]);
     }
+
+    ui->plainTextEdit->appendPlainText(QString("*** defined filters ***: \n\n%1").arg(definedFilters.join("\n")));
 
     if(definedFilters.empty()) {
         setFilter(QString());
@@ -182,6 +186,8 @@ void Player::applyFilter()
         layout = "0_0|0_h0|v0_0|v0_h0|0_h0+h1|v0_h0+h1";
     }
 
+    ui->plainTextEdit->appendPlainText(QString("*** layout ***: \n\n%1").arg(layout));
+
     QString splits[] = {
         "",
         "split=2[in1][in2];",
@@ -193,6 +199,8 @@ void Player::applyFilter()
 
     auto split = splits[definedFilters.length() - 1];
 
+    ui->plainTextEdit->appendPlainText(QString("*** split ***: \n\n%1").arg(split));
+
     QString filterString;
 
     if(definedFilters.length() == 1) {
@@ -202,6 +210,8 @@ void Player::applyFilter()
             filterString += QString("[in%1]%2[out%1];").arg(i + 1).arg(definedFilters[i]);
         }
     }
+
+    ui->plainTextEdit->appendPlainText(QString("*** filterString ***: \n\n%1").arg(filterString));
 
     QString xstack_inputs[] = {
         "",
@@ -213,6 +223,9 @@ void Player::applyFilter()
     };
 
     auto xstack_input = xstack_inputs[definedFilters.length() - 1];
+
+    ui->plainTextEdit->appendPlainText(QString("*** xstack_input ***: \n\n%1").arg(xstack_input));
+
     QString xstack_option;
 
     if(definedFilters.length() != 1) {
@@ -220,6 +233,8 @@ void Player::applyFilter()
     }
 
     QString combinedFilter = split + filterString + xstack_option;
+
+    ui->plainTextEdit->appendPlainText(QString("*** result ***: \n\n%1").arg(combinedFilter));
 
     setFilter(combinedFilter);
 }

@@ -132,7 +132,7 @@
          <property name="geometry">
           <rect>
            <x>422</x>
-           <y>181</y>
+           <y>28</y>
            <width>300</width>
            <height>246</height>
           </rect>
@@ -298,6 +298,9 @@
          <bool>true</bool>
         </property>
        </widget>
+      </item>
+      <item row="1" column="0" colspan="3">
+       <widget class="QPlainTextEdit" name="plainTextEdit"/>
       </item>
      </layout>
     </widget>
