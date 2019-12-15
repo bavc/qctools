@@ -78,6 +78,18 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QWidget(parent)
 void PlayerWindow::setFile(const QString &filePath)
 {
     m_player->setFile(filePath);
+
+    std::shared_ptr<QMetaObject::Connection> pConnection = std::make_shared<QMetaObject::Connection>();
+    *pConnection = connect(m_player, &QtAV::AVPlayer::stateChanged, [this, pConnection](QtAV::AVPlayer::State state) {
+        if(state == QtAV::AVPlayer::PlayingState) {
+            m_player->pause();
+            m_player->seek(m_player->position());
+        }
+
+        QObject::disconnect(*pConnection);
+    });
+
+    m_player->play();
 }
 
 void PlayerWindow::openMedia()
@@ -127,6 +139,10 @@ void PlayerWindow::setFilter(QString filter)
 {
     m_videoFilter->setOptions(filter);
     m_audioFilter->setOptions(filter);
+
+    if(m_player->isPaused()) {
+        m_player->seek(m_player->position());
+    }
 }
 
 void PlayerWindow::updateSlider(qint64 value)
