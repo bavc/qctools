@@ -20,8 +20,8 @@
 #include "GUI/Plots.h"
 #include "GUI/draggablechildrenbehaviour.h"
 #include "GUI/preferences.h"
-#include "GUI/BigDisplay.h"
 #include "GUI/barchartprofilesmodel.h"
+#include "GUI/player.h"
 
 //---------------------------------------------------------------------------
 
@@ -495,9 +495,6 @@ void MainWindow::Update()
 {
 	if (TinyDisplayArea)
         TinyDisplayArea->Update(false);
-
-    if(TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
-        TinyDisplayArea->BigDisplayArea->ShowPicture();
 
 	if(ControlArea)
 		ControlArea->Update();

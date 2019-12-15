@@ -260,23 +260,6 @@ void Control::Update()
         P0->setEnabled(true);
         P1->setEnabled(true);
         P2->setEnabled(true);
-
-        if (TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
-        {
-            TinyDisplayArea->BigDisplayArea->ControlArea->SelectedSpeed=SelectedSpeed;
-            TinyDisplayArea->BigDisplayArea->ControlArea->M2->setEnabled(M2->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
-            TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
-            TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
-            TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->P2->setEnabled(P2->isEnabled());
-        }
     }
     else if (Frames_Pos+1==FileInfoData->ReferenceStat()->x_Current_Max)
     {
@@ -293,23 +276,6 @@ void Control::Update()
         P0->setEnabled(false);
         P1->setEnabled(false);
         P2->setEnabled(false);
-
-        if (TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
-        {
-            TinyDisplayArea->BigDisplayArea->ControlArea->SelectedSpeed=SelectedSpeed;
-            TinyDisplayArea->BigDisplayArea->ControlArea->M2->setEnabled(M2->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
-            TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
-            TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
-            TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
-            TinyDisplayArea->BigDisplayArea->ControlArea->P2->setEnabled(P2->isEnabled());
-        }
     }
     else
     {
@@ -322,23 +288,6 @@ void Control::Update()
             PlayPause->setText(">");
             PlayPause->setIcon(QIcon(":/icon/play.png"));
             PlayPause->setEnabled(true);
-
-            if (TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
-            {
-                TinyDisplayArea->BigDisplayArea->ControlArea->SelectedSpeed=SelectedSpeed;
-                TinyDisplayArea->BigDisplayArea->ControlArea->M2->setEnabled(M2->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
-                TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
-                TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
-                TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->P2->setEnabled(P2->isEnabled());
-            }
         }
         if (SelectedSpeed==Speed_O && Frames_Pos+1!=FileInfoData->ReferenceStat()->x_Current_Max)
         {
@@ -349,23 +298,6 @@ void Control::Update()
             P0->setEnabled(true);
             P1->setEnabled(true);
             P2->setEnabled(true);
-
-            if (TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
-            {
-                TinyDisplayArea->BigDisplayArea->ControlArea->SelectedSpeed=SelectedSpeed;
-                TinyDisplayArea->BigDisplayArea->ControlArea->M2->setEnabled(M2->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
-                TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
-                TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
-                TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
-                TinyDisplayArea->BigDisplayArea->ControlArea->P2->setEnabled(P2->isEnabled());
-            }
         }
     }
 }
@@ -436,23 +368,6 @@ void Control::on_M2_clicked(bool checked)
     P1->setEnabled(true);
     P2->setEnabled(true);
 
-    if (TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
-    {
-        TinyDisplayArea->BigDisplayArea->ControlArea->SelectedSpeed=SelectedSpeed;
-        TinyDisplayArea->BigDisplayArea->ControlArea->M2->setEnabled(M2->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P2->setEnabled(P2->isEnabled());
-    }
-
     TimeOut_Init();
 }
 
@@ -477,23 +392,6 @@ void Control::on_M1_clicked(bool checked)
     P1->setEnabled(true);
     P2->setEnabled(true);
 
-    if (TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
-    {
-        TinyDisplayArea->BigDisplayArea->ControlArea->SelectedSpeed=SelectedSpeed;
-        TinyDisplayArea->BigDisplayArea->ControlArea->M2->setEnabled(M2->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P2->setEnabled(P2->isEnabled());
-    }
-
     TimeOut_Init();
 }
 
@@ -517,23 +415,6 @@ void Control::on_M0_clicked(bool checked)
     P0->setEnabled(true);
     P1->setEnabled(true);
     P2->setEnabled(true);
-
-    if (TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
-    {
-        TinyDisplayArea->BigDisplayArea->ControlArea->SelectedSpeed=SelectedSpeed;
-        TinyDisplayArea->BigDisplayArea->ControlArea->M2->setEnabled(M2->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P2->setEnabled(P2->isEnabled());
-    }
 
     TimeOut_Init();
 }
@@ -568,23 +449,6 @@ void Control::on_Pause_clicked(bool checked)
     P1->setEnabled(Frames_Pos+1!=FileInfoData->ReferenceStat()->x_Current_Max);
     P2->setEnabled(Frames_Pos+1!=FileInfoData->ReferenceStat()->x_Current_Max);
 
-    if (TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
-    {
-        TinyDisplayArea->BigDisplayArea->ControlArea->SelectedSpeed=SelectedSpeed;
-        TinyDisplayArea->BigDisplayArea->ControlArea->M2->setEnabled(M2->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P2->setEnabled(P2->isEnabled());
-    }
-
     Q_EMIT stopClicked();
     stop();
 }
@@ -609,23 +473,6 @@ void Control::on_P0_clicked(bool checked)
     P0->setEnabled(false);
     P1->setEnabled(true);
     P2->setEnabled(true);
-
-    if (TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
-    {
-        TinyDisplayArea->BigDisplayArea->ControlArea->SelectedSpeed=SelectedSpeed;
-        TinyDisplayArea->BigDisplayArea->ControlArea->M2->setEnabled(M2->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P2->setEnabled(P2->isEnabled());
-    }
 
     Q_EMIT playClicked();
     TimeOut_Init();
@@ -652,23 +499,6 @@ void Control::on_P1_clicked(bool checked)
     P1->setEnabled(false);
     P2->setEnabled(true);
 
-    if (TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
-    {
-        TinyDisplayArea->BigDisplayArea->ControlArea->SelectedSpeed=SelectedSpeed;
-        TinyDisplayArea->BigDisplayArea->ControlArea->M2->setEnabled(M2->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P2->setEnabled(P2->isEnabled());
-    }
-
     Q_EMIT playClicked();
     TimeOut_Init();
 }
@@ -693,24 +523,6 @@ void Control::on_P2_clicked(bool checked)
     P0->setEnabled(true);
     P1->setEnabled(true);
     P2->setEnabled(false);
-
-    if (TinyDisplayArea && TinyDisplayArea->BigDisplayArea)
-    {
-        TinyDisplayArea->BigDisplayArea->ControlArea->SelectedSpeed=SelectedSpeed;
-        TinyDisplayArea->BigDisplayArea->ControlArea->SelectedSpeed=SelectedSpeed;
-        TinyDisplayArea->BigDisplayArea->ControlArea->M2->setEnabled(M2->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->M1->setEnabled(M1->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->M0->setEnabled(M0->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->Minus->setEnabled(Minus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setText(PlayPause->text());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIcon(PlayPause->icon());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setIconSize(PlayPause->iconSize());
-        TinyDisplayArea->BigDisplayArea->ControlArea->PlayPause->setEnabled(PlayPause->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->Plus->setEnabled(Plus->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P0->setEnabled(P0->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P1->setEnabled(P1->isEnabled());
-        TinyDisplayArea->BigDisplayArea->ControlArea->P2->setEnabled(P2->isEnabled());
-    }
 
     Q_EMIT playClicked();
     TimeOut_Init();

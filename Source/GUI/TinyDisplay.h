@@ -13,7 +13,7 @@
 
 class FileInformation;
 class Control;
-class BigDisplay;
+class Player;
 
 class QLabel;
 class QToolButton;
@@ -29,7 +29,6 @@ public:
 
     // To update
     Control                    *ControlArea;
-    BigDisplay                 *BigDisplayArea;
 
     // Commands
     void                        Filters_Show(); //Quick hack for showing filters
@@ -49,6 +48,7 @@ private:
     int                         lastWidth;
 
     QHBoxLayout*                Layout;
+    Player* m_player;
 
 protected:
     FileInformation*            FileInfoData;

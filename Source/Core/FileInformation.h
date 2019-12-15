@@ -131,6 +131,9 @@ public:
 
     void readStats(QIODevice& StatsFromExternalData_FileName, bool StatsFromExternalData_FileName_IsCompressed);
 
+    int width(int pos = 1) const;
+    int height(int pos = 1) const;
+
 public Q_SLOTS:
 
     void checkFileUploaded(const QString& fileName);

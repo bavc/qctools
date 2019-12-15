@@ -143,7 +143,6 @@ message("qctools: THIRD_PARTY_PATH = " $$THIRD_PARTY_PATH)
 INCLUDEPATH += $$SOURCES_PATH/GUI
 
 HEADERS += \
-    $$SOURCES_PATH/GUI/BigDisplay.h \
     $$SOURCES_PATH/GUI/Control.h \
     $$SOURCES_PATH/GUI/FilesList.h \
     $$SOURCES_PATH/GUI/Help.h \
@@ -158,7 +157,6 @@ HEADERS += \
     $$SOURCES_PATH/GUI/PlotScaleWidget.h \
     $$SOURCES_PATH/GUI/TinyDisplay.h \
     $$SOURCES_PATH/GUI/SelectionArea.h \
-    $$SOURCES_PATH/GUI/Imagelabel.h \
     $$SOURCES_PATH/GUI/config.h \
     $$SOURCES_PATH/GUI/draggablechildrenbehaviour.h \
     $$SOURCES_PATH/ThirdParty/cqmarkdown/CMarkdown.h \
@@ -166,13 +164,12 @@ HEADERS += \
     $$SOURCES_PATH/GUI/barchartconditioninput.h \
     $$SOURCES_PATH/GUI/managebarchartconditions.h \
     $$SOURCES_PATH/GUI/barchartprofilesmodel.h \
-    $$SOURCES_PATH/GUI/playerwindow.h \
-    ../../../Source/GUI/doublespinboxwithslider.h \
-    ../../../Source/GUI/filters.h \
-    ../../../Source/GUI/filterselector.h
+    $$SOURCES_PATH/GUI/player.h \
+    $$SOURCES_PATH/GUI/doublespinboxwithslider.h \
+    $$SOURCES_PATH/GUI/filters.h \
+    $$SOURCES_PATH/GUI/filterselector.h
 
 SOURCES += \
-    $$SOURCES_PATH/GUI/BigDisplay.cpp \
     $$SOURCES_PATH/GUI/Control.cpp \
     $$SOURCES_PATH/GUI/FilesList.cpp \
     $$SOURCES_PATH/GUI/Help.cpp \
@@ -191,7 +188,6 @@ SOURCES += \
     $$SOURCES_PATH/GUI/preferences.cpp \
     $$SOURCES_PATH/GUI/TinyDisplay.cpp \
     $$SOURCES_PATH/GUI/SelectionArea.cpp \
-    $$SOURCES_PATH/GUI/Imagelabel.cpp \
     $$SOURCES_PATH/GUI/config.cpp \
     $$SOURCES_PATH/GUI/draggablechildrenbehaviour.cpp \
     $$SOURCES_PATH/ThirdParty/cqmarkdown/CMarkdown.cpp \
@@ -199,10 +195,10 @@ SOURCES += \
     $$SOURCES_PATH/GUI/barchartconditioninput.cpp \
     $$SOURCES_PATH/GUI/managebarchartconditions.cpp \
     $$SOURCES_PATH/GUI/barchartprofilesmodel.cpp \
-    $$SOURCES_PATH/GUI/playerwindow.cpp \
-    ../../../Source/GUI/doublespinboxwithslider.cpp \
-    ../../../Source/GUI/filters.cpp \
-    ../../../Source/GUI/filterselector.cpp
+    $$SOURCES_PATH/GUI/player.cpp \
+    $$SOURCES_PATH/GUI/doublespinboxwithslider.cpp \
+    $$SOURCES_PATH/GUI/filters.cpp \
+    $$SOURCES_PATH/GUI/filterselector.cpp
 
 win32 {
     greaterThan(QT_MAJOR_VERSION, 4): {
@@ -220,7 +216,7 @@ FORMS += \
     $$SOURCES_PATH/GUI/mainwindow.ui \
     $$SOURCES_PATH/GUI/preferences.ui \
     $$SOURCES_PATH/GUI/CommentsEditor.ui \
-    $$SOURCES_PATH/GUI/imagelabel.ui \
+    $$SOURCES_PATH/GUI/player.ui \
     $$SOURCES_PATH/GUI/barchartconditioneditor.ui \
     $$SOURCES_PATH/GUI/barchartconditioninput.ui \
     $$SOURCES_PATH/GUI/managebarchartconditions.ui \
