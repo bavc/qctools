@@ -1,6 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include <QTimer>
 #include <QWidget>
 #include <QtAV>
 
@@ -33,6 +34,7 @@ private Q_SLOTS:
     void updateSlider();
     void updateSliderUnit();
     void updateVideoOutputSize();
+    void applyFilter();
 
 private Q_SLOTS:
     void on_playPause_pushButton_clicked();
@@ -59,7 +61,9 @@ private:
     QtAV::LibAVFilterAudio* m_audioFilter;
 
     FileInformation* m_fileInformation;
-    FilterSelector* m_filterSelector;
+    FilterSelector* m_filterSelectors[6];
+    QString m_filters[6];
+    QTimer m_filterUpdateTimer;
 };
 
 #endif // PLAYER_H

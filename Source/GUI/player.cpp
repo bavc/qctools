@@ -7,6 +7,8 @@
 #include <QStandardPaths>
 #include <QTimer>
 
+const int MaxFilters = 6;
+
 Player::Player(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Player)
@@ -42,12 +44,17 @@ Player::Player(QWidget *parent) :
     connect(m_player, SIGNAL(started()), SLOT(updateSlider()));
     connect(m_player, SIGNAL(notifyIntervalChanged()), SLOT(updateSliderUnit()));
 
-    m_filterSelector = new FilterSelector(this);
-    handleFilterChange(m_filterSelector, 0);
+    ui->filterGroupBox->setLayout(new QVBoxLayout);
+    ui->filterGroupBox->setMinimumHeight(60 * MaxFilters);
 
-    ui->filterFrame->setLayout(new QHBoxLayout);
-    ui->filterFrame->setMinimumHeight(100);
-    ui->filterFrame->layout()->addWidget(m_filterSelector);
+    for(int i = 0; i < 6; ++i) {
+        m_filterSelectors[i] = new FilterSelector(this);
+        handleFilterChange(m_filterSelectors[i], i);
+        ui->filterGroupBox->layout()->addWidget(m_filterSelectors[i]);
+    }
+
+    m_filterUpdateTimer.setSingleShot(true);
+    connect(&m_filterUpdateTimer, &QTimer::timeout, this, &Player::applyFilter);
 }
 
 Player::~Player()
@@ -59,7 +66,11 @@ void Player::setFile(FileInformation *fileInfo)
 {
     if(m_player->file() != fileInfo->fileName()) {
         m_fileInformation = fileInfo;
-        m_filterSelector->setFileInformation(m_fileInformation);
+        for(int i = 0; i < MaxFilters; ++i)
+        {
+            m_filterSelectors[i]->setFileInformation(m_fileInformation);
+        }
+
         m_player->setFile(fileInfo->fileName());
 
         std::shared_ptr<QMetaObject::Connection> pConnection = std::make_shared<QMetaObject::Connection>();
@@ -146,6 +157,71 @@ void Player::updateVideoOutputSize()
     // qDebug() << "new geometry: " << geometry;
 
     ui->scrollArea->widget()->setGeometry(geometry);
+}
+
+void Player::applyFilter()
+{
+    QStringList definedFilters;
+    for(auto i = 0; i < MaxFilters; ++i) {
+        auto empty = m_filters[i].isEmpty();
+        if(!empty)
+            definedFilters.append(m_filters[i]);
+    }
+
+    if(definedFilters.empty()) {
+        setFilter(QString());
+        return;
+    }
+
+    auto layout = QString();
+    if(ui->vertical_checkBox->isChecked()) {
+        layout = "0_0|0_h0|0_h0+h1|0_h0+h1+h2|0_h0+h1+h2+h3|0_h0+h1+h2+h3+h4";
+    } else if(ui->horizontal_checkBox->isChecked()) {
+        layout = "0_0|v0_0|v0+v1_0|v0+v1+v2_0|v0+v1+v2+v3_0|v0+v1+v2+v3+v4_0";
+    } else if(ui->grid_checkBox->isChecked()) {
+        layout = "0_0|0_h0|v0_0|v0_h0|0_h0+h1|v0_h0+h1";
+    }
+
+    QString splits[] = {
+        "",
+        "split=2[in1][in2];",
+        "split=3[in1][in2][in3];",
+        "split=4[in1][in2][in3][in4];",
+        "split=5[in1][in2][in3][in4][in5];",
+        "split=6[in1][in2][in3][in4][in5][in6];"
+    };
+
+    auto split = splits[definedFilters.length() - 1];
+
+    QString filterString;
+
+    if(definedFilters.length() == 1) {
+        filterString = definedFilters[0];
+    } else {
+        for(int i = 0; i < definedFilters.length(); ++i) {
+            filterString += QString("[in%1]%2[out%1];").arg(i + 1).arg(definedFilters[i]);
+        }
+    }
+
+    QString xstack_inputs[] = {
+        "",
+        "[out1][out2]",
+        "[out1][out2][out3]",
+        "[out1][out2][out3][out4]",
+        "[out1][out2][out3][out4][out5]",
+        "[out1][out2][out3][out4][out5][out6]"
+    };
+
+    auto xstack_input = xstack_inputs[definedFilters.length() - 1];
+    QString xstack_option;
+
+    if(definedFilters.length() != 1) {
+        xstack_option = QString("%1xstack=inputs=%2:layout=%3").arg(xstack_input).arg(definedFilters.length()).arg(layout);
+    }
+
+    QString combinedFilter = split + filterString + xstack_option;
+
+    setFilter(combinedFilter);
 }
 
 void Player::on_playPause_pushButton_clicked()
@@ -287,7 +363,10 @@ void Player::handleFilterChange(FilterSelector *filterSelector, int filterIndex)
             }
         }
 
-        setFilter(str);
+        m_filters[filterIndex] = str;
+
+        m_filterUpdateTimer.stop();
+        m_filterUpdateTimer.start(100);
     });
 }
 
