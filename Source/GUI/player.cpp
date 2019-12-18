@@ -181,9 +181,9 @@ void Player::applyFilter()
     if(ui->vertical_checkBox->isChecked()) {
         layout = "0_0|0_h0|0_h0+h1|0_h0+h1+h2|0_h0+h1+h2+h3|0_h0+h1+h2+h3+h4";
     } else if(ui->horizontal_checkBox->isChecked()) {
-        layout = "0_0|v0_0|v0+v1_0|v0+v1+v2_0|v0+v1+v2+v3_0|v0+v1+v2+v3+v4_0";
+        layout = "0_0|w0_0|w0+w1_0|w0+w1+w2_0|w0+w1+w2+w3_0|w0+w1+w2+w3+w4_0";
     } else if(ui->grid_checkBox->isChecked()) {
-        layout = "0_0|0_h0|v0_0|v0_h0|0_h0+h1|v0_h0+h1";
+        layout = "0_0|w0_0|0_h0|w0_h0|0_h0+h1|w0_h0+h1";
     }
 
     ui->plainTextEdit->appendPlainText(QString("*** layout ***: \n\n%1").arg(layout));
