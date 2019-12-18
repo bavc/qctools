@@ -190,11 +190,11 @@ void Player::applyFilter()
 
     QString splits[] = {
         "",
-        "split=2[in1][in2];",
-        "split=3[in1][in2][in3];",
-        "split=4[in1][in2][in3][in4];",
-        "split=5[in1][in2][in3][in4][in5];",
-        "split=6[in1][in2][in3][in4][in5][in6];"
+        "split=2[x1][x2];",
+        "split=3[x1][x2][x3];",
+        "split=4[x1][x2][x3][x4];",
+        "split=5[x1][x2][x3][x4][x5];",
+        "split=6[x1][x2][x3][x4][x5][x6];"
     };
 
     auto split = splits[definedFilters.length() - 1];
@@ -207,7 +207,7 @@ void Player::applyFilter()
         filterString = definedFilters[0];
     } else {
         for(int i = 0; i < definedFilters.length(); ++i) {
-            filterString += QString("[in%1]%2[out%1];").arg(i + 1).arg(definedFilters[i]);
+            filterString += QString("[x%1]%2[y%1];").arg(i + 1).arg(definedFilters[i]);
         }
     }
 
@@ -215,11 +215,11 @@ void Player::applyFilter()
 
     QString xstack_inputs[] = {
         "",
-        "[out1][out2]",
-        "[out1][out2][out3]",
-        "[out1][out2][out3][out4]",
-        "[out1][out2][out3][out4][out5]",
-        "[out1][out2][out3][out4][out5][out6]"
+        "[y1][y2]",
+        "[y1][y2][y3]",
+        "[y1][y2][y3][y4]",
+        "[y1][y2][y3][y4][y5]",
+        "[y1][y2][y3][y4][y5][y6]"
     };
 
     auto xstack_input = xstack_inputs[definedFilters.length() - 1];
