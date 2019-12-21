@@ -71,7 +71,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "",
+            "copy",
             "il=l=d:c=d",
         },
     },
