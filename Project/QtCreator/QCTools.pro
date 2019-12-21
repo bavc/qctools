@@ -128,7 +128,7 @@ SUBDIRS = \
         qctools-cli \
         qctools-gui
 
-qctools-qtav.file = qctools-qtav/qtav.pro
+qctools-qtav.file = qctools-qtav/QtAV.pro
 
 qctools-lib.subdir = qctools-lib
 qctools-cli.subdir = qctools-cli
