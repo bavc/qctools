@@ -35,7 +35,7 @@ public:
     options& getOptions();
 
     int getPhysicalFilterIndex(int displayFilterIndex);
-    void setCurrentFilter(int index, bool leftLayout = true);
+    void setCurrentFilter(int index);
 
     struct previous_values
     {
@@ -72,7 +72,6 @@ protected Q_SLOTS:
     void on_Color1_click(bool checked);
 private:
     options m_filterOptions;
-    bool m_leftLayout;
     std::vector<previous_values> m_previousValues;
 
     FileInformation* FileInfoData;

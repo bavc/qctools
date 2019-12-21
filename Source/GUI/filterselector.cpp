@@ -105,10 +105,8 @@ int FilterSelector::getPhysicalFilterIndex(int displayFilterIndex)
     return m_filterOptions.FiltersList->itemData(displayFilterIndex).toInt();
 }
 
-void FilterSelector::setCurrentFilter(int filterIndex, bool leftLayout)
+void FilterSelector::setCurrentFilter(int filterIndex)
 {
-    m_leftLayout = leftLayout;
-
     // Help
     if (filterIndex == 0)
     {
@@ -123,25 +121,14 @@ void FilterSelector::setCurrentFilter(int filterIndex, bool leftLayout)
     Layout0->setContentsMargins(0, 0, 0, 0);
     Layout0->setSpacing(8);
 
-    if(leftLayout) {
-        Layout0->addWidget(m_filterOptions.FiltersList, 0, 0, Qt::AlignLeft);
-        FiltersList_currentIndexChanged(filterIndex, Layout0);
+    Layout0->addWidget(m_filterOptions.FiltersList, 0, 0, Qt::AlignLeft);
+    FiltersList_currentIndexChanged(filterIndex, Layout0);
 
-        m_filterOptions.FiltersList_Fake=new QLabel(" ");
-        Layout0->addWidget(m_filterOptions.FiltersList_Fake, 1, 0, Qt::AlignLeft);
-        Layout0->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Minimum), 0, 14);
+    m_filterOptions.FiltersList_Fake=new QLabel(" ");
+    Layout0->addWidget(m_filterOptions.FiltersList_Fake, 1, 0, Qt::AlignLeft);
+    Layout0->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Minimum), 0, 14);
 
-        Layout->addLayout(Layout0, 0, 0, 1, 1, Qt::AlignLeft|Qt::AlignTop);
-    } else {
-        Layout0->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum), 0, 0);
-
-        FiltersList_currentIndexChanged(filterIndex, Layout0);
-        Layout0->addWidget(m_filterOptions.FiltersList, 0, 14, Qt::AlignRight);
-
-        m_filterOptions.FiltersList_Fake=new QLabel(" ");
-        Layout0->addWidget(m_filterOptions.FiltersList_Fake, 1, 14, Qt::AlignRight);
-        Layout->addLayout(Layout0, 0, 2, 1, 1, Qt::AlignRight|Qt::AlignTop);
-    }
+    Layout->addLayout(Layout0, 0, 0, 1, 1, Qt::AlignLeft|Qt::AlignTop);
 
     m_currentFilterIndex = filterIndex;
     on_FiltersList_currentOptionChanged(filterIndex);
@@ -193,7 +180,7 @@ void FilterSelector::on_FiltersList_currentIndexChanged(int Pos)
         if(!combo->itemData(Pos).isNull())
             Pos = combo->itemData(Pos).toInt();
 
-        setCurrentFilter(Pos, m_leftLayout);
+        setCurrentFilter(Pos);
     }
 }
 
