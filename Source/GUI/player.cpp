@@ -44,6 +44,8 @@ Player::Player(QWidget *parent) :
     connect(m_player, SIGNAL(started()), SLOT(updateSlider()));
     connect(m_player, SIGNAL(notifyIntervalChanged()), SLOT(updateSliderUnit()));
 
+    connect(ui->arrangementButtonGroup, SIGNAL(buttonToggled(QAbstractButton*, bool)), this, SLOT(applyFilter()));
+
     ui->filterGroupBox->setLayout(new QVBoxLayout);
     ui->filterGroupBox->setMinimumHeight(60 * MaxFilters);
 
