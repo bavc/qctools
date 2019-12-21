@@ -141,18 +141,23 @@ void Player::updateSliderUnit()
 void Player::updateVideoOutputSize()
 {
     QSize newSize;
+    auto sourceFrameWidth = m_fileInformation->Glue->Width_Get();
+    auto sourceFrameHeight = m_fileInformation->Glue->Height_Get();
+
+    auto filteredFrameWidth = m_vo->videoFrameSize().width();
+    auto filteredFrameHeight = m_vo->videoFrameSize().height();
 
     if(!ui->fitToScreen_radioButton->isChecked()) {
         double multiplier = ((double) ui->scalePercentage_spinBox->value()) / 100;
-        newSize = QSize(m_fileInformation->width(), m_fileInformation->height()) * multiplier;
+        newSize = QSize(filteredFrameWidth, filteredFrameHeight) * multiplier;
     } else {
         auto availableSize = ui->scrollArea->viewport()->size() - QSize(1, 1);
 
-        auto scaleFactor = double(availableSize.width()) / m_fileInformation->width();
-        newSize = QSize(availableSize.width(), scaleFactor * m_fileInformation->height());
+        auto scaleFactor = double(availableSize.width()) / filteredFrameWidth;
+        newSize = QSize(availableSize.width(), scaleFactor * filteredFrameHeight);
         if(newSize.height() > availableSize.height()) {
-            scaleFactor = double(availableSize.height()) / m_fileInformation->height();
-            newSize = QSize(scaleFactor * m_fileInformation->width(), availableSize.height());
+            scaleFactor = double(availableSize.height()) / filteredFrameHeight;
+            newSize = QSize(scaleFactor * filteredFrameWidth, availableSize.height());
         }
     }
 
@@ -244,6 +249,8 @@ void Player::applyFilter()
     ui->plainTextEdit->appendPlainText(QString("*** result ***: \n\n%1").arg(combinedFilter));
 
     setFilter(combinedFilter);
+
+    updateVideoOutputSize();
 }
 
 void Player::on_playPause_pushButton_clicked()
@@ -273,7 +280,7 @@ void Player::on_scalePercentage_spinBox_valueChanged(int value)
 {
     double multiplier = ((double) value) / 100;
 
-    QSize newSize = QSize(m_fileInformation->width(), m_fileInformation->height()) * multiplier;
+    QSize newSize = QSize(m_vo->videoFrameSize().width(), m_vo->videoFrameSize().height()) * multiplier;
     QSize currentSize = ui->scrollArea->widget()->size();
 
     if(newSize != currentSize)

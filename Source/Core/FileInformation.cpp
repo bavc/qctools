@@ -231,24 +231,6 @@ void FileInformation::readStats(QIODevice& StatsFromExternalData_File, bool Stat
     delete[] Xml;
 }
 
-int FileInformation::width(int pos) const
-{
-    int width = Glue->OutputFilterWidth_Get(pos - 1);
-    if(width == 0)
-        width = Glue->Width_Get();
-
-    return width;
-}
-
-int FileInformation::height(int pos) const
-{
-    int height = Glue->OutputFilterHeight_Get(pos - 1);
-    if(height == 0)
-        height = Glue->Height_Get();
-
-    return height;
-}
-
 FileInformation::FileInformation (SignalServer* signalServer, const QString &FileName_, activefilters ActiveFilters_, activealltracks ActiveAllTracks_,
                                   int FrameCount) :
     FileName(FileName_),

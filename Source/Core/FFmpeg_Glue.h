@@ -123,9 +123,6 @@ public:
     int                         OutputWidth_Get(int Pos);
     int                         OutputHeight_Get(int Pos);
 
-    int                         OutputFilterWidth_Get(int Pos);
-    int                         OutputFilterHeight_Get(int Pos);
-
     int                         OutputThumbnailWidth_Get() const;
     int                         OutputThumbnailHeight_Get() const;
     int                         OutputThumbnailBitRate_Get() const;
