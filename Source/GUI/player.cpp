@@ -10,7 +10,7 @@
 const int MaxFilters = 6;
 
 Player::Player(QWidget *parent) :
-    QWidget(parent),
+    QMainWindow(parent),
     ui(new Ui::Player)
 {
     ui->setupUi(this);

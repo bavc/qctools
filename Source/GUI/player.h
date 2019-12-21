@@ -1,6 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include <QMainWindow>
 #include <QTimer>
 #include <QWidget>
 #include <QtAV>
@@ -12,7 +13,7 @@ namespace Ui {
 class Player;
 }
 
-class Player : public QWidget
+class Player : public QMainWindow
 {
     Q_OBJECT
 
