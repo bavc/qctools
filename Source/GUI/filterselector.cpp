@@ -107,16 +107,6 @@ int FilterSelector::getPhysicalFilterIndex(int displayFilterIndex)
 
 void FilterSelector::setCurrentFilter(int filterIndex)
 {
-    // Help
-    if (filterIndex == 0)
-    {
-        // 2do help selected
-
-        // Help* Frame=new Help(this);
-        // Frame->PlaybackFilters();
-        return;
-    }
-
     QGridLayout* Layout0=new QGridLayout();
     Layout0->setContentsMargins(0, 0, 0, 0);
     Layout0->setSpacing(8);
