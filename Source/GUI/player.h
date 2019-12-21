@@ -46,6 +46,8 @@ private Q_SLOTS:
     void on_scalePercentage_spinBox_valueChanged(int value);
     void on_scalePercentage_horizontalSlider_valueChanged(int value);
 
+    void on_graphmonitor_checkBox_clicked(bool checked);
+
 private:
     void setScaleSliderPercentage(int percents);
     void setScaleSpinboxPercentage(int percents);

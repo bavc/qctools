@@ -246,6 +246,11 @@ void Player::applyFilter()
 
     QString combinedFilter = split + filterString + xstack_option;
 
+    if(ui->graphmonitor_checkBox->isChecked())
+    {
+        combinedFilter.append(QString(",graphmonitor=flags=queue+pts+time+timebase+format+size+rate:m=full"));
+    }
+
     ui->plainTextEdit->appendPlainText(QString("*** result ***: \n\n%1").arg(combinedFilter));
 
     setFilter(combinedFilter);
@@ -407,4 +412,9 @@ void Player::setFilter(const QString &filter)
     if(m_player->isPaused()) {
         m_player->seek(m_player->position());
     }
+}
+
+void Player::on_graphmonitor_checkBox_clicked(bool checked)
+{
+    applyFilter();
 }
