@@ -62,6 +62,11 @@ Player::~Player()
     delete ui;
 }
 
+FileInformation *Player::file() const
+{
+    return m_fileInformation;
+}
+
 void Player::setFile(FileInformation *fileInfo)
 {
     if(m_player->file() != fileInfo->fileName()) {

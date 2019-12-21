@@ -26,8 +26,6 @@ TinyDisplay::TinyDisplay(QWidget *parent, FileInformation* FileInformationData_)
       lastWidth(0),
       FileInfoData(FileInformationData_)
 {
-    m_player = new Player();
-
     // To update
     ControlArea = NULL;
 
@@ -244,13 +242,5 @@ void TinyDisplay::on_thumbnails_clicked(bool)
         }
     }
 
-    // player->show();
-    LoadBigDisplay();
-}
-
-void TinyDisplay::LoadBigDisplay()
-{
-    m_player->hide();
-    m_player->setFile(FileInfoData);
-    m_player->show();
+    Q_EMIT thumbnailClicked();
 }

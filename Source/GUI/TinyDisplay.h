@@ -32,7 +32,6 @@ public:
 
     // Commands
     void                        Filters_Show(); //Quick hack for showing filters
-    void                        LoadBigDisplay();
 
 public Q_SLOTS:
     void                        Update(bool updateBigDisplay = true);
@@ -48,7 +47,6 @@ private:
     int                         lastWidth;
 
     QHBoxLayout*                Layout;
-    Player* m_player;
 
 protected:
     FileInformation*            FileInfoData;
@@ -62,6 +60,7 @@ protected:
 
 Q_SIGNALS:
     void                        resized();
+    void                        thumbnailClicked();
 
 private Q_SLOTS:
     void                        thumbsLayoutResized();

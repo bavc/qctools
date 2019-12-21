@@ -6,6 +6,7 @@
 
 //---------------------------------------------------------------------------
 #include "mainwindow.h"
+#include "player.h"
 #include "ui_mainwindow.h"
 #include "Core/FFmpeg_Glue.h"
 #include "GUI/Plots.h"
@@ -113,6 +114,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // Info
     DragDrop_Image=NULL;
     DragDrop_Text=NULL;
+
+    m_player = new Player();
 
     // UI
     Ui_Init();
@@ -446,8 +449,7 @@ void MainWindow::on_actionPreferences_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionFiltersLayout_triggered()
 {
-    if (TinyDisplayArea)
-        TinyDisplayArea->LoadBigDisplay();
+    showPlayer();
 }
 
 //---------------------------------------------------------------------------
@@ -846,6 +848,16 @@ void MainWindow::updateExportAllAction()
     ui->actionExport_XmlGz_SidecarAll->setEnabled(allParsedOrHaveStats);
 }
 
+void MainWindow::showPlayer()
+{
+    auto selectedFile = Files[getFilesCurrentPos()];
+    if(selectedFile != m_player->file()) {
+        m_player->hide();
+        m_player->setFile(selectedFile);
+    }
+    m_player->show();
+}
+
 void MainWindow::on_actionNavigateNextComment_triggered()
 {
     if (getFilesCurrentPos()>=Files.size())
@@ -919,6 +931,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
             return;
         }
     }
+
+    m_player->hide();
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event)

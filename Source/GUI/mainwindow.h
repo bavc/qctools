@@ -46,6 +46,7 @@ class PreferencesDialog;
 class DraggableChildrenBehaviour;
 class SignalServer;
 class Preferences;
+class Player;
 
 class MainWindow : public QMainWindow
 {
@@ -237,6 +238,7 @@ private Q_SLOTS:
 
     void updateExportActions();
     void updateExportAllAction();
+    void showPlayer();
 
     void on_actionNavigateNextComment_triggered();
 
@@ -271,6 +273,7 @@ private:
 
     QJsonDocument m_barchartsProfile;
     QComboBox* m_profileSelectorCombobox;
+    Player* m_player;
 
     Ui::MainWindow *ui;
 };

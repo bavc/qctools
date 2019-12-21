@@ -20,6 +20,8 @@ public:
     explicit Player(QWidget *parent = nullptr);
     ~Player();
 
+    FileInformation* file() const;
+
 public Q_SLOTS:
     void setFile(FileInformation* filePath);
     void playPause();

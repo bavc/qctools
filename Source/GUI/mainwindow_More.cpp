@@ -355,6 +355,7 @@ void MainWindow::createGraphsLayout()
     }
 
     TinyDisplayArea=new TinyDisplay(this, Files[getFilesCurrentPos()]);
+    connect(TinyDisplayArea, &TinyDisplay::thumbnailClicked, this, &MainWindow::showPlayer);
     if (!ui->actionGraphsLayout->isChecked())
         TinyDisplayArea->hide();
     ui->verticalLayout->addWidget(TinyDisplayArea);
