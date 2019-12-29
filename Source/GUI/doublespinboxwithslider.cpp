@@ -309,6 +309,8 @@ QString DoubleSpinBoxWithSlider::textFromValue (double value) const
         return "ITU.BT-709 Y'CbCr";
     else if (IsSystem && value==8)
         return "ITU-R.BT-2020";
+    else if (IsSystem && value==9)
+        return "DCI-P3";
     else
         return QDoubleSpinBox::textFromValue(value);
 }

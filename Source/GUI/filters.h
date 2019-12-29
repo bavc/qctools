@@ -330,8 +330,8 @@ const filter Filters[] =
         "CIE Scope",
         0,
         {
-            { Args_Type_Slider,   1,   0,   8,   1, "System"},
-            { Args_Type_Slider,   1,   0,   8,   1, "Gamut"},
+            { Args_Type_Slider,   1,   0,   9,   1, "System"},
+            { Args_Type_Slider,   1,   0,   9,   1, "Gamut"},
             { Args_Type_Slider,   7,   0,  10,  10, "Contrast" },
             { Args_Type_Slider,   1,   0, 100, 100, "Intensity" },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
