@@ -296,25 +296,6 @@ const filter Filters[] =
         },
     },
     {
-        "Waveform / Vectorscope",
-        0,
-        {
-            { Args_Type_Slider,   1,   0,  10,  10, "Waveform" },
-            { Args_Type_Slider,   1,   0,  10,  10, "Vectorscope" },
-            { Args_Type_None,     0,   0,   0,   0, nullptr },
-            { Args_Type_None,     0,   0,   0,   0, nullptr },
-            { Args_Type_None,     0,   0,   0,   0, nullptr },
-            { Args_Type_None,     0,   0,   0,   0, nullptr },
-            { Args_Type_None,     0,   0,   0,   0, nullptr },
-        },
-        {
-            "split[a][b];[a]format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,\
-            vectorscope=intensity=${2}:mode=4,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=720:512,setsar=1/1[a1];\
-            [b]waveform=intensity=${1}:mode=column:mirror=1:c=1,scale=720:512,setsar=1/1[b1];\
-            [b1][a1]blend=c0_mode=addition:c1_mode=average:c2_mode=average,hue=s=2",
-        },
-    },
-    {
         "CIE Scope",
         0,
         {
@@ -365,23 +346,6 @@ const filter Filters[] =
         {
             "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:intensity=${4}",
             "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:strength=${4}",
-        },
-    },
-    {
-        "Extract Planes UV Equal.",
-        0,
-        {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Slider,   2,   0,  10,  10, "Strength" },
-            { Args_Type_Slider,   2,   0,  10,  10, "Intensity" },
-            { Args_Type_None,     0,   0,   0,   0, nullptr },
-            { Args_Type_None,     0,   0,   0,   0, nullptr },
-            { Args_Type_None,     0,   0,   0,   0, nullptr },
-            { Args_Type_None,     0,   0,   0,   0, nullptr },
-        },
-        {
-            "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,hstack,histeq=strength=${2}:intensity=${3}",
-            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=u+v,hstack,histeq=strength=${2}:strength=${3}",
         },
     },
     {
