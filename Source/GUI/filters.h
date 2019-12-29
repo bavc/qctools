@@ -123,6 +123,37 @@ const filter Filters[] =
         },
     },
     {
+        "Histogram (Temporal)",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Overlay" },
+            { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
+            { Args_Type_LogLin,   0,   0,   0,   0, "Levels" },
+            { Args_Type_None,     0,   0,   0,   0, nullptr },
+            { Args_Type_None,     0,   0,   0,   0, nullptr },
+            { Args_Type_None,     0,   0,   0,   0, nullptr },
+        },
+        {
+            // field N, overlay N, all planes N
+            "thistogram=components=${3}:levels_mode=${4}",
+            // field N, overlay N, all planes Y
+            "thistogram=levels_mode=${4}",
+            // field N, overlay Y, all planes N
+            "thistogram=display_mode=overlay:components=${3}:levels_mode=${4}",
+            // field N, overlay Y, all planes Y
+            "thistogram=display_mode=overlay:levels_mode=${4}",
+            // field Y, overlay N, all planes N
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=components=${3}:levels_mode=${4}[a2];[b1]thistogram=components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
+            // field Y, overlay N, all planes Y
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=levels_mode=${4}[a2];[b1]thistogram=levels_mode=${4}[b2];[a2][b2]hstack",
+            // field Y, overlay Y, all planes N
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=display_mode=overlay:components=${3}:levels_mode=${4}[a2];[b1]thistogram=display_mode=overlay:components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
+            // field Y, overlay Y, all planes Y
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=display_mode=overlay:levels_mode=${4}[a2];[b1]thistogram=display_mode=overlay:levels_mode=${4}[b2];[a2][b2]vstack",
+        },
+    },
+    {
         "Waveform",
         0,
         {
