@@ -24,6 +24,7 @@ Project/QtCreator/qctools-gui/QCTools.app
 Project/QtCreator/qctools-gui/*.h
 Project/QtCreator/qctools-lib/libqctools.a
 Project/QtCreator/qctools-lib/moc_*
+Project/QtCreator/build/
 Source/Makefile
 Source/Source.pro
 Source/build
