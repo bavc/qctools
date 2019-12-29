@@ -251,6 +251,8 @@ QString DoubleSpinBoxWithSlider::textFromValue (double value) const
         return "acolor";
     else if (IsFilter && value==6)
         return "xflat";
+    else if (IsFilter && value==7)
+        return "yflat";
     else if (IsPeak && value==0)
         return "none";
     else if (IsPeak && value==1)
