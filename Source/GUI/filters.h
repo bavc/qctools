@@ -71,8 +71,8 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "copy",
-            "il=l=d:c=d",
+            "format=yuv444p,scale",
+            "format=yuv444p,scale,il=l=d:c=d",
         },
     },
     {
