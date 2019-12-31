@@ -142,6 +142,12 @@ void FilterSelector::setCurrentIndex(int index)
     m_currentFilterIndex = index;
 }
 
+void FilterSelector::selectCurrentFilter(int index)
+{
+    QSignalBlocker blocker(m_filterOptions.FiltersList);
+    m_filterOptions.FiltersList->setCurrentIndex(index);
+}
+
 void FilterSelector::on_FiltersOptions_click()
 {
     on_FiltersList_currentOptionChanged(m_currentFilterIndex);

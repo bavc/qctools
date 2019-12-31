@@ -8,6 +8,7 @@
 #include <QTimer>
 
 const int MaxFilters = 6;
+const int DefaultFilterIndex = 1;
 
 Player::Player(QWidget *parent) :
     QMainWindow(parent),
@@ -23,8 +24,10 @@ Player::Player(QWidget *parent) :
     ui->scrollArea->widget()->setGeometry(0, 0, 100, 100);
 
     m_player->setRenderer(m_vo);
-    m_videoFilter = new QtAV::LibAVFilterVideo();
-    m_audioFilter = new QtAV::LibAVFilterAudio();
+    m_player->setSeekType(QtAV::AccurateSeek);
+
+    m_videoFilter = new QtAV::LibAVFilterVideo(this);
+    m_audioFilter = new QtAV::LibAVFilterAudio(this);
 
     m_player->installFilter(m_videoFilter);
     m_player->installFilter(m_audioFilter);
@@ -55,12 +58,18 @@ Player::Player(QWidget *parent) :
         ui->filterGroupBox->layout()->addWidget(m_filterSelectors[i]);
     }
 
+    // select 'normal' by default
+    m_filterSelectors[0]->selectCurrentFilter(DefaultFilterIndex);
+
     m_filterUpdateTimer.setSingleShot(true);
     connect(&m_filterUpdateTimer, &QTimer::timeout, this, &Player::applyFilter);
 }
 
 Player::~Player()
 {
+    m_player->stop();
+    m_player->removeEventFilter(m_videoFilter);
+    m_player->removeEventFilter(m_audioFilter);
     delete ui;
 }
 
@@ -78,16 +87,30 @@ void Player::setFile(FileInformation *fileInfo)
             m_filterSelectors[i]->setFileInformation(m_fileInformation);
         }
 
+        m_player->stop();
         m_player->setFile(fileInfo->fileName());
+        m_player->audio()->setMute(true);
 
         std::shared_ptr<QMetaObject::Connection> pConnection = std::make_shared<QMetaObject::Connection>();
+
         *pConnection = connect(m_player, &QtAV::AVPlayer::stateChanged, [this, pConnection](QtAV::AVPlayer::State state) {
             if(state == QtAV::AVPlayer::PlayingState) {
-                m_player->pause();
-                m_player->seek(m_player->position());
-            }
+                auto position = m_player->position();
+                QTimer::singleShot(0, this, [this, position] {
+                    m_player->audio()->setMute(false);
 
-            QObject::disconnect(*pConnection);
+                    m_player->seek((qint64)0);
+                    m_player->pause(true);
+
+                    QTimer::singleShot(0, this, [this] {
+                        // select 'normal' by default
+                        m_filterSelectors[0]->setCurrentFilter(DefaultFilterIndex);
+                    });
+                });
+
+                QObject::disconnect(*pConnection);
+
+            }
         });
 
         QTimer::singleShot(0, this, SLOT(updateVideoOutputSize()));
@@ -410,7 +433,11 @@ void Player::setFilter(const QString &filter)
     m_audioFilter->setOptions(filter);
 
     if(m_player->isPaused()) {
-        m_player->seek(m_player->position());
+        QTimer::singleShot(0, this, [&] {
+            auto sliderValue = (qint64)ui->playerSlider->value();
+            m_player->seek(sliderValue * m_unit);
+            m_player->pause(true);
+        });
     }
 }
 
