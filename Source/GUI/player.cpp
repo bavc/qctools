@@ -165,8 +165,6 @@ void Player::updateSliderUnit()
 void Player::updateVideoOutputSize()
 {
     QSize newSize;
-    auto sourceFrameWidth = m_fileInformation->Glue->Width_Get();
-    auto sourceFrameHeight = m_fileInformation->Glue->Height_Get();
 
     auto filteredFrameWidth = m_vo->videoFrameSize().width();
     auto filteredFrameHeight = m_vo->videoFrameSize().height();
@@ -185,12 +183,8 @@ void Player::updateVideoOutputSize()
         }
     }
 
-    // qDebug() << "newSize: " << newSize;
     auto geometry = ui->scrollArea->widget()->geometry();
-    // qDebug() << "old geometry: " << geometry;
-
     geometry.setSize(newSize);
-    // qDebug() << "new geometry: " << geometry;
 
     ui->scrollArea->widget()->setGeometry(geometry);
 }
