@@ -19,6 +19,7 @@ Player::Player(QWidget *parent) :
 
     m_player = new QtAV::AVPlayer(ui->scrollArea);
     m_vo = new QtAV::VideoOutput(ui->scrollArea);
+    connect(m_vo, SIGNAL(videoFrameSizeChanged()), this, SLOT(updateVideoOutputSize()));
 
     ui->scrollArea->setWidget(m_vo->widget());
     ui->scrollArea->widget()->setGeometry(0, 0, 100, 100);
@@ -277,8 +278,6 @@ void Player::applyFilter()
     ui->plainTextEdit->appendPlainText(QString("*** result ***: \n\n%1").arg(combinedFilter));
 
     setFilter(combinedFilter);
-
-    updateVideoOutputSize();
 }
 
 void Player::on_playPause_pushButton_clicked()
