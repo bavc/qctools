@@ -868,6 +868,7 @@ const filter Filters[] =
             "readvitc=scan_max=${2},readeia608=scan_max=${2}:msd=${1}:chp=1,crop=iw:${2}:0:0,scale=${width}:${height}:flags=neighbor,drawtext=fontfile=${fontfile}:fontcolor=white:fontsize=36:box=1:boxcolor=black@0.5:x=(w-tw)/2:y=h*3/4-ascent:text=Line %{metadata\\\\:lavfi.readeia608.0.line\\\\:-} %{metadata\\\\:lavfi.readeia608.0.cc\\\\:------} - Line %{metadata\\\\:lavfi.readeia608.1.line\\\\:-} %{metadata\\\\:lavfi.readeia608.1.cc\\\\:------},drawtext=fontfile=${fontfile}:fontcolor=white:fontsize=36:box=1:boxcolor=black@0.5:x=(w-tw)/2:y=h*3/4-ascent*3:text=VITC %{metadata\\\\:lavfi.readvitc.tc_str\\\\:-- -- -- --}",
         },
     },
+/*
     {
         "(Separator)",
         -1,
@@ -1029,6 +1030,7 @@ const filter Filters[] =
             "ebur128=video=1:meter=${1}[out0][out1];[out1]anullsink;[out0]copy",
         },
     },
+*/
     {
         "(End)",
         -1,
