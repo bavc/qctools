@@ -15,13 +15,6 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_6">
-    <item row="1" column="0">
-     <widget class="QSlider" name="playerSlider">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
     <item row="2" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
@@ -58,16 +51,29 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="goToStart_pushButton">
         <property name="text">
-         <string>PushButton</string>
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../Resource/Resources.qrc">
+          <normaloff>:/icon/backward.png</normaloff>:/icon/backward.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>23</width>
+          <height>23</height>
+         </size>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_3">
+       <widget class="QPushButton" name="prev_pushButton">
         <property name="text">
-         <string>PushButton</string>
+         <string>Prev</string>
+        </property>
+        <property name="shortcut">
+         <string>J</string>
         </property>
        </widget>
       </item>
@@ -80,21 +86,46 @@
          <iconset resource="../Resource/Resources.qrc">
           <normaloff>:/icon/play.png</normaloff>:/icon/play.png</iconset>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButton_4">
-        <property name="text">
-         <string>PushButton</string>
+        <property name="iconSize">
+         <size>
+          <width>23</width>
+          <height>23</height>
+         </size>
+        </property>
+        <property name="shortcut">
+         <string>K</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="next_pushButton">
         <property name="text">
-         <string>PushButton</string>
+         <string>Next</string>
+        </property>
+        <property name="shortcut">
+         <string>L</string>
         </property>
        </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="goToEnd_pushButton">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../Resource/Resources.qrc">
+          <normaloff>:/icon/forward.png</normaloff>:/icon/forward.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>23</width>
+          <height>23</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit"/>
       </item>
       <item>
        <spacer name="horizontalSpacer_2">
@@ -110,9 +141,16 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="slider_label">
         <property name="text">
          <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="frame_label">
+        <property name="text">
+         <string>Frame</string>
         </property>
        </widget>
       </item>
@@ -151,13 +189,20 @@
       <widget class="QWidget" name="scrollAreaWidgetContents">
        <property name="geometry">
         <rect>
-         <x>296</x>
-         <y>154</y>
+         <x>893</x>
+         <y>411</y>
          <width>300</width>
          <height>246</height>
         </rect>
        </property>
       </widget>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QSlider" name="playerSlider">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
      </widget>
     </item>
    </layout>
@@ -167,8 +212,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1492</width>
-     <height>22</height>
+     <width>2592</width>
+     <height>26</height>
     </rect>
    </property>
   </widget>

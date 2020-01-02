@@ -15,7 +15,7 @@ Player::Player(QWidget *parent) :
     ui(new Ui::Player)
 {
     ui->setupUi(this);
-    m_unit = 1000;
+    m_unit = 1;
 
     m_player = new QtAV::AVPlayer(ui->scrollArea);
     m_vo = new QtAV::VideoOutput(ui->scrollArea);
@@ -25,7 +25,12 @@ Player::Player(QWidget *parent) :
     ui->scrollArea->widget()->setGeometry(0, 0, 100, 100);
 
     m_player->setRenderer(m_vo);
-    m_player->setSeekType(QtAV::AccurateSeek);
+    m_player->setSeekType(QtAV::AnyFrameSeek);
+    m_player->setMediaEndAction(QtAV::MediaEndAction_Pause);
+    m_player->setAsyncLoad(false);
+    m_player->setNotifyInterval(1);
+    m_player->setBufferMode(QtAV::BufferPackets);
+    m_player->setBufferValue(10000);
 
     m_videoFilter = new QtAV::LibAVFilterVideo(this);
     m_audioFilter = new QtAV::LibAVFilterAudio(this);
@@ -46,7 +51,7 @@ Player::Player(QWidget *parent) :
 
     connect(m_player, SIGNAL(positionChanged(qint64)), SLOT(updateSlider(qint64)));
     connect(m_player, SIGNAL(started()), SLOT(updateSlider()));
-    connect(m_player, SIGNAL(notifyIntervalChanged()), SLOT(updateSliderUnit()));
+    // connect(m_player, SIGNAL(notifyIntervalChanged()), SLOT(updateSliderUnit()));
 
     connect(ui->arrangementButtonGroup, SIGNAL(buttonToggled(QAbstractButton*, bool)), this, SLOT(applyFilter()));
 
@@ -115,6 +120,13 @@ void Player::setFile(FileInformation *fileInfo)
         });
 
         QTimer::singleShot(0, this, SLOT(updateVideoOutputSize()));
+        m_player->load();
+
+        m_framesCount = m_fileInformation->Glue->VideoFrameCount_Get();
+        ui->playerSlider->setMaximum(m_player->duration());
+
+        m_unit = 1; // qreal(m_player->duration()) / m_framesCount;
+
         m_player->play();
     }
 }
@@ -132,7 +144,11 @@ void Player::seekBySlider(int value)
 {
     if (!m_player->isPlaying())
         return;
-    m_player->seek(qint64(value*m_unit));
+
+    auto newValue = qint64(value*m_unit);
+    qDebug() << "seek to: " << value;
+
+    m_player->seek(newValue);
 }
 
 void Player::seekBySlider()
@@ -147,8 +163,21 @@ void Player::resizeEvent(QResizeEvent *event)
 
 void Player::updateSlider(qint64 value)
 {
-    ui->playerSlider->setRange(0, int(m_player->duration()/m_unit));
-    ui->playerSlider->setValue(int(value/m_unit));
+    auto newValue = int(qreal(value)/m_unit);
+    if(ui->playerSlider->value() == newValue)
+        return;
+
+    qDebug() << "update slider: " << newValue;
+
+    // ui->playerSlider->setRange(0, int(m_player->duration()/m_unit));
+    ui->playerSlider->setValue(newValue);
+
+    ui->slider_label->setText(QString::number(m_player->duration()) + "/" + QString::number(int(newValue/m_unit)));
+
+    auto position = m_player->position();
+    auto duration = m_player->duration();
+    auto framePos = (int) (qreal(position) / duration  * m_framesCount);
+    ui->frame_label->setText(QString("Frame %1 [%2]").arg(framePos).arg(m_fileInformation->Frame_Type_Get()));
 }
 
 void Player::updateSlider()
@@ -158,8 +187,8 @@ void Player::updateSlider()
 
 void Player::updateSliderUnit()
 {
-    m_unit = m_player->notifyInterval();
-    updateSlider();
+    // m_unit = m_player->notifyInterval();
+    // updateSlider();
 }
 
 void Player::updateVideoOutputSize()
@@ -428,7 +457,7 @@ void Player::setFilter(const QString &filter)
     if(m_player->isPaused()) {
         QTimer::singleShot(0, this, [&] {
             auto sliderValue = (qint64)ui->playerSlider->value();
-            m_player->seek(sliderValue * m_unit);
+            // m_player->seek(sliderValue * m_unit);
             m_player->pause(true);
         });
     }
@@ -437,4 +466,43 @@ void Player::setFilter(const QString &filter)
 void Player::on_graphmonitor_checkBox_clicked(bool checked)
 {
     applyFilter();
+}
+
+void Player::on_goToStart_pushButton_clicked()
+{
+    m_player->seek(qint64(0));
+}
+
+void Player::on_goToEnd_pushButton_clicked()
+{
+    m_player->seek(m_player->startPosition() + m_player->duration());
+}
+
+void Player::on_prev_pushButton_clicked()
+{
+    auto newPosition = m_player->position() - 1;
+    qDebug() << "new position: " << newPosition;
+    // m_player->seek(newPosition);
+
+    auto frameDuration = (qreal) m_player->duration() / m_framesCount;
+    m_player->seek(m_player->position() - (qint64) frameDuration);
+
+    /*
+    m_player->stepForward();
+    m_player->stepBackward();
+    m_player->stepBackward();
+    */
+}
+
+void Player::on_next_pushButton_clicked()
+{
+    auto newPosition = m_player->position() + 1;
+    qDebug() << "new position: " << newPosition;
+    // m_player->seek(newPosition);
+    m_player->stepForward();
+}
+
+void Player::on_lineEdit_returnPressed()
+{
+    m_player->seek((qint64) (m_unit * ui->lineEdit->text().toInt()));
 }

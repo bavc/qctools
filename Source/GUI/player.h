@@ -41,12 +41,26 @@ private Q_SLOTS:
 
 private Q_SLOTS:
     void on_playPause_pushButton_clicked();
+
     void on_fitToScreen_radioButton_toggled(bool value);
+
     void on_normalScale_radioButton_toggled(bool value);
+
     void on_scalePercentage_spinBox_valueChanged(int value);
+
     void on_scalePercentage_horizontalSlider_valueChanged(int value);
 
     void on_graphmonitor_checkBox_clicked(bool checked);
+
+    void on_goToStart_pushButton_clicked();
+
+    void on_goToEnd_pushButton_clicked();
+
+    void on_prev_pushButton_clicked();
+
+    void on_next_pushButton_clicked();
+
+    void on_lineEdit_returnPressed();
 
 private:
     void setScaleSliderPercentage(int percents);
@@ -57,10 +71,11 @@ private:
 private:
     Ui::Player *ui;
 
-    int m_unit;
-
     QtAV::VideoOutput *m_vo;
     QtAV::AVPlayer *m_player;
+
+    qreal m_unit;
+    int m_framesCount;
 
     QtAV::LibAVFilterVideo* m_videoFilter;
     QtAV::LibAVFilterAudio* m_audioFilter;
