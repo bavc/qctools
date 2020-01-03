@@ -63,7 +63,7 @@ const filter Filters[] =
         0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_None,     0,   0,   0,   0, nullptr },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Metadata" },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
@@ -72,7 +72,9 @@ const filter Filters[] =
         },
         {
             "format=yuv444p,scale",
+            "format=yuv444p,scale,drawtext=fontfile=${fontfile}:box=1:boxborderw=4:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=4:text=PTS %{pts\\\\:hms}",
             "format=yuv444p,scale,il=l=d:c=d",
+            "format=yuv444p,scale,il=l=d:c=d,drawtext=fontfile=${fontfile}:box=1:boxborderw=4:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=4:text=PTS %{pts\\\\:hms}",
         },
     },
     {
