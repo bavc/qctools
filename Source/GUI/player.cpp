@@ -101,11 +101,13 @@ void Player::setFile(FileInformation *fileInfo)
 
         *pConnection = connect(m_player, &QtAV::AVPlayer::stateChanged, [this, pConnection](QtAV::AVPlayer::State state) {
             if(state == QtAV::AVPlayer::PlayingState) {
-                auto position = m_player->position();
-                QTimer::singleShot(0, this, [this, position] {
+                m_player->pause(true);
+
+                QTimer::singleShot(0, this, [this] {
                     m_player->audio()->setMute(false);
 
-                    m_player->seek((qint64)0);
+                    auto ms = qint64(qreal(m_player->duration()) / m_framesCount * m_fileInformation->Frames_Pos_Get());
+                    m_player->seek(ms);
                     m_player->pause(true);
 
                     QTimer::singleShot(0, this, [this] {
@@ -126,8 +128,11 @@ void Player::setFile(FileInformation *fileInfo)
         ui->playerSlider->setMaximum(m_player->duration());
 
         m_unit = 1; // qreal(m_player->duration()) / m_framesCount;
-
         m_player->play();
+    } else {
+
+        auto ms = qint64(qreal(m_player->duration()) / m_framesCount * m_fileInformation->Frames_Pos_Get());
+        m_player->seek(ms);
     }
 }
 

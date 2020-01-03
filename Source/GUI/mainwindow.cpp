@@ -853,8 +853,8 @@ void MainWindow::showPlayer()
     auto selectedFile = Files[getFilesCurrentPos()];
     if(selectedFile != m_player->file()) {
         m_player->hide();
-        m_player->setFile(selectedFile);
     }
+    m_player->setFile(selectedFile);
     m_player->show();
 }
 
