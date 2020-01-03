@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QStandardPaths>
 #include <QTimer>
+#include <QMetaMethod>
 
 const int MaxFilters = 6;
 const int DefaultFilterIndex = 1;
@@ -29,8 +30,6 @@ Player::Player(QWidget *parent) :
     m_player->setMediaEndAction(QtAV::MediaEndAction_Pause);
     m_player->setAsyncLoad(false);
     m_player->setNotifyInterval(1);
-    m_player->setBufferMode(QtAV::BufferPackets);
-    m_player->setBufferValue(10000);
 
     m_videoFilter = new QtAV::LibAVFilterVideo(this);
     m_audioFilter = new QtAV::LibAVFilterAudio(this);
@@ -84,6 +83,88 @@ FileInformation *Player::file() const
     return m_fileInformation;
 }
 
+template <typename T>
+class PropertyWaiter {
+public:
+    PropertyWaiter(const QObject* object, const QString typeName, const QString& propertyName, const T& expectedValue) : _object(object), _propertyName(propertyName), _expectedValue(expectedValue) {
+        auto signalName = QString("%1Changed(const %2&)").arg(propertyName).arg(typeName);
+        auto emitter = object;
+
+        int index = emitter->metaObject()
+                   ->indexOfSignal(QMetaObject::normalizedSignature(qPrintable(signalName)));
+        _signal = object->metaObject()->method(index);
+
+        QObject* receiver = &_loop;
+        index = receiver->metaObject()
+                ->indexOfSlot(QMetaObject::normalizedSignature(qPrintable("quit()")));
+
+        _slot = receiver->metaObject()->method(index);
+
+        QObject::connect(emitter, _signal, receiver, _slot);
+    }
+    ~PropertyWaiter() {
+        auto emitter = _object;
+        QObject* receiver = &_loop;
+
+        QObject::disconnect(emitter, _signal, receiver, _slot);
+    };
+
+    void wait() {
+
+        while(true) {
+            auto propertyValue = _object->property(_propertyName.toStdString().c_str());
+            if(qvariant_cast<T>(propertyValue) == _expectedValue)
+                return;
+
+            _loop.exec();
+        }
+    }
+
+private:
+    const QObject* _object;
+    QMetaMethod _signal;
+    QMetaMethod _slot;
+    QString _propertyName;
+    QEventLoop _loop;
+    T _expectedValue;
+};
+
+class SignalWaiter {
+public:
+    SignalWaiter(const QObject* object, const char* signalName) : _object(object) {
+        auto emitter = object;
+
+        int index = emitter->metaObject()
+                   ->indexOfSignal(QMetaObject::normalizedSignature(qPrintable(signalName)));
+        _signal = object->metaObject()->method(index);
+
+        QObject* receiver = &_loop;
+        index = receiver->metaObject()
+                ->indexOfSlot(QMetaObject::normalizedSignature(qPrintable("quit()")));
+
+        _slot = receiver->metaObject()->method(index);
+
+        QObject::connect(emitter, _signal, receiver, _slot);
+
+    }
+
+    void wait() {
+        _loop.exec();
+    }
+
+    ~SignalWaiter() {
+        auto emitter = _object;
+        QObject* receiver = &_loop;
+
+        QObject::disconnect(emitter, _signal, receiver, _slot);
+    }
+private:
+    const QObject* _object;
+    QMetaMethod _signal;
+    QMetaMethod _slot;
+    QEventLoop _loop;
+};
+
 void Player::setFile(FileInformation *fileInfo)
 {
     if(m_player->file() != fileInfo->fileName()) {
@@ -97,30 +178,6 @@ void Player::setFile(FileInformation *fileInfo)
         m_player->setFile(fileInfo->fileName());
         m_player->audio()->setMute(true);
 
-        std::shared_ptr<QMetaObject::Connection> pConnection = std::make_shared<QMetaObject::Connection>();
-
-        *pConnection = connect(m_player, &QtAV::AVPlayer::stateChanged, [this, pConnection](QtAV::AVPlayer::State state) {
-            if(state == QtAV::AVPlayer::PlayingState) {
-                m_player->pause(true);
-
-                QTimer::singleShot(0, this, [this] {
-                    m_player->audio()->setMute(false);
-
-                    auto ms = qint64(qreal(m_player->duration()) / m_framesCount * m_fileInformation->Frames_Pos_Get());
-                    m_player->seek(ms);
-                    m_player->pause(true);
-
-                    QTimer::singleShot(0, this, [this] {
-                        // select 'normal' by default
-                        m_filterSelectors[0]->setCurrentFilter(DefaultFilterIndex);
-                    });
-                });
-
-                QObject::disconnect(*pConnection);
-
-            }
-        });
-
         QTimer::singleShot(0, this, SLOT(updateVideoOutputSize()));
         m_player->load();
 
@@ -128,7 +185,29 @@ void Player::setFile(FileInformation *fileInfo)
         ui->playerSlider->setMaximum(m_player->duration());
 
         m_unit = 1; // qreal(m_player->duration()) / m_framesCount;
-        m_player->play();
+
+        {
+            PropertyWaiter<QtAV::AVPlayer::State> waiter(m_player, "QtAV::AVPlayer::State", "state", QtAV::AVPlayer::PlayingState);
+            m_player->play();
+            waiter.wait();
+        }
+
+        {
+            PropertyWaiter<QtAV::AVPlayer::State> waiter(m_player, "QtAV::AVPlayer::State", "state", QtAV::AVPlayer::PausedState);
+            m_player->pause();
+            waiter.wait();
+        }
+
+        {
+            auto ms = qint64(qreal(m_player->duration()) / m_framesCount * m_fileInformation->Frames_Pos_Get());
+
+            SignalWaiter waiter(m_player, "seekFinished(qint64)");
+            m_player->seek(qint64(ms));
+            waiter.wait();
+        }
+
+        qDebug() << "seek finished";
+
     } else {
 
         auto ms = qint64(qreal(m_player->duration()) / m_framesCount * m_fileInformation->Frames_Pos_Get());
