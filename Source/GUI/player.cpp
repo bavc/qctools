@@ -138,6 +138,14 @@ void Player::setFile(FileInformation *fileInfo)
 
 void Player::playPause()
 {
+    qreal speed = 1.0;
+    bool ok = false;
+    auto newSpeedInPercent = ui->speed_lineEdit->text().toDouble(&ok);
+    if(ok) {
+        speed = newSpeedInPercent / 100;
+    }
+    m_player->setSpeed(speed);
+
     if (!m_player->isPlaying()) {
         m_player->play();
         return;
