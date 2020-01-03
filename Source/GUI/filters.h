@@ -72,9 +72,11 @@ const filter Filters[] =
         },
         {
             "format=yuv444p,scale",
-            "format=yuv444p,scale,drawtext=fontfile=${fontfile}:box=1:boxborderw=4:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=4:text=PTS %{pts\\\\:hms}",
+            "format=yuv444p,scale,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=4:text=pts %{pts\\\\:hms}\
+                                 ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=20:text=size %{eif\\\\:w\\\\:d}x%{eif\\\\:h\\\\:d} dar %{e\\\\:dar}",
             "format=yuv444p,scale,il=l=d:c=d",
-            "format=yuv444p,scale,il=l=d:c=d,drawtext=fontfile=${fontfile}:box=1:boxborderw=4:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=4:text=PTS %{pts\\\\:hms}",
+            "format=yuv444p,scale,il=l=d:c=d,drawtext=fontfile=${fontfile}:box=1:boxborderw=4:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=4:text=PTS %{pts\\\\:hms}\
+                                            ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=20:text=size %{eif\\\\:w\\\\:d}x%{eif\\\\:h\\\\:d} dar %{e\\\\:dar}",
         },
     },
     {
