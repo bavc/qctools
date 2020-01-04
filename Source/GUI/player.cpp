@@ -249,11 +249,11 @@ void Player::applyFilter()
 
     QString splits[] = {
         "",
-        "split=2[x1][x2];",
-        "split=3[x1][x2][x3];",
-        "split=4[x1][x2][x3][x4];",
-        "split=5[x1][x2][x3][x4][x5];",
-        "split=6[x1][x2][x3][x4][x5][x6];"
+        "sws_flags=neighbor;split=2[x1][x2];",
+        "sws_flags=neighbor;split=3[x1][x2][x3];",
+        "sws_flags=neighbor;split=4[x1][x2][x3][x4];",
+        "sws_flags=neighbor;split=5[x1][x2][x3][x4][x5];",
+        "sws_flags=neighbor;split=6[x1][x2][x3][x4][x5][x6];"
     };
 
     auto split = splits[definedFilters.length() - 1];
