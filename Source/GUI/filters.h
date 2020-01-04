@@ -807,8 +807,8 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "crop=iw:1:0:${1}:0:1,tile=1x${2}:overlap=${2}-1:init_padding=${2}-1",
-            "split[a][b];[a]crop=iw:1:0:${1}:0:1,tile=1x${2}:overlap=${2}-1:init_padding=${2}-1,pad=iw:ih+1[a1];[b]crop=iw:1:0:${1}+1:0:1,tile=1x${2}:overlap=${2}-1:init_padding=${2}-1[b1];[a1][b1]vstack"
+            "format=rgb24|yuv444p,crop=iw:1:0:${1}:0:1,tile=1x${2}:overlap=${2}-1:init_padding=${2}-1",
+            "format=rgb24|yuv444p,split[a][b];[a]crop=iw:1:0:${1}:0:1,tile=1x${2}:overlap=${2}-1:init_padding=${2}-1,pad=iw:ih+1[a1];[b]crop=iw:1:0:${1}+1:0:1,tile=1x${2}:overlap=${2}-1:init_padding=${2}-1[b1];[a1][b1]vstack"
         },
     },
     {
