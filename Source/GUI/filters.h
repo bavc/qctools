@@ -419,41 +419,73 @@ const filter Filters[] =
         "Bit Plane (10 slices)",
         0,
         {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Rows" },
             { Args_Type_Yuv,      0,   0,   0,   0, "Plane"},
-            { Args_Type_Slider,   0,   1,   0,   1, "x offset" },
-            { Args_Type_None,     0,   0,   0,   0, nullptr },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Show 2" },
+            { Args_Type_Toggle,   1,   0,   0,   0, "Slice" },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,split[h1][h2];[h1][h2]hstack,crop=iw/2:ih:${3}:0,\
-            split=10[b0][b1][b2][b3][b4][b5][b6][b7][b8][b9];\
-            [b0]crop=iw/10:ih:(iw/10)*0:0,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-1))*pow(2\\,1)[b0c];\
-            [b1]crop=iw/10:ih:(iw/10)*1:0,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-2))*pow(2\\,2)[b1c];\
-            [b2]crop=iw/10:ih:(iw/10)*2:0,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-3))*pow(2\\,3)[b2c];\
-            [b3]crop=iw/10:ih:(iw/10)*3:0,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-4))*pow(2\\,4)[b3c];\
-            [b4]crop=iw/10:ih:(iw/10)*4:0,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-5))*pow(2\\,5)[b4c];\
-            [b5]crop=iw/10:ih:(iw/10)*5:0,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-6))*pow(2\\,6)[b5c];\
-            [b6]crop=iw/10:ih:(iw/10)*6:0,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-7))*pow(2\\,7)[b6c];\
-            [b7]crop=iw/10:ih:(iw/10)*7:0,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-8))*pow(2\\,8)[b7c];\
-            [b8]crop=iw/10:ih:(iw/10)*8:0,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-9))*pow(2\\,9)[b8c];\
-            [b9]crop=iw/10:ih:(iw/10)*9:0,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-10))*pow(2\\,10)[b9c];\
-            [b0c][b1c][b2c][b3c][b4c][b5c][b6c][b7c][b8c][b9c]hstack=10,format=yuv444p,drawgrid=w=iw/10:h=ih:t=2:c=green@0.5",
-            "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,split[h1][h2];[h1][h2]hstack,crop=iw/2:ih:${3}:0,\
-            split=10[b0][b1][b2][b3][b4][b5][b6][b7][b8][b9];\
-            [b0]crop=iw:ih/10:0:(ih/10)*0,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-1))*pow(2\\,1)[b0c];\
-            [b1]crop=iw:ih/10:0:(ih/10)*1,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-2))*pow(2\\,2)[b1c];\
-            [b2]crop=iw:ih/10:0:(ih/10)*2,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-3))*pow(2\\,3)[b2c];\
-            [b3]crop=iw:ih/10:0:(ih/10)*3,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-4))*pow(2\\,4)[b3c];\
-            [b4]crop=iw:ih/10:0:(ih/10)*4,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-5))*pow(2\\,5)[b4c];\
-            [b5]crop=iw:ih/10:0:(ih/10)*5,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-6))*pow(2\\,6)[b5c];\
-            [b6]crop=iw:ih/10:0:(ih/10)*6,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-7))*pow(2\\,7)[b6c];\
-            [b7]crop=iw:ih/10:0:(ih/10)*7,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-8))*pow(2\\,8)[b7c];\
-            [b8]crop=iw:ih/10:0:(ih/10)*8,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-9))*pow(2\\,9)[b8c];\
-            [b9]crop=iw:ih/10:0:(ih/10)*9,lutyuv=y=512:u=512:v=512:${2}=bitand(val\\,pow(2\\,10-10))*pow(2\\,10)[b9c];\
-            [b0c][b1c][b2c][b3c][b4c][b5c][b6c][b7c][b8c][b9c]vstack=10,format=yuv444p,drawgrid=w=iw:h=ih/10:t=2:c=green@0.5",
+          // Slice N Show 2 N
+          "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,\
+          split=10[b0][b1][b2][b3][b4][b5][b6][b7][b8][b9];\
+          [b0]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-1))*pow(2\\,1)[b0c];\
+          [b1]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-2))*pow(2\\,2)[b1c];\
+          [b2]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-3))*pow(2\\,3)[b2c];\
+          [b3]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-4))*pow(2\\,4)[b3c];\
+          [b4]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-5))*pow(2\\,5)[b4c];\
+          [b5]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-6))*pow(2\\,6)[b5c];\
+          [b6]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-7))*pow(2\\,7)[b6c];\
+          [b7]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-8))*pow(2\\,8)[b7c];\
+          [b8]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-9))*pow(2\\,9)[b8c];\
+          [b9]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-10))*pow(2\\,10)[b9c];\
+          [b0c][b1c][b2c][b3c][b4c][b5c][b6c][b7c][b8c][b9c]hstack=10",
+          // Slice Y Show 2 N
+          "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,\
+          split=10[b0][b1][b2][b3][b4][b5][b6][b7][b8][b9];\
+          [b0]crop=iw/10:ih:(iw/10)*0:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-1))*pow(2\\,1)[b0c];\
+          [b1]crop=iw/10:ih:(iw/10)*1:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-2))*pow(2\\,2)[b1c];\
+          [b2]crop=iw/10:ih:(iw/10)*2:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-3))*pow(2\\,3)[b2c];\
+          [b3]crop=iw/10:ih:(iw/10)*3:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-4))*pow(2\\,4)[b3c];\
+          [b4]crop=iw/10:ih:(iw/10)*4:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-5))*pow(2\\,5)[b4c];\
+          [b5]crop=iw/10:ih:(iw/10)*5:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-6))*pow(2\\,6)[b5c];\
+          [b6]crop=iw/10:ih:(iw/10)*6:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-7))*pow(2\\,7)[b6c];\
+          [b7]crop=iw/10:ih:(iw/10)*7:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-8))*pow(2\\,8)[b7c];\
+          [b8]crop=iw/10:ih:(iw/10)*8:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-9))*pow(2\\,9)[b8c];\
+          [b9]crop=iw/10:ih:(iw/10)*9:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-10))*pow(2\\,10)[b9c];\
+          [b0c][b1c][b2c][b3c][b4c][b5c][b6c][b7c][b8c][b9c]hstack=10,format=yuv444p,drawgrid=w=iw/10:h=ih:t=2:c=green@0.5",
+          // Slice N Show 2 Y
+          "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,\
+          split=10[b0][b1][b2][b3][b4][b5][b6][b7][b8][b9];\
+          [b0]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-1))*pow(2\\,1)[b0c];\
+          [b1]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-2))*pow(2\\,2)[b1c];\
+          [b2]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-3))*pow(2\\,3)[b2c];\
+          [b3]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-4))*pow(2\\,4)[b3c];\
+          [b4]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-5))*pow(2\\,5)[b4c];\
+          [b5]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-6))*pow(2\\,6)[b5c];\
+          [b6]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-7))*pow(2\\,7)[b6c];\
+          [b7]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-8))*pow(2\\,8)[b7c];\
+          [b8]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-9))*pow(2\\,9)[b8c];\
+          [b9]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-10))*pow(2\\,10)[b9c];\
+          [b0c][b1c][b2c][b3c][b4c][b5c][b6c][b7c][b8c][b9c]hstack=10,split=3[b1][bt1][bd1];\
+          [bt1]crop=${width}*9:${height}:0:0[bt2];[bd1]crop=${width}*9:${height}:${width}:0[bd2];\
+          [bt2][bd2]blend=all_mode=average,pad=${width}*10:${height}:${width}/2:0[btd];\
+          [b1][btd]xstack=layout=0_0|0_h0",
+          // Slice Y Show 2 Y
+          "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,\
+          split=10[b0][b1][b2][b3][b4][b5][b6][b7][b8][b9];\
+          [b0]crop=iw/10:ih:(iw/10)*0:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-1)+pow(2\\,10-2))*pow(2\\,1)[b0c];\
+          [b1]crop=iw/10:ih:(iw/10)*1:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-2)+pow(2\\,10-3))*pow(2\\,2)[b1c];\
+          [b2]crop=iw/10:ih:(iw/10)*2:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-3)+pow(2\\,10-4))*pow(2\\,3)[b2c];\
+          [b3]crop=iw/10:ih:(iw/10)*3:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-4)+pow(2\\,10-5))*pow(2\\,4)[b3c];\
+          [b4]crop=iw/10:ih:(iw/10)*4:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-5)+pow(2\\,10-6))*pow(2\\,5)[b4c];\
+          [b5]crop=iw/10:ih:(iw/10)*5:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-6)+pow(2\\,10-7))*pow(2\\,6)[b5c];\
+          [b6]crop=iw/10:ih:(iw/10)*6:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-7)+pow(2\\,10-8))*pow(2\\,7)[b6c];\
+          [b7]crop=iw/10:ih:(iw/10)*7:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-8)+pow(2\\,10-9))*pow(2\\,8)[b7c];\
+          [b8]crop=iw/10:ih:(iw/10)*8:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-9)+pow(2\\,10-10))*pow(2\\,9)[b8c];\
+          [b9]crop=iw/10:ih:(iw/10)*9:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-10)+pow(2\\,10-11))*pow(2\\,10)[b9c];\
+          [b0c][b1c][b2c][b3c][b4c][b5c][b6c][b7c][b8c][b9c]hstack=10,format=yuv444p,drawgrid=w=iw/10:h=ih:t=2:c=green@0.5",
         },
     },
     {
