@@ -212,7 +212,7 @@ const filter Filters[] =
             "crop=${3}:${4}:${1}:${2},\
             waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=invert:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1",
             "split[a][b];\
-            [a]lutyuv=y=val/4,scale=${width}:${height},setsar=1/1,format=yuv444p|yuv444p10le[a1];\
+            [a]lutyuv=y=val/4,scale=${width}:${height},setsar=1/1,format=yuv444p|yuv444p10le,drawbox=w=${3}:h=${4}:x=${1}:y=${2}:color=invert:thickness=1[a1];\
             [b]crop=${3}:${4}:${1}:${2},\
             waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=invert:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1[b1];\
             [a1][b1]blend=addition",
@@ -331,7 +331,7 @@ const filter Filters[] =
             "crop=${3}:${4}:${1}:${2},\
             format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=invert:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
             "split[a][b];\
-            [a]lutyuv=y=val/4,scale=${width}:${height},setsar=1/1,format=yuv444p|yuv444p10le[a1];\
+            [a]lutyuv=y=val/4,scale=${width}:${height},setsar=1/1,format=yuv444p|yuv444p10le,drawbox=w=${3}:h=${4}:x=${1}:y=${2}:color=invert:thickness=1[a1];\
             [b]crop=${3}:${4}:${1}:${2},\
             format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=invert:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height},setsar=1/1[b1];\
             [a1][b1]blend=addition",
