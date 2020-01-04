@@ -567,13 +567,18 @@ void FilterSelector::FiltersList_currentIndexChanged(size_t FilterPos, QGridLayo
             QString MaxTemp(Filters[FilterPos].Args[OptionPos].Name);
             if(strcmp(Filters[FilterPos].Name, "Limiter") == 0)
             {
-                int BitsPerRawSample = FileInfoData->Glue->BitsPerRawSample_Get();
-                if (BitsPerRawSample == 0) {
-                    BitsPerRawSample = 8; //Workaround when BitsPerRawSample is unknown, we hope it is 8-bit.
+                if (MaxTemp == "Min" || MaxTemp == "Max")
+                {
+                    int BitsPerRawSample = FileInfoData->Glue->BitsPerRawSample_Get();
+                    if (BitsPerRawSample == 0) {
+                        BitsPerRawSample = 8; //Workaround when BitsPerRawSample is unknown, we hope it is 8-bit.
+                    }
+                    Max = pow(2, BitsPerRawSample) - 1;
+                    if (Filters[FilterPos].Args[OptionPos].Name && std::string(Filters[FilterPos].Args[OptionPos].Name)=="Max")
+                        m_previousValues[FilterPos].Values[OptionPos]=pow(2, BitsPerRawSample) - 1;
                 }
-                Max = pow(2, BitsPerRawSample) - 1;
-                if (Filters[FilterPos].Args[OptionPos].Name && std::string(Filters[FilterPos].Args[OptionPos].Name)=="Max")
-                    m_previousValues[FilterPos].Values[OptionPos]=pow(2, BitsPerRawSample) - 1;
+                else
+                  Max=Filters[FilterPos].Args[OptionPos].Max;
             } else
                 if (MaxTemp == "Line")
                 {

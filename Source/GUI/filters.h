@@ -675,10 +675,10 @@ const filter Filters[] =
             { Args_Type_None,          0,   0,   0,   0, nullptr },
         },
         {
-            "limiter=min=${3}:max=${4}:planes=${2},histeq=strength=${5}",
-            "limiter=min=${3}:max=${4}:planes=7,histeq=strength=${5}",
-            "il=l=d:c=d,limiter=min=${3}:max=${4}:planes=${2},histeq=strength=${5}",
-            "il=l=d:c=d,limiter=min=${3}:max=${4}:planes=7,histeq=strength=${5}",
+                       "limiter=min=${3}:max=${4}:planes=${2},shuffleplanes=${2}-1,histeq=strength=${5},format=gray,format=yuv444p",
+                       "limiter=min=${3}:max=${4}:planes=7,histeq=strength=${5},format=yuv444p",
+            "il=l=d:c=d,limiter=min=${3}:max=${4}:planes=${2},shuffleplanes=${2}-1,histeq=strength=${5},format=gray,format=yuv444p",
+            "il=l=d:c=d,limiter=min=${3}:max=${4}:planes=7,histeq=strength=${5},format=yuv444p",
         },
     },
     {
