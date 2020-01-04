@@ -501,9 +501,9 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "bitplanenoise=bitplane=${2}:filter=1,format=yuv444p,extractplanes=${3}",
+            "bitplanenoise=bitplane=${2}:filter=1,extractplanes=${3},format=yuv444p",
             "bitplanenoise=bitplane=${2}:filter=1",
-            "il=l=d:c=d,bitplanenoise=bitplane=${2}:filter=1,format=yuv444p,extractplanes=${3}",
+            "il=l=d:c=d,bitplanenoise=bitplane=${2}:filter=1,format=yuv444p,extractplanes=${3},format=yuv444p",
             "il=l=d:c=d,bitplanenoise=bitplane=${2}:filter=1",
 
         },
