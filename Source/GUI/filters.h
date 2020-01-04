@@ -772,20 +772,26 @@ const filter Filters[] =
         },
     },
     {
-        "Frame Tiles",
+        "Filmstrip",
         0,
         {
-            { Args_Type_Slider,   2,   1,   12,   1, "Width"},
-            { Args_Type_Slider,   2,   1,   12,   1, "Height"},
-            { Args_Type_Toggle,   0,   0,    0,   0, "Field" },
-            { Args_Type_None,     0,   0,   0,   0, nullptr },
+            { Args_Type_Slider,   8,   1,  12,   1, "Columns"},
+            { Args_Type_Slider,   4,   1,  12,   1, "Rows"},
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "FullSize" },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "scale=iw/${1}:ih/${2},tile=${1}x${2}",
-            "il=l=d:c=d,scale=iw/${1}:ih/${2},tile=${1}x${2}"
+            "scale=iw/${1}:ih/${2}:force_original_aspect_ratio=decrease,tile=${1}x${2}:overlap=${1}*${2}-1:init_padding=${1}*${2}-1",
+            "tile=${1}x${2}:overlap=${1}*${2}-1:init_padding=${1}*${2}-1",
+            "split=2[fst][fsb];[fst]field=top,scale=iw/${1}:ih/${2}:force_original_aspect_ratio=decrease[fst1];[fsb]field=bottom,scale=iw/${1}:ih/${2}:force_original_aspect_ratio=decrease[fsb1];\
+             [fst1]tile=${1}x${2}:overlap=${1}*${2}-1:init_padding=${1}*${2}-1[fst2];\
+             [fsb1]tile=${1}x${2}:overlap=${1}*${2}-1:init_padding=${1}*${2}-1[fsb2];[fst2][fsb2]vstack",
+            "split=2[fst][fsb];[fst]field=top[fst1];[fsb]field=bottom[fsb1];\
+             [fst1]tile=${1}x${2}:overlap=${1}*${2}-1:init_padding=${1}*${2}-1[fst2];\
+             [fsb1]tile=${1}x${2}:overlap=${1}*${2}-1:init_padding=${1}*${2}-1[fsb2];[fst2][fsb2]vstack",
         },
     },
     {
