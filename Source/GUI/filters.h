@@ -887,7 +887,7 @@ const filter Filters[] =
             { Args_Type_Slider,  30,   1, 100,   1, "scan_max" },
             { Args_Type_Slider,  27,  10,  70, 100, "spw" },
             { Args_Type_Toggle,   0,   0,   0,   0, "parity" },
-            { Args_Type_Toggle,   0,   0,   0,   0, "zoom" },
+            { Args_Type_Toggle,   1,   0,   0,   0, "zoom" },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
