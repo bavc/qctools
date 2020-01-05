@@ -221,10 +221,6 @@ private Q_SLOTS:
 
     void on_actionZoomOne_triggered();
 
-    void on_actionPlay_at_Frame_Rate_triggered();
-
-    void on_actionPlay_All_Frames_triggered();
-
     void on_actionUploadToSignalServer_triggered();
     void on_actionUploadToSignalServerAll_triggered();
 

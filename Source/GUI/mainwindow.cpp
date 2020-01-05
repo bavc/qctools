@@ -589,18 +589,6 @@ void MainWindow::dropEvent(QDropEvent *Event)
     addFile_finish();
 }
 
-void MainWindow::on_actionPlay_at_Frame_Rate_triggered()
-{
-    if(ControlArea)
-        ControlArea->setPlayAllFrames(false);
-}
-
-void MainWindow::on_actionPlay_All_Frames_triggered()
-{
-    if(ControlArea)
-        ControlArea->setPlayAllFrames(true);
-}
-
 void MainWindow::on_actionUploadToSignalServer_triggered()
 {
     if(!Files.empty() && isFileSelected())

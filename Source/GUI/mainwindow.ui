@@ -108,9 +108,6 @@
     <addaction name="actionNavigatePreviousComment"/>
     <addaction name="actionNavigateNextComment"/>
     <addaction name="separator"/>
-    <addaction name="actionPlay_All_Frames"/>
-    <addaction name="actionPlay_at_Frame_Rate"/>
-    <addaction name="separator"/>
     <addaction name="actionToolbar"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
