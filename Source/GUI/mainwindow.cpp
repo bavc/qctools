@@ -105,9 +105,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // Pictures
     TinyDisplayArea=NULL;
 
-    // Control
-    ControlArea=NULL;
-
     // Info
     InfoArea=NULL;
 
@@ -154,7 +151,6 @@ MainWindow::~MainWindow()
 
     preferences->saveSelectedFilters(getSelectedFilters());
     // Controls
-    delete ControlArea;
 
     // Files (must be deleted first in order to stop ffmpeg processes)
     for (size_t Pos=0; Pos<Files.size(); Pos++)
@@ -239,7 +235,7 @@ void MainWindow::on_actionZoomOut_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionGoTo_triggered()
 {
-    if (!ControlArea && !TinyDisplayArea) //TODO: without TinyDisplayArea
+    if (!TinyDisplayArea) //TODO: without TinyDisplayArea
         return;
 
     if (getFilesCurrentPos()>=Files.size())
@@ -384,8 +380,6 @@ void MainWindow::on_actionFilesList_triggered()
         PlotsArea->hide();
     if (TinyDisplayArea)
         TinyDisplayArea->hide();
-    if (ControlArea)
-        ControlArea->hide();
     if (FilesListArea && !Files.empty())
         FilesListArea->show();
 
@@ -429,8 +423,6 @@ void MainWindow::on_actionGraphsLayout_triggered()
         PlotsArea->show();
     if (TinyDisplayArea)
         TinyDisplayArea->show();
-    if (ControlArea)
-        ControlArea->show();
     if (FilesListArea)
         FilesListArea->hide();
 
@@ -504,48 +496,6 @@ void MainWindow::on_fileNamesBox_currentIndexChanged(int index)
 void MainWindow::on_check_toggled(bool checked)
 {
     refreshDisplay();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_M1_triggered()
-{
-    if (ControlArea)
-        ControlArea->on_M1_clicked(true);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_Minus_triggered()
-{
-    if (ControlArea)
-        ControlArea->on_Minus_clicked(true);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_PlayPause_triggered()
-{
-    if (ControlArea)
-        ControlArea->on_PlayPause_clicked(true);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_Pause_triggered()
-{
-    if (ControlArea)
-        ControlArea->on_PlayPause_clicked(true);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_Plus_triggered()
-{
-    if (ControlArea)
-        ControlArea->on_Plus_clicked(true);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_P1_triggered()
-{
-    if (ControlArea)
-        ControlArea->on_P1_clicked(true);
 }
 
 //---------------------------------------------------------------------------

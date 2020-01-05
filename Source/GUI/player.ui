@@ -31,7 +31,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="time_label">
         <property name="text">
          <string>TextLabel</string>
         </property>

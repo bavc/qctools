@@ -150,11 +150,6 @@ void MainWindow::processFile(const QString &FileName)
         ui->verticalLayout->removeWidget(TinyDisplayArea);
         delete TinyDisplayArea; TinyDisplayArea=NULL;
     }
-    if (ControlArea)
-    {
-        ui->verticalLayout->removeWidget(ControlArea);
-        delete ControlArea; ControlArea=NULL;
-    }
     if (InfoArea)
     {
         ui->verticalLayout->removeWidget(InfoArea);
@@ -182,9 +177,6 @@ void MainWindow::processFile(const QString &FileName)
 //---------------------------------------------------------------------------
 void MainWindow::clearFiles()
 {
-    if (ControlArea)
-        ControlArea->stop();
-
     // Files (must be deleted first in order to stop ffmpeg processes)
     for (size_t Pos=0; Pos<Files.size(); Pos++)
         delete Files[Pos];
@@ -286,11 +278,6 @@ void MainWindow::clearGraphsLayout()
         ui->verticalLayout->removeWidget(TinyDisplayArea);
         delete TinyDisplayArea; TinyDisplayArea=NULL;
     }
-    if (ControlArea)
-    {
-        ui->verticalLayout->removeWidget(ControlArea);
-        delete ControlArea; ControlArea=NULL;
-    }
     if (InfoArea)
     {
         ui->verticalLayout->removeWidget(InfoArea);
@@ -359,20 +346,6 @@ void MainWindow::createGraphsLayout()
     if (!ui->actionGraphsLayout->isChecked())
         TinyDisplayArea->hide();
     ui->verticalLayout->addWidget(TinyDisplayArea);
-
-    ControlArea=new Control(this, Files[getFilesCurrentPos()]);
-    ControlArea->setPlayAllFrames(ui->actionPlay_All_Frames->isChecked());
-
-    connect( ControlArea, SIGNAL( currentFrameChanged() ), 
-        this, SLOT( on_CurrentFrameChanged() ) );
-
-    if (!ui->actionGraphsLayout->isChecked())
-        ControlArea->hide();
-    ui->verticalLayout->addWidget(ControlArea);
-
-    TinyDisplayArea->ControlArea=ControlArea;
-    ControlArea->TinyDisplayArea=TinyDisplayArea;
-    ControlArea->InfoArea=InfoArea;
 
     refreshDisplay();
 
@@ -496,9 +469,6 @@ void MainWindow::Update()
 {
 	if (TinyDisplayArea)
         TinyDisplayArea->Update(false);
-
-	if(ControlArea)
-		ControlArea->Update();
 
 	if(InfoArea)
         InfoArea->Update();

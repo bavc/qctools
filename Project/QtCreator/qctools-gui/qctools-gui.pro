@@ -143,7 +143,6 @@ message("qctools: THIRD_PARTY_PATH = " $$THIRD_PARTY_PATH)
 INCLUDEPATH += $$SOURCES_PATH/GUI
 
 HEADERS += \
-    $$SOURCES_PATH/GUI/Control.h \
     $$SOURCES_PATH/GUI/FilesList.h \
     $$SOURCES_PATH/GUI/Help.h \
     $$SOURCES_PATH/GUI/Info.h \
@@ -170,7 +169,6 @@ HEADERS += \
     $$SOURCES_PATH/GUI/filterselector.h
 
 SOURCES += \
-    $$SOURCES_PATH/GUI/Control.cpp \
     $$SOURCES_PATH/GUI/FilesList.cpp \
     $$SOURCES_PATH/GUI/Help.cpp \
     $$SOURCES_PATH/GUI/Info.cpp \

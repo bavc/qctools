@@ -8,7 +8,6 @@
 #include "GUI/player.h"
 
 #include "GUI/BigDisplay.h"
-#include "GUI/Control.h"
 #include "Core/FileInformation.h"
 #include "Core/CommonStats.h"
 
@@ -26,9 +25,6 @@ TinyDisplay::TinyDisplay(QWidget *parent, FileInformation* FileInformationData_)
       lastWidth(0),
       FileInfoData(FileInformationData_)
 {
-    // To update
-    ControlArea = NULL;
-
     needsUpdate = true;
     lastFramePos = 0;
 

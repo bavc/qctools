@@ -2,6 +2,7 @@
 #include "ui_player.h"
 #include "Core/FileInformation.h"
 #include "Core/FFmpeg_Glue.h"
+#include "Core/CommonStats.h"
 #include "GUI/filterselector.h"
 #include <QDir>
 #include <QStandardPaths>
@@ -263,6 +264,8 @@ void Player::resizeEvent(QResizeEvent *event)
     updateVideoOutputSize();
 }
 
+static QTime zeroTime = QTime::fromString("00:00:00");
+
 void Player::updateSlider(qint64 value)
 {
     auto newValue = int(qreal(value)/m_unit);
@@ -283,6 +286,31 @@ void Player::updateSlider(qint64 value)
     auto duration = m_player->duration();
     auto framePos = (int) (qreal(position) / duration  * m_framesCount);
     ui->frame_label->setText(QString("Frame %1 [%2]").arg(framePos).arg(m_fileInformation->Frame_Type_Get()));
+
+
+    auto framesPos = m_fileInformation->Frames_Pos_Get();
+
+    int Milliseconds=(int)-1;
+    if (m_fileInformation && !m_fileInformation->Stats.empty()
+     && ( framesPos<m_fileInformation->ReferenceStat()->x_Current
+      || (framesPos<m_fileInformation->ReferenceStat()->x_Current_Max && m_fileInformation->ReferenceStat()->x[1][framesPos]))) //Also includes when stats are not ready but timestamp is available
+        Milliseconds=(int)(m_fileInformation->ReferenceStat()->x[1][framesPos]*1000);
+    else
+    {
+        double TimeStamp = m_fileInformation->Glue->TimeStampOfCurrentFrame(0);
+        if (TimeStamp!=DBL_MAX)
+            Milliseconds=(int)(TimeStamp*1000);
+    }
+
+    if (Milliseconds >= 0)
+    {
+        QTime time = zeroTime;
+        time = time.addMSecs(Milliseconds);
+        QString timeString = time.toString("hh:mm:ss.zzz");
+        ui->time_label->setText(timeString);
+    }
+    else
+        ui->time_label->setText("");
 }
 
 void Player::updateSlider()

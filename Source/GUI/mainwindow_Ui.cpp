@@ -69,18 +69,6 @@ void MainWindow::Ui_Init()
     // Shortcuts
     QShortcut *shortcutEqual = new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_Equal), this);
     QObject::connect(shortcutEqual, SIGNAL(activated()), this, SLOT(on_actionZoomIn_triggered()));
-    QShortcut *shortcutJ = new QShortcut(QKeySequence(Qt::Key_J), this);
-    QObject::connect(shortcutJ, SIGNAL(activated()), this, SLOT(on_M1_triggered()));
-    QShortcut *shortcutLeft = new QShortcut(QKeySequence(Qt::Key_Left), this);
-    QObject::connect(shortcutLeft, SIGNAL(activated()), this, SLOT(on_Minus_triggered()));
-    QShortcut *shortcutK = new QShortcut(QKeySequence(Qt::Key_K), this);
-    QObject::connect(shortcutK, SIGNAL(activated()), this, SLOT(on_Pause_triggered()));
-    QShortcut *shortcutRight = new QShortcut(QKeySequence(Qt::Key_Right), this);
-    QObject::connect(shortcutRight, SIGNAL(activated()), this, SLOT(on_Plus_triggered()));
-    QShortcut *shortcutL = new QShortcut(QKeySequence(Qt::Key_L), this);
-    QObject::connect(shortcutL, SIGNAL(activated()), this, SLOT(on_P1_triggered()));
-    QShortcut *shortcutSpace = new QShortcut(QKeySequence(Qt::Key_Space), this);
-    QObject::connect(shortcutSpace, SIGNAL(activated()), this, SLOT(on_PlayPause_triggered()));
     QShortcut *shortcutF = new QShortcut(QKeySequence(Qt::Key_F), this);
     QObject::connect(shortcutF, SIGNAL(activated()), this, SLOT(on_Full_triggered()));
 
@@ -277,10 +265,6 @@ void MainWindow::Ui_Init()
     alignmentGroup->addAction(ui->actionFilesList);
     alignmentGroup->addAction(ui->actionGraphsLayout);
     alignmentGroup->addAction(ui->actionFiltersLayout);
-
-    QActionGroup* playModesGroup = new QActionGroup(this);
-    playModesGroup->addAction(ui->actionPlay_All_Frames);
-    playModesGroup->addAction(ui->actionPlay_at_Frame_Rate);
 
     createDragDrop();
     ui->actionFilesList->setChecked(false);

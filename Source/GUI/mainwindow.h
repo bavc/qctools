@@ -22,7 +22,6 @@ using namespace std;
 #include "Core/FileInformation.h"
 #include "Core/SignalServerConnectionChecker.h"
 #include "GUI/TinyDisplay.h"
-#include "GUI/Control.h"
 #include "GUI/Info.h"
 #include "GUI/FilesList.h"
 
@@ -99,7 +98,6 @@ public:
     FilesList*                  FilesListArea;
     Plots*                      PlotsArea;
     TinyDisplay*                TinyDisplayArea;
-    Control*                    ControlArea;
     Info*                       InfoArea;
     QLabel*                     DragDrop_Image;
     QLabel*                     DragDrop_Text;
@@ -201,18 +199,6 @@ private Q_SLOTS:
     void on_fileNamesBox_currentIndexChanged(int index);
 
     void on_check_toggled(bool checked);
-
-    void on_M1_triggered();
-
-    void on_Minus_triggered();
-
-    void on_PlayPause_triggered();
-
-    void on_Pause_triggered();
-
-    void on_Plus_triggered();
-
-    void on_P1_triggered();
 
     void on_Full_triggered();
 

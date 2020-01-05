@@ -413,40 +413,6 @@
     <string>Ctrl+0</string>
    </property>
   </action>
-  <action name="actionPlay_All_Frames">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Play All Frames</string>
-   </property>
-   <property name="toolTip">
-    <string>Try to play at frame rate, but never skip frames</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Alt+,</string>
-   </property>
-  </action>
-  <action name="actionPlay_at_Frame_Rate">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Play at Frame Rate</string>
-   </property>
-   <property name="toolTip">
-    <string>Play at frame rate and skip frames if need</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Alt+.</string>
-   </property>
-  </action>
   <action name="actionSignalServer_status">
    <property name="enabled">
     <bool>true</bool>
