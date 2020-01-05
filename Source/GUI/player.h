@@ -25,6 +25,8 @@ public:
 
     void playPaused(qint64 ms);
 
+    void updateInfoLabels();
+
 public Q_SLOTS:
     void setFile(FileInformation* filePath);
     void playPause();

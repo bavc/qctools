@@ -257,6 +257,12 @@ void Player::seekBySlider(int value)
         return;
 
     auto newValue = qint64(value*m_unit);
+
+    auto framePos = msToFrame(newValue);
+    m_fileInformation->Frames_Pos_Set(framePos);
+
+    updateInfoLabels();
+
     qDebug() << "seek to: " << value;
 
     m_player->seek(newValue);
@@ -274,27 +280,12 @@ void Player::resizeEvent(QResizeEvent *event)
 
 static QTime zeroTime = QTime::fromString("00:00:00");
 
-void Player::updateSlider(qint64 value)
+void Player::updateInfoLabels()
 {
-    auto newValue = int(qreal(value)/m_unit);
-    if(ui->playerSlider->value() == newValue)
-        return;
+    ui->slider_label->setText(QString::number(m_player->duration()) + "/" + QString::number(int(ui->playerSlider->value()/m_unit)));
 
-    if(!ui->playerSlider->isEnabled() || ui->playerSlider->isSliderDown())
-        return;
-
-    qDebug() << "update slider: " << newValue;
-
-    // ui->playerSlider->setRange(0, int(m_player->duration()/m_unit));
-    ui->playerSlider->setValue(newValue);
-
-    ui->slider_label->setText(QString::number(m_player->duration()) + "/" + QString::number(int(newValue/m_unit)));
-
-    auto position = m_player->position();
     auto duration = m_player->duration();
-    auto framePos = msToFrame(position);
-    ui->frame_label->setText(QString("Frame %1 [%2]").arg(framePos).arg(m_fileInformation->Frame_Type_Get()));
-    m_fileInformation->Frames_Pos_Set(framePos);
+    ui->frame_label->setText(QString("Frame %1 [%2]").arg(m_fileInformation->Frames_Pos_Get()).arg(m_fileInformation->Frame_Type_Get()));
 
     auto framesPos = m_fileInformation->Frames_Pos_Get();
 
@@ -319,6 +310,27 @@ void Player::updateSlider(qint64 value)
     }
     else
         ui->time_label->setText("");
+}
+
+void Player::updateSlider(qint64 value)
+{
+    auto newValue = int(qreal(value)/m_unit);
+    if(ui->playerSlider->value() == newValue)
+        return;
+
+    if(!ui->playerSlider->isEnabled() || ui->playerSlider->isSliderDown())
+        return;
+
+    qDebug() << "update slider: " << newValue;
+
+    // ui->playerSlider->setRange(0, int(m_player->duration()/m_unit));
+    ui->playerSlider->setValue(newValue);
+
+    auto position = m_player->position();
+    auto framePos = msToFrame(position);
+    m_fileInformation->Frames_Pos_Set(framePos);
+
+    updateInfoLabels();
 }
 
 void Player::updateSlider()
