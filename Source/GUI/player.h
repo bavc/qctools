@@ -23,6 +23,8 @@ public:
 
     FileInformation* file() const;
 
+    void playPaused(qint64 ms);
+
 public Q_SLOTS:
     void setFile(FileInformation* filePath);
     void playPause();
