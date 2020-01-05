@@ -40,6 +40,7 @@ private Q_SLOTS:
     void updateSliderUnit();
     void updateVideoOutputSize();
     void applyFilter();
+    void handleFileInformationPositionChanges();
 
 private Q_SLOTS:
     void on_playPause_pushButton_clicked();
@@ -69,6 +70,10 @@ private:
     void setScaleSpinboxPercentage(int percents);
     void handleFilterChange(FilterSelector *filterSelector, int filterIndex);
     void setFilter(const QString& filter);
+
+private:
+    qint64 frameToMs(int frame);
+    int msToFrame(qint64 ms);
 
 private:
     Ui::Player *ui;

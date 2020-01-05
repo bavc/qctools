@@ -327,6 +327,9 @@ void MainWindow::createGraphsLayout()
             saveBarchartsProfile(selectedProfileFileName);
         }
     });
+    connect(Files[getFilesCurrentPos()], &FileInformation::positionChanged, [&]() {
+        PlotsArea->setCursorPos(Files[getFilesCurrentPos()]->Frames_Pos_Get());
+    });
 
     applyBarchartsProfile();
 

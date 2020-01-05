@@ -4,6 +4,7 @@
 #include "Core/FFmpeg_Glue.h"
 #include "Core/CommonStats.h"
 #include "GUI/filterselector.h"
+#include <cfloat>
 #include <QDir>
 #include <QStandardPaths>
 #include <QTimer>
@@ -14,7 +15,8 @@ const int DefaultFilterIndex = 1;
 
 Player::Player(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::Player)
+    ui(new Ui::Player),
+    m_fileInformation(nullptr)
 {
     ui->setupUi(this);
     m_unit = 1;
@@ -196,6 +198,10 @@ void Player::playPaused(qint64 ms)
 void Player::setFile(FileInformation *fileInfo)
 {
     if(m_player->file() != fileInfo->fileName()) {
+
+        if(m_fileInformation != nullptr)
+            disconnect(m_fileInformation, &FileInformation::positionChanged, this, &Player::handleFileInformationPositionChanges);
+
         m_fileInformation = fileInfo;
         for(int i = 0; i < MaxFilters; ++i)
         {
@@ -214,14 +220,16 @@ void Player::setFile(FileInformation *fileInfo)
 
         m_unit = 1; // qreal(m_player->duration()) / m_framesCount;
 
-        auto ms = qint64(qreal(m_player->duration()) / m_framesCount * m_fileInformation->Frames_Pos_Get());
+        auto ms = frameToMs(m_fileInformation->Frames_Pos_Get());
         playPaused(ms);
 
         qDebug() << "seek finished at " << ms;
 
+        connect(m_fileInformation, &FileInformation::positionChanged, this, &Player::handleFileInformationPositionChanges);
+
     } else {
 
-        auto ms = qint64(qreal(m_player->duration()) / m_framesCount * m_fileInformation->Frames_Pos_Get());
+        auto ms = frameToMs(m_fileInformation->Frames_Pos_Get());
         m_player->seek(ms);
     }
 }
@@ -284,9 +292,9 @@ void Player::updateSlider(qint64 value)
 
     auto position = m_player->position();
     auto duration = m_player->duration();
-    auto framePos = (int) (qreal(position) / duration  * m_framesCount);
+    auto framePos = msToFrame(position);
     ui->frame_label->setText(QString("Frame %1 [%2]").arg(framePos).arg(m_fileInformation->Frame_Type_Get()));
-
+    m_fileInformation->Frames_Pos_Set(framePos);
 
     auto framesPos = m_fileInformation->Frames_Pos_Get();
 
@@ -434,6 +442,12 @@ void Player::applyFilter()
     ui->plainTextEdit->appendPlainText(QString("*** result ***: \n\n%1").arg(combinedFilter));
 
     setFilter(combinedFilter);
+}
+
+void Player::handleFileInformationPositionChanges()
+{
+    if(m_player->isPaused())
+        m_player->setPosition(frameToMs(m_fileInformation->Frames_Pos_Get()));
 }
 
 void Player::on_playPause_pushButton_clicked()
@@ -600,6 +614,18 @@ void Player::setFilter(const QString &filter)
 
         playPaused(sliderValue * m_unit);
     }
+}
+
+qint64 Player::frameToMs(int frame)
+{
+    auto ms = qint64(qreal(m_player->duration()) / m_framesCount * frame);
+    return ms;
+}
+
+int Player::msToFrame(qint64 ms)
+{
+    auto frame = (int) (qreal(ms) / m_player->duration()  * m_framesCount);
+    return frame;
 }
 
 void Player::on_graphmonitor_checkBox_clicked(bool checked)
