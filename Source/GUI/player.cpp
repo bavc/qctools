@@ -212,7 +212,6 @@ void Player::setFile(FileInformation *fileInfo)
         m_player->setFile(fileInfo->fileName());
         m_player->audio()->setMute(true);
 
-        QTimer::singleShot(0, this, SLOT(updateVideoOutputSize()));
         m_player->load();
 
         m_framesCount = m_fileInformation->Glue->VideoFrameCount_Get();
@@ -221,7 +220,9 @@ void Player::setFile(FileInformation *fileInfo)
         m_unit = 1; // qreal(m_player->duration()) / m_framesCount;
 
         auto ms = frameToMs(m_fileInformation->Frames_Pos_Get());
+
         playPaused(ms);
+        updateVideoOutputSize();
 
         qDebug() << "seek finished at " << ms;
 
@@ -625,6 +626,7 @@ void Player::setFilter(const QString &filter)
         }
 
         playPaused(sliderValue * m_unit);
+        updateVideoOutputSize();
     }
 }
 
