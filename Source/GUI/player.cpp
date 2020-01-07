@@ -9,6 +9,7 @@
 #include <QStandardPaths>
 #include <QTimer>
 #include <QMetaMethod>
+#include "draggablechildrenbehaviour.h"
 
 const int MaxFilters = 6;
 const int DefaultFilterIndex = 0;
@@ -84,6 +85,11 @@ Player::Player(QWidget *parent) :
         ui->filterGroupBox->layout()->addWidget(m_filterSelectors[i]);
     }
 
+    m_draggableBehaviour = new DraggableChildrenBehaviour(static_cast<QVBoxLayout*> (ui->filterGroupBox->layout()));
+    connect(m_draggableBehaviour, &DraggableChildrenBehaviour::childPositionChanged, [&](QWidget* child, int oldPos, int newPos) {
+        applyFilter();
+    });
+
     m_adjustmentSelector = new FilterSelector(nullptr, [&](const char* filterName) {
         auto i = 0;
         while(adjustments[i]) {
@@ -95,6 +101,7 @@ Player::Player(QWidget *parent) :
 
         return false;
     });
+
     m_adjustmentSelector->selectCurrentFilter(-1);
     m_adjustmentSelector->setCurrentIndex(21);
 
@@ -423,9 +430,15 @@ void Player::applyFilter()
 
     QStringList definedFilters;
     for(auto i = 0; i < MaxFilters; ++i) {
-        auto empty = m_filters[i].isEmpty();
+        auto layoutItem = (ui->filterGroupBox->layout()->itemAt(i));
+        auto filter = qobject_cast<FilterSelector*>(layoutItem->widget());
+        if(!filter)
+            continue;
+
+        auto filterString = replaceFilterTokens(filter->getFilter());
+        auto empty = filterString.isEmpty();
         if(!empty)
-            definedFilters.append(m_filters[i]);
+            definedFilters.append(filterString);
     }
 
     ui->plainTextEdit->appendPlainText(QString("*** defined filters ***: \n\n%1").arg(definedFilters.join("\n")));
@@ -455,7 +468,8 @@ void Player::applyFilter()
         "sws_flags=neighbor;%1split=6[x1][x2][x3][x4][x5][x6];"
     };
 
-    auto split = splits[definedFilters.length() - 1].arg(!m_adjustmentFilter.isEmpty() ? (m_adjustmentFilter + ",") : m_adjustmentFilter);
+    auto adjustmentFilterString = replaceFilterTokens(m_adjustmentSelector->getFilter());
+    auto split = splits[definedFilters.length() - 1].arg(!adjustmentFilterString.isEmpty() ? (adjustmentFilterString + ",") : adjustmentFilterString);
 
     ui->plainTextEdit->appendPlainText(QString("*** split ***: \n\n%1").arg(split));
 
@@ -608,50 +622,6 @@ void Player::setScaleSpinboxPercentage(int percents)
 void Player::handleFilterChange(FilterSelector *filterSelector, int filterIndex)
 {
     connect(filterSelector, &FilterSelector::filterChanged, [this, filterIndex](const QString& filterString) {
-
-        QString str = filterString;
-
-        str.replace(QString("${width}"), QString::number(m_fileInformation->Glue->Width_Get()));
-        str.replace(QString("${height}"), QString::number(m_fileInformation->Glue->Height_Get()));
-        str.replace(QString("${dar}"), QString::number(m_fileInformation->Glue->DAR_Get()));
-
-        //    QSize windowSize = imageLabels[Pos]->pixmapSize();
-        QSize windowSize = ui->scrollArea->widget()->size();
-
-        str.replace(QString("${window_width}"), QString::number(windowSize.width()));
-        str.replace(QString("${window_height}"), QString::number(windowSize.height()));
-
-        QString tempLocation = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-        QDir tempDir(tempLocation);
-
-        QString qctoolsTmpSubDir = "qctools";
-        QString fontFileName = "Anonymous_Pro_B.ttf";
-
-        if(tempDir.exists())
-        {
-            QDir qctoolsTmpDir(tempLocation + "/" + qctoolsTmpSubDir);
-            if(!qctoolsTmpDir.exists())
-                tempDir.mkdir(qctoolsTmpSubDir);
-
-            QFile fontFile(qctoolsTmpDir.path() + "/" + fontFileName);
-            if(!fontFile.exists())
-            {
-                QFile::copy(":/" + fontFileName, fontFile.fileName());
-            }
-
-            if(fontFile.exists())
-            {
-                QString fontFileName(fontFile.fileName());
-                fontFileName = fontFileName.replace(":", "\\\\:"); // ":" is a reserved character, it must be escaped
-                str.replace(QString("${fontfile}"), fontFileName);
-            }
-        }
-
-        if(filterIndex == -1)
-            m_adjustmentFilter = str;
-        else
-            m_filters[filterIndex] = str;
-
         m_filterUpdateTimer.stop();
         m_filterUpdateTimer.start(100);
     });
@@ -685,6 +655,49 @@ void Player::setFilter(const QString &filter)
             updateVideoOutputSize();
         });
     }
+}
+
+QString Player::replaceFilterTokens(const QString &filterString)
+{
+    QString str = filterString;
+
+    str.replace(QString("${width}"), QString::number(m_fileInformation->Glue->Width_Get()));
+    str.replace(QString("${height}"), QString::number(m_fileInformation->Glue->Height_Get()));
+    str.replace(QString("${dar}"), QString::number(m_fileInformation->Glue->DAR_Get()));
+
+    //    QSize windowSize = imageLabels[Pos]->pixmapSize();
+    QSize windowSize = ui->scrollArea->widget()->size();
+
+    str.replace(QString("${window_width}"), QString::number(windowSize.width()));
+    str.replace(QString("${window_height}"), QString::number(windowSize.height()));
+
+    QString tempLocation = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+    QDir tempDir(tempLocation);
+
+    QString qctoolsTmpSubDir = "qctools";
+    QString fontFileName = "Anonymous_Pro_B.ttf";
+
+    if(tempDir.exists())
+    {
+        QDir qctoolsTmpDir(tempLocation + "/" + qctoolsTmpSubDir);
+        if(!qctoolsTmpDir.exists())
+            tempDir.mkdir(qctoolsTmpSubDir);
+
+        QFile fontFile(qctoolsTmpDir.path() + "/" + fontFileName);
+        if(!fontFile.exists())
+        {
+            QFile::copy(":/" + fontFileName, fontFile.fileName());
+        }
+
+        if(fontFile.exists())
+        {
+            QString fontFileName(fontFile.fileName());
+            fontFileName = fontFileName.replace(":", "\\\\:"); // ":" is a reserved character, it must be escaped
+            str.replace(QString("${fontfile}"), fontFileName);
+        }
+    }
+
+    return str;
 }
 
 qint64 Player::frameToMs(int frame)

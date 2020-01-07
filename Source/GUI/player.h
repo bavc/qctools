@@ -8,6 +8,7 @@
 
 class FileInformation;
 class FilterSelector;
+class DraggableChildrenBehaviour;
 
 namespace Ui {
 class Player;
@@ -74,6 +75,7 @@ private:
     void setScaleSpinboxPercentage(int percents);
     void handleFilterChange(FilterSelector *filterSelector, int filterIndex);
     void setFilter(const QString& filter);
+    QString replaceFilterTokens(const QString& filterString);
 
 private:
     qint64 frameToMs(int frame);
@@ -94,9 +96,8 @@ private:
     FileInformation* m_fileInformation;
     FilterSelector* m_filterSelectors[6];
     FilterSelector* m_adjustmentSelector;
+    DraggableChildrenBehaviour* m_draggableBehaviour;
 
-    QString m_filters[6];
-    QString m_adjustmentFilter;
     QTimer m_filterUpdateTimer;
 };
 

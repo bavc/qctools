@@ -170,6 +170,18 @@ void FilterSelector::selectCurrentFilter(int index)
     m_filterOptions.FiltersList->setCurrentIndex(index);
 }
 
+QString FilterSelector::getFilter()
+{
+    QString filterString;
+
+    if(m_filterOptions.EnableCheckbox->isChecked())
+    {
+        filterString = QString::fromStdString(FiltersList_currentOptionChanged(m_currentFilterIndex));
+    }
+
+    return filterString;
+}
+
 void FilterSelector::on_FiltersOptions_click()
 {
     on_FiltersList_currentOptionChanged(m_currentFilterIndex);
@@ -186,14 +198,8 @@ void FilterSelector::hideOthersOnEntering(DoubleSpinBoxWithSlider *doubleSpinBox
 
 void FilterSelector::on_FiltersList_currentOptionChanged(int filterIndex)
 {
-    if(m_filterOptions.EnableCheckbox->isChecked())
-    {
-        std::string Modified_String = FiltersList_currentOptionChanged(filterIndex);
-        Q_EMIT filterChanged(QString::fromStdString(Modified_String));
-    } else
-    {
-        Q_EMIT filterChanged(QString(""));
-    }
+    auto filterString = getFilter();
+    Q_EMIT filterChanged(filterString);
 }
 
 void FilterSelector::on_FiltersList_currentIndexChanged(int Pos)

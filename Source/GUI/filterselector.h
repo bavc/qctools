@@ -55,6 +55,8 @@ public:
     void setCurrentIndex(int index);
     void selectCurrentFilter(int index);
 
+    QString getFilter();
+
 Q_SIGNALS:
     void filterChanged(const QString& filterString);
 
