@@ -66,6 +66,29 @@ Player::Player(QWidget *parent) :
         ui->filterGroupBox->layout()->addWidget(m_filterSelectors[i]);
     }
 
+    m_adjustmentSelector = new FilterSelector(nullptr, [&](const char* filterName) {
+        static const char* allowedFilters[] = {
+            "No Display",
+            "Chroma Adjust",
+            "Luma Adjust",
+            nullptr
+        };
+
+        auto i = 0;
+        while(allowedFilters[i]) {
+            if(strcmp(allowedFilters[i], filterName) == 0)
+                return true;
+
+            ++i;
+        }
+
+        return false;
+    });
+    handleFilterChange(m_adjustmentSelector, -1);
+
+    ui->adjustmentsGroupBox->setLayout(new QVBoxLayout);
+    ui->adjustmentsGroupBox->layout()->addWidget(m_adjustmentSelector);
+
     // select 'normal' by default
     m_filterSelectors[0]->selectCurrentFilter(DefaultFilterIndex);
 
@@ -410,15 +433,15 @@ void Player::applyFilter()
     ui->plainTextEdit->appendPlainText(QString("*** layout ***: \n\n%1").arg(layout));
 
     QString splits[] = {
-        "",
-        "sws_flags=neighbor;split=2[x1][x2];",
-        "sws_flags=neighbor;split=3[x1][x2][x3];",
-        "sws_flags=neighbor;split=4[x1][x2][x3][x4];",
-        "sws_flags=neighbor;split=5[x1][x2][x3][x4][x5];",
-        "sws_flags=neighbor;split=6[x1][x2][x3][x4][x5][x6];"
+        "%1",
+        "sws_flags=neighbor;%1split=2[x1][x2];",
+        "sws_flags=neighbor;%1split=3[x1][x2][x3];",
+        "sws_flags=neighbor;%1split=4[x1][x2][x3][x4];",
+        "sws_flags=neighbor;%1split=5[x1][x2][x3][x4][x5];",
+        "sws_flags=neighbor;%1split=6[x1][x2][x3][x4][x5][x6];"
     };
 
-    auto split = splits[definedFilters.length() - 1];
+    auto split = splits[definedFilters.length() - 1].arg(!m_adjustmentFilter.isEmpty() ? (m_adjustmentFilter + ",") : m_adjustmentFilter);
 
     ui->plainTextEdit->appendPlainText(QString("*** split ***: \n\n%1").arg(split));
 
@@ -610,7 +633,10 @@ void Player::handleFilterChange(FilterSelector *filterSelector, int filterIndex)
             }
         }
 
-        m_filters[filterIndex] = str;
+        if(filterIndex == -1)
+            m_adjustmentFilter = str;
+        else
+            m_filters[filterIndex] = str;
 
         m_filterUpdateTimer.stop();
         m_filterUpdateTimer.start(100);

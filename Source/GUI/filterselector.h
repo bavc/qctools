@@ -16,7 +16,7 @@ class FilterSelector : public QFrame
 {
     Q_OBJECT
 public:
-    FilterSelector(QWidget* parent = nullptr);
+    FilterSelector(QWidget* parent = nullptr, const std::function<bool(const char*)>& nameFilter = {});
 
     // Content
     struct options

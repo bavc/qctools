@@ -93,7 +93,10 @@ private:
 
     FileInformation* m_fileInformation;
     FilterSelector* m_filterSelectors[6];
+    FilterSelector* m_adjustmentSelector;
+
     QString m_filters[6];
+    QString m_adjustmentFilter;
     QTimer m_filterUpdateTimer;
 };
 

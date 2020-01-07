@@ -8,7 +8,7 @@
 #include <string>
 #include <cmath>
 
-FilterSelector::FilterSelector(QWidget *parent) : QFrame(parent), FileInfoData(nullptr)
+FilterSelector::FilterSelector(QWidget *parent, const std::function<bool(const char*)>& nameFilter) : QFrame(parent), FileInfoData(nullptr)
 {
     for (size_t OptionPos=0; OptionPos<Args_Max; OptionPos++)
     {
@@ -49,7 +49,6 @@ FilterSelector::FilterSelector(QWidget *parent) : QFrame(parent), FileInfoData(n
     for (size_t FilterPos=0; FilterPos<FiltersListDefault_Count; FilterPos++)
     {
         const char* filterName = Filters[FilterPos].Name;
-
         if (strcmp(filterName, "(Separator)") && strcmp(filterName, "(End)"))
         {
             if(filtersGroups.empty())
@@ -57,7 +56,7 @@ FilterSelector::FilterSelector(QWidget *parent) : QFrame(parent), FileInfoData(n
 
             filtersGroups.back().append(FilterInfo(filterName, FilterPos));
         }
-        else if (strcmp(Filters[FilterPos].Name, "(End)"))
+        else if (strcmp(filterName, "(End)"))
         {
             filtersGroups.push_back(FiltersGroup());
         }
@@ -72,6 +71,11 @@ FilterSelector::FilterSelector(QWidget *parent) : QFrame(parent), FileInfoData(n
         {
             auto first = it->first;
             auto second = it->second;
+
+            auto filterNameString = first.toStdString();
+            const char* filterName = filterNameString.c_str();
+            if(nameFilter && !nameFilter(filterName))
+                continue;
 
             m_filterOptions.FiltersList->addItem(first, second);
         }
@@ -89,10 +93,12 @@ FilterSelector::FilterSelector(QWidget *parent) : QFrame(parent), FileInfoData(n
     Layout = new QGridLayout();
     Layout->setMargin(0);
     Layout->setContentsMargins(0, 0, 0, 0);
-    Layout->setSizeConstraint(QLayout::SetMinimumSize);
     setLayout(Layout);
 
     setFrameStyle(QFrame::Box);
+
+    auto minimumSize = QSize(m_filterOptions.FiltersList->minimumWidth(), m_filterOptions.FiltersList->height());
+    setMinimumSize(minimumSize);
 }
 
 FilterSelector::options &FilterSelector::getOptions()
