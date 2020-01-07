@@ -227,7 +227,10 @@ void Player::setFile(FileInformation *fileInfo)
         auto ms = frameToMs(m_fileInformation->Frames_Pos_Get());
 
         playPaused(ms);
-        updateVideoOutputSize();
+
+        QTimer::singleShot(0, this, [&]() {
+            updateVideoOutputSize();
+        });
 
         qDebug() << "seek finished at " << ms;
 
@@ -638,7 +641,9 @@ void Player::setFilter(const QString &filter)
         stopAndWait();
 
         playPaused(sliderValue * m_unit);
-        updateVideoOutputSize();
+        QTimer::singleShot(0, this, [&]() {
+            updateVideoOutputSize();
+        });
     }
 }
 
