@@ -43,22 +43,6 @@ struct filter
 const filter Filters[] =
 {
     {
-        "No Display",
-        -1,
-        {
-            { Args_Type_None,   0, 0, 0, 0, nullptr },
-            { Args_Type_None,   0, 0, 0, 0, nullptr },
-            { Args_Type_None,   0, 0, 0, 0, nullptr },
-            { Args_Type_None,   0, 0, 0, 0, nullptr },
-            { Args_Type_None,   0, 0, 0, 0, nullptr },
-            { Args_Type_None,   0, 0, 0, 0, nullptr },
-            { Args_Type_None,   0, 0, 0, 0, nullptr },
-        },
-        {
-            "",
-        },
-    },
-    {
         "Normal",
         0,
         {

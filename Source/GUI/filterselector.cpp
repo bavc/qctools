@@ -22,7 +22,12 @@ FilterSelector::FilterSelector(QWidget *parent, const std::function<bool(const c
     }
     m_filterOptions.FiltersList_Fake=nullptr;
 
-    m_filterOptions.FiltersList=new QComboBox(this);
+    m_filterOptions.EnableCheckbox = new QCheckBox(this);
+    connect(m_filterOptions.EnableCheckbox, &QCheckBox::toggled, [&](bool toggled) {
+       on_FiltersOptions_click();
+    });
+
+    m_filterOptions.FiltersList = new QComboBox(this);
 
     QFont Font=QFont();
 #ifdef _WIN32
@@ -117,7 +122,12 @@ void FilterSelector::setCurrentFilter(int filterIndex)
     Layout0->setContentsMargins(0, 0, 0, 0);
     Layout0->setSpacing(8);
 
-    Layout0->addWidget(m_filterOptions.FiltersList, 0, 0, Qt::AlignLeft);
+    auto hbox = new QHBoxLayout();
+
+    hbox->addWidget(m_filterOptions.EnableCheckbox);
+    hbox->addWidget(m_filterOptions.FiltersList);
+
+    Layout0->addLayout(hbox, 0, 0, Qt::AlignLeft);
     FiltersList_currentIndexChanged(filterIndex, Layout0);
 
     m_filterOptions.FiltersList_Fake=new QLabel(" ");
@@ -128,6 +138,12 @@ void FilterSelector::setCurrentFilter(int filterIndex)
 
     m_currentFilterIndex = filterIndex;
     on_FiltersList_currentOptionChanged(filterIndex);
+}
+
+void FilterSelector::enableCurrentFilter(bool enable)
+{
+    QSignalBlocker blocker(this);
+    m_filterOptions.EnableCheckbox->setChecked(enable);
 }
 
 void FilterSelector::setFileInformation(FileInformation *fileInformation)
@@ -168,10 +184,16 @@ void FilterSelector::hideOthersOnEntering(DoubleSpinBoxWithSlider *doubleSpinBox
     });
 }
 
-void FilterSelector::on_FiltersList_currentOptionChanged(size_t filterIndex)
+void FilterSelector::on_FiltersList_currentOptionChanged(int filterIndex)
 {
-    std::string Modified_String = FiltersList_currentOptionChanged(filterIndex);
-    Q_EMIT filterChanged(QString::fromStdString(Modified_String));
+    if(m_filterOptions.EnableCheckbox->isChecked())
+    {
+        std::string Modified_String = FiltersList_currentOptionChanged(filterIndex);
+        Q_EMIT filterChanged(QString::fromStdString(Modified_String));
+    } else
+    {
+        Q_EMIT filterChanged(QString(""));
+    }
 }
 
 void FilterSelector::on_FiltersList_currentIndexChanged(int Pos)
@@ -214,7 +236,7 @@ void FilterSelector::on_FiltersOptions1_toggle(bool checked)
         on_FiltersList_currentOptionChanged(m_currentFilterIndex);
 }
 
-std::string FilterSelector::FiltersList_currentOptionChanged(size_t Picture_Current)
+std::string FilterSelector::FiltersList_currentOptionChanged(int Picture_Current)
 {
     size_t Value_Pos=0;
     bool Modified=false;
@@ -515,7 +537,7 @@ std::string FilterSelector::FiltersList_currentOptionChanged(size_t Picture_Curr
 }
 
 //---------------------------------------------------------------------------
-void FilterSelector::FiltersList_currentIndexChanged(size_t FilterPos, QGridLayout* Layout0)
+void FilterSelector::FiltersList_currentIndexChanged(int FilterPos, QGridLayout* Layout0)
 {
     // Options
     for (size_t OptionPos=0; OptionPos<Args_Max; OptionPos++)
@@ -531,6 +553,10 @@ void FilterSelector::FiltersList_currentIndexChanged(size_t FilterPos, QGridLayo
         delete m_filterOptions.ColorButton[OptionPos]; m_filterOptions.ColorButton[OptionPos]=NULL;
     }
     delete m_filterOptions.FiltersList_Fake; m_filterOptions.FiltersList_Fake=NULL;
+
+    if(FilterPos == -1)
+        return;
+
     Layout0->setContentsMargins(0, 0, 0, 0);
     QFont Font=QFont();
 #ifdef _WIN32

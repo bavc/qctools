@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QWidget>
+#include <QPointer>
 #include "doublespinboxwithslider.h"
 #include "filters.h"
 
@@ -21,6 +22,7 @@ public:
     // Content
     struct options
     {
+        QCheckBox*              EnableCheckbox;
         QCheckBox*              Checks[Args_Max];
         QLabel*                 Sliders_Label[Args_Max];
         DoubleSpinBoxWithSlider* Sliders_SpinBox[Args_Max];
@@ -36,6 +38,7 @@ public:
 
     int getPhysicalFilterIndex(int displayFilterIndex);
     void setCurrentFilter(int index);
+    void enableCurrentFilter(bool enable);
 
     struct previous_values
     {
@@ -61,10 +64,10 @@ private Q_SLOTS:
     void on_FiltersList_currentIndexChanged(int Pos);
 
 protected:
-    void FiltersList_currentIndexChanged(size_t FilterPos, QGridLayout *Layout0);
+    void FiltersList_currentIndexChanged(int FilterPos, QGridLayout *Layout0);
 
-    void on_FiltersList_currentOptionChanged(size_t filterIndex);
-    std::string FiltersList_currentOptionChanged(size_t Picture_Current);
+    void on_FiltersList_currentOptionChanged(int filterIndex);
+    std::string FiltersList_currentOptionChanged(int Picture_Current);
 
 protected Q_SLOTS:
     void on_FiltersSpinBox1_click();

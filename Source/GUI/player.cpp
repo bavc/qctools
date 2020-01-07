@@ -11,7 +11,7 @@
 #include <QMetaMethod>
 
 const int MaxFilters = 6;
-const int DefaultFilterIndex = 1;
+const int DefaultFilterIndex = 0;
 
 Player::Player(QWidget *parent) :
     QMainWindow(parent),
@@ -77,21 +77,17 @@ Player::Player(QWidget *parent) :
 
             return true;
         });
+        m_filterSelectors[i]->selectCurrentFilter(-1);
+        m_filterSelectors[i]->selectCurrentFilter(DefaultFilterIndex);
 
         handleFilterChange(m_filterSelectors[i], i);
         ui->filterGroupBox->layout()->addWidget(m_filterSelectors[i]);
     }
 
     m_adjustmentSelector = new FilterSelector(nullptr, [&](const char* filterName) {
-        static const char* allowedFilters[] = {
-            "No Display",
-            "Adjust Signal",
-            nullptr
-        };
-
         auto i = 0;
-        while(allowedFilters[i]) {
-            if(strcmp(allowedFilters[i], filterName) == 0)
+        while(adjustments[i]) {
+            if(strcmp(adjustments[i], filterName) == 0)
                 return true;
 
             ++i;
@@ -99,13 +95,16 @@ Player::Player(QWidget *parent) :
 
         return false;
     });
+    m_adjustmentSelector->selectCurrentFilter(-1);
+    m_adjustmentSelector->setCurrentIndex(21);
+
     handleFilterChange(m_adjustmentSelector, -1);
 
     ui->adjustmentsGroupBox->setLayout(new QVBoxLayout);
     ui->adjustmentsGroupBox->layout()->addWidget(m_adjustmentSelector);
 
     // select 'normal' by default
-    m_filterSelectors[0]->selectCurrentFilter(DefaultFilterIndex);
+    m_filterSelectors[0]->enableCurrentFilter(true);
 
     m_filterUpdateTimer.setSingleShot(true);
     connect(&m_filterUpdateTimer, &QTimer::timeout, this, &Player::applyFilter);
