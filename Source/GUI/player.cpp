@@ -479,7 +479,11 @@ void Player::applyFilter()
         filterString = definedFilters[0];
     } else {
         for(int i = 0; i < definedFilters.length(); ++i) {
-            filterString += QString("[x%1]%2[y%1];").arg(i + 1).arg(definedFilters[i]);
+            if(ui->fitToGrid_checkBox->isChecked()) {
+                filterString += replaceFilterTokens(QString("[x%1]%2,scale=${width}:${height}[y%1];")).arg(i + 1).arg(definedFilters[i]);
+            } else {
+                filterString += QString("[x%1]%2[y%1];").arg(i + 1).arg(definedFilters[i]);
+            }
         }
     }
 
@@ -754,4 +758,9 @@ void Player::on_next_pushButton_clicked()
 void Player::on_lineEdit_returnPressed()
 {
     m_player->seek((qint64) (m_unit * ui->lineEdit->text().toInt()));
+}
+
+void Player::on_fitToGrid_checkBox_toggled(bool checked)
+{
+    applyFilter();
 }

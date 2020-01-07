@@ -70,6 +70,8 @@ private Q_SLOTS:
 
     void on_lineEdit_returnPressed();
 
+    void on_fitToGrid_checkBox_toggled(bool checked);
+
 private:
     void setScaleSliderPercentage(int percents);
     void setScaleSpinboxPercentage(int percents);
