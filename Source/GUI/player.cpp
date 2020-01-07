@@ -60,8 +60,25 @@ Player::Player(QWidget *parent) :
     ui->filterGroupBox->setLayout(new QVBoxLayout);
     ui->filterGroupBox->setMinimumHeight(60 * MaxFilters);
 
+    static const char* adjustments[] = {
+        "Chroma Adjust",
+        "Luma Adjust",
+        nullptr
+    };
+
     for(int i = 0; i < 6; ++i) {
-        m_filterSelectors[i] = new FilterSelector(this);
+        m_filterSelectors[i] = new FilterSelector(this, [&](const char* filterName) {
+            auto i = 0;
+            while(adjustments[i]) {
+                if(strcmp(adjustments[i], filterName) == 0)
+                    return false;
+
+                ++i;
+            }
+
+            return true;
+        });
+
         handleFilterChange(m_filterSelectors[i], i);
         ui->filterGroupBox->layout()->addWidget(m_filterSelectors[i]);
     }
