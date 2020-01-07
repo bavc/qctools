@@ -566,52 +566,19 @@ const filter Filters[] =
         },
     },
     {
-        "Chroma Adjust",
+        "Adjust Signal",
         0,
         {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Toggle,   0,   0,   0,   0, "Vectorscope" },
+            { Args_Type_Slider,   0,-180, 180,   1, "Black"},
+            { Args_Type_Slider, 100,   0, 400, 100, "Contrast"},
             { Args_Type_Slider,   0,-180, 180,   1, "Hue"},
-            { Args_Type_Slider,  10,   0,  30,  10, "Saturation"},
+            { Args_Type_Slider,  10,   0,  30,  10, "Sat"},
             { Args_Type_Slider,   0,-128, 128,   1, "Cb Shift"},
             { Args_Type_Slider,   0,-128, 128,   1, "Cr Shift"},
-            { Args_Type_Slider,   1,   0,   2,   1, "Colorspace" },
+            { Args_Type_None,          0,   0,   0,   0, nullptr },
         },
         {
-            "format=yuv444p|yuvj444p,lutyuv=y=val:u=mod(val+${5}\\,256):v=mod(val+${6}\\,256),hue=h=${3}:s=${4}",
-            "format=yuv444p|yuvj444p,lutyuv=y=val:u=mod(val+${5}\\,256):v=mod(val+${6}\\,256),hue=h=${3}:s=${4},split[a][b];[a]vectorscope=mode=color2:colorspace=${7}:graticule=invert:flags=name,\
-            scale=512:512,pad=720:512:(ow-iw)/2:(oh-ih)/2,setsar=1/1[a1];\
-            [b]lutyuv=y=val/2,scale=720:512,setsar=1/1[b1];[a1][b1]blend=addition",
-            "il=l=d:c=d,format=yuv444p|yuvj444p,lutyuv=y=val:u=mod(val+${5}\\,256):v=mod(val+${6}\\,256),hue=h=${3}:s=${4}",
-            "il=l=d:c=d,format=yuv444p|yuvj444p,lutyuv=y=val:u=mod(val+${5}\\,256):v=mod(val+${6}\\,256),hue=h=${3}:s=${4},split[a][b];[a]vectorscope=mode=color2:colorspace=${7}:graticule=invert:flags=name,\
-            scale=512:512,pad=720:512:(ow-iw)/2:(oh-ih)/2,setsar=1/1[a1];\
-            [b]lutyuv=y=val/2,scale=720:512,setsar=1/1[b1];[a1][b1]blend=addition",
-        },
-    },
-    {
-        "Luma Adjust",
-        0,
-        {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Toggle,   0,   0,   0,   0, "Waveform" },
-            { Args_Type_Slider,   0,-180, 180,   1, "Offset"},
-            { Args_Type_Slider, 100,   0, 400, 100, "Contrast"},
-            { Args_Type_Slider,   0,   0,   7,   1, "Filter" },
-            { Args_Type_Slider,   0,   0,   2,   1, "Scale" },
-            { Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
-        },
-        {
-            "format=yuv444p|yuvj444p,lutyuv=y=(val+${3})*${4}:u=val:v=val",
-            "format=yuv444p|yuvj444p,lutyuv=y=(val+${3})*${4}:u=val:v=val,split[a][b];[a]waveform=intensity=${7}:graticule=invert:flags=numbers+dots:f=${5}:scale=${6},\
-            scale=${width}:${height},setsar=1/1[a1];[b]setsar=1/1[b1];\
-            [b1][a1]vstack",
-            "il=l=d:c=d,format=yuv444p|yuvj444p,lutyuv=y=(val+${3})*${4}:u=val:v=val",
-            "format=yuv444p|yuvj444p,split[a][b];\
-            [a]field=top,split[t1][t2];\
-            [t1]lutyuv=y=(val+${3})*${4}:u=val:v=val,waveform=intensity=${7}:graticule=invert:flags=numbers+dots:f=${5}:scale=${6}[t1w];\
-            [b]field=bottom,split[b1][b2];\
-            [b1]lutyuv=y=(val+${3})*${4}:u=val:v=val,waveform=intensity=${7}:graticule=invert:flags=numbers+dots:f=${5}:scale=${6}[b1w];\
-            [t2][t1w][b2][b1w]vstack=4",
+            "lutyuv=y=(val+${1})*${2}:u=val+${5}:v=val+${6},hue=h=${3}:s=${4}",
         },
     },
     {

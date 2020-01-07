@@ -61,8 +61,7 @@ Player::Player(QWidget *parent) :
     ui->filterGroupBox->setMinimumHeight(60 * MaxFilters);
 
     static const char* adjustments[] = {
-        "Chroma Adjust",
-        "Luma Adjust",
+        "Adjust Signal",
         nullptr
     };
 
@@ -86,8 +85,7 @@ Player::Player(QWidget *parent) :
     m_adjustmentSelector = new FilterSelector(nullptr, [&](const char* filterName) {
         static const char* allowedFilters[] = {
             "No Display",
-            "Chroma Adjust",
-            "Luma Adjust",
+            "Adjust Signal",
             nullptr
         };
 
