@@ -180,11 +180,15 @@ void Player::playPaused(qint64 ms)
         waiter.wait();
     }
 
+    QApplication::processEvents();
+
     {
         PropertyWaiter<QtAV::AVPlayer::State> waiter(m_player, "QtAV::AVPlayer::State", "state", QtAV::AVPlayer::PausedState);
         m_player->pause();
         waiter.wait();
     }
+
+    QApplication::processEvents();
 
     {
         SignalWaiter waiter(m_player, "seekFinished(qint64)");
@@ -208,7 +212,8 @@ void Player::setFile(FileInformation *fileInfo)
             m_filterSelectors[i]->setFileInformation(m_fileInformation);
         }
 
-        m_player->stop();
+        stopAndWait();
+
         m_player->setFile(fileInfo->fileName());
         m_player->audio()->setMute(true);
 
@@ -609,6 +614,17 @@ void Player::handleFilterChange(FilterSelector *filterSelector, int filterIndex)
     });
 }
 
+void Player::stopAndWait()
+{
+    {
+        PropertyWaiter<QtAV::AVPlayer::State> waiter(m_player, "QtAV::AVPlayer::State", "state", QtAV::AVPlayer::StoppedState);
+        m_player->stop();
+        waiter.wait();
+    }
+
+    QApplication::processEvents();
+}
+
 void Player::setFilter(const QString &filter)
 {
     m_videoFilter->setOptions(filter);
@@ -619,11 +635,7 @@ void Player::setFilter(const QString &filter)
         auto sliderValue = (qint64)ui->playerSlider->value();
         qDebug() << "slider value: " << sliderValue;
 
-        {
-            PropertyWaiter<QtAV::AVPlayer::State> waiter(m_player, "QtAV::AVPlayer::State", "state", QtAV::AVPlayer::StoppedState);
-            m_player->stop();
-            waiter.wait();
-        }
+        stopAndWait();
 
         playPaused(sliderValue * m_unit);
         updateVideoOutputSize();
