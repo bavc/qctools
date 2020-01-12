@@ -11,6 +11,9 @@
 #include <QStandardPaths>
 #include <QTimer>
 #include <QMetaMethod>
+#include <QGraphicsItem>
+#include <QGraphicsObject>
+#include <QFileDialog>
 #include "draggablechildrenbehaviour.h"
 
 const int MaxFilters = 6;
@@ -917,4 +920,19 @@ void Player::on_goToTime_lineEdit_returnPressed()
     ui->plainTextEdit->appendPlainText(QString("*** go to: %1 ***").arg(ms));
 
     m_player->seek(ms);
+}
+
+void Player::on_export_pushButton_clicked()
+{
+    auto fileName = QFileDialog::getSaveFileName(this, "Export video frame", "", "*.png");
+    if(!fileName.isEmpty()) {
+        m_player->videoCapture()->setAutoSave(false);
+        connect(m_player->videoCapture(), &QtAV::VideoCapture::imageCaptured, this, [&](const QImage& image) {
+            image.save(fileName);
+        }, Qt::UniqueConnection);
+
+        SignalWaiter waiter(m_player->videoCapture(), "imageCaptured(const QImage&)");
+        m_player->videoCapture()->capture();
+        waiter.wait();
+    }
 }

@@ -77,6 +77,8 @@ private Q_SLOTS:
 
     void on_goToTime_lineEdit_returnPressed();
 
+    void on_export_pushButton_clicked();
+
 private:
     void setScaleSliderPercentage(int percents);
     void setScaleSpinboxPercentage(int percents);
