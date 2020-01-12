@@ -57,6 +57,13 @@ Player::Player(QWidget *parent) :
     connect(ui->playerSlider, SIGNAL(sliderMoved(int)), SLOT(seekBySlider(int)));
     connect(ui->playerSlider, SIGNAL(sliderPressed()), SLOT(seekBySlider()));
 
+    QAction* playAction = new QAction();
+    playAction->setShortcuts({ QKeySequence("Space"), QKeySequence("K") });
+    connect(playAction, &QAction::triggered, [this]() {
+        ui->playPause_pushButton->animateClick();
+    });
+    addAction(playAction);
+
     connect(m_player, SIGNAL(positionChanged(qint64)), SLOT(updateSlider(qint64)));
     connect(m_player, SIGNAL(started()), SLOT(updateSlider()));
     // connect(m_player, SIGNAL(notifyIntervalChanged()), SLOT(updateSliderUnit()));
@@ -315,11 +322,9 @@ void Player::setFile(FileInformation *fileInfo)
 void Player::playPause()
 {
     qreal speed = 1.0;
-    bool ok = false;
-    auto newSpeedInPercent = ui->speed_lineEdit->text().toDouble(&ok);
-    if(ok) {
-        speed = newSpeedInPercent / 100;
-    }
+    auto newSpeedInPercent = (double) ui->speedp_horizontalSlider->value();
+    speed = newSpeedInPercent / 100;
+
     m_player->setSpeed(speed);
 
     if (!m_player->isPlaying()) {
@@ -812,12 +817,9 @@ void Player::on_next_pushButton_clicked()
     auto newPosition = m_player->position() + 1;
     qDebug() << "new position: " << newPosition;
     // m_player->seek(newPosition);
-    m_player->stepForward();
-}
 
-void Player::on_lineEdit_returnPressed()
-{
-    m_player->seek((qint64) (m_unit * ui->lineEdit->text().toInt()));
+    qDebug() << "step forward";
+    m_player->stepForward();
 }
 
 void Player::on_fitToGrid_checkBox_toggled(bool checked)

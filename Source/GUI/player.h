@@ -71,8 +71,6 @@ private Q_SLOTS:
 
     void on_next_pushButton_clicked();
 
-    void on_lineEdit_returnPressed();
-
     void on_fitToGrid_checkBox_toggled(bool checked);
 
 private:
