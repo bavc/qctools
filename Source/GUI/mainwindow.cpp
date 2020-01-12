@@ -242,7 +242,7 @@ void MainWindow::on_actionGoTo_triggered()
         return;
 
     bool ok;
-    int i = QInputDialog::getInt(this, tr("Go to frame at position..."), Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max?("frame position (0-"+QString::number(Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max-1)+"):"):QString("frame position (0-based)"), Files[getFilesCurrentPos()]->Frames_Pos_Get(), 0, Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max-1, 1, &ok);
+    int i = QInputDialog::getInt(this, tr("Go to..."), Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max?("frame position (0-"+QString::number(Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max-1)+"):"):QString("frame position (0-based)"), Files[getFilesCurrentPos()]->Frames_Pos_Get(), 0, Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max-1, 1, &ok);
     if (Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max && i>=Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max)
         i=Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max-1;
     if (ok)

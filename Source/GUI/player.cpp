@@ -844,3 +844,67 @@ void Player::on_speedp_horizontalSlider_valueChanged(int value)
 
     m_player->setSpeed(speed);
 }
+
+void Player::on_goToTime_lineEdit_returnPressed()
+{
+    qint64 ms = 0;
+
+    auto timeValue = ui->goToTime_lineEdit->text();
+    if(!timeValue.contains(".") && !timeValue.contains(":")) {
+        ms = timeValue.toInt();
+    } else if (timeValue.contains(".") && !timeValue.contains(":")) {
+        auto secAndMs = timeValue.split(".");
+        if(secAndMs.count() == 2) {
+            auto sec = secAndMs[0].toInt();
+            auto msec = secAndMs[1].toInt();
+            ms = qint64(sec) * 1000 + msec;
+        }
+    } else if(!timeValue.contains(".") && timeValue.contains(":")) {
+        auto splitted = timeValue.split(":");
+        auto hh = 0;
+        auto mm = 0;
+        auto ss = 0;
+
+        if(splitted.count() == 2) {
+            mm = splitted[0].toInt();
+            ss = splitted[1].toInt();
+        } else if(splitted.count() == 3) {
+            hh = splitted[0].toInt();
+            mm = splitted[1].toInt();
+            ss = splitted[2].toInt();
+        }
+
+        ms = qint64(hh) * 60 * 60 * 1000 + qint64(mm) * 60 * 1000 + qint64(ss) * 1000;
+
+    } else if(timeValue.contains(".") && timeValue.contains(":")) {
+        auto timeAndMs = timeValue.split(".");
+        if(timeAndMs.count() == 2) {
+            auto timeValue = timeAndMs[0];
+            auto msec = timeAndMs[1].toInt();
+
+            auto splitted = timeValue.split(":");
+            auto hh = 0;
+            auto mm = 0;
+            auto ss = 0;
+
+            if(splitted.count() == 2) {
+                mm = splitted[0].toInt();
+                ss = splitted[1].toInt();
+            } else if(splitted.count() == 3) {
+                hh = splitted[0].toInt();
+                mm = splitted[1].toInt();
+                ss = splitted[2].toInt();
+            }
+
+            ms = qint64(hh) * 60 * 60 * 1000 + qint64(mm) * 60 * 1000 + qint64(ss) * 1000 + msec;
+        }
+    }
+
+    qDebug() << "go to " << ms;
+    ui->goToTime_lineEdit->clearFocus();
+
+    ui->plainTextEdit->clear();
+    ui->plainTextEdit->appendPlainText(QString("*** go to: %1 ***").arg(ms));
+
+    m_player->seek(ms);
+}
