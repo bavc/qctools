@@ -9,6 +9,7 @@
 class FileInformation;
 class FilterSelector;
 class DraggableChildrenBehaviour;
+class CommentsPlot;
 
 namespace Ui {
 class Player;
@@ -38,6 +39,7 @@ public Q_SLOTS:
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
+    bool eventFilter( QObject *object, QEvent *event ) override;
 
 private Q_SLOTS:
     void updateSlider(qint64 value);
@@ -46,6 +48,7 @@ private Q_SLOTS:
     void updateVideoOutputSize();
     void applyFilter();
     void handleFileInformationPositionChanges();
+    void onCursorMoved(int index);
 
 private Q_SLOTS:
     void on_playPause_pushButton_clicked();
@@ -99,6 +102,7 @@ private:
     FilterSelector* m_filterSelectors[6];
     FilterSelector* m_adjustmentSelector;
     DraggableChildrenBehaviour* m_draggableBehaviour;
+    CommentsPlot* m_commentsPlot;
 
     QTimer m_filterUpdateTimer;
 };

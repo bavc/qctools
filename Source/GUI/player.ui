@@ -15,7 +15,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_6">
-    <item row="2" column="0">
+    <item row="3" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
        <spacer name="horizontalSpacer_3">
@@ -203,8 +203,8 @@
       <widget class="QWidget" name="scrollAreaWidgetContents">
        <property name="geometry">
         <rect>
-         <x>893</x>
-         <y>411</y>
+         <x>890</x>
+         <y>412</y>
          <width>300</width>
          <height>246</height>
         </rect>
@@ -219,6 +219,16 @@
       </property>
      </widget>
     </item>
+    <item row="2" column="0">
+     <widget class="QFrame" name="commentsPlaceHolderFrame">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -227,7 +237,7 @@
      <x>0</x>
      <y>0</y>
      <width>2592</width>
-     <height>26</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>

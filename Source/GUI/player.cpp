@@ -4,6 +4,8 @@
 #include "Core/FFmpeg_Glue.h"
 #include "Core/CommonStats.h"
 #include "GUI/filterselector.h"
+#include "GUI/Comments.h"
+#include "GUI/Plots.h"
 #include <cfloat>
 #include <QDir>
 #include <QStandardPaths>
@@ -17,10 +19,13 @@ const int DefaultFilterIndex = 0;
 Player::Player(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Player),
-    m_fileInformation(nullptr)
+    m_fileInformation(nullptr), m_commentsPlot(nullptr)
 {
     ui->setupUi(this);
     m_unit = 1;
+
+    ui->commentsPlaceHolderFrame->setLayout(new QHBoxLayout);
+    ui->commentsPlaceHolderFrame->layout()->setMargin(0);
 
     m_player = new QtAV::AVPlayer(ui->scrollArea);
     m_vo = new QtAV::VideoOutput(ui->scrollArea);
@@ -250,7 +255,27 @@ void Player::setFile(FileInformation *fileInfo)
         if(m_fileInformation != nullptr)
             disconnect(m_fileInformation, &FileInformation::positionChanged, this, &Player::handleFileInformationPositionChanges);
 
+        delete m_commentsPlot;
+
         m_fileInformation = fileInfo;
+
+        m_commentsPlot = createCommentsPlot(m_fileInformation, nullptr);
+        m_commentsPlot->enableAxis(QwtPlot::yLeft, false);
+        m_commentsPlot->enableAxis(QwtPlot::xBottom, true);
+        m_commentsPlot->setAxisScale(QwtPlot::xBottom, 0, m_fileInformation->Glue->VideoFrameCount_Get());
+        m_commentsPlot->setAxisAutoScale(QwtPlot::xBottom, false);
+
+        m_commentsPlot->setFrameShape(QFrame::NoFrame);
+        m_commentsPlot->setObjectName("commentsPlot");
+        m_commentsPlot->setStyleSheet("#commentsPlot { border: 0px solid transparent; }");
+        m_commentsPlot->canvas()->setObjectName("commentsPlotCanvas");
+        dynamic_cast<QFrame*>(m_commentsPlot->canvas())->setFrameStyle( QFrame::NoFrame );
+        dynamic_cast<QFrame*>(m_commentsPlot->canvas())->setContentsMargins(0, 0, 0, 0);
+
+        connect( m_commentsPlot, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
+        m_commentsPlot->canvas()->installEventFilter( this );
+        ui->commentsPlaceHolderFrame->layout()->addWidget(m_commentsPlot);
+
         for(int i = 0; i < MaxFilters; ++i)
         {
             m_filterSelectors[i]->setFileInformation(m_fileInformation);
@@ -329,6 +354,30 @@ void Player::seekBySlider()
 void Player::resizeEvent(QResizeEvent *event)
 {
     updateVideoOutputSize();
+}
+
+bool Player::eventFilter(QObject *object, QEvent *event)
+{
+    if(object == m_commentsPlot->canvas()) {
+
+        if(event->type() == QEvent::MouseButtonDblClick)
+        {
+            QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+            if(mouseEvent->button() == Qt::LeftButton)
+            {
+                showEditFrameCommentsDialog(parentWidget(), m_fileInformation, m_fileInformation->ReferenceStat(), m_fileInformation->Frames_Pos_Get());
+            }
+        } else if(event->type() == QEvent::KeyPress)
+        {
+            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+            if(keyEvent->key() == Qt::Key_M)
+            {
+                showEditFrameCommentsDialog(parentWidget(), m_fileInformation, m_fileInformation->ReferenceStat(), m_fileInformation->Frames_Pos_Get());
+            }
+        }
+    }
+
+    return QWidget::eventFilter( object, event );
 }
 
 static QTime zeroTime = QTime::fromString("00:00:00");
@@ -524,6 +573,14 @@ void Player::handleFileInformationPositionChanges()
 {
     if(m_player->isPaused())
         m_player->setPosition(frameToMs(m_fileInformation->Frames_Pos_Get()));
+
+    m_commentsPlot->setCursorPos(m_fileInformation->Frames_Pos_Get());
+}
+
+void Player::onCursorMoved(int x)
+{
+    m_commentsPlot->setCursorPos(x);
+    seekBySlider(frameToMs(x));
 }
 
 void Player::on_playPause_pushButton_clicked()
