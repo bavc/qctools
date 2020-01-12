@@ -103,6 +103,7 @@ private:
     FilterSelector* m_adjustmentSelector;
     DraggableChildrenBehaviour* m_draggableBehaviour;
     CommentsPlot* m_commentsPlot;
+    bool m_seekOnFileInformationPositionChange;
 
     QTimer m_filterUpdateTimer;
 };

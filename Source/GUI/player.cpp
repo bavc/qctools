@@ -19,7 +19,7 @@ const int DefaultFilterIndex = 0;
 Player::Player(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Player),
-    m_fileInformation(nullptr), m_commentsPlot(nullptr)
+    m_fileInformation(nullptr), m_commentsPlot(nullptr), m_seekOnFileInformationPositionChange(true)
 {
     ui->setupUi(this);
     m_unit = 1;
@@ -430,7 +430,10 @@ void Player::updateSlider(qint64 value)
 
     auto position = m_player->position();
     auto framePos = msToFrame(position);
+
+    m_seekOnFileInformationPositionChange = false;
     m_fileInformation->Frames_Pos_Set(framePos);
+    m_seekOnFileInformationPositionChange = true;
 
     updateInfoLabels();
 }
@@ -571,8 +574,8 @@ void Player::applyFilter()
 
 void Player::handleFileInformationPositionChanges()
 {
-    if(m_player->isPaused())
-        m_player->setPosition(frameToMs(m_fileInformation->Frames_Pos_Get()));
+    if(m_player->isPaused() && m_seekOnFileInformationPositionChange)
+        m_player->seek(frameToMs(m_fileInformation->Frames_Pos_Get()));
 
     m_commentsPlot->setCursorPos(m_fileInformation->Frames_Pos_Get());
 }
