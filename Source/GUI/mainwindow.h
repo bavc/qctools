@@ -129,9 +129,10 @@ public:
     size_t getFilesCurrentPos() const;
     void setFilesCurrentPos(const size_t &value);
     bool isFileSelected() const;
-
+    bool isFileSelected(size_t pos) const;
 Q_SIGNALS:
     void fileSelected(bool selected);
+    void filePositionChanged(size_t filePosition);
 
 public Q_SLOTS:
 	void Update();

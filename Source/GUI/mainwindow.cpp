@@ -898,6 +898,8 @@ void MainWindow::setFilesCurrentPos(const size_t &value)
     if(files_CurrentPos != value) {
         files_CurrentPos = value;
 
+        Q_EMIT filePositionChanged(files_CurrentPos);
+
         if(fileWasSelected != isFileSelected())
             Q_EMIT(fileSelected(isFileSelected()));
     }
@@ -908,7 +910,12 @@ void MainWindow::setFilesCurrentPos(const size_t &value)
 
 bool MainWindow::isFileSelected() const
 {
-    return files_CurrentPos != (size_t)-1;
+    return isFileSelected(files_CurrentPos);
+}
+
+bool MainWindow::isFileSelected(size_t pos) const
+{
+    return pos != (size_t)-1;
 }
 
 void MainWindow::on_actionClear_Recent_History_triggered()
