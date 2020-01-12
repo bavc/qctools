@@ -65,7 +65,10 @@ Player::Player(QWidget *parent) :
     addAction(playAction);
 
     connect(m_player, SIGNAL(positionChanged(qint64)), SLOT(updateSlider(qint64)));
-    connect(m_player, SIGNAL(started()), SLOT(updateSlider()));
+
+    ui->speed_label->installEventFilter(this);
+
+    // connect(m_player, SIGNAL(started()), SLOT(updateSlider()));
     // connect(m_player, SIGNAL(notifyIntervalChanged()), SLOT(updateSliderUnit()));
 
     connect(ui->arrangementButtonGroup, SIGNAL(buttonToggled(QAbstractButton*, bool)), this, SLOT(applyFilter()));
@@ -363,7 +366,7 @@ void Player::resizeEvent(QResizeEvent *event)
 
 bool Player::eventFilter(QObject *object, QEvent *event)
 {
-    if(object == m_commentsPlot->canvas()) {
+    if(m_commentsPlot && object == m_commentsPlot->canvas()) {
 
         if(event->type() == QEvent::MouseButtonDblClick)
         {
@@ -379,6 +382,11 @@ bool Player::eventFilter(QObject *object, QEvent *event)
             {
                 showEditFrameCommentsDialog(parentWidget(), m_fileInformation, m_fileInformation->ReferenceStat(), m_fileInformation->Frames_Pos_Get());
             }
+        }
+    } else if(object == ui->speed_label) {
+
+        if(event->type() == QEvent::MouseButtonPress) {
+            ui->speedp_horizontalSlider->setValue(100);
         }
     }
 
@@ -825,4 +833,14 @@ void Player::on_next_pushButton_clicked()
 void Player::on_fitToGrid_checkBox_toggled(bool checked)
 {
     applyFilter();
+}
+
+void Player::on_speedp_horizontalSlider_valueChanged(int value)
+{
+    ui->speed_label->setText(QString("Speed: %1%").arg(value));
+    qreal speed = 1.0;
+    auto newSpeedInPercent = (double) ui->speedp_horizontalSlider->value();
+    speed = newSpeedInPercent / 100;
+
+    m_player->setSpeed(speed);
 }

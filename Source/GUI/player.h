@@ -73,6 +73,8 @@ private Q_SLOTS:
 
     void on_fitToGrid_checkBox_toggled(bool checked);
 
+    void on_speedp_horizontalSlider_valueChanged(int value);
+
 private:
     void setScaleSliderPercentage(int percents);
     void setScaleSpinboxPercentage(int percents);
