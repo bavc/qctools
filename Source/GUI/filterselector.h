@@ -54,6 +54,7 @@ public:
     void setFileInformation(FileInformation* fileInformation);
     void setCurrentIndex(int index);
     void selectCurrentFilter(int index);
+    void selectCurrentFilterByName(const char* filterName);
 
     QString getFilter();
 

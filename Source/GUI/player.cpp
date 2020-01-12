@@ -14,7 +14,10 @@
 #include "draggablechildrenbehaviour.h"
 
 const int MaxFilters = 6;
-const int DefaultFilterIndex = 0;
+const int DefaultFirstFilterIndex = 0;
+const int DefaultSecondFilterIndex = 4;
+const int DefaultThirdFilterIndex = 0;
+const int DefaultForthFilterIndex = 0;
 
 Player::Player(QWidget *parent) :
     QMainWindow(parent),
@@ -93,8 +96,6 @@ Player::Player(QWidget *parent) :
 
             return true;
         });
-        m_filterSelectors[i]->selectCurrentFilter(-1);
-        m_filterSelectors[i]->selectCurrentFilter(DefaultFilterIndex);
 
         handleFilterChange(m_filterSelectors[i], i);
         ui->filterGroupBox->layout()->addWidget(m_filterSelectors[i]);
@@ -124,6 +125,8 @@ Player::Player(QWidget *parent) :
 
     ui->adjustmentsGroupBox->setLayout(new QVBoxLayout);
     ui->adjustmentsGroupBox->layout()->addWidget(m_adjustmentSelector);
+
+    m_filterSelectors[0]->selectCurrentFilter(-1);
 
     // select 'normal' by default
     m_filterSelectors[0]->enableCurrentFilter(true);
@@ -265,7 +268,9 @@ void Player::setFile(FileInformation *fileInfo)
         if(m_fileInformation != nullptr)
             disconnect(m_fileInformation, &FileInformation::positionChanged, this, &Player::handleFileInformationPositionChanges);
 
-        delete m_commentsPlot;
+        auto commentsPlot = m_commentsPlot;
+        m_commentsPlot = nullptr; // to allow event filter to skip comments plot
+        delete commentsPlot;
 
         m_fileInformation = fileInfo;
 
@@ -290,6 +295,11 @@ void Player::setFile(FileInformation *fileInfo)
         {
             m_filterSelectors[i]->setFileInformation(m_fileInformation);
         }
+
+        m_filterSelectors[0]->selectCurrentFilterByName("Normal");
+        m_filterSelectors[1]->selectCurrentFilterByName("Waveform");
+        m_filterSelectors[2]->selectCurrentFilterByName("Bit Plane (10 slices)");
+        m_filterSelectors[3]->selectCurrentFilterByName("Vectorscope");
 
         stopAndWait();
 

@@ -170,13 +170,27 @@ void FilterSelector::selectCurrentFilter(int index)
     m_filterOptions.FiltersList->setCurrentIndex(index);
 }
 
+void FilterSelector::selectCurrentFilterByName(const char *filterName)
+{
+    for(auto i = 0; i < m_filterOptions.FiltersList->count(); ++i) {
+        auto itemIndex = m_filterOptions.FiltersList->itemData(i).toInt();
+        auto itemText = m_filterOptions.FiltersList->itemText(i);
+
+        if(itemText == filterName) {
+            selectCurrentFilter(i);
+            break;
+        }
+    }
+}
+
 QString FilterSelector::getFilter()
 {
     QString filterString;
 
     if(m_filterOptions.EnableCheckbox->isChecked())
     {
-        filterString = QString::fromStdString(FiltersList_currentOptionChanged(m_currentFilterIndex));
+        if(m_currentFilterIndex != -1)
+            filterString = QString::fromStdString(FiltersList_currentOptionChanged(m_currentFilterIndex));
     }
 
     return filterString;
