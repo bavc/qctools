@@ -6,6 +6,7 @@
 
 //---------------------------------------------------------------------------
 #include <QApplication>
+#include <QScreen>
 #include <QtPlugin>
 #include <iostream>
 
@@ -24,6 +25,10 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w(NULL);
+
+    auto screenGeometry = w.screen()->geometry();
+    w.setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, screenGeometry.size() * 0.95, screenGeometry));
+
     for (int Pos=1; Pos<argc; Pos++)
     {
         if(strcmp(argv[Pos], "--debug") == 0)

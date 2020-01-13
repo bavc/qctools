@@ -33,6 +33,7 @@
 #include <QMetaEnum>
 #include <QMessageBox>
 #include <QJsonDocument>
+#include <QScreen>
 
 #include "GUI/draggablechildrenbehaviour.h"
 #include "GUI/config.h"
@@ -113,6 +114,9 @@ MainWindow::MainWindow(QWidget *parent) :
     DragDrop_Text=NULL;
 
     m_player = new Player();
+
+    auto screenGeometry = m_player->screen()->geometry();
+    m_player->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, screenGeometry.size() * 0.9, screenGeometry));
 
     // UI
     Ui_Init();
