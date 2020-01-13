@@ -27,6 +27,8 @@ Player::Player(QWidget *parent) :
     ui(new Ui::Player),
     m_fileInformation(nullptr), m_commentsPlot(nullptr), m_seekOnFileInformationPositionChange(true)
 {
+    QtAV::setLogLevel(QtAV::LogOff);
+
     ui->setupUi(this);
     m_unit = 1;
 
