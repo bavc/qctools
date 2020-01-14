@@ -34,6 +34,7 @@
 #include <QMessageBox>
 #include <QJsonDocument>
 #include <QScreen>
+#include <QDesktopWidget>
 
 #include "GUI/draggablechildrenbehaviour.h"
 #include "GUI/config.h"
@@ -115,7 +116,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_player = new Player();
 
-    auto screenGeometry = m_player->screen()->geometry();
+    QDesktopWidget desktop;
+    auto screenNumber = desktop.screenNumber(m_player);
+    auto screenGeometry = desktop.screenGeometry(screenNumber);
+
     m_player->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, screenGeometry.size() * 0.9, screenGeometry));
 
     // UI

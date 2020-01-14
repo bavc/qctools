@@ -6,6 +6,7 @@
 
 //---------------------------------------------------------------------------
 #include <QApplication>
+#include <QDesktopWidget>
 #include <QScreen>
 #include <QtPlugin>
 #include <iostream>
@@ -26,7 +27,10 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w(NULL);
 
-    auto screenGeometry = w.screen()->geometry();
+    QDesktopWidget desktop;
+    auto screenNumber = desktop.screenNumber(&w);
+    auto screenGeometry = desktop.screenGeometry(screenNumber);
+
     w.setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, screenGeometry.size() * 0.95, screenGeometry));
 
     for (int Pos=1; Pos<argc; Pos++)
