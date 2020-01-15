@@ -79,9 +79,6 @@ exists($$FFMPEG/lib) {
 
 FFMPEG_INCLUDES += $$FFMPEG_INCLUDE
 
-ffmpegIncludes = "INCLUDEPATH+=$$FFMPEG_INCLUDES"
-ffmpegLibs = "LIBS+=$$FFMPEG_LIBS"
-
 oldConf = $$cat($$QTAV/.qmake.conf.backup, lines)
 isEmpty(oldConf) {
     oldConf = $$cat($$QTAV/.qmake.conf, lines)
@@ -92,12 +89,35 @@ isEmpty(oldConf) {
 }
 
 message('oldConf: ' $$oldConf)
-message('ffmpegIncludes: ' $$ffmpegIncludes)
-message('ffmpegLibs: ' $$ffmpegLibs)
-
 write_file($$QTAV/.qmake.conf, oldConf)
-write_file($$QTAV/.qmake.conf, ffmpegIncludes, append)
-write_file($$QTAV/.qmake.conf, ffmpegLibs, append)
+
+include(brew.pri)
+
+contains(DEFINES, USE_BREW) {
+    message('using ffmpeg from brew via PKGCONFIG')
+
+    pkgConfig = "PKGCONFIG += libavdevice libavcodec libavfilter libavformat libpostproc libswresample libswscale libavcodec libavutil"
+    linkPkgConfig = "CONFIG += link_pkgconfig"
+
+    message('pkgConfig: ' $$pkgConfig)
+    message('linkPkgConfig: ' $$linkPkgConfig)
+
+    write_file($$QTAV/.qmake.conf, pkgConfig, append)
+    write_file($$QTAV/.qmake.conf, linkPkgConfig, append)
+} else {
+    ffmpegIncludes = "INCLUDEPATH+=$$FFMPEG_INCLUDES"
+    ffmpegLibs = "LIBS+=$$FFMPEG_LIBS"
+
+    message('ffmpegIncludes: ' $$ffmpegIncludes)
+    message('ffmpegLibs: ' $$ffmpegLibs)
+
+    staticffmpeg = "CONFIG += static_ffmpeg"
+    message('staticffmpeg: ' $$ffmpegLibs)
+
+    write_file($$QTAV/.qmake.conf, ffmpegIncludes, append)
+    write_file($$QTAV/.qmake.conf, ffmpegLibs, append)
+    write_file($$QTAV/.qmake.conf, staticffmpeg, append)
+}
 
 linux: {
 fpic = "QMAKE_CXXFLAGS += -fPIC"
