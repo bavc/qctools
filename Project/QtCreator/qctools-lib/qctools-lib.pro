@@ -63,13 +63,7 @@ SOURCES = \
     $$SOURCES_PATH/Core/FFmpegVideoEncoder.cpp
 
 win32 {
-    greaterThan(QT_MAJOR_VERSION, 4): {
-        greaterThan(QT_MINOR_VERSION, 8): {
-            ZLIB_INCLUDE_PATH = $$absolute_path($$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib/src)
-        } else {
-            ZLIB_INCLUDE_PATH = $$absolute_path($$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib)
-        }
-    }
+    ZLIB_INCLUDE_PATH = $${THIRD_PARTY_PATH}/zlib/include
     message("qctools-lib: ZLIB_INCLUDE_PATH = " $$ZLIB_INCLUDE_PATH)
     INCLUDEPATH += $$ZLIB_INCLUDE_PATH
 }

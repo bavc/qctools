@@ -86,13 +86,7 @@ SOURCES += \
     $$SOURCES_PATH/GUI/barchartprofilesmodel.cpp
 
 win32 {
-    greaterThan(QT_MAJOR_VERSION, 4): {
-        greaterThan(QT_MINOR_VERSION, 8): {
-            ZLIB_INCLUDE_PATH = $$absolute_path($$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib/src)
-        } else {
-            ZLIB_INCLUDE_PATH = $$absolute_path($$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib)
-        }
-    }
+    ZLIB_INCLUDE_PATH = $${THIRD_PARTY_PATH}/zlib/include
     message("qctools: ZLIB_INCLUDE_PATH = " $$ZLIB_INCLUDE_PATH)
     INCLUDEPATH += $$ZLIB_INCLUDE_PATH
 }
@@ -197,17 +191,15 @@ macx:contains(DEFINES, USE_BREW) {
     }
     include( $${QWT_ROOT}/qwtfunctions.pri )
 
-    !win32 {
-            LIBS      += -L$${QWT_ROOT}/lib -lqwt
+    macx {
+        macx:LIBS       += -F$${QWT_ROOT}/lib -framework qwt
     }
 
-    win32 {
-        CONFIG(debug, debug|release) {
-            LIBS += -L$${QWT_ROOT}/lib -lqwtd
-        } else:CONFIG(release, debug|release) {
-            LIBS += -L$${QWT_ROOT}/lib -lqwt
-        }
+    win32-msvc* {
+        DEFINES += QWT_DLL
     }
+
+    !macx:LIBS += -L$${QWT_ROOT}/lib -lqwt
 
     INCLUDEPATH += $$QWT_ROOT/src
 }
@@ -216,8 +208,12 @@ INCLUDEPATH += $$SOURCES_PATH
 INCLUDEPATH += $$SOURCES_PATH/ThirdParty/cqmarkdown
 include(../ffmpeg.pri)
 
-!win32 {
-    LIBS += -lz
+win32-msvc* {
+    LIBS += $${THIRD_PARTY_PATH}/zlib/lib/zlibstatic.lib
+}
+
+win32-g++* {
+    LIBS += -lz -lbcrypt -lwsock32 -lws2_32
 }
 
 !win32 {
@@ -225,13 +221,13 @@ include(../ffmpeg.pri)
 }
 
 unix {
-    LIBS       += -ldl
+    LIBS       += -lz -ldl
     !macx:LIBS += -lrt
 }
 
 macx:ICON = $$SOURCES_PATH/Resource/Logo.icns
 macx:LIBS += -liconv \
-	     -framework CoreFoundation \
+             -framework CoreFoundation \
              -framework Foundation \
              -framework AppKit \
              -framework AudioToolBox \
