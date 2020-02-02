@@ -166,7 +166,8 @@ HEADERS += \
     $$SOURCES_PATH/GUI/player.h \
     $$SOURCES_PATH/GUI/doublespinboxwithslider.h \
     $$SOURCES_PATH/GUI/filters.h \
-    $$SOURCES_PATH/GUI/filterselector.h
+    $$SOURCES_PATH/GUI/filterselector.h \
+    $$SOURCES_PATH/GUI/playercontrol.h
 
 SOURCES += \
     $$SOURCES_PATH/GUI/FilesList.cpp \
@@ -196,7 +197,8 @@ SOURCES += \
     $$SOURCES_PATH/GUI/player.cpp \
     $$SOURCES_PATH/GUI/doublespinboxwithslider.cpp \
     $$SOURCES_PATH/GUI/filters.cpp \
-    $$SOURCES_PATH/GUI/filterselector.cpp
+    $$SOURCES_PATH/GUI/filterselector.cpp \
+    $$SOURCES_PATH/GUI/playercontrol.cpp
 
 win32 {
     greaterThan(QT_MAJOR_VERSION, 4): {
@@ -218,6 +220,7 @@ FORMS += \
     $$SOURCES_PATH/GUI/barchartconditioneditor.ui \
     $$SOURCES_PATH/GUI/barchartconditioninput.ui \
     $$SOURCES_PATH/GUI/managebarchartconditions.ui \
+    $$SOURCES_PATH/GUI/playercontrol.ui
 
 RESOURCES += \
     $$SOURCES_PATH/Resource/Resources.qrc

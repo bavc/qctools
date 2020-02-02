@@ -127,9 +127,13 @@ public:
     QAction* uploadAllAction() const;
 
     size_t getFilesCurrentPos() const;
+    FileInformation* getCurrenFileInformation() const;
+
     void setFilesCurrentPos(const size_t &value);
     bool isFileSelected() const;
     bool isFileSelected(size_t pos) const;
+
+    bool hasMediaFile() const;
 Q_SIGNALS:
     void fileSelected(bool selected);
     void filePositionChanged(size_t filePosition);
@@ -257,6 +261,7 @@ private:
     QJsonDocument m_barchartsProfile;
     QComboBox* m_profileSelectorCombobox;
     Player* m_player;
+    QTimer m_playbackSimulationTimer;
 
     Ui::MainWindow *ui;
 };

@@ -19,6 +19,7 @@
 class QwtPlot;
 class Plot;
 class PlotScaleWidget;
+class PlayerControl;
 
 void showEditFrameCommentsDialog(QWidget* parentWidget, FileInformation* info, CommonStats* stats, size_t frameIndex);
 
@@ -86,6 +87,8 @@ public:
     explicit                    Plots( QWidget *parent, FileInformation* );
     virtual                     ~Plots();
 
+    const PlayerControl*        playerControl() const;
+
     void                        setPlotVisible( size_t type, size_t group, bool on );
 
     const QwtPlot*              plot( size_t streamPos, size_t group ) const;
@@ -137,6 +140,7 @@ private:
 private:
     PlotScaleWidget*            m_scaleWidget;
     CommentsPlot*               m_commentsPlot;
+    PlayerControl*              m_playerControl;
     Plot***                     m_plots; // pointer on an array of streams and groups per stream and Plot* per group
     int                         m_plotsCount;
 

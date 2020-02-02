@@ -69,7 +69,8 @@ public:
     QString                     Frame_Type_Get              (size_t Stats_Pos=(size_t)-1, size_t frameIndex = (size_t)-1) const;
     void                        Frames_Pos_Set              (int Frames_Pos, size_t Stats_Pos=(size_t)-1);
     void                        Frames_Pos_Minus            ();
-    void                        Frames_Pos_Plus             ();
+    bool                        Frames_Pos_Plus             ();
+    bool                        Frames_Pos_AtEnd            ();
     bool                        PlayBackFilters_Available   ();
 
     qreal                       averageFrameRate        () const;

@@ -794,14 +794,22 @@ void FileInformation::Frames_Pos_Minus ()
 }
 
 //---------------------------------------------------------------------------
-void FileInformation::Frames_Pos_Plus ()
+bool FileInformation::Frames_Pos_Plus ()
 {
     if (Frames_Pos+1>=ReferenceStat()->x_Current_Max)
-        return;
+        return false;;
 
     Frames_Pos++;
 
     Q_EMIT positionChanged();
+    return true;
+}
+
+bool FileInformation::Frames_Pos_AtEnd()
+{
+    auto maxX = ReferenceStat()->x_Current_Max;
+    bool atEnd = (Frames_Pos + 1) == maxX;
+    return atEnd;
 }
 
 //---------------------------------------------------------------------------

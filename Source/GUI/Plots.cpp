@@ -16,6 +16,7 @@
 #include "GUI/barchartconditioninput.h"
 #include "Core/Core.h"
 #include "Core/VideoCore.h"
+#include "playercontrol.h"
 #include <QComboBox>
 #include <QGridLayout>
 #include <QEvent>
@@ -314,6 +315,9 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     layout->addWidget( xAxisBox, layout_y, 1 );
 #endif
 
+    m_playerControl = new PlayerControl();
+    layout->addWidget(m_playerControl, m_plotsCount + 2, 0);
+
     layout->setColumnStretch( 0, 10 );
     layout->setColumnStretch( 1, 0 );
 
@@ -325,6 +329,11 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
 //---------------------------------------------------------------------------
 Plots::~Plots()
 {
+}
+
+const PlayerControl *Plots::playerControl() const
+{
+    return m_playerControl;
 }
 
 //---------------------------------------------------------------------------

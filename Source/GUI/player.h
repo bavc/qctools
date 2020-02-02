@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include <QMainWindow>
+#include <QPushButton>
 #include <QTimer>
 #include <QWidget>
 #include <QtAV>
@@ -25,11 +26,14 @@ public:
 
     FileInformation* file() const;
 
+    QPushButton* playPauseButton() const;
     void playPaused(qint64 ms);
 
     void updateInfoLabels();
 
     void stopAndWait();
+
+    static qint64 timeStringToMs(const QString& timeValue);
 
 public Q_SLOTS:
     void setFile(FileInformation* filePath);
@@ -38,6 +42,7 @@ public Q_SLOTS:
     void seekBySlider();
 
 protected:
+    void showEvent(QShowEvent* event) override;
     void resizeEvent(QResizeEvent *event) override;
     bool eventFilter( QObject *object, QEvent *event ) override;
 
@@ -95,6 +100,7 @@ private:
 
     QtAV::VideoOutput *m_vo;
     QtAV::AVPlayer *m_player;
+    bool m_handlePlayPauseClick;
 
     qreal m_unit;
     int m_framesCount;

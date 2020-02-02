@@ -38,6 +38,7 @@
 
 #include "GUI/draggablechildrenbehaviour.h"
 #include "GUI/config.h"
+#include "GUI/playercontrol.h"
 
 //***************************************************************************
 // Constructor / Desructor
@@ -492,8 +493,24 @@ void MainWindow::on_actionAbout_triggered()
 void MainWindow::on_fileNamesBox_currentIndexChanged(int index)
 {
     setFilesCurrentPos(index);
+    m_playbackSimulationTimer.stop();
+
+    if(isFileSelected()) {
+
+        if(Files[index]->Glue) {
+            m_player->setFile(Files[index]);
+        } else {
+            m_player->setFile(nullptr);
+        }
+
+    } else {
+
+        m_player->setFile(nullptr);
+    }
+
     if (!ui->actionGraphsLayout->isChecked())
         return;
+
     createGraphsLayout();
     refreshDisplay();
     Update();
@@ -899,6 +916,11 @@ size_t MainWindow::getFilesCurrentPos() const
     return files_CurrentPos;
 }
 
+FileInformation *MainWindow::getCurrenFileInformation() const
+{
+    return isFileSelected() ? Files[getFilesCurrentPos()] : nullptr;
+}
+
 void MainWindow::setFilesCurrentPos(const size_t &value)
 {
     bool fileWasSelected = isFileSelected();
@@ -924,6 +946,11 @@ bool MainWindow::isFileSelected() const
 bool MainWindow::isFileSelected(size_t pos) const
 {
     return pos != (size_t)-1;
+}
+
+bool MainWindow::hasMediaFile() const
+{
+    return Files[files_CurrentPos]->Glue;
 }
 
 void MainWindow::on_actionClear_Recent_History_triggered()

@@ -17,11 +17,13 @@
 #include <QMessageBox>
 
 #include "Core/Core.h"
+#include "Core/FFmpeg_Glue.h"
 #include "GUI/Plots.h"
 #include "GUI/draggablechildrenbehaviour.h"
 #include "GUI/preferences.h"
 #include "GUI/barchartprofilesmodel.h"
 #include "GUI/player.h"
+#include "GUI/playercontrol.h"
 
 //---------------------------------------------------------------------------
 
@@ -353,6 +355,89 @@ void MainWindow::createGraphsLayout()
     refreshDisplay();
 
     configureZoom();
+
+    auto playPauseButton = const_cast<QPushButton*>(PlotsArea->playerControl()->playPauseButton());
+    playPauseButton->setIcon(QIcon(":/icon/play.png"));
+
+    if(isFileSelected()) {
+        auto averageFrameRate = getCurrenFileInformation()->averageFrameRate();
+        auto averageFrameDuration = averageFrameRate != 0.0 ? 1000.0 / averageFrameRate : 0.0;
+
+        m_playbackSimulationTimer.setInterval(averageFrameDuration);
+    }
+
+    static QIcon pauseButton(":/icon/pause.png");
+    static QIcon playButton(":/icon/play.png");
+
+    connect(&m_playbackSimulationTimer, &QTimer::timeout, this, [this, playPauseButton]() {
+        auto fileInfo = getCurrenFileInformation();
+        if(!fileInfo->Frames_Pos_Plus()) {
+            m_playbackSimulationTimer.stop();
+            playPauseButton->setIcon(m_playbackSimulationTimer.isActive() ? pauseButton : playButton);
+        }
+    }, Qt::UniqueConnection);
+
+    connect(PlotsArea->playerControl()->goToEndButton(), &QPushButton::clicked, this, [this]() {
+        auto fileInfo = getCurrenFileInformation();
+        fileInfo->Frames_Pos_Set(fileInfo->ReferenceStat()->x_Current_Max);
+    }, Qt::UniqueConnection);
+
+    connect(PlotsArea->playerControl()->goToStartButton(), &QPushButton::clicked, this, [this]() {
+        auto fileInfo = getCurrenFileInformation();
+        fileInfo->Frames_Pos_Set(0);
+    }, Qt::UniqueConnection);
+
+    connect(PlotsArea->playerControl()->prevFrameButton(), &QPushButton::clicked, this, [this]() {
+        auto fileInfo = getCurrenFileInformation();
+        fileInfo->Frames_Pos_Minus();
+    }, Qt::UniqueConnection);
+
+    connect(PlotsArea->playerControl()->nextFrameButton(), &QPushButton::clicked, this, [this]() {
+        auto fileInfo = getCurrenFileInformation();
+        fileInfo->Frames_Pos_Plus();
+    }, Qt::UniqueConnection);
+
+    connect(m_player->playPauseButton(), &QPushButton::clicked, this, [this, playPauseButton]() {
+        playPauseButton->setIcon(m_player->playPauseButton()->icon());
+    }, Qt::UniqueConnection);
+
+    connect(PlotsArea->playerControl()->playPauseButton(), &QPushButton::clicked, this, [this, playPauseButton]() {
+        if(isFileSelected()) {
+            if(!hasMediaFile()) {
+                auto fileInfo = getCurrenFileInformation();
+                if(!fileInfo->Frames_Pos_AtEnd()) {
+                    if(m_playbackSimulationTimer.isActive()) {
+                        m_playbackSimulationTimer.stop();
+                    } else {
+                        m_playbackSimulationTimer.start();
+                    }
+
+                    playPauseButton->setIcon(m_playbackSimulationTimer.isActive() ? pauseButton : playButton);
+                }
+            } else {
+                m_player->playPauseButton()->animateClick();
+            }
+        }
+    }, Qt::UniqueConnection);
+
+    auto goToTime_lineEdit = PlotsArea->playerControl()->lineEdit();
+    connect(PlotsArea->playerControl()->lineEdit(), &QLineEdit::returnPressed, this, [this, goToTime_lineEdit]() {
+        if(isFileSelected()) {
+            if(!hasMediaFile()) {
+                auto timeValue = goToTime_lineEdit->text();
+                qint64 ms = Player::timeStringToMs(timeValue);
+
+                auto fileInfo = getCurrenFileInformation();
+                if(fileInfo->ReferenceStat()->x_Current_Max >= 1) {
+                    auto millisecondsPerFrame = (int)(fileInfo->ReferenceStat()->x[1][1]*1000);
+
+                    auto frameIndex = qreal(ms) / millisecondsPerFrame;
+                    fileInfo->Frames_Pos_Set(frameIndex);
+                }
+            }
+        }
+    });
+
 }
 
 //---------------------------------------------------------------------------
@@ -467,6 +552,8 @@ SignalServer *MainWindow::getSignalServer()
     return signalServer;
 }
 
+static QTime zeroTime = QTime::fromString("00:00:00");
+
 //---------------------------------------------------------------------------
 void MainWindow::Update()
 {
@@ -475,6 +562,38 @@ void MainWindow::Update()
 
 	if(InfoArea)
         InfoArea->Update();
+
+    if(PlotsArea) {
+        auto playerControl = const_cast<PlayerControl*> (PlotsArea->playerControl());
+        auto fileInfo = getCurrenFileInformation();
+        auto duration = getCurrenFileInformation()->Frames_Count_Get();
+        auto framesPos = fileInfo->Frames_Pos_Get();
+
+        playerControl->sliderLabel()->setText(QString::number(fileInfo->Frames_Count_Get()) + "/" + QString::number(framesPos));
+        playerControl->frameLabel()->setText(QString("Frame %1 [%2]").arg(fileInfo->Frames_Pos_Get()).arg(fileInfo->Frame_Type_Get()));
+
+        int Milliseconds=(int)-1;
+        if (fileInfo && !fileInfo->Stats.empty()
+         && ( framesPos<fileInfo->ReferenceStat()->x_Current
+          || (framesPos<fileInfo->ReferenceStat()->x_Current_Max && fileInfo->ReferenceStat()->x[1][framesPos]))) //Also includes when stats are not ready but timestamp is available
+            Milliseconds=(int)(fileInfo->ReferenceStat()->x[1][framesPos]*1000);
+        else
+        {
+            double TimeStamp = fileInfo->Glue->TimeStampOfCurrentFrame(0);
+            if (TimeStamp!=DBL_MAX)
+                Milliseconds=(int)(TimeStamp*1000);
+        }
+
+        if (Milliseconds >= 0)
+        {
+            QTime time = zeroTime;
+            time = time.addMSecs(Milliseconds);
+            QString timeString = time.toString("hh:mm:ss.zzz");
+            playerControl->timeLabel()->setText(timeString);
+        }
+        else
+            playerControl->timeLabel()->setText("");
+    }
 }
 
 void MainWindow::applyBarchartsProfile()
