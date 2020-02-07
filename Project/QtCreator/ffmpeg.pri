@@ -29,8 +29,15 @@ macx:contains(DEFINES, USE_BREW) {
         FFMPEG_SWSCALE=$$absolute_path($$FFMPEG/lib)
         FFMPEG_AVUTIL=$$absolute_path($$FFMPEG/lib)
 
-        FFMPEG_LIBS += \
-                     -L$$absolute_path($$FFMPEG/lib) -lavdevice -lavcodec -lavfilter -lavformat -lpostproc -lswresample -lswscale -lavutil
+        FFMPEG_LIBS += -L$$absolute_path($$FFMPEG/lib) \
+                        -lavdevice \
+                        -lavcodec \
+                        -lavfilter \
+                        -lavformat \
+                        -lpostproc \
+                        -lswresample \
+                        -lswscale \
+                        -lavutil
 
     } else {
         FFMPEG_AVDEVICE=$$absolute_path($$FFMPEG/libavdevice)
