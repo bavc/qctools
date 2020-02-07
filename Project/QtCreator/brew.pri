@@ -30,7 +30,7 @@ macx:contains(DEFINES, USE_BREW) {
     QMAKE_TARGET_BUNDLE_PREFIX = org.bavc
     QT_CONFIG -= no-pkg-config
 
-    include ( $$system(brew --prefix qwt-qt5)/features/qwt.prf )
+    include ( $$system(brew --prefix qwt)/features/qwt.prf )
 
     CONFIG += link_pkgconfig
 

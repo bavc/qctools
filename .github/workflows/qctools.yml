@@ -1,0 +1,340 @@
+name: qctools
+
+on: [push, pull_request]
+
+jobs:
+
+  build-macos-brew:
+
+    strategy:
+      matrix:
+        compiler: ['gcc-7', 'gcc-8', 'gcc-9', 'clang-6', 'clang-9']
+        include:
+          - compiler: gcc-7
+            packages: gcc@7
+            env: { 'CC': 'gcc-7', 'CXX': 'g++-7' }
+          - compiler: gcc-8
+            packages: gcc@8
+            env: { 'CC': 'gcc-8', 'CXX': 'g++-8' }
+          - compiler: gcc-9
+            packages: gcc@9
+            env: { 'CC': 'gcc-9', 'CXX': 'g++-9' }
+          - compiler: clang-6
+            packages: llvm@6
+            env: { 'CC': 'clang-6.0', 'CXX': 'clang++-6.0' }
+          - compiler: clang-9
+            packages: llvm@9
+            env: { 'CC': 'clang-9', 'CXX': 'clang++-9' }
+
+    runs-on: macos-latest
+
+    env: ${{ matrix.env }}
+
+    steps:
+    - uses: actions/checkout@v2.0.0
+      with:
+        fetch: 1
+
+    - name: Install dependencies
+      run: |
+        brew install ${{ matrix.packages }} pkg-config ffmpeg qwt
+
+    - name: Build QCTools
+      env:
+        QCTOOLS_USE_BREW: true
+      run: |
+        export PATH=/usr/local/opt/qt5/bin:$PATH
+        cd Project/QtCreator
+        qmake
+        make -j4
+
+
+  build-macos-no-brew:
+
+    strategy:
+      matrix:
+        compiler: ['gcc-7', 'gcc-8', 'gcc-9', 'clang-6', 'clang-9']
+        include:
+          - compiler: gcc-7
+            packages: gcc@7
+            env: { 'CC': 'gcc-7', 'CXX': 'g++-7' }
+          - compiler: gcc-8
+            packages: gcc@8
+            env: { 'CC': 'gcc-8', 'CXX': 'g++-8' }
+          - compiler: gcc-9
+            packages: gcc@9
+            env: { 'CC': 'gcc-9', 'CXX': 'g++-9' }
+          - compiler: clang-6
+            packages: llvm@6
+            env: { 'CC': 'clang-6.0', 'CXX': 'clang++-6.0' }
+          - compiler: clang-9
+            packages: llvm@9
+            env: { 'CC': 'clang-9', 'CXX': 'clang++-9' }
+
+    runs-on: macos-latest
+
+    env: ${{ matrix.env }}
+
+    steps:
+    - uses: actions/checkout@v2.0.0
+      with:
+        fetch: 1
+
+    - name: Install dependencies
+      run: |
+        brew install ${{ matrix.packages }} qt5 nasm
+    - name: Set Qt5 environment path
+      run: |
+        echo "::add-path::/usr/local/opt/qt5/bin"
+
+    - name: Build qwt
+      run: |
+        git clone --depth 1 https://github.com/opencor/qwt ../qwt
+        cd ../qwt
+        qmake -r
+        make -j4
+
+    - name: Build FFmpeg
+      run: |
+        git clone --depth 1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
+        cd ../ffmpeg
+        ./configure --enable-gpl \
+                    --enable-static \
+                    --disable-shared \
+                    --disable-autodetect \
+                    --disable-securetransport \
+                    --disable-videotoolbox \
+                    --disable-doc \
+                    --disable-ffplay \
+                    --disable-ffprobe \
+                    --disable-debug
+        make -j4
+
+    - name: Build QCTools
+      env:
+        QCTOOLS_USE_BREW: false
+      run: |
+        cd Project/QtCreator
+        qmake
+        make -j4
+
+
+  build-linux:
+
+    strategy:
+      matrix:
+        compiler: ['gcc-7', 'gcc-8', 'gcc-9', 'clang-6', 'clang-9']
+        include:
+          - compiler: gcc-7
+            packages: gcc-7 g++-7
+            env: { 'CC': 'gcc-7', 'CXX': 'g++-7' }
+          - compiler: gcc-8
+            packages: gcc-8 g++-8
+            env: { 'CC': 'gcc-8', 'CXX': 'g++-8' }
+          - compiler: gcc-9
+            packages: gcc-9 g++-9
+            env: { 'CC': 'gcc-9', 'CXX': 'g++-9' }
+          - compiler: clang-6
+            packages: ''
+            env: { 'CC': 'clang-6.0', 'CXX': 'clang++-6.0' }
+          - compiler: clang-9
+            packages: 'clang-9'
+            env: { 'CC': 'clang-9', 'CXX': 'clang++-9' }
+
+    runs-on: ubuntu-latest
+
+    env: ${{ matrix.env }}
+
+    steps:
+    - uses: actions/checkout@v2.0.0
+      with:
+        fetch: 1
+
+    - name: Add Clang apt repository
+      if: matrix.compiler == 'clang-9'
+      run: |
+        echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main" \
+        | sudo tee -a /etc/apt/sources.list.d/llvm.list
+        curl -L https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+        sudo apt-get update
+
+    - name: Install compiler and FFmpeg dependencies
+      run: |
+        sudo add-apt-repository ppa:jonathonf/ffmpeg-4
+        sudo apt-get update &&
+        sudo apt-get install -y ${{ matrix.packages }} \
+                                libavcodec-dev \
+                                libavformat-dev \
+                                libavdevice-dev
+
+    - name: Install Qt 5.12.6
+      uses: jurplel/install-qt-action@v2
+
+    - name: Cleanup
+      run: |
+        sudo apt-get clean -y
+        sudo rm -rf /var/lib/apt/lists/*
+
+    - name: Build qwt
+      run: |
+        git clone --depth 1 https://github.com/opencor/qwt ../qwt
+        cd ../qwt
+        qmake -r
+        make -j4
+
+    - name: Build QCTools
+      run: |
+        cd Project/QtCreator
+        qmake
+        make -j4
+
+
+  build-windows-mingw:
+
+    runs-on: windows-latest
+
+    env:
+      MSYSTEM: MINGW64
+      MSYS2_PATH_TYPE: inherit
+
+    steps:
+    - uses: actions/checkout@v2.0.0
+      with:
+        fetch: 1
+
+    - name: Install Qt 5.12.6
+      uses: jurplel/install-qt-action@v2
+      with:
+          arch: win64_mingw73
+
+    - name: Install msys2
+      run: |
+        $LINK = "http://repo.msys2.org/distrib/msys2-x86_64-latest.tar.xz"
+        Invoke-WebRequest -OutFile msys2.tar.xz -Uri "$LINK"
+        7z x msys2.tar.xz
+        7z x -aoa -oC:/ msys2.tar
+        Remove-Item msys2.tar.xz, msys2.tar
+        echo "::add-path::C:/msys64/usr/bin"
+        echo "::add-path::C:/msys64/mingw64/bin"
+
+    - name: Initialize msys2
+      run: |
+        bash -lc "exit"
+
+    - name: Update msys2
+      run: |
+        pacman -Syyuu --needed --ask=20 --noconfirm
+
+    - name: Install build packages
+      run: |
+        pacman -S --needed --ask=20 --noconfirm make `
+                                                mingw-w64-x86_64-gcc `
+                                                mingw-w64-x86_64-ffmpeg
+
+    - name: Download and configure qwt
+      run: |
+        git clone --depth 1 https://github.com/opencor/qwt ../qwt
+        cd ../qwt
+        qmake -r
+
+    - name: Build qwt
+      run: |
+        cd ../qwt
+        mingw32-make -j4
+
+    - name: Configure QCTools
+      run: |
+        cd Project/QtCreator
+        qmake
+
+    - name: Build QCTools
+      run: |
+        cd Project/QtCreator
+        mingw32-make -j4
+
+
+  build-windows-vs:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2.0.0
+      with:
+        fetch: 1
+
+    - name: Set vswhere path
+      run: |
+        $VsPath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer"
+        echo "::add-path::$VsPath"
+
+    - name: Set MSVC x86_64 paths
+      run: |
+        $LinkGlob = "VC\Tools\MSVC\*\bin\Hostx64\x64"
+        $LinkPath = vswhere -latest -products * -find "$LinkGlob" |
+                    Select-Object -Last 1
+        echo "::add-path::$LinkPath"
+
+    - name: Install jom
+      run: |
+        choco install jom
+
+    - name: Build and install zlib
+      shell: cmd
+      run: |
+        set "VS_PATH=C:\\Program Files (x86)\\Microsoft Visual Studio\\2019"
+        call "%VS_PATH%\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
+        git clone --depth 1 https://github.com/madler/zlib ../zlib-dev
+        cd ../zlib-dev
+        mkdir build
+        cd build
+        cmake -G "NMake Makefiles JOM" ^
+              -DCMAKE_INSTALL_PREFIX="%GITHUB_WORKSPACE%\..\zlib" ^
+              -DBUILD_SHARED_LIBS=0 ^
+              -DCMAKE_BUILD_TYPE=Release ^
+              ..
+        jom -j4 install
+
+    - name: Install Qt 5.12.6
+      uses: jurplel/install-qt-action@v2
+
+    - name: Install FFmpeg
+      run: |
+        cd ..
+        $FFMPEG_VERSION = "ffmpeg-4.2.1-win64"
+        $LINK_DEV = "https://ffmpeg.zeranoe.com/builds/win64/dev"
+        $LINK_SHARED = "https://ffmpeg.zeranoe.com/builds/win64/shared"
+        curl -LO "$LINK_DEV/$FFMPEG_VERSION-dev.zip"
+        curl -LO "$LINK_SHARED/$FFMPEG_VERSION-shared.zip"
+        7z x "$FFMPEG_VERSION-dev.zip"
+        7z x "$FFMPEG_VERSION-shared.zip"
+        Rename-Item -Path ".\$FFMPEG_VERSION-dev" -NewName ".\ffmpeg"
+        Rename-Item -Path ".\$FFMPEG_VERSION-shared" -NewName ".\ffmpeg_shared"
+        Move-Item -Path .\ffmpeg\include\* -Destination .\ffmpeg\
+        Move-Item -Path .\ffmpeg_shared\bin\* -Destination .\ffmpeg\lib
+
+    - name: Download and configure qwt
+      run: |
+        git clone --depth 1 https://github.com/opencor/qwt ../qwt
+        cd ../qwt
+        qmake -r
+
+    - name: Build qwt
+      shell: cmd
+      run: |
+        set "VS_PATH=C:\\Program Files (x86)\\Microsoft Visual Studio\\2019"
+        call "%VS_PATH%\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
+        cd ../qwt
+        jom -j4
+
+    - name: Configure QCTools
+      run: |
+        cd Project/QtCreator
+        qmake
+
+    - name: Build QCTools
+      shell: cmd
+      run: |
+        set "VS_PATH=C:\\Program Files (x86)\\Microsoft Visual Studio\\2019"
+        call "%VS_PATH%\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
+        cd Project/QtCreator
+        jom -j4
