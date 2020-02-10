@@ -85,11 +85,8 @@ SOURCES += \
     $$SOURCES_PATH/GUI/managebarchartconditions.cpp \
     $$SOURCES_PATH/GUI/barchartprofilesmodel.cpp
 
-win32 {
-    ZLIB_INCLUDE_PATH = $${THIRD_PARTY_PATH}/zlib/include
-    message("qctools: ZLIB_INCLUDE_PATH = " $$ZLIB_INCLUDE_PATH)
-    INCLUDEPATH += $$ZLIB_INCLUDE_PATH
-}
+
+include(../zlib.pri)
 
 FORMS += \
     $$SOURCES_PATH/GUI/mainwindow.ui \
@@ -199,7 +196,11 @@ macx:contains(DEFINES, USE_BREW) {
         DEFINES += QWT_DLL
     }
 
-    !macx:LIBS += -L$${QWT_ROOT}/lib -lqwt
+    !macx: {
+        win32:CONFIG(release, debug|release): LIBS += -L$${QWT_ROOT}/lib -lqwt
+        else:win32:CONFIG(debug, debug|release): LIBS += -L$${QWT_ROOT}/lib -lqwtd
+        else: LIBS += -L$${QWT_ROOT}/lib -lqwt
+    }
 
     INCLUDEPATH += $$QWT_ROOT/src
 }
@@ -208,12 +209,8 @@ INCLUDEPATH += $$SOURCES_PATH
 INCLUDEPATH += $$SOURCES_PATH/ThirdParty/cqmarkdown
 include(../ffmpeg.pri)
 
-win32-msvc* {
-    LIBS += $${THIRD_PARTY_PATH}/zlib/lib/zlibstatic.lib
-}
-
 win32-g++* {
-    LIBS += -lz -lbcrypt -lwsock32 -lws2_32
+    LIBS += -lbcrypt -lwsock32 -lws2_32
 }
 
 !win32 {
@@ -221,7 +218,7 @@ win32-g++* {
 }
 
 unix {
-    LIBS       += -lz -ldl
+    LIBS       += -ldl
     !macx:LIBS += -lrt
 }
 

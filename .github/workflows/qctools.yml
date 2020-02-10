@@ -309,7 +309,6 @@ jobs:
         7z x "$FFMPEG_VERSION-shared.zip"
         Rename-Item -Path ".\$FFMPEG_VERSION-dev" -NewName ".\ffmpeg"
         Rename-Item -Path ".\$FFMPEG_VERSION-shared" -NewName ".\ffmpeg_shared"
-        Move-Item -Path .\ffmpeg\include\* -Destination .\ffmpeg\
         Move-Item -Path .\ffmpeg_shared\bin\* -Destination .\ffmpeg\lib
 
     - name: Download and configure qwt
