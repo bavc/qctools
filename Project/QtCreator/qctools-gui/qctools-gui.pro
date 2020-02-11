@@ -213,15 +213,6 @@ win32-g++* {
     LIBS += -lbcrypt -lwsock32 -lws2_32
 }
 
-!win32 {
-    LIBS      += -lbz2
-}
-
-unix {
-    LIBS       += -ldl
-    !macx:LIBS += -lrt
-}
-
 macx:ICON = $$SOURCES_PATH/Resource/Logo.icns
 macx:LIBS += -liconv \
              -framework CoreFoundation \
