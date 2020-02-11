@@ -199,6 +199,20 @@ jobs:
         echo "::add-path::C:/msys64/usr/bin"
         echo "::add-path::C:/msys64/mingw64/bin"
 
+    - name: Install FFmpeg
+      run: |
+        cd ..
+        $FFMPEG_VERSION = "ffmpeg-4.2.1-win64"
+        $LINK_DEV = "https://ffmpeg.zeranoe.com/builds/win64/dev"
+        $LINK_SHARED = "https://ffmpeg.zeranoe.com/builds/win64/shared"
+        curl -LO "$LINK_DEV/$FFMPEG_VERSION-dev.zip"
+        curl -LO "$LINK_SHARED/$FFMPEG_VERSION-shared.zip"
+        7z x "$FFMPEG_VERSION-dev.zip"
+        7z x "$FFMPEG_VERSION-shared.zip"
+        Rename-Item -Path ".\$FFMPEG_VERSION-dev" -NewName ".\ffmpeg"
+        Rename-Item -Path ".\$FFMPEG_VERSION-shared" -NewName ".\ffmpeg_shared"
+        Move-Item -Path .\ffmpeg_shared\bin\* -Destination .\ffmpeg\lib
+
     - name: Initialize msys2
       run: |
         bash -lc "exit"
@@ -209,9 +223,7 @@ jobs:
 
     - name: Install build packages
       run: |
-        pacman -S --needed --ask=20 --noconfirm make `
-                                                mingw-w64-x86_64-gcc `
-                                                mingw-w64-x86_64-ffmpeg
+        pacman -S --needed --ask=20 --noconfirm make mingw-w64-x86_64-gcc
 
     - name: Download and configure qwt
       run: |
