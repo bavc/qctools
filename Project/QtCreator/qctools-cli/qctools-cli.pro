@@ -59,15 +59,6 @@ win32-g++* {
     LIBS += -lbcrypt -lwsock32 -lws2_32
 }
 
-!win32 {
-    LIBS      += -lbz2
-}
-
-unix {
-    LIBS       += -ldl
-    !macx:LIBS += -lrt
-}
-
 macx:LIBS += -liconv \
              -framework CoreFoundation \
              -framework Foundation \
