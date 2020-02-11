@@ -199,7 +199,7 @@ jobs:
     - name: Install FFmpeg
       run: |
         cd ..
-        $FFMPEG_VERSION = "ffmpeg-4.2.1-win64"
+        $FFMPEG_VERSION = "ffmpeg-latest-win64"
         $LINK_DEV = "https://ffmpeg.zeranoe.com/builds/win64/dev"
         $LINK_SHARED = "https://ffmpeg.zeranoe.com/builds/win64/shared"
         curl -LO "$LINK_DEV/$FFMPEG_VERSION-dev.zip"
@@ -291,7 +291,7 @@ jobs:
     - name: Install FFmpeg
       run: |
         cd ..
-        $FFMPEG_VERSION = "ffmpeg-4.2.1-win64"
+        $FFMPEG_VERSION = "ffmpeg-latest-win64"
         $LINK_DEV = "https://ffmpeg.zeranoe.com/builds/win64/dev"
         $LINK_SHARED = "https://ffmpeg.zeranoe.com/builds/win64/shared"
         curl -LO "$LINK_DEV/$FFMPEG_VERSION-dev.zip"
