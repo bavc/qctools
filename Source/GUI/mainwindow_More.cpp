@@ -8,6 +8,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <float.h>
 #include <QFileDialog>
 #include <QLabel>
 #include <QCheckBox>

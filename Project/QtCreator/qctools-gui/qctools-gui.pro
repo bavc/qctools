@@ -301,20 +301,20 @@ macx:contains(DEFINES, USE_BREW) {
     !win32 {
         include( $${QWT_ROOT}/qwtbuild.pri )
     }
-
-    message("using $${QWT_ROOT}/qwtfunctions.pri")
     include( $${QWT_ROOT}/qwtfunctions.pri )
 
-    !win32 {
-            LIBS      += -L$${QWT_ROOT}/lib -lqwt
+    macx {
+        macx:LIBS       += -F$${QWT_ROOT}/lib -framework qwt
     }
 
-    win32 {
-        CONFIG(debug, debug|release) {
-            LIBS += -L$${QWT_ROOT}/lib -lqwtd
-        } else:CONFIG(release, debug|release) {
-            LIBS += -L$${QWT_ROOT}/lib -lqwt
-        }
+    win32-msvc* {
+        DEFINES += QWT_DLL
+    }
+
+    !macx: {
+        win32:CONFIG(release, debug|release): LIBS += -L$${QWT_ROOT}/lib -lqwt
+        else:win32:CONFIG(debug, debug|release): LIBS += -L$${QWT_ROOT}/lib -lqwtd
+        else: LIBS += -L$${QWT_ROOT}/lib -lqwt
     }
 
     INCLUDEPATH += $$QWT_ROOT/src
@@ -324,17 +324,8 @@ INCLUDEPATH += $$SOURCES_PATH
 INCLUDEPATH += $$SOURCES_PATH/ThirdParty/cqmarkdown
 include(../ffmpeg.pri)
 
-win32 {
+win32-g++* {
     LIBS += -lbcrypt -lwsock32 -lws2_32
-}
-
-!win32 {
-    LIBS      += -lbz2
-}
-
-unix {
-    LIBS       += -lz -ldl
-    !macx:LIBS += -lrt
 }
 
 macx:ICON = $$SOURCES_PATH/Resource/Logo.icns

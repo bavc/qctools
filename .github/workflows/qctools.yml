@@ -25,6 +25,12 @@ jobs:
     - uses: actions/checkout@v2.0.0
       with:
         fetch: 1
+    - name: Checkout submodules
+      shell: bash
+      run: |
+        auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+        git submodule sync --recursive
+        git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
 
     - name: Install dependencies
       run: |
@@ -36,7 +42,9 @@ jobs:
       run: |
         export PATH=/usr/local/opt/qt5/bin:$PATH
         cd Project/QtCreator
-        qmake
+        mkdir build
+        cd build
+        qmake ..
         make -j4
 
 
@@ -61,7 +69,13 @@ jobs:
     - uses: actions/checkout@v2.0.0
       with:
         fetch: 1
-
+    - name: Checkout submodules
+      shell: bash
+      run: |
+        auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+        git submodule sync --recursive
+        git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
+        
     - name: Install dependencies
       run: |
         brew install ${{ matrix.packages }} qt5 nasm
@@ -97,7 +111,9 @@ jobs:
         QCTOOLS_USE_BREW: false
       run: |
         cd Project/QtCreator
-        qmake
+        mkdir build
+        cd build
+        qmake .. 
         make -j4
 
 
@@ -128,6 +144,12 @@ jobs:
     - uses: actions/checkout@v2.0.0
       with:
         fetch: 1
+    - name: Checkout submodules
+      shell: bash
+      run: |
+        auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+        git submodule sync --recursive
+        git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
 
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
@@ -186,6 +208,12 @@ jobs:
     - uses: actions/checkout@v2.0.0
       with:
         fetch: 1
+    - name: Checkout submodules
+      shell: bash
+      run: |
+        auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+        git submodule sync --recursive
+        git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
 
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
@@ -264,6 +292,12 @@ jobs:
     - uses: actions/checkout@v2.0.0
       with:
         fetch: 1
+    - name: Checkout submodules
+      shell: bash
+      run: |
+        auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+        git submodule sync --recursive
+        git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
 
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
