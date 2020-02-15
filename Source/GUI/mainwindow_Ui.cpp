@@ -152,6 +152,22 @@ void MainWindow::Ui_Init()
 
     m_profileSelectorCombobox = new QComboBox;
     connect(this, &MainWindow::fileSelected, m_profileSelectorCombobox, &QComboBox::setEnabled);
+    connect(this, &MainWindow::fileSelected, this, [this](bool selected) {
+        ui->actionGo_to_end->setEnabled(selected);
+        ui->actionGo_to_start->setEnabled(selected);
+        ui->actionNext->setEnabled(selected);
+        ui->actionPrev->setEnabled(selected);
+        ui->actionPlay_Pause->setEnabled(selected);
+
+        ui->actionGrab_frame->setEnabled(selected);
+        ui->actionGrab_plots_image->setEnabled(selected);
+
+        ui->actionShow_hide_debug_panel->setEnabled(selected);
+        ui->actionShow_hide_filters_panel->setEnabled(selected);
+
+        ui->actionNavigateNextComment->setEnabled(selected);
+        ui->actionNavigatePreviousComment->setEnabled(selected);
+    });
 
     connect(this, &MainWindow::filePositionChanged, [this](size_t filePosition) {
         if (isFileSelected(filePosition)) {

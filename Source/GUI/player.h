@@ -40,6 +40,9 @@ public Q_SLOTS:
     void playPause();
     void seekBySlider(int value);
     void seekBySlider();
+    void grabFrame();
+    void showHideDebug();
+    void showHideFilters();
 
 protected:
     void showEvent(QShowEvent* event) override;

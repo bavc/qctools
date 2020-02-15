@@ -409,6 +409,27 @@ void Player::seekBySlider()
     seekBySlider(ui->playerSlider->value());
 }
 
+void Player::grabFrame()
+{
+    ui->export_pushButton->click();
+}
+
+void Player::showHideDebug()
+{
+    if(ui->dockWidget_2->isVisible())
+        ui->dockWidget_2->hide();
+    else
+        ui->dockWidget_2->show();
+}
+
+void Player::showHideFilters()
+{
+    if(ui->dockWidget->isVisible())
+        ui->dockWidget->hide();
+    else
+        ui->dockWidget->show();
+}
+
 void Player::showEvent(QShowEvent *event)
 {
     updateVideoOutputSize();

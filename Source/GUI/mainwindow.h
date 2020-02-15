@@ -239,6 +239,14 @@ private Q_SLOTS:
 
     void on_actionExport_Mkv_Prompt_triggered();
 
+    void on_actionGrab_frame_triggered();
+
+    void on_actionGrab_plots_image_triggered();
+
+    void on_actionShow_hide_debug_panel_triggered();
+
+    void on_actionShow_hide_filters_panel_triggered();
+
 protected:
     void closeEvent(QCloseEvent* event);
     void resizeEvent(QResizeEvent* event);

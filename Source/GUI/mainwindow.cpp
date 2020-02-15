@@ -974,3 +974,27 @@ void MainWindow::on_actionReveal_file_location_triggered()
     QFileInfo fileInfo(Files[getFilesCurrentPos()]->fileName());
     QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absoluteDir().path()));
 }
+
+void MainWindow::on_actionGrab_frame_triggered()
+{
+    if(m_player->isVisible())
+        m_player->grabFrame();
+}
+
+void MainWindow::on_actionGrab_plots_image_triggered()
+{
+    if(PlotsArea)
+        PlotsArea->playerControl()->exportButton()->click();
+}
+
+void MainWindow::on_actionShow_hide_debug_panel_triggered()
+{
+    if(m_player->isVisible())
+        m_player->showHideDebug();
+}
+
+void MainWindow::on_actionShow_hide_filters_panel_triggered()
+{
+    if(m_player->isVisible())
+        m_player->showHideFilters();
+}

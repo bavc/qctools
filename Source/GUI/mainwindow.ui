@@ -109,6 +109,10 @@
     <addaction name="actionPrev"/>
     <addaction name="actionGo_to_start"/>
     <addaction name="actionGo_to_end"/>
+    <addaction name="actionGrab_frame"/>
+    <addaction name="actionGrab_plots_image"/>
+    <addaction name="actionShow_hide_debug_panel"/>
+    <addaction name="actionShow_hide_filters_panel"/>
     <addaction name="separator"/>
     <addaction name="actionGoTo"/>
     <addaction name="actionNavigatePreviousComment"/>
@@ -508,6 +512,9 @@
    </property>
   </action>
   <action name="actionPlay_Pause">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Play/Pause</string>
    </property>
@@ -522,6 +529,9 @@
    </property>
   </action>
   <action name="actionNext">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Next frame</string>
    </property>
@@ -536,6 +546,9 @@
    </property>
   </action>
   <action name="actionPrev">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Previous frame</string>
    </property>
@@ -550,6 +563,9 @@
    </property>
   </action>
   <action name="actionGo_to_start">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Go to start</string>
    </property>
@@ -564,6 +580,9 @@
    </property>
   </action>
   <action name="actionGo_to_end">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Go to end</string>
    </property>
@@ -575,6 +594,38 @@
    </property>
    <property name="priority">
     <enum>QAction::HighPriority</enum>
+   </property>
+  </action>
+  <action name="actionGrab_frame">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Grab frame</string>
+   </property>
+  </action>
+  <action name="actionGrab_plots_image">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Grab plots image</string>
+   </property>
+  </action>
+  <action name="actionShow_hide_debug_panel">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Show / hide debug panel</string>
+   </property>
+  </action>
+  <action name="actionShow_hide_filters_panel">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Show / hide filters panel</string>
    </property>
   </action>
  </widget>
