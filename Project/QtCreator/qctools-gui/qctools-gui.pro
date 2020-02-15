@@ -200,17 +200,7 @@ SOURCES += \
     $$SOURCES_PATH/GUI/filterselector.cpp \
     $$SOURCES_PATH/GUI/playercontrol.cpp
 
-win32 {
-    greaterThan(QT_MAJOR_VERSION, 4): {
-        greaterThan(QT_MINOR_VERSION, 8): {
-            ZLIB_INCLUDE_PATH = $$absolute_path($$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib/src)
-        } else {
-            ZLIB_INCLUDE_PATH = $$absolute_path($$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib)
-        }
-    }
-    message("qctools: ZLIB_INCLUDE_PATH = " $$ZLIB_INCLUDE_PATH)
-    INCLUDEPATH += $$ZLIB_INCLUDE_PATH
-}
+include(../zlib.pri)
 
 FORMS += \
     $$SOURCES_PATH/GUI/mainwindow.ui \
@@ -335,7 +325,7 @@ INCLUDEPATH += $$SOURCES_PATH/ThirdParty/cqmarkdown
 include(../ffmpeg.pri)
 
 win32 {
-    LIBS += -lz -lbcrypt -lwsock32 -lws2_32
+    LIBS += -lbcrypt -lwsock32 -lws2_32
 }
 
 !win32 {
