@@ -18,7 +18,6 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QVector>
-#include "playerwindow.h"
 
 TinyDisplay::TinyDisplay(QWidget *parent, FileInformation* FileInformationData_)
     : QWidget(parent),

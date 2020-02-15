@@ -87,7 +87,7 @@ public:
     explicit                    Plots( QWidget *parent, FileInformation* );
     virtual                     ~Plots();
 
-    const PlayerControl*        playerControl() const;
+    PlayerControl*              playerControl();
 
     void                        setPlotVisible( size_t type, size_t group, bool on );
 

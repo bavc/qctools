@@ -18,11 +18,12 @@ public:
     explicit PlayerControl(QWidget *parent = nullptr);
     ~PlayerControl();
 
-    const QPushButton* goToStartButton() const;
-    const QPushButton* goToEndButton() const;
-    const QPushButton* prevFrameButton() const;
-    const QPushButton* nextFrameButton() const;
-    const QPushButton* playPauseButton() const;
+    QPushButton* goToStartButton();
+    QPushButton* goToEndButton();
+    QPushButton* prevFrameButton();
+    QPushButton* nextFrameButton();
+    QPushButton* playPauseButton();
+    QPushButton* exportButton();
 
     QLabel* timeLabel() const;
     QLabel* frameLabel() const;

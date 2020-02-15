@@ -331,7 +331,7 @@ Plots::~Plots()
 {
 }
 
-const PlayerControl *Plots::playerControl() const
+PlayerControl *Plots::playerControl()
 {
     return m_playerControl;
 }

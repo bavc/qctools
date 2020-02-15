@@ -104,6 +104,8 @@
     <addaction name="actionZoomOne"/>
     <addaction name="actionZoomOut"/>
     <addaction name="separator"/>
+    <addaction name="actionPlay_Pause"/>
+    <addaction name="separator"/>
     <addaction name="actionGoTo"/>
     <addaction name="actionNavigatePreviousComment"/>
     <addaction name="actionNavigateNextComment"/>
@@ -499,6 +501,14 @@
   <action name="actionExport_Mkv_Prompt">
    <property name="text">
     <string>To .qctools.mkv..</string>
+   </property>
+  </action>
+  <action name="actionPlay_Pause">
+   <property name="text">
+    <string>Play/Pause</string>
+   </property>
+   <property name="shortcut">
+    <string>K, Space</string>
    </property>
   </action>
  </widget>

@@ -13,29 +13,34 @@ PlayerControl::~PlayerControl()
     delete ui;
 }
 
-const QPushButton *PlayerControl::goToStartButton() const
+QPushButton *PlayerControl::goToStartButton()
 {
     return ui->goToStart_pushButton;
 }
 
-const QPushButton *PlayerControl::goToEndButton() const
+QPushButton *PlayerControl::goToEndButton()
 {
     return ui->goToEnd_pushButton;
 }
 
-const QPushButton *PlayerControl::prevFrameButton() const
+QPushButton *PlayerControl::prevFrameButton()
 {
     return ui->prev_pushButton;
 }
 
-const QPushButton *PlayerControl::nextFrameButton() const
+QPushButton *PlayerControl::nextFrameButton()
 {
     return ui->next_pushButton;
 }
 
-const QPushButton *PlayerControl::playPauseButton() const
+QPushButton *PlayerControl::playPauseButton()
 {
     return ui->playPause_pushButton;
+}
+
+QPushButton *PlayerControl::exportButton()
+{
+    return ui->export_pushButton;
 }
 
 QLabel *PlayerControl::timeLabel() const

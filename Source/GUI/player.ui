@@ -35,8 +35,8 @@
       <widget class="QWidget" name="scrollAreaWidgetContents">
        <property name="geometry">
         <rect>
-         <x>893</x>
-         <y>393</y>
+         <x>343</x>
+         <y>143</y>
          <width>300</width>
          <height>246</height>
         </rect>
@@ -172,7 +172,7 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="icon">
          <iconset resource="../Resource/Resources.qrc">
-          <normaloff>:/icon/backward.png</normaloff>:/icon/backward.png</iconset>
+          <normaloff>:/icon/first_frame.png</normaloff>:/icon/first_frame.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -188,7 +188,17 @@ p, li { white-space: pre-wrap; }
          <enum>Qt::NoFocus</enum>
         </property>
         <property name="text">
-         <string>Prev</string>
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../Resource/Resources.qrc">
+          <normaloff>:/icon/backward.png</normaloff>:/icon/backward.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>23</width>
+          <height>23</height>
+         </size>
         </property>
         <property name="shortcut">
          <string>J</string>
@@ -224,7 +234,17 @@ p, li { white-space: pre-wrap; }
          <enum>Qt::NoFocus</enum>
         </property>
         <property name="text">
-         <string>Next</string>
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../Resource/Resources.qrc">
+          <normaloff>:/icon/forward.png</normaloff>:/icon/forward.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>23</width>
+          <height>23</height>
+         </size>
         </property>
         <property name="shortcut">
          <string>L</string>
@@ -241,7 +261,7 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="icon">
          <iconset resource="../Resource/Resources.qrc">
-          <normaloff>:/icon/forward.png</normaloff>:/icon/forward.png</iconset>
+          <normaloff>:/icon/last_frame.png</normaloff>:/icon/last_frame.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -254,7 +274,17 @@ p, li { white-space: pre-wrap; }
       <item>
        <widget class="QPushButton" name="export_pushButton">
         <property name="text">
-         <string>Grab Image</string>
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../Resource/Resources.qrc">
+          <normaloff>:/icon/grab_imag.png</normaloff>:/icon/grab_imag.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>23</width>
+          <height>23</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -307,7 +337,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>2592</width>
+     <width>1492</width>
      <height>26</height>
     </rect>
    </property>

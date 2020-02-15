@@ -357,7 +357,7 @@ void MainWindow::createGraphsLayout()
 
     configureZoom();
 
-    auto playPauseButton = const_cast<QPushButton*>(PlotsArea->playerControl()->playPauseButton());
+    auto playPauseButton = PlotsArea->playerControl()->playPauseButton();
     playPauseButton->setIcon(QIcon(":/icon/play.png"));
 
     if(isFileSelected()) {
@@ -367,14 +367,27 @@ void MainWindow::createGraphsLayout()
         m_playbackSimulationTimer.setInterval(averageFrameDuration);
     }
 
+    auto exportButton = const_cast<QPushButton*>(PlotsArea->playerControl()->exportButton());
+    connect(exportButton, &QPushButton::clicked, this, [this]() {
+        auto fileName = QFileDialog::getSaveFileName(this, "Export plots as image", "", "*.png");
+        if(!fileName.isEmpty()) {
+            this->PlotsArea->playerControl()->setVisible(false);
+            auto image = PlotsArea->grab();
+            this->PlotsArea->playerControl()->setVisible(true);
+
+            image.save(fileName);
+        }
+
+    }, Qt::UniqueConnection);
+
     static QIcon pauseButton(":/icon/pause.png");
     static QIcon playButton(":/icon/play.png");
 
-    connect(&m_playbackSimulationTimer, &QTimer::timeout, this, [this, playPauseButton]() {
+    connect(&m_playbackSimulationTimer, &QTimer::timeout, this, [this]() {
         auto fileInfo = getCurrenFileInformation();
         if(!fileInfo->Frames_Pos_Plus()) {
             m_playbackSimulationTimer.stop();
-            playPauseButton->setIcon(m_playbackSimulationTimer.isActive() ? pauseButton : playButton);
+            PlotsArea->playerControl()->playPauseButton()->setIcon(m_playbackSimulationTimer.isActive() ? pauseButton : playButton);
         }
     }, Qt::UniqueConnection);
 
@@ -398,11 +411,11 @@ void MainWindow::createGraphsLayout()
         fileInfo->Frames_Pos_Plus();
     }, Qt::UniqueConnection);
 
-    connect(m_player->playPauseButton(), &QPushButton::clicked, this, [this, playPauseButton]() {
-        playPauseButton->setIcon(m_player->playPauseButton()->icon());
+    connect(m_player->playPauseButton(), &QPushButton::clicked, this, [this]() {
+        PlotsArea->playerControl()->playPauseButton()->setIcon(m_player->playPauseButton()->icon());
     }, Qt::UniqueConnection);
 
-    connect(PlotsArea->playerControl()->playPauseButton(), &QPushButton::clicked, this, [this, playPauseButton]() {
+    connect(PlotsArea->playerControl()->playPauseButton(), &QPushButton::clicked, this, [this]() {
         if(isFileSelected()) {
             if(!hasMediaFile()) {
                 auto fileInfo = getCurrenFileInformation();
@@ -413,7 +426,7 @@ void MainWindow::createGraphsLayout()
                         m_playbackSimulationTimer.start();
                     }
 
-                    playPauseButton->setIcon(m_playbackSimulationTimer.isActive() ? pauseButton : playButton);
+                    PlotsArea->playerControl()->playPauseButton()->setIcon(m_playbackSimulationTimer.isActive() ? pauseButton : playButton);
                 }
             } else {
                 m_player->playPauseButton()->animateClick();
