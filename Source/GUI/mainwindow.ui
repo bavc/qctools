@@ -105,6 +105,10 @@
     <addaction name="actionZoomOut"/>
     <addaction name="separator"/>
     <addaction name="actionPlay_Pause"/>
+    <addaction name="actionNext"/>
+    <addaction name="actionPrev"/>
+    <addaction name="actionGo_to_start"/>
+    <addaction name="actionGo_to_end"/>
     <addaction name="separator"/>
     <addaction name="actionGoTo"/>
     <addaction name="actionNavigatePreviousComment"/>
@@ -509,6 +513,68 @@
    </property>
    <property name="shortcut">
     <string>K, Space</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+   <property name="priority">
+    <enum>QAction::HighPriority</enum>
+   </property>
+  </action>
+  <action name="actionNext">
+   <property name="text">
+    <string>Next frame</string>
+   </property>
+   <property name="shortcut">
+    <string>L, Right</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+   <property name="priority">
+    <enum>QAction::HighPriority</enum>
+   </property>
+  </action>
+  <action name="actionPrev">
+   <property name="text">
+    <string>Previous frame</string>
+   </property>
+   <property name="shortcut">
+    <string>J, Left</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+   <property name="priority">
+    <enum>QAction::HighPriority</enum>
+   </property>
+  </action>
+  <action name="actionGo_to_start">
+   <property name="text">
+    <string>Go to start</string>
+   </property>
+   <property name="shortcut">
+    <string>/, Ctrl+Left</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+   <property name="priority">
+    <enum>QAction::HighPriority</enum>
+   </property>
+  </action>
+  <action name="actionGo_to_end">
+   <property name="text">
+    <string>Go to end</string>
+   </property>
+   <property name="shortcut">
+    <string>], Ctrl+Right</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+   <property name="priority">
+    <enum>QAction::HighPriority</enum>
    </property>
   </action>
  </widget>

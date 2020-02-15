@@ -72,6 +72,34 @@ Player::Player(QWidget *parent) :
     });
     addAction(playAction);
 
+    auto* nextAction = new QAction(this);
+    nextAction->setShortcuts({ QKeySequence(Qt::Key_Right) });
+    connect(nextAction, &QAction::triggered, this, [this]() {
+        ui->next_pushButton->animateClick();
+    }, Qt::UniqueConnection);
+    addAction(nextAction);
+
+    auto* prevAction = new QAction(this);
+    prevAction->setShortcuts({ QKeySequence(Qt::Key_Left) });
+    connect(prevAction, &QAction::triggered, this, [this]() {
+        ui->prev_pushButton->animateClick();
+    }, Qt::UniqueConnection);
+    addAction(prevAction);
+
+    auto* gotostartAction = new QAction(this);
+    gotostartAction->setShortcuts({ QKeySequence(Qt::CTRL + Qt::Key_Left), QKeySequence(Qt::Key_Slash) });
+    connect(gotostartAction, &QAction::triggered, this, [this]() {
+        ui->goToStart_pushButton->animateClick();
+    }, Qt::UniqueConnection);
+    addAction(gotostartAction);
+
+    auto* gotoendAction = new QAction(this);
+    gotoendAction->setShortcuts({ QKeySequence(Qt::CTRL + Qt::Key_Right), QKeySequence(Qt::Key_BracketRight) });
+    connect(gotoendAction, &QAction::triggered, this, [this]() {
+        ui->goToEnd_pushButton->animateClick();
+    }, Qt::UniqueConnection);
+    addAction(gotoendAction);
+
     connect(m_player, SIGNAL(positionChanged(qint64)), SLOT(updateSlider(qint64)));
 
     ui->speed_label->installEventFilter(this);
