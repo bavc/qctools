@@ -35,8 +35,8 @@
       <widget class="QWidget" name="scrollAreaWidgetContents">
        <property name="geometry">
         <rect>
-         <x>361</x>
-         <y>143</y>
+         <x>893</x>
+         <y>393</y>
          <width>300</width>
          <height>246</height>
         </rect>
@@ -307,7 +307,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1492</width>
+     <width>2592</width>
      <height>26</height>
     </rect>
    </property>
@@ -316,12 +316,6 @@ p, li { white-space: pre-wrap; }
   <widget class="QDockWidget" name="dockWidget">
    <property name="floating">
     <bool>false</bool>
-   </property>
-   <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
-   </property>
-   <property name="windowTitle">
-    <string>Filters</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
@@ -490,12 +484,6 @@ p, li { white-space: pre-wrap; }
    </widget>
   </widget>
   <widget class="QDockWidget" name="dockWidget_2">
-   <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
-   </property>
-   <property name="windowTitle">
-    <string>Debug</string>
-   </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>

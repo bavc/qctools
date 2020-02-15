@@ -14,7 +14,6 @@
 #include <QGraphicsItem>
 #include <QGraphicsObject>
 #include <QFileDialog>
-#include <QTabBar>
 #include "draggablechildrenbehaviour.h"
 
 const int MaxFilters = 6;
@@ -31,23 +30,6 @@ Player::Player(QWidget *parent) :
     QtAV::setLogLevel(QtAV::LogOff);
 
     ui->setupUi(this);
-    tabifyDockWidget(ui->dockWidget, ui->dockWidget_2);
-
-    QList<QTabBar*> tabBars = findChildren<QTabBar*>();
-    for(QTabBar* bar : tabBars)
-    {
-        int count = bar->count();
-        for (int i = 0; i < count; i++)
-        {
-            QVariant data = bar->tabData(i);
-            QVariant::DataPtr dataPtr = data.data_ptr();
-            if (dataPtr.data.ptr == ui->dockWidget)
-            {
-                bar->setCurrentIndex(i);
-            }
-        }
-    }
-
     m_unit = 1;
 
     ui->commentsPlaceHolderFrame->setLayout(new QHBoxLayout);
