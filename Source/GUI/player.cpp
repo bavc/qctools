@@ -8,6 +8,7 @@
 #include "GUI/Plots.h"
 #include <cfloat>
 #include <QDir>
+#include <QAction>
 #include <QStandardPaths>
 #include <QTimer>
 #include <QMetaMethod>

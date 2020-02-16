@@ -35,8 +35,8 @@
       <widget class="QWidget" name="scrollAreaWidgetContents">
        <property name="geometry">
         <rect>
-         <x>343</x>
-         <y>143</y>
+         <x>323</x>
+         <y>142</y>
          <width>300</width>
          <height>246</height>
         </rect>
@@ -349,16 +349,6 @@ p, li { white-space: pre-wrap; }
      </layout>
     </item>
    </layout>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1492</width>
-     <height>26</height>
-    </rect>
-   </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="dockWidget">
