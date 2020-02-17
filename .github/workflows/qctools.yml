@@ -129,6 +129,12 @@ jobs:
       with:
         fetch: 1
 
+    - name: Install Python 3.7 version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
+
     - name: Add Clang apt repository
       if: matrix.compiler == 'clang-9'
       run: |
@@ -147,7 +153,7 @@ jobs:
                                 libavdevice-dev
 
     - name: Install Qt 5.12.6
-      uses: jurplel/install-qt-action@v2
+      uses: ouuan/install-qt-action@v2.3.1
 
     - name: Cleanup
       run: |
@@ -181,8 +187,14 @@ jobs:
       with:
         fetch: 1
 
+    - name: Install Python 3.7 version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
+
     - name: Install Qt 5.12.6
-      uses: jurplel/install-qt-action@v2
+      uses: ouuan/install-qt-action@v2.3.1
       with:
           arch: win64_mingw73
 
@@ -253,6 +265,12 @@ jobs:
       with:
         fetch: 1
 
+    - name: Install Python 3.7 version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
+
     - name: Set vswhere path
       run: |
         $VsPath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer"
@@ -286,7 +304,7 @@ jobs:
         jom -j4 install
 
     - name: Install Qt 5.12.6
-      uses: jurplel/install-qt-action@v2
+      uses: ouuan/install-qt-action@v2.3.1
 
     - name: Install FFmpeg
       run: |
