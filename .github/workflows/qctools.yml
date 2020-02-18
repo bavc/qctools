@@ -172,7 +172,10 @@ jobs:
         sudo apt-get install -y ${{ matrix.packages }} \
                                 libavcodec-dev \
                                 libavformat-dev \
-                                libavdevice-dev
+                                libavdevice-dev \
+                                libegl1-mesa-dev \
+                                libglew-dev \
+                                libxv-dev
 
     - name: Install Qt 5.12.6
       uses: ouuan/install-qt-action@v2.3.1
