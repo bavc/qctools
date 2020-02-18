@@ -1242,12 +1242,18 @@ size_t FFmpeg_Glue::FramesCountPerStream(size_t index) const
 {
     QMutexLocker locker(mutex);
 
+    if(!InputDatas.at(index))
+        return 0;
+
     return InputDatas.at(index)->FrameCount;
 }
 
 size_t FFmpeg_Glue::FramesProcessedPerStream(size_t index) const
 {
     QMutexLocker locker(mutex);
+
+    if(!InputDatas.at(index))
+        return 0;
 
     return InputDatas.at(index)->FramePos;
 }
