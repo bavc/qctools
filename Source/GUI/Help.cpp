@@ -8,6 +8,7 @@
 
 //---------------------------------------------------------------------------
 #include "GUI/Help.h"
+#include "Core/FFmpeg_Glue.h"
 #include <QTextBrowser>
 #include <QVBoxLayout>
 #include <QPushButton>
@@ -16,6 +17,8 @@
 #include <QDesktopWidget>
 #include <QTabWidget>
 #include <QFile>
+#include <QLabel>
+#include <QtAV>
 #include "CMarkdown.h"
 //---------------------------------------------------------------------------
 
@@ -109,6 +112,26 @@ Help::Help(QWidget * parent)
     Text7->setOpenExternalLinks(true);
     Text7->setSource(QUrl("qrc:/Help/About.html"));
     Central->addTab(Text7, tr("About"));
+
+    auto label = new QTextBrowser();
+    QString ffmpegGlueVersionInfo = QString("<h3>QCTools ffmpeg integration</h3><p>%1</p><p>%2</p><p>%3</p><p>%4</p><p>%5</p>");
+
+    {
+        auto version = FFmpeg_Glue::FFmpeg_Version();
+        auto year = FFmpeg_Glue::FFmpeg_Year();
+        auto compiler = FFmpeg_Glue::FFmpeg_Compiler();
+        auto configuration = FFmpeg_Glue::FFmpeg_Configuration();
+        auto libsVersion = FFmpeg_Glue::FFmpeg_LibsVersion();
+
+        ffmpegGlueVersionInfo = ffmpegGlueVersionInfo.arg(QString::fromStdString(version))
+                .arg(year)
+                .arg(QString::fromStdString(compiler))
+                .arg(QString::fromStdString(configuration))
+                .arg(QString::fromStdString(libsVersion));
+    }
+
+    label->setHtml(QString("%1<br>*******************<br>%2<br>*******************<br>%3").arg(ffmpegGlueVersionInfo).arg(QtAV::aboutQtAV_HTML()).arg(QtAV::aboutFFmpeg_HTML()));
+    Central->addTab(label, tr("Version"));
 
     L->addWidget(Central);
     L->addWidget(Close);

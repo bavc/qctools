@@ -13,7 +13,7 @@
 
 class FileInformation;
 class Control;
-class BigDisplay;
+class Player;
 
 class QLabel;
 class QToolButton;
@@ -29,11 +29,9 @@ public:
 
     // To update
     Control                    *ControlArea;
-    BigDisplay                 *BigDisplayArea;
 
     // Commands
     void                        Filters_Show(); //Quick hack for showing filters
-    void                        LoadBigDisplay();
 
 public Q_SLOTS:
     void                        Update(bool updateBigDisplay = true);
@@ -62,6 +60,7 @@ protected:
 
 Q_SIGNALS:
     void                        resized();
+    void                        thumbnailClicked();
 
 private Q_SLOTS:
     void                        thumbsLayoutResized();

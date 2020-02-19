@@ -22,7 +22,6 @@ using namespace std;
 #include "Core/FileInformation.h"
 #include "Core/SignalServerConnectionChecker.h"
 #include "GUI/TinyDisplay.h"
-#include "GUI/Control.h"
 #include "GUI/Info.h"
 #include "GUI/FilesList.h"
 
@@ -46,6 +45,7 @@ class PreferencesDialog;
 class DraggableChildrenBehaviour;
 class SignalServer;
 class Preferences;
+class Player;
 
 class MainWindow : public QMainWindow
 {
@@ -98,7 +98,6 @@ public:
     FilesList*                  FilesListArea;
     Plots*                      PlotsArea;
     TinyDisplay*                TinyDisplayArea;
-    Control*                    ControlArea;
     Info*                       InfoArea;
     QLabel*                     DragDrop_Image;
     QLabel*                     DragDrop_Text;
@@ -128,11 +127,16 @@ public:
     QAction* uploadAllAction() const;
 
     size_t getFilesCurrentPos() const;
+    FileInformation* getCurrenFileInformation() const;
+
     void setFilesCurrentPos(const size_t &value);
     bool isFileSelected() const;
+    bool isFileSelected(size_t pos) const;
 
+    bool hasMediaFile() const;
 Q_SIGNALS:
     void fileSelected(bool selected);
+    void filePositionChanged(size_t filePosition);
 
 public Q_SLOTS:
 	void Update();
@@ -201,28 +205,12 @@ private Q_SLOTS:
 
     void on_check_toggled(bool checked);
 
-    void on_M1_triggered();
-
-    void on_Minus_triggered();
-
-    void on_PlayPause_triggered();
-
-    void on_Pause_triggered();
-
-    void on_Plus_triggered();
-
-    void on_P1_triggered();
-
     void on_Full_triggered();
 
     void on_CurrentFrameChanged();
 
 
     void on_actionZoomOne_triggered();
-
-    void on_actionPlay_at_Frame_Rate_triggered();
-
-    void on_actionPlay_All_Frames_triggered();
 
     void on_actionUploadToSignalServer_triggered();
     void on_actionUploadToSignalServerAll_triggered();
@@ -237,6 +225,7 @@ private Q_SLOTS:
 
     void updateExportActions();
     void updateExportAllAction();
+    void showPlayer();
 
     void on_actionNavigateNextComment_triggered();
 
@@ -249,6 +238,14 @@ private Q_SLOTS:
     void on_actionReveal_file_location_triggered();
 
     void on_actionExport_Mkv_Prompt_triggered();
+
+    void on_actionGrab_frame_triggered();
+
+    void on_actionGrab_plots_image_triggered();
+
+    void on_actionShow_hide_debug_panel_triggered();
+
+    void on_actionShow_hide_filters_panel_triggered();
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -271,6 +268,8 @@ private:
 
     QJsonDocument m_barchartsProfile;
     QComboBox* m_profileSelectorCombobox;
+    Player* m_player;
+    QTimer m_playbackSimulationTimer;
 
     Ui::MainWindow *ui;
 };

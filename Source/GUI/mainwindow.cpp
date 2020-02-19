@@ -6,6 +6,7 @@
 
 //---------------------------------------------------------------------------
 #include "mainwindow.h"
+#include "player.h"
 #include "ui_mainwindow.h"
 #include "Core/FFmpeg_Glue.h"
 #include "GUI/Plots.h"
@@ -32,9 +33,12 @@
 #include <QMetaEnum>
 #include <QMessageBox>
 #include <QJsonDocument>
+#include <QScreen>
+#include <QDesktopWidget>
 
 #include "GUI/draggablechildrenbehaviour.h"
 #include "GUI/config.h"
+#include "GUI/playercontrol.h"
 
 //***************************************************************************
 // Constructor / Desructor
@@ -104,15 +108,20 @@ MainWindow::MainWindow(QWidget *parent) :
     // Pictures
     TinyDisplayArea=NULL;
 
-    // Control
-    ControlArea=NULL;
-
     // Info
     InfoArea=NULL;
 
     // Info
     DragDrop_Image=NULL;
     DragDrop_Text=NULL;
+
+    m_player = new Player();
+
+    QDesktopWidget desktop;
+    auto screenNumber = desktop.screenNumber(m_player);
+    auto screenGeometry = desktop.screenGeometry(screenNumber);
+
+    m_player->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, screenGeometry.size() * 0.9, screenGeometry));
 
     // UI
     Ui_Init();
@@ -151,7 +160,6 @@ MainWindow::~MainWindow()
 
     preferences->saveSelectedFilters(getSelectedFilters());
     // Controls
-    delete ControlArea;
 
     // Files (must be deleted first in order to stop ffmpeg processes)
     for (size_t Pos=0; Pos<Files.size(); Pos++)
@@ -236,14 +244,14 @@ void MainWindow::on_actionZoomOut_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionGoTo_triggered()
 {
-    if (!ControlArea && !TinyDisplayArea) //TODO: without TinyDisplayArea
+    if (!TinyDisplayArea) //TODO: without TinyDisplayArea
         return;
 
     if (getFilesCurrentPos()>=Files.size())
         return;
 
     bool ok;
-    int i = QInputDialog::getInt(this, tr("Go to frame at position..."), Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max?("frame position (0-"+QString::number(Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max-1)+"):"):QString("frame position (0-based)"), Files[getFilesCurrentPos()]->Frames_Pos_Get(), 0, Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max-1, 1, &ok);
+    int i = QInputDialog::getInt(this, tr("Go to..."), Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max?("frame position (0-"+QString::number(Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max-1)+"):"):QString("frame position (0-based)"), Files[getFilesCurrentPos()]->Frames_Pos_Get(), 0, Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max-1, 1, &ok);
     if (Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max && i>=Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max)
         i=Files[getFilesCurrentPos()]->ReferenceStat()->x_Current_Max-1;
     if (ok)
@@ -381,8 +389,6 @@ void MainWindow::on_actionFilesList_triggered()
         PlotsArea->hide();
     if (TinyDisplayArea)
         TinyDisplayArea->hide();
-    if (ControlArea)
-        ControlArea->hide();
     if (FilesListArea && !Files.empty())
         FilesListArea->show();
 
@@ -426,8 +432,6 @@ void MainWindow::on_actionGraphsLayout_triggered()
         PlotsArea->show();
     if (TinyDisplayArea)
         TinyDisplayArea->show();
-    if (ControlArea)
-        ControlArea->show();
     if (FilesListArea)
         FilesListArea->hide();
 
@@ -446,8 +450,7 @@ void MainWindow::on_actionPreferences_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionFiltersLayout_triggered()
 {
-    if (TinyDisplayArea)
-        TinyDisplayArea->LoadBigDisplay();
+    showPlayer();
 }
 
 //---------------------------------------------------------------------------
@@ -490,8 +493,24 @@ void MainWindow::on_actionAbout_triggered()
 void MainWindow::on_fileNamesBox_currentIndexChanged(int index)
 {
     setFilesCurrentPos(index);
+    m_playbackSimulationTimer.stop();
+
+    if(isFileSelected()) {
+
+        if(Files[index]->Glue) {
+            m_player->setFile(Files[index]);
+        } else {
+            m_player->setFile(nullptr);
+        }
+
+    } else {
+
+        m_player->setFile(nullptr);
+    }
+
     if (!ui->actionGraphsLayout->isChecked())
         return;
+
     createGraphsLayout();
     refreshDisplay();
     Update();
@@ -502,48 +521,6 @@ void MainWindow::on_fileNamesBox_currentIndexChanged(int index)
 void MainWindow::on_check_toggled(bool checked)
 {
     refreshDisplay();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_M1_triggered()
-{
-    if (ControlArea)
-        ControlArea->on_M1_clicked(true);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_Minus_triggered()
-{
-    if (ControlArea)
-        ControlArea->on_Minus_clicked(true);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_PlayPause_triggered()
-{
-    if (ControlArea)
-        ControlArea->on_PlayPause_clicked(true);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_Pause_triggered()
-{
-    if (ControlArea)
-        ControlArea->on_PlayPause_clicked(true);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_Plus_triggered()
-{
-    if (ControlArea)
-        ControlArea->on_Plus_clicked(true);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_P1_triggered()
-{
-    if (ControlArea)
-        ControlArea->on_P1_clicked(true);
 }
 
 //---------------------------------------------------------------------------
@@ -585,18 +562,6 @@ void MainWindow::dropEvent(QDropEvent *Event)
 
     clearDragDrop();
     addFile_finish();
-}
-
-void MainWindow::on_actionPlay_at_Frame_Rate_triggered()
-{
-    if(ControlArea)
-        ControlArea->setPlayAllFrames(false);
-}
-
-void MainWindow::on_actionPlay_All_Frames_triggered()
-{
-    if(ControlArea)
-        ControlArea->setPlayAllFrames(true);
 }
 
 void MainWindow::on_actionUploadToSignalServer_triggered()
@@ -846,6 +811,16 @@ void MainWindow::updateExportAllAction()
     ui->actionExport_XmlGz_SidecarAll->setEnabled(allParsedOrHaveStats);
 }
 
+void MainWindow::showPlayer()
+{
+    auto selectedFile = Files[getFilesCurrentPos()];
+    if(selectedFile != m_player->file()) {
+        m_player->hide();
+    }
+    m_player->setFile(selectedFile);
+    m_player->show();
+}
+
 void MainWindow::on_actionNavigateNextComment_triggered()
 {
     if (getFilesCurrentPos()>=Files.size())
@@ -919,6 +894,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
             return;
         }
     }
+
+    m_player->hide();
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event)
@@ -939,12 +916,19 @@ size_t MainWindow::getFilesCurrentPos() const
     return files_CurrentPos;
 }
 
+FileInformation *MainWindow::getCurrenFileInformation() const
+{
+    return isFileSelected() ? Files[getFilesCurrentPos()] : nullptr;
+}
+
 void MainWindow::setFilesCurrentPos(const size_t &value)
 {
     bool fileWasSelected = isFileSelected();
 
     if(files_CurrentPos != value) {
         files_CurrentPos = value;
+
+        Q_EMIT filePositionChanged(files_CurrentPos);
 
         if(fileWasSelected != isFileSelected())
             Q_EMIT(fileSelected(isFileSelected()));
@@ -956,7 +940,17 @@ void MainWindow::setFilesCurrentPos(const size_t &value)
 
 bool MainWindow::isFileSelected() const
 {
-    return files_CurrentPos != (size_t)-1;
+    return isFileSelected(files_CurrentPos);
+}
+
+bool MainWindow::isFileSelected(size_t pos) const
+{
+    return pos != (size_t)-1;
+}
+
+bool MainWindow::hasMediaFile() const
+{
+    return Files[files_CurrentPos]->Glue;
 }
 
 void MainWindow::on_actionClear_Recent_History_triggered()
@@ -979,4 +973,28 @@ void MainWindow::on_actionReveal_file_location_triggered()
 
     QFileInfo fileInfo(Files[getFilesCurrentPos()]->fileName());
     QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absoluteDir().path()));
+}
+
+void MainWindow::on_actionGrab_frame_triggered()
+{
+    if(m_player->isVisible())
+        m_player->grabFrame();
+}
+
+void MainWindow::on_actionGrab_plots_image_triggered()
+{
+    if(PlotsArea)
+        PlotsArea->playerControl()->exportButton()->click();
+}
+
+void MainWindow::on_actionShow_hide_debug_panel_triggered()
+{
+    if(m_player->isVisible())
+        m_player->showHideDebug();
+}
+
+void MainWindow::on_actionShow_hide_filters_panel_triggered()
+{
+    if(m_player->isVisible())
+        m_player->showHideFilters();
 }

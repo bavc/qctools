@@ -1648,30 +1648,6 @@ int FFmpeg_Glue::OutputHeight_Get(int Pos)
     return 0;
 }
 
-int FFmpeg_Glue::OutputFilterWidth_Get(int Pos)
-{
-    outputdata* OutputData=OutputDatas[Pos];
-
-    if (OutputData && OutputData->FilteredFrame)
-    {
-        return OutputData->FilteredFrame->width;
-    }
-
-    return 0;
-}
-
-int FFmpeg_Glue::OutputFilterHeight_Get(int Pos)
-{
-    outputdata* OutputData=OutputDatas[Pos];
-
-    if (OutputData && OutputData->FilteredFrame)
-    {
-        return OutputData->FilteredFrame->height;
-    }
-
-    return 0;
-}
-
 int FFmpeg_Glue::OutputThumbnailWidth_Get() const
 {
     outputdata* OutputData=OutputDatas[0];

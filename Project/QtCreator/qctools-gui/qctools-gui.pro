@@ -1,4 +1,10 @@
 QT       += core gui network
+
+QMAKEFEATURES = C:/Users/ai/Projects/qctools/qctools/Source/ThirdParty/QtAV/mkspecs/features
+message("!!! QMAKEFEATURES = " $$QMAKEFEATURES)
+
+#QT += avwidgets
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport qml
 
 TARGET = QCTools
@@ -17,6 +23,111 @@ else:unix: LIBS += -L$$OUT_PWD/../qctools-lib/ -lqctools
 INCLUDEPATH += $$PWD/../qctools-lib
 DEPENDPATH += $$PWD/../qctools-lib
 
+defineReplace(platformTargetSuffix) {
+    ios:CONFIG(iphonesimulator, iphonesimulator|iphoneos): \
+        suffix = _iphonesimulator
+    else: \
+        suffix =
+
+    CONFIG(debug, debug|release) {
+        !debug_and_release|build_pass {
+            mac: return($${suffix}_debug)
+            win32: return($${suffix}d)
+        }
+    }
+    return($$suffix)
+}
+
+win32: {
+    QTAVLIBFOLDER=lib_win_x86_64
+}
+linux: {
+    QTAVLIBFOLDER=lib_linux_x86_64
+}
+mac: {
+    QTAVLIBFOLDER=lib_osx_x86_64_llvm
+}
+
+QTAV = $$QTAV
+isEmpty(QTAV) {
+    message('qctools-gui: using default location for QTAV: ' $$QTAV)
+    QTAV=$$absolute_path($$PWD/../qctools-qtav)
+}
+message('qctools-gui: QTAV: ' $$QTAV)
+
+message('QTAVLIBFOLDER: ' $$QTAVLIBFOLDER)
+INCLUDEPATH += $$absolute_path($$QTAV/src) $$absolute_path($$QTAV/src/QtAV)
+
+if(equals(MAKEFILE_GENERATOR, MSVC.NET)|equals(MAKEFILE_GENERATOR, MSBUILD)) {
+  TRY_COPY = $$QMAKE_COPY
+} else {
+  TRY_COPY = -$$QMAKE_COPY #makefile. or -\$\(COPY_FILE\)
+}
+
+message('TRY_COPY: ' $$TRY_COPY)
+
+mac: {
+    QTAVLIBS = -F$$absolute_path($$OUT_PWD/../qctools-qtav/$$QTAVLIBFOLDER) -framework QtAV$$platformTargetSuffix()
+
+    qtavlibs.pattern = $$absolute_path($$OUT_PWD/../qctools-qtav/$$QTAVLIBFOLDER/$${QTAVLIBNAME}*)
+    message('qtavlibs.pattern: ' $$qtavlibs.pattern)
+
+    qtavlibs.files = $$files($$qtavlibs.pattern)
+    message('qtavlibs.files: ' $$qtavlibs.files)
+
+    qtavlibs.path = $$absolute_path($$OUT_PWD$${BUILD_DIR}/$${TARGET}.app/Contents/Frameworks)
+    message('qtavlibs.path: ' $$qtavlibs.path)
+
+    qtavlibs.commands += $$escape_expand(\\n\\t)$$QMAKE_MKDIR_CMD $$shell_path($$qtavlibs.path)
+
+    for(f, qtavlibs.files) {
+      message('***: ' $$escape_expand(\\n\\t)$$QMAKE_COPY_DIR $$shell_path($$f) $$shell_path($$qtavlibs.path))
+      qtavlibs.commands += $$escape_expand(\\n\\t)$$QMAKE_COPY_DIR $$shell_path($$f) $$shell_path($$qtavlibs.path)
+    }
+
+    isEmpty(QMAKE_POST_LINK): QMAKE_POST_LINK = $$qtavlibs.commands
+    else: QMAKE_POST_LINK = $${QMAKE_POST_LINK}$$escape_expand(\\n\\t)$$qtavlibs.commands
+
+    message('QMAKE_POST_LINK: ' $${QMAKE_POST_LINK})
+
+} else {
+    win32: {
+        CONFIG(debug, debug|release) {
+            BUILD_SUFFIX=d
+            BUILD_DIR=/debug
+        } else:CONFIG(release, debug|release) {
+            BUILD_SUFFIX=
+            BUILD_DIR=/release
+        }
+        QTAVLIBNAME = QtAV$${BUILD_SUFFIX}1
+    } else {
+        QTAVLIBNAME = QtAV$${BUILD_SUFFIX}
+    }
+    message('QTAVLIBNAME: ' $${QTAVLIBNAME})
+
+    QTAVLIBS += -L$$absolute_path($$OUT_PWD/../qctools-qtav/$$QTAVLIBFOLDER) -l$${QTAVLIBNAME}
+    qtavlibs.pattern = $$absolute_path($$OUT_PWD/../qctools-qtav/$$QTAVLIBFOLDER/*.$$QMAKE_EXTENSION_SHLIB)
+    message('qtavlibs.pattern: ' $$qtavlibs.pattern)
+
+    qtavlibs.files = $$files($$qtavlibs.pattern)
+    message('qtavlibs.files: ' $$qtavlibs.files)
+
+    qtavlibs.path = $$absolute_path($$OUT_PWD$${BUILD_DIR})
+    for(f, qtavlibs.files) {
+      message('***: ' $$escape_expand(\\n\\t)$$TRY_COPY $$shell_path($$f) $$shell_path($$qtavlibs.path))
+      qtavlibs.commands += $$escape_expand(\\n\\t)$$TRY_COPY $$shell_path($$f) $$shell_path($$qtavlibs.path)
+    }
+
+    isEmpty(QMAKE_POST_LINK): QMAKE_POST_LINK = $$qtavlibs.commands
+    else: QMAKE_POST_LINK = $${QMAKE_POST_LINK}$$escape_expand(\\n\\t)$$qtavlibs.commands
+
+    message('QMAKE_POST_LINK: ' $${QMAKE_POST_LINK})
+}
+
+message('QTAVLIBS: ' $$QTAVLIBS)
+
+LIBS += $$QTAVLIBS
+
 win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../qctools-lib/release/libqctools.a
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../qctools-lib/debug/libqctools.a
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../qctools-lib/release/qctools.lib
@@ -32,8 +143,6 @@ message("qctools: THIRD_PARTY_PATH = " $$THIRD_PARTY_PATH)
 INCLUDEPATH += $$SOURCES_PATH/GUI
 
 HEADERS += \
-    $$SOURCES_PATH/GUI/BigDisplay.h \
-    $$SOURCES_PATH/GUI/Control.h \
     $$SOURCES_PATH/GUI/FilesList.h \
     $$SOURCES_PATH/GUI/Help.h \
     $$SOURCES_PATH/GUI/Info.h \
@@ -47,18 +156,20 @@ HEADERS += \
     $$SOURCES_PATH/GUI/PlotScaleWidget.h \
     $$SOURCES_PATH/GUI/TinyDisplay.h \
     $$SOURCES_PATH/GUI/SelectionArea.h \
-    $$SOURCES_PATH/GUI/Imagelabel.h \
     $$SOURCES_PATH/GUI/config.h \
     $$SOURCES_PATH/GUI/draggablechildrenbehaviour.h \
     $$SOURCES_PATH/ThirdParty/cqmarkdown/CMarkdown.h \
     $$SOURCES_PATH/GUI/barchartconditioneditor.h \
     $$SOURCES_PATH/GUI/barchartconditioninput.h \
     $$SOURCES_PATH/GUI/managebarchartconditions.h \
-    $$SOURCES_PATH/GUI/barchartprofilesmodel.h
+    $$SOURCES_PATH/GUI/barchartprofilesmodel.h \
+    $$SOURCES_PATH/GUI/player.h \
+    $$SOURCES_PATH/GUI/doublespinboxwithslider.h \
+    $$SOURCES_PATH/GUI/filters.h \
+    $$SOURCES_PATH/GUI/filterselector.h \
+    $$SOURCES_PATH/GUI/playercontrol.h
 
 SOURCES += \
-    $$SOURCES_PATH/GUI/BigDisplay.cpp \
-    $$SOURCES_PATH/GUI/Control.cpp \
     $$SOURCES_PATH/GUI/FilesList.cpp \
     $$SOURCES_PATH/GUI/Help.cpp \
     $$SOURCES_PATH/GUI/Info.cpp \
@@ -76,15 +187,18 @@ SOURCES += \
     $$SOURCES_PATH/GUI/preferences.cpp \
     $$SOURCES_PATH/GUI/TinyDisplay.cpp \
     $$SOURCES_PATH/GUI/SelectionArea.cpp \
-    $$SOURCES_PATH/GUI/Imagelabel.cpp \
     $$SOURCES_PATH/GUI/config.cpp \
     $$SOURCES_PATH/GUI/draggablechildrenbehaviour.cpp \
     $$SOURCES_PATH/ThirdParty/cqmarkdown/CMarkdown.cpp \
     $$SOURCES_PATH/GUI/barchartconditioneditor.cpp \
     $$SOURCES_PATH/GUI/barchartconditioninput.cpp \
     $$SOURCES_PATH/GUI/managebarchartconditions.cpp \
-    $$SOURCES_PATH/GUI/barchartprofilesmodel.cpp
-
+    $$SOURCES_PATH/GUI/barchartprofilesmodel.cpp \
+    $$SOURCES_PATH/GUI/player.cpp \
+    $$SOURCES_PATH/GUI/doublespinboxwithslider.cpp \
+    $$SOURCES_PATH/GUI/filters.cpp \
+    $$SOURCES_PATH/GUI/filterselector.cpp \
+    $$SOURCES_PATH/GUI/playercontrol.cpp
 
 include(../zlib.pri)
 
@@ -92,10 +206,11 @@ FORMS += \
     $$SOURCES_PATH/GUI/mainwindow.ui \
     $$SOURCES_PATH/GUI/preferences.ui \
     $$SOURCES_PATH/GUI/CommentsEditor.ui \
-    $$SOURCES_PATH/GUI/imagelabel.ui \
+    $$SOURCES_PATH/GUI/player.ui \
     $$SOURCES_PATH/GUI/barchartconditioneditor.ui \
     $$SOURCES_PATH/GUI/barchartconditioninput.ui \
-    $$SOURCES_PATH/GUI/managebarchartconditions.ui
+    $$SOURCES_PATH/GUI/managebarchartconditions.ui \
+    $$SOURCES_PATH/GUI/playercontrol.ui
 
 RESOURCES += \
     $$SOURCES_PATH/Resource/Resources.qrc
@@ -215,7 +330,7 @@ win32-g++* {
 
 macx:ICON = $$SOURCES_PATH/Resource/Logo.icns
 macx:LIBS += -liconv \
-             -framework CoreFoundation \
+	     -framework CoreFoundation \
              -framework Foundation \
              -framework AppKit \
              -framework AudioToolBox \

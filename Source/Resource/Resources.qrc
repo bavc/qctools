@@ -25,6 +25,9 @@
         <file>settings.png</file>
         <file>bar_chart.png</file>
         <file>chart_chart.png</file>
+        <file>first_frame.png</file>
+        <file>grab_imag.png</file>
+        <file>last_frame.png</file>
     </qresource>
     <qresource prefix="/">
         <file alias="Help/About.html">../../License.html</file>

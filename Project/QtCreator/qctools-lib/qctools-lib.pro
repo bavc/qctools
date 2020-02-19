@@ -6,6 +6,8 @@ CONFIG += c++11
 CONFIG += staticlib
 
 include(../brew.pri)
+
+message('qctools-lib: including ffmpeg')
 include(../ffmpeg.pri)
 
 SOURCES_PATH = $$absolute_path($$PWD/../../../Source)

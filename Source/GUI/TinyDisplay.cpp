@@ -5,9 +5,9 @@
  */
 
 #include "GUI/TinyDisplay.h"
+#include "GUI/player.h"
 
 #include "GUI/BigDisplay.h"
-#include "GUI/Control.h"
 #include "Core/FileInformation.h"
 #include "Core/CommonStats.h"
 
@@ -24,11 +24,6 @@ TinyDisplay::TinyDisplay(QWidget *parent, FileInformation* FileInformationData_)
       lastWidth(0),
       FileInfoData(FileInformationData_)
 {
-    // To update
-    ControlArea = NULL;
-
-    BigDisplayArea = NULL;
-
     needsUpdate = true;
     lastFramePos = 0;
 
@@ -215,10 +210,6 @@ void TinyDisplay::Update(bool updateBigDisplay)
         // we update thumbs again (till all thumbs for current frames are available)
         if (framePos - center + total_thumbs < current)
             needsUpdate = false;
-
-        if (updateBigDisplay && BigDisplayArea) {
-            BigDisplayArea->ShowPicture();
-        }
     }
 }
 
@@ -246,40 +237,5 @@ void TinyDisplay::on_thumbnails_clicked(bool)
         }
     }
 
-    LoadBigDisplay();
-}
-
-void TinyDisplay::LoadBigDisplay()
-{
-    if (BigDisplayArea == NULL) {
-        BigDisplayArea = new BigDisplay(this, FileInfoData);
-
-        unsigned long width = QApplication::desktop()->screenGeometry().width();
-        unsigned long height = QApplication::desktop()->screenGeometry().height();
-        BigDisplayArea->resize(width - 300, height - 300);
-
-        //FIXME: BigDisplayArea->move(geometry().left()+geometry().width(), geometry().top());
-        BigDisplayArea->move(150, 150);
-        if (ControlArea) {
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->M9         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_M9_clicked        (bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->M2         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_M2_clicked        (bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->M1         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_M1_clicked        (bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->M0         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_M0_clicked        (bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->Minus      , SIGNAL(clicked(bool)), ControlArea, SLOT(on_Minus_clicked     (bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->PlayPause  , SIGNAL(clicked(bool)), ControlArea, SLOT(on_PlayPause_clicked (bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->Pause      , SIGNAL(clicked(bool)), ControlArea, SLOT(on_Pause_clicked     (bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->Plus       , SIGNAL(clicked(bool)), ControlArea, SLOT(on_Plus_clicked      (bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->P0         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_P0_clicked        (bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->P1         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_P1_clicked        (bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->P2         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_P2_clicked        (bool)));
-            BigDisplayArea->connect(BigDisplayArea->ControlArea->P9         , SIGNAL(clicked(bool)), ControlArea, SLOT(on_P9_clicked        (bool)));
-            connect(BigDisplayArea, SIGNAL(rewind(int)), ControlArea, SLOT(rewind(int)));
-        }
-    }
-
-    BigDisplayArea->hide();
-    BigDisplayArea->InitPicture();
-
-    BigDisplayArea->show();
-    BigDisplayArea->ShowPicture();
+    Q_EMIT thumbnailClicked();
 }

@@ -12,10 +12,15 @@
 //---------------------------------------------------------------------------
 #include <QDialog>
 #include <QDoubleSpinBox>
+#include <QPointer>
 #include <QResizeEvent>
 #include <QTimer>
 #include <string>
+#include "doublespinboxwithslider.h"
+#include "filters.h"
+#include "filterselector.h"
 
+class PlayerWindow;
 class FFmpeg_Glue;
 class Control;
 class Info;
@@ -37,59 +42,9 @@ class QSplitter;
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-const size_t Args_Max=7;
 //---------------------------------------------------------------------------
 
 class BigDisplay;
-class DoubleSpinBoxWithSlider : public QDoubleSpinBox
-{
-    Q_OBJECT
-
-public:
-    explicit DoubleSpinBoxWithSlider (DoubleSpinBoxWithSlider** Others, int Min, int Max, int Divisor, int Current, const char* Name, BigDisplay* Display, size_t Pos, bool IsBitSlice, bool IsFilter, bool IsPeak, bool IsMode, bool IsScale, bool IsColorspace, bool IsDmode, bool IsSystem, QWidget *parent=NULL);
-    ~DoubleSpinBoxWithSlider();
-
-    bool IsBitSlice;
-    bool IsFilter;
-    bool IsPeak;
-    bool IsMode;
-    bool IsScale;
-    bool IsColorspace;
-    bool IsDmode;
-    bool IsSystem;
-    void ChangeMax(int Max);
-
-    void applyValue(double value, bool notify);
-
-protected:
-    void enterEvent (QEvent* event);
-    void leaveEvent (QEvent* event);
-    void keyPressEvent (QKeyEvent* event);
-    void moveEvent (QMoveEvent * event);
-
-    void hidePopup ();
-
-    void showEvent (QShowEvent* event);
-    QString textFromValue (double value) const;
-    double  valueFromText (const QString& text) const;
-
-private:
-    DoubleSpinBoxWithSlider**   Others;
-    QWidget*                    Popup;
-    QSlider*                    Slider;
-    int                         Min;
-    int                         Max;
-    int                         Divisor;
-    BigDisplay*                 Display;
-    size_t                      Pos;
-
-public Q_SLOTS:
-    void on_valueChanged(double);
-    void on_sliderMoved(int);
-
-Q_SIGNALS:
-    void controlValueChanged(double);
-};
 
 //***************************************************************************
 // Class
@@ -125,60 +80,29 @@ protected:
     FFmpeg_Glue*                Picture;
     size_t                      Picture_Current[2];
 
-    // Content
-    struct options
-    {
-        QCheckBox*              Checks[Args_Max];
-        QLabel*                 Sliders_Label[Args_Max];
-        DoubleSpinBoxWithSlider* Sliders_SpinBox[Args_Max];
-        QRadioButton*           Radios[Args_Max][4];
-        QButtonGroup*           Radios_Group[Args_Max];
-        QPushButton*            ColorButton[Args_Max];
-        int                     ColorValue[Args_Max];
-        QComboBox*              FiltersList;
-        QLabel*                 FiltersList_Fake;
-    };
-    options                     Options[2];
-    struct previous_values
-    {
-        int                     Values[Args_Max];
-
-        previous_values()
-        {
-            for (size_t OptionPos=0; OptionPos<Args_Max; OptionPos++)
-                Values[OptionPos]=-2;
-        }
-    };
-    std::vector<previous_values>PreviousValues[2];
     Info*                       InfoArea;
 
-    ImageLabel*                 imageLabels[2];
+    PlayerWindow*               imageLabels[2];
     QSlider*                    Slider;
 
     // Temp
     QGridLayout*                Layout;
-    size_t                      FiltersListDefault_Count;
-
-    // Events
-    void                        FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos, QGridLayout* Layout0);
-    void                        FiltersList_currentIndexChanged(size_t Pos, size_t FilterPos);
 
     std::string                 FiltersList_currentOptionChanged(size_t Pos, size_t Picture_Current);
     void                        on_FiltersList_currentOptionChanged(size_t Pos, size_t Picture_Current);
 
-    void updateSelection(int Pos, ImageLabel* image, options& opts);
+    void updateSelection(int Pos, ImageLabel* image, FilterSelector& opts);
 
 private:
     QSplitter* splitter;
-    QTimer timer;
-
     CommentsPlot* plot;
 
-    void setCurrentFilter(size_t playerIndex, size_t filterIndex);
+    QPointer<FilterSelector> m_filterSelectors[2];
+
+    void handleFilterChange(FilterSelector* filterSelector, int pos);
 
 protected:
     bool eventFilter(QObject *, QEvent *);
-    void resizeEvent(QResizeEvent * e);
 
 Q_SIGNALS:
 	void rewind(int pos);
@@ -190,22 +114,7 @@ public Q_SLOTS:
     void updateImagesAndSlider(const QPixmap& pixmap1, const QPixmap& pixmap2, int sliderPos);
     void onSliderValueChanged(int value);
 
-    void on_FiltersList_currentIndexChanged(int Pos);
-
-    void on_FiltersSource_stateChanged(int state);
-    void on_FiltersOptions1_click();
-    void on_FiltersOptions2_click();
-    void on_FiltersOptions1_toggle(bool checked);
-    void on_FiltersOptions2_toggle(bool checked);
-    void on_FiltersSpinBox1_click();
-    void on_FiltersSpinBox2_click();
-    void on_Color1_click(bool checked);
-    void on_Color2_click(bool checked);
-
     void on_Full_triggered();
-
-private Q_SLOTS:
-    void onAfterResize();
 };
 
 #endif // GUI_BigDisplay_H
