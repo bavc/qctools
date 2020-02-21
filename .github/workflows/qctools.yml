@@ -22,30 +22,37 @@ jobs:
     env: ${{ matrix.env }}
 
     steps:
-    - uses: actions/checkout@v2.0.0
+    - uses: actions/checkout@v2
       with:
         fetch: 1
+
     - name: Checkout submodules
       shell: bash
       run: |
-        auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+        GIT_PATH=https://github.com/.extraheader
+        AUTH_HEADER="$(git config --local --get http.$GIT_PATH)"
         git submodule sync --recursive
-        git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
+        git -c "http.extraheader=$AUTH_HEADER" \
+            -c protocol.version=2 \
+            submodule update --init --force --recursive --depth=1
 
     - name: Install dependencies
       run: |
         brew install ${{ matrix.packages }} pkg-config ffmpeg qwt
 
+    - name: Set Qt5 environment path
+      run: |
+        echo "::add-path::/usr/local/opt/qt5/bin"
+
     - name: Build QCTools
       env:
         QCTOOLS_USE_BREW: true
       run: |
-        export PATH=/usr/local/opt/qt5/bin:$PATH
         cd Project/QtCreator
         mkdir build
         cd build
         qmake ..
-        make -j4
+        make -j12
 
 
   build-macos-no-brew:
@@ -66,29 +73,33 @@ jobs:
     env: ${{ matrix.env }}
 
     steps:
-    - uses: actions/checkout@v2.0.0
+    - uses: actions/checkout@v2
       with:
         fetch: 1
+
     - name: Checkout submodules
       shell: bash
       run: |
-        auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+        GIT_PATH=https://github.com/.extraheader
+        AUTH_HEADER="$(git config --local --get http.$GIT_PATH)"
         git submodule sync --recursive
-        git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
-        
+        git -c "http.extraheader=$AUTH_HEADER" \
+            -c protocol.version=2 \
+            submodule update --init --force --recursive --depth=1
+
     - name: Install dependencies
       run: |
-        brew install ${{ matrix.packages }} qt5 nasm
-    - name: Set Qt5 environment path
-      run: |
-        echo "::add-path::/usr/local/opt/qt5/bin"
+        brew install ${{ matrix.packages }} nasm
+
+    - name: Install Qt 5.12.6
+      uses: jurplel/install-qt-action@v2
 
     - name: Build qwt
       run: |
         git clone --depth 1 https://github.com/opencor/qwt ../qwt
         cd ../qwt
         qmake -r
-        make -j4
+        make -j12
 
     - name: Build FFmpeg
       run: |
@@ -104,7 +115,7 @@ jobs:
                     --disable-ffplay \
                     --disable-ffprobe \
                     --disable-debug
-        make -j4
+        make -j12
 
     - name: Build QCTools
       env:
@@ -113,8 +124,8 @@ jobs:
         cd Project/QtCreator
         mkdir build
         cd build
-        qmake .. 
-        make -j4
+        qmake ..
+        make -j12
 
 
   build-linux:
@@ -141,15 +152,19 @@ jobs:
     env: ${{ matrix.env }}
 
     steps:
-    - uses: actions/checkout@v2.0.0
+    - uses: actions/checkout@v2
       with:
         fetch: 1
+
     - name: Checkout submodules
       shell: bash
       run: |
-        auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+        GIT_PATH=https://github.com/.extraheader
+        AUTH_HEADER="$(git config --local --get http.$GIT_PATH)"
         git submodule sync --recursive
-        git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
+        git -c "http.extraheader=$AUTH_HEADER" \
+            -c protocol.version=2 \
+            submodule update --init --force --recursive --depth=1
 
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
@@ -178,7 +193,7 @@ jobs:
                                 libxv-dev
 
     - name: Install Qt 5.12.6
-      uses: ouuan/install-qt-action@v2.3.1
+      uses: jurplel/install-qt-action@v2
 
     - name: Cleanup
       run: |
@@ -190,13 +205,13 @@ jobs:
         git clone --depth 1 https://github.com/opencor/qwt ../qwt
         cd ../qwt
         qmake -r
-        make -j4
+        make -j12
 
     - name: Build QCTools
       run: |
         cd Project/QtCreator
         qmake
-        make -j4
+        make -j12
 
 
   build-windows-mingw:
@@ -208,15 +223,19 @@ jobs:
       MSYS2_PATH_TYPE: inherit
 
     steps:
-    - uses: actions/checkout@v2.0.0
+    - uses: actions/checkout@v2
       with:
         fetch: 1
+
     - name: Checkout submodules
       shell: bash
       run: |
-        auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+        GIT_PATH=https://github.com/.extraheader
+        AUTH_HEADER="$(git config --local --get http.$GIT_PATH)"
         git submodule sync --recursive
-        git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
+        git -c "http.extraheader=$AUTH_HEADER" \
+            -c protocol.version=2 \
+            submodule update --init --force --recursive --depth=1
 
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
@@ -225,9 +244,9 @@ jobs:
         architecture: 'x64'
 
     - name: Install Qt 5.12.6
-      uses: ouuan/install-qt-action@v2.3.1
+      uses: jurplel/install-qt-action@v2
       with:
-          arch: win64_mingw73
+        arch: win64_mingw73
 
     - name: Install msys2
       run: |
@@ -274,7 +293,7 @@ jobs:
     - name: Build qwt
       run: |
         cd ../qwt
-        mingw32-make -j4
+        mingw32-make -j12
 
     - name: Configure QCTools
       run: |
@@ -284,7 +303,7 @@ jobs:
     - name: Build QCTools
       run: |
         cd Project/QtCreator
-        mingw32-make -j4
+        mingw32-make -j12
 
 
   build-windows-vs:
@@ -292,15 +311,19 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2.0.0
+    - uses: actions/checkout@v2
       with:
         fetch: 1
+
     - name: Checkout submodules
       shell: bash
       run: |
-        auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+        GIT_PATH=https://github.com/.extraheader
+        AUTH_HEADER="$(git config --local --get http.$GIT_PATH)"
         git submodule sync --recursive
-        git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
+        git -c "http.extraheader=$AUTH_HEADER" \
+            -c protocol.version=2 \
+            submodule update --init --force --recursive --depth=1
 
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
@@ -338,10 +361,10 @@ jobs:
               -DBUILD_SHARED_LIBS=0 ^
               -DCMAKE_BUILD_TYPE=Release ^
               ..
-        jom -j4 install
+        jom -j12 install
 
     - name: Install Qt 5.12.6
-      uses: ouuan/install-qt-action@v2.3.1
+      uses: jurplel/install-qt-action@v2
 
     - name: Install FFmpeg
       run: |
@@ -369,7 +392,7 @@ jobs:
         set "VS_PATH=C:\\Program Files (x86)\\Microsoft Visual Studio\\2019"
         call "%VS_PATH%\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
         cd ../qwt
-        jom -j4
+        jom -j12
 
     - name: Configure QCTools
       run: |
@@ -382,4 +405,4 @@ jobs:
         set "VS_PATH=C:\\Program Files (x86)\\Microsoft Visual Studio\\2019"
         call "%VS_PATH%\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
         cd Project/QtCreator
-        jom -j4
+        jom -j12
