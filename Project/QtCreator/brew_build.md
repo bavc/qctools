@@ -2,15 +2,13 @@ Building
 --------
 Xcode needs to be installed before proceeding with your build. https://developer.apple.com/xcode/download/
 
-Install ffmpeg, freetype2, qt5
+Install ffmpeg, freetype2, qt, qwt
 
-    $ brew install freetype ffmpeg qt5
+    $ brew install freetype ffmpeg qt qwt
 
-Uninstall qwt if already installed and reinstall from provided formula (this might
-require not having a homebrew installation of qt (aka qt4):
+Install submodules
 
-    $ brew uninstall qwt
-    $ brew install amiaopensource/amiaos/qwt-qt5
+    $ git submodule update --init --recursive
 
 set QCTOOLS_USE_BREW environment variable:
 
@@ -21,7 +19,3 @@ Build the main application
     $ qmake
     $ make
 
-Caveats
--------
-
-Building qwt with qt4 installed was not tested and might not work.
