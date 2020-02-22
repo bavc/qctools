@@ -10,6 +10,8 @@
 
 FilterSelector::FilterSelector(QWidget *parent, const std::function<bool(const char*)>& nameFilter) : QFrame(parent), FileInfoData(nullptr)
 {
+    setFrameStyle(QFrame::NoFrame);
+
     for (size_t OptionPos=0; OptionPos<Args_Max; OptionPos++)
     {
         m_filterOptions.Checks[OptionPos]=nullptr;
@@ -93,17 +95,16 @@ FilterSelector::FilterSelector(QWidget *parent, const std::function<bool(const c
     m_filterOptions.FiltersList->setMaximumWidth(m_filterOptions.FiltersList->minimumSizeHint().width());
     m_filterOptions.FiltersList->setMaxVisibleItems(25);
 
-    connect(m_filterOptions.FiltersList, SIGNAL(currentIndexChanged(int)), this, SLOT(on_FiltersList_currentIndexChanged(int)));
-
     Layout = new QGridLayout();
     Layout->setMargin(0);
     Layout->setContentsMargins(0, 0, 0, 0);
     setLayout(Layout);
 
-    setFrameStyle(QFrame::Box);
-
     auto minimumSize = QSize(m_filterOptions.FiltersList->minimumWidth(), m_filterOptions.FiltersList->height());
     setMinimumSize(minimumSize);
+
+    setCurrentFilter(0);
+    connect(m_filterOptions.FiltersList, SIGNAL(currentIndexChanged(int)), this, SLOT(on_FiltersList_currentIndexChanged(int)));
 }
 
 FilterSelector::options &FilterSelector::getOptions()
@@ -120,9 +121,10 @@ void FilterSelector::setCurrentFilter(int filterIndex)
 {
     QGridLayout* Layout0=new QGridLayout();
     Layout0->setContentsMargins(0, 0, 0, 0);
-    Layout0->setSpacing(8);
+    Layout0->setSpacing(4);
 
     auto hbox = new QHBoxLayout();
+    hbox->setSpacing(4);
 
     hbox->addWidget(m_filterOptions.EnableCheckbox);
     hbox->addWidget(m_filterOptions.FiltersList);
