@@ -6,41 +6,34 @@ The QCTools preview window is intended as an analytical playback environment tha
 
 # Table of Contents
 
-[Audio Bit Scope](#audio-bit-scope)  
-[Audio Frequency](#audio-frequency)  
-[Audio Phase Meter](#audio-phase-meter)  
-[Audio Waveform](#audio-waveform)  
-[Audio Spectrum](#audio-spectrum)  
-[Audio Vectorscope](#audio-vectorscope)  
-[Audio Volume](#audio-volume)  
-[Audio Waveform](#audio-waveform)  
-[Bit Plane](#bit-plane)   
-[Bit Plane 10 slices](#bit-plane-10-slices)    
-[Bit Plane Noise](#bit-plane-noise)   
-[Broadcast Illegal Focus](#broadcast-illegal-focus)   
-[Broadcast Range Pixels](#broadcast-range-pixels)   
-[Chroma Adjust](#chroma-adjust)  
+[Arrangement](#arrangement)  
+
+[Adjustments](#adjustments)  
+[Adjust Signal](#adjust-signal)  
+
+[Bit Plane](#bit-plane)  
+[Bit Plane 10 slices](#bit-plane-10-slices)  
+[Bit Plane Noise](#bit-plane-noise)  
+[Broadcast Illegal Focus](#broadcast-illegal-focus)  
+[Broadcast Range Pixels](#broadcast-range-pixels)  
 [Chroma Delay](#chroma-delay)  
 [CIE Scope](#cie-scope)  
 [Color Matrix](#color-matrix)  
 [Corners](#corners)  
 [Datascope](#datascope)  
-[EBU R128 Loudness Meter](#ebur128)  
-[EIA608 VITC Viewer](#eia608)
+[EIA608 VITC Viewer](#eia608)  
 [Extract Planes Equalized](#extract-planes-equalized)  
-[Extract Planes UV Equalized](#extract-planes-uv-equalized)  
 [Field Difference](#field-difference)  
-[Frame Tiles](#frame-tiles)  
-[Help](#help)  
+[Filmstrip](#filmstrip)  
 [Histogram](#histogram)  
+[Histogram Temporal](#histogram-temporal)  X
 [Limiter](#limiter)  
-[Lines Over Time](#line-over-time)  
+[Line Over Time](#line-over-time)  
 [Line Select](#line-select)  
-[Luma Adjust](#luma-adjust)  
-[No Display](#no-display)  
 [Normal](#normal)  
 [Oscilloscope](#oscilloscope)  
 [Pixel Offset Subtraction](#pixel-offset-subtraction)  
+[Pixel Scope](#pixel-scope)  X
 [Sample Range](#sample-range)  
 [Saturation Highlight](#saturation-highlight)  
 [Temporal Difference](#temporal-difference)  
@@ -48,34 +41,43 @@ The QCTools preview window is intended as an analytical playback environment tha
 [Value Highlight](#value-highlight)  
 [Vectorscope](#vectorscope)  
 [Vectorscope High/Low](#vectorscope-highlow)  
+[Vectorscope Target](#vectorscope-target)  
 [Vertical Line Repetitions](#vertical-line-repetitions)  
 [Vertical Repetition Pixels](#vertical-repetition-pixels)  
-[Vectorscope Target](#vectorscope-target)  
 [Waveform](#waveform)  
-[Waveform / Vectorscope](#waveform-vectorscope)  
 [Zoom](#zoom)  
 
-# Standard Displays
+# Arrangement
 
-## Help {#help}
+The size of the player may be set to "Fit to screen", "100%", or "Free Scale".
 
-This selection will launch the Playback Filters window where you may review the documentation.
+- Fit to screen: The size of the player will scale dynamically to fit the size of the window.
+- 100%: The player will stay at the size of the decoded video, for instance a 720x480 video shall be presented in 720x480 of monitor pixels.
+- Free Scale: A slider will set the player to a set level of scale from 50% to 200%.
 
-## No Display {#no-display}
+The QCTools player can show from one to six different visualizations, so their arrangement may be selected from the following options:
 
-This option enables you to remove one display, thereby only showing one view. This option allows a single playback window to occupy a greater amount of screen-space.
+- Vertical: All selected filters will be presented in a vertically arranged stack.
+- Horizontal: All selected filters will be presented in a horizontally arranged stack.
+- Grid: The filters will be presented in a grid up to a 3x2 arrangement. Filters may output images that use differing sizes, so a grid presentation may lead to overlapping filters or unused space. The 'Fit to Grid' option re-scales all filters to the same size as the input video (this is nicer to look at but can distort the presentation).
 
-![No Display](media/playbackfilter_no_display.jpg)
+# Adjustments
+
+## Adjust Signal
+
+If "Adjust Signal" is enabled, then the signal of the input video will be adjusted before the filters are applied or the presentation is made. For instance, if viewing the waveform filter and adjusting the 'Black' or 'Contrast' settings under 'Adjust Signal' then you'll see the waveform be subsequently adjusted. Adjustments can be helpful is you suspect a video was digitization with unoptimal settings and the brightness and color could here be adjusted, similar to the settings of a proc amp, to show the impact of the change. It is recommend to use the waveform and vectorscope filters as the 'Adjust Signal' settings are calibrated in order to see the impact of the adjustments.
+
+This filter allows the Y values to be increased or decreased via the **Black** slider. Also the **Contrast** allows a multiplier to be applied to all Y values.
+
+This filter enables the hue and saturation levels to be adjusted. Hue adjustments may be expressed in degrees where 0 is no change and 180 would invert the color. For saturation a value of 1 needs the saturation unchanged, 0 removes all color, and the saturation may be increased up to a maximum of 10\. The chroma values (Cb and Cr) may also be shifted by increasing or decreasing their values (similar to Red Shift/Blue Shift on a time-base corrector).
+
+## Filters
 
 ## Normal {#normal}
 
 This view simply shows the video as QCTools interprets it, no special effects or filtering are added. In this view, however, you also have the option of enabling a **'Field'** display which splits the two video fields for the selected frame and displays them as discrete images. Thus all odd-numbered video lines appear are resorted to appear on the top of the image and the even-numbered lines appear on the bottom. Since many analog video issues occur differently between the two interlaced fields, splitting the fields into two distinct images can make it easier to see if a given issue is from problems with the analog video playback device (such as a head clog where the two fields would react very differently) and tape damage (where the two fields would react similarly).
 
-This image shows two Normal displays side-by-side where the right image has **'Field'** enabled. By viewed the fields separated on the right, it is easily clear that while field 1 was read correctly from the tape, there was no color data was read for field 2\. This issue was due to a head clog and fixed by cleaning the video player and re-digitizing the content.
-
-![Normal / Field Split](media/fieldsplit.jpg)
-
-# Video Playback Filters
+The **Metadata** option will overlay some metadata onto the image, including the presentation timestamp, frame size, and metadata from filters that perform crop detection and interlacement pattern detection.
 
 ## Bit Plane {#bit-plane}
 
@@ -88,7 +90,7 @@ Generally lossy video codecs will show blocky structured patterns at higher numb
 
 ## Bit Plane 10 slices {#bit-plane-10-slices}
 
-This filter is similar to **Bit Plane**, but it shows a section of each of the first 10 bit planes at once in the selected plane. The slices are presented in most-significant to least-significant order as left to right (or top to bottom if 'Rows' is selected). Each of the 10 bit planes is marked by a green border. This filter can be offset horizontally by a desired numbers of pixels using the "x offset" option. This will move the frame to the left, allowing different sections of the frame to be compared.
+This filter is similar to **Bit Plane**, but it shows a section of each of the first 10 bit planes at once in the selected plane. The slices are presented in most-significant to least-significant order as left to right (or top to bottom if 'Rows' is selected). Each of the 10 bit planes is marked by a green border. If the **Slice** option is enabled, the video will be sliced into 10 parts with a different bit position (from 1 to 10) presented in each slice, if **slice** is unchecked then the video is repeated as a full frame ten times with a different bit position presented in each iteration. The **Show 2** will present each bit plane with the subsequent bit plane.
 
 ![Bit Plane 10 Slices](media/playbackfilter_bit_plane_10_slices.jpg)
 
@@ -121,12 +123,6 @@ This is the same presentation as 'Normal' except that pixels that are outside of
 This filter plots the range of visible colors as defined by the Committee Internationale de l'Eclairage/International Commission on Lighting (CIE) chromaticity diagram. See Georgia State University's [Hyperphysics](http://hyperphysics.phy-astr.gsu.edu/hbase/vision/cie.html) page for more information on this color space.
 
 ![CIE Scope](media/playbackfilter_CIE_scope.jpg)
-
-## Chroma Adjust {#chroma-adjust}
-
-This filter enables the hue and saturation levels to be adjusted. Hue adjustments may be expressed in degrees where 0 is no change and 180 would invert the color. For saturation a value of 1 needs the saturation unchanged, 0 removes all color, and the saturation may be increased up to a maximum of 10\. The chroma values (Cb and Cr) may also be shifted by increasing or decreasing their values (similar to Red Shift/Blue Shift on a time-base corrector).
-
-![Chroma Adjust](media/playbackfilter_chroma_adjust.jpg)
 
 ## Chroma Delay {#chroma-delay}
 
@@ -170,21 +166,15 @@ This image shows the Normal display on the left and Extract Planes on the right.
 
 ![Extract Planes Equalized](media/extractplanes.jpg)
 
-## Extract Planes UV Equalized {#extract-planes-uv-equalized}
-
-This filter is similar to the **Extract Planes Equalized** filter but shows the two chroma planes (U and V) side by side.
-
-![Extract Planes UV Equalized](media/playbackfilter_extract_planes_UV_equalized_2.jpg)
-
 ## Field Difference {#field-difference}
 
 This presentation visualizes the difference between video field 1 and field 2\. A middle gray image would mean that field 1 and field 2 were identical, whereas deviation to white or black indicates a difference.
 
 ![Field Difference](media/fielddiff.jpg)
 
-## Frame Tiles {#frame-tiles}
+## Filmstrip {#filmstrip}
 
-Displays a user-defined "tiled" mosaic of successive frames. Maximum 12x12 grid. Note that because this filter requires more than one frame to display the filter will need to be in playback mode to reveal an image.
+Displays a user-defined "tiled" mosaic of successive frames. Maximum 12x12 grid. Note that because this filter requires more than one frame to display the filter will need to be in playback mode to reveal an image. By default, this player will scale down the frame size before tiling them together, but the "Full Size" option will avoid scaling but impact performance.
 
 ![Frame Tiles](media/playbackfilter_frame_tiles.jpg)
 
@@ -194,11 +184,15 @@ The histogram shows the frequency of occurrence of values per channel. Typically
 
 ![Histogram](media/playbackfilter_histogram_3.jpg)
 
+## Histogram (Temporal) {#histogram-temporal}
+
+The histogram shows the frequency of occurrence of values per channel over time. See [the ffmpeg documentation on thistogram](https://ffmpeg.org/ffmpeg-filters.html#thistogram) for more information.
+
 ## Limiter {#limiter}
 
 Constrain playback to a specified sample range of the frame. Setting min and max values will clip all values below min to min and all values above max to max. For instance with an 8 bit video, the samples above broadcast range could be examined by setting min to 235 (the upper limit of broadcast range) and 255 (the highest possible 8-bit value). The strength value will apply a global color histogram equalization to stress the difference between the sample values. See the FFmpeg [limiter](http://ffmpeg.org/ffmpeg-filters.html#limiter) filter for more information.
 
-## Lines over Time {#line-over-time}
+## Line over Time {#line-over-time}
 
 This filter shows only 1 or 2 lines of video accumulate over time, like a slit-scan video. It can be used to focus on a single line of video (such as captioning in line 21) but showing multiple frames of an isolated line at once. The image is generated with FFmpeg's [tile filter](http://ffmpeg.org/ffmpeg-filters.html#tile).
 
@@ -207,10 +201,6 @@ This filter shows only 1 or 2 lines of video accumulate over time, like a slit-s
 Allows a user to select one line of video signal to display as a waveform. Includes **'Vertical'** and **'Background'** modes. When **'Vertical'** is enable the user may select to plot a waveform of a single column rather than the default plot of a single row. The **'Background'** option shows the frame image under the waveform with the highlighted row or column highlighted in yellow.
 
 ![Line Select](media/lineselect.jpg)
-
-## Luma Adjust {#luma-adjust}
-
-Allows the Y values to be increased or decreased via the **Offset** slider. Also the **Contrast** allows a multiplier to be applied to all Y values. The **Waveform** checkbox will display a waveform stacked with the adjusted image.
 
 ## Oscilloscope {#oscilloscope}
 
@@ -317,59 +307,3 @@ The Waveform Target is similar to the **Waveform** filter but a box is drawn ove
 Allows a user to zoom to a particular portion of the image using X and Y coordinates. Includes "Strength" and "Intensity" modes.
 
 ![Zoom](media/playbackfilter_zoom.jpg)
-
-# Audio Playback Filters
-
-## Audio Bit Scope {#audio-bit-scope}
-
-Shows an audio bit scope visualization of the audio. See FFmpeg's [abitscope](https://ffmpeg.org/ffmpeg-filters.html#abitscope) filter.
-
-![Audio Bit Scope](media/playbackfilter_audio_bit_scope.jpg)
-
-## Audio Frequency {#audio-frequency}
-
-Shows the output of FFmpeg's [showfreqs](https://ffmpeg.org/ffmpeg-filters.html#showfreqs) filter, representing the audio power spectrum.
-
-![Audio Frequency](media/playbackfilter_audio_frequency.jpg)
-
-## Audio Phase Meter {#audio-phase-meter}
-
-Shows the output of FFmpeg's [aphasemeter](https://ffmpeg.org/ffmpeg-filters.html#aphasemeter) filter, displaying the audio phase.
-
-![Audio Phase Meter](media/playbackfilter_audio_phase_meter.jpg)
-
-## Audio Spectrum {#audio-spectrum}
-
-Displays a visualization of the audio spectrum. Note that because this filter requires more than one frame to display the filter will need to be in playback mode to reveal an image.
-
-![Audio Spectrum](media/playbackfilter_audio_spectrum.jpg)
-
-## Audio Vectorscope {#audio-vectorscope}
-
-Plots two channels of audio against each other on different axis. This display can show if audio is out-of-phase (displays as a horizontal line), dual-mono (displays as a vertical line), or stereo (displays as a two dimensional complex shape).
-
-![Audio Vectorscope](media/playbackfilter_audio_vectorscope.jpg)
-
-## Audio Volume {#audio-volume}
-
-Shows the output of FFmpeg's [showvolume](https://ffmpeg.org/ffmpeg-filters.html#showvolume) filter.
-
-![Audio Volume](media/playbackfilter_audio_volume.jpg)
-
-## Audio Waveform {#audio-waveform}
-
-Displays a visualization of the audio waveform. Note that because this filter requires more than one frame to display the filter will need to be in playback mode to reveal an image.
-
-![Audio Waveform](media/playbackfilter_audio_waveform.jpg)
-
-## EBU R128 Loudness Meter {#ebur128}
-
-Displays a real time graph to observe the loudness evolution. The main graphing area contains the short-term loudness (3 seconds of analysis), and the gauge on the right is for the momentary loudness (400 milliseconds).
-
-See FFmpeg's [ebur128](https://ffmpeg.org/ffmpeg-filters.html#ebur128) filter.
-
-## Show CQT {#show-cqt}
-
-Displays a visualization of the audio as a musical scale. See [FFmpeg's showcqt documentation](https://ffmpeg.org/ffmpeg-filters.html#showcqt) for information and examples.
-
-![Show CQT](media/playbackfilter_show_CQT_1.jpg)
