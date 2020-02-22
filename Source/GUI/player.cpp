@@ -111,7 +111,8 @@ Player::Player(QWidget *parent) :
     connect(ui->arrangementButtonGroup, SIGNAL(buttonToggled(QAbstractButton*, bool)), this, SLOT(applyFilter()));
 
     ui->filterGroupBox->setLayout(new QVBoxLayout);
-    ui->filterGroupBox->setMinimumHeight(60 * MaxFilters);
+    ui->filterGroupBox->layout()->setContentsMargins(2, 2, 2, 2);
+    ui->filterGroupBox->setMinimumHeight(50 * MaxFilters);
 
     static const char* adjustments[] = {
         "Adjust Signal",
@@ -152,12 +153,14 @@ Player::Player(QWidget *parent) :
         return false;
     });
 
+    m_adjustmentSelector->setMinimumHeight(50);
     m_adjustmentSelector->selectCurrentFilter(-1);
     m_adjustmentSelector->setCurrentIndex(21);
 
     handleFilterChange(m_adjustmentSelector, -1);
 
     ui->adjustmentsGroupBox->setLayout(new QVBoxLayout);
+    ui->adjustmentsGroupBox->layout()->setContentsMargins(2, 2, 2, 2);
     ui->adjustmentsGroupBox->layout()->addWidget(m_adjustmentSelector);
 
     m_filterSelectors[0]->selectCurrentFilter(-1);
