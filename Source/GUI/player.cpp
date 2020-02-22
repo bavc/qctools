@@ -152,6 +152,7 @@ Player::Player(QWidget *parent) :
         return false;
     });
 
+    m_adjustmentSelector->setMinimumHeight(60);
     m_adjustmentSelector->selectCurrentFilter(-1);
     m_adjustmentSelector->setCurrentIndex(21);
 
