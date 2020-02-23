@@ -216,19 +216,6 @@ p, li { white-space: pre-wrap; }
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="slider_label">
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>slider label</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QLabel" name="frame_label">
        <property name="minimumSize">
         <size>
