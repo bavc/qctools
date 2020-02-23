@@ -1,3 +1,23 @@
+Next
+=== Thanks to New York Public Library and the Hirshhorn Museum and Sculpture Garden for their support ===
++ Player is refactored to QtAV/mdk
++ Updates to support GitHub Actions for testing environment
++ Add more filter options to CIE Scope, Waveform
++ Add debug mode and graphmonitor for filterchains
++ Add export to image option for the player
++ Add Temporal Histogram
+x Fix reset of histeq variable in some filters
++ Add metadata overlap for Normal player
++ Refactor Frame Tiles as Filmstrip
++ Adjust scaling to neighbor as a filterchain default
++ Update bit plane viewer to allow the full image of each bit plane
++ Updates to READeia608 filter
++ UI to adjust playback speed
++ Updates to player geomtry management and redrawing
++ Separate Luma and Chroma Adjustments to occur before the overall filterchain
++ Add 'fit to grid' option to force geometry of components of the filterchain
+x Fix crash is the first track was not video or audio
+
 1.0, 2018-04-09
 + Add possibility to wrap 'qctools.xml.gzip' report into 'mkv' to save thumbnails too
 + Add 'Entropy' and 'Entropy-diff' filters
