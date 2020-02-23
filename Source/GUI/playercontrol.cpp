@@ -53,11 +53,6 @@ QLabel *PlayerControl::frameLabel() const
     return ui->frame_label;
 }
 
-QLabel *PlayerControl::sliderLabel() const
-{
-    return ui->slider_label;
-}
-
 QLineEdit *PlayerControl::lineEdit() const
 {
     return ui->goToTime_lineEdit;

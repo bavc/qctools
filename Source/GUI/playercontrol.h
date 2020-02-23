@@ -27,7 +27,6 @@ public:
 
     QLabel* timeLabel() const;
     QLabel* frameLabel() const;
-    QLabel* sliderLabel() const;
 
     QLineEdit* lineEdit() const;
 

@@ -583,7 +583,6 @@ void MainWindow::Update()
         auto duration = getCurrenFileInformation()->Frames_Count_Get();
         auto framesPos = fileInfo->Frames_Pos_Get();
 
-        playerControl->sliderLabel()->setText(QString::number(fileInfo->Frames_Count_Get()) + "/" + QString::number(framesPos));
         playerControl->frameLabel()->setText(QString("Frame %1 [%2]").arg(fileInfo->Frames_Pos_Get()).arg(fileInfo->Frame_Type_Get()));
 
         int Milliseconds=(int)-1;

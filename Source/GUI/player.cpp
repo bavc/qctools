@@ -477,8 +477,6 @@ static QTime zeroTime = QTime::fromString("00:00:00");
 
 void Player::updateInfoLabels()
 {
-    ui->slider_label->setText(QString::number(m_player->duration()) + "/" + QString::number(int(ui->playerSlider->value()/m_unit)));
-
     auto duration = m_player->duration();
     ui->frame_label->setText(QString("Frame %1 [%2]").arg(m_fileInformation->Frames_Pos_Get()).arg(m_fileInformation->Frame_Type_Get()));
 
