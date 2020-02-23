@@ -959,8 +959,9 @@ void Player::on_prev_pushButton_clicked()
     qDebug() << "new position: " << newPosition;
     // m_player->seek(newPosition);
 
-    auto frameDuration = (qreal) m_player->duration() / m_framesCount;
-    m_player->seek(m_player->position() - (qint64) frameDuration);
+    m_player->stepBackward();
+    // auto frameDuration = (qreal) m_player->duration() / m_framesCount;
+    // m_player->seek(m_player->position() - (qint64) frameDuration);
 
     /*
     m_player->stepForward();
