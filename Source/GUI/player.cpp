@@ -942,13 +942,13 @@ QString Player::replaceFilterTokens(const QString &filterString)
 
 qint64 Player::frameToMs(int frame)
 {
-    auto ms = qint64(qreal(m_player->duration()) / m_framesCount * frame);
+    auto ms = qint64(qreal(m_player->duration()) * frame / m_framesCount);
     return ms;
 }
 
 int Player::msToFrame(qint64 ms)
 {
-    auto frame = (int) (qreal(ms) / m_player->duration()  * m_framesCount);
+    auto frame = ceil(qreal(ms) * m_framesCount / m_player->duration());
     return frame;
 }
 
