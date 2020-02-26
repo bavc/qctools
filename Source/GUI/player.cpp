@@ -26,7 +26,7 @@ const int DefaultForthFilterIndex = 0;
 Player::Player(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Player),
-    m_fileInformation(nullptr), m_commentsPlot(nullptr), m_seekOnFileInformationPositionChange(true), m_handlePlayPauseClick(true)
+    m_fileInformation(nullptr), m_commentsPlot(nullptr), m_seekOnFileInformationPositionChange(true), m_handlePlayPauseClick(true), m_ignorePositionChanges(false)
 {
     QtAV::setLogLevel(QtAV::LogOff);
 
@@ -380,10 +380,6 @@ void Player::setFile(FileInformation *fileInfo)
 
         connect(m_fileInformation, &FileInformation::positionChanged, this, &Player::handleFileInformationPositionChanges);
 
-    } else {
-
-        auto ms = frameToMs(m_fileInformation->Frames_Pos_Get());
-        m_player->seek(ms);
     }
 }
 
@@ -518,6 +514,9 @@ void Player::updateInfoLabels()
 
 void Player::updateSlider(qint64 value)
 {
+    if(m_ignorePositionChanges)
+        return;
+
     auto displayPosition = m_player->displayPosition();
     value = displayPosition;
 
@@ -692,8 +691,35 @@ void Player::applyFilter()
 
 void Player::handleFileInformationPositionChanges()
 {
-    if(m_player->isPaused() && m_seekOnFileInformationPositionChange)
-        m_player->seek(frameToMs(m_fileInformation->Frames_Pos_Get()));
+    if(m_player->isPaused() && m_seekOnFileInformationPositionChange) {
+
+        auto ms = frameToMs(m_fileInformation->Frames_Pos_Get());
+
+        if(ms != m_player->displayPosition())
+        {
+            m_ignorePositionChanges = true;
+
+            auto prevMs = frameToMs(m_fileInformation->Frames_Pos_Get() - 12);
+            if(prevMs < 0)
+                prevMs = 0;
+
+            SignalWaiter waiter(m_player, "seekFinished(qint64)");
+            m_player->seek(qint64(prevMs));
+            waiter.wait();
+
+            while(ms > m_player->displayPosition())
+            {
+                {
+                    SignalWaiter waiter(m_player, "stepFinished()");
+                    m_player->stepForward();
+                    waiter.wait();
+                }
+            }
+            m_ignorePositionChanges = false;
+
+            ui->playerSlider->setValue(ms);
+        }
+    }
 
     m_commentsPlot->setCursorPos(m_fileInformation->Frames_Pos_Get());
 }
