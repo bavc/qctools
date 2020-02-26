@@ -513,6 +513,9 @@ void Player::updateInfoLabels()
 
 void Player::updateSlider(qint64 value)
 {
+    auto displayPosition = m_player->displayPosition();
+    value = displayPosition;
+
     auto newValue = int(qreal(value)/m_unit);
     if(ui->playerSlider->value() == newValue)
         return;
@@ -550,7 +553,7 @@ void Player::updateSlider(qint64 value)
 
 void Player::updateSlider()
 {
-    updateSlider(m_player->position());
+    updateSlider(m_player->displayPosition());
 }
 
 void Player::updateSliderUnit()
