@@ -528,7 +528,7 @@ void Player::updateSlider(qint64 value)
     // ui->playerSlider->setRange(0, int(m_player->duration()/m_unit));
     ui->playerSlider->setValue(newValue);
 
-    auto position = m_player->position();
+    auto position = m_player->displayPosition();
     auto framePos = msToFrame(position);
 
     m_seekOnFileInformationPositionChange = false;
@@ -964,28 +964,17 @@ void Player::on_goToEnd_pushButton_clicked()
 
 void Player::on_prev_pushButton_clicked()
 {
-    auto newPosition = m_player->position() - 1;
-    qDebug() << "new position: " << newPosition;
-    // m_player->seek(newPosition);
-
+    auto newPosition = m_player->displayPosition() - 1;
+    qDebug() << "expected new position: " << newPosition;
+    qDebug() << "stepping backward...";
     m_player->stepBackward();
-    // auto frameDuration = (qreal) m_player->duration() / m_framesCount;
-    // m_player->seek(m_player->position() - (qint64) frameDuration);
-
-    /*
-    m_player->stepForward();
-    m_player->stepBackward();
-    m_player->stepBackward();
-    */
 }
 
 void Player::on_next_pushButton_clicked()
 {
-    auto newPosition = m_player->position() + 1;
-    qDebug() << "new position: " << newPosition;
-    // m_player->seek(newPosition);
-
-    qDebug() << "step forward";
+    auto newPosition = m_player->displayPosition() + 1;
+    qDebug() << "expected new position: " << newPosition;
+    qDebug() << "stepping forward...";
     m_player->stepForward();
 }
 
