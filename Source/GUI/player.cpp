@@ -105,6 +105,12 @@ Player::Player(QWidget *parent) :
 
     ui->speed_label->installEventFilter(this);
 
+    connect(m_player, &QtAV::AVPlayer::started, [this](){
+      m_player->masterClock()->setClockAuto(false);
+      m_player->masterClock()->setClockType(QtAV::AVClock::ExternalClock);
+      updateSlider();
+    });
+
     // connect(m_player, SIGNAL(started()), SLOT(updateSlider()));
     // connect(m_player, SIGNAL(notifyIntervalChanged()), SLOT(updateSliderUnit()));
 
