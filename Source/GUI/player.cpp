@@ -306,6 +306,11 @@ void Player::playPaused(qint64 ms)
         waiter.wait();        
     }
 
+    if(m_player->displayPosition() > ms)
+        m_player->stepBackward();
+    else if(m_player->displayPosition() < ms)
+        m_player->stepForward();
+
     ui->playerSlider->setDisabled(false);
 }
 
