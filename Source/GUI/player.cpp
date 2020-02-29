@@ -406,7 +406,10 @@ void Player::seekBySlider(int value)
     auto newValue = qint64(value*m_unit);
 
     auto framePos = msToFrame(newValue);
+
+    m_seekOnFileInformationPositionChange = false;
     m_fileInformation->Frames_Pos_Set(framePos);
+    m_seekOnFileInformationPositionChange = true;
 
     updateInfoLabels();
 
