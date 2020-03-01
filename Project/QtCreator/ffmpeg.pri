@@ -19,7 +19,26 @@ macx:contains(DEFINES, USE_BREW) {
         FFMPEG_INCLUDES=$$FFMPEG
     }
 
-    exists($$FFMPEG/lib) {
+    win32:exists($$FFMPEG/bin) {
+        FFMPEG_AVDEVICE=$$absolute_path($$FFMPEG/bin)
+        FFMPEG_AVCODEC=$$absolute_path($$FFMPEG/bin)
+        FFMPEG_AVFILTER=$$absolute_path($$FFMPEG/bin)
+        FFMPEG_AVFORMAT=$$absolute_path($$FFMPEG/bin)
+        FFMPEG_POSTPROC=$$absolute_path($$FFMPEG/bin)
+        FFMPEG_SWRESAMPLE=$$absolute_path($$FFMPEG/bin)
+        FFMPEG_SWSCALE=$$absolute_path($$FFMPEG/bin)
+        FFMPEG_AVUTIL=$$absolute_path($$FFMPEG/bin)
+
+        FFMPEG_LIBS += -L$$absolute_path($$FFMPEG/bin) \
+                        -lavdevice \
+                        -lavcodec \
+                        -lavfilter \
+                        -lavformat \
+                        -lpostproc \
+                        -lswresample \
+                        -lswscale \
+                        -lavutil
+    } else:exists($$FFMPEG/lib) {
         FFMPEG_AVDEVICE=$$absolute_path($$FFMPEG/lib)
         FFMPEG_AVCODEC=$$absolute_path($$FFMPEG/lib)
         FFMPEG_AVFILTER=$$absolute_path($$FFMPEG/lib)
