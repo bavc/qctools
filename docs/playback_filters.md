@@ -102,9 +102,7 @@ This filter is similar to **Bit Plane**, but instead of showing if the selected 
 
 ## Bit Plane Noise Graph {#bit-plane-noise-graph}
 
-This filter displays the YUV plot of a selected bit position. Note that because this filter requires more than one frame to display the filter will need to be in playback mode to reveal an image.
-
-![Bit Plane Noise Graph](media/playbackfilter_bit_plane_noise_graph.jpg)
+This filter displays the YUV plot of a selected plane (y, u, or v). Note that because this filter requires more than one frame to display the filter will need to be in playback mode to reveal an image. The 10 least significant bits will be plotted on a scale of 0 to 1, where 1 (the top of the graph) indicates a random level of noise and 0 depicts less random data. When the video uses less than 10 bits, the higher numbered bits will be 0.
 
 ## Broadcast Illegal Focus {#broadcast-illegal-focus}
 
