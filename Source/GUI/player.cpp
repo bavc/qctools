@@ -988,7 +988,24 @@ void Player::on_graphmonitor_checkBox_clicked(bool checked)
 
 void Player::on_goToStart_pushButton_clicked()
 {
-    m_player->seek(qint64(0));
+    {
+        SignalWaiter waiter(m_player, "seekFinished(qint64)");
+        m_player->seek(qint64(0));
+        waiter.wait();
+    }
+
+    if(m_player->displayPosition() > 0)
+    {
+        SignalWaiter waiter(m_player, "stepFinished()");
+        m_player->stepBackward();
+        waiter.wait();
+    }
+    else if(m_player->displayPosition() < 0)
+    {
+        SignalWaiter waiter(m_player, "stepFinished()");
+        m_player->stepForward();
+        waiter.wait();
+    }
 }
 
 void Player::on_goToEnd_pushButton_clicked()
