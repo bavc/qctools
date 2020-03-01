@@ -661,7 +661,7 @@ void Player::applyFilter()
     QString xstack_option;
 
     if(definedFilters.length() != 1) {
-        xstack_option = QString("%1xstack=inputs=%2:layout=%3").arg(xstack_input).arg(definedFilters.length()).arg(layout);
+        xstack_option = QString("%1xstack=fill=slategray:inputs=%2:layout=%3").arg(xstack_input).arg(definedFilters.length()).arg(layout);
     }
 
     QString combinedFilter = split + filterString + xstack_option;
