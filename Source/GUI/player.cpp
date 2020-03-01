@@ -26,7 +26,7 @@ const int DefaultForthFilterIndex = 0;
 Player::Player(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Player),
-    m_fileInformation(nullptr), m_commentsPlot(nullptr), m_seekOnFileInformationPositionChange(true), m_handlePlayPauseClick(true)
+    m_fileInformation(nullptr), m_commentsPlot(nullptr), m_seekOnFileInformationPositionChange(true), m_handlePlayPauseClick(true), m_ignorePositionChanges(false)
 {
     QtAV::setLogLevel(QtAV::LogOff);
 
@@ -104,6 +104,12 @@ Player::Player(QWidget *parent) :
     connect(m_player, SIGNAL(positionChanged(qint64)), SLOT(updateSlider(qint64)));
 
     ui->speed_label->installEventFilter(this);
+
+    connect(m_player, &QtAV::AVPlayer::started, [this](){
+      // m_player->masterClock()->setClockAuto(false);
+      // m_player->masterClock()->setClockType(QtAV::AVClock::ExternalClock);
+      updateSlider();
+    });
 
     // connect(m_player, SIGNAL(started()), SLOT(updateSlider()));
     // connect(m_player, SIGNAL(notifyIntervalChanged()), SLOT(updateSliderUnit()));
@@ -300,6 +306,11 @@ void Player::playPaused(qint64 ms)
         waiter.wait();        
     }
 
+    if(m_player->displayPosition() > ms)
+        m_player->stepBackward();
+    else if(m_player->displayPosition() < ms)
+        m_player->stepForward();
+
     ui->playerSlider->setDisabled(false);
 }
 
@@ -369,10 +380,6 @@ void Player::setFile(FileInformation *fileInfo)
 
         connect(m_fileInformation, &FileInformation::positionChanged, this, &Player::handleFileInformationPositionChanges);
 
-    } else {
-
-        auto ms = frameToMs(m_fileInformation->Frames_Pos_Get());
-        m_player->seek(ms);
     }
 }
 
@@ -399,7 +406,10 @@ void Player::seekBySlider(int value)
     auto newValue = qint64(value*m_unit);
 
     auto framePos = msToFrame(newValue);
+
+    m_seekOnFileInformationPositionChange = false;
     m_fileInformation->Frames_Pos_Set(framePos);
+    m_seekOnFileInformationPositionChange = true;
 
     updateInfoLabels();
 
@@ -507,6 +517,12 @@ void Player::updateInfoLabels()
 
 void Player::updateSlider(qint64 value)
 {
+    if(m_ignorePositionChanges)
+        return;
+
+    auto displayPosition = m_player->displayPosition();
+    value = displayPosition;
+
     auto newValue = int(qreal(value)/m_unit);
     if(ui->playerSlider->value() == newValue)
         return;
@@ -519,7 +535,7 @@ void Player::updateSlider(qint64 value)
     // ui->playerSlider->setRange(0, int(m_player->duration()/m_unit));
     ui->playerSlider->setValue(newValue);
 
-    auto position = m_player->position();
+    auto position = m_player->displayPosition();
     auto framePos = msToFrame(position);
 
     m_seekOnFileInformationPositionChange = false;
@@ -544,7 +560,7 @@ void Player::updateSlider(qint64 value)
 
 void Player::updateSlider()
 {
-    updateSlider(m_player->position());
+    updateSlider(m_player->displayPosition());
 }
 
 void Player::updateSliderUnit()
@@ -678,8 +694,35 @@ void Player::applyFilter()
 
 void Player::handleFileInformationPositionChanges()
 {
-    if(m_player->isPaused() && m_seekOnFileInformationPositionChange)
-        m_player->seek(frameToMs(m_fileInformation->Frames_Pos_Get()));
+    if(m_player->isPaused() && m_seekOnFileInformationPositionChange) {
+
+        auto ms = frameToMs(m_fileInformation->Frames_Pos_Get());
+
+        if(ms != m_player->displayPosition())
+        {
+            m_ignorePositionChanges = true;
+
+            auto prevMs = frameToMs(m_fileInformation->Frames_Pos_Get() - 12);
+            if(prevMs < 0)
+                prevMs = 0;
+
+            SignalWaiter waiter(m_player, "seekFinished(qint64)");
+            m_player->seek(qint64(prevMs));
+            waiter.wait();
+
+            while(ms > m_player->displayPosition())
+            {
+                {
+                    SignalWaiter waiter(m_player, "stepFinished()");
+                    m_player->stepForward();
+                    waiter.wait();
+                }
+            }
+            m_ignorePositionChanges = false;
+
+            ui->playerSlider->setValue(ms);
+        }
+    }
 
     m_commentsPlot->setCursorPos(m_fileInformation->Frames_Pos_Get());
 }
@@ -928,13 +971,13 @@ QString Player::replaceFilterTokens(const QString &filterString)
 
 qint64 Player::frameToMs(int frame)
 {
-    auto ms = qint64(qreal(m_player->duration()) / m_framesCount * frame);
+    auto ms = qint64(qreal(m_player->duration()) * frame / m_framesCount);
     return ms;
 }
 
 int Player::msToFrame(qint64 ms)
 {
-    auto frame = (int) (qreal(ms) / m_player->duration()  * m_framesCount);
+    auto frame = ceil(qreal(ms) * m_framesCount / m_player->duration());
     return frame;
 }
 
@@ -945,7 +988,24 @@ void Player::on_graphmonitor_checkBox_clicked(bool checked)
 
 void Player::on_goToStart_pushButton_clicked()
 {
-    m_player->seek(qint64(0));
+    {
+        SignalWaiter waiter(m_player, "seekFinished(qint64)");
+        m_player->seek(qint64(0));
+        waiter.wait();
+    }
+
+    if(m_player->displayPosition() > 0)
+    {
+        SignalWaiter waiter(m_player, "stepFinished()");
+        m_player->stepBackward();
+        waiter.wait();
+    }
+    else if(m_player->displayPosition() < 0)
+    {
+        SignalWaiter waiter(m_player, "stepFinished()");
+        m_player->stepForward();
+        waiter.wait();
+    }
 }
 
 void Player::on_goToEnd_pushButton_clicked()
@@ -955,28 +1015,17 @@ void Player::on_goToEnd_pushButton_clicked()
 
 void Player::on_prev_pushButton_clicked()
 {
-    auto newPosition = m_player->position() - 1;
-    qDebug() << "new position: " << newPosition;
-    // m_player->seek(newPosition);
-
+    auto newPosition = m_player->displayPosition() - 1;
+    qDebug() << "expected new position: " << newPosition;
+    qDebug() << "stepping backward...";
     m_player->stepBackward();
-    // auto frameDuration = (qreal) m_player->duration() / m_framesCount;
-    // m_player->seek(m_player->position() - (qint64) frameDuration);
-
-    /*
-    m_player->stepForward();
-    m_player->stepBackward();
-    m_player->stepBackward();
-    */
 }
 
 void Player::on_next_pushButton_clicked()
 {
-    auto newPosition = m_player->position() + 1;
-    qDebug() << "new position: " << newPosition;
-    // m_player->seek(newPosition);
-
-    qDebug() << "step forward";
+    auto newPosition = m_player->displayPosition() + 1;
+    qDebug() << "expected new position: " << newPosition;
+    qDebug() << "stepping forward...";
     m_player->stepForward();
 }
 

@@ -117,6 +117,7 @@ private:
     DraggableChildrenBehaviour* m_draggableBehaviour;
     CommentsPlot* m_commentsPlot;
     bool m_seekOnFileInformationPositionChange;
+    bool m_ignorePositionChanges;
 
     QTimer m_filterUpdateTimer;
 };
