@@ -86,7 +86,7 @@ Player::Player(QWidget *parent) :
     m_player->setSeekType(QtAV::AnyFrameSeek);
     m_player->setMediaEndAction(QtAV::MediaEndAction_Pause);
     m_player->setAsyncLoad(false);
-    m_player->setNotifyInterval(1);
+    m_player->setNotifyInterval(10);
 
     m_videoFilter = new QtAV::LibAVFilterVideo(this);
     m_audioFilter = new QtAV::LibAVFilterAudio(this);
