@@ -530,7 +530,7 @@ void Player::updateSlider(qint64 value)
     if(!ui->playerSlider->isEnabled() || ui->playerSlider->isSliderDown())
         return;
 
-    qDebug() << "update slider: " << newValue;
+    // qDebug() << "update slider: " << newValue;
 
     // ui->playerSlider->setRange(0, int(m_player->duration()/m_unit));
     ui->playerSlider->setValue(newValue);
@@ -543,7 +543,7 @@ void Player::updateSlider(qint64 value)
     m_seekOnFileInformationPositionChange = true;
 
     auto framesCount = m_fileInformation->Frames_Count_Get();
-    qDebug() << "framesCount: " << framesCount << "framesPos: " << framePos;
+    // qDebug() << "framesCount: " << framesCount << "framesPos: " << framePos;
 
     if((framePos + 1) == framesCount) {
         m_player->pause(true);
