@@ -283,7 +283,7 @@ private:
 
 class SignalWaiter {
 public:
-    SignalWaiter(const QObject* object, const char* signalName) : _object(object) {
+    SignalWaiter(const QObject* object, const char* signalName, int timeout = -1) : _object(object), _timeout(timeout) {
         auto emitter = object;
 
         int index = emitter->metaObject()
@@ -298,9 +298,21 @@ public:
 
         QObject::connect(emitter, _signal, receiver, _slot);
 
+        if(timeout != -1) {
+            _timer.setInterval(timeout);
+            _timer.setSingleShot(true);
+            QObject::connect(&_timer, &QTimer::timeout, [this]() {
+                qDebug() << "SignalWaiter: quit-ing by timeout";
+                _loop.quit();
+            });
+        }
+
     }
 
     void wait() {
+        if(_timeout != -1)
+            _timer.start();
+
         _loop.exec();
     }
 
@@ -309,12 +321,17 @@ public:
         QObject* receiver = &_loop;
 
         QObject::disconnect(emitter, _signal, receiver, _slot);
+
+        if(_timeout != -1)
+            _timer.stop();
     }
 private:
     const QObject* _object;
     QMetaMethod _signal;
     QMetaMethod _slot;
     QEventLoop _loop;
+    QTimer _timer;
+    int _timeout;
 };
 
 void Player::playPaused(qint64 ms)
@@ -351,6 +368,8 @@ void Player::playPaused(qint64 ms)
         m_player->stepForward();
 
     ui->playerSlider->setDisabled(false);
+
+    qDebug() << "play to " << ms << " done...";
 }
 
 void Player::setFile(FileInformation *fileInfo)
@@ -751,10 +770,12 @@ void Player::handleFileInformationPositionChanges()
             m_player->seek(qint64(prevMs));
             waiter.wait();
 
+            QApplication::processEvents();
+
             while(ms > m_player->displayPosition())
             {
                 {
-                    SignalWaiter waiter(m_player, "stepFinished()");
+                    SignalWaiter waiter(m_player, "stepFinished()", 1000);
                     m_player->stepForward();
                     waiter.wait();
                 }
@@ -1029,6 +1050,8 @@ void Player::on_graphmonitor_checkBox_clicked(bool checked)
 
 void Player::on_goToStart_pushButton_clicked()
 {
+    qDebug() << "go to start... ";
+
     ScopedMute mute(m_player);
 
     {
@@ -1037,18 +1060,22 @@ void Player::on_goToStart_pushButton_clicked()
         waiter.wait();
     }
 
+    QApplication::processEvents();
+
     if(m_player->displayPosition() > 0)
     {
-        SignalWaiter waiter(m_player, "stepFinished()");
+        SignalWaiter waiter(m_player, "stepFinished()", 1000);
         m_player->stepBackward();
         waiter.wait();
     }
     else if(m_player->displayPosition() < 0)
     {
-        SignalWaiter waiter(m_player, "stepFinished()");
+        SignalWaiter waiter(m_player, "stepFinished()", 1000);
         m_player->stepForward();
         waiter.wait();
     }
+
+    qDebug() << "go to start... done. ";
 }
 
 void Player::on_goToEnd_pushButton_clicked()
