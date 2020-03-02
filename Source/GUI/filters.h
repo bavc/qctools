@@ -500,8 +500,7 @@ const filter Filters[] =
         "Bit Plane Noise Graph",
         0,
         {
-            // TODO: Adjust slider max to bit depth.
-            { Args_Type_Slider,   1,   1,  16,   1, "Bit position" },
+            { Args_Type_Yuv,      0,   0,   0,   0, "Plane"},
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
@@ -510,7 +509,45 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "bitplanenoise=${1},drawgraph=fg1=0x006400:fg2=0x00008B:fg3=0x8B0000:m1=lavfi.bitplanenoise.0.${1}:m2=lavfi.bitplanenoise.1.${1}:m3=lavfi.bitplanenoise.2.${1}:min=0:max=1:slide=rscroll:s=${width}x${height}",
+          "split=3[b1][b2][b3];\
+          [b1]bitplanenoise=1,bitplanenoise=2,bitplanenoise=3,bitplanenoise=4,\
+          drawgraph=mode=line:slide=scroll:size=612x${height}:min=0:max=1:m1=lavfi.bitplanenoise.${1}.1:m2=lavfi.bitplanenoise.${1}.2:m3=lavfi.bitplanenoise.${1}.3:m4=lavfi.bitplanenoise.${1}.4:bg=Wheat@1:\
+          fg1=0xff0000ff:fg2=0xffff0000:fg3=0xffff00ff:fg4=0xff808000,\
+          pad=iw+108:ih:108:0:color=white,format=rgba,\
+          drawtext=fontfile=${fontfile}:fontcolor=black:fontsize=12:text='RANDOM':x=4:y=(h/12)*0+6,\
+          drawtext=fontfile=${fontfile}:fontcolor=0xff0000ff:fontsize=12:text=bit1  %{metadata\\\\:lavfi.bitplanenoise.${1}.1}:x=4:y=(h/12)*1+6,\
+          drawtext=fontfile=${fontfile}:fontcolor=0x0000ffff:fontsize=12:text=bit2  %{metadata\\\\:lavfi.bitplanenoise.${1}.2}:x=4:y=(h/12)*2+6,\
+          drawtext=fontfile=${fontfile}:fontcolor=0xff00ffff:fontsize=12:text=bit3  %{metadata\\\\:lavfi.bitplanenoise.${1}.3}:x=4:y=(h/12)*3+6,\
+          drawtext=fontfile=${fontfile}:fontcolor=0x008080ff:fontsize=12:text=bit4  %{metadata\\\\:lavfi.bitplanenoise.${1}.4}:x=4:y=(h/12)*4+6[b1o];\
+          \
+          [b2]bitplanenoise=5,bitplanenoise=6,bitplanenoise=7,bitplanenoise=8,\
+          drawgraph=mode=line:slide=scroll:size=612x${height}:min=0:max=1:m1=lavfi.bitplanenoise.${1}.5:m2=lavfi.bitplanenoise.${1}.6:m3=lavfi.bitplanenoise.${1}.7:m4=lavfi.bitplanenoise.${1}.8:bg=white@0:\
+          fg1=0xff008000:fg2=0xff00ff00:fg3=0xff000080:fg4=0xff800000,\
+          pad=iw+108:ih:108:0:color=white@0,format=rgba,\
+          drawtext=fontfile=${fontfile}:fontcolor=0x008000ff:fontsize=12:text=bit5  %{metadata\\\\:lavfi.bitplanenoise.${1}.5}:x=4:y=(h/12)*5+6,\
+          drawtext=fontfile=${fontfile}:fontcolor=0x00ff00ff:fontsize=12:text=bit6  %{metadata\\\\:lavfi.bitplanenoise.${1}.6}:x=4:y=(h/12)*6+6,\
+          drawtext=fontfile=${fontfile}:fontcolor=0x800000ff:fontsize=12:text=bit7  %{metadata\\\\:lavfi.bitplanenoise.${1}.7}:x=4:y=(h/12)*7+6,\
+          drawtext=fontfile=${fontfile}:fontcolor=0x000080ff:fontsize=12:text=bit8  %{metadata\\\\:lavfi.bitplanenoise.${1}.8}:x=4:y=(h/12)*8+6[b2o];\
+          \
+          [b3]bitplanenoise=9,bitplanenoise=10,\
+          drawgraph=mode=line:slide=scroll:size=612x${height}:min=0:max=1:m1=lavfi.bitplanenoise.${1}.9:m2=lavfi.bitplanenoise.${1}.10:bg=white@0:\
+          fg1=0xff800080:fg2=0xff0000ff,\
+          pad=iw+108:ih:108:0:color=white@0,format=rgba,\
+          drawtext=fontfile=${fontfile}:fontcolor=0x800080ff:fontsize=12:text=bit9  %{metadata\\\\:lavfi.bitplanenoise.${1}.9}:x=4:y=(h/12)*9+6,\
+          drawtext=fontfile=${fontfile}:fontcolor=0xff0000ff:fontsize=12:text=bit10 %{metadata\\\\:lavfi.bitplanenoise.${1}.10}:x=4:y=(h/12)*10+6,\
+          drawtext=fontfile=${fontfile}:fontcolor=black:fontsize=12:text='NON-RANDOM':x=4:y=(h/12)*11+6,\
+          drawtext=fontfile=${fontfile}:fontcolor=black:fontsize=12:text='bit1=LSB':x=4:y=h-12[b3o];\
+          \
+          [b1o][b2o]overlay[bpn1];[bpn1][b3o]overlay,\
+          drawbox=x=100:y=(ih/10)*1:c=green@0.2:t=1:h=1:w=iw,\
+          drawbox=x=100:y=(ih/10)*2:c=green@0.2:t=1:h=1:w=iw,\
+          drawbox=x=100:y=(ih/10)*3:c=green@0.2:t=1:h=1:w=iw,\
+          drawbox=x=100:y=(ih/10)*4:c=green@0.2:t=1:h=1:w=iw,\
+          drawbox=x=100:y=(ih/10)*5:c=green@0.5:t=1:h=1:w=iw,\
+          drawbox=x=100:y=(ih/10)*6:c=green@0.2:t=1:h=1:w=iw,\
+          drawbox=x=100:y=(ih/10)*7:c=green@0.2:t=1:h=1:w=iw,\
+          drawbox=x=100:y=(ih/10)*8:c=green@0.2:t=1:h=1:w=iw,\
+          drawbox=x=100:y=(ih/10)*9:c=green@0.2:t=1:h=1:w=iw",
         },
     },
     {

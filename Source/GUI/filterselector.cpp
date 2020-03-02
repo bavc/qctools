@@ -353,6 +353,17 @@ std::string FilterSelector::FiltersList_currentOptionChanged(int Picture_Current
                         default:;
                         }
                     }
+                    else if (string(Filters[Picture_Current].Name)=="Bit Plane Noise Graph")
+                    {
+                        switch (OptionPos2)
+                        {
+                        case 0: WithRadios[OptionPos]="0"; break;
+                        case 1: WithRadios[OptionPos]="1"; break;
+                        case 2: WithRadios[OptionPos]="2"; break;
+                        case 3: WithRadios[OptionPos]="3"; break; //unused, bitplane noise graph is yuv only
+                        default:;
+                        }
+                    }
                     else
                     {
                         switch (OptionPos2)
