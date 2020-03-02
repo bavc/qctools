@@ -43,9 +43,9 @@ public:
 class ScopedMute
 {
 public:
-    ScopedMute(QtAV::AVPlayer* player) {
+    ScopedMute(QtAV::AVPlayer* player) : m_action(nullptr) {
         if(player && player->audio()) {
-            m_action = std::make_unique<ScopedAction>([this, player] {
+            m_action = new ScopedAction([this, player] {
                 if(!player->audio()->isMute()) {
                     player->audio()->setMute(true);
                     m_muted = true;
@@ -57,9 +57,14 @@ public:
         }
     }
 
+    ~ScopedMute() {
+        if(m_action)
+            delete m_action;
+    }
+
 private:
     bool m_muted = {false};
-    std::unique_ptr<ScopedAction> m_action;
+    ScopedAction* m_action;
 };
 
 Player::Player(QWidget *parent) :
