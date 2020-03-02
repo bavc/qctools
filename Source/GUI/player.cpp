@@ -23,6 +23,50 @@ const int DefaultSecondFilterIndex = 4;
 const int DefaultThirdFilterIndex = 0;
 const int DefaultForthFilterIndex = 0;
 
+class ScopedAction
+{
+public:
+    ScopedAction(const std::function<void()>& enterAction = {}, const std::function<void()>& leaveAction = {}) : m_enterAction(enterAction), m_leaveAction(leaveAction) {
+        if(m_enterAction)
+            m_enterAction();
+    }
+
+    ~ScopedAction() {
+        if(m_leaveAction)
+            m_leaveAction();
+    }
+
+    std::function<void()> m_enterAction;
+    std::function<void()> m_leaveAction;
+};
+
+class ScopedMute
+{
+public:
+    ScopedMute(QtAV::AVPlayer* player) : m_action(nullptr) {
+        if(player && player->audio()) {
+            m_action = new ScopedAction([this, player] {
+                if(!player->audio()->isMute()) {
+                    player->audio()->setMute(true);
+                    m_muted = true;
+                }
+            }, [this, player] {
+                if(m_muted)
+                    player->audio()->setMute(false);
+            });
+        }
+    }
+
+    ~ScopedMute() {
+        if(m_action)
+            delete m_action;
+    }
+
+private:
+    bool m_muted = {false};
+    ScopedAction* m_action;
+};
+
 Player::Player(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Player),
@@ -47,7 +91,7 @@ Player::Player(QWidget *parent) :
     m_player->setSeekType(QtAV::AnyFrameSeek);
     m_player->setMediaEndAction(QtAV::MediaEndAction_Pause);
     m_player->setAsyncLoad(false);
-    m_player->setNotifyInterval(1);
+    m_player->setNotifyInterval(10);
 
     m_videoFilter = new QtAV::LibAVFilterVideo(this);
     m_audioFilter = new QtAV::LibAVFilterAudio(this);
@@ -244,7 +288,7 @@ private:
 
 class SignalWaiter {
 public:
-    SignalWaiter(const QObject* object, const char* signalName) : _object(object) {
+    SignalWaiter(const QObject* object, const char* signalName, int timeout = -1) : _object(object), _timeout(timeout) {
         auto emitter = object;
 
         int index = emitter->metaObject()
@@ -259,9 +303,21 @@ public:
 
         QObject::connect(emitter, _signal, receiver, _slot);
 
+        if(timeout != -1) {
+            _timer.setInterval(timeout);
+            _timer.setSingleShot(true);
+            QObject::connect(&_timer, &QTimer::timeout, [this]() {
+                qDebug() << "SignalWaiter: quit-ing by timeout";
+                _loop.quit();
+            });
+        }
+
     }
 
     void wait() {
+        if(_timeout != -1)
+            _timer.start();
+
         _loop.exec();
     }
 
@@ -270,12 +326,17 @@ public:
         QObject* receiver = &_loop;
 
         QObject::disconnect(emitter, _signal, receiver, _slot);
+
+        if(_timeout != -1)
+            _timer.stop();
     }
 private:
     const QObject* _object;
     QMetaMethod _signal;
     QMetaMethod _slot;
     QEventLoop _loop;
+    QTimer _timer;
+    int _timeout;
 };
 
 void Player::playPaused(qint64 ms)
@@ -312,6 +373,8 @@ void Player::playPaused(qint64 ms)
         m_player->stepForward();
 
     ui->playerSlider->setDisabled(false);
+
+    qDebug() << "play to " << ms << " done...";
 }
 
 void Player::setFile(FileInformation *fileInfo)
@@ -363,7 +426,7 @@ void Player::setFile(FileInformation *fileInfo)
         stopAndWait();
 
         m_player->setFile(fileInfo->fileName());
-        m_player->audio()->setMute(true);
+        ScopedMute mute(m_player);
 
         m_player->load();
 
@@ -530,7 +593,7 @@ void Player::updateSlider(qint64 value)
     if(!ui->playerSlider->isEnabled() || ui->playerSlider->isSliderDown())
         return;
 
-    qDebug() << "update slider: " << newValue;
+    // qDebug() << "update slider: " << newValue;
 
     // ui->playerSlider->setRange(0, int(m_player->duration()/m_unit));
     ui->playerSlider->setValue(newValue);
@@ -543,7 +606,7 @@ void Player::updateSlider(qint64 value)
     m_seekOnFileInformationPositionChange = true;
 
     auto framesCount = m_fileInformation->Frames_Count_Get();
-    qDebug() << "framesCount: " << framesCount << "framesPos: " << framePos;
+    // qDebug() << "framesCount: " << framesCount << "framesPos: " << framePos;
 
     if((framePos + 1) == framesCount) {
         m_player->pause(true);
@@ -706,14 +769,18 @@ void Player::handleFileInformationPositionChanges()
             if(prevMs < 0)
                 prevMs = 0;
 
+            ScopedMute mute(m_player);
+
             SignalWaiter waiter(m_player, "seekFinished(qint64)");
             m_player->seek(qint64(prevMs));
             waiter.wait();
 
+            QApplication::processEvents();
+
             while(ms > m_player->displayPosition())
             {
                 {
-                    SignalWaiter waiter(m_player, "stepFinished()");
+                    SignalWaiter waiter(m_player, "stepFinished()", 1000);
                     m_player->stepForward();
                     waiter.wait();
                 }
@@ -988,24 +1055,32 @@ void Player::on_graphmonitor_checkBox_clicked(bool checked)
 
 void Player::on_goToStart_pushButton_clicked()
 {
+    qDebug() << "go to start... ";
+
+    ScopedMute mute(m_player);
+
     {
         SignalWaiter waiter(m_player, "seekFinished(qint64)");
         m_player->seek(qint64(0));
         waiter.wait();
     }
 
+    QApplication::processEvents();
+
     if(m_player->displayPosition() > 0)
     {
-        SignalWaiter waiter(m_player, "stepFinished()");
+        SignalWaiter waiter(m_player, "stepFinished()", 1000);
         m_player->stepBackward();
         waiter.wait();
     }
     else if(m_player->displayPosition() < 0)
     {
-        SignalWaiter waiter(m_player, "stepFinished()");
+        SignalWaiter waiter(m_player, "stepFinished()", 1000);
         m_player->stepForward();
         waiter.wait();
     }
+
+    qDebug() << "go to start... done. ";
 }
 
 void Player::on_goToEnd_pushButton_clicked()
