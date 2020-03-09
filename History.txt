@@ -1,4 +1,4 @@
-Next
+1.1, 2020-03-05
 === Thanks to New York Public Library and the Hirshhorn Museum and Sculpture Garden for their support ===
 + Player is refactored to QtAV/mdk
 + Updates to support GitHub Actions for testing environment
