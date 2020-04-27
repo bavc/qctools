@@ -11,7 +11,7 @@ Cli::Cli() : indexOfStreamWithKnownFrameCount(0), statsFileBytesWritten(0), stat
 int Cli::exec(QCoreApplication &a)
 {
     std::string appName = "qcli";
-    std::string copyright = "Copyright (c) 2013-2018 BAVC";
+    std::string copyright = "Copyright (C): 2013-2017, BAVC.\nCopyright (C): 2018-2020, RiceCapades LLC & MediaArea.net SARL.";
 
     QString input;
     QString output;
@@ -81,14 +81,14 @@ int Cli::exec(QCoreApplication &a)
         if(showShortHelp)
         {
             std::cout <<
-                 appName << " " << (VERSION) << ", " << copyright << std::endl <<
+                 appName << " " << (VERSION) << std::endl << copyright << std::endl <<
                  "Usage: " << appName << " -i <qctools-input> [-o <qctools-output>]" << std::endl << std::endl <<
                  "Use " << appName << " -h to get detailed help" << std::endl << std::endl;
         }
         else
         {
             std::cout
-                << appName << " " << (VERSION) << ", " << copyright << std::endl
+                << appName << " " << (VERSION) << std::endl << copyright << std::endl
                 << "Usage: " << appName << " -i <qctools-input> [-o <qctools-output>]" << std::endl
                 << std::endl
                 << "-i <input file>" << std::endl
