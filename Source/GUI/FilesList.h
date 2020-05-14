@@ -40,10 +40,14 @@ private Q_SLOTS:
     void on_itemDoubleClicked(QTableWidgetItem * item);
     void on_verticalHeaderClicked(int logicalIndex);
     void on_verticalHeaderDoubleClicked(int logicalIndex);
+    void on_verticalHeaderContextMenuRequested(const QPoint& pos);
 
     void updateSignalServerCheckUploadedStatus();
     void updateSignalServerUploadStatus();
     void updateSignalServerUploadProgress(qint64, qint64);
+
+private:
+    void contextMenu(const QPoint& pos, const int& row);
 };
 
 #endif // GraphLayout_H

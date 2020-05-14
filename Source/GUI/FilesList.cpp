@@ -178,6 +178,10 @@ FilesList::FilesList(MainWindow* Main_) :
     Main(Main_)
 {
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    verticalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    connect(verticalHeader(), SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(on_verticalHeaderContextMenuRequested(const QPoint&)));
+
     setSortingEnabled(true);
 }
 
@@ -436,6 +440,12 @@ void FilesList::contextMenuEvent (QContextMenuEvent* Event)
     if (Item==NULL)
         return;
 
+    contextMenu(Event->globalPos(), Item->row());
+}
+
+//---------------------------------------------------------------------------
+void FilesList::contextMenu(const QPoint& pos, const int& row)
+{
     //Creating menu
     QMenu menu(this);
     menu.addAction(new QAction("Show graphs", this)); //If you change this, change the test text too
@@ -448,7 +458,7 @@ void FilesList::contextMenuEvent (QContextMenuEvent* Event)
     menu.addAction(new QAction("Close", this)); //If you change this, change the test text too
 
     //Displaying
-    QAction* Action=menu.exec(Event->globalPos());
+    QAction* Action=menu.exec(pos);
     if (Action==NULL)
         return;
 
@@ -458,24 +468,24 @@ void FilesList::contextMenuEvent (QContextMenuEvent* Event)
     //Special cases
     if (Text=="Show graphs") //If you change this, change the creation text too
     {
-        Main->selectDisplayFile(Item->row());
+        Main->selectDisplayFile(row);
         return;
     }
     if (Text=="Show filters") //If you change this, change the creation text too
     {
-        Main->selectDisplayFiltersFile(Item->row());
+        Main->selectDisplayFiltersFile(row);
         return;
     }
     if (Text=="Close") //If you change this, change the creation text too
     {
-        Main->selectFile(Item->row());
+        Main->selectFile(row);
         Main->closeFile();
         UpdateAll();
         return;
     }
     if(Text == "Reveal file location")
     {
-        QString fileName = verticalHeaderItem(Item->row())->data(Qt::UserRole).toString();
+        QString fileName = verticalHeaderItem(row)->data(Qt::UserRole).toString();
         QFileInfo fileInfo(fileName);
         QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absoluteDir().path()));
     }
@@ -509,6 +519,20 @@ void FilesList::on_verticalHeaderDoubleClicked(int logicalIndex)
     Main->selectDisplayFile(logicalIndex);
 }
 
+//---------------------------------------------------------------------------
+void FilesList::on_verticalHeaderContextMenuRequested(const QPoint& pos)
+{
+    //Retrieving data
+    int index = verticalHeader()->logicalIndexAt(pos);
+    if (index<0 || index>=rowCount())
+        return;
+
+    selectRow(index);
+    Main->selectFile(index);
+    contextMenu(verticalHeader()->mapToGlobal(pos), index);
+}
+
+//---------------------------------------------------------------------------
 void FilesList::updateSignalServerCheckUploadedStatus()
 {
     FileInformation* file = qobject_cast<FileInformation*>(sender());
