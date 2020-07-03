@@ -1,0 +1,26 @@
+#!/bin/bash
+INPUT_VIDEO="${1}"
+TEMP_OUTPUT="${INPUT_VIDEO}.qctools.mkv"
+PANEL_OUTPUT="${INPUT_VIDEO}.qctools_panels.mkv"
+
+if [[ ! -f "${TEMP_OUTPUT}" ]] ; then
+    qcli -i "${INPUT_VIDEO}" -o "${TEMP_OUTPUT}"
+fi
+
+PANEL_WIDTH=1024
+
+if [[ -f "${PANEL_OUTPUT}" ]] ; then
+    echo "${PANEL_OUTPUT} already exists, stopping"
+else
+    ffmpeg \
+        -i "${TEMP_OUTPUT}" -i "${INPUT_VIDEO}" \
+        -map 0 \
+        -lavfi "[1:v:0]split=2[p1][p2];\
+        [p1]format=rgb24,crop=1:ih:iw/2:0,tile=layout=${PANEL_WIDTH}x1[p1o];\
+        [p2]format=rgb24,transpose=0,crop=1:ih:iw/2:0,tile=layout=${PANEL_WIDTH}x1[p2o]" \
+        -metadata:s:v:0 "title=Frame Thumbnails" \
+        -map "[p1o]" -metadata:s:v:1 "title=Tiled Center Column" \
+        -map "[p2o]" -metadata:s:v:2 "title=Tiled Center Row" \
+        -c:v ffv1 -c:v:0 copy "${PANEL_OUTPUT}"
+    echo "${PANEL_OUTPUT} is done :)"
+fi
