@@ -46,6 +46,7 @@ public:
         Output_None,
         Output_QImage,
         Output_Jpeg,
+        Output_Panels,
         Output_Stats,
     };
     FFmpeg_Glue(const string &FileName, activealltracks ActiveAllTracks, std::vector<CommonStats*>* Stats, StreamsStats** streamsStats, FormatStats** formatStats, bool WithStats=false);
@@ -71,6 +72,7 @@ public:
 
     // Images
     Image Image_Get(size_t Pos) const;
+    std::vector<FFmpeg_Glue::AVFramePtr>& GetPanels() const;
 
     struct bytes
     {
@@ -273,6 +275,8 @@ private:
         };
 
         std::vector<std::unique_ptr<AVPacket, AVPacketDeleter>>  Thumbnails;
+        std::vector<AVFramePtr> Panels;
+
         size_t                  Thumbnails_Modulo;
         CommonStats*            Stats;
 

@@ -464,6 +464,18 @@ void MainWindow::addFile(const QString &FileName)
     FileInformation* Temp=new FileInformation(signalServer, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks);
     connect(Temp, SIGNAL(positionChanged()), this, SLOT(Update()), Qt::DirectConnection); // direct connection is required here to get Update called from separate thread
     connect(Temp, SIGNAL(parsingCompleted(bool)), this, SLOT(updateExportAllAction()));
+    connect(Temp, &FileInformation::parsingCompleted, [Temp](bool) {
+        if(Temp->Glue) {
+            auto & panels = Temp->Glue->GetPanels();
+            for(auto i = 0; i < panels.size(); ++i) {
+                FFmpeg_Glue::Image frameImage;
+                frameImage.frame = panels[i];
+                auto panelImage = QImage(frameImage.data(), frameImage.width(), frameImage.height(), frameImage.linesize(), QImage::Format_RGB888);
+
+                panelImage.save(QString("%1%2.png").arg("panel").arg(i));
+            }
+        }
+    });
 
     Temp->setIndex(Files.size());
     Temp->setExportFilters(Prefs->ActiveFilters);

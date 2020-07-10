@@ -249,6 +249,7 @@ void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
     {
         case Output_QImage  :   ReplaceImage(); break;
         case Output_Jpeg    :   AddThumbnail();  break;
+        case Output_Panels  :   if(OutputFrame) Panels.push_back(OutputFrame); break;
         default             :   ;
     }    
 }
@@ -736,6 +737,11 @@ FFmpeg_Glue::Image FFmpeg_Glue::Image_Get(size_t Pos) const
         return Image();
 
     return OutputDatas[Pos]->image;
+}
+
+std::vector<FFmpeg_Glue::AVFramePtr>& FFmpeg_Glue::GetPanels() const
+{
+    return OutputDatas[3]->Panels;
 }
 
 AVPacket *FFmpeg_Glue::ThumbnailPacket_Get(size_t Pos, size_t FramePos)
