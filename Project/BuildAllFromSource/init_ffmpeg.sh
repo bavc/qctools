@@ -17,7 +17,7 @@ fi
     FFMPEG_CONFIGURE_OPTS=(--enable-gpl --enable-version3 --disable-securetransport --disable-videotoolbox --enable-shared --disable-static --disable-doc --disable-ffplay --disable-ffprobe --disable-debug --disable-lzma --disable-iconv --enable-pic)
 
     if sw_vers >/dev/null 2>&1 ; then
-        FFMPEG_CONFIGURE_OPTS+=(--extra-cflags="-mmacosx-version-min=10.7" --extra-ldflags="-mmacosx-version-min=10.7")
+        FFMPEG_CONFIGURE_OPTS+=(--extra-cflags="-mmacosx-version-min=10.8" --extra-ldflags="-mmacosx-version-min=10.8")
     fi
 
     chmod u+x configure
