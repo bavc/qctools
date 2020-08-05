@@ -298,17 +298,15 @@ macx:contains(DEFINES, USE_BREW) {
     message("use external qwt: QWT_ROOT = " $$QWT_ROOT)
 
     include( $${QWT_ROOT}/qwtconfig.pri )
-    !win32 {
-        include( $${QWT_ROOT}/qwtbuild.pri )
-    }
-    include( $${QWT_ROOT}/qwtfunctions.pri )
 
     macx {
         macx:LIBS       += -F$${QWT_ROOT}/lib -framework qwt
     }
 
     win32-msvc* {
-        DEFINES += QWT_DLL
+        isEmpty(QWT_STATIC) {
+            DEFINES += QWT_DLL
+        }
     }
 
     !macx: {
