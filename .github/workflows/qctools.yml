@@ -276,14 +276,6 @@ jobs:
       run: |
         bash -lc "exit"
 
-    - name: Update msys2
-      run: |
-        pacman -Syyuu --needed --ask=20 --noconfirm
-
-    - name: Install build packages
-      run: |
-        pacman -S --needed --ask=20 --noconfirm make mingw-w64-x86_64-gcc
-
     - name: Download and configure qwt
       run: |
         git clone --depth 1 https://github.com/opencor/qwt ../qwt
