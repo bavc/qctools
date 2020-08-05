@@ -52,6 +52,10 @@ contains(DEFINES, USE_BREW) {
     write_file($$QTAV/.qmake.conf, ffmpegIncludes, append)
     write_file($$QTAV/.qmake.conf, ffmpegLibs, append)
     write_file($$QTAV/.qmake.conf, staticffmpeg, append)
+
+    # to fix building QtAV with the latest ffmpeg
+    limitMacros = "DEFINES += __STDC_LIMIT_MACROS"
+    write_file($$QTAV/.qmake.conf, limitMacros, append)
 }
 
 linux: {
