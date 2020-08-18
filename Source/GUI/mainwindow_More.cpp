@@ -16,6 +16,7 @@
 #include <QFont>
 #include <QPalette>
 #include <QMessageBox>
+#include <QStandardPaths>
 
 #include "Core/Core.h"
 #include "Core/FFmpeg_Glue.h"
@@ -472,7 +473,8 @@ void MainWindow::addFile(const QString &FileName)
                 frameImage.frame = panels[i];
                 auto panelImage = QImage(frameImage.data(), frameImage.width(), frameImage.height(), frameImage.linesize(), QImage::Format_RGB888);
 
-                panelImage.save(QString("%1%2.png").arg("panel").arg(i));
+                auto writablePath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+                panelImage.save(QString("%1/%2%3.png").arg(writablePath).arg("panel").arg(i));
             }
         }
     });
