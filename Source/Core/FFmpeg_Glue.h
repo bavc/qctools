@@ -73,6 +73,9 @@ public:
     // Images
     Image Image_Get(size_t Pos) const;
     std::vector<FFmpeg_Glue::AVFramePtr>& GetPanels() const;
+    int GetPanelsCount() const;
+    FFmpeg_Glue::AVFramePtr GetPanel(int index) const;
+    int GetPanelSize() const;
 
     struct bytes
     {

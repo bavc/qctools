@@ -167,7 +167,8 @@ HEADERS += \
     $$SOURCES_PATH/GUI/doublespinboxwithslider.h \
     $$SOURCES_PATH/GUI/filters.h \
     $$SOURCES_PATH/GUI/filterselector.h \
-    $$SOURCES_PATH/GUI/playercontrol.h
+    $$SOURCES_PATH/GUI/playercontrol.h \
+    $$SOURCES_PATH/GUI/panelsview.h
 
 SOURCES += \
     $$SOURCES_PATH/GUI/FilesList.cpp \
@@ -198,7 +199,8 @@ SOURCES += \
     $$SOURCES_PATH/GUI/doublespinboxwithslider.cpp \
     $$SOURCES_PATH/GUI/filters.cpp \
     $$SOURCES_PATH/GUI/filterselector.cpp \
-    $$SOURCES_PATH/GUI/playercontrol.cpp
+    $$SOURCES_PATH/GUI/playercontrol.cpp \
+    $$SOURCES_PATH/GUI/panelsview.cpp
 
 include(../zlib.pri)
 

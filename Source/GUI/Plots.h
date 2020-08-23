@@ -13,6 +13,7 @@
 #include "Core/CommonStats.h"
 #include "Core/FileInformation.h"
 #include "GUI/Comments.h"
+#include "panelsview.h"
 
 #include <QWidget>
 
@@ -94,6 +95,8 @@ public:
     const QwtPlot*              plot( size_t streamPos, size_t group ) const;
     CommentsPlot*               commentsPlot() const { return m_commentsPlot; }
 
+    PanelsView*                 panels() const { return m_PanelsView; }
+
     void                        Zoom_Move( int Begin );
     void                        refresh();
 
@@ -111,6 +114,7 @@ public:
     void showEditBarchartProfileDialog(const size_t plotGroup, Plot* plot, const stream_info& streamInfo);
 
 Q_SIGNALS:
+    void visibleFramesChanged(int from, int to);
     void                        barchartProfileChanged();
 
 public Q_SLOTS:
@@ -140,6 +144,7 @@ private:
 private:
     PlotScaleWidget*            m_scaleWidget;
     CommentsPlot*               m_commentsPlot;
+    PanelsView*                 m_PanelsView;
     PlayerControl*              m_playerControl;
     Plot***                     m_plots; // pointer on an array of streams and groups per stream and Plot* per group
     int                         m_plotsCount;
