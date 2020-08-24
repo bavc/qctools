@@ -754,11 +754,6 @@ FFmpeg_Glue::AVFramePtr FFmpeg_Glue::GetPanel(int index) const
     return OutputDatas.back()->Panels[index];
 }
 
-int FFmpeg_Glue::GetPanelSize() const
-{
-    return 1024;
-}
-
 AVPacket *FFmpeg_Glue::ThumbnailPacket_Get(size_t Pos, size_t FramePos)
 {
     QMutexLocker locker(mutex);

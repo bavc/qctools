@@ -7,7 +7,7 @@ PanelsView::PanelsView(QWidget *parent) : QFrame(parent), m_actualWidth(0)
 
 }
 
-void PanelsView::setProvider(const std::function<int ()> &getPanelsCount, const std::function<int ()> &getPanelSize, const std::function<QImage (int)> &getPanelImage)
+void PanelsView::setProvider(const std::function<int ()> &getPanelsCount, const std::function<QSize ()> &getPanelSize, const std::function<QImage (int)> &getPanelImage)
 {
     this->getPanelsCount = getPanelsCount;
     this->getPanelSize = getPanelSize;
@@ -16,19 +16,20 @@ void PanelsView::setProvider(const std::function<int ()> &getPanelsCount, const 
 
 int PanelsView::panelIndexByFrame(int frameIndex) const
 {
-    auto panelIndex = ceil((double) frameIndex / getPanelSize());
+    auto panelIndex = ceil((double) frameIndex / getPanelSize().width());
     return panelIndex;
 }
 
 void PanelsView::getPanelsBounds(int &startPanelIndex, int &startPanelOffset, int &endPanelIndex, int &endPanelLength)
 {
     auto panelSize = getPanelSize();
+    auto panelWidth = panelSize.width();
 
-    startPanelOffset = m_startFrame % panelSize;
-    startPanelIndex = (m_startFrame - startPanelOffset) / panelSize;
+    startPanelOffset = m_startFrame % panelWidth;
+    startPanelIndex = (m_startFrame - startPanelOffset) / panelWidth;
 
-    endPanelLength = m_endFrame % panelSize;
-    endPanelIndex = (m_endFrame - endPanelLength) / panelSize;
+    endPanelLength = m_endFrame % panelWidth;
+    endPanelIndex = (m_endFrame - endPanelLength) / panelWidth;
 }
 
 void PanelsView::refresh()
@@ -57,6 +58,8 @@ void PanelsView::paintEvent(QPaintEvent *)
 
     auto availableWidth = width() - contentsMargins().left() - contentsMargins().right();
     auto sx = m_actualWidth == 0 ? 1 : ((qreal) availableWidth / m_actualWidth);
+    auto sy = (qreal)height() / getPanelSize().height();
+
     auto dx = availableWidth - m_actualWidth;
     qDebug() << "sx: " << sx << "m_actualWidth: " << m_actualWidth;
 
@@ -65,7 +68,7 @@ void PanelsView::paintEvent(QPaintEvent *)
 
     qDebug() << "viewport: " << viewport;
 
-    QMatrix scalingMatrix(sx, 0, 0, 1, 0, 0);
+    QMatrix scalingMatrix(sx, 0, 0, sy, 0, 0);
     QMatrix translationMatrix(1, 0, 0, 1, 0, 0);
     p.setMatrix(scalingMatrix * translationMatrix);
 
@@ -75,7 +78,8 @@ void PanelsView::paintEvent(QPaintEvent *)
     qDebug() << "contentsMargins: " << contentsMargins();
 
     qDebug() << "startPanelIndex: " << startPanelIndex << "startPanelOffset: " << startPanelOffset
-             << "endPanelIndex: " << endPanelIndex << "endPanelLength: " << endPanelLength << "width: " << width() << "actual: " << m_actualWidth;
+             << "endPanelIndex: " << endPanelIndex << "endPanelLength: " << endPanelLength << "width: " << width() << "actual: " << m_actualWidth
+             << "height: " << height();
 
     // p.fillRect(QRect(0, 0, width(), height()), Qt::green);
     int x = 0;
@@ -88,8 +92,9 @@ void PanelsView::paintEvent(QPaintEvent *)
             auto image = getPanelImage(i);
             auto imageXOffset = ((i == startPanelIndex) ? startPanelOffset : 0);
             auto imageWidth = ((i == endPanelIndex) ? endPanelLength : image.width());
+            auto imageHeight = image.height();
 
-            QRect sr(imageXOffset, 100, imageWidth, height());
+            QRect sr(imageXOffset, 0, imageWidth, imageHeight);
             p.drawImage(QPointF(x, y), image, sr);
             //p.fillRect(x, 0, imageWidth, image.height(), Qt::red);
 

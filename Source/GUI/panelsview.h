@@ -2,6 +2,7 @@
 #define PANELSVIEW_H
 
 #include <QFrame>
+#include <QSize>
 #include <functional>
 
 class PanelsView : public QFrame
@@ -9,7 +10,7 @@ class PanelsView : public QFrame
     Q_OBJECT
 public:
     explicit PanelsView(QWidget *parent = nullptr);
-    void setProvider(const std::function<int()>& getPanelsCount, const std::function<int()>& getPanelSize,
+    void setProvider(const std::function<int()>& getPanelsCount, const std::function<QSize()>& getPanelSize,
                      const std::function<QImage(int)>& getPanelImage);
 
     int panelIndexByFrame(int frameIndex) const;
@@ -30,7 +31,7 @@ private:
     int m_endFrame;
     int m_actualWidth;
     std::function<int()> getPanelsCount;
-    std::function<int()> getPanelSize;
+    std::function<QSize()> getPanelSize;
     std::function<QImage(int)> getPanelImage;
 };
 

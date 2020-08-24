@@ -339,7 +339,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     m_PanelsView->setProvider([&] {
         return m_fileInfoData->Glue->GetPanelsCount();
     }, [&] {
-        return m_fileInfoData->Glue->GetPanelSize();
+        return m_fileInfoData->panelSize();
     }, [&](int index) -> QImage {
         FFmpeg_Glue::Image frameImage;
         frameImage.frame = m_fileInfoData->Glue->GetPanel(index);

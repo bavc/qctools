@@ -19,6 +19,7 @@
 #include <QFile>
 #include <QSharedPointer>
 #include <QFileInfo>
+#include <QSize>
 class CommonStats;
 class StreamsStats;
 class FormatStats;
@@ -132,6 +133,7 @@ public:
 
     void readStats(QIODevice& StatsFromExternalData_FileName, bool StatsFromExternalData_FileName_IsCompressed);
 
+    QSize panelSize() const;
 public Q_SLOTS:
 
     void checkFileUploaded(const QString& fileName);
@@ -181,6 +183,7 @@ private:
     bool m_autoUpload;
     bool m_hasStats;
     bool m_commentsUpdated;
+    QSize m_panelSize;
 
     activefilters m_exportFilters;
 };

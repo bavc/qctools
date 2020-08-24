@@ -231,6 +231,11 @@ void FileInformation::readStats(QIODevice& StatsFromExternalData_File, bool Stat
     delete[] Xml;
 }
 
+QSize FileInformation::panelSize() const
+{
+    return m_panelSize;
+}
+
 FileInformation::FileInformation (SignalServer* signalServer, const QString &FileName_, activefilters ActiveFilters_, activealltracks ActiveAllTracks_,
                                   int FrameCount) :
     FileName(FileName_),
@@ -370,7 +375,9 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         if (ActiveFilters[ActiveFilter_Audio_EbuR128])
             Filters[1]+=",ebur128=metadata=1";
         Filters[1].erase(0, 1); // remove first comma
-        Filters[2] = "format=rgb24,crop=1:ih:iw/2:0,tile=layout=1024x1";
+
+        m_panelSize.setWidth(1024);
+        Filters[2] = QString("format=rgb24,crop=1:ih:iw/2:0,tile=layout=%1x1").arg(m_panelSize.width()).toStdString();
     }
     else
     {
@@ -400,7 +407,9 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         Glue->AddOutput(0, 72, 72, FFmpeg_Glue::Output_Jpeg);
         Glue->AddOutput(1, 0, 0, FFmpeg_Glue::Output_Stats, 0, Filters[0]);
         Glue->AddOutput(0, 0, 0, FFmpeg_Glue::Output_Stats, 1, Filters[1]);
-        Glue->AddOutput(2, 72, 1, FFmpeg_Glue::Output_Panels, 0, Filters[2]);
+
+        m_panelSize.setHeight(Glue->Height_Get());
+        Glue->AddOutput(FFmpeg_Glue::Output_Panels, m_panelSize.height(), 1, FFmpeg_Glue::Output_Panels, 0, Filters[2]);
     }
 
     // Looking for the reference stream (video or audio)
