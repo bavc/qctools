@@ -1,10 +1,11 @@
 #include "panelsview.h"
 #include <QDebug>
 #include <QPainter>
+#include <QPushButton>
+#include <QWheelEvent>
 
 PanelsView::PanelsView(QWidget *parent) : QFrame(parent), m_actualWidth(0)
 {
-
 }
 
 void PanelsView::setProvider(const std::function<int ()> &getPanelsCount, const std::function<QSize ()> &getPanelSize, const std::function<QImage (int)> &getPanelImage)
@@ -107,4 +108,23 @@ void PanelsView::paintEvent(QPaintEvent *)
     }
 
     p.end();
+}
+
+void PanelsView::wheelEvent(QWheelEvent *event)
+{
+    if(event->delta() > 0) {
+        auto newHeight = height() + 10;
+        if(newHeight > getPanelSize().height())
+            newHeight = getPanelSize().height();
+
+        this->setMinimumHeight(newHeight);
+    }
+    else if(event->delta() < 0)
+    {
+        auto newHeight = height() - 10;
+        if(newHeight < 100)
+            newHeight = 100;
+
+        this->setMinimumHeight(newHeight);
+    }
 }
