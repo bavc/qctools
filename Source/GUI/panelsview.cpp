@@ -61,24 +61,27 @@ void PanelsView::paintEvent(QPaintEvent *)
     auto sy = (qreal)height() / getPanelSize().height();
 
     auto dx = availableWidth - m_actualWidth;
-    qDebug() << "sx: " << sx << "m_actualWidth: " << m_actualWidth;
+    qDebug() << "sx: " << sx << "m_actualWidth: " << m_actualWidth << "availableWidth: " << availableWidth;
 
     QRect viewport(contentsMargins().left(), 0, width() - contentsMargins().right(), height());
     p.setViewport(viewport);
 
     qDebug() << "viewport: " << viewport;
 
-    QMatrix scalingMatrix(sx, 0, 0, sy, 0, 0);
-    QMatrix translationMatrix(1, 0, 0, 1, 0, 0);
-    p.setMatrix(scalingMatrix * translationMatrix);
+    auto totalFrames = m_endFrame - m_startFrame;
+    auto zx = (qreal) m_actualWidth / totalFrames;
+
+    QMatrix scalingViewMatrix(sx, 0, 0, sy, 0, 0);
+    QMatrix scalingZoomMatrix(zx, 0, 0, 1, 0, 0);
+    p.setMatrix(scalingViewMatrix * scalingZoomMatrix);
 
     int startPanelOffset, startPanelIndex, endPanelLength, endPanelIndex;
     getPanelsBounds(startPanelIndex, startPanelOffset, endPanelIndex, endPanelLength);
 
-    qDebug() << "contentsMargins: " << contentsMargins();
+    qDebug() << "contentsMargins: " << contentsMargins() << "totalFrames: " << totalFrames;
 
     qDebug() << "startPanelIndex: " << startPanelIndex << "startPanelOffset: " << startPanelOffset
-             << "endPanelIndex: " << endPanelIndex << "endPanelLength: " << endPanelLength << "width: " << width() << "actual: " << m_actualWidth
+             << "endPanelIndex: " << endPanelIndex << "endPanelLength: " << endPanelLength << "availableWidth: " << availableWidth << "actual: " << m_actualWidth
              << "height: " << height();
 
     // p.fillRect(QRect(0, 0, width(), height()), Qt::green);
