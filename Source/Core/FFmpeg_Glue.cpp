@@ -378,10 +378,17 @@ void FFmpeg_Glue::outputdata::AddThumbnail()
         return;
     }
 
-    int got_packet=0;
-    int result = avcodec_encode_video2(JpegOutput_CodecContext, jpegOutPacket.get(), OutputFrame.get(), &got_packet);
+    int result = avcodec_send_frame(JpegOutput_CodecContext, OutputFrame.get());
+    if (result < 0)
+    {
+        char buffer[256];
+        qDebug() << av_make_error_string(buffer, sizeof buffer, result);
+        Thumbnails.push_back(std::move(jpegOutPacket));
+        return;
+    }
 
-    if (result < 0 || !got_packet)
+    result = avcodec_receive_packet(JpegOutput_CodecContext, jpegOutPacket.get());
+    if (result != 0)
     {
         char buffer[256];
         qDebug() << av_make_error_string(buffer, sizeof buffer, result);
