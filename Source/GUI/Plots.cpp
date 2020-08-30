@@ -306,18 +306,38 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     qDebug() << "mappedTopLeft: " << mappedTopLeft;
     qDebug() << "mappedBottomRight: " << mappedBottomRight;
 
-    m_PanelsView = new PanelsView(this);
-    m_PanelsView->setContentsMargins(mappedTopLeft.x(), 0, m_PanelsView->width() - m_commentsPlot->width(), 0);
-    m_PanelsView->setMinimumHeight(100);
-
-    connect(this, &Plots::visibleFramesChanged, m_PanelsView, &PanelsView::setVisibleFrames);
-
-    if(m_PanelsView)
+    auto panelsCount = m_fileInfoData->panelOutputsByTitle().count();
+    auto& panelOutputsByTitle = m_fileInfoData->panelOutputsByTitle();
+    for(auto & item : panelOutputsByTitle.keys())
     {
-        layout->addWidget(m_PanelsView, m_plotsCount + 1, 0);
+        auto panelOutputIndex = panelOutputsByTitle[item];
+
+        auto m_PanelsView = new PanelsView(this);
+        m_PanelsView->setContentsMargins(mappedTopLeft.x(), 0, m_PanelsView->width() - m_commentsPlot->width(), 0);
+        m_PanelsView->setMinimumHeight(100);
+
+        connect(this, &Plots::visibleFramesChanged, m_PanelsView, &PanelsView::setVisibleFrames);
+
+        if(m_PanelsView)
+        {
+            layout->addWidget(m_PanelsView, m_plotsCount + m_PanelsViews.size() + 1, 0);
+        }
+
+        m_PanelsView->setProvider([&, panelOutputIndex] {
+            return m_fileInfoData->Glue->GetPanelFramesCount(panelOutputIndex);
+        }, [&, panelOutputIndex](int index) -> QImage {
+            FFmpeg_Glue::Image frameImage;
+            frameImage.frame = m_fileInfoData->Glue->GetPanelFrame(panelOutputIndex, index);
+            auto panelImage = QImage(frameImage.data(), frameImage.width(), frameImage.height(), frameImage.linesize(), QImage::Format_RGB888);
+
+            return panelImage;
+        });
+        m_PanelsView->setVisibleFrames(0, numFrames() - 1);
+
+        m_PanelsViews.push_back(m_PanelsView);
     }
 
-    layout->addWidget( m_scaleWidget, m_plotsCount + 2, 0, 1, 2 );
+    layout->addWidget( m_scaleWidget, m_plotsCount + panelsCount + 1, 0, 1, 2 );
 
     // combo box for the axis format
     XAxisFormatBox* xAxisBox = new XAxisFormatBox();
@@ -327,27 +347,15 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
 
     int axisBoxRow = layout->rowCount() - 1;
     // one row below to have space enough for bottom scale tick labels
-    layout->addWidget( xAxisBox, m_plotsCount + 2, 1 );
+    layout->addWidget( xAxisBox, m_plotsCount + panelsCount + 1, 1 );
 
     m_playerControl = new PlayerControl();
-    layout->addWidget(m_playerControl, m_plotsCount + 3, 0);
+    layout->addWidget(m_playerControl, m_plotsCount + panelsCount + 2, 0);
 
     layout->setColumnStretch( 0, 10 );
     layout->setColumnStretch( 1, 0 );
 
     m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
-    m_PanelsView->setProvider([&] {
-        return m_fileInfoData->Glue->GetPanelsCount();
-    }, [&] {
-        return m_fileInfoData->panelSize();
-    }, [&](int index) -> QImage {
-        FFmpeg_Glue::Image frameImage;
-        frameImage.frame = m_fileInfoData->Glue->GetPanel(index);
-        auto panelImage = QImage(frameImage.data(), frameImage.width(), frameImage.height(), frameImage.linesize(), QImage::Format_RGB888);
-
-        return panelImage;
-    });
-    m_PanelsView->setVisibleFrames(0, numFrames() - 1);
 
     setCursorPos( framePos() );
 }
@@ -385,7 +393,9 @@ void Plots::refresh()
             }
         }
 
-    m_PanelsView->refresh();
+    for(auto m_PanelsView : m_PanelsViews)
+        m_PanelsView->refresh();
+
     setCursorPos( framePos() );
     replotAll();
 
@@ -621,9 +631,6 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
 {
     if ( event->type() == QEvent::Move || event->type() == QEvent::Resize )
     {
-        if(m_PanelsView && plot(0, 0))
-            m_PanelsView->setActualWidth(plot(0, 0)->canvas()->contentsRect().width());
-
         auto canvasRect = m_commentsPlot->plotLayout()->canvasRect();
         auto mappedTopLeft = m_commentsPlot->canvas()->mapToParent(QPoint(0, 0));
         auto mappedBottomRight = m_commentsPlot->canvas()->mapToParent(QPoint(canvasRect.width(), canvasRect.height()));
@@ -631,7 +638,14 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
         qDebug() << "mappedTopLeft: " << mappedTopLeft;
         qDebug() << "mappedBottomRight: " << mappedBottomRight;
 
-        m_PanelsView->setContentsMargins(mappedTopLeft.x(), 0, m_PanelsView->width() - mappedBottomRight.x(), 0);
+        if(plot(0, 0))
+        {
+            for(auto m_PanelsView : m_PanelsViews) {
+                m_PanelsView->setContentsMargins(mappedTopLeft.x(), 0, m_PanelsView->width() - mappedBottomRight.x(), 0);
+                m_PanelsView->setActualWidth(plot(0, 0)->canvas()->contentsRect().width());
+            }
+        }
+
 
         for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
             if ( m_fileInfoData->Stats[streamPos] && m_plots[streamPos] )

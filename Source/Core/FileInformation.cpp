@@ -236,6 +236,11 @@ QSize FileInformation::panelSize() const
     return m_panelSize;
 }
 
+const QMap<std::string, int> &FileInformation::panelOutputsByTitle() const
+{
+    return m_panelOutputsByTitle;
+}
+
 FileInformation::FileInformation (SignalServer* signalServer, const QString &FileName_, activefilters ActiveFilters_, activealltracks ActiveAllTracks_,
                                   int FrameCount) :
     FileName(FileName_),
@@ -270,27 +275,41 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     static const QString dotQctoolsDotMkv = ".qctools.mkv";
 
     QByteArray attachment;
+    string glueFileName = FileName.toUtf8().data();
 
     if (FileName.endsWith(dotQctoolsDotXmlDotGz))
     {
         StatsFromExternalData_FileName=FileName;
         FileName.resize(FileName.length() - dotQctoolsDotXmlDotGz.length());
+        if(!QFile::exists(FileName)) {
+            FileName = FileName + dotQctoolsDotXmlDotGz;
+        }
+
         StatsFromExternalData_FileName_IsCompressed=true;
     }
     else if (FileName.endsWith(dotQctoolsDotXml))
     {
         StatsFromExternalData_FileName=FileName;
         FileName.resize(FileName.length() - dotQctoolsDotXml.length());
+
+        if(!QFile::exists(FileName)) {
+            FileName = FileName + dotQctoolsDotXml;
+        }
     }
     else if (FileName.endsWith(dotXmlDotGz))
     {
         StatsFromExternalData_FileName=FileName;
         FileName.resize(FileName.length() - dotXmlDotGz.length());
+
+        if(!QFile::exists(FileName)) {
+            FileName = FileName + dotXmlDotGz;
+        }
+
         StatsFromExternalData_FileName_IsCompressed=true;
     }
     else if (FileName.endsWith(dotQctoolsDotMkv))
     {
-        attachment = FFmpeg_Glue::getAttachment(FileName, StatsFromExternalData_FileName);
+        attachment = FFmpeg_Glue::getAttachment(FileName, StatsFromExternalData_FileName);        
         FileName.resize(FileName.length() - dotQctoolsDotMkv.length());
 
         if(!QFile::exists(FileName)) {
@@ -317,6 +336,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         else if (QFile::exists(FileName + dotQctoolsDotMkv))
         {
             attachment = FFmpeg_Glue::getAttachment(FileName + dotQctoolsDotMkv, StatsFromExternalData_FileName);
+            glueFileName = glueFileName + dotQctoolsDotMkv.toStdString();
         }
     }
 
@@ -337,9 +357,8 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     bool StatsFromExternalData_IsOpen=StatsFromExternalData_File->open(QIODevice::ReadOnly);
 
     // Running FFmpeg
-    string FileName_string=FileName.toUtf8().data();
     #ifdef _WIN32
-        replace(FileName_string.begin(), FileName_string.end(), '/', '\\' );
+        replace(glueFileName.begin(), glueFileName .end(), '/', '\\' );
     #endif
     string Filters[Type_Max];
     if (!StatsFromExternalData_IsOpen)
@@ -389,12 +408,12 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         }
     }
 
-    std::string fileName = FileName_string;
-    if(fileName == "-")
-        fileName = "pipe:0";
+    if(glueFileName  == "-")
+        glueFileName  = "pipe:0";
 
-    Glue=new FFmpeg_Glue(fileName, ActiveAllTracks, &Stats, &streamsStats, &formatStats, Stats.empty());
-    if (!FileName_string.empty() && Glue->ContainerFormat_Get().empty())
+    qDebug() << "opening " << glueFileName .c_str();
+    Glue=new FFmpeg_Glue(glueFileName , ActiveAllTracks, &Stats, &streamsStats, &formatStats, Stats.empty());
+    if (!glueFileName .empty() && Glue->ContainerFormat_Get().empty())
     {
         delete Glue;
         Glue=NULL;
@@ -404,12 +423,51 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
     if (Glue)
     {
-        Glue->AddOutput(0, 72, 72, FFmpeg_Glue::Output_Jpeg);
-        Glue->AddOutput(1, 0, 0, FFmpeg_Glue::Output_Stats, 0, Filters[0]);
-        Glue->AddOutput(0, 0, 0, FFmpeg_Glue::Output_Stats, 1, Filters[1]);
+        if(attachment.isEmpty())
+        {
+            Glue->AddOutput(72, 72, FFmpeg_Glue::Output_Jpeg);
+            Glue->AddOutput(0, 0, FFmpeg_Glue::Output_Stats, 0, Filters[0]);
+            Glue->AddOutput(0, 0, FFmpeg_Glue::Output_Stats, 1, Filters[1]);
 
-        m_panelSize.setHeight(Glue->Height_Get());
-        Glue->AddOutput(FFmpeg_Glue::Output_Panels, m_panelSize.height(), 1, FFmpeg_Glue::Output_Panels, 0, Filters[2]);
+            auto videoStreams = Glue->findVideoStreams();
+            m_panelSize.setHeight(Glue->Height_Get());
+
+            for(auto & streamIndex : videoStreams)
+            {
+                auto output = Glue->AddOutput(streamIndex, 1, m_panelSize.height(), FFmpeg_Glue::Output_Panels, 0 /*AVMEDIA_TYPE_VIDEO*/, Filters[2]);
+                output->Title = "Test";
+                qDebug() << "added output" << output << streamIndex << output->Title.c_str();
+                m_panelOutputsByTitle[output->Title] = output->index;
+            }
+        }
+        else
+        {
+            auto thumbnails = Glue->findStreams(FFmpeg_Glue::Thumbnails);
+            if(thumbnails.size() != 0)
+            {
+                auto thumbnailsStreamIndex = thumbnails[0].second;
+                Glue->AddOutput(thumbnailsStreamIndex, 72, 72, FFmpeg_Glue::Output_Jpeg);
+
+                auto panels = Glue->findStreams(FFmpeg_Glue::Panels);
+                for(auto& panel : panels)
+                {
+                    auto panelStreamIndex = panel.second;
+                    auto output = Glue->AddOutput(panelStreamIndex, 0, 0, FFmpeg_Glue::Output_Panels);
+                    output->Title = panel.first;
+                    qDebug() << "added output" << output << panelStreamIndex << output->Title.c_str();
+                    m_panelOutputsByTitle[output->Title] = output->index;
+                }
+            }
+            else
+            {
+                auto thumbnails = Glue->findVideoStreams();
+                if(thumbnails.size() != 0)
+                {
+                    auto thumbnailsStreamIndex = thumbnails[0];
+                    Glue->AddOutput(thumbnailsStreamIndex, 72, 72, FFmpeg_Glue::Output_Jpeg);
+                }
+            }
+        }
     }
 
     // Looking for the reference stream (video or audio)

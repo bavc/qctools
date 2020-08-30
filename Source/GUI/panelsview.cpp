@@ -8,22 +8,15 @@ PanelsView::PanelsView(QWidget *parent) : QFrame(parent), m_actualWidth(0)
 {
 }
 
-void PanelsView::setProvider(const std::function<int ()> &getPanelsCount, const std::function<QSize ()> &getPanelSize, const std::function<QImage (int)> &getPanelImage)
+void PanelsView::setProvider(const std::function<int ()> &getPanelsCount, const std::function<QImage (int)> &getPanelImage)
 {
     this->getPanelsCount = getPanelsCount;
-    this->getPanelSize = getPanelSize;
     this->getPanelImage = getPanelImage;
-}
-
-int PanelsView::panelIndexByFrame(int frameIndex) const
-{
-    auto panelIndex = ceil((double) frameIndex / getPanelSize().width());
-    return panelIndex;
 }
 
 void PanelsView::getPanelsBounds(int &startPanelIndex, int &startPanelOffset, int &endPanelIndex, int &endPanelLength)
 {
-    auto panelSize = getPanelSize();
+    auto panelSize = getPanelImage(0).size();
     auto panelWidth = panelSize.width();
 
     startPanelOffset = m_startFrame % panelWidth;
@@ -54,12 +47,18 @@ void PanelsView::setActualWidth(int actualWidth)
 
 void PanelsView::paintEvent(QPaintEvent *)
 {
+    auto panelsCount = getPanelsCount();
+    if(panelsCount == 0)
+        return;
+
+    qDebug() << "panelsCount: " << panelsCount;
+
     QPainter p;
     p.begin(this);
 
     auto availableWidth = width() - contentsMargins().left() - contentsMargins().right();
     auto sx = m_actualWidth == 0 ? 1 : ((qreal) availableWidth / m_actualWidth);
-    auto sy = (qreal)height() / getPanelSize().height();
+    auto sy = (qreal)height() / getPanelImage(0).height();
 
     auto dx = availableWidth - m_actualWidth;
     qDebug() << "sx: " << sx << "m_actualWidth: " << m_actualWidth << "availableWidth: " << availableWidth;
@@ -114,8 +113,8 @@ void PanelsView::wheelEvent(QWheelEvent *event)
 {
     if(event->delta() > 0) {
         auto newHeight = height() + 10;
-        if(newHeight > getPanelSize().height())
-            newHeight = getPanelSize().height();
+        if(newHeight > getPanelImage(0).height())
+            newHeight = getPanelImage(0).height();
 
         this->setMinimumHeight(newHeight);
     }

@@ -134,6 +134,7 @@ public:
     void readStats(QIODevice& StatsFromExternalData_FileName, bool StatsFromExternalData_FileName_IsCompressed);
 
     QSize panelSize() const;
+    const QMap<std::string, int>& panelOutputsByTitle() const;
 public Q_SLOTS:
 
     void checkFileUploaded(const QString& fileName);
@@ -186,6 +187,8 @@ private:
     QSize m_panelSize;
 
     activefilters m_exportFilters;
+
+    QMap<std::string, int> m_panelOutputsByTitle;
 };
 
 #endif // GUI_FileInformation_H

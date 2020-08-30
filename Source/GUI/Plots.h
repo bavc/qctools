@@ -95,8 +95,6 @@ public:
     const QwtPlot*              plot( size_t streamPos, size_t group ) const;
     CommentsPlot*               commentsPlot() const { return m_commentsPlot; }
 
-    PanelsView*                 panels() const { return m_PanelsView; }
-
     void                        Zoom_Move( int Begin );
     void                        refresh();
 
@@ -144,7 +142,7 @@ private:
 private:
     PlotScaleWidget*            m_scaleWidget;
     CommentsPlot*               m_commentsPlot;
-    PanelsView*                 m_PanelsView;
+    std::vector<PanelsView*>    m_PanelsViews;
     PlayerControl*              m_playerControl;
     Plot***                     m_plots; // pointer on an array of streams and groups per stream and Plot* per group
     int                         m_plotsCount;
