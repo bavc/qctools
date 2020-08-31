@@ -757,6 +757,9 @@ void Player::applyFilter()
 
 void Player::handleFileInformationPositionChanges()
 {
+    if (m_ignorePositionChanges)
+        return;
+
     if(m_player->isPaused() && m_seekOnFileInformationPositionChange) {
 
         auto ms = frameToMs(m_fileInformation->Frames_Pos_Get());
