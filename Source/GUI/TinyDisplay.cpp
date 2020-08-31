@@ -7,7 +7,6 @@
 #include "GUI/TinyDisplay.h"
 #include "GUI/player.h"
 
-#include "GUI/BigDisplay.h"
 #include "Core/FileInformation.h"
 #include "Core/CommonStats.h"
 
