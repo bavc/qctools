@@ -333,9 +333,10 @@ void FFmpeg_Glue::outputdata::ApplyScale(const AVFramePtr& sourceFrame)
 
     ScaledFrame->width=Width;
     ScaledFrame->height=Height;
-    ScaledFrame->format=sourceFrame->format;
+    AVPixelFormat PixelFormat=OutputMethod==Output_QImage?AV_PIX_FMT_RGB24:AV_PIX_FMT_YUVJ420P;
+    ScaledFrame->format=PixelFormat;
 
-    av_image_alloc(ScaledFrame->data, ScaledFrame->linesize, Width, Height, OutputMethod==Output_QImage?AV_PIX_FMT_RGB24:AV_PIX_FMT_YUVJ420P, 1);
+    av_image_alloc(ScaledFrame->data, ScaledFrame->linesize, Width, Height, PixelFormat, 1);
     if (sws_scale(ScaleContext, sourceFrame->data, sourceFrame->linesize, 0, sourceFrame->height, ScaledFrame->data, ScaledFrame->linesize)<0)
     {
         ScaledFrame.reset();
