@@ -702,16 +702,26 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
     metadata << FFmpegVideoEncoder::MetadataEntry(QString("creation_time"), QString("now"));
 
     encoder.setMetadata(metadata);
-    encoder.makeVideo(ExportFileName, Glue->OutputThumbnailWidth_Get(), Glue->OutputThumbnailHeight_Get(), Glue->OutputThumbnailBitRate_Get(), num, den,
-                      [&]() -> AVPacket* {
 
+    FFmpegVideoEncoder::Source source;
+    source.width = Glue->OutputThumbnailWidth_Get();
+    source.height = Glue->OutputThumbnailHeight_Get();
+    source.bitrate = Glue->OutputThumbnailBitRate_Get();
+    source.num = num;
+    source.den = den;
+    source.getPacket = [&]() -> std::shared_ptr<AVPacket> {
         bool hasNext = thumbnailIndex < thumbnailsCount;
 
         if(!hasNext)
             return nullptr;
 
         return Glue->ThumbnailPacket_Get(0, thumbnailIndex++);
-    }, attachment, attachmentFileName);
+    };
+
+    QVector<FFmpegVideoEncoder::Source> sources;
+    sources.push_back(source);
+
+    encoder.makeVideo(ExportFileName, sources, attachment, attachmentFileName);
 
     disconnect(connection);
 }
