@@ -167,10 +167,13 @@ FFmpeg_Glue::outputdata::outputdata(int index)
 
     // FFmpeg pointers - Scale
     ScaleContext(NULL),
+    Scale_OutputPixelFormat(AV_PIX_FMT_YUVJ420P),
     ScaledFrame(NULL),
 
     // FFmpeg pointers - Output
-    JpegOutput_CodecContext(NULL),
+    Output_CodecContext(NULL),
+    Output_PixelFormat(AV_PIX_FMT_YUVJ420P),
+    Output_CodecID(AV_CODEC_ID_MJPEG),
 
     // Out
     OutputMethod(Output_None),
@@ -194,8 +197,8 @@ FFmpeg_Glue::outputdata::~outputdata()
 
     Thumbnails.clear();
 
-    if (JpegOutput_CodecContext)
-        avcodec_free_context(&JpegOutput_CodecContext);
+    if (Output_CodecContext)
+        avcodec_free_context(&Output_CodecContext);
 
     // FFmpeg pointers - Scale
     if (ScaledFrame)
@@ -237,6 +240,10 @@ void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
         Stats->StatsFromFrame(FilteredFrame.get(), Stream->codec->width, Stream->codec->height);
     }
 
+    if(OutputMethod == Output_Panels && OutputFrame)
+    {
+        qDebug() << "panels";
+    }
     // Scale
     ApplyScale(OutputFrame);
 
@@ -250,7 +257,19 @@ void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
         case Output_Jpeg    :   AddThumbnail();  break;
         case Output_Panels  :   {
             if(OutputFrame == DecodedFrame) {
-                auto clone = av_frame_clone(OutputFrame.get());
+
+                auto frame = OutputFrame.get();
+
+                AVFrame *copyFrame = av_frame_alloc();
+                copyFrame->format = frame->format;
+                copyFrame->width = frame->width;
+                copyFrame->height = frame->height;
+                copyFrame->channels = frame->channels;
+                copyFrame->channel_layout = frame->channel_layout;
+                copyFrame->nb_samples = frame->nb_samples;
+                av_frame_get_buffer(copyFrame, 32);
+                av_frame_copy(copyFrame, frame);
+                av_frame_copy_props(copyFrame, frame);
 
                 struct FilteredFrameDeleter {
                     static void free(AVFrame* frame) {
@@ -261,7 +280,7 @@ void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
                     }
                 };
 
-                OutputFrame.reset(clone, FilteredFrameDeleter::free);
+                OutputFrame.reset(copyFrame, FilteredFrameDeleter::free);
             }
             AddPanel(); break;
 
@@ -324,13 +343,16 @@ void FFmpeg_Glue::outputdata::ApplyScale(const AVFramePtr& sourceFrame)
     if (!sourceFrame || !sourceFrame->width || !sourceFrame->height)
         return;
 
-    switch (OutputMethod)
+    if(!forceScale)
     {
-        case Output_Jpeg:
-        case Output_QImage:
-                            break;
-        default: 
-                            return;
+        switch (OutputMethod)
+        {
+            case Output_Jpeg:
+            case Output_QImage:
+                                break;
+            default:
+                                return;
+        }
     }
 
     if (!ScaleContext && !Scale_Init())
@@ -350,10 +372,8 @@ void FFmpeg_Glue::outputdata::ApplyScale(const AVFramePtr& sourceFrame)
 
     ScaledFrame->width=Width;
     ScaledFrame->height=Height;
-    AVPixelFormat PixelFormat=OutputMethod==Output_QImage?AV_PIX_FMT_RGB24:AV_PIX_FMT_YUVJ420P;
-    ScaledFrame->format=PixelFormat;
 
-    av_image_alloc(ScaledFrame->data, ScaledFrame->linesize, Width, Height, PixelFormat, 1);
+    av_image_alloc(ScaledFrame->data, ScaledFrame->linesize, Width, Height, (AVPixelFormat) Scale_OutputPixelFormat, 1);
     if (sws_scale(ScaleContext, sourceFrame->data, sourceFrame->linesize, 0, sourceFrame->height, ScaledFrame->data, ScaledFrame->linesize)<0)
     {
         ScaledFrame.reset();
@@ -384,38 +404,7 @@ void FFmpeg_Glue::outputdata::AddThumbnail()
         return; // Not wanting to saturate memory. TODO: Find a smarter way to detect memory usage
     }
 
-    auto jpegOutPacket = std::unique_ptr<AVPacket, AVPacketDeleter>(av_packet_alloc(), AVPacketDeleter());
-    av_init_packet (jpegOutPacket.get());
-
-    jpegOutPacket->data = nullptr;
-    jpegOutPacket->size = 0;
-
-    if (!JpegOutput_CodecContext && !InitThumnails())
-    {
-        Thumbnails.push_back(std::move(jpegOutPacket));
-        return;
-    }
-
-    int result = avcodec_send_frame(JpegOutput_CodecContext, OutputFrame.get());
-    if (result < 0)
-    {
-        char buffer[256];
-        qDebug() << av_make_error_string(buffer, sizeof buffer, result);
-        Thumbnails.push_back(std::move(jpegOutPacket));
-        return;
-    }
-
-    result = avcodec_receive_packet(JpegOutput_CodecContext, jpegOutPacket.get());
-    if (result != 0)
-    {
-        char buffer[256];
-        qDebug() << av_make_error_string(buffer, sizeof buffer, result);
-
-        Thumbnails.push_back(std::move(jpegOutPacket));
-        return;
-    }
-
-    Thumbnails.push_back(std::move(jpegOutPacket));
+    Thumbnails.push_back(encodeFrame(OutputFrame.get()));
 }
 
 void FFmpeg_Glue::outputdata::AddPanel()
@@ -427,30 +416,64 @@ void FFmpeg_Glue::outputdata::AddPanel()
 }
 
 //---------------------------------------------------------------------------
-bool FFmpeg_Glue::outputdata::InitThumnails()
+bool FFmpeg_Glue::outputdata::initEncoder(const QSize& size)
 {
-    if(JpegOutput_CodecContext)
+    if(Output_CodecContext)
         return true;
 
     //
-    AVCodec *JpegOutput_Codec=avcodec_find_encoder(AV_CODEC_ID_MJPEG);
-    if (!JpegOutput_Codec)
+    AVCodec *Output_Codec=avcodec_find_encoder((AVCodecID) Output_CodecID);
+    if (!Output_Codec)
         return false;
-    JpegOutput_CodecContext=avcodec_alloc_context3 (JpegOutput_Codec);
-    if (!JpegOutput_CodecContext)
+    Output_CodecContext=avcodec_alloc_context3 (Output_Codec);
+    if (!Output_CodecContext)
         return false;
-    JpegOutput_CodecContext->qmin          = 8;
-    JpegOutput_CodecContext->qmax          = 12;
-    JpegOutput_CodecContext->width         = Width;
-    JpegOutput_CodecContext->height        = Height;
-    JpegOutput_CodecContext->pix_fmt       = AV_PIX_FMT_YUVJ420P;
-    JpegOutput_CodecContext->time_base.num = Stream->codec->time_base.num;
-    JpegOutput_CodecContext->time_base.den = Stream->codec->time_base.den;
-    if (avcodec_open2(JpegOutput_CodecContext, JpegOutput_Codec, NULL) < 0)
+    Output_CodecContext->qmin          = 8;
+    Output_CodecContext->qmax          = 12;
+    Output_CodecContext->width         = size.width();
+    Output_CodecContext->height        = size.height();
+    Output_CodecContext->pix_fmt       = (AVPixelFormat) Output_PixelFormat;
+    Output_CodecContext->time_base.num = Stream->codec->time_base.num;
+    Output_CodecContext->time_base.den = Stream->codec->time_base.den;
+    if (avcodec_open2(Output_CodecContext, Output_Codec, NULL) < 0)
         return false;
 
     // All is OK
     return true;
+}
+
+std::unique_ptr<AVPacket, FFmpeg_Glue::outputdata::AVPacketDeleter> FFmpeg_Glue::outputdata::encodeFrame(AVFrame* frame, bool* ok /*= nullptr*/)
+{
+    if(ok)
+        *ok = true;
+
+    auto outPacket = std::unique_ptr<AVPacket, AVPacketDeleter>(av_packet_alloc(), AVPacketDeleter());
+    av_init_packet (outPacket.get());
+
+    outPacket->data = nullptr;
+    outPacket->size = 0;
+
+    if (!Output_CodecContext && !initEncoder(QSize(frame->width, frame->height)))
+    {
+        if(ok)
+            *ok = false;
+
+        return outPacket;
+    }
+
+    int got_packet=0;
+    int result = avcodec_encode_video2(Output_CodecContext, outPacket.get(), frame, &got_packet);
+
+    if (result < 0 || !got_packet)
+    {
+        char buffer[256];
+        qDebug() << av_make_error_string(buffer, sizeof buffer, result);
+
+        if(ok)
+            *ok = false;
+    }
+
+    return outPacket;
 }
 
 //---------------------------------------------------------------------------
@@ -541,14 +564,17 @@ bool FFmpeg_Glue::outputdata::Scale_Init()
     if (!OutputFrame)
         return false;    
         
-    if (!AdaptDAR())
-        return false;
+    if(OutputMethod != Output_Panels)
+    {
+        if (!AdaptDAR())
+            return false;
+    }
 
     // Init
     ScaleContext = sws_getContext(OutputFrame->width, OutputFrame->height,
                                     (AVPixelFormat)OutputFrame->format,
                                     Width, Height,
-                                    OutputMethod==Output_QImage?AV_PIX_FMT_RGB24:AV_PIX_FMT_YUVJ420P,
+                                    (AVPixelFormat) Scale_OutputPixelFormat,
                                     Output_QImage?/* SWS_BICUBIC */ SWS_FAST_BILINEAR :SWS_FAST_BILINEAR, NULL, NULL, NULL);
 
     // All is OK
@@ -782,14 +808,26 @@ FFmpeg_Glue::AVFramePtr FFmpeg_Glue::GetPanelFrame(int outputIndex, int index) c
     return output->Panels[index];
 }
 
-AVPacket *FFmpeg_Glue::ThumbnailPacket_Get(size_t Pos, size_t FramePos)
+QSize FFmpeg_Glue::GetPanelFrameSize(int outputIndex, int index) const
+{
+    auto output = OutputDatas[outputIndex];
+    return QSize(output->Panels[index]->width, output->Panels[index]->height);
+}
+
+FFmpeg_Glue::AVPacketPtr FFmpeg_Glue::encodePanelFrame(int outputIndex, AVFrame *frame)
+{
+    auto output = OutputDatas[outputIndex];
+    return output->encodeFrame(frame);
+}
+
+std::shared_ptr<AVPacket> FFmpeg_Glue::ThumbnailPacket_Get(size_t Pos, size_t FramePos)
 {
     QMutexLocker locker(mutex);
 
     if (Pos>=OutputDatas.size() || !OutputDatas[Pos] || !OutputDatas[Pos]->Enabled)
         return NULL;
 
-    auto avpacket = OutputDatas[Pos]->Thumbnails[FramePos].get();
+    auto avpacket = OutputDatas[Pos]->Thumbnails[FramePos];
     return avpacket;
 }
 
@@ -864,6 +902,8 @@ void FFmpeg_Glue::ModifyOutput(size_t InputPos, size_t OutputPos, int Scale_Widt
     OutputData->Width=Scale_Width;
     OutputData->Height=Scale_Height;
     OutputData->OutputMethod=OutputMethod;
+    OutputData->Scale_OutputPixelFormat = (OutputMethod == Output_QImage ? AV_PIX_FMT_RGB24:AV_PIX_FMT_YUVJ420P);
+
     OutputData->Filter=Filter;
 
     qDebug() << "created output: " << OutputData << "input pos: " << InputPos << "output pos: " << OutputPos << "filter: " << Filter.c_str();
@@ -1020,7 +1060,9 @@ bool FFmpeg_Glue::NextFrame()
     while (Packet->size || av_read_frame(FormatContext, Packet) >= 0)
     {
         AVPacket TempPacket=*Packet;
-        if (Packet->stream_index<InputDatas.size() && InputDatas[Packet->stream_index] && InputDatas[Packet->stream_index]->Enabled)
+        auto packetStreamIndex = Packet->stream_index;
+
+        if (Packet->stream_index<InputDatas.size() && InputDatas[packetStreamIndex] && InputDatas[packetStreamIndex]->Enabled)
         {
             do
             {
@@ -1108,8 +1150,19 @@ bool FFmpeg_Glue::OutputFrame(AVPacket* TempPacket, bool Decode)
             InputData->FirstTimeStamp=((double)ts)*InputData->Stream->time_base.num/InputData->Stream->time_base.den;
         
         for (size_t OutputPos=0; OutputPos<OutputDatas.size(); OutputPos++)
-            if (OutputDatas[OutputPos] && OutputDatas[OutputPos]->Enabled && OutputDatas[OutputPos]->Stream==InputData->Stream)
-                OutputDatas[OutputPos]->Process(Frame);
+        {
+            auto output = OutputDatas[OutputPos];
+            if(!output)
+                continue;
+
+            if(!output->Enabled)
+                continue;
+
+            if(output->Stream != InputData->Stream)
+                continue;
+
+            output->Process(Frame);
+        }
 
         if(Decode)
             InputData->FramePos++;
@@ -1753,7 +1806,7 @@ int FFmpeg_Glue::OutputThumbnailWidth_Get() const
 
     if (OutputData)
     {
-        return OutputData->JpegOutput_CodecContext->width;
+        return OutputData->Output_CodecContext->width;
     }
 
     return 0;
@@ -1765,7 +1818,7 @@ int FFmpeg_Glue::OutputThumbnailHeight_Get() const
 
     if (OutputData)
     {
-        return OutputData->JpegOutput_CodecContext->height;
+        return OutputData->Output_CodecContext->height;
     }
 
     return 0;
@@ -1777,7 +1830,7 @@ int FFmpeg_Glue::OutputThumbnailBitRate_Get() const
 
     if (OutputData)
     {
-        return OutputData->JpegOutput_CodecContext->bit_rate;
+        return OutputData->Output_CodecContext->bit_rate;
     }
 
     return 0;
@@ -1791,8 +1844,8 @@ void FFmpeg_Glue::OutputThumbnailTimeBase_Get(int &num, int &den) const
 
     if (OutputData)
     {
-        num = OutputData->JpegOutput_CodecContext->time_base.num;
-        den = OutputData->JpegOutput_CodecContext->time_base.den;
+        num = OutputData->Output_CodecContext->time_base.num;
+        den = OutputData->Output_CodecContext->time_base.den;
     }
 }
 
@@ -2554,6 +2607,11 @@ bool FFmpeg_Glue::isUnsignedAudioSampleFormat(int audioFormat)
 {
     return audioFormat == AV_SAMPLE_FMT_U8
             || audioFormat == AV_SAMPLE_FMT_U8P;
+}
+
+QByteArray FFmpeg_Glue::toByteArray(AVPacket *avpacket)
+{
+    return QByteArray(reinterpret_cast<char*> (avpacket->data), avpacket->size);
 }
 
 FFmpeg_Glue::Image::Image()

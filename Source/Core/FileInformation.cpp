@@ -12,6 +12,7 @@
 #include "Core/AudioStats.h"
 #include "Core/FormatStats.h"
 #include "Core/StreamsStats.h"
+#include <libavcodec/codec_id.h>
 
 #include "FFmpegVideoEncoder.h"
 
@@ -396,7 +397,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         Filters[1].erase(0, 1); // remove first comma
 
         m_panelSize.setWidth(1024);
-        Filters[2] = QString("format=rgb24,crop=1:ih:iw/2:0,tile=layout=%1x1").arg(m_panelSize.width()).toStdString();
+        Filters[2] = QString("scale,format=rgb24,crop=1:ih:iw/2:0,tile=layout=%1x1,setsar=1/1").arg(m_panelSize.width()).toStdString();
     }
     else
     {
@@ -434,8 +435,22 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
             for(auto & streamIndex : videoStreams)
             {
-                auto output = Glue->AddOutput(streamIndex, 1, m_panelSize.height(), FFmpeg_Glue::Output_Panels, 0 /*AVMEDIA_TYPE_VIDEO*/, Filters[2]);
+                auto output = Glue->AddOutput(streamIndex, m_panelSize.width(), m_panelSize.height(), FFmpeg_Glue::Output_Panels, 0 /*AVMEDIA_TYPE_VIDEO*/, Filters[2]);
+                output->Output_CodecID =
+                        //AV_CODEC_ID_FFV1
+                        AV_CODEC_ID_MJPEG
+                        ;
+                output->Output_PixelFormat =
+                        //AV_PIX_FMT_RGB24
+                        AV_PIX_FMT_YUVJ420P
+                        ;
+                output->Scale_OutputPixelFormat =
+                        //AV_PIX_FMT_RGB24
+                        AV_PIX_FMT_YUVJ420P
+                        ;
                 output->Title = "Test";
+                output->forceScale = true;
+
                 qDebug() << "added output" << output << streamIndex << output->Title.c_str();
                 m_panelOutputsByTitle[output->Title] = output->index;
             }
@@ -452,12 +467,15 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                 for(auto& panel : panels)
                 {
                     auto panelStreamIndex = panel.second;
-                    auto output = Glue->AddOutput(panelStreamIndex, 0, 0, FFmpeg_Glue::Output_Panels);
+                    auto output = Glue->AddOutput(panelStreamIndex, 0, 0, FFmpeg_Glue::Output_Panels, 0, "format=rgb24");
                     output->Title = panel.first;
+                    output->Scale_OutputPixelFormat = AV_PIX_FMT_RGB24;
+                    // output->forceScale = true;
                     qDebug() << "added output" << output << panelStreamIndex << output->Title.c_str();
                     m_panelOutputsByTitle[output->Title] = output->index;
                 }
             }
+
             else
             {
                 auto thumbnails = Glue->findVideoStreams();

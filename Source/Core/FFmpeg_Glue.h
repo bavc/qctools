@@ -9,7 +9,6 @@
 #define FFmpeg_Glue_H
 
 #include "Core/Core.h"
-
 #include <string>
 #include <vector>
 #include <memory>
@@ -18,6 +17,7 @@
 #include <QByteArray>
 #include <QMutex>
 #include <QString>
+#include <QSize>
 using namespace std;
 
 struct AVFormatContext;
@@ -43,6 +43,7 @@ class FFmpeg_Glue
 public:
 
     typedef std::shared_ptr<AVFrame> AVFramePtr;
+    typedef std::shared_ptr<AVPacket> AVPacketPtr;
     typedef std::pair<std::string, int> StreamInfo;
 
     // Constructor / Destructor
@@ -136,11 +137,14 @@ public:
         // FFmpeg pointers - Scale
         SwsContext*             ScaleContext;
         AVFramePtr              ScaledFrame;
-
+        int                     Scale_OutputPixelFormat;
         AVFramePtr              OutputFrame;
 
+
         // FFmpeg pointers - Output
-        AVCodecContext*         JpegOutput_CodecContext;
+        AVCodecContext*         Output_CodecContext;
+        int                     Output_PixelFormat;
+        int                     Output_CodecID;
 
         // Out
         outputmethod            OutputMethod;
@@ -150,7 +154,7 @@ public:
             void operator()(AVPacket* packet);
         };
 
-        std::vector<std::unique_ptr<AVPacket, AVPacketDeleter>>  Thumbnails;
+        std::vector<std::shared_ptr<AVPacket>>  Thumbnails;
         std::vector<AVFramePtr> Panels;
 
         size_t                  Thumbnails_Modulo;
@@ -161,7 +165,7 @@ public:
         double                  TimeStamp;              // Current position of playback
 
         // Helpers
-        bool                    InitThumnails();
+        bool                    initEncoder(const QSize& size);;
         bool                    FilterGraph_Init();
         void                    FilterGraph_Free();
         bool                    Scale_Init();
@@ -171,6 +175,9 @@ public:
 
         int                     Width;
         int                     Height;
+        bool forceScale = { false };
+
+        std::unique_ptr<AVPacket, outputdata::AVPacketDeleter> FFmpeg_Glue::outputdata::encodeFrame(AVFrame* frame, bool* ok = nullptr);
     };
 
     FFmpeg_Glue(const string &FileName, activealltracks ActiveAllTracks, std::vector<CommonStats*>* Stats, StreamsStats** streamsStats, FormatStats** formatStats, bool WithStats=false);
@@ -182,6 +189,8 @@ public:
     std::vector<FFmpeg_Glue::AVFramePtr>& GetPanelFrames(int outputIndex) const;
     int GetPanelFramesCount(int outputIndex) const;
     FFmpeg_Glue::AVFramePtr GetPanelFrame(int outputIndex, int index) const;
+    QSize GetPanelFrameSize(int outputIndex, int index) const;
+    FFmpeg_Glue::AVPacketPtr encodePanelFrame(int outputIndex, AVFrame* frame);
 
     struct bytes
     {
@@ -201,7 +210,7 @@ public:
         }
     };
 
-    AVPacket*                   ThumbnailPacket_Get(size_t Pos, size_t FramePos);
+    std::shared_ptr<AVPacket>   ThumbnailPacket_Get(size_t Pos, size_t FramePos);
     QByteArray                  Thumbnail_Get(size_t Pos, size_t FramePos);
     size_t                      Thumbnails_Size(size_t Pos);
     
@@ -275,6 +284,7 @@ public:
     static bool                 isFloatAudioSampleFormat(int audioFormat);
     static bool                 isSignedAudioSampleFormat(int audioFormat);
     static bool                 isUnsignedAudioSampleFormat(int audioFormat);
+    static QByteArray           toByteArray(AVPacket* packet);
 
     // Actions
     FFmpeg_Glue::outputdata*    AddOutput(size_t inputPos, int Scale_Width=0, int Scale_Height=0, outputmethod OutputMethod=Output_None, int FilterType=0, const string &Filter=string());

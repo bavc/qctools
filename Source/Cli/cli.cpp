@@ -402,7 +402,7 @@ int Cli::exec(QCoreApplication &a)
                     panelSource.metadata = streamMetadata;
                     panelSource.width = frameSize.width();
                     panelSource.height = frameSize.height();
-                    panelSource.bitrate = info->Glue->OutputThumbnailBitRate_Get();
+                    panelSource.bitrate = info->Glue->OutputThumbnailBitRate_Get() / 1024;
                     panelSource.num = num;
                     panelSource.den = den;
                     panelSource.getPacket = [panelIndex, panelsCount, panelOutputIndex, this]() mutable -> std::shared_ptr<AVPacket> {
@@ -417,7 +417,7 @@ int Cli::exec(QCoreApplication &a)
                         }
 
                         auto frame = info->Glue->GetPanelFrame(panelOutputIndex, panelIndex);
-                        auto packet = info->Glue->JpegEncode(panelOutputIndex, frame.get());
+                        auto packet = info->Glue->encodePanelFrame(panelOutputIndex, frame.get());
 
                         ++panelIndex;
 
