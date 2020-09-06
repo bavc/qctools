@@ -343,16 +343,13 @@ void FFmpeg_Glue::outputdata::ApplyScale(const AVFramePtr& sourceFrame)
     if (!sourceFrame || !sourceFrame->width || !sourceFrame->height)
         return;
 
-    if(!forceScale)
+    switch (OutputMethod)
     {
-        switch (OutputMethod)
-        {
-            case Output_Jpeg:
-            case Output_QImage:
-                                break;
-            default:
-                                return;
-        }
+        case Output_Jpeg:
+        case Output_QImage:
+                            break;
+        default:
+                            return;
     }
 
     if (!ScaleContext && !Scale_Init())
@@ -461,8 +458,48 @@ std::unique_ptr<AVPacket, FFmpeg_Glue::outputdata::AVPacketDeleter> FFmpeg_Glue:
         return outPacket;
     }
 
+    struct NoDeleter {
+        static void free(AVFrame* frame) {
+            Q_UNUSED(frame)
+        }
+    };
+
+    AVFramePtr Frame(frame, NoDeleter::free);
+
+    if(scaleBeforeEncoding)
+    {
+        if (ScaleContext || Scale_Init())
+        {
+            struct ScaledFrameDeleter {
+                static void free(AVFrame* frame) {
+                    if(frame) {
+                        av_freep(&frame->data[0]);
+                        av_frame_free(&frame);
+                    }
+                }
+            };
+
+            auto scaledFrame = AVFramePtr(av_frame_alloc(), ScaledFrameDeleter::free);
+            av_frame_copy_props(scaledFrame.get(), Frame.get());
+
+            scaledFrame->width = Width;
+            scaledFrame->height= Height;
+
+            av_image_alloc(scaledFrame->data, scaledFrame->linesize, scaledFrame->width, scaledFrame->height, (AVPixelFormat) Scale_OutputPixelFormat, 1);
+            if (sws_scale(ScaleContext, Frame->data, Frame->linesize, 0, Frame->height, scaledFrame->data, scaledFrame->linesize)<0)
+            {
+                scaledFrame.reset();
+            }
+            else
+            {
+                Frame = scaledFrame;
+            }
+
+        }
+    }
+
     int got_packet=0;
-    int result = avcodec_encode_video2(Output_CodecContext, outPacket.get(), frame, &got_packet);
+    int result = avcodec_encode_video2(Output_CodecContext, outPacket.get(), Frame.get(), &got_packet);
 
     if (result < 0 || !got_packet)
     {

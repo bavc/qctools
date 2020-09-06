@@ -175,7 +175,7 @@ public:
 
         int                     Width;
         int                     Height;
-        bool forceScale = { false };
+        bool scaleBeforeEncoding = { false }; // used to change format before encoding
 
         std::unique_ptr<AVPacket, outputdata::AVPacketDeleter> FFmpeg_Glue::outputdata::encodeFrame(AVFrame* frame, bool* ok = nullptr);
     };

@@ -449,7 +449,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                         AV_PIX_FMT_YUVJ420P
                         ;
                 output->Title = "Test";
-                output->forceScale = true;
+                output->scaleBeforeEncoding = true;
 
                 qDebug() << "added output" << output << streamIndex << output->Title.c_str();
                 m_panelOutputsByTitle[output->Title] = output->index;
@@ -722,6 +722,11 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
     encoder.setMetadata(metadata);
 
     FFmpegVideoEncoder::Source source;
+
+    FFmpegVideoEncoder::Metadata streamMetadata;
+    streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString("Frame Thumbnails"));
+
+    source.metadata = streamMetadata;
     source.width = Glue->OutputThumbnailWidth_Get();
     source.height = Glue->OutputThumbnailHeight_Get();
     source.bitrate = Glue->OutputThumbnailBitRate_Get();
@@ -738,6 +743,45 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
 
     QVector<FFmpegVideoEncoder::Source> sources;
     sources.push_back(source);
+
+    for(auto& panelTitle : panelOutputsByTitle().keys())
+    {
+        auto panelOutputIndex = panelOutputsByTitle()[panelTitle];
+        auto panelFramesCount = Glue->GetPanelFramesCount(panelOutputIndex);
+        if(panelFramesCount == 0)
+            continue;
+
+        auto frameSize = Glue->GetPanelFrameSize(panelOutputIndex, 0);
+        auto panelsCount = Glue->GetPanelFramesCount(panelOutputIndex);
+        auto panelIndex = 0;
+
+        FFmpegVideoEncoder::Metadata streamMetadata;
+        streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString::fromStdString(panelTitle));
+
+        FFmpegVideoEncoder::Source panelSource;
+        panelSource.metadata = streamMetadata;
+        panelSource.width = frameSize.width();
+        panelSource.height = frameSize.height();
+        panelSource.bitrate = Glue->OutputThumbnailBitRate_Get() / 1024;
+        panelSource.num = num;
+        panelSource.den = den;
+        panelSource.getPacket = [panelIndex, panelsCount, panelOutputIndex, this]() mutable -> std::shared_ptr<AVPacket> {
+            bool hasNext = panelIndex < panelsCount;
+
+            if(!hasNext) {
+                return nullptr;
+            }
+
+            auto frame = Glue->GetPanelFrame(panelOutputIndex, panelIndex);
+            auto packet = Glue->encodePanelFrame(panelOutputIndex, frame.get());
+
+            ++panelIndex;
+
+            return packet;
+        };
+
+        sources.push_back(panelSource);
+    }
 
     encoder.makeVideo(ExportFileName, sources, attachment, attachmentFileName);
 
