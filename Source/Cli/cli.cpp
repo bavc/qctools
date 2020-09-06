@@ -344,11 +344,6 @@ int Cli::exec(QCoreApplication &a)
                 int num = 0;
                 int den = 0;
 
-                std::cout << std::endl << "generating QCTools report with thumbnails and panels... " << std::endl;
-
-                progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
-                progress->setValue(0);
-
                 info->Glue->OutputThumbnailTimeBase_Get(num, den);
 
                 FFmpegVideoEncoder::Source source;
@@ -364,9 +359,16 @@ int Cli::exec(QCoreApplication &a)
                 source.den = den;
                 source.getPacket = [&]() -> std::shared_ptr<AVPacket> {
 
+                    if(thumbnailIndex == 0) {
+                        std::cout << std::endl << "adding thumbnails to QCTools report... " << std::endl;
+
+                        progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
+                        progress->setValue(0);
+                    }
+
                     bool hasNext = thumbnailIndex < thumbnailsCount;
 
-                    progress->setValue(50 * thumbnailIndex/ thumbnailsCount);
+                    progress->setValue(100 * thumbnailIndex/ thumbnailsCount);
                     QCoreApplication::processEvents();
 
                     if(!hasNext) {
@@ -378,11 +380,6 @@ int Cli::exec(QCoreApplication &a)
 
                 QVector<FFmpegVideoEncoder::Source> sources;
                 sources.push_back(source);
-
-                std::cout << std::endl << "generating QCTools report with panels... " << std::endl;
-
-                progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
-                progress->setValue(50);
 
                 for(auto& panelTitle : info->panelOutputsByTitle().keys())
                 {
@@ -407,9 +404,17 @@ int Cli::exec(QCoreApplication &a)
                     panelSource.den = den;
                     panelSource.getPacket = [panelIndex, panelsCount, panelOutputIndex, this]() mutable -> std::shared_ptr<AVPacket> {
 
+                        if(panelIndex == 0)
+                        {
+                            std::cout << std::endl << "adding panels to QCTools report... " << std::endl;
+
+                            progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
+                            progress->setValue(0);
+                        }
+
                         bool hasNext = panelIndex < panelsCount;
 
-                        progress->setValue(50 + 50 * panelIndex / panelsCount);
+                        progress->setValue(100 * panelIndex / panelsCount);
                         QCoreApplication::processEvents();
 
                         if(!hasNext) {
