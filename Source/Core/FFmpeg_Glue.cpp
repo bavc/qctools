@@ -499,15 +499,28 @@ std::unique_ptr<AVPacket, FFmpeg_Glue::outputdata::AVPacketDeleter> FFmpeg_Glue:
     }
 
     int got_packet=0;
-    int result = avcodec_encode_video2(Output_CodecContext, outPacket.get(), Frame.get(), &got_packet);
-
-    if (result < 0 || !got_packet)
+    int result = avcodec_send_frame(Output_CodecContext, Frame.get());
+    if (result < 0)
     {
         char buffer[256];
         qDebug() << av_make_error_string(buffer, sizeof buffer, result);
 
         if(ok)
             *ok = false;
+
+        return outPacket;
+    }
+
+    result = avcodec_receive_packet(Output_CodecContext, outPacket.get());
+    if (result != 0)
+    {
+        char buffer[256];
+        qDebug() << av_make_error_string(buffer, sizeof buffer, result);
+
+        if(ok)
+            *ok = false;
+
+        return outPacket;
     }
 
     return outPacket;
