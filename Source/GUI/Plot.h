@@ -212,7 +212,7 @@ public:
         }
 
         static QJSValue makeConditionFunction(QJSEngine* engine, const QString& condition) {
-            return engine->evaluate(QString("function(y) { return %1; }").arg(condition));
+            return engine->evaluate(QString("'function(y) { return %1; }'").arg(condition));
         }
 
         QJSValue makeConditionFunction(const QString& condition) const {
