@@ -177,7 +177,7 @@ public:
         int                     Height;
         bool scaleBeforeEncoding = { false }; // used to change format before encoding
 
-        std::unique_ptr<AVPacket, outputdata::AVPacketDeleter> FFmpeg_Glue::outputdata::encodeFrame(AVFrame* frame, bool* ok = nullptr);
+        std::unique_ptr<AVPacket, AVPacketDeleter> encodeFrame(AVFrame* frame, bool* ok = nullptr);
     };
 
     FFmpeg_Glue(const string &FileName, activealltracks ActiveAllTracks, std::vector<CommonStats*>* Stats, StreamsStats** streamsStats, FormatStats** formatStats, bool WithStats=false);
