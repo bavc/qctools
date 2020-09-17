@@ -312,10 +312,11 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     {
         auto panelOutputIndex = panelOutputsByTitle[item];
 
-        auto m_PanelsView = new PanelsView(this);
+        auto m_PanelsView = new PanelsView(this, m_commentsPlot);
         m_PanelsView->setContentsMargins(mappedTopLeft.x(), 0, m_PanelsView->width() - m_commentsPlot->width(), 0);
         m_PanelsView->setMinimumHeight(100);
 
+        connect(m_PanelsView, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
         connect(this, &Plots::visibleFramesChanged, m_PanelsView, &PanelsView::setVisibleFrames);
 
         if(m_PanelsView)
@@ -467,8 +468,13 @@ void Plots::setCursorPos( int newFramePos )
                 if (m_plots[streamPos][i])
                 m_plots[streamPos][i]->setCursorPos( x );
 
-            if(type == Type_Video)
+            if(type == Type_Video) {
                 m_commentsPlot->setCursorPos(x);
+
+                for(auto& panel : m_PanelsViews) {
+                    panel->setCursorPos(x);
+                }
+            }
         }
 
     m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
@@ -1060,5 +1066,10 @@ void Plots::replotAll()
     {
         m_commentsPlot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
         m_commentsPlot->replot();
+    }
+
+    for(auto& panel : m_PanelsViews)
+    {
+        panel->refresh();
     }
 }

@@ -1,11 +1,45 @@
 #include "panelsview.h"
+#include "Comments.h"
+#include "Plot.h"
 #include <QDebug>
 #include <QPainter>
 #include <QPushButton>
 #include <QWheelEvent>
 
-PanelsView::PanelsView(QWidget *parent) : QFrame(parent), m_actualWidth(0)
+class PanelCursor : public PlotCursor {
+public:
+    PanelCursor( QWidget *canvas, QwtPlot* plot ): PlotCursor(canvas), m_plot(plot)
+    {
+    }
+
+    virtual int translatedPos( double pos ) const
+    {
+        // translate from plot into widget coordinate
+
+        const QwtPlot* plot = m_plot;
+        if ( plot )
+        {
+            const QwtScaleMap scaleMap = plot->canvasMap( QwtPlot::xBottom );
+            auto translated = qRound( scaleMap.transform( pos ) ) + parentWidget()->contentsMargins().left();
+
+            qDebug() << "translated: " << translated;
+            return translated;
+        }
+
+        return -1;
+    }
+
+    QwtPlot* m_plot;
+};
+
+PanelsView::PanelsView(QWidget *parent, CommentsPlot* plot) : QFrame(parent), m_actualWidth(0), m_plot(plot)
 {
+    m_PlotCursor = new PanelCursor(this, plot);
+    m_PlotCursor->setPosition( 0 );
+
+    auto picker = new QwtPanelPicker(this, plot);
+    connect(picker, SIGNAL(moved(const QPointF&)), SLOT(onPickerMoved(const QPointF&)));
+    connect(picker, SIGNAL(selected(const QPointF&)), SLOT(onPickerMoved(const QPointF&)));
 }
 
 void PanelsView::setProvider(const std::function<int ()> &getPanelsCount, const std::function<QImage (int)> &getPanelImage)
@@ -29,6 +63,7 @@ void PanelsView::getPanelsBounds(int &startPanelIndex, int &startPanelOffset, in
 void PanelsView::refresh()
 {
     repaint();
+    m_PlotCursor->updateOverlay();
 }
 
 void PanelsView::setVisibleFrames(int from, int to)
@@ -43,6 +78,18 @@ void PanelsView::setVisibleFrames(int from, int to)
 void PanelsView::setActualWidth(int actualWidth)
 {
     m_actualWidth = actualWidth;
+}
+
+void PanelsView::setCursorPos(double x)
+{
+    m_PlotCursor->setPosition( x );
+}
+
+void PanelsView::onPickerMoved(const QPointF &pos)
+{
+    const int idx = m_plot->frameAt( pos.x() );
+    if ( idx >= 0 )
+        Q_EMIT cursorMoved( idx );
 }
 
 void PanelsView::paintEvent(QPaintEvent *)

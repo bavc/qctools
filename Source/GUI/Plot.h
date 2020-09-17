@@ -84,8 +84,8 @@ public:
         return QObject::eventFilter( object, event );
     }
 
-private:
-    int translatedPos( double pos ) const
+protected:
+    virtual int translatedPos( double pos ) const
     {
         // translate from plot into widget coordinate
 
