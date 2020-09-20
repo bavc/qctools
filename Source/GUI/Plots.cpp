@@ -312,7 +312,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     {
         auto panelOutputIndex = panelOutputsByTitle[item];
 
-        auto m_PanelsView = new PanelsView(this, m_commentsPlot);
+        auto m_PanelsView = new PanelsView(this, QString::fromStdString(item), m_commentsPlot);
         m_PanelsView->setContentsMargins(mappedTopLeft.x(), 0, m_PanelsView->width() - m_commentsPlot->width(), 0);
         m_PanelsView->setMinimumHeight(100);
 

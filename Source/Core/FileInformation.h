@@ -47,7 +47,9 @@ public:
 
     // Constructor/Destructor
                                 FileInformation             (SignalServer* signalServer, const QString &fileName,
-                                                             activefilters ActiveFilters, activealltracks ActiveAllTracks, int FrameCount=0);
+                                                             activefilters ActiveFilters, activealltracks ActiveAllTracks,
+                                                             QMap<QString, QString> activePanels,
+                                                             int FrameCount=0);
                                 ~FileInformation            ();
 
     // Parsing
@@ -64,6 +66,7 @@ public:
 
     activefilters               ActiveFilters;
     activealltracks             ActiveAllTracks;
+
     size_t                      ReferenceStream_Pos_Get     () const {return ReferenceStream_Pos;}
     int                         Frames_Count_Get            (size_t Stats_Pos=(size_t)-1);
     int                         Frames_Pos_Get              (size_t Stats_Pos=(size_t)-1);
@@ -189,6 +192,7 @@ private:
     activefilters m_exportFilters;
 
     QMap<std::string, int> m_panelOutputsByTitle;
+    QMap<QString, QString> m_activePanels;
 };
 
 #endif // GUI_FileInformation_H

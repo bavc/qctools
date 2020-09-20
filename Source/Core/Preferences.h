@@ -18,6 +18,13 @@
 typedef std::tuple<int, int> GroupAndType;
 typedef QList<GroupAndType> FilterSelectorsOrder;
 
+struct PanelInfo {
+    QString name;
+    QString yaxis;
+    QString filterchain;
+    QString version;
+};
+
 class Preferences : public QObject
 {
 public:
@@ -28,6 +35,11 @@ public:
 
     activealltracks activeAllTracks() const;
     void setActiveAllTracks(const activealltracks& alltracks);
+
+    QSet<QString> activePanels() const;
+    void setActivePanels(const QSet<QString>& activePanels);
+
+    QList<PanelInfo> availablePanels() const;
 
     FilterSelectorsOrder loadFilterSelectorsOrder();
     void saveFilterSelectorsOrder(const FilterSelectorsOrder& order);

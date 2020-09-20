@@ -1,0 +1,20 @@
+[
+    {
+        "name" : "Tiled Center Column",
+        "yaxis" : "Bottom-Top",
+        "filterchain" : "scale,format=rgb24,crop=1:ih:iw/2:0,tile=layout=${PANEL_WIDTH}x1,setsar=1/1",
+        "version" : "1.0"
+    },
+    {
+        "name" : "Tiled Center Row",
+        "yaxis" : "Left-Right",
+        "filterchain" : "scale,format=rgb24,transpose=0,crop=1:ih:iw/2:0,tile=layout=${PANEL_WIDTH}x1,setsar=1/1",
+        "version" : "1.0"
+    },
+    {
+        "name" : "Horizontal Blur",
+        "yaxis" : "Bottom-Top",
+        "filterchain" : "scale,format=rgb24,scale=iw/2:ih/2,format=gray,convolution='0 1 0 1 -4 1 0 1 0',split[a][b];[a]scale=iw:1[a1];[a1][b]scale2ref[a2][b];[b][a2]blend=all_mode=subtract,lut=c0=val*val,scale=iw:1,lut=c0=val*4,transpose=0,setsar=1/1,tile=layout=${PANEL_WIDTH}x1",
+        "version" : "1.0"
+    }
+]

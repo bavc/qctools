@@ -67,3 +67,6 @@ SOURCES = \
     $$SOURCES_PATH/Core/FFmpegVideoEncoder.cpp
 
 include($$SOURCES_PATH/ThirdParty/qblowfish/qblowfish.pri)
+
+RESOURCES += \
+    $$SOURCES_PATH/Core/resources.qrc

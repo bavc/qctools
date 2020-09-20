@@ -382,6 +382,8 @@ void MainWindow::on_actionFilesList_triggered()
         for (size_t group=0; group<CheckBoxes[type].size(); group++)
             CheckBoxes[type][group]->hide();
     m_commentsCheckbox->hide();
+    for(auto panelCheckbox : m_panelsCheckboxes)
+        panelCheckbox->hide();
 
     if (ui->fileNamesBox)
         ui->fileNamesBox->hide();
@@ -424,7 +426,11 @@ void MainWindow::on_actionGraphsLayout_triggered()
                 CheckBoxes[type][group]->show();
 
     if(getFilesCurrentPos()<Files.size())
+    {
         m_commentsCheckbox->show();
+        for(auto panelCheckbox : m_panelsCheckboxes)
+            panelCheckbox->show();
+    }
 
     if (ui->fileNamesBox)
         ui->fileNamesBox->show();

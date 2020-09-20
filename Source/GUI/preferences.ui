@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>609</width>
-    <height>409</height>
+    <width>783</width>
+    <height>581</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,119 +17,148 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="Filters">
       <attribute name="title">
        <string>Filters</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_9">
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_10">
-         <item>
-          <widget class="QGroupBox" name="groupBox_2">
-           <property name="title">
-            <string>Video</string>
-           </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Video</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_4">
-              <item>
-               <widget class="QCheckBox" name="Filters_Video_signalstats">
-                <property name="text">
-                 <string>signalstats (video analysis statistics) </string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="Filters_Video_cropdetect">
-                <property name="text">
-                 <string>cropdetect (detect image boundaries)</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="Filters_Video_Psnr">
-                <property name="text">
-                 <string>PSNR (video field comparisons)</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="Filters_Video_Ssim">
-                <property name="text">
-                 <string>SSIM (video field comparisons)</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="Filters_Video_Idet">
-                <property name="text">
-                 <string>idet (interlacement detection)</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="Filters_Video_Deflicker">
-                <property name="text">
-                 <string>deflicker (temporal frame luminance variations)</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="Filters_Video_Entropy">
-                <property name="text">
-                 <string>entropy (graylevel entropy in histogram of color channels)</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="Filters_Video_EntropyDiff">
-                <property name="text">
-                 <string>entropy-diff (frame-to-frame difference in graylevel entropy in histogram of color channels)</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <widget class="QCheckBox" name="Filters_Video_signalstats">
+              <property name="text">
+               <string>signalstats (video analysis statistics) </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="Filters_Video_cropdetect">
+              <property name="text">
+               <string>cropdetect (detect image boundaries)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="Filters_Video_Psnr">
+              <property name="text">
+               <string>PSNR (video field comparisons)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="Filters_Video_Ssim">
+              <property name="text">
+               <string>SSIM (video field comparisons)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="Filters_Video_Idet">
+              <property name="text">
+               <string>idet (interlacement detection)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="Filters_Video_Deflicker">
+              <property name="text">
+               <string>deflicker (temporal frame luminance variations)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="Filters_Video_Entropy">
+              <property name="text">
+               <string>entropy (graylevel entropy in histogram of color channels)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="Filters_Video_EntropyDiff">
+              <property name="text">
+               <string>entropy-diff (frame-to-frame difference in graylevel entropy in histogram of color channels)</string>
+              </property>
+             </widget>
             </item>
            </layout>
-          </widget>
-         </item>
-         <item>
-          <widget class="QGroupBox" name="groupBox_3">
-           <property name="title">
-            <string>Audio</string>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_11">
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>Audio</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_11">
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_3">
-              <item>
-               <widget class="QCheckBox" name="Filters_Audio_astats">
-                <property name="text">
-                 <string>astats (time domain statistics about audio frames)</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="Filters_Audio_EbuR128">
-                <property name="text">
-                 <string>EBU R128 (perceived volume analysis)</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="Filters_Audio_aphasemeter">
-                <property name="text">
-                 <string>Audio Phase Meter (detect audio phase)</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <widget class="QCheckBox" name="Filters_Audio_astats">
+              <property name="text">
+               <string>astats (time domain statistics about audio frames)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="Filters_Audio_EbuR128">
+              <property name="text">
+               <string>EBU R128 (perceived volume analysis)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="Filters_Audio_aphasemeter">
+              <property name="text">
+               <string>Audio Phase Meter (detect audio phase)</string>
+              </property>
+             </widget>
             </item>
            </layout>
-          </widget>
-         </item>
-        </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QGroupBox" name="panelsGroupBox">
+         <property name="title">
+          <string>Panels</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_13">
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_9">
+            <item>
+             <widget class="QCheckBox" name="samplePanel_checkBox">
+              <property name="text">
+               <string>sample panel</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -370,10 +399,6 @@
   <tabstop>Tracks_Video_All</tabstop>
   <tabstop>Tracks_Audio_First</tabstop>
   <tabstop>Tracks_Audio_All</tabstop>
-  <tabstop>XmlGz_Prompt</tabstop>
-  <tabstop>XmlGz_Sidecar</tabstop>
-  <tabstop>XmlGz_Directory</tabstop>
-  <tabstop>XmlGz_Directory_Name</tabstop>
   <tabstop>signalServerUrl_lineEdit</tabstop>
   <tabstop>signalServerLogin_lineEdit</tabstop>
   <tabstop>signalServerPassword_lineEdit</tabstop>

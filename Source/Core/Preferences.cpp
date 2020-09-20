@@ -11,6 +11,10 @@
 #include <QDataStream>
 #include <QDebug>
 #include <QSettings>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 #include "qblowfish.h"
 
@@ -26,10 +30,13 @@ QString KeySignalServerPassword = "SignalServerPassword";
 
 QString KeyActiveFilters = "ActiveFilters";
 QString KeyActiveAllTracks = "ActiveAllTracks";
+QString KeyActivePanels = "ActivePanels";
 QString KeyFilterSelectorsOrder = "filterSelectorsOrder";
 
 Preferences::Preferences(QObject *parent) : QObject(parent)
 {
+    Q_INIT_RESOURCE(resources);
+
     static struct RegisterMetatypes {
         RegisterMetatypes() {
             qRegisterMetaTypeStreamOperators<FilterSelectorsOrder>("FilterSelectorsOrder");
@@ -64,6 +71,78 @@ void Preferences::setActiveAllTracks(const activealltracks &alltracks)
 {
     QSettings settings;
     settings.setValue(KeyActiveAllTracks, (uint) alltracks.to_ulong());
+}
+
+QSet<QString> Preferences::activePanels() const
+{
+    QSettings settings;
+
+    auto panelsCount = settings.value(KeyActivePanels + "Count", -1).toInt();
+
+    if(panelsCount == -1) {
+        return QSet<QString>{ QString("Tiled Center Column") };
+    }
+
+    QStringList panels;
+    auto count = settings.beginReadArray(KeyActivePanels);
+    for(auto i = 0; i < count; ++i)
+    {
+        settings.setArrayIndex(i);
+        auto panelName = settings.value("panel").toString();
+
+        panels << panelName;
+    }
+    settings.endArray();
+
+    return QSet<QString>(panels.begin(), panels.end());
+}
+
+void Preferences::setActivePanels(const QSet<QString> &activePanels)
+{
+    QSettings settings;
+    settings.beginWriteArray(KeyActivePanels);
+
+    auto activePanelsList = activePanels.toList();
+    for(auto i = 0; i < activePanelsList.size(); ++i)
+    {
+        settings.setArrayIndex(i);
+        settings.setValue("panel", activePanelsList.at(i));
+    }
+
+    settings.endArray();
+
+    settings.setValue(KeyActivePanels + "Count", activePanels.size());
+}
+
+QList<PanelInfo> Preferences::availablePanels() const
+{
+    QList<PanelInfo> panels;
+
+    QFile file(":/panels.json");
+    if(file.exists() && file.open(QFile::ReadOnly))
+    {
+        QJsonParseError error;
+        QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &error);
+        if(error.error == QJsonParseError::NoError)
+        {
+            for(auto elem : doc.array()) {
+                auto panel = elem.toObject();
+                auto panelName = panel.value("name").toString();
+                auto panelFilterchain = panel.value("filterchain").toString();
+                auto panelYAxis = panel.value("yaxis").toString();
+                auto panelVersion = panel.value("version").toString();
+
+                PanelInfo panelInfo { panelName, panelYAxis, panelFilterchain, panelVersion };
+                panels.append(panelInfo);
+
+            }
+
+        } else {
+            qDebug() << "parse error: " << error.errorString() << error.offset;
+        }
+    }
+
+    return panels;
 }
 
 FilterSelectorsOrder Preferences::loadFilterSelectorsOrder()

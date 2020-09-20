@@ -95,6 +95,9 @@ public:
     const QwtPlot*              plot( size_t streamPos, size_t group ) const;
     CommentsPlot*               commentsPlot() const { return m_commentsPlot; }
 
+    PanelsView*                 panelsView(size_t index) const { return m_PanelsViews[index]; }
+    size_t                      panelsCount() const { return m_PanelsViews.size(); }
+
     void                        Zoom_Move( int Begin );
     void                        refresh();
 

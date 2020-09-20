@@ -63,6 +63,38 @@ const int MaxRecentFiles = 20;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+QPushButton* MainWindow::createCheckButton(const QString& name, int type, int group, const QString& tooltip)
+{
+    QPushButton* CheckBox=new QPushButton(name);
+
+    QFontMetrics metrics(CheckBox->font());
+    CheckBox->setMinimumWidth(metrics.width(CheckBox->text()));
+    CheckBox->setCheckable(true);
+    CheckBox->setFlat(true);
+    CheckBox->setProperty("type", (quint64) type); // unfortunately QVariant doesn't support size_t
+    CheckBox->setProperty("group", (quint64) group);
+    CheckBox->setStyleSheet("\
+        QPushButton {\
+            color: black;\
+            padding-top: 8px;\
+            padding-bottom: 8px;\
+            border: solid;\
+            border-color: lightgrey;\
+            border-width: 0 0 0 1px;\
+        }\
+        QPushButton:checked{\
+            background-color: grey;\
+        }\
+        QPushButton:hover{\
+            background-color: lightgrey;\
+        }  \
+        ");
+
+    CheckBox->setToolTip(tooltip);
+
+    return CheckBox;
+}
+
 void MainWindow::Ui_Init()
 {
     ui->setupUi(this);
@@ -262,32 +294,9 @@ void MainWindow::Ui_Init()
     for (size_t type = 0; type < Type_Max; type++)
         for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ ) // Group_Axis
         {
-            QPushButton* CheckBox=new QPushButton(PerStreamType[type].PerGroup[group].Name);
-
-            QFontMetrics metrics(CheckBox->font());
-            CheckBox->setMinimumWidth(metrics.width(CheckBox->text()));
-            CheckBox->setCheckable(true);
-            CheckBox->setFlat(true);
-            CheckBox->setProperty("type", (quint64) type); // unfortunately QVariant doesn't support size_t
-            CheckBox->setProperty("group", (quint64) group);
-            CheckBox->setStyleSheet("\
-                QPushButton {\
-                    color: black;\
-                    padding-top: 8px;\
-                    padding-bottom: 8px;\
-                    border: solid;\
-                    border-color: lightgrey;\
-                    border-width: 0 0 0 1px;\
-                }\
-                QPushButton:checked{\
-                    background-color: grey;\
-                }\
-                QPushButton:hover{\
-                    background-color: lightgrey;\
-                }  \
-                ");
-
-            CheckBox->setToolTip(PerStreamType[type].PerGroup[group].Description);
+            auto name = PerStreamType[type].PerGroup[group].Name;
+            auto description = PerStreamType[type].PerGroup[group].Description;
+            auto CheckBox = createCheckButton(name, type, group, description);
 
             if(!selectedFilters.empty())
             {
@@ -306,35 +315,27 @@ void MainWindow::Ui_Init()
             CheckBoxes[type].push_back(CheckBox);
         }
 
-    m_commentsCheckbox=new QPushButton("Comments");
-    QFontMetrics metrics(m_commentsCheckbox->font());
-    m_commentsCheckbox->setMinimumWidth(metrics.width(m_commentsCheckbox->text()));
-
-    m_commentsCheckbox->setProperty("type", (quint64) Type_Max);
-    m_commentsCheckbox->setProperty("group", (quint64) 0);
-    m_commentsCheckbox->setToolTip("comments");
-    m_commentsCheckbox->setFlat(true);
-    m_commentsCheckbox->setStyleSheet("\
-        QPushButton {\
-            color: black;\
-            padding-top: 8px;\
-            padding-bottom: 8px;\
-            border: solid;\
-            border-color: lightgrey;\
-            border-width: 0 1px 0 0;\
-        }\
-        QPushButton:checked{\
-            background-color: grey;\
-        }\
-        QPushButton:hover{\
-            background-color: lightgrey;\
-        }  \
-        ");
-    m_commentsCheckbox->setCheckable(true);
+    m_commentsCheckbox=createCheckButton("Comments", Type_Max, 0, "comments");
     m_commentsCheckbox->setChecked(true);
     m_commentsCheckbox->setVisible(false);
+
     QObject::connect(m_commentsCheckbox, SIGNAL(toggled(bool)), this, SLOT(on_check_toggled(bool)));
     ui->horizontalLayout->addWidget(m_commentsCheckbox);
+
+    for(auto panelInfo : preferences->availablePanels())
+    {
+        if(preferences->activePanels().contains(panelInfo.name))
+        {
+            auto panelCheckbox = createCheckButton(panelInfo.name, Type_Max, 0, panelInfo.name);
+            panelCheckbox->setChecked(true);
+            panelCheckbox->setVisible(false);
+
+            QObject::connect(panelCheckbox, SIGNAL(toggled(bool)), this, SLOT(on_check_toggled(bool)));
+            ui->horizontalLayout->addWidget(panelCheckbox);
+
+            m_panelsCheckboxes.push_back(panelCheckbox);
+        }
+    }
 
     qDebug() << "checkboxes in layout: " << ui->horizontalLayout->count();
 
@@ -609,6 +610,18 @@ void MainWindow::refreshDisplay()
     {
         PlotsArea->commentsPlot()->setVisible(m_commentsCheckbox->isChecked());
         PlotsArea->commentsPlot()->legend()->setVisible(m_commentsCheckbox->isChecked());
+
+        for(auto panelCheckbox : m_panelsCheckboxes) {
+            for(auto panelIndex = 0; panelIndex < PlotsArea->panelsCount(); ++panelIndex) {
+                auto panel = PlotsArea->panelsView(panelIndex);
+                qDebug() << "panel name: " << panel->panelTitle();
+
+                if(panel->panelTitle() == panelCheckbox->text()) {
+                    panel->setVisible(panelCheckbox->isChecked());
+                    break;
+                }
+            }
+        }
 
         for (size_t type = 0; type<Type_Max; type++)
             for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)

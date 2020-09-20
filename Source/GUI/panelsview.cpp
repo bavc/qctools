@@ -32,10 +32,11 @@ public:
     QwtPlot* m_plot;
 };
 
-PanelsView::PanelsView(QWidget *parent, CommentsPlot* plot) : QFrame(parent), m_actualWidth(0), m_plot(plot)
+PanelsView::PanelsView(QWidget *parent, const QString& panelTitle, CommentsPlot* plot) : QFrame(parent), m_actualWidth(0), m_plot(plot)
 {
     m_PlotCursor = new PanelCursor(this, plot);
     m_PlotCursor->setPosition( 0 );
+    m_panelTitle = panelTitle;
 
     auto picker = new QwtPanelPicker(this, plot);
     connect(picker, SIGNAL(moved(const QPointF&)), SLOT(onPickerMoved(const QPointF&)));

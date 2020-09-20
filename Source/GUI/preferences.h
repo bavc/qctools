@@ -5,6 +5,8 @@
 
 #include <QDialog>
 #include <QList>
+#include <QSet>
+#include <QMap>
 #include <QUrl>
 #include <tuple>
 
@@ -24,6 +26,7 @@ public:
     //Preferences
     activefilters ActiveFilters;
     activealltracks ActiveAllTracks;
+    QMap<QString, QString> ActivePanels;
 
     QList<std::tuple<int, int>> loadFilterSelectorsOrder();
     void saveFilterSelectorsOrder(const QList<std::tuple<int, int>>& order);

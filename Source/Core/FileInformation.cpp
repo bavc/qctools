@@ -243,10 +243,12 @@ const QMap<std::string, int> &FileInformation::panelOutputsByTitle() const
 }
 
 FileInformation::FileInformation (SignalServer* signalServer, const QString &FileName_, activefilters ActiveFilters_, activealltracks ActiveAllTracks_,
+                                  QMap<QString, QString> activePanels,
                                   int FrameCount) :
     FileName(FileName_),
     ActiveFilters(ActiveFilters_),
     ActiveAllTracks(ActiveAllTracks_),
+    m_activePanels(activePanels),
     signalServer(signalServer),
     m_jobType(Parsing),
 	streamsStats(NULL),
@@ -397,7 +399,6 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         Filters[1].erase(0, 1); // remove first comma
 
         m_panelSize.setWidth(1024);
-        Filters[2] = QString("scale,format=rgb24,crop=1:ih:iw/2:0,tile=layout=%1x1,setsar=1/1").arg(m_panelSize.width()).toStdString();
     }
     else
     {
@@ -435,24 +436,30 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
             for(auto & streamIndex : videoStreams)
             {
-                auto output = Glue->AddOutput(streamIndex, m_panelSize.width(), m_panelSize.height(), FFmpeg_Glue::Output_Panels, 0 /*AVMEDIA_TYPE_VIDEO*/, Filters[2]);
-                output->Output_CodecID =
-                        //AV_CODEC_ID_FFV1
-                        AV_CODEC_ID_MJPEG
-                        ;
-                output->Output_PixelFormat =
-                        //AV_PIX_FMT_RGB24
-                        AV_PIX_FMT_YUVJ420P
-                        ;
-                output->Scale_OutputPixelFormat =
-                        //AV_PIX_FMT_RGB24
-                        AV_PIX_FMT_YUVJ420P
-                        ;
-                output->Title = "Test";
-                output->scaleBeforeEncoding = true;
+                for(auto panelTitle : m_activePanels.keys())
+                {
+                    auto filter = m_activePanels[panelTitle];
+                    filter.replace(QString("${PANEL_WIDTH}"), QString::number(m_panelSize.width()));
 
-                qDebug() << "added output" << output << streamIndex << output->Title.c_str();
-                m_panelOutputsByTitle[output->Title] = output->index;
+                    auto output = Glue->AddOutput(streamIndex, m_panelSize.width(), m_panelSize.height(), FFmpeg_Glue::Output_Panels, 0 /*AVMEDIA_TYPE_VIDEO*/, filter.toStdString());
+                    output->Output_CodecID =
+                            //AV_CODEC_ID_FFV1
+                            AV_CODEC_ID_MJPEG
+                            ;
+                    output->Output_PixelFormat =
+                            //AV_PIX_FMT_RGB24
+                            AV_PIX_FMT_YUVJ420P
+                            ;
+                    output->Scale_OutputPixelFormat =
+                            //AV_PIX_FMT_RGB24
+                            AV_PIX_FMT_YUVJ420P
+                            ;
+                    output->Title = panelTitle.toStdString();
+                    output->scaleBeforeEncoding = true;
+
+                    qDebug() << "added output" << output << streamIndex << output->Title.c_str();
+                    m_panelOutputsByTitle[output->Title] = output->index;
+                }
             }
         }
         else

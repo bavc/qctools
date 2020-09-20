@@ -78,7 +78,6 @@ enum Types
 {
     Type_Video,
     Type_Audio,
-    Type_Panels,
     Type_Max
 };
 

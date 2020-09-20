@@ -105,6 +105,7 @@ public:
     //CheckBoxes
     std::vector<QPushButton*>     CheckBoxes[Type_Max];
     QPushButton*                  m_commentsCheckbox;
+    std::vector<QPushButton*>     m_panelsCheckboxes;
 
     // Files
     std::vector<FileInformation*> Files;
@@ -134,6 +135,8 @@ public:
     bool isFileSelected(size_t pos) const;
 
     bool hasMediaFile() const;
+    QPushButton* createCheckButton(const QString& name, int type, int group, const QString& tooltip);
+
 Q_SIGNALS:
     void fileSelected(bool selected);
     void filePositionChanged(size_t filePosition);
