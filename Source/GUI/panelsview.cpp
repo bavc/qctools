@@ -41,6 +41,20 @@ PanelsView::PanelsView(QWidget *parent, const QString& panelTitle, CommentsPlot*
     auto picker = new QwtPanelPicker(this, plot);
     connect(picker, SIGNAL(moved(const QPointF&)), SLOT(onPickerMoved(const QPointF&)));
     connect(picker, SIGNAL(selected(const QPointF&)), SLOT(onPickerMoved(const QPointF&)));
+
+    auto plotHeight = 30;
+
+    m_legend = new PlotLegend();
+    m_legend->setMaximumHeight(plotHeight);
+
+    /*
+    connect( this, SIGNAL( legendDataChanged( const QVariant &, const QList<QwtLegendData> & ) ),
+         m_legend, SLOT( updateLegend( const QVariant &, const QList<QwtLegendData> & ) ) );
+    */
+
+    QwtLegendData data;
+    data.setValue(QwtLegendData::TitleRole, m_panelTitle);
+    m_legend->updateLegend(QVariant("title"), QList<QwtLegendData> { data });
 }
 
 void PanelsView::setProvider(const std::function<int ()> &getPanelsCount, const std::function<QImage (int)> &getPanelImage)

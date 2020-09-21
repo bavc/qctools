@@ -1,9 +1,12 @@
 #ifndef PANELSVIEW_H
 #define PANELSVIEW_H
 
+#include "PlotLegend.h"
+
 #include <QFrame>
 #include <QSize>
 #include <functional>
+#include <qwt_legend.h>
 #include <qwt_picker_machine.h>
 #include <qwt_plot.h>
 #include <qwt_plot_picker.h>
@@ -343,6 +346,7 @@ public:
     void refresh();
 
     QString panelTitle() const { return m_panelTitle; }
+    PlotLegend *legend() { return m_legend; }
 
 public Q_SLOTS:
     void setVisibleFrames(int from, int to);
@@ -360,6 +364,7 @@ Q_SIGNALS:
 
 private:
 
+    PlotLegend* m_legend;
     PlotCursor* m_PlotCursor;
     CommentsPlot* m_plot;
     QString m_panelTitle;

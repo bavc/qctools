@@ -322,6 +322,14 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
         if(m_PanelsView)
         {
             layout->addWidget(m_PanelsView, m_plotsCount + m_PanelsViews.size() + 1, 0);
+
+            QVBoxLayout* legendLayout = new QVBoxLayout();
+            legendLayout->setContentsMargins(5, 0, 5, 0);
+            legendLayout->setSpacing(10);
+            legendLayout->setAlignment(Qt::AlignVCenter);
+            legendLayout->addWidget(m_PanelsView->legend());
+
+            layout->addLayout(legendLayout, m_plotsCount + m_PanelsViews.size() + 1, 1 );
         }
 
         m_PanelsView->setProvider([&, panelOutputIndex] {
@@ -712,9 +720,11 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
     QList <std::tuple<size_t, size_t, size_t>> currentOrderedPlotsInfo;
     QList <std::tuple<size_t, size_t, size_t>> expectedOrderedPlotsInfo;
 
-    for(auto row = 0; row < m_plotsCount; ++row)
+    for(auto row = 0; row < (m_plotsCount + 1 + m_PanelsViews.size()); ++row)
     {
         auto plotItem = gridLayout->itemAtPosition(row, 0);
+        qDebug() << "plotItem: " << plotItem;
+
         auto legendItem = gridLayout->itemAtPosition(row, 1);
 
         Q_ASSERT(plotItem);
@@ -727,9 +737,13 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
         auto commentsPlot = qobject_cast<CommentsPlot*> (plotItem->widget());
         if(commentsPlot)
             currentOrderedPlotsInfo.push_back(std::make_tuple(0, Type_Max, 0));
+
+        auto panelsView = qobject_cast<PanelsView*> (plotItem->widget());
+        if(panelsView)
+            currentOrderedPlotsInfo.push_back(std::make_tuple(0, Type_Max, 0));
     }
 
-    currentOrderedPlotsInfo.push_back(std::make_tuple(0, Type_Max, 0));
+    // currentOrderedPlotsInfo.push_back(std::make_tuple(0, Type_Max, 0));
 
     for(auto filterInfo : orderedFilterInfo)
     {
