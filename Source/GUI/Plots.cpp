@@ -313,9 +313,26 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     for(auto & item : panelOutputsByTitle.keys())
     {
         auto panelOutputIndex = panelOutputsByTitle[item];
+        auto metadata = m_fileInfoData->Glue->getOutputMetadata(panelOutputIndex);
+        auto yaxisIt = metadata.find("yaxis");
+        auto yaxis = yaxisIt != metadata.end() ? yaxisIt->second : "";
 
-        auto m_PanelsView = new PanelsView(this, QString::fromStdString(item), m_commentsPlot);
-        m_PanelsView->setContentsMargins(mappedTopLeft.x(), 0, m_PanelsView->width() - m_commentsPlot->width(), 0);
+        auto m_PanelsView = new PanelsView(this, QString::fromStdString(item), QString::fromStdString(yaxis), m_commentsPlot);
+        m_PanelsView->setFrameShape(QFrame::Panel);
+        m_PanelsView->setLineWidth(2);
+
+        auto leftMargin = m_commentsPlot->axisWidget(QwtPlot::yLeft)->margin();
+        auto leftSpacing = m_commentsPlot->axisWidget(QwtPlot::yLeft)->spacing();
+
+        mappedTopLeft.setX(mappedTopLeft.x() + leftMargin + leftSpacing);
+        mappedBottomRight.setX(mappedBottomRight.x() - leftMargin - leftSpacing);
+
+        auto right = m_PanelsView->width() - m_commentsPlot->width();
+
+        m_PanelsView->setContentsMargins(mappedTopLeft.x(), 0,
+                                         /*right*/
+                                         mappedBottomRight.x(), 0);
+
         m_PanelsView->setMinimumHeight(100);
         m_PanelsView->setVisible(false);
         m_PanelsView->legend()->setVisible(false);
@@ -656,9 +673,18 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
         qDebug() << "mappedTopLeft: " << mappedTopLeft;
         qDebug() << "mappedBottomRight: " << mappedBottomRight;
 
+        auto leftMargin = m_commentsPlot->axisWidget(QwtPlot::yLeft)->margin();
+        auto leftSpacing = m_commentsPlot->axisWidget(QwtPlot::yLeft)->spacing();
+
+        /*
+        mappedTopLeft.setX(mappedTopLeft.x() + leftMargin + leftSpacing);
+        mappedBottomRight.setX(mappedBottomRight.x() - leftMargin - leftSpacing);
+        */
+
         if(plot(0, 0))
         {
             for(auto m_PanelsView : m_PanelsViews) {
+                m_PanelsView->setLeftOffset(leftMargin + leftSpacing);
                 m_PanelsView->setContentsMargins(mappedTopLeft.x(), 0, m_PanelsView->width() - mappedBottomRight.x(), 0);
                 m_PanelsView->setActualWidth(plot(0, 0)->canvas()->contentsRect().width());
             }

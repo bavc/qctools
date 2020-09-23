@@ -1467,7 +1467,7 @@ std::map<string, string> FFmpeg_Glue::getInputMetadata(int pos) const
     while ((tag = av_dict_get(tags, "", tag, AV_DICT_IGNORE_SUFFIX))) {
         if(tag->key && tag->value)
         {
-            metadata[tag->key] = tag->value;
+            metadata[QString(tag->key).toLower().toStdString()] = tag->value;
         } else
         {
             break;

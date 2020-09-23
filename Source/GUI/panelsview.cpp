@@ -32,7 +32,7 @@ public:
     QwtPlot* m_plot;
 };
 
-PanelsView::PanelsView(QWidget *parent, const QString& panelTitle, CommentsPlot* plot) : QFrame(parent), m_actualWidth(0), m_plot(plot)
+PanelsView::PanelsView(QWidget *parent, const QString& panelTitle, const QString& yaxis, CommentsPlot* plot) : QFrame(parent), m_actualWidth(0), m_plot(plot)
 {
     m_PlotCursor = new PanelCursor(this, plot);
     m_PlotCursor->setPosition( 0 );
@@ -43,6 +43,13 @@ PanelsView::PanelsView(QWidget *parent, const QString& panelTitle, CommentsPlot*
     connect(picker, SIGNAL(selected(const QPointF&)), SLOT(onPickerMoved(const QPointF&)));
 
     auto plotHeight = 30;
+
+    auto splitted = yaxis.split(":");
+    if(splitted.length() == 2)
+    {
+        m_bottomYLabel = splitted[0];
+        m_topYLabel = splitted[1];
+    }
 
     m_legend = new PlotLegend();
     m_legend->setMaximumHeight(plotHeight);
@@ -101,6 +108,11 @@ void PanelsView::setCursorPos(double x)
     m_PlotCursor->setPosition( x );
 }
 
+void PanelsView::setLeftOffset(int leftOffset)
+{
+    m_leftOffset = leftOffset;
+}
+
 void PanelsView::onPickerMoved(const QPointF &pos)
 {
     const int idx = m_plot->frameAt( pos.x() );
@@ -108,28 +120,55 @@ void PanelsView::onPickerMoved(const QPointF &pos)
         Q_EMIT cursorMoved( idx );
 }
 
-void PanelsView::paintEvent(QPaintEvent *)
+void PanelsView::paintEvent(QPaintEvent *e)
 {
+    QPainter p;
+    p.begin(this);
+
+    p.drawRect(QRect(contentsMargins().left(),
+                     lineWidth() - 1,
+                     width() - (contentsMargins().left() + contentsMargins().right() + 1),
+                     height() - (lineWidth() - 1) * 2));
+
+
+    p.save();
+    auto font = p.font();
+    font.setBold(true);
+    p.setFont(font);
+
+    QFontMetrics metrics(font);
+    auto topYLabelWidth = metrics.width(m_topYLabel);
+    auto topYLabelHeight = metrics.height();
+
+    p.setPen(Qt::black);
+    p.drawText(QPoint(contentsMargins().left() - m_leftOffset / 2 - topYLabelWidth,
+                      lineWidth() + topYLabelHeight), m_topYLabel);
+
+    auto bottomYLabelWidth = metrics.width(m_bottomYLabel);
+    auto bottomYLabelHeight = metrics.height();
+
+    p.drawText(QPoint(contentsMargins().left() - m_leftOffset / 2 - bottomYLabelWidth,
+                      height() - (lineWidth() - 1) - bottomYLabelHeight), m_bottomYLabel);
+
+    p.restore();
+
     auto panelsCount = getPanelsCount();
     if(panelsCount == 0)
         return;
 
-    qDebug() << "panelsCount: " << panelsCount;
-
-    QPainter p;
-    p.begin(this);
-
-    auto availableWidth = width() - contentsMargins().left() - contentsMargins().right();
+    auto availableWidth = width() - (contentsMargins().left() + m_leftOffset + 1) - (contentsMargins().right() + m_leftOffset - 1);
     auto sx = m_actualWidth == 0 ? 1 : ((qreal) availableWidth / m_actualWidth);
-    auto sy = (qreal)height() / getPanelImage(0).height();
+    auto availableHeight = height() - lineWidth();
+    auto sy = (qreal)availableHeight / getPanelImage(0).height();
 
     auto dx = availableWidth - m_actualWidth;
-    qDebug() << "sx: " << sx << "m_actualWidth: " << m_actualWidth << "availableWidth: " << availableWidth;
 
-    QRect viewport(contentsMargins().left(), 0, width() - contentsMargins().right(), height());
+    QRect viewport(contentsMargins().left() + m_leftOffset + 1,
+                   lineWidth(),
+                   width() - (contentsMargins().right() + m_leftOffset - 1),
+                   availableHeight);
+
     p.setViewport(viewport);
-
-    qDebug() << "viewport: " << viewport;
 
     auto totalFrames = m_endFrame - m_startFrame;
     auto zx = (qreal) m_actualWidth / totalFrames;
@@ -145,7 +184,7 @@ void PanelsView::paintEvent(QPaintEvent *)
 
     qDebug() << "startPanelIndex: " << startPanelIndex << "startPanelOffset: " << startPanelOffset
              << "endPanelIndex: " << endPanelIndex << "endPanelLength: " << endPanelLength << "availableWidth: " << availableWidth << "actual: " << m_actualWidth
-             << "height: " << height();
+             << "height: " << availableHeight;
 
     // p.fillRect(QRect(0, 0, width(), height()), Qt::green);
     int x = 0;

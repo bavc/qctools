@@ -337,7 +337,7 @@ class PanelsView : public QFrame
 {
     Q_OBJECT
 public:
-    explicit PanelsView(QWidget *parent = nullptr, const QString & panelTitle = QString(), CommentsPlot* plot = nullptr);
+    explicit PanelsView(QWidget *parent = nullptr, const QString & panelTitle = QString(), const QString & yaxis = QString(), CommentsPlot* plot = nullptr);
     void setProvider(const std::function<int()>& getPanelsCount,
                      const std::function<QImage(int)>& getPanelImage);
 
@@ -352,6 +352,7 @@ public Q_SLOTS:
     void setVisibleFrames(int from, int to);
     void setActualWidth(int width);
     void setCursorPos(double x);
+    void setLeftOffset(int leftOffset);
 
     void onPickerMoved( const QPointF& pos );
 
@@ -369,6 +370,10 @@ private:
     CommentsPlot* m_plot;
     QString m_panelTitle;
 
+    QString m_bottomYLabel;
+    QString m_topYLabel;
+
+    int m_leftOffset;
     int m_startFrame;
     int m_endFrame;
     int m_actualWidth;
