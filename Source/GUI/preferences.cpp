@@ -45,12 +45,12 @@ PreferencesDialog::~PreferencesDialog()
     delete ui;
 }
 
-QList<std::tuple<size_t, size_t> > PreferencesDialog::loadFilterSelectorsOrder()
+QList<std::tuple<quint64, quint64> > PreferencesDialog::loadFilterSelectorsOrder()
 {
     return preferences->loadFilterSelectorsOrder();
 }
 
-void PreferencesDialog::saveFilterSelectorsOrder(const QList<std::tuple<size_t, size_t> > &order)
+void PreferencesDialog::saveFilterSelectorsOrder(const QList<std::tuple<quint64, quint64> > &order)
 {
     preferences->saveFilterSelectorsOrder(order);
 }

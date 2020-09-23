@@ -121,7 +121,7 @@ public:
     QList<QAction*>             recentFilesActions;
 
     SignalServer*               getSignalServer();
-    QList<std::tuple<size_t, size_t>> getFilterSelectorsOrder(int start, int end);
+    QList<std::tuple<quint64, quint64>> getFilterSelectorsOrder(int start, int end);
     QStringList                 getSelectedFilters() const;
 
     QAction* uploadAction() const;
@@ -260,7 +260,7 @@ private:
     void updateScrollBar( bool blockSignals = false );
     bool isPlotZoomable() const;
     void Zoom( bool );
-    void changeFilterSelectorsOrder(QList<std::tuple<size_t, size_t> > filtersInfo);
+    void changeFilterSelectorsOrder(QList<std::tuple<quint64, quint64> > filtersInfo);
 
     QAction* createOpenRecentAction(const QString& fileName);
     void updateRecentFiles(const QString& fileName);

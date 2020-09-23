@@ -15,7 +15,7 @@
 #include <QList>
 #include <tuple>
 
-typedef std::tuple<size_t, size_t> GroupAndType;
+typedef std::tuple<quint64, quint64> GroupAndType;
 typedef QList<GroupAndType> FilterSelectorsOrder;
 
 struct PanelInfo {

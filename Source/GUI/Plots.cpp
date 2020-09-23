@@ -730,7 +730,7 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
     return QWidget::eventFilter( object, event );
 }
 
-void Plots::changeOrder(QList<std::tuple<size_t, size_t> > orderedFilterInfo)
+void Plots::changeOrder(QList<std::tuple<quint64, quint64> > orderedFilterInfo)
 {
     if(orderedFilterInfo.empty())
     {
@@ -747,8 +747,8 @@ void Plots::changeOrder(QList<std::tuple<size_t, size_t> > orderedFilterInfo)
 
     qDebug() << "plotsCount: " << m_plotsCount << "commentsCount: " << 1 << "panelsCount: " << m_PanelsViews.size();
 
-    QList <std::tuple<size_t, size_t, size_t>> currentOrderedPlotsInfo;
-    QList <std::tuple<size_t, size_t, size_t>> expectedOrderedPlotsInfo;
+    QList <std::tuple<quint64, quint64, quint64>> currentOrderedPlotsInfo;
+    QList <std::tuple<quint64, quint64, quint64>> expectedOrderedPlotsInfo;
 
     for(auto row = 0; row < (m_plotsCount + 1 + m_PanelsViews.size()); ++row)
     {

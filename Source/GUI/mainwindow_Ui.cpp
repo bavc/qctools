@@ -291,8 +291,8 @@ void MainWindow::Ui_Init()
 
     QSet<QString> selectedFilters = QSet<QString>::fromList(preferences->loadSelectedFilters());
 
-    for (size_t type = 0; type < Type_Max; type++)
-        for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ ) // Group_Axis
+    for (quint64 type = 0; type < Type_Max; type++)
+        for ( quint64 group = 0; group < PerStreamType[type].CountOfGroups; group++ ) // Group_Axis
         {
             auto name = PerStreamType[type].PerGroup[group].Name;
             auto description = PerStreamType[type].PerGroup[group].Description;
@@ -538,7 +538,7 @@ void MainWindow::Zoom( bool on )
     configureZoom();
 }
 
-void MainWindow::changeFilterSelectorsOrder(QList<std::tuple<size_t, size_t> > filtersInfo)
+void MainWindow::changeFilterSelectorsOrder(QList<std::tuple<quint64, quint64> > filtersInfo)
 {
     QSignalBlocker blocker(draggableBehaviour);
 
@@ -697,8 +697,8 @@ void MainWindow::refreshDisplay()
 
         updatePanelsVisibility();
 
-        for (size_t type = 0; type<Type_Max; type++)
-            for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
+        for (quint64 type = 0; type<Type_Max; type++)
+            for (quint64 group=0; group<PerStreamType[type].CountOfGroups; group++)
                 PlotsArea->setPlotVisible( type, group, CheckBoxes[type][group]->isChecked() );
 
         PlotsArea->alignYAxes();
