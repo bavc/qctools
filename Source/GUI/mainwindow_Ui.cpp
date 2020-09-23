@@ -315,18 +315,23 @@ void MainWindow::Ui_Init()
             CheckBoxes[type].push_back(CheckBox);
         }
 
-    m_commentsCheckbox=createCheckButton("Comments", Type_Max, 0, "comments");
+
+    qDebug() << "*checkboxes in layout: " << ui->horizontalLayout->count();
+
+    m_commentsCheckbox=createCheckButton("Comments", Type_Comments, 0, "comments");
     m_commentsCheckbox->setChecked(true);
     m_commentsCheckbox->setVisible(false);
 
     QObject::connect(m_commentsCheckbox, SIGNAL(toggled(bool)), this, SLOT(on_check_toggled(bool)));
     ui->horizontalLayout->addWidget(m_commentsCheckbox);
 
+    qDebug() << "**checkboxes in layout: " << ui->horizontalLayout->count();
+
     for(auto panelInfo : preferences->availablePanels())
     {
         if(preferences->activePanels().contains(panelInfo.name))
         {
-            auto panelCheckbox = createCheckButton(panelInfo.name, Type_Max, 0, panelInfo.name);
+            auto panelCheckbox = createCheckButton(panelInfo.name, Type_Panels, qHash(panelInfo.name), panelInfo.name);
             panelCheckbox->setChecked(true);
             panelCheckbox->setVisible(false);
 
@@ -337,7 +342,12 @@ void MainWindow::Ui_Init()
         }
     }
 
-    qDebug() << "checkboxes in layout: " << ui->horizontalLayout->count();
+    qDebug() << "***checkboxes in layout: " << ui->horizontalLayout->count();
+
+    for(auto i = 0; i < ui->horizontalLayout->count(); ++i) {
+        auto w = ui->horizontalLayout->itemAt(i)->widget();
+        qDebug() << "MainWindow::Ui_Init: group: " << w->property("group") << "type: " << w->property("type");
+    }
 
     configureZoom();
 
@@ -364,6 +374,64 @@ void MainWindow::Ui_Init()
     //Preferences
     Prefs=new PreferencesDialog(preferences, connectionChecker, this);
     connect(Prefs, SIGNAL(saved()), this, SLOT(updateSignalServerSettings()));
+    connect(Prefs, &PreferencesDialog::saved, [&]() {
+
+        auto existingPanels = QSet<QString>();
+        for(auto & panelCheckbox : m_panelsCheckboxes)
+            existingPanels.insert(panelCheckbox->text());
+
+        auto newPanels = preferences->activePanels().subtract(existingPanels);
+        m_panelsCheckboxes.clear();
+
+        for(auto i = 0; i < ui->horizontalLayout->count();)
+        {
+            auto layoutItem = ui->horizontalLayout->itemAt(i);
+            auto widget = layoutItem->widget();
+            if(widget) {
+                auto type = widget->property("type").toInt();
+                auto text = widget->property("text").toString();
+
+                if(type == Type_Panels)
+                {
+                    if(preferences->activePanels().contains(text))
+                    {
+                        widget->setVisible(true);
+                        m_panelsCheckboxes.push_back(qobject_cast<QPushButton*>(widget));
+                    }
+                    else
+                    {
+                        for(auto panelIndex = 0; panelIndex < PlotsArea->panelsCount(); ++panelIndex) {
+                            auto panel = PlotsArea->panelsView(panelIndex);
+                            qDebug() << "panel name: " << panel->panelTitle();
+
+                            if(panel->panelTitle() == text) {
+                                panel->setVisible(false);
+                                panel->legend()->setVisible(false);
+                                break;
+                            }
+                        }
+
+                        delete widget;
+                        continue;
+                    }
+                }
+            }
+
+            ++i;
+        }
+
+        for(auto panelName : newPanels)
+        {
+            auto panelCheckbox = createCheckButton(panelName, Type_Panels, qHash(panelName), panelName);
+            panelCheckbox->setChecked(false);
+            panelCheckbox->setVisible(true);
+
+            QObject::connect(panelCheckbox, SIGNAL(toggled(bool)), this, SLOT(on_check_toggled(bool)));
+            ui->horizontalLayout->addWidget(panelCheckbox);
+
+            m_panelsCheckboxes.push_back(panelCheckbox);
+        }
+    });
 
     updateSignalServerSettings();
     updateConnectionIndicator();
@@ -470,7 +538,7 @@ void MainWindow::Zoom( bool on )
     configureZoom();
 }
 
-void MainWindow::changeFilterSelectorsOrder(QList<std::tuple<int, int> > filtersInfo)
+void MainWindow::changeFilterSelectorsOrder(QList<std::tuple<size_t, size_t> > filtersInfo)
 {
     QSignalBlocker blocker(draggableBehaviour);
 
@@ -604,6 +672,22 @@ void MainWindow::Export_PDF()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::updatePanelsVisibility()
+{
+    for(auto panelCheckbox : m_panelsCheckboxes) {
+        for(auto panelIndex = 0; panelIndex < PlotsArea->panelsCount(); ++panelIndex) {
+            auto panel = PlotsArea->panelsView(panelIndex);
+            qDebug() << "panel name: " << panel->panelTitle();
+
+            if(panel->panelTitle() == panelCheckbox->text()) {
+                panel->setVisible(panelCheckbox->isChecked());
+                panel->legend()->setVisible(panelCheckbox->isChecked());
+                break;
+            }
+        }
+    }
+}
+
 void MainWindow::refreshDisplay()
 {
     if (PlotsArea)
@@ -611,17 +695,7 @@ void MainWindow::refreshDisplay()
         PlotsArea->commentsPlot()->setVisible(m_commentsCheckbox->isChecked());
         PlotsArea->commentsPlot()->legend()->setVisible(m_commentsCheckbox->isChecked());
 
-        for(auto panelCheckbox : m_panelsCheckboxes) {
-            for(auto panelIndex = 0; panelIndex < PlotsArea->panelsCount(); ++panelIndex) {
-                auto panel = PlotsArea->panelsView(panelIndex);
-                qDebug() << "panel name: " << panel->panelTitle();
-
-                if(panel->panelTitle() == panelCheckbox->text()) {
-                    panel->setVisible(panelCheckbox->isChecked());
-                    break;
-                }
-            }
-        }
+        updatePanelsVisibility();
 
         for (size_t type = 0; type<Type_Max; type++)
             for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)

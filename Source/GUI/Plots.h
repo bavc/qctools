@@ -107,7 +107,7 @@ public:
     int                         numFrames() const { return stats()->x_Current_Max; }
 
     virtual bool                eventFilter( QObject *, QEvent * );
-    void                        changeOrder(QList<std::tuple<int, int>> filterSelectorsInfo);
+    void                        changeOrder(QList<std::tuple<size_t, size_t>> filterSelectorsInfo);
 
     QJsonObject                 saveBarchartsProfile();
     void                        loadBarchartsProfile(const QJsonObject& profile);

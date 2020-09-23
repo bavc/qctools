@@ -45,20 +45,27 @@
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-QList<std::tuple<int, int>> MainWindow::getFilterSelectorsOrder(int start = 0, int end = -1)
+QList<std::tuple<size_t, size_t>> MainWindow::getFilterSelectorsOrder(int start = 0, int end = -1)
 {
-    QList<std::tuple<int, int>> filtersInfo;
+    QList<std::tuple<size_t, size_t>> filtersInfo;
     if(end == -1)
         end = ui->horizontalLayout->count() - 1;
 
     for(int i = start; i <= end; ++i)
     {
         auto o = ui->horizontalLayout->itemAt(i)->widget();
-        auto group = o->property("group").toInt();
-        auto type = o->property("type").toInt();
+        if(o->property("group").isValid())
+        {
+            auto group = o->property("group").toUInt();
+            auto type = o->property("type").toUInt();
 
-        filtersInfo.push_back(std::make_tuple(group, type));
+            qDebug() << "getFilterSelectorsOrder: group: " << group << "type: " << type;
+
+            filtersInfo.push_back(std::make_tuple(group, type));
+        }
     }
+
+    qDebug() << "filtersInfo.size(): " << filtersInfo.size();
 
     return filtersInfo;
 }
@@ -146,7 +153,7 @@ MainWindow::MainWindow(QWidget *parent) :
             end = oldPos;
         }
 
-        QList<std::tuple<int, int>> filtersSelectors = getFilterSelectorsOrder();
+        QList<std::tuple<size_t, size_t>> filtersSelectors = getFilterSelectorsOrder();
 
         if(PlotsArea)
             PlotsArea->changeOrder(filtersSelectors);
@@ -428,8 +435,11 @@ void MainWindow::on_actionGraphsLayout_triggered()
     if(getFilesCurrentPos()<Files.size())
     {
         m_commentsCheckbox->show();
-        for(auto panelCheckbox : m_panelsCheckboxes)
-            panelCheckbox->show();
+        for(auto panelCheckbox : m_panelsCheckboxes) {
+            if(preferences->activePanels().contains(panelCheckbox->text())) {
+                panelCheckbox->show();
+            }
+        }
     }
 
     if (ui->fileNamesBox)

@@ -121,7 +121,7 @@ public:
     QList<QAction*>             recentFilesActions;
 
     SignalServer*               getSignalServer();
-    QList<std::tuple<int, int>> getFilterSelectorsOrder(int start, int end);
+    QList<std::tuple<size_t, size_t>> getFilterSelectorsOrder(int start, int end);
     QStringList                 getSelectedFilters() const;
 
     QAction* uploadAction() const;
@@ -136,6 +136,8 @@ public:
 
     bool hasMediaFile() const;
     QPushButton* createCheckButton(const QString& name, int type, int group, const QString& tooltip);
+
+    void updatePanelsVisibility();
 
 Q_SIGNALS:
     void fileSelected(bool selected);
@@ -258,7 +260,7 @@ private:
     void updateScrollBar( bool blockSignals = false );
     bool isPlotZoomable() const;
     void Zoom( bool );
-    void changeFilterSelectorsOrder(QList<std::tuple<int, int> > filtersInfo);
+    void changeFilterSelectorsOrder(QList<std::tuple<size_t, size_t> > filtersInfo);
 
     QAction* createOpenRecentAction(const QString& fileName);
     void updateRecentFiles(const QString& fileName);

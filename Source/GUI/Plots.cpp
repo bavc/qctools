@@ -283,6 +283,8 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     m_commentsPlot = createCommentsPlot(fileInformation, &m_dataTypeIndex);
     m_commentsPlot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
     m_commentsPlot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
+    m_commentsPlot->setVisible(false);
+    m_commentsPlot->legend()->setVisible(false);
 
     connect( m_commentsPlot, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
     m_commentsPlot->canvas()->installEventFilter( this );
@@ -315,6 +317,8 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
         auto m_PanelsView = new PanelsView(this, QString::fromStdString(item), m_commentsPlot);
         m_PanelsView->setContentsMargins(mappedTopLeft.x(), 0, m_PanelsView->width() - m_commentsPlot->width(), 0);
         m_PanelsView->setMinimumHeight(100);
+        m_PanelsView->setVisible(false);
+        m_PanelsView->legend()->setVisible(false);
 
         connect(m_PanelsView, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
         connect(this, &Plots::visibleFramesChanged, m_PanelsView, &PanelsView::setVisibleFrames);
@@ -700,7 +704,7 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
     return QWidget::eventFilter( object, event );
 }
 
-void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
+void Plots::changeOrder(QList<std::tuple<size_t, size_t> > orderedFilterInfo)
 {
     if(orderedFilterInfo.empty())
     {
@@ -715,7 +719,7 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
 
     Q_ASSERT(m_plotsCount <= rowsCount);
 
-    qDebug() << "plotsCount: " << m_plotsCount;
+    qDebug() << "plotsCount: " << m_plotsCount << "commentsCount: " << 1 << "panelsCount: " << m_PanelsViews.size();
 
     QList <std::tuple<size_t, size_t, size_t>> currentOrderedPlotsInfo;
     QList <std::tuple<size_t, size_t, size_t>> expectedOrderedPlotsInfo;
@@ -736,17 +740,23 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
 
         auto commentsPlot = qobject_cast<CommentsPlot*> (plotItem->widget());
         if(commentsPlot)
-            currentOrderedPlotsInfo.push_back(std::make_tuple(0, Type_Max, 0));
+            currentOrderedPlotsInfo.push_back(std::make_tuple(0, Type_Comments, 0));
 
         auto panelsView = qobject_cast<PanelsView*> (plotItem->widget());
         if(panelsView)
-            currentOrderedPlotsInfo.push_back(std::make_tuple(0, Type_Max, 0));
+            currentOrderedPlotsInfo.push_back(std::make_tuple(qHash(panelsView->panelTitle()), Type_Panels, 0));
     }
 
     // currentOrderedPlotsInfo.push_back(std::make_tuple(0, Type_Max, 0));
 
+    qDebug() << "\torderedFilterInfo: " << orderedFilterInfo.length();
+
     for(auto filterInfo : orderedFilterInfo)
     {
+        qDebug() << QString("group: %1/type: %2")
+                    .arg(std::get<0>(filterInfo))
+                    .arg(std::get<1>(filterInfo));
+
         for(auto plotInfo : currentOrderedPlotsInfo)
         {
             if(std::get<0>(plotInfo) == std::get<0>(filterInfo) && std::get<1>(plotInfo) == std::get<1>(filterInfo))
@@ -758,21 +768,45 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
 
     Q_ASSERT(currentOrderedPlotsInfo.length() == expectedOrderedPlotsInfo.length());
     if(currentOrderedPlotsInfo.length() != expectedOrderedPlotsInfo.length())
-        return;
-
-    for(auto i = 0; i < expectedOrderedPlotsInfo.length(); ++i)
     {
-        qDebug() << "cg: " << std::get<0>(currentOrderedPlotsInfo[i])
-                 << ", "
-                 << "ct: " << std::get<1>(currentOrderedPlotsInfo[i])
-                 << ", "
-                 << "cp: " << std::get<2>(currentOrderedPlotsInfo[i])
-                 << ", "
-                 << "eg: " << std::get<0>(expectedOrderedPlotsInfo[i])
-                 << ", "
-                 << "et: " << std::get<1>(expectedOrderedPlotsInfo[i])
-                 << ", "
-                 << "ep: " << std::get<2>(expectedOrderedPlotsInfo[i]);
+        auto currentSet = QSet<QString>();
+        auto expectedSet = QSet<QString>();
+
+        qDebug() << "\tcurrent: " << currentOrderedPlotsInfo.size();
+
+        for(auto i = 0; i < currentOrderedPlotsInfo.length(); ++i) {
+            qDebug() << QString("group: %1/type: %2")
+                        .arg(std::get<0>(currentOrderedPlotsInfo[i]))
+                        .arg(std::get<1>(currentOrderedPlotsInfo[i]));
+
+            currentSet.insert(
+                        QString("group: %1/type: %2")
+                        .arg(std::get<0>(currentOrderedPlotsInfo[i]))
+                        .arg(std::get<1>(currentOrderedPlotsInfo[i]))
+                        );
+        }
+
+        qDebug() << "\texpected: " << expectedOrderedPlotsInfo.size();
+
+        for(auto i = 0; i < expectedOrderedPlotsInfo.length(); ++i) {
+            qDebug() << QString("group: %1/type: %2")
+                        .arg(std::get<0>(expectedOrderedPlotsInfo[i]))
+                        .arg(std::get<1>(expectedOrderedPlotsInfo[i]));
+
+            expectedSet.insert(
+                        QString("group: %1/type: %2")
+                        .arg(std::get<0>(expectedOrderedPlotsInfo[i]))
+                        .arg(std::get<1>(expectedOrderedPlotsInfo[i]))
+                        );
+        }
+
+        auto expectedMinusCurrent = QSet<QString>(expectedSet).subtract(currentSet);
+        auto currentMinusExpected = QSet<QString>(currentSet).subtract(expectedSet);
+
+        qDebug() << "expectedMinusCurrent: " << expectedMinusCurrent;
+        qDebug() << "currentMinusExpected: " << currentMinusExpected;
+
+        return;
     }
 
     for(auto i = 0; i < expectedOrderedPlotsInfo.length(); ++i)

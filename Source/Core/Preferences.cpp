@@ -318,8 +318,8 @@ QDataStream &operator<<(QDataStream &out, const FilterSelectorsOrder &order) {
 QDataStream &operator>>(QDataStream &in, FilterSelectorsOrder &order) {
     while(!in.atEnd())
     {
-        int group;
-        int type;
+        size_t group;
+        size_t type;
         in >> group;
         in >> type;
 

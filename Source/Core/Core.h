@@ -81,6 +81,9 @@ enum Types
     Type_Max
 };
 
+constexpr Types Type_Comments = Type_Max;
+constexpr Types Type_Panels = (Types) (Type_Comments + 1);
+
 typedef std::bitset<Type_Max> activealltracks;
 
 extern const struct stream_info PerStreamType    [Type_Max];

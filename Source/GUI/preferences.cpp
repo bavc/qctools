@@ -45,12 +45,12 @@ PreferencesDialog::~PreferencesDialog()
     delete ui;
 }
 
-QList<std::tuple<int, int> > PreferencesDialog::loadFilterSelectorsOrder()
+QList<std::tuple<size_t, size_t> > PreferencesDialog::loadFilterSelectorsOrder()
 {
     return preferences->loadFilterSelectorsOrder();
 }
 
-void PreferencesDialog::saveFilterSelectorsOrder(const QList<std::tuple<int, int> > &order)
+void PreferencesDialog::saveFilterSelectorsOrder(const QList<std::tuple<size_t, size_t> > &order)
 {
     preferences->saveFilterSelectorsOrder(order);
 }
@@ -137,8 +137,11 @@ void PreferencesDialog::Save()
 {
     preferences->setActiveFilters(ActiveFilters);
     preferences->setActiveAllTracks(ActiveAllTracks);
-    preferences->setActivePanels(QSet<QString>(ActivePanels.keys().begin(), ActivePanels.keys().end()));
 
+    qDebug() << "ActivePanels: " << ActivePanels.size();
+    auto activePanelsNames = ActivePanels.keys();
+
+    preferences->setActivePanels(QSet<QString>(activePanelsNames.begin(), activePanelsNames.end()));
     preferences->setSignalServerUrlString(ui->signalServerUrl_lineEdit->text());
     preferences->setSignalServerLogin(ui->signalServerLogin_lineEdit->text());
     preferences->setSignalServerPassword(ui->signalServerPassword_lineEdit->text());

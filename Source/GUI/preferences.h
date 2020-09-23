@@ -28,8 +28,8 @@ public:
     activealltracks ActiveAllTracks;
     QMap<QString, QString> ActivePanels;
 
-    QList<std::tuple<int, int>> loadFilterSelectorsOrder();
-    void saveFilterSelectorsOrder(const QList<std::tuple<int, int>>& order);
+    QList<std::tuple<size_t, size_t>> loadFilterSelectorsOrder();
+    void saveFilterSelectorsOrder(const QList<std::tuple<size_t, size_t>>& order);
 
     bool isSignalServerEnabled() const;
     bool isSignalServerAutoUploadEnabled() const;
