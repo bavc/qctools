@@ -1454,6 +1454,29 @@ FFmpeg_Glue::AVFramePtr FFmpeg_Glue::ScaledFrame(size_t index) const
     return OutputDatas[index]->ScaledFrame;
 }
 
+std::map<string, string> FFmpeg_Glue::getInputMetadata(int pos) const
+{
+    std::map<string, string> metadata;
+
+    auto tags = InputDatas[pos]->Stream->metadata;
+    if (!tags)
+        return metadata;
+
+    AVDictionaryEntry *tag = NULL;
+
+    while ((tag = av_dict_get(tags, "", tag, AV_DICT_IGNORE_SUFFIX))) {
+        if(tag->key && tag->value)
+        {
+            metadata[tag->key] = tag->value;
+        } else
+        {
+            break;
+        }
+    }
+
+    return metadata;
+}
+
 void FFmpeg_Glue::setThreadSafe(bool enable)
 {
     if(enable)
@@ -1897,6 +1920,16 @@ void FFmpeg_Glue::OutputThumbnailTimeBase_Get(int &num, int &den) const
         num = OutputData->Output_CodecContext->time_base.num;
         den = OutputData->Output_CodecContext->time_base.den;
     }
+}
+
+std::string FFmpeg_Glue::getOutputFilter(int pos) const
+{
+    return OutputDatas[pos]->Filter;
+}
+
+std::map<std::string, std::string> FFmpeg_Glue::getOutputMetadata(int pos) const
+{
+    return OutputDatas[pos]->metadata;
 }
 
 //---------------------------------------------------------------------------

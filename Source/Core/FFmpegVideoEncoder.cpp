@@ -197,6 +197,8 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, const QVector<Source>& 
         auto stream = streams[i];
 
         for(auto & entry : source.metadata) {
+            qDebug() << "setting stream metadata for stream: " << i << "key: " << entry.first << "value: " << entry.second;
+
             auto res = av_dict_set(&stream->metadata, entry.first.toStdString().c_str(), entry.second.toStdString().c_str(), 0);
             qDebug() << "stream metadata: " << res;
         }

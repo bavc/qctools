@@ -73,6 +73,17 @@ void Preferences::setActiveAllTracks(const activealltracks &alltracks)
     settings.setValue(KeyActiveAllTracks, (uint) alltracks.to_ulong());
 }
 
+QMap<QString, std::tuple<QString, QString, QString> > Preferences::getActivePanels() const
+{
+    auto activePanelsMap = QMap<QString, std::tuple<QString, QString, QString>>();
+    for(auto panelInfo : availablePanels())
+    {
+        if(activePanels().contains(panelInfo.name))
+            activePanelsMap[panelInfo.name] = std::tuple<QString, QString, QString>(panelInfo.filterchain, panelInfo.version, panelInfo.yaxis);
+    }
+    return activePanelsMap;
+}
+
 QSet<QString> Preferences::activePanels() const
 {
     QSettings settings;

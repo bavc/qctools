@@ -243,12 +243,11 @@ const QMap<std::string, int> &FileInformation::panelOutputsByTitle() const
 }
 
 FileInformation::FileInformation (SignalServer* signalServer, const QString &FileName_, activefilters ActiveFilters_, activealltracks ActiveAllTracks_,
-                                  QMap<QString, QString> activePanels,
+                                  QMap<QString, std::tuple<QString, QString, QString>> activePanels,
                                   int FrameCount) :
     FileName(FileName_),
     ActiveFilters(ActiveFilters_),
     ActiveAllTracks(ActiveAllTracks_),
-    m_activePanels(activePanels),
     signalServer(signalServer),
     m_jobType(Parsing),
 	streamsStats(NULL),
@@ -436,10 +435,12 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
             for(auto & streamIndex : videoStreams)
             {
-                for(auto panelTitle : m_activePanels.keys())
+                for(auto panelTitle : activePanels.keys())
                 {
-                    auto filter = m_activePanels[panelTitle];
+                    auto filter = std::get<0>(activePanels[panelTitle]);
                     filter.replace(QString("${PANEL_WIDTH}"), QString::number(m_panelSize.width()));
+                    auto version = std::get<1>(activePanels[panelTitle]);
+                    auto yaxis = std::get<2>(activePanels[panelTitle]);
 
                     auto output = Glue->AddOutput(streamIndex, m_panelSize.width(), m_panelSize.height(), FFmpeg_Glue::Output_Panels, 0 /*AVMEDIA_TYPE_VIDEO*/, filter.toStdString());
                     output->Output_CodecID =
@@ -456,6 +457,10 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                             ;
                     output->Title = panelTitle.toStdString();
                     output->scaleBeforeEncoding = true;
+
+                    output->metadata["filter"] = filter.toStdString();
+                    output->metadata["version"] = version.toStdString();
+                    output->metadata["yaxis"] = yaxis.toStdString();
 
                     qDebug() << "added output" << output << streamIndex << output->Title.c_str();
                     m_panelOutputsByTitle[output->Title] = output->index;
@@ -474,9 +479,12 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                 for(auto& panel : panels)
                 {
                     auto panelStreamIndex = panel.second;
+                    auto metadata = Glue->getInputMetadata(panelStreamIndex);
+
                     auto output = Glue->AddOutput(panelStreamIndex, 0, 0, FFmpeg_Glue::Output_Panels, 0, "format=rgb24");
                     output->Title = panel.first;
                     output->Scale_OutputPixelFormat = AV_PIX_FMT_RGB24;
+                    output->metadata = metadata;
                     // output->forceScale = true;
                     qDebug() << "added output" << output << panelStreamIndex << output->Title.c_str();
                     m_panelOutputsByTitle[output->Title] = output->index;
@@ -764,6 +772,16 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
 
         FFmpegVideoEncoder::Metadata streamMetadata;
         streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString::fromStdString(panelTitle));
+        streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("filterchain"), QString::fromStdString(Glue->getOutputFilter(panelOutputIndex)));
+
+        auto outputMetadata = Glue->getOutputMetadata(panelOutputIndex);
+        auto versionIt = outputMetadata.find("version");
+        auto yaxisIt = outputMetadata.find("yaxis");
+        auto version = versionIt != outputMetadata.end() ? versionIt->second : "";
+        auto yaxis = yaxisIt != outputMetadata.end() ? yaxisIt->second : "";
+
+        streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("version"), QString::fromStdString(version));
+        streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("yaxis"), QString::fromStdString(yaxis));
 
         FFmpegVideoEncoder::Source panelSource;
         panelSource.metadata = streamMetadata;

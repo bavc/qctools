@@ -48,7 +48,7 @@ public:
     // Constructor/Destructor
                                 FileInformation             (SignalServer* signalServer, const QString &fileName,
                                                              activefilters ActiveFilters, activealltracks ActiveAllTracks,
-                                                             QMap<QString, QString> activePanels,
+                                                             QMap<QString, std::tuple<QString, QString, QString>> activePanels,
                                                              int FrameCount=0);
                                 ~FileInformation            ();
 
@@ -192,7 +192,6 @@ private:
     activefilters m_exportFilters;
 
     QMap<std::string, int> m_panelOutputsByTitle;
-    QMap<QString, QString> m_activePanels;
 };
 
 #endif // GUI_FileInformation_H

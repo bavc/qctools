@@ -274,14 +274,7 @@ int Cli::exec(QCoreApplication &a)
 
     std::cout << std::endl;
 
-    auto activePanels = QMap<QString, QString>();
-    for(auto panelInfo : prefs.availablePanels())
-    {
-        if(prefs.activePanels().contains(panelInfo.name))
-            activePanels[panelInfo.name] = panelInfo.filterchain;
-    }
-
-    info = std::unique_ptr<FileInformation>(new FileInformation(signalServer.get(), input, filters, prefs.activeAllTracks(), activePanels));
+    info = std::unique_ptr<FileInformation>(new FileInformation(signalServer.get(), input, filters, prefs.activeAllTracks(), prefs.getActivePanels()));
     info->setAutoCheckFileUploaded(false);
     info->setAutoUpload(false);
 

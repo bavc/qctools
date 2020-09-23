@@ -164,7 +164,7 @@ void MainWindow::processFile(const QString &FileName)
     statusBar()->showMessage("Scanning "+QFileInfo(FileName).fileName()+"...");
 
     // Launch analysis
-    FileInformation* file = new FileInformation(signalServer, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks, Prefs->ActivePanels);
+    FileInformation* file = new FileInformation(signalServer, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks, preferences->getActivePanels());
     connect(file, SIGNAL(positionChanged()), this, SLOT(Update()), Qt::DirectConnection); // direct connection is required here to get Update called from separate thread
     file->setIndex(Files.size());
     file->setExportFilters(Prefs->ActiveFilters);
@@ -464,7 +464,7 @@ void MainWindow::addFile(const QString &FileName)
         return;
 
     // Launch analysis
-    FileInformation* Temp=new FileInformation(signalServer, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks, Prefs->ActivePanels);
+    FileInformation* Temp=new FileInformation(signalServer, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks, preferences->getActivePanels());
     connect(Temp, SIGNAL(positionChanged()), this, SLOT(Update()), Qt::DirectConnection); // direct connection is required here to get Update called from separate thread
     connect(Temp, SIGNAL(parsingCompleted(bool)), this, SLOT(updateExportAllAction()));
 

@@ -36,6 +36,8 @@ public:
     activealltracks activeAllTracks() const;
     void setActiveAllTracks(const activealltracks& alltracks);
 
+    QMap<QString, std::tuple<QString, QString, QString>> getActivePanels() const;
+
     QSet<QString> activePanels() const;
     void setActivePanels(const QSet<QString>& activePanels);
 

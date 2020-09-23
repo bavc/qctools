@@ -18,6 +18,7 @@
 #include <QMutex>
 #include <QString>
 #include <QSize>
+#include <map>
 using namespace std;
 
 struct AVFormatContext;
@@ -122,6 +123,7 @@ public:
         bool                    Enabled;
         string                  Filter;
         string                  Title;
+        std::map<std::string, std::string> metadata;
 
         // FFmpeg pointers - Input
         int                     Type;
@@ -257,6 +259,9 @@ public:
     int                         OutputThumbnailBitRate_Get() const;
     void                        OutputThumbnailTimeBase_Get(int& num, int& den) const;
 
+    std::string getOutputFilter(int pos) const;
+    std::map<std::string, std::string> getOutputMetadata(int pos) const;
+
     QString                     FrameType_Get() const;
     string                      PixFormat_Get();
     string                      ColorSpace_Get();
@@ -315,7 +320,10 @@ public:
     AVFramePtr                  FilteredFrame(size_t index) const;
     AVFramePtr                  ScaledFrame(size_t index) const;
 
+    std::map<std::string, std::string> getInputMetadata(int pos) const;
+
     // Between different FFmpeg_Glue instances
+
     void*                       InputData_Get() { return InputDatas[0]; }
     void                        InputData_Set(void* InputData) {InputDatas.push_back((inputdata*)InputData); InputDatas_Copy=true;}
 

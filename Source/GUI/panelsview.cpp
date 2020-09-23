@@ -52,9 +52,10 @@ PanelsView::PanelsView(QWidget *parent, const QString& panelTitle, CommentsPlot*
          m_legend, SLOT( updateLegend( const QVariant &, const QList<QwtLegendData> & ) ) );
     */
 
-    QwtLegendData data;
-    data.setValue(QwtLegendData::TitleRole, m_panelTitle);
-    m_legend->updateLegend(QVariant("title"), QList<QwtLegendData> { data });
+    QwtLegendData titleData;
+    titleData.setValue(QwtLegendData::TitleRole, m_panelTitle);
+
+    m_legend->updateLegend(QVariant("title"), QList<QwtLegendData> { titleData });
 }
 
 void PanelsView::setProvider(const std::function<int ()> &getPanelsCount, const std::function<QImage (int)> &getPanelImage)
