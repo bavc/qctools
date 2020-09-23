@@ -69,4 +69,4 @@ SOURCES = \
 include($$SOURCES_PATH/ThirdParty/qblowfish/qblowfish.pri)
 
 RESOURCES += \
-    $$SOURCES_PATH/Core/resources.qrc
+    $$SOURCES_PATH/Core/coreresources.qrc

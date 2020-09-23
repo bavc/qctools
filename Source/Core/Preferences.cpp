@@ -35,7 +35,7 @@ QString KeyFilterSelectorsOrder = "filterSelectorsOrder";
 
 Preferences::Preferences(QObject *parent) : QObject(parent)
 {
-    Q_INIT_RESOURCE(resources);
+    Q_INIT_RESOURCE(coreresources);
 
     static struct RegisterMetatypes {
         RegisterMetatypes() {
