@@ -141,7 +141,10 @@ void PreferencesDialog::Save()
     qDebug() << "ActivePanels: " << ActivePanels.size();
     auto activePanelsNames = ActivePanels.keys();
 
-    preferences->setActivePanels(QSet<QString>(activePanelsNames.begin(), activePanelsNames.end()));
+    QSet<QString> A;
+    for (auto it = activePanelsNames.begin(); it != activePanelsNames.end(); ++it)
+        A.insert(*it);
+    preferences->setActivePanels(A);
     preferences->setSignalServerUrlString(ui->signalServerUrl_lineEdit->text());
     preferences->setSignalServerLogin(ui->signalServerLogin_lineEdit->text());
     preferences->setSignalServerPassword(ui->signalServerPassword_lineEdit->text());

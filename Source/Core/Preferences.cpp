@@ -105,7 +105,10 @@ QSet<QString> Preferences::activePanels() const
     }
     settings.endArray();
 
-    return QSet<QString>(panels.begin(), panels.end());
+    QSet<QString> A;
+    for (auto it = panels.begin(); it != panels.end(); ++it)
+        A.insert(*it);
+    return A;
 }
 
 void Preferences::setActivePanels(const QSet<QString> &activePanels)
