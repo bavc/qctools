@@ -376,6 +376,9 @@ void MainWindow::Ui_Init()
     connect(Prefs, SIGNAL(saved()), this, SLOT(updateSignalServerSettings()));
     connect(Prefs, &PreferencesDialog::saved, [&]() {
 
+        if(!PlotsArea)
+            return;
+
         auto existingPanels = QSet<QString>();
         for(auto & panelCheckbox : m_panelsCheckboxes)
             existingPanels.insert(panelCheckbox->text());
