@@ -369,6 +369,7 @@ void FFmpeg_Glue::outputdata::ApplyScale(const AVFramePtr& sourceFrame)
 
     ScaledFrame->width=Width;
     ScaledFrame->height=Height;
+    ScaledFrame->format=(AVPixelFormat)Scale_OutputPixelFormat; 
 
     av_image_alloc(ScaledFrame->data, ScaledFrame->linesize, Width, Height, (AVPixelFormat) Scale_OutputPixelFormat, 1);
     if (sws_scale(ScaleContext, sourceFrame->data, sourceFrame->linesize, 0, sourceFrame->height, ScaledFrame->data, ScaledFrame->linesize)<0)
