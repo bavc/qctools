@@ -45,12 +45,12 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, const QVector<Source>& 
                                    const QByteArray& attachment, const QString& attachmentName)
 {
     struct ContextDeleter {
-        void operator()(AVCodecContext** context) {
-            avcodec_free_context(context);
+        void operator()(AVCodecContext* context) {
+            avcodec_free_context(&context);
         }
     };
 
-    std::vector<std::unique_ptr<AVCodecContext*, ContextDeleter>> contexts;
+    std::vector<std::unique_ptr<AVCodecContext, ContextDeleter>> contexts;
     QVector<AVStream*> streams;
 
     auto filename = video.toStdString();
@@ -77,7 +77,7 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, const QVector<Source>& 
             return;
         }
 
-        std::unique_ptr<AVCodecContext*, ContextDeleter> videoEncCtxPtr(&videoEncCtx, ContextDeleter());
+        std::unique_ptr<AVCodecContext, ContextDeleter> videoEncCtxPtr(videoEncCtx, ContextDeleter());
         contexts.push_back(std::move(videoEncCtxPtr));
 
         /* Resolution must be a multiple of two. */
@@ -160,7 +160,7 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, const QVector<Source>& 
         return;
     }
 
-    std::unique_ptr<AVCodecContext*, ContextDeleter> attachementEncCtxPtr(&attachementEncCtx, ContextDeleter());
+    std::unique_ptr<AVCodecContext, ContextDeleter> attachementEncCtxPtr(attachementEncCtx, ContextDeleter());
     contexts.push_back(std::move(attachementEncCtxPtr));
 
     attachementEncCtx->codec_type = AVMEDIA_TYPE_ATTACHMENT;
