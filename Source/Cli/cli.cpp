@@ -399,7 +399,7 @@ int Cli::exec(QCoreApplication &a)
                     panelSource.metadata = streamMetadata;
                     panelSource.width = frameSize.width();
                     panelSource.height = frameSize.height();
-                    panelSource.bitrate = info->Glue->OutputThumbnailBitRate_Get() / 1024;
+                    panelSource.bitrate = info->Glue->OutputThumbnailBitRate_Get() / info->panelSize().width();
                     panelSource.num = num;
                     panelSource.den = den;
                     panelSource.getPacket = [panelIndex, panelsCount, panelOutputIndex, this]() mutable -> std::shared_ptr<AVPacket> {

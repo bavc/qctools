@@ -397,7 +397,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
             Filters[1]+=",ebur128=metadata=1";
         Filters[1].erase(0, 1); // remove first comma
 
-        m_panelSize.setWidth(1024);
+        m_panelSize.setWidth(512);
     }
     else
     {
@@ -787,7 +787,7 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
         panelSource.metadata = streamMetadata;
         panelSource.width = frameSize.width();
         panelSource.height = frameSize.height();
-        panelSource.bitrate = Glue->OutputThumbnailBitRate_Get() / 1024;
+        panelSource.bitrate = Glue->OutputThumbnailBitRate_Get() / panelSize().width();
         panelSource.num = num;
         panelSource.den = den;
         panelSource.getPacket = [panelIndex, panelsCount, panelOutputIndex, this]() mutable -> std::shared_ptr<AVPacket> {
