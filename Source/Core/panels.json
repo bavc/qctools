@@ -13,7 +13,7 @@
     },
     {
         "name" : "Horizontal Blur",
-        "yaxis" : "Bottom:Top",
+        "yaxis" : "Left:Right",
         "filterchain" : "scale=iw/4:ih/4,format=gray,convolution=0m='0 1 0 1 -4 1 0 1 0':0bias=128,split[a][b];[a]scale=iw:1[a1];[a1][b]scale2ref[a2][b];[b][a2]lut2=c0=((x-y)*(x-y))/2,scale=iw:1,transpose=2,tile=layout=${PANEL_WIDTH}x1,setsar=1/1,format=rgb24",
         "version" : "1.0"
     },
