@@ -485,6 +485,7 @@ std::unique_ptr<AVPacket, FFmpeg_Glue::outputdata::AVPacketDeleter> FFmpeg_Glue:
 
             scaledFrame->width = Width;
             scaledFrame->height= Height;
+            scaledFrame->format=(AVPixelFormat)Scale_OutputPixelFormat;
 
             av_image_alloc(scaledFrame->data, scaledFrame->linesize, scaledFrame->width, scaledFrame->height, (AVPixelFormat) Scale_OutputPixelFormat, 1);
             if (sws_scale(ScaleContext, Frame->data, Frame->linesize, 0, Frame->height, scaledFrame->data, scaledFrame->linesize)<0)
