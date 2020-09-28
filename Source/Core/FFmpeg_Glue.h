@@ -47,6 +47,21 @@ public:
     typedef std::shared_ptr<AVPacket> AVPacketPtr;
     typedef std::pair<std::string, int> StreamInfo;
 
+    struct FrameRate {
+        FrameRate(int  num, int den) : num(num), den(den) {}
+
+        int num;
+        int den;
+
+        double value() {
+            return double(num) / den;
+        }
+
+        bool isValid() const {
+            return num > 0 && den > 0;
+        }
+    };
+
     // Constructor / Destructor
     enum outputmethod
     {
@@ -170,7 +185,7 @@ public:
         bool                    initEncoder(const QSize& size);;
         bool                    FilterGraph_Init();
         void                    FilterGraph_Free();
-        bool                    Scale_Init();
+        bool                    Scale_Init(AVFrame* frame);
         void                    Scale_Free();
         bool                    AdaptDAR();
         double                  GetDAR();
@@ -232,9 +247,15 @@ public:
         Panels
     };
 
+    FrameRate getFrameRate(int streamIndex) const;
+    FrameRate getAvgVideoFrameRate() const;
+
+    int getStreamType(int streamIndex) const;
     std::vector<StreamInfo>     findStreams(StreamType type);
     std::vector<int>            findStreams(const std::function<bool(AVStream* stream)>& criteria);
+    std::vector<int>            findMediaStreams();
     std::vector<int>            findVideoStreams();
+    std::vector<int>            findAudioStreams();
     int                         BitRate_Get();
 
     // Video information

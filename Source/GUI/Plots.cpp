@@ -316,6 +316,10 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
         auto metadata = m_fileInfoData->Glue->getOutputMetadata(panelOutputIndex);
         auto yaxisIt = metadata.find("yaxis");
         auto yaxis = yaxisIt != metadata.end() ? yaxisIt->second : "";
+        auto panel_typeIt = metadata.find("panel_type");
+        auto isAudioPanel = panel_typeIt != metadata.end() ? (panel_typeIt->second == "audio") : false;
+
+        qDebug() << "panelTitle: " << QString::fromStdString(item);
 
         auto m_PanelsView = new PanelsView(this, QString::fromStdString(item), QString::fromStdString(yaxis), m_commentsPlot);
         m_PanelsView->setFrameShape(QFrame::Panel);
@@ -353,15 +357,34 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
             layout->addLayout(legendLayout, m_plotsCount + m_PanelsViews.size() + 1, 1 );
         }
 
-        m_PanelsView->setProvider([&, panelOutputIndex] {
-            return m_fileInfoData->Glue->GetPanelFramesCount(panelOutputIndex);
-        }, [&, panelOutputIndex](int index) -> QImage {
-            FFmpeg_Glue::Image frameImage;
-            frameImage.frame = m_fileInfoData->Glue->GetPanelFrame(panelOutputIndex, index);
-            auto panelImage = QImage(frameImage.data(), frameImage.width(), frameImage.height(), frameImage.linesize(), QImage::Format_RGB888);
+        if(isAudioPanel) {
+            m_PanelsView->setProvider([&, panelOutputIndex] {
+                auto panelsCount = m_fileInfoData->Glue->GetPanelFramesCount(panelOutputIndex);
+                return panelsCount;
+            }, [&, panelOutputIndex](int index) -> QImage {
+                FFmpeg_Glue::Image frameImage;
+                frameImage.frame = m_fileInfoData->Glue->GetPanelFrame(panelOutputIndex, index);
+                auto panelImage = QImage(frameImage.data(), frameImage.width(), frameImage.height(), frameImage.linesize(), QImage::Format_RGB888);
 
-            return panelImage;
-        });
+                auto frameRate = m_fileInfoData->Glue->getAvgVideoFrameRate();
+                if(frameRate.isValid()) {
+                    return panelImage.scaled(panelImage.width() * frameRate.value() / 16, panelImage.height());
+                }
+                else return panelImage;
+            });
+
+        } else {
+            m_PanelsView->setProvider([&, panelOutputIndex] {
+                auto panelsCount = m_fileInfoData->Glue->GetPanelFramesCount(panelOutputIndex);
+                return panelsCount;
+            }, [&, panelOutputIndex](int index) -> QImage {
+                FFmpeg_Glue::Image frameImage;
+                frameImage.frame = m_fileInfoData->Glue->GetPanelFrame(panelOutputIndex, index);
+                auto panelImage = QImage(frameImage.data(), frameImage.width(), frameImage.height(), frameImage.linesize(), QImage::Format_RGB888);
+
+                return panelImage;
+            });
+        }
         m_PanelsView->setVisibleFrames(0, numFrames() - 1);
 
         m_PanelsViews.push_back(m_PanelsView);

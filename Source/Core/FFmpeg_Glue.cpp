@@ -259,28 +259,29 @@ void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
             if(OutputFrame == DecodedFrame) {
 
                 auto frame = OutputFrame.get();
+                if(frame) {
+                    AVFrame *copyFrame = av_frame_alloc();
+                    copyFrame->format = frame->format;
+                    copyFrame->width = frame->width;
+                    copyFrame->height = frame->height;
+                    copyFrame->channels = frame->channels;
+                    copyFrame->channel_layout = frame->channel_layout;
+                    copyFrame->nb_samples = frame->nb_samples;
+                    av_frame_get_buffer(copyFrame, 32);
+                    av_frame_copy(copyFrame, frame);
+                    av_frame_copy_props(copyFrame, frame);
 
-                AVFrame *copyFrame = av_frame_alloc();
-                copyFrame->format = frame->format;
-                copyFrame->width = frame->width;
-                copyFrame->height = frame->height;
-                copyFrame->channels = frame->channels;
-                copyFrame->channel_layout = frame->channel_layout;
-                copyFrame->nb_samples = frame->nb_samples;
-                av_frame_get_buffer(copyFrame, 32);
-                av_frame_copy(copyFrame, frame);
-                av_frame_copy_props(copyFrame, frame);
-
-                struct FilteredFrameDeleter {
-                    static void free(AVFrame* frame) {
-                        if(frame) {
-                            av_frame_unref(frame);
-                            av_frame_free(&frame);
+                    struct FilteredFrameDeleter {
+                        static void free(AVFrame* frame) {
+                            if(frame) {
+                                av_frame_unref(frame);
+                                av_frame_free(&frame);
+                            }
                         }
-                    }
-                };
+                    };
 
-                OutputFrame.reset(copyFrame, FilteredFrameDeleter::free);
+                    OutputFrame.reset(copyFrame, FilteredFrameDeleter::free);
+                }
             }
             AddPanel(); break;
 
@@ -352,7 +353,7 @@ void FFmpeg_Glue::outputdata::ApplyScale(const AVFramePtr& sourceFrame)
                             return;
     }
 
-    if (!ScaleContext && !Scale_Init())
+    if (!ScaleContext && !Scale_Init(OutputFrame.get()))
         return;
 
     struct ScaledFrameDeleter {
@@ -469,7 +470,7 @@ std::unique_ptr<AVPacket, FFmpeg_Glue::outputdata::AVPacketDeleter> FFmpeg_Glue:
 
     if(scaleBeforeEncoding)
     {
-        if (ScaleContext || Scale_Init())
+        if (ScaleContext || Scale_Init(frame))
         {
             struct ScaledFrameDeleter {
                 static void free(AVFrame* frame) {
@@ -611,9 +612,9 @@ void FFmpeg_Glue::outputdata::FilterGraph_Free()
 }
 
 //---------------------------------------------------------------------------
-bool FFmpeg_Glue::outputdata::Scale_Init()
+bool FFmpeg_Glue::outputdata::Scale_Init(AVFrame* frame)
 {
-    if (!OutputFrame)
+    if (!frame)
         return false;    
         
     if(OutputMethod != Output_Panels)
@@ -623,8 +624,8 @@ bool FFmpeg_Glue::outputdata::Scale_Init()
     }
 
     // Init
-    ScaleContext = sws_getContext(OutputFrame->width, OutputFrame->height,
-                                    (AVPixelFormat)OutputFrame->format,
+    ScaleContext = sws_getContext(frame->width, frame->height,
+                                    (AVPixelFormat)frame->format,
                                     Width, Height,
                                     (AVPixelFormat) Scale_OutputPixelFormat,
                                     Output_QImage?/* SWS_BICUBIC */ SWS_FAST_BILINEAR :SWS_FAST_BILINEAR, NULL, NULL, NULL);
@@ -854,9 +855,8 @@ int FFmpeg_Glue::GetPanelFramesCount(int outputIndex) const
 FFmpeg_Glue::AVFramePtr FFmpeg_Glue::GetPanelFrame(int outputIndex, int index) const
 {
     auto output = OutputDatas[outputIndex];
-    qDebug() << "GetPanelFrame: " << outputIndex << index << output;
-
-    qDebug() << "GetPanelFrame: " << output->Panels.size();
+    // qDebug() << "GetPanelFrame: " << outputIndex << index << output;
+    // qDebug() << "GetPanelFrame: " << output->Panels.size();
     return output->Panels[index];
 }
 
@@ -1518,6 +1518,28 @@ int FFmpeg_Glue::StreamCount_Get()
     return FormatContext->nb_streams;
 }
 
+FFmpeg_Glue::FrameRate FFmpeg_Glue::getFrameRate(int streamIndex) const
+{
+    return FrameRate(InputDatas[streamIndex]->Stream->avg_frame_rate.num, InputDatas[streamIndex]->Stream->avg_frame_rate.den);
+}
+
+FFmpeg_Glue::FrameRate FFmpeg_Glue::getAvgVideoFrameRate() const
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            return getFrameRate(Pos);
+        }
+
+    return FrameRate(0, 0);
+}
+
+int FFmpeg_Glue::getStreamType(int streamIndex) const
+{
+    return InputDatas[streamIndex]->Stream->codecpar->codec_type;
+}
+
 std::vector<FFmpeg_Glue::StreamInfo> FFmpeg_Glue::findStreams(StreamType type)
 {
     std::vector<StreamInfo> streamInfos;
@@ -1568,10 +1590,24 @@ std::vector<int> FFmpeg_Glue::findStreams(const std::function<bool (AVStream *)>
     return streamInfos;
 }
 
+std::vector<int> FFmpeg_Glue::findMediaStreams()
+{
+    return findStreams([](AVStream* stream) -> bool {
+        return stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO || stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO;
+    });
+}
+
 std::vector<int> FFmpeg_Glue::findVideoStreams()
 {
     return findStreams([](AVStream* stream) -> bool {
         return stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO;
+    });
+}
+
+std::vector<int> FFmpeg_Glue::findAudioStreams()
+{
+    return findStreams([](AVStream* stream) -> bool {
+        return stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO;
     });
 }
 

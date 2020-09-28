@@ -73,13 +73,13 @@ void Preferences::setActiveAllTracks(const activealltracks &alltracks)
     settings.setValue(KeyActiveAllTracks, (uint) alltracks.to_ulong());
 }
 
-QMap<QString, std::tuple<QString, QString, QString> > Preferences::getActivePanels() const
+QMap<QString, std::tuple<QString, QString, QString, int> > Preferences::getActivePanels() const
 {
-    auto activePanelsMap = QMap<QString, std::tuple<QString, QString, QString>>();
+    auto activePanelsMap = QMap<QString, std::tuple<QString, QString, QString, int>>();
     for(auto panelInfo : availablePanels())
     {
         if(activePanels().contains(panelInfo.name))
-            activePanelsMap[panelInfo.name] = std::tuple<QString, QString, QString>(panelInfo.filterchain, panelInfo.version, panelInfo.yaxis);
+            activePanelsMap[panelInfo.name] = std::tuple<QString, QString, QString, int>(panelInfo.filterchain, panelInfo.version, panelInfo.yaxis, panelInfo.panelType);
     }
     return activePanelsMap;
 }
@@ -145,8 +145,10 @@ QList<PanelInfo> Preferences::availablePanels() const
                 auto panelFilterchain = panel.value("filterchain").toString();
                 auto panelYAxis = panel.value("yaxis").toString();
                 auto panelVersion = panel.value("version").toString();
+                auto panelType = panel.value("panel_type").toString() == "audio" ?
+                            1 /* AVMEDIA_TYPE_AUDIO */ : 0 /* AVMEDIA_TYPE_VIDEO */;
 
-                PanelInfo panelInfo { panelName, panelYAxis, panelFilterchain, panelVersion };
+                PanelInfo panelInfo { panelName, panelYAxis, panelFilterchain, panelVersion, panelType };
                 panels.append(panelInfo);
 
             }

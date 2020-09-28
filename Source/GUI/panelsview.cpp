@@ -74,6 +74,14 @@ void PanelsView::setProvider(const std::function<int ()> &getPanelsCount, const 
 void PanelsView::getPanelsBounds(int &startPanelIndex, int &startPanelOffset, int &endPanelIndex, int &endPanelLength)
 {
     auto panelSize = getPanelImage(0).size();
+    if(panelSize.isEmpty()) {
+        startPanelIndex = 0;
+        startPanelOffset = 0;
+        endPanelIndex = 0;
+        endPanelLength = 0;
+        return;
+    }
+
     auto panelWidth = panelSize.width();
 
     startPanelOffset = m_startFrame % panelWidth;
@@ -180,11 +188,13 @@ void PanelsView::paintEvent(QPaintEvent *e)
     int startPanelOffset, startPanelIndex, endPanelLength, endPanelIndex;
     getPanelsBounds(startPanelIndex, startPanelOffset, endPanelIndex, endPanelLength);
 
-    qDebug() << "contentsMargins: " << contentsMargins() << "totalFrames: " << totalFrames;
+    // qDebug() << "contentsMargins: " << contentsMargins() << "totalFrames: " << totalFrames;
 
+    /*
     qDebug() << "startPanelIndex: " << startPanelIndex << "startPanelOffset: " << startPanelOffset
              << "endPanelIndex: " << endPanelIndex << "endPanelLength: " << endPanelLength << "availableWidth: " << availableWidth << "actual: " << m_actualWidth
              << "height: " << availableHeight;
+    */
 
     // p.fillRect(QRect(0, 0, width(), height()), Qt::green);
     int x = 0;

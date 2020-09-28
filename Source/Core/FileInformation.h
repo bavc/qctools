@@ -48,7 +48,7 @@ public:
     // Constructor/Destructor
                                 FileInformation             (SignalServer* signalServer, const QString &fileName,
                                                              activefilters ActiveFilters, activealltracks ActiveAllTracks,
-                                                             QMap<QString, std::tuple<QString, QString, QString>> activePanels,
+                                                             QMap<QString, std::tuple<QString, QString, QString, int>> activePanels,
                                                              int FrameCount=0);
                                 ~FileInformation            ();
 

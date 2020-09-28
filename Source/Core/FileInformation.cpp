@@ -243,7 +243,7 @@ const QMap<std::string, int> &FileInformation::panelOutputsByTitle() const
 }
 
 FileInformation::FileInformation (SignalServer* signalServer, const QString &FileName_, activefilters ActiveFilters_, activealltracks ActiveAllTracks_,
-                                  QMap<QString, std::tuple<QString, QString, QString>> activePanels,
+                                  QMap<QString, std::tuple<QString, QString, QString, int>> activePanels,
                                   int FrameCount) :
     FileName(FileName_),
     ActiveFilters(ActiveFilters_),
@@ -424,25 +424,48 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
     if (Glue)
     {
+        auto audioStreams = Glue->findAudioStreams();
+        for(auto streamIndex : audioStreams) {
+            auto frameRate = Glue->getFrameRate(streamIndex).value();
+            qDebug() << "audio frame rate: " << frameRate;
+        }
+
         if(attachment.isEmpty())
         {
             Glue->AddOutput(72, 72, FFmpeg_Glue::Output_Jpeg);
             Glue->AddOutput(0, 0, FFmpeg_Glue::Output_Stats, 0, Filters[0]);
             Glue->AddOutput(0, 0, FFmpeg_Glue::Output_Stats, 1, Filters[1]);
 
-            auto videoStreams = Glue->findVideoStreams();
+            auto mediaStreams = Glue->findMediaStreams();
             m_panelSize.setHeight(Glue->Height_Get());
+            QSet<int> visitedStreamTypes;
 
-            for(auto & streamIndex : videoStreams)
+            for(auto & streamIndex : mediaStreams)
             {
+                auto streamType = Glue->getStreamType(streamIndex);
+                if(visitedStreamTypes.contains(streamType))
+                    continue;
+
+                visitedStreamTypes.insert(streamType);
+
                 for(auto panelTitle : activePanels.keys())
                 {
+                    auto panelType = std::get<3>(activePanels[panelTitle]);
+                    if(streamType != panelType)
+                        continue;
+
                     auto filter = std::get<0>(activePanels[panelTitle]);
-                    filter.replace(QString("${PANEL_WIDTH}"), QString::number(m_panelSize.width()));
+                    while(filter.indexOf(QString("${PANEL_WIDTH}")) != -1)
+                        filter.replace(QString("${PANEL_WIDTH}"), QString::number(m_panelSize.width()));
+                    while(filter.indexOf(QString("${AUDIO_FRAME_RATE}")) != -1)
+                        filter.replace(QString("${AUDIO_FRAME_RATE}"), QString::number(32));
+                    while(filter.indexOf(QString("${DEFAULT_HEIGHT}")) != -1)
+                        filter.replace(QString("${DEFAULT_HEIGHT}"), QString::number(360));
+
                     auto version = std::get<1>(activePanels[panelTitle]);
                     auto yaxis = std::get<2>(activePanels[panelTitle]);
 
-                    auto output = Glue->AddOutput(streamIndex, m_panelSize.width(), m_panelSize.height(), FFmpeg_Glue::Output_Panels, 0 /*AVMEDIA_TYPE_VIDEO*/, filter.toStdString());
+                    auto output = Glue->AddOutput(streamIndex, m_panelSize.width(), m_panelSize.height(), FFmpeg_Glue::Output_Panels, streamType, filter.toStdString());
                     output->Output_CodecID =
                             //AV_CODEC_ID_FFV1
                             AV_CODEC_ID_MJPEG
@@ -456,13 +479,15 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                             AV_PIX_FMT_YUVJ420P
                             ;
                     output->Title = panelTitle.toStdString();
+                    output->Scale_OutputPixelFormat = AV_PIX_FMT_YUVJ420P;
                     output->scaleBeforeEncoding = true;
 
                     output->metadata["filter"] = filter.toStdString();
                     output->metadata["version"] = version.toStdString();
                     output->metadata["yaxis"] = yaxis.toStdString();
+                    output->metadata["panel_type"] = panelType == 0 ? "video" : "audio";
 
-                    qDebug() << "added output" << output << streamIndex << output->Title.c_str();
+                    qDebug() << "added output" << output << streamIndex << output->Title.c_str() << "streamType: " << streamType << "filter: " << filter;
                     m_panelOutputsByTitle[output->Title] = output->index;
                 }
             }
@@ -777,11 +802,15 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
         auto outputMetadata = Glue->getOutputMetadata(panelOutputIndex);
         auto versionIt = outputMetadata.find("version");
         auto yaxisIt = outputMetadata.find("yaxis");
+        auto panelTypeIt = outputMetadata.find("panel_type");
         auto version = versionIt != outputMetadata.end() ? versionIt->second : "";
         auto yaxis = yaxisIt != outputMetadata.end() ? yaxisIt->second : "";
+        auto panelType = panelTypeIt != outputMetadata.end() ? panelTypeIt->second : "video";
+        auto isAudioPanel = panelType != "video";
 
         streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("version"), QString::fromStdString(version));
         streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("yaxis"), QString::fromStdString(yaxis));
+        streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("panel_type"), QString::fromStdString(panelType));
 
         FFmpegVideoEncoder::Source panelSource;
         panelSource.metadata = streamMetadata;
