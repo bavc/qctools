@@ -394,6 +394,20 @@ int Cli::exec(QCoreApplication &a)
 
                     FFmpegVideoEncoder::Metadata streamMetadata;
                     streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString::fromStdString(panelTitle));
+                    streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("filterchain"), QString::fromStdString(info->Glue->getOutputFilter(panelOutputIndex)));
+
+                    auto outputMetadata = info->Glue->getOutputMetadata(panelOutputIndex);
+                    auto versionIt = outputMetadata.find("version");
+                    auto yaxisIt = outputMetadata.find("yaxis");
+                    auto panelTypeIt = outputMetadata.find("panel_type");
+                    auto version = versionIt != outputMetadata.end() ? versionIt->second : "";
+                    auto yaxis = yaxisIt != outputMetadata.end() ? yaxisIt->second : "";
+                    auto panelType = panelTypeIt != outputMetadata.end() ? panelTypeIt->second : "video";
+                    auto isAudioPanel = panelType != "video";
+
+                    streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("version"), QString::fromStdString(version));
+                    streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("yaxis"), QString::fromStdString(yaxis));
+                    streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("panel_type"), QString::fromStdString(panelType));
 
                     FFmpegVideoEncoder::Source panelSource;
                     panelSource.metadata = streamMetadata;
