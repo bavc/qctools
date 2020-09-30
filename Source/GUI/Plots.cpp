@@ -368,7 +368,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
 
                 auto frameRate = m_fileInfoData->Glue->getAvgVideoFrameRate();
                 if(frameRate.isValid()) {
-                    return panelImage.scaled(panelImage.width() * frameRate.value() / 16, panelImage.height());
+                    return panelImage.scaled(panelImage.width() * frameRate.value() / 32, panelImage.height());
                 }
                 else return panelImage;
             });
