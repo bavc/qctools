@@ -22,7 +22,7 @@ public:
             const QwtScaleMap scaleMap = plot->canvasMap( QwtPlot::xBottom );
             auto translated = qRound( scaleMap.transform( pos ) ) + parentWidget()->contentsMargins().left();
 
-            qDebug() << "translated: " << translated;
+            // qDebug() << "translated: " << translated;
             return translated;
         }
 
@@ -213,7 +213,7 @@ void PanelsView::paintEvent(QPaintEvent *e)
             p.drawImage(QPointF(x, y), image, sr);
             //p.fillRect(x, 0, imageWidth, image.height(), Qt::red);
 
-            qDebug() << "x: " << x << "sr: " << sr;
+            //qDebug() << "x: " << x << "sr: " << sr;
             x += (sr.width() - imageXOffset);
         }
     }

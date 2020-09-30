@@ -405,7 +405,7 @@ void MainWindow::Ui_Init()
                     {
                         for(auto panelIndex = 0; panelIndex < PlotsArea->panelsCount(); ++panelIndex) {
                             auto panel = PlotsArea->panelsView(panelIndex);
-                            qDebug() << "panel name: " << panel->panelTitle();
+                            // qDebug() << "panel name: " << panel->panelTitle();
 
                             if(panel->panelTitle() == text) {
                                 panel->setVisible(false);
@@ -680,7 +680,7 @@ void MainWindow::updatePanelsVisibility()
     for(auto panelCheckbox : m_panelsCheckboxes) {
         for(auto panelIndex = 0; panelIndex < PlotsArea->panelsCount(); ++panelIndex) {
             auto panel = PlotsArea->panelsView(panelIndex);
-            qDebug() << "panel name: " << panel->panelTitle();
+            // qDebug() << "panel name: " << panel->panelTitle();
 
             if(panel->panelTitle() == panelCheckbox->text()) {
                 panel->setVisible(panelCheckbox->isChecked());
