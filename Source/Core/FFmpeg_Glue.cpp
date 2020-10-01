@@ -1132,10 +1132,19 @@ bool FFmpeg_Glue::NextFrame()
         Packet->size=0;
     }
     
-    // Flushing
-    Packet->data=NULL;
-    Packet->size=0;
-    while (OutputFrame(Packet));
+    for(auto i = 0; i < InputDatas.size(); ++i)
+    {
+        if(!InputDatas[i])
+            continue;
+
+        auto streamIndex = InputDatas[i]->Stream->index;
+
+        Packet->stream_index = streamIndex;
+        // Flushing
+        Packet->data=NULL;
+        Packet->size=0;
+        while (OutputFrame(Packet));
+    }
     
     // Complete
     if (WithStats)
