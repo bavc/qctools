@@ -452,14 +452,6 @@ std::unique_ptr<AVPacket, FFmpeg_Glue::outputdata::AVPacketDeleter> FFmpeg_Glue:
     outPacket->data = nullptr;
     outPacket->size = 0;
 
-    if (!Output_CodecContext && !initEncoder(QSize(frame->width, frame->height)))
-    {
-        if(ok)
-            *ok = false;
-
-        return outPacket;
-    }
-
     struct NoDeleter {
         static void free(AVFrame* frame) {
             Q_UNUSED(frame)
@@ -499,6 +491,14 @@ std::unique_ptr<AVPacket, FFmpeg_Glue::outputdata::AVPacketDeleter> FFmpeg_Glue:
             }
 
         }
+    }
+
+    if (!Output_CodecContext && !initEncoder(QSize(Frame->width, Frame->height)))
+    {
+        if(ok)
+            *ok = false;
+
+        return outPacket;
     }
 
     int got_packet=0;

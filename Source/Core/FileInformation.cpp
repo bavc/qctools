@@ -814,8 +814,8 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
 
         FFmpegVideoEncoder::Source panelSource;
         panelSource.metadata = streamMetadata;
-        panelSource.width = frameSize.width();
-        panelSource.height = frameSize.height();
+        panelSource.width = panelSize().width();
+        panelSource.height = panelSize().height();
         panelSource.bitrate = Glue->OutputThumbnailBitRate_Get() / panelSize().width();
         panelSource.num = num;
         panelSource.den = den;

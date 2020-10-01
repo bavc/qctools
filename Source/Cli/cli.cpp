@@ -411,8 +411,8 @@ int Cli::exec(QCoreApplication &a)
 
                     FFmpegVideoEncoder::Source panelSource;
                     panelSource.metadata = streamMetadata;
-                    panelSource.width = frameSize.width();
-                    panelSource.height = frameSize.height();
+                    panelSource.width = info->panelSize().width();
+                    panelSource.height = info->panelSize().height();
                     panelSource.bitrate = info->Glue->OutputThumbnailBitRate_Get() / info->panelSize().width();
                     panelSource.num = num;
                     panelSource.den = den;
