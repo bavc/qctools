@@ -344,7 +344,7 @@ QwtText CommentsPlotPicker::trackerTextF(const QPointF &pos) const
 
 QString CommentsPlotPicker::infoText(int index) const
 {
-    if(stats->comments[index])
+    if(stats->comments && stats->comments[index])
         return QString::fromUtf8(stats->comments[index]);
 
     return "";
