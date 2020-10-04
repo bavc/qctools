@@ -222,6 +222,14 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, const QVector<Source>& 
 
             newPacket.stream_index = stream->index;
 
+            AVRational src;
+            src.den = source.den;
+            src.num = source.num;
+
+            // for some reasons ffmpeg changes time_base for stream (and it doesn't matter what was set before)
+            // so here we have too recalculate pts based on new stream's time_base value
+            av_packet_rescale_ts(&newPacket, src, stream->time_base);
+
             av_interleaved_write_frame(oc, &newPacket);
             av_packet_unref(&newPacket);
         }
