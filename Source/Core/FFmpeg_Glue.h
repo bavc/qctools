@@ -144,6 +144,7 @@ public:
         int                     Type;
         AVStream*               Stream;
         AVFramePtr              DecodedFrame;
+        int64_t                 AccumulatedDuration = {0}; // durating of all the frames contributing to filtered frame
 
         // FFmpeg pointers - Filter
         AVFilterGraph*          FilterGraph;
@@ -282,6 +283,7 @@ public:
 
     std::string getOutputFilter(int pos) const;
     std::map<std::string, std::string> getOutputMetadata(int pos) const;
+    void getOutputTimeBase(int pos, int& num, int& den) const;
 
     QString                     FrameType_Get() const;
     string                      PixFormat_Get();

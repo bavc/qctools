@@ -19,7 +19,7 @@ public:
     struct Source {
         int width;
         int height;
-        int bitrate;
+        int bitrate = { 0 };
         int num;
         int den;
         Metadata metadata;

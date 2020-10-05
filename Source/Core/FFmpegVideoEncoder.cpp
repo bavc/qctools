@@ -83,7 +83,9 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, const QVector<Source>& 
         /* Resolution must be a multiple of two. */
         videoEncCtx->width    = source.width;
         videoEncCtx->height   = source.height;
-        videoEncCtx->bit_rate = source.bitrate;
+
+        if(source.bitrate != 0)
+            videoEncCtx->bit_rate = source.bitrate;
 
         /* timebase: This is the fundamental unit of time (in seconds) in terms
          * of which frame timestamps are represented. For fixed-fps content,
@@ -126,8 +128,10 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, const QVector<Source>& 
             return;
         }
 
+        /*
         videoStream->avg_frame_rate.den = videoEncCtx->time_base.num;
         videoStream->avg_frame_rate.num = videoEncCtx->time_base.den;
+        */
 
         ret = avcodec_open2(videoEncCtx, videoCodec, NULL);
         if(ret < 0) {

@@ -816,7 +816,11 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
         panelSource.metadata = streamMetadata;
         panelSource.width = panelSize().width();
         panelSource.height = panelSize().height();
-        panelSource.bitrate = Glue->OutputThumbnailBitRate_Get() / panelSize().width();
+
+        int num = 0;
+        int den = 0;
+        Glue->getOutputTimeBase(panelOutputIndex, num, den);
+
         panelSource.num = num;
         panelSource.den = den;
         panelSource.getPacket = [panelIndex, panelsCount, panelOutputIndex, this]() mutable -> std::shared_ptr<AVPacket> {

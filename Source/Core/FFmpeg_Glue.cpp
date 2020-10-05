@@ -300,7 +300,10 @@ void FFmpeg_Glue::outputdata::ApplyFilter(const AVFramePtr& sourceFrame)
 
     if (!FilterGraph && !FilterGraph_Init())
         return;
-            
+
+    if (sourceFrame)
+        AccumulatedDuration += sourceFrame->pkt_duration;
+
     // Push the decoded Frame into the filtergraph 
     //if (av_buffersrc_add_frame_flags(FilterGraph_Source_Context, DecodedFrame, AV_BUFFERSRC_FLAG_KEEP_REF)<0)
     if (av_buffersrc_add_frame_flags(FilterGraph_Source_Context, sourceFrame.get(), 0)<0)
@@ -333,7 +336,11 @@ void FFmpeg_Glue::outputdata::ApplyFilter(const AVFramePtr& sourceFrame)
     if (GetAnswer<0)
     {
         FilteredFrame.reset();
+        return;
     }
+
+    FilteredFrame->pkt_duration = AccumulatedDuration;
+    AccumulatedDuration = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -410,7 +417,7 @@ void FFmpeg_Glue::outputdata::AddPanel()
 {
     if(OutputFrame) {
         Panels.push_back(OutputFrame);
-        qDebug() << "added panel: " << index << this << OutputFrame->width << " x " << OutputFrame->height;
+        qDebug() << "added panel: " << index << this << OutputFrame->width << " x " << OutputFrame->height << " duration " << OutputFrame->pkt_duration;
     }
 }
 
@@ -526,6 +533,7 @@ std::unique_ptr<AVPacket, FFmpeg_Glue::outputdata::AVPacketDeleter> FFmpeg_Glue:
         return outPacket;
     }
 
+    outPacket->duration = Frame->pkt_duration;
     return outPacket;
 }
 
@@ -1977,6 +1985,12 @@ std::string FFmpeg_Glue::getOutputFilter(int pos) const
 std::map<std::string, std::string> FFmpeg_Glue::getOutputMetadata(int pos) const
 {
     return OutputDatas[pos]->metadata;
+}
+
+void FFmpeg_Glue::getOutputTimeBase(int pos, int &num, int &den) const
+{
+    num = OutputDatas[pos]->Stream->time_base.num;
+    den = OutputDatas[pos]->Stream->time_base.den;
 }
 
 //---------------------------------------------------------------------------
