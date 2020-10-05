@@ -381,6 +381,7 @@ void Player::setFile(FileInformation *fileInfo)
 {
     if(fileInfo == nullptr) {
         m_player->stop();
+        m_player->setFile(QString());
         m_fileInformation = nullptr;
         return;
     }
