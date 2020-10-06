@@ -313,6 +313,22 @@ void MainWindow::createGraphsLayout()
         createDragDrop();
         return;
     }
+
+    // here we fix geometry of main window while creating plots
+    // to ensure it will not expand
+    auto maxSize = maximumSize();
+    auto minSize = minimumSize();
+    auto currentGeometry = geometry();
+
+    setMinimumSize(currentGeometry.size());
+    setMaximumSize(currentGeometry.size());
+
+    // .. and schedule returning min/max sizes
+    QTimer::singleShot(0, [this, maxSize, minSize]() {
+        setMaximumSize(maxSize);
+        setMinimumSize(minSize);
+    });
+
     clearDragDrop();
 
     for (size_t type = 0; type < Type_Max; type++)
