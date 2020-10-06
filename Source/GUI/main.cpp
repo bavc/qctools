@@ -29,9 +29,12 @@ int main(int argc, char *argv[])
 
     QDesktopWidget desktop;
     auto screenNumber = desktop.screenNumber(&w);
-    auto screenGeometry = desktop.screenGeometry(screenNumber);
+    auto availableGeometry = desktop.availableGeometry(screenNumber);
+    auto newSize = availableGeometry.size() * 0.95;
+    auto newGeometry = QStyle::alignedRect(Qt::LayoutDirectionAuto, Qt::AlignCenter, newSize, availableGeometry);
 
-    w.setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, screenGeometry.size() * 0.95, screenGeometry));
+    qDebug() << "new size: " << newSize << "availableGeometry: " << availableGeometry << "new geometry: " << newGeometry;
+    w.setGeometry(newGeometry);
 
     for (int Pos=1; Pos<argc; Pos++)
     {
@@ -45,6 +48,10 @@ int main(int argc, char *argv[])
         }
     }
     w.addFile_finish();
+    qDebug() << "size: " << w.size() << "pos: " << w.pos();
+
     w.show();
+    qDebug() << "size: " << w.size() << "pos: " << w.pos();
+
     return a.exec();
 }

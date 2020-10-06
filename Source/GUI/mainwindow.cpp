@@ -923,7 +923,20 @@ void MainWindow::resizeEvent(QResizeEvent *event)
         static QLabel* label = new QLabel();
         ui->statusBar->insertPermanentWidget(0, label);
 
-        label->setText(QString("MainWindow width = %1, height = %2").arg(width()).arg(height()));
+        label->setText(QString("MainWindow x = %1, y = %2, width = %3, height = %4").arg(x()).arg(y()).arg(width()).arg(height()));
+    }
+}
+
+void MainWindow::moveEvent(QMoveEvent *event)
+{
+    Q_UNUSED(event);
+
+    if(Config::instance().getDebug())
+    {
+        static QLabel* label = new QLabel();
+        ui->statusBar->insertPermanentWidget(0, label);
+
+        label->setText(QString("MainWindow x = %1, y = %2").arg(x()).arg(y()));
     }
 }
 
