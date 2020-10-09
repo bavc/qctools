@@ -310,7 +310,7 @@ const filter Filters[] =
             { Args_Type_Slider, 120,  16,   0,   1, "w" },
             { Args_Type_Slider, 120,  16,   0,   1, "h" },
             //{ Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
-            { Args_Type_Slider,   3,   0,   4,   1, "Mode" },
+            { Args_Type_Slider,   3,   0,   5,   1, "Mode" },
             { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
             { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
         },
