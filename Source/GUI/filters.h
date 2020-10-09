@@ -254,8 +254,8 @@ const filter Filters[] =
             { Args_Type_None,        0,   0,       0,   0, nullptr },
         },
         {
-            "pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5}",
-            "il=l=d:c=d,pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5}",
+            "pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5},format=rgb24",
+            "il=l=d:c=d,pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5},format=rgb24",
         },
     },
     {
