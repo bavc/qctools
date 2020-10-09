@@ -45,7 +45,6 @@ void MainWindow::TimeOut ()
         createFilesList();
     if (ui->actionGraphsLayout->isChecked() && PlotsArea==NULL)
         createGraphsLayout();
-    refreshDisplay();
     Update();
 
     // this code seems to launch more parsings tasks
@@ -139,5 +138,5 @@ void MainWindow::TimeOut ()
 void MainWindow::TimeOut_Refresh ()
 {
     // Hack for refreshing the plots, else plots are not aligned in some cases (e.g. very small file with sidecar stats file). TODO: find the source of the issue
-    refreshDisplay();
+    PlotsArea->alignYAxes();
 }

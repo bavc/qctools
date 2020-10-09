@@ -14,6 +14,7 @@
 #include <QMutex>
 #include <QPushButton>
 #include <QJsonDocument>
+#include <QPointer>
 
 #include <vector>
 using namespace std;
@@ -24,6 +25,7 @@ using namespace std;
 #include "GUI/TinyDisplay.h"
 #include "GUI/Info.h"
 #include "GUI/FilesList.h"
+#include "GUI/plotschooser.h"
 
 namespace Ui {
 class MainWindow;
@@ -70,7 +72,6 @@ public:
     void                        Zoom_In                     ();
     void                        Zoom_Out                    ();
     void                        Export_PDF                  ();
-    void                        refreshDisplay              ();
     void                        Options_Preferences         ();
     void                        Help_GettingStarted         ();
     void                        Help_HowToUse               ();
@@ -102,10 +103,7 @@ public:
     QLabel*                     DragDrop_Image;
     QLabel*                     DragDrop_Text;
 
-    //CheckBoxes
-    std::vector<QPushButton*>     CheckBoxes[Type_Max];
-    QPushButton*                  m_commentsCheckbox;
-    std::vector<QPushButton*>     m_panelsCheckboxes;
+    QPointer<PlotsChooser> m_plotsChooser;
 
     // Files
     std::vector<FileInformation*> Files;
@@ -121,7 +119,6 @@ public:
     QList<QAction*>             recentFilesActions;
 
     SignalServer*               getSignalServer();
-    QList<std::tuple<quint64, quint64>> getFilterSelectorsOrder(int start, int end);
     QStringList                 getSelectedFilters() const;
 
     QAction* uploadAction() const;
@@ -135,9 +132,6 @@ public:
     bool isFileSelected(size_t pos) const;
 
     bool hasMediaFile() const;
-    QPushButton* createCheckButton(const QString& name, int type, int group, const QString& tooltip);
-
-    void updatePanelsVisibility();
 
 Q_SIGNALS:
     void fileSelected(bool selected);
@@ -148,6 +142,7 @@ public Q_SLOTS:
     void applyBarchartsProfile();
     void loadBarchartsProfile(const QString& profile);
     void saveBarchartsProfile(const QString& profile);
+    void setPlotVisible(quint64 group, quint64 type, bool visible);
 
 private Q_SLOTS:
 
@@ -208,8 +203,6 @@ private Q_SLOTS:
 
     void on_fileNamesBox_currentIndexChanged(int index);
 
-    void on_check_toggled(bool checked);
-
     void on_Full_triggered();
 
     void on_CurrentFrameChanged();
@@ -252,6 +245,10 @@ private Q_SLOTS:
 
     void on_actionShow_hide_filters_panel_triggered();
 
+    void on_copyToClipboard_pushButton_clicked();
+
+    void on_setupFilters_pushButton_clicked();
+
 protected:
     void closeEvent(QCloseEvent* event);
     void resizeEvent(QResizeEvent* event);
@@ -261,12 +258,10 @@ private:
     void updateScrollBar( bool blockSignals = false );
     bool isPlotZoomable() const;
     void Zoom( bool );
-    void changeFilterSelectorsOrder(QList<std::tuple<quint64, quint64> > filtersInfo);
 
     QAction* createOpenRecentAction(const QString& fileName);
     void updateRecentFiles(const QString& fileName);
 
-    DraggableChildrenBehaviour* draggableBehaviour;
     SignalServer* signalServer;
     SignalServerConnectionChecker* connectionChecker;
     QWidget* connectionIndicator;

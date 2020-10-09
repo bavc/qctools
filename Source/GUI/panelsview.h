@@ -346,6 +346,7 @@ public:
     void refresh();
 
     QString panelTitle() const { return m_panelTitle; }
+    uint panelGroup() const { return m_panelGroup; }
     PlotLegend *legend() { return m_legend; }
 
 public Q_SLOTS:
@@ -369,6 +370,7 @@ private:
     PlotCursor* m_PlotCursor;
     CommentsPlot* m_plot;
     QString m_panelTitle;
+    uint m_panelGroup;
 
     QString m_bottomYLabel;
     QString m_topYLabel;

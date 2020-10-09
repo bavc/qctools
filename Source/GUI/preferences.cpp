@@ -45,16 +45,6 @@ PreferencesDialog::~PreferencesDialog()
     delete ui;
 }
 
-QList<std::tuple<quint64, quint64> > PreferencesDialog::loadFilterSelectorsOrder()
-{
-    return preferences->loadFilterSelectorsOrder();
-}
-
-void PreferencesDialog::saveFilterSelectorsOrder(const QList<std::tuple<quint64, quint64> > &order)
-{
-    preferences->saveFilterSelectorsOrder(order);
-}
-
 bool PreferencesDialog::isSignalServerEnabled() const
 {
     return preferences->isSignalServerEnabled();

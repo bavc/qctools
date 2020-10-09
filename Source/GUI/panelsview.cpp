@@ -34,9 +34,12 @@ public:
 
 PanelsView::PanelsView(QWidget *parent, const QString& panelTitle, const QString& yaxis, CommentsPlot* plot) : QFrame(parent), m_actualWidth(0), m_plot(plot)
 {
+    qDebug() << "creating PanelsView: " << panelTitle;
+
     m_PlotCursor = new PanelCursor(this, plot);
     m_PlotCursor->setPosition( 0 );
     m_panelTitle = panelTitle;
+    m_panelGroup = qHash(m_panelTitle);
 
     auto picker = new QwtPanelPicker(this, plot);
     connect(picker, SIGNAL(moved(const QPointF&)), SLOT(onPickerMoved(const QPointF&)));

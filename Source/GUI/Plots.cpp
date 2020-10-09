@@ -25,6 +25,7 @@
 #include <qwt_plot_canvas.h>
 #include <cmath>
 #include <clocale>
+#include <unordered_set>
 #include <QMouseEvent>
 #include <QInputDialog>
 #include <QTextDocument>
@@ -157,6 +158,9 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                 if (m_fileInfoData->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
                 {
                     Plot* plot = new Plot( streamPos, type, group, m_fileInfoData, this );
+                    connect(plot, &Plot::visibilityChanged, [plot](bool visible) {
+                        qDebug() << "plot" << plot << "visible: " << visible;
+                    });
 
                     const size_t plotType = plot->type();
                     const size_t plotGroup = plot->group();
@@ -266,7 +270,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
 
                     m_plotsCount++;
 
-                    qDebug() << "g: " << plot->group() << ", t: " << plot->type() << ", m_plotsCount: " << m_plotsCount;
+                    qDebug() << "created plot with group: " << plot->group() << ", type: " << plot->type() << ", m_plotsCount: " << m_plotsCount;
                 }
                 else
                 {
@@ -305,8 +309,8 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     auto mappedTopLeft = m_commentsPlot->canvas()->mapToParent(m_commentsPlot->plotLayout()->canvasRect().topLeft().toPoint());
     auto mappedBottomRight = m_commentsPlot->canvas()->mapToParent(m_commentsPlot->plotLayout()->canvasRect().bottomRight().toPoint());
 
-    qDebug() << "mappedTopLeft: " << mappedTopLeft;
-    qDebug() << "mappedBottomRight: " << mappedBottomRight;
+    // qDebug() << "mappedTopLeft: " << mappedTopLeft;
+    // qDebug() << "mappedBottomRight: " << mappedBottomRight;
 
     auto panelsCount = m_fileInfoData->panelOutputsByTitle().count();
     auto& panelOutputsByTitle = m_fileInfoData->panelOutputsByTitle();
@@ -693,8 +697,8 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
         auto mappedTopLeft = m_commentsPlot->canvas()->mapToParent(QPoint(0, 0));
         auto mappedBottomRight = m_commentsPlot->canvas()->mapToParent(QPoint(canvasRect.width(), canvasRect.height()));
 
-        qDebug() << "mappedTopLeft: " << mappedTopLeft;
-        qDebug() << "mappedBottomRight: " << mappedBottomRight;
+        // qDebug() << "mappedTopLeft: " << mappedTopLeft;
+        // qDebug() << "mappedBottomRight: " << mappedBottomRight;
 
         auto leftMargin = m_commentsPlot->axisWidget(QwtPlot::yLeft)->margin();
         auto leftSpacing = m_commentsPlot->axisWidget(QwtPlot::yLeft)->spacing();
@@ -753,15 +757,15 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
     return QWidget::eventFilter( object, event );
 }
 
-void Plots::changeOrder(QList<std::tuple<quint64, quint64> > orderedFilterInfo)
+void Plots::changeOrder(QList<std::tuple<quint64, quint64>> newOrder)
 {
-    if(orderedFilterInfo.empty())
+    if(newOrder.empty())
     {
         qDebug() << "orderedFilterInfo is empty, do not reorder..";
         return;
     }
 
-    qDebug() << "changeOrder: items = " << orderedFilterInfo.count();
+    qDebug() << "changeOrder: items = " << newOrder.count();
 
     auto gridLayout = static_cast<QGridLayout*> (layout());
     auto rowsCount = gridLayout->rowCount();
@@ -771,12 +775,12 @@ void Plots::changeOrder(QList<std::tuple<quint64, quint64> > orderedFilterInfo)
     qDebug() << "plotsCount: " << m_plotsCount << "commentsCount: " << 1 << "panelsCount: " << m_PanelsViews.size();
 
     QList <std::tuple<quint64, quint64, quint64>> currentOrderedPlotsInfo;
-    QList <std::tuple<quint64, quint64, quint64>> expectedOrderedPlotsInfo;
+    QList <std::tuple<quint64, quint64, quint64>> newOrderedPlotsInfo;
 
     for(auto row = 0; row < (m_plotsCount + 1 + m_PanelsViews.size()); ++row)
     {
         auto plotItem = gridLayout->itemAtPosition(row, 0);
-        qDebug() << "plotItem: " << plotItem;
+        // qDebug() << "plotItem: " << plotItem;
 
         auto legendItem = gridLayout->itemAtPosition(row, 1);
 
@@ -798,33 +802,50 @@ void Plots::changeOrder(QList<std::tuple<quint64, quint64> > orderedFilterInfo)
 
     // currentOrderedPlotsInfo.push_back(std::make_tuple(0, Type_Max, 0));
 
-    qDebug() << "\torderedFilterInfo: " << orderedFilterInfo.length();
-
-    for(auto filterInfo : orderedFilterInfo)
+    qDebug() << "\tnewOrder: " << newOrder.length();
+    for(auto filterInfo : newOrder)
     {
-        qDebug() << QString("group: %1/type: %2")
+        qDebug() << "\t\t" << QString("group: %1/type: %2")
                     .arg(std::get<0>(filterInfo))
                     .arg(std::get<1>(filterInfo));
+    }
 
+    qDebug() << "\tcurrentOrderedPlotsInfo: " << currentOrderedPlotsInfo.length();
+    for(auto filterInfo : currentOrderedPlotsInfo)
+    {
+        qDebug() << "\t\t" << QString("group: %1/type: %2")
+                    .arg(std::get<0>(filterInfo))
+                    .arg(std::get<1>(filterInfo));
+    }
+
+    for(auto filterInfo : newOrder)
+    {
         for(auto plotInfo : currentOrderedPlotsInfo)
         {
-            if(std::get<0>(plotInfo) == std::get<0>(filterInfo) && std::get<1>(plotInfo) == std::get<1>(filterInfo))
+            auto plotGroup = std::get<0>(plotInfo);
+            auto filterGroup = std::get<0>(filterInfo);
+
+            auto plotType = std::get<1>(plotInfo);
+            auto filterType = std::get<1>(filterInfo);
+
+            if(plotGroup == filterGroup &&  plotType == filterType)
             {
-                expectedOrderedPlotsInfo.push_back(plotInfo);
+                newOrderedPlotsInfo.push_back(plotInfo);
+                break;
             }
         }
     }
 
-    Q_ASSERT(currentOrderedPlotsInfo.length() == expectedOrderedPlotsInfo.length());
-    if(currentOrderedPlotsInfo.length() != expectedOrderedPlotsInfo.length())
+    Q_ASSERT(currentOrderedPlotsInfo.length() == newOrderedPlotsInfo.length());
+    if(currentOrderedPlotsInfo.length() != newOrderedPlotsInfo.length())
     {
         auto currentSet = QSet<QString>();
-        auto expectedSet = QSet<QString>();
+        auto newSet = QSet<QString>();
 
         qDebug() << "\tcurrent: " << currentOrderedPlotsInfo.size();
 
         for(auto i = 0; i < currentOrderedPlotsInfo.length(); ++i) {
-            qDebug() << QString("group: %1/type: %2")
+            qDebug() << "\t\t" << QString("group: %1/type: %2")
                         .arg(std::get<0>(currentOrderedPlotsInfo[i]))
                         .arg(std::get<1>(currentOrderedPlotsInfo[i]));
 
@@ -835,37 +856,37 @@ void Plots::changeOrder(QList<std::tuple<quint64, quint64> > orderedFilterInfo)
                         );
         }
 
-        qDebug() << "\texpected: " << expectedOrderedPlotsInfo.size();
+        qDebug() << "\tnew: " << newOrderedPlotsInfo.size();
 
-        for(auto i = 0; i < expectedOrderedPlotsInfo.length(); ++i) {
-            qDebug() << QString("group: %1/type: %2")
-                        .arg(std::get<0>(expectedOrderedPlotsInfo[i]))
-                        .arg(std::get<1>(expectedOrderedPlotsInfo[i]));
+        for(auto i = 0; i < newOrderedPlotsInfo.length(); ++i) {
+            qDebug() << "\t\t" << QString("group: %1/type: %2")
+                        .arg(std::get<0>(newOrderedPlotsInfo[i]))
+                        .arg(std::get<1>(newOrderedPlotsInfo[i]));
 
-            expectedSet.insert(
+            newSet.insert(
                         QString("group: %1/type: %2")
-                        .arg(std::get<0>(expectedOrderedPlotsInfo[i]))
-                        .arg(std::get<1>(expectedOrderedPlotsInfo[i]))
+                        .arg(std::get<0>(newOrderedPlotsInfo[i]))
+                        .arg(std::get<1>(newOrderedPlotsInfo[i]))
                         );
         }
 
-        auto expectedMinusCurrent = QSet<QString>(expectedSet).subtract(currentSet);
-        auto currentMinusExpected = QSet<QString>(currentSet).subtract(expectedSet);
+        auto newMinusCurrent = QSet<QString>(newSet).subtract(currentSet);
+        auto currentMinusNew= QSet<QString>(currentSet).subtract(newSet);
 
-        qDebug() << "expectedMinusCurrent: " << expectedMinusCurrent;
-        qDebug() << "currentMinusExpected: " << currentMinusExpected;
+        qDebug() << "newMinusCurrent: " << newMinusCurrent;
+        qDebug() << "currentMinusNew: " << currentMinusNew;
 
         return;
     }
 
-    for(auto i = 0; i < expectedOrderedPlotsInfo.length(); ++i)
+    for(auto i = 0; i < newOrderedPlotsInfo.length(); ++i)
     {
-        if(expectedOrderedPlotsInfo[i] != currentOrderedPlotsInfo[i])
+        if(newOrderedPlotsInfo[i] != currentOrderedPlotsInfo[i])
         {
-            // search current item which we should put at expected position
-            for(auto j = 0; j < expectedOrderedPlotsInfo.length(); ++j)
+            // search current item which we should put at new position
+            for(auto j = 0; j < newOrderedPlotsInfo.length(); ++j)
             {
-                if(expectedOrderedPlotsInfo[i] == currentOrderedPlotsInfo[j])
+                if(newOrderedPlotsInfo[i] == currentOrderedPlotsInfo[j])
                 {
                     qDebug() << "i: " << i << ", j: " << j;
 
@@ -888,7 +909,7 @@ void Plots::changeOrder(QList<std::tuple<quint64, quint64> > orderedFilterInfo)
                     gridLayout->addItem(swapLegendItem, j, 1);
 
                     currentOrderedPlotsInfo[j] = currentOrderedPlotsInfo[i];
-                    currentOrderedPlotsInfo[i] = expectedOrderedPlotsInfo[i];
+                    currentOrderedPlotsInfo[i] = newOrderedPlotsInfo[i];
 
                     break;
                 }
@@ -1082,6 +1103,62 @@ void Plots::setPlotVisible( size_t type, size_t group, bool on )
                 m_plots[streamPos][group]->legend()->setVisible( on );
             }
         }
+}
+
+void Plots::updatePlotsVisibility(const QMap<QString, std::tuple<quint64, quint64> > &visiblePlots)
+{
+    qDebug() << "updatePlotsVisibility";
+    for(auto plotName : visiblePlots.keys()) {
+        qDebug() << "\tplotName: " << plotName;
+    }
+
+    class GroupAndTypeTupleHashFunction {
+    public:
+        size_t operator()(const std::tuple<quint64, quint64>& p) const
+        {
+            auto group = std::get<0>(p);
+            auto type = std::get<1>(p);
+
+            return (std::hash<unsigned long long>()(group)) ^ (std::hash<unsigned long long>()(type));
+        }
+    };
+
+    std::unordered_set<std::tuple<quint64, quint64>, GroupAndTypeTupleHashFunction> groupAndTypeSet;
+    for(auto groupAndType : visiblePlots.values())
+    {
+        groupAndTypeSet.insert(groupAndType);
+    }
+
+    for (quint64 type = 0; type<Type_Max; type++) {
+        for (quint64 group=0; group<PerStreamType[type].CountOfGroups; group++) {
+            auto tuple = std::tuple<quint64, quint64>(group, type);
+            bool visible = groupAndTypeSet.find(tuple) != groupAndTypeSet.end();
+            if(groupAndTypeSet.empty()) {
+                visible = PerStreamType[type].PerGroup[group].CheckedByDefault;
+            }
+            setPlotVisible(type, group, visible);
+        }
+    }
+
+    auto tuple = std::tuple<quint64, quint64>(0, Type_Comments);
+    bool visible = groupAndTypeSet.find(tuple) != groupAndTypeSet.end();
+    if(groupAndTypeSet.empty()) {
+        visible = true;
+    }
+
+    m_commentsPlot->setVisible(visible);
+    m_commentsPlot->legend()->setVisible(visible);
+
+    for(size_t panelIndex = 0; panelIndex < panelsCount(); ++panelIndex) {
+        auto panel = panelsView(panelIndex);
+        auto panelTitle = panel->panelTitle();
+        qDebug() << "\tpanelTitle: " << panelTitle;
+        auto panelVisible = visiblePlots.contains(panelTitle);
+        qDebug() << "\tpanelVisible: " << panelVisible;
+
+        panel->setVisible(panelVisible);
+        panel->legend()->setVisible(panelVisible);
+    }
 }
 
 //---------------------------------------------------------------------------

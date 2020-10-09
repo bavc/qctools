@@ -14,6 +14,7 @@
 #include "Core/FileInformation.h"
 #include "GUI/Comments.h"
 #include "panelsview.h"
+#include <unordered_set>
 
 #include <QWidget>
 
@@ -91,6 +92,7 @@ public:
     PlayerControl*              playerControl();
 
     void                        setPlotVisible( size_t type, size_t group, bool on );
+    void updatePlotsVisibility(const QMap<QString, std::tuple<quint64, quint64>> & visiblePlots);
 
     const QwtPlot*              plot( size_t streamPos, size_t group ) const;
     CommentsPlot*               commentsPlot() const { return m_commentsPlot; }

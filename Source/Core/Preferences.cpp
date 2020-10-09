@@ -320,18 +320,23 @@ void Preferences::sync()
 
 QDataStream &operator<<(QDataStream &out, const FilterSelectorsOrder &order) {
 
-    qDebug() << "serializing total " << order.length() << ": \n";
+    qDebug() << "*** serializing filters order... ***";
 
     for(auto item : order) {
-        qDebug() << "g: " << std::get<0>(item) << ", t: " << std::get<1>(item);;
+        qDebug() << "\tgroup: " << std::get<0>(item) << ", type: " << std::get<1>(item);;
     }
 
     for(auto filterInfo : order)
         out << std::get<0>(filterInfo) << std::get<1>(filterInfo);
 
+    qDebug() << "**** serializing filters order: total " << order.length() << " done ****";
+
     return out;
 }
 QDataStream &operator>>(QDataStream &in, FilterSelectorsOrder &order) {
+
+    qDebug() << "*** deserializing filter order... ***";
+
     while(!in.atEnd())
     {
         quint64 group;
@@ -344,11 +349,11 @@ QDataStream &operator>>(QDataStream &in, FilterSelectorsOrder &order) {
             order.push_back(entry);
     }
 
-    qDebug() << "deserialized: total " << order.length() << "\n";
-
     for(auto item : order) {
-        qDebug() << "g: " << std::get<0>(item) << ", t: " << std::get<1>(item);
+        qDebug() << "\tgroup: " << std::get<0>(item) << ", type: " << std::get<1>(item);
     }
+
+    qDebug() << "**** deserializing filters order: total " << order.length() << "done ****";
 
     return in;
 }

@@ -298,6 +298,7 @@ void MainWindow::createGraphsLayout()
 
     if (getFilesCurrentPos()==(size_t)-1)
     {
+        /*
         for (size_t type = 0; type < Type_Max; type++)
             for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
                 if (CheckBoxes[type][group])
@@ -306,9 +307,14 @@ void MainWindow::createGraphsLayout()
         m_commentsCheckbox->hide();
         for(auto panelCheckbox : m_panelsCheckboxes)
             panelCheckbox->hide();
+        */
 
         if (ui->fileNamesBox)
             ui->fileNamesBox->hide();
+        if (ui->copyToClipboard_pushButton)
+            ui->copyToClipboard_pushButton->hide();
+        if (ui->setupFilters_pushButton)
+            ui->setupFilters_pushButton->hide();
 
         createDragDrop();
         return;
@@ -331,14 +337,30 @@ void MainWindow::createGraphsLayout()
 
     clearDragDrop();
 
+    m_plotsChooser->setFilterCriteria([this](quint64 type, quint64 group) -> bool {
+        auto showFilter = true;
+        if(type < Type_Max) {
+            showFilter = getFilesCurrentPos()<Files.size() && Files[getFilesCurrentPos()]->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup];
+        }
+
+        qDebug() << "type: " << type << ", group: " << group << ", showFilter: " << showFilter;
+        return showFilter;
+    });
+    /*
     for (size_t type = 0; type < Type_Max; type++)
         for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
             if (CheckBoxes[type][group] && getFilesCurrentPos()<Files.size() && Files[getFilesCurrentPos()]->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
                 CheckBoxes[type][group]->show();
             else
                 CheckBoxes[type][group]->hide();
+                */
+
     if (ui->fileNamesBox)
         ui->fileNamesBox->show();
+    if (ui->copyToClipboard_pushButton)
+        ui->copyToClipboard_pushButton->show();
+    if (ui->setupFilters_pushButton)
+        ui->setupFilters_pushButton->show();
 
     PlotsArea=Files[getFilesCurrentPos()]->Stats.empty()?NULL:new Plots(this, Files[getFilesCurrentPos()]);
     connect(PlotsArea, &Plots::barchartProfileChanged, this, [&] {
@@ -355,8 +377,8 @@ void MainWindow::createGraphsLayout()
 
     applyBarchartsProfile();
 
-    auto filtersInfo = Prefs->loadFilterSelectorsOrder();
-    changeFilterSelectorsOrder(filtersInfo);
+    auto filtersInfo = preferences->loadFilterSelectorsOrder();
+    m_plotsChooser->changeOrder(filtersInfo);
     if (PlotsArea)
     {
         PlotsArea->changeOrder(filtersInfo);
@@ -371,8 +393,6 @@ void MainWindow::createGraphsLayout()
     if (!ui->actionGraphsLayout->isChecked())
         TinyDisplayArea->hide();
     ui->verticalLayout->addWidget(TinyDisplayArea);
-
-    refreshDisplay();
 
     configureZoom();
 
@@ -661,6 +681,25 @@ void MainWindow::saveBarchartsProfile(const QString &profileName)
         QFile profile(profileName);
         if(profile.open(QIODevice::WriteOnly))  {
             profile.write(json);
+        }
+    }
+}
+
+void MainWindow::setPlotVisible(quint64 group, quint64 type, bool visible)
+{
+    if(type < Type_Max) {
+        PlotsArea->setPlotVisible(type, group, visible);
+    } else if(type == Type_Comments) {
+        PlotsArea->commentsPlot()->setVisible(visible);
+        PlotsArea->commentsPlot()->legend()->setVisible(visible);
+    } else if(type == Type_Panels) {
+        for(size_t panelIndex = 0; panelIndex < PlotsArea->panelsCount(); ++panelIndex) {
+            auto panel = PlotsArea->panelsView(panelIndex);
+            auto panelGroup = panel->panelGroup();
+            if(panelGroup == group) {
+                panel->setVisible(visible);
+                panel->legend()->setVisible(visible);
+            }
         }
     }
 }
