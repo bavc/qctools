@@ -693,31 +693,6 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
 {
     if ( event->type() == QEvent::Move || event->type() == QEvent::Resize )
     {
-        auto canvasRect = m_commentsPlot->plotLayout()->canvasRect();
-        auto mappedTopLeft = m_commentsPlot->canvas()->mapToParent(QPoint(0, 0));
-        auto mappedBottomRight = m_commentsPlot->canvas()->mapToParent(QPoint(canvasRect.width(), canvasRect.height()));
-
-        // qDebug() << "mappedTopLeft: " << mappedTopLeft;
-        // qDebug() << "mappedBottomRight: " << mappedBottomRight;
-
-        auto leftMargin = m_commentsPlot->axisWidget(QwtPlot::yLeft)->margin();
-        auto leftSpacing = m_commentsPlot->axisWidget(QwtPlot::yLeft)->spacing();
-
-        /*
-        mappedTopLeft.setX(mappedTopLeft.x() + leftMargin + leftSpacing);
-        mappedBottomRight.setX(mappedBottomRight.x() - leftMargin - leftSpacing);
-        */
-
-        if(plot(0, 0))
-        {
-            for(auto m_PanelsView : m_PanelsViews) {
-                m_PanelsView->setLeftOffset(leftMargin + leftSpacing);
-                m_PanelsView->setContentsMargins(mappedTopLeft.x(), 0, m_PanelsView->width() - mappedBottomRight.x(), 0);
-                m_PanelsView->setActualWidth(plot(0, 0)->canvas()->contentsRect().width());
-            }
-        }
-
-
         for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
             if ( m_fileInfoData->Stats[streamPos] && m_plots[streamPos] )
             {
@@ -727,8 +702,9 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
                 {
                     if ( m_plots[streamPos][group] && m_plots[streamPos][group]->isVisibleTo( this ) )
                     {
-                        if ( object == m_plots[streamPos][group]->canvas() )
+                        if ( object == m_plots[streamPos][group]->canvas() ) {
                             alignXAxis( m_plots[streamPos][group] );
+                        }
 
                         break;
                     }
@@ -737,6 +713,35 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
 
         if(m_commentsPlot && object == m_commentsPlot->canvas())
             alignXAxis(m_commentsPlot);
+
+        alignYAxes();
+
+        if(plot(0, 0))
+        {
+            QTimer::singleShot(0, [&]() {
+                auto canvasRect = m_commentsPlot->plotLayout()->canvasRect();
+                auto mappedTopLeft = m_commentsPlot->canvas()->mapToParent(QPoint(0, 0));
+                auto mappedBottomRight = m_commentsPlot->canvas()->mapToParent(QPoint(canvasRect.width(), canvasRect.height()));
+
+                // qDebug() << "mappedTopLeft: " << mappedTopLeft;
+                // qDebug() << "mappedBottomRight: " << mappedBottomRight;
+
+                auto leftMargin = m_commentsPlot->axisWidget(QwtPlot::yLeft)->margin();
+                auto leftSpacing = m_commentsPlot->axisWidget(QwtPlot::yLeft)->spacing();
+
+                /*
+                mappedTopLeft.setX(mappedTopLeft.x() + leftMargin + leftSpacing);
+                mappedBottomRight.setX(mappedBottomRight.x() - leftMargin - leftSpacing);
+                */
+
+                for(auto m_PanelsView : m_PanelsViews) {
+                    m_PanelsView->setLeftOffset(leftMargin + leftSpacing);
+                    m_PanelsView->setContentsMargins(mappedTopLeft.x(), 0, m_PanelsView->width() - mappedBottomRight.x(), 0);
+                    m_PanelsView->setActualWidth(plot(0, 0)->canvas()->contentsRect().width());
+                }
+            });
+        }
+
     }
     else if(event->type() == QEvent::MouseButtonDblClick)
     {

@@ -147,7 +147,6 @@ public Q_SLOTS:
 private Q_SLOTS:
 
     void TimeOut();
-    void TimeOut_Refresh();
 
     void on_actionQuit_triggered();
 

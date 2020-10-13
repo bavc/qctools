@@ -494,7 +494,6 @@ void MainWindow::on_fileNamesBox_currentIndexChanged(int index)
 
     createGraphsLayout();
     Update();
-    QTimer::singleShot(0, this, SLOT(TimeOut_Refresh()));
 }
 
 //---------------------------------------------------------------------------
