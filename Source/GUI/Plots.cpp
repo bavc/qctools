@@ -836,7 +836,7 @@ void Plots::changeOrder(QList<std::tuple<quint64, quint64>> newOrder)
         }
     }
 
-    Q_ASSERT(currentOrderedPlotsInfo.length() == newOrderedPlotsInfo.length());
+    // Q_ASSERT(currentOrderedPlotsInfo.length() == newOrderedPlotsInfo.length());
     if(currentOrderedPlotsInfo.length() != newOrderedPlotsInfo.length())
     {
         auto currentSet = QSet<QString>();
@@ -876,7 +876,26 @@ void Plots::changeOrder(QList<std::tuple<quint64, quint64>> newOrder)
         qDebug() << "newMinusCurrent: " << newMinusCurrent;
         qDebug() << "currentMinusNew: " << currentMinusNew;
 
-        return;
+        if(currentOrderedPlotsInfo.length() > newOrderedPlotsInfo.length())
+        {
+            for(auto i = 0; i < currentOrderedPlotsInfo.size(); ++i)
+            {
+                bool existsInNew = false;
+                for(auto j = 0; j < newOrderedPlotsInfo.length(); ++j) {
+                    if(newOrderedPlotsInfo[j] == currentOrderedPlotsInfo[i]) {
+                        existsInNew = true;
+                        break;
+                    }
+                }
+                if(!existsInNew) {
+                    newOrderedPlotsInfo.append(currentOrderedPlotsInfo[i]);
+                }
+            }
+        }
+        else
+        {
+            return;
+        }
     }
 
     for(auto i = 0; i < newOrderedPlotsInfo.length(); ++i)
