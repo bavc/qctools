@@ -12,7 +12,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
 {
     //Y
     {
-        Item_YMIN,      5,    "0",  "'function() { return two_pow_bitsPerRawSample_minus_one; }'",  3,  "Y",  true,
+        Item_YMIN,      5,    "0",  "(function() { return two_pow_bitsPerRawSample_minus_one; })",  3,  "Y",  true,
         "For all samples of the Y plane, plot the MAXimum, MIVimum, AVeraGe,\n"
         "LOW (10th percentile), and HIGH (90th percentile) values for each frame.\n"
         "The Y plane provides information about video brightness or luminance.",
@@ -20,7 +20,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //U
     {
-        Item_UMIN,      5,    "0",  "'function() { return two_pow_bitsPerRawSample_minus_one; }'",  3,  "U",  true,
+        Item_UMIN,      5,    "0",  "(function() { return two_pow_bitsPerRawSample_minus_one; })",  3,  "U",  true,
         "For all samples of the U plane, plot the MAXimum, MIVimum, AVeraGe,\n"
         "LOW (10th percentile), and HIGH (90th percentile) values for each frame.\n"
         "The U plane (along with V) provides information about video color.",
@@ -28,7 +28,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //V
     {
-        Item_VMIN,      5,    "0",  "'function() { return two_pow_bitsPerRawSample_minus_one; }'",  3,  "V",  true,
+        Item_VMIN,      5,    "0",  "(function() { return two_pow_bitsPerRawSample_minus_one; })",  3,  "V",  true,
         "For all samples of the V plane, plot the MAXimum, MIVimum, AVeraGe,\n"
         "LOW (10th percentile), and HIGH (90th percentile) values for each frame.\n"
         "The V plane (along with U) provides information about video color.",
@@ -66,7 +66,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
     },
     //Sat
     {
-        Item_SATMIN,    5,    "0",  "'function() { return sqrt_pow_bitsPerRawSample_2; }'",  4,  "Sat", true,
+        Item_SATMIN,    5,    "0",  "(function() { return sqrt_pow_bitsPerRawSample_2; })",  4,  "Sat", true,
         "This filter does the equivalent of plotting all pixels in a vectorscope\n"
         "and measuring the distance from that plotted points to the center of the\n"
         "vectorscope. The MAXimum, MIVimum, AVeraGe, LOW (10th percentile), and\n"

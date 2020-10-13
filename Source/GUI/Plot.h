@@ -299,11 +299,11 @@ public:
             engine.globalObject().setProperty("yHalf", (::pow(2, bitdepth)) / 2);
             autocomplete << QPair<QString, QString>("yHalf", QString("2^(bitdepth) / 2 (Current value = %1)").arg(engine.globalObject().property("yHalf").toInt()));
 
-            auto pow2 = engine.evaluate("function(value) { return Math.pow(value, 2); }");
+            auto pow2 = engine.evaluate("(function(value) { return Math.pow(value, 2); })");
             engine.globalObject().setProperty("pow2", pow2);
             autocomplete << QPair<QString, QString>("pow2", "pow2(exponent)");
 
-            auto pow = engine.evaluate("function(base, exponent) { return Math.pow(base, exponent); }");
+            auto pow = engine.evaluate("(function(base, exponent) { return Math.pow(base, exponent); })");
             engine.globalObject().setProperty("pow", pow);
             autocomplete << QPair<QString, QString>("pow", "pow(base, exponent)");
 
