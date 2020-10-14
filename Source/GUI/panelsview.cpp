@@ -48,10 +48,19 @@ PanelsView::PanelsView(QWidget *parent, const QString& panelTitle, const QString
     auto plotHeight = 30;
 
     auto splitted = yaxis.split(":");
+    if(splitted.length() == 1)
+    {
+        m_middleYLabel = splitted[0];
+    }
     if(splitted.length() == 2)
     {
         m_bottomYLabel = splitted[0];
         m_topYLabel = splitted[1];
+    } else if(splitted.length() == 3)
+    {
+        m_bottomYLabel = splitted[0];
+        m_middleYLabel = splitted[1];
+        m_topYLabel = splitted[2];
     }
 
     m_legend = new PlotLegend();
@@ -146,20 +155,36 @@ void PanelsView::paintEvent(QPaintEvent *e)
     auto font = p.font();
     font.setBold(true);
     p.setFont(font);
-
     QFontMetrics metrics(font);
-    auto topYLabelWidth = metrics.width(m_topYLabel);
-    auto topYLabelHeight = metrics.height();
 
-    p.setPen(Qt::black);
-    p.drawText(QPoint(contentsMargins().left() - m_leftOffset / 2 - topYLabelWidth,
-                      lineWidth() + topYLabelHeight), m_topYLabel);
+    if(!m_topYLabel.isEmpty())
+    {
+        auto topYLabelWidth = metrics.width(m_topYLabel);
+        auto topYLabelHeight = metrics.height();
 
-    auto bottomYLabelWidth = metrics.width(m_bottomYLabel);
-    auto bottomYLabelHeight = metrics.height();
+        p.setPen(Qt::black);
+        p.drawText(QPoint(contentsMargins().left() - m_leftOffset / 2 - topYLabelWidth,
+                          lineWidth() + topYLabelHeight), m_topYLabel);
+    }
 
-    p.drawText(QPoint(contentsMargins().left() - m_leftOffset / 2 - bottomYLabelWidth,
-                      height() - (lineWidth() - 1) - bottomYLabelHeight), m_bottomYLabel);
+    if(!m_middleYLabel.isEmpty())
+    {
+        auto middleYLabelWidth = metrics.width(m_middleYLabel);
+        auto middleYLabelHeight = metrics.height();
+
+        p.setPen(Qt::black);
+        p.drawText(QPoint(contentsMargins().left() - m_leftOffset / 2 - middleYLabelWidth,
+                          height() / 2 - (lineWidth() -1)), m_middleYLabel);
+    }
+
+    if(!m_bottomYLabel.isEmpty())
+    {
+        auto bottomYLabelWidth = metrics.width(m_bottomYLabel);
+        auto bottomYLabelHeight = metrics.height();
+
+        p.drawText(QPoint(contentsMargins().left() - m_leftOffset / 2 - bottomYLabelWidth,
+                          height() - (lineWidth() - 1) - bottomYLabelHeight), m_bottomYLabel);
+    }
 
     p.restore();
 
