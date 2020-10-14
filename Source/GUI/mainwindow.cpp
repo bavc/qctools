@@ -380,23 +380,6 @@ void MainWindow::on_actionGraphsLayout_triggered()
     if (ui->actionWindowOut)
         ui->actionWindowOut->setVisible(false);
 
-    /*
-    for (size_t type = 0; type < Type_Max; type++)
-        for (size_t group=0; group<CheckBoxes[type].size(); group++)
-            if (CheckBoxes[type][group] && getFilesCurrentPos()<Files.size() && Files[getFilesCurrentPos()]->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
-                CheckBoxes[type][group]->show();
-
-    if(getFilesCurrentPos()<Files.size())
-    {
-        m_commentsCheckbox->show();
-        for(auto panelCheckbox : m_panelsCheckboxes) {
-            if(preferences->activePanels().contains(panelCheckbox->text())) {
-                panelCheckbox->show();
-            }
-        }
-    }
-    */
-
     if (ui->fileNamesBox)
         ui->fileNamesBox->show();
     if (ui->copyToClipboard_pushButton)
@@ -404,13 +387,8 @@ void MainWindow::on_actionGraphsLayout_triggered()
     if (ui->setupFilters_pushButton)
         ui->setupFilters_pushButton->show();
 
-    if (PlotsArea) {
+    if (PlotsArea)
         PlotsArea->show();
-        QMap<QString, std::tuple<quint64, quint64>> filters;
-        m_plotsChooser->getSelectedFilters(&filters);
-
-        PlotsArea->updatePlotsVisibility(filters);
-    }
     if (TinyDisplayArea)
         TinyDisplayArea->show();
     if (FilesListArea)

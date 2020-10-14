@@ -298,17 +298,6 @@ void MainWindow::createGraphsLayout()
 
     if (getFilesCurrentPos()==(size_t)-1)
     {
-        /*
-        for (size_t type = 0; type < Type_Max; type++)
-            for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
-                if (CheckBoxes[type][group])
-                    CheckBoxes[type][group]->hide();
-
-        m_commentsCheckbox->hide();
-        for(auto panelCheckbox : m_panelsCheckboxes)
-            panelCheckbox->hide();
-        */
-
         if (ui->fileNamesBox)
             ui->fileNamesBox->hide();
         if (ui->copyToClipboard_pushButton)
@@ -346,14 +335,7 @@ void MainWindow::createGraphsLayout()
         qDebug() << "type: " << type << ", group: " << group << ", showFilter: " << showFilter;
         return showFilter;
     });
-    /*
-    for (size_t type = 0; type < Type_Max; type++)
-        for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
-            if (CheckBoxes[type][group] && getFilesCurrentPos()<Files.size() && Files[getFilesCurrentPos()]->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
-                CheckBoxes[type][group]->show();
-            else
-                CheckBoxes[type][group]->hide();
-                */
+
 
     if (ui->fileNamesBox)
         ui->fileNamesBox->show();
@@ -363,6 +345,7 @@ void MainWindow::createGraphsLayout()
         ui->setupFilters_pushButton->show();
 
     PlotsArea=Files[getFilesCurrentPos()]->Stats.empty()?NULL:new Plots(this, Files[getFilesCurrentPos()]);
+
     connect(PlotsArea, &Plots::barchartProfileChanged, this, [&] {
         auto selectedProfileFileName = m_profileSelectorCombobox->itemData(m_profileSelectorCombobox->currentIndex(), BarchartProfilesModel::Data).toString();
         auto isSystem = m_profileSelectorCombobox->itemData(m_profileSelectorCombobox->currentIndex(), BarchartProfilesModel::IsSystem).toBool();
@@ -386,6 +369,15 @@ void MainWindow::createGraphsLayout()
             PlotsArea->hide();
 
         ui->verticalLayout->addWidget(PlotsArea);
+        if(ui->actionGraphsLayout->isChecked()) {
+            // we need force show to get all the charts shown (and prevent Qt from doing it at wrong moment)...
+            PlotsArea->show();
+
+            QMap<QString, std::tuple<quint64, quint64>> filters;
+            m_plotsChooser->getSelectedFilters(&filters);
+            // ... and then hide it accordingly to filters
+            PlotsArea->updatePlotsVisibility(filters);
+        }
     }
 
     TinyDisplayArea=new TinyDisplay(this, Files[getFilesCurrentPos()]);

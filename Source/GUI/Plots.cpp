@@ -159,7 +159,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                 {
                     Plot* plot = new Plot( streamPos, type, group, m_fileInfoData, this );
                     connect(plot, &Plot::visibilityChanged, [plot](bool visible) {
-                        qDebug() << "plot" << plot << "visible: " << visible;
+                        qDebug() << "Plot::visibilityChanged for " << plot << "visible: " << visible;
                     });
 
                     const size_t plotType = plot->type();
