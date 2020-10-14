@@ -711,37 +711,25 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
                 }
             }
 
-        if(m_commentsPlot && object == m_commentsPlot->canvas())
+        if(object == m_commentsPlot->canvas())
             alignXAxis(m_commentsPlot);
 
         alignYAxes();
 
-        if(plot(0, 0))
-        {
-            QTimer::singleShot(0, [&]() {
-                auto canvasRect = m_commentsPlot->plotLayout()->canvasRect();
-                auto mappedTopLeft = m_commentsPlot->canvas()->mapToParent(QPoint(0, 0));
-                auto mappedBottomRight = m_commentsPlot->canvas()->mapToParent(QPoint(canvasRect.width(), canvasRect.height()));
+        QTimer::singleShot(0, [&]() {
+            auto canvasRect = m_commentsPlot->plotLayout()->canvasRect();
+            auto mappedTopLeft = m_commentsPlot->canvas()->mapToParent(QPoint(0, 0));
+            auto mappedBottomRight = m_commentsPlot->canvas()->mapToParent(QPoint(canvasRect.width(), canvasRect.height()));
 
-                // qDebug() << "mappedTopLeft: " << mappedTopLeft;
-                // qDebug() << "mappedBottomRight: " << mappedBottomRight;
+            auto leftMargin = m_commentsPlot->axisWidget(QwtPlot::yLeft)->margin();
+            auto leftSpacing = m_commentsPlot->axisWidget(QwtPlot::yLeft)->spacing();
 
-                auto leftMargin = m_commentsPlot->axisWidget(QwtPlot::yLeft)->margin();
-                auto leftSpacing = m_commentsPlot->axisWidget(QwtPlot::yLeft)->spacing();
-
-                /*
-                mappedTopLeft.setX(mappedTopLeft.x() + leftMargin + leftSpacing);
-                mappedBottomRight.setX(mappedBottomRight.x() - leftMargin - leftSpacing);
-                */
-
-                for(auto m_PanelsView : m_PanelsViews) {
-                    m_PanelsView->setLeftOffset(leftMargin + leftSpacing);
-                    m_PanelsView->setContentsMargins(mappedTopLeft.x(), 0, m_PanelsView->width() - mappedBottomRight.x(), 0);
-                    m_PanelsView->setActualWidth(plot(0, 0)->canvas()->contentsRect().width());
-                }
-            });
-        }
-
+            for(auto m_PanelsView : m_PanelsViews) {
+                m_PanelsView->setLeftOffset(leftMargin + leftSpacing);
+                m_PanelsView->setContentsMargins(mappedTopLeft.x(), 0, m_PanelsView->width() - mappedBottomRight.x(), 0);
+                m_PanelsView->setActualWidth(plot(0, 0)->canvas()->contentsRect().width());
+            }
+        });
     }
     else if(event->type() == QEvent::MouseButtonDblClick)
     {
