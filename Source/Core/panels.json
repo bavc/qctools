@@ -37,7 +37,7 @@
     {
         "name" : "Audio Normalized Cross-correlation",
         "yaxis" : "Out of Phase Correlation:Uncorrelated:In Phase Correlation",
-        "filterchain" : "channelsplit,axcorrelate,showwaves=mode=point:colors=green:size=${PANEL_WIDTH}x${DEFAULT_HEIGHT}:scale=lin:draw=full:rate=${AUDIO_FRAME_RATE}/${PANEL_WIDTH},format=rgba,chromakey=blend=0:color=green:similarity=0.15[axc];yuvtestsrc=size=${PANEL_WIDTH}x3,crop=iw:1:0:2,transpose=1,scale=${PANEL_WIDTH}x${DEFAULT_HEIGHT}[z1];[z1][axc]overlay,setsar=1/1,format=rgb24",
+        "filterchain" : "channelsplit,axcorrelate=algo=fast,showwaves=mode=point:colors=green:size=${PANEL_WIDTH}x${DEFAULT_HEIGHT}:scale=lin:draw=full:rate=${AUDIO_FRAME_RATE}/${PANEL_WIDTH},format=rgba,chromakey=blend=0:color=green:similarity=0.15[axc];yuvtestsrc=size=${PANEL_WIDTH}x3:r=${AUDIO_FRAME_RATE}/${PANEL_WIDTH},crop=iw:1:0:2,transpose=1,scale=${PANEL_WIDTH}x${DEFAULT_HEIGHT}[z1];[z1][axc]overlay=shortest=1,setsar=1/1,format=rgb24",
         "panel_type" : "audio",
         "version" : "1.0"
     },
