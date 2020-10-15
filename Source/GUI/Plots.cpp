@@ -328,6 +328,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
         auto m_PanelsView = new PanelsView(this, QString::fromStdString(item), QString::fromStdString(yaxis), m_commentsPlot);
         m_PanelsView->setFrameShape(QFrame::Panel);
         m_PanelsView->setLineWidth(2);
+        m_PanelsView->setFont(m_commentsPlot->axisWidget(QwtPlot::yLeft)->font());
 
         auto leftMargin = m_commentsPlot->axisWidget(QwtPlot::yLeft)->margin();
         auto leftSpacing = m_commentsPlot->axisWidget(QwtPlot::yLeft)->spacing();

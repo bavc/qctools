@@ -152,8 +152,7 @@ void PanelsView::paintEvent(QPaintEvent *e)
 
 
     p.save();
-    auto font = p.font();
-    font.setBold(true);
+    auto font = this->font();
     p.setFont(font);
     QFontMetrics metrics(font);
 
