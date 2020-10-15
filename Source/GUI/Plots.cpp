@@ -320,12 +320,14 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
         auto metadata = m_fileInfoData->Glue->getOutputMetadata(panelOutputIndex);
         auto yaxisIt = metadata.find("yaxis");
         auto yaxis = yaxisIt != metadata.end() ? yaxisIt->second : "";
+        auto legendIt = metadata.find("legend");
+        auto legend = legendIt != metadata.end() ? legendIt->second : "";
         auto panel_typeIt = metadata.find("panel_type");
         auto isAudioPanel = panel_typeIt != metadata.end() ? (panel_typeIt->second == "audio") : false;
 
         qDebug() << "panelTitle: " << QString::fromStdString(item);
 
-        auto m_PanelsView = new PanelsView(this, QString::fromStdString(item), QString::fromStdString(yaxis), m_commentsPlot);
+        auto m_PanelsView = new PanelsView(this, QString::fromStdString(item), QString::fromStdString(yaxis), QString::fromStdString(legend), m_commentsPlot);
         m_PanelsView->setFrameShape(QFrame::Panel);
         m_PanelsView->setLineWidth(2);
         m_PanelsView->setFont(m_commentsPlot->axisWidget(QwtPlot::yLeft)->font());

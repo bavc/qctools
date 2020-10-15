@@ -337,7 +337,7 @@ class PanelsView : public QFrame
 {
     Q_OBJECT
 public:
-    explicit PanelsView(QWidget *parent = nullptr, const QString & panelTitle = QString(), const QString & yaxis = QString(), CommentsPlot* plot = nullptr);
+    explicit PanelsView(QWidget *parent = nullptr, const QString & panelTitle = QString(), const QString & yaxis = QString(), const QString & legend = QString(), CommentsPlot* plot = nullptr);
     void setProvider(const std::function<int()>& getPanelsCount,
                      const std::function<QImage(int)>& getPanelImage);
 

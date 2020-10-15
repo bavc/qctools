@@ -243,7 +243,7 @@ const QMap<std::string, int> &FileInformation::panelOutputsByTitle() const
 }
 
 FileInformation::FileInformation (SignalServer* signalServer, const QString &FileName_, activefilters ActiveFilters_, activealltracks ActiveAllTracks_,
-                                  QMap<QString, std::tuple<QString, QString, QString, int>> activePanels,
+                                  QMap<QString, std::tuple<QString, QString, QString, QString, int>> activePanels,
                                   int FrameCount) :
     FileName(FileName_),
     ActiveFilters(ActiveFilters_),
@@ -450,7 +450,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
                 for(auto panelTitle : activePanels.keys())
                 {
-                    auto panelType = std::get<3>(activePanels[panelTitle]);
+                    auto panelType = std::get<4>(activePanels[panelTitle]);
                     if(streamType != panelType)
                         continue;
 
@@ -464,6 +464,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
                     auto version = std::get<1>(activePanels[panelTitle]);
                     auto yaxis = std::get<2>(activePanels[panelTitle]);
+                    auto legend = std::get<3>(activePanels[panelTitle]);
 
                     auto output = Glue->AddOutput(streamIndex, m_panelSize.width(), m_panelSize.height(), FFmpeg_Glue::Output_Panels, streamType, filter.toStdString());
                     output->Output_CodecID =
@@ -485,6 +486,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                     output->metadata["filter"] = filter.toStdString();
                     output->metadata["version"] = version.toStdString();
                     output->metadata["yaxis"] = yaxis.toStdString();
+                    output->metadata["legend"] = legend.toStdString();
                     output->metadata["panel_type"] = panelType == 0 ? "video" : "audio";
 
                     qDebug() << "added output" << output << streamIndex << output->Title.c_str() << "streamType: " << streamType << "filter: " << filter;
@@ -802,14 +804,17 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
         auto outputMetadata = Glue->getOutputMetadata(panelOutputIndex);
         auto versionIt = outputMetadata.find("version");
         auto yaxisIt = outputMetadata.find("yaxis");
+        auto legendIt = outputMetadata.find("legend");
         auto panelTypeIt = outputMetadata.find("panel_type");
         auto version = versionIt != outputMetadata.end() ? versionIt->second : "";
         auto yaxis = yaxisIt != outputMetadata.end() ? yaxisIt->second : "";
+        auto legend = legendIt != outputMetadata.end() ? legendIt->second : "";
         auto panelType = panelTypeIt != outputMetadata.end() ? panelTypeIt->second : "video";
         auto isAudioPanel = panelType != "video";
 
         streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("version"), QString::fromStdString(version));
         streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("yaxis"), QString::fromStdString(yaxis));
+        streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("legend"), QString::fromStdString(legend));
         streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("panel_type"), QString::fromStdString(panelType));
 
         FFmpegVideoEncoder::Source panelSource;

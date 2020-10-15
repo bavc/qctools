@@ -23,6 +23,7 @@ struct PanelInfo {
     QString yaxis;
     QString filterchain;
     QString version;
+    QString legend;
     int panelType; // AVMEDIA_TYPE_VIDEO / AVMEDIA_TYPE_AUDIO
 };
 
@@ -37,7 +38,7 @@ public:
     activealltracks activeAllTracks() const;
     void setActiveAllTracks(const activealltracks& alltracks);
 
-    QMap<QString, std::tuple<QString, QString, QString, int>> getActivePanels() const;
+    QMap<QString, std::tuple<QString, QString, QString, QString, int>> getActivePanels() const;
 
     QSet<QString> activePanels() const;
     void setActivePanels(const QSet<QString>& activePanels);

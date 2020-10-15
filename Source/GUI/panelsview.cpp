@@ -32,7 +32,7 @@ public:
     QwtPlot* m_plot;
 };
 
-PanelsView::PanelsView(QWidget *parent, const QString& panelTitle, const QString& yaxis, CommentsPlot* plot) : QFrame(parent), m_actualWidth(0), m_plot(plot)
+PanelsView::PanelsView(QWidget *parent, const QString& panelTitle, const QString& yaxis, const QString& legend, CommentsPlot* plot) : QFrame(parent), m_actualWidth(0), m_plot(plot)
 {
     qDebug() << "creating PanelsView: " << panelTitle;
 
@@ -64,7 +64,6 @@ PanelsView::PanelsView(QWidget *parent, const QString& panelTitle, const QString
     }
 
     m_legend = new PlotLegend();
-    m_legend->setMaximumHeight(plotHeight);
 
     /*
     connect( this, SIGNAL( legendDataChanged( const QVariant &, const QList<QwtLegendData> & ) ),
@@ -72,7 +71,7 @@ PanelsView::PanelsView(QWidget *parent, const QString& panelTitle, const QString
     */
 
     QwtLegendData titleData;
-    titleData.setValue(QwtLegendData::TitleRole, m_panelTitle);
+    titleData.setValue(QwtLegendData::TitleRole, legend);
 
     m_legend->updateLegend(QVariant("title"), QList<QwtLegendData> { titleData });
 }

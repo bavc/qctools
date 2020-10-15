@@ -399,14 +399,17 @@ int Cli::exec(QCoreApplication &a)
                     auto outputMetadata = info->Glue->getOutputMetadata(panelOutputIndex);
                     auto versionIt = outputMetadata.find("version");
                     auto yaxisIt = outputMetadata.find("yaxis");
+                    auto legendIt = outputMetadata.find("legend");
                     auto panelTypeIt = outputMetadata.find("panel_type");
                     auto version = versionIt != outputMetadata.end() ? versionIt->second : "";
                     auto yaxis = yaxisIt != outputMetadata.end() ? yaxisIt->second : "";
+                    auto legend = legendIt != outputMetadata.end() ? legendIt->second : "";
                     auto panelType = panelTypeIt != outputMetadata.end() ? panelTypeIt->second : "video";
                     auto isAudioPanel = panelType != "video";
 
                     streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("version"), QString::fromStdString(version));
                     streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("yaxis"), QString::fromStdString(yaxis));
+                    streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("legend"), QString::fromStdString(legend));
                     streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("panel_type"), QString::fromStdString(panelType));
 
                     FFmpegVideoEncoder::Source panelSource;
