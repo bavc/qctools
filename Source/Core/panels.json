@@ -28,9 +28,16 @@
         "version" : "1.0"
     },
     {
-        "name" : "Audio Waveform",
+        "name" : "Audio Waveform (Linear)",
         "yaxis" : "",
         "filterchain" : "showwaves=mode=p2p:split_channels=1:size=${PANEL_WIDTH}x${DEFAULT_HEIGHT}:scale=lin:draw=full:rate=${AUDIO_FRAME_RATE}/${PANEL_WIDTH},format=rgb24",
+        "panel_type" : "audio",
+        "version" : "1.0"
+    },
+    {
+        "name" : "Audio Waveform (Logarithmic)",
+        "yaxis" : "",
+        "filterchain" : "showwaves=mode=p2p:split_channels=1:size=${PANEL_WIDTH}x${DEFAULT_HEIGHT}:scale=log:draw=full:rate=${AUDIO_FRAME_RATE}/${PANEL_WIDTH},format=rgb24",
         "panel_type" : "audio",
         "version" : "1.0"
     },
