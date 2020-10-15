@@ -315,63 +315,33 @@ void MainWindow::Ui_Init()
         if(!PlotsArea)
             return;
 
-        /*
-        auto existingPanels = QSet<QString>();
-        for(auto & panelCheckbox : m_panelsCheckboxes)
-            existingPanels.insert(panelCheckbox->text());
+        auto existingPanelsSet = QSet<QString>();
+        auto existingPanelsList = m_plotsChooser->getAvailableFilters([](quint64 type) -> bool {
+            return type == Type_Panels;
+        });
 
-        auto newPanels = preferences->activePanels().subtract(existingPanels);
-        m_panelsCheckboxes.clear();
-
-        for(auto i = 0; i < ui->horizontalLayout->count();)
+        for(auto & panelName : existingPanelsList)
         {
-            auto layoutItem = ui->horizontalLayout->itemAt(i);
-            auto widget = layoutItem->widget();
-            if(widget) {
-                auto type = widget->property("type").toInt();
-                auto text = widget->property("text").toString();
+            existingPanelsSet.insert(panelName);
+        }
 
-                if(type == Type_Panels)
-                {
-                    if(preferences->activePanels().contains(text))
-                    {
-                        widget->setVisible(true);
-                        m_panelsCheckboxes.push_back(qobject_cast<QPushButton*>(widget));
-                    }
-                    else
-                    {
-                        for(auto panelIndex = 0; panelIndex < PlotsArea->panelsCount(); ++panelIndex) {
-                            auto panel = PlotsArea->panelsView(panelIndex);
-                            // qDebug() << "panel name: " << panel->panelTitle();
+        auto panelsToAdd= preferences->activePanels().subtract(existingPanelsSet);
+        auto panelsToRemove = existingPanelsSet.subtract(preferences->activePanels());
 
-                            if(panel->panelTitle() == text) {
-                                panel->setVisible(false);
-                                panel->legend()->setVisible(false);
-                                break;
-                            }
-                        }
+        for(size_t panelIndex = 0; !panelsToRemove.empty() && panelIndex < PlotsArea->panelsCount(); ++panelIndex) {
+            auto panel = PlotsArea->panelsView(panelIndex);
+            if(panelsToRemove.contains(panel->panelTitle())) {
+                panel->setVisible(false);
+                panel->legend()->setVisible(false);
 
-                        delete widget;
-                        continue;
-                    }
-                }
+                m_plotsChooser->remove(panel->panelTitle());
             }
-
-            ++i;
         }
 
-        for(auto panelName : newPanels)
+        for(auto newPanel : panelsToAdd)
         {
-            auto panelCheckbox = createCheckButton(panelName, Type_Panels, qHash(panelName), panelName);
-            panelCheckbox->setChecked(false);
-            panelCheckbox->setVisible(true);
-
-            QObject::connect(panelCheckbox, SIGNAL(toggled(bool)), this, SLOT(on_check_toggled(bool)));
-            ui->horizontalLayout->addWidget(panelCheckbox);
-
-            m_panelsCheckboxes.push_back(panelCheckbox);
+            m_plotsChooser->add(newPanel, Type_Panels, qHash(newPanel), newPanel, true);
         }
-        */
     });
 
     updateSignalServerSettings();

@@ -405,10 +405,34 @@ void PlotsChooser::add(const QString &name, quint64 type, quint64 group, const Q
              << "\tselected = " << selected << "\n";
 }
 
+void PlotsChooser::remove(const QString &name)
+{
+    for(int row = 0; row < m_sourceModel->rowCount(); ++row) {
+        auto rowName = m_sourceModel->data(m_sourceModel->index(row, NAME_COLUMN), Qt::DisplayRole).toString();
+        if(rowName == name)
+            m_sourceModel->removeRows(row, 1, QModelIndex());
+    }
+}
+
 void PlotsChooser::setFilterCriteria(const std::function<bool (quint64, quint64)> &filterCriteria)
 {
     m_filteringModel->setFilterCriteria(filterCriteria);
     m_filteringModel->invalidate();
+}
+
+QList<QString> PlotsChooser::getAvailableFilters(const std::function<bool (quint64)> &criteria)
+{
+    QList<QString> filterNames;
+
+    for(int row = 0; row < m_sourceModel->rowCount(); ++row) {
+        auto modelGroup = m_sourceModel->data(m_sourceModel->index(row, NAME_COLUMN), GroupRole).toULongLong();
+        auto modelType = m_sourceModel->data(m_sourceModel->index(row, NAME_COLUMN), TypeRole).toULongLong();
+
+        if(criteria(modelType))
+            filterNames.append(m_sourceModel->data(m_sourceModel->index(row, NAME_COLUMN), Qt::DisplayRole).toString());
+    }
+
+    return filterNames;
 }
 
 void PlotsChooser::showEvent(QShowEvent *e)
