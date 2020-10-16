@@ -16,7 +16,7 @@ message("qctools-lib: SOURCES_PATH = " $$SOURCES_PATH)
 THIRD_PARTY_PATH = $$absolute_path($$SOURCES_PATH/../..)
 message("qctools-lib: THIRD_PARTY_PATH = " $$THIRD_PARTY_PATH)
 
-INCLUDEPATH += $$SOURCES_PATH
+INCLUDEPATH += $$SOURCES_PATH $$SOURCES_PATH/ThirdParty
 INCLUDEPATH += $$SOURCES_PATH/ThirdParty/tinyxml2
 
 QMAKE_CXXFLAGS += -DWITH_SYSTEM_FFMPEG=1
@@ -42,7 +42,8 @@ HEADERS = \
     $$SOURCES_PATH/Core/SignalServerConnectionChecker.h \
     $$SOURCES_PATH/Core/SignalServer.h \
     $$SOURCES_PATH/Core/Preferences.h \
-    $$SOURCES_PATH/Core/FFmpegVideoEncoder.h
+    $$SOURCES_PATH/Core/FFmpegVideoEncoder.h \
+    $$SOURCES_PATH/Core/logging.h
 
 
 SOURCES = \
@@ -64,7 +65,9 @@ SOURCES = \
     $$SOURCES_PATH/Core/SignalServerConnectionChecker.cpp \
     $$SOURCES_PATH/Core/SignalServer.cpp \
     $$SOURCES_PATH/Core/Preferences.cpp \
-    $$SOURCES_PATH/Core/FFmpegVideoEncoder.cpp
+    $$SOURCES_PATH/Core/FFmpegVideoEncoder.cpp \
+    $$SOURCES_PATH/Core/logging.cpp
+
 
 include($$SOURCES_PATH/ThirdParty/qblowfish/qblowfish.pri)
 

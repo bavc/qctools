@@ -13,6 +13,8 @@
 
 
 #include <QtCore/QtPlugin>
+
+#include <Core/logging.h>
 #ifdef __MACOSX__
     #include <ApplicationServices/ApplicationServices.h>
 #endif //__MACOSX__
@@ -25,6 +27,25 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    Logging logging;
+
+    QStringList files;
+    for (int Pos=1; Pos<argc; Pos++)
+    {
+        if(strcmp(argv[Pos], "--debug") == 0)
+        {
+            Config::instance().setDebug(true);
+        }
+        else if(strcmp(argv[Pos], "--log") == 0)
+        {
+            logging.enable();
+        }
+        else
+        {
+            files.append(QString::fromLocal8Bit(argv[Pos]));
+        }
+    }
+
     MainWindow w(NULL);
 
     QDesktopWidget desktop;
@@ -35,17 +56,9 @@ int main(int argc, char *argv[])
 
     qDebug() << "new size: " << newSize << "availableGeometry: " << availableGeometry << "new geometry: " << newGeometry;
     w.setGeometry(newGeometry);
-
-    for (int Pos=1; Pos<argc; Pos++)
+    for(auto file : files)
     {
-        if(strcmp(argv[Pos], "--debug") == 0)
-        {
-            Config::instance().setDebug(true);
-        }
-        else
-        {
-            w.addFile(QString::fromLocal8Bit(argv[Pos]));
-        }
+        w.addFile(file);
     }
     w.addFile_finish();
     qDebug() << "size: " << w.size() << "pos: " << w.pos();
