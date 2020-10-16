@@ -730,7 +730,7 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
             for(auto m_PanelsView : m_PanelsViews) {
                 m_PanelsView->setLeftOffset(leftMargin + leftSpacing);
                 m_PanelsView->setContentsMargins(mappedTopLeft.x(), 0, m_PanelsView->width() - mappedBottomRight.x(), 0);
-                m_PanelsView->setActualWidth(plot(0, 0)->canvas()->contentsRect().width());
+                m_PanelsView->setActualWidth(m_commentsPlot->canvas()->contentsRect().width());
             }
         });
     }
@@ -1193,7 +1193,7 @@ void Plots::zoomXAxis( ZoomTypes zoomType )
 
     if(m_zoomType == ZoomOneToOne)
     {
-        numVisibleFrames = plot(0, 0)->canvas()->contentsRect().width();
+        numVisibleFrames = m_commentsPlot->canvas()->contentsRect().width();
         m_zoomFactor = log(double(m_fileInfoData->Frames_Count_Get()) / numVisibleFrames) / log(2);
     }
 
