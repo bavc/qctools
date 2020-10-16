@@ -250,7 +250,7 @@ jobs:
     - name: Install Qt 5.15
       uses: jurplel/install-qt-action@v2
       with:
-        arch: win64_mingw73
+        arch: win64_mingw81
         version: 5.15.1
 
     - name: Install msys2
@@ -263,23 +263,22 @@ jobs:
         echo "::add-path::C:/msys64/usr/bin"
         echo "::add-path::C:/msys64/mingw64/bin"
 
-    - name: Install FFmpeg
-      run: |
-        cd ..
-        $FFMPEG_VERSION = "ffmpeg-latest-win64"
-        $LINK_DEV = "https://ffmpeg.zeranoe.com/builds/win64/dev"
-        $LINK_SHARED = "https://ffmpeg.zeranoe.com/builds/win64/shared"
-        curl -LO "$LINK_DEV/$FFMPEG_VERSION-dev.zip"
-        curl -LO "$LINK_SHARED/$FFMPEG_VERSION-shared.zip"
-        7z x "$FFMPEG_VERSION-dev.zip"
-        7z x "$FFMPEG_VERSION-shared.zip"
-        Rename-Item -Path ".\$FFMPEG_VERSION-dev" -NewName ".\ffmpeg"
-        Rename-Item -Path ".\$FFMPEG_VERSION-shared" -NewName ".\ffmpeg_shared"
-        Move-Item -Path .\ffmpeg_shared\bin\* -Destination .\ffmpeg\lib
-
     - name: Initialize msys2
       run: |
         bash -lc "exit"
+
+    - name: Install FFmpeg
+      run: |
+        cd ..
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        bootstrap-vcpkg.bat
+        vcpkg integrate install
+        vcpkg install ffmpeg:x64-windows
+        cd ..
+        xcopy /E /I vcpkg\packages\ffmpeg_x64-windows .\ffmpeg
+        xcopy vcpkg\packages\ffmpeg_x64-windows\lib .\ffmpeg\bin
+        dir ffmpeg
 
     - name: Download and configure qwt
       run: |
@@ -368,16 +367,15 @@ jobs:
     - name: Install FFmpeg
       run: |
         cd ..
-        $FFMPEG_VERSION = "ffmpeg-latest-win64"
-        $LINK_DEV = "https://ffmpeg.zeranoe.com/builds/win64/dev"
-        $LINK_SHARED = "https://ffmpeg.zeranoe.com/builds/win64/shared"
-        curl -LO "$LINK_DEV/$FFMPEG_VERSION-dev.zip"
-        curl -LO "$LINK_SHARED/$FFMPEG_VERSION-shared.zip"
-        7z x "$FFMPEG_VERSION-dev.zip"
-        7z x "$FFMPEG_VERSION-shared.zip"
-        Rename-Item -Path ".\$FFMPEG_VERSION-dev" -NewName ".\ffmpeg"
-        Rename-Item -Path ".\$FFMPEG_VERSION-shared" -NewName ".\ffmpeg_shared"
-        Move-Item -Path .\ffmpeg_shared\bin\* -Destination .\ffmpeg\lib
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        bootstrap-vcpkg.bat
+        vcpkg integrate install
+        vcpkg install ffmpeg:x64-windows
+        cd ..
+        xcopy /E /I vcpkg\packages\ffmpeg_x64-windows .\ffmpeg
+        xcopy vcpkg\packages\ffmpeg_x64-windows\lib .\ffmpeg\bin
+        dir ffmpeg
 
     - name: Download and configure qwt
       run: |
