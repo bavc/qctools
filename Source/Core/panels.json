@@ -62,13 +62,5 @@
         "filterchain" : "ahistogram=dmode=separate:rheight=0:s=${DEFAULT_HEIGHT}x1:r=${AUDIO_FRAME_RATE},transpose=2,tile=layout=${PANEL_WIDTH}x1,format=rgb24",
         "panel_type" : "audio",
         "version" : "1.0"
-    },
-    {
-        "name" : "Audio Spectrum",
-        "legend" : "Audio Spectrum",
-        "yaxis" : "",
-        "filterchain" : "showspectrum=s=1x${DEFAULT_HEIGHT}:slide=fullframe:fps=${AUDIO_FRAME_RATE},tile=layout=${PANEL_WIDTH}x1,format=rgb24",
-        "panel_type" : "audio",
-        "version" : "1.0"
     }
 ]
