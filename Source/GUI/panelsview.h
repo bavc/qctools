@@ -366,7 +366,7 @@ Q_SIGNALS:
 
 private:
 
-    QImage m_panelImage;
+    QPixmap m_panelPixmap;
     PlotLegend* m_legend;
     PlotCursor* m_PlotCursor;
     CommentsPlot* m_plot;

@@ -104,7 +104,7 @@ void PanelsView::getPanelsBounds(int &startPanelIndex, int &startPanelOffset, in
 
 void PanelsView::refresh()
 {
-    m_panelImage = QImage();
+    m_panelPixmap = QPixmap();
     update();
     m_PlotCursor->updateOverlay();
 }
@@ -195,11 +195,11 @@ void PanelsView::paintEvent(QPaintEvent *e)
 
     p.restore();
 
-    if(m_panelImage.height() != (height() - lineWidth())) {
-        m_panelImage = QImage();
+    if(m_panelPixmap.height() != (height() - lineWidth())) {
+        m_panelPixmap = QPixmap();
     }
 
-    if(m_panelImage.isNull())
+    if(m_panelPixmap.isNull())
     {
         auto panelsCount = getPanelsCount();
         if(panelsCount == 0)
@@ -212,8 +212,8 @@ void PanelsView::paintEvent(QPaintEvent *e)
 
         auto dx = availableWidth - m_actualWidth;
 
-        m_panelImage = QImage(availableWidth, availableHeight, QImage::Format_ARGB32);
-        QPainter p(&m_panelImage);
+        m_panelPixmap = QPixmap(availableWidth, availableHeight);
+        QPainter p(&m_panelPixmap);
 
         /*
         QRect viewport(contentsMargins().left() + m_leftOffset + 1,
@@ -265,7 +265,7 @@ void PanelsView::paintEvent(QPaintEvent *e)
         }
     }
 
-    p.drawImage(contentsMargins().left() + m_leftOffset + 1, lineWidth(), m_panelImage);
+    p.drawPixmap(contentsMargins().left() + m_leftOffset + 1, lineWidth(), m_panelPixmap);
 
     p.end();
 }
