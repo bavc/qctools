@@ -195,6 +195,10 @@ void PanelsView::paintEvent(QPaintEvent *e)
 
     p.restore();
 
+    if(m_panelImage.height() != (height() - lineWidth())) {
+        m_panelImage = QImage();
+    }
+
     if(m_panelImage.isNull())
     {
         auto panelsCount = getPanelsCount();
