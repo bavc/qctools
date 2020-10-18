@@ -104,7 +104,8 @@ void PanelsView::getPanelsBounds(int &startPanelIndex, int &startPanelOffset, in
 
 void PanelsView::refresh()
 {
-    repaint();
+    m_panelImage = QImage();
+    update();
     m_PlotCursor->updateOverlay();
 }
 
@@ -114,7 +115,7 @@ void PanelsView::setVisibleFrames(int from, int to)
     m_endFrame = to;
     qDebug() << "from: " << from << "to: " << to;
 
-    repaint();
+    refresh();
 }
 
 void PanelsView::setActualWidth(int actualWidth)
@@ -148,7 +149,6 @@ void PanelsView::paintEvent(QPaintEvent *e)
                      lineWidth() - 1,
                      width() - (contentsMargins().left() + contentsMargins().right() + 1),
                      height() - (lineWidth() - 1) * 2));
-
 
     p.save();
     auto font = this->font();
@@ -195,63 +195,73 @@ void PanelsView::paintEvent(QPaintEvent *e)
 
     p.restore();
 
-    auto panelsCount = getPanelsCount();
-    if(panelsCount == 0)
-        return;
+    if(m_panelImage.isNull())
+    {
+        auto panelsCount = getPanelsCount();
+        if(panelsCount == 0)
+            return;
 
-    auto availableWidth = width() - (contentsMargins().left() + m_leftOffset + 1) - (contentsMargins().right() + m_leftOffset - 1);
-    auto sx = m_actualWidth == 0 ? 1 : ((qreal) availableWidth / m_actualWidth);
-    auto availableHeight = height() - lineWidth();
-    auto sy = (qreal)availableHeight / getPanelImage(0).height();
+        auto availableWidth = width() - (contentsMargins().left() + m_leftOffset + 1) - (contentsMargins().right() + m_leftOffset - 1);
+        auto sx = m_actualWidth == 0 ? 1 : ((qreal) availableWidth / m_actualWidth);
+        auto availableHeight = height() - lineWidth();
+        auto sy = (qreal)availableHeight / getPanelImage(0).height();
 
-    auto dx = availableWidth - m_actualWidth;
+        auto dx = availableWidth - m_actualWidth;
 
-    QRect viewport(contentsMargins().left() + m_leftOffset + 1,
-                   lineWidth(),
-                   width() - (contentsMargins().right() + m_leftOffset - 1),
-                   availableHeight);
+        m_panelImage = QImage(availableWidth, availableHeight, QImage::Format_ARGB32);
+        QPainter p(&m_panelImage);
 
-    p.setViewport(viewport);
+        /*
+        QRect viewport(contentsMargins().left() + m_leftOffset + 1,
+                       lineWidth(),
+                       width() - (contentsMargins().right() + m_leftOffset - 1),
+                       availableHeight);
 
-    auto totalFrames = m_endFrame - m_startFrame;
-    auto zx = (qreal) m_actualWidth / totalFrames;
+        p.setViewport(viewport);
+        */
 
-    QMatrix scalingViewMatrix(sx, 0, 0, sy, 0, 0);
-    QMatrix scalingZoomMatrix(zx, 0, 0, 1, 0, 0);
-    p.setMatrix(scalingViewMatrix * scalingZoomMatrix);
+        auto totalFrames = m_endFrame - m_startFrame;
+        auto zx = (qreal) m_actualWidth / totalFrames;
 
-    int startPanelOffset, startPanelIndex, endPanelLength, endPanelIndex;
-    getPanelsBounds(startPanelIndex, startPanelOffset, endPanelIndex, endPanelLength);
+        QMatrix scalingViewMatrix(sx, 0, 0, sy, 0, 0);
+        QMatrix scalingZoomMatrix(zx, 0, 0, 1, 0, 0);
+        p.setMatrix(scalingViewMatrix * scalingZoomMatrix);
 
-    // qDebug() << "contentsMargins: " << contentsMargins() << "totalFrames: " << totalFrames;
+        int startPanelOffset, startPanelIndex, endPanelLength, endPanelIndex;
+        getPanelsBounds(startPanelIndex, startPanelOffset, endPanelIndex, endPanelLength);
 
-    /*
-    qDebug() << "startPanelIndex: " << startPanelIndex << "startPanelOffset: " << startPanelOffset
-             << "endPanelIndex: " << endPanelIndex << "endPanelLength: " << endPanelLength << "availableWidth: " << availableWidth << "actual: " << m_actualWidth
-             << "height: " << availableHeight;
-    */
+        // qDebug() << "contentsMargins: " << contentsMargins() << "totalFrames: " << totalFrames;
 
-    // p.fillRect(QRect(0, 0, width(), height()), Qt::green);
-    int x = 0;
-    int y = 0;
+        /*
+        qDebug() << "startPanelIndex: " << startPanelIndex << "startPanelOffset: " << startPanelOffset
+                 << "endPanelIndex: " << endPanelIndex << "endPanelLength: " << endPanelLength << "availableWidth: " << availableWidth << "actual: " << m_actualWidth
+                 << "height: " << availableHeight;
+        */
 
-    for(auto i = startPanelIndex; i <= endPanelIndex; ++i) {
+        // p.fillRect(QRect(0, 0, width(), height()), Qt::green);
+        int x = 0;
+        int y = 0;
 
-        if(i < getPanelsCount())
-        {
-            auto image = getPanelImage(i);
-            auto imageXOffset = ((i == startPanelIndex) ? startPanelOffset : 0);
-            auto imageWidth = ((i == endPanelIndex) ? endPanelLength : image.width());
-            auto imageHeight = image.height();
+        for(auto i = startPanelIndex; i <= endPanelIndex; ++i) {
 
-            QRect sr(imageXOffset, 0, imageWidth, imageHeight);
-            p.drawImage(QPointF(x, y), image, sr);
-            //p.fillRect(x, 0, imageWidth, image.height(), Qt::red);
+            if(i < getPanelsCount())
+            {
+                auto image = getPanelImage(i);
+                auto imageXOffset = ((i == startPanelIndex) ? startPanelOffset : 0);
+                auto imageWidth = ((i == endPanelIndex) ? endPanelLength : image.width());
+                auto imageHeight = image.height();
 
-            //qDebug() << "x: " << x << "sr: " << sr;
-            x += (sr.width() - imageXOffset);
+                QRect sr(imageXOffset, 0, imageWidth, imageHeight);
+                p.drawImage(QPointF(x, y), image, sr);
+                //p.fillRect(x, 0, imageWidth, image.height(), Qt::red);
+
+                //qDebug() << "x: " << x << "sr: " << sr;
+                x += (sr.width() - imageXOffset);
+            }
         }
     }
+
+    p.drawImage(contentsMargins().left() + m_leftOffset + 1, lineWidth(), m_panelImage);
 
     p.end();
 }
