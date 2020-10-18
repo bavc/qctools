@@ -92,6 +92,7 @@ public:
     PlayerControl*              playerControl();
 
     void                        setPlotVisible( size_t type, size_t group, bool on );
+    void setCommentsVisible(bool visible);
     void updatePlotsVisibility(const QMap<QString, std::tuple<quint64, quint64>> & visiblePlots);
 
     const QwtPlot*              plot( size_t streamPos, size_t group ) const;

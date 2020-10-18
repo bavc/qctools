@@ -287,8 +287,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     m_commentsPlot = createCommentsPlot(fileInformation, &m_dataTypeIndex);
     m_commentsPlot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
     m_commentsPlot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
-    m_commentsPlot->setVisible(false);
-    m_commentsPlot->legend()->setVisible(false);
+    setCommentsVisible(false);
 
     connect( m_commentsPlot, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
     m_commentsPlot->canvas()->installEventFilter( this );
@@ -1120,6 +1119,17 @@ void Plots::setPlotVisible( size_t type, size_t group, bool on )
         }
 }
 
+void Plots::setCommentsVisible(bool visible)
+{
+    if(visible) {
+        m_commentsPlot->restorePlotHeight();
+    } else {
+        m_commentsPlot->setMinimumHeight(0);
+        m_commentsPlot->setMaximumHeight(0);
+    }
+    m_commentsPlot->legend()->setVisible(visible);
+}
+
 void Plots::updatePlotsVisibility(const QMap<QString, std::tuple<quint64, quint64> > &visiblePlots)
 {
     qDebug() << "updatePlotsVisibility";
@@ -1161,8 +1171,7 @@ void Plots::updatePlotsVisibility(const QMap<QString, std::tuple<quint64, quint6
         visible = true;
     }
 
-    m_commentsPlot->setVisible(visible);
-    m_commentsPlot->legend()->setVisible(visible);
+    setCommentsVisible(visible);
 
     for(size_t panelIndex = 0; panelIndex < panelsCount(); ++panelIndex) {
         auto panel = panelsView(panelIndex);

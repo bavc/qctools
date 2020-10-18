@@ -682,8 +682,7 @@ void MainWindow::setPlotVisible(quint64 group, quint64 type, bool visible)
     if(type < Type_Max) {
         PlotsArea->setPlotVisible(type, group, visible);
     } else if(type == Type_Comments) {
-        PlotsArea->commentsPlot()->setVisible(visible);
-        PlotsArea->commentsPlot()->legend()->setVisible(visible);
+        PlotsArea->setCommentsVisible(visible);
     } else if(type == Type_Panels) {
         for(size_t panelIndex = 0; panelIndex < PlotsArea->panelsCount(); ++panelIndex) {
             auto panel = PlotsArea->panelsView(panelIndex);
