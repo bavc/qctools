@@ -195,10 +195,6 @@ void PanelsView::paintEvent(QPaintEvent *e)
 
     p.restore();
 
-    if(m_panelPixmap.height() != (height() - lineWidth())) {
-        m_panelPixmap = QPixmap();
-    }
-
     if(m_panelPixmap.isNull())
     {
         auto panelsCount = getPanelsCount();
@@ -277,6 +273,7 @@ void PanelsView::wheelEvent(QWheelEvent *event)
         if(newHeight > getPanelImage(0).height())
             newHeight = getPanelImage(0).height();
 
+        m_panelPixmap = QPixmap();
         this->setMinimumHeight(newHeight);
     }
     else if(event->delta() < 0)
@@ -285,6 +282,7 @@ void PanelsView::wheelEvent(QWheelEvent *event)
         if(newHeight < 100)
             newHeight = 100;
 
+        m_panelPixmap = QPixmap();
         this->setMinimumHeight(newHeight);
     }
 }
