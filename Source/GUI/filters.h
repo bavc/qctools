@@ -254,8 +254,8 @@ const filter Filters[] =
             { Args_Type_None,        0,   0,       0,   0, nullptr },
         },
         {
-            "pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5}",
-            "il=l=d:c=d,pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5}",
+            "pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5},format=rgb24",
+            "il=l=d:c=d,pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5},format=rgb24",
         },
     },
     {
@@ -310,7 +310,7 @@ const filter Filters[] =
             { Args_Type_Slider, 120,  16,   0,   1, "w" },
             { Args_Type_Slider, 120,  16,   0,   1, "h" },
             //{ Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
-            { Args_Type_Slider,   3,   0,   4,   1, "Mode" },
+            { Args_Type_Slider,   3,   0,   5,   1, "Mode" },
             { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
             { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
         },
