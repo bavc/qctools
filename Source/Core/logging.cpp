@@ -10,7 +10,7 @@
     #include "ThirdParty/spdlog/sinks/wincolor_sink.h"
 #endif // Q_OS_WIN
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
-    #include "Thirdparty/spdlog/sinks/syslog_sink.h"
+    #include "ThirdParty/spdlog/sinks/syslog_sink.h"
 #endif // Q_OS_IOS
 
 void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString & msg)
