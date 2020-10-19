@@ -465,7 +465,7 @@ int Cli::exec(QCoreApplication &a)
 
         QObject::disconnect(info.get(), SIGNAL(statsFileGenerationProgress(quint64, quint64)), this, SLOT(onStatsFileGenerationProgress(quint64, quint64)));
 
-        std::cout << std::endl << "generating QCTools report... done" << std::endl;
+        std::cout << std::endl << "generating QCTools report... done, in " << output.toStdString() << std::endl;
     }
     else
     {
