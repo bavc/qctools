@@ -20,7 +20,7 @@ int Cli::exec(QCoreApplication &a)
     bool showLongHelp = false;
     bool showShortHelp = false;
     bool showVersion = false;
-    bool createMkv = false;
+    bool createMkv = true;
 
     bool uploadToSignalServer = false;
     bool forceUploadToSignalServer = false;
@@ -106,9 +106,9 @@ int Cli::exec(QCoreApplication &a)
                 << "    with \".qctools.xml.gz\" (if -s used) or  \".qctools.mkv\" (if -a used)." << std::endl
                 << "-s" << std::endl
                 << "    Stats only (no thumbnails, no panels)." << std::endl
-                << "    Is default." << std::endl
                 << "-a" << std::endl
                 << "    All (stats + thumbnails + panels)." << std::endl
+                << "    Is default." << std::endl
                 << "-f" << std::endl
                 << "    Specifies '+'-separated string of filters used. Example: -f signalstats+cropdetect" << std::endl
                 << "    The filters used in " << appName << " may also be declared via the qctools-gui (see the" << std::endl
