@@ -16,6 +16,12 @@ set QCTOOLS_USE_BREW environment variable:
 
 Build the main application
 
-    $ qmake
+    $ cd Project/QtCreator
+    $ mkdir build
+    $ cd build
+    $ qmake ../
     $ make
 
+Or from within the build directory, run:
+
+    $ export QCTOOLS_USE_BREW=true ; qmake ../ && make
