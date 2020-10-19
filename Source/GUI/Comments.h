@@ -71,6 +71,7 @@ public:
 
     int frameAt( double x ) const;
     void setCursorPos( double x );
+    void restorePlotHeight();
 
     PlotLegend *legend() { return m_legend; }
 

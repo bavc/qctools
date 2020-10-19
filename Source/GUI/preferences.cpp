@@ -45,16 +45,6 @@ PreferencesDialog::~PreferencesDialog()
     delete ui;
 }
 
-QList<std::tuple<int, int> > PreferencesDialog::loadFilterSelectorsOrder()
-{
-    return preferences->loadFilterSelectorsOrder();
-}
-
-void PreferencesDialog::saveFilterSelectorsOrder(const QList<std::tuple<int, int> > &order)
-{
-    preferences->saveFilterSelectorsOrder(order);
-}
-
 bool PreferencesDialog::isSignalServerEnabled() const
 {
     return preferences->isSignalServerEnabled();
@@ -89,6 +79,25 @@ void PreferencesDialog::Load()
 {
     ActiveFilters = preferences->activeFilters();
     ActiveAllTracks = preferences->activeAllTracks();
+    for(auto panelInfo : preferences->availablePanels())
+    {
+        if(preferences->activePanels().contains(panelInfo.name))
+            ActivePanels[panelInfo.name] = panelInfo.filterchain;
+    }
+
+    ui->panelsGroupBox->setUpdatesEnabled(false);
+    auto children = ui->panelsGroupBox->findChildren<QCheckBox*>();
+    qDeleteAll(children);
+    auto allPanels = preferences->availablePanels();
+    for(auto panel : allPanels) {
+        auto panelCheckbox = new QCheckBox(panel.name, ui->panelsGroupBox);
+        panelCheckbox->setProperty("filterchain", panel.filterchain);
+
+        ui->panelsGroupBox->layout()->addWidget(panelCheckbox);
+        if(ActivePanels.contains(panel.name))
+            panelCheckbox->setChecked(true);
+    }
+    ui->panelsGroupBox->setUpdatesEnabled(true);
 
     ui->Filters_Video_signalstats->setChecked(ActiveFilters[ActiveFilter_Video_signalstats]);
     ui->Filters_Video_cropdetect->setChecked(ActiveFilters[ActiveFilter_Video_cropdetect]);
@@ -118,6 +127,14 @@ void PreferencesDialog::Save()
 {
     preferences->setActiveFilters(ActiveFilters);
     preferences->setActiveAllTracks(ActiveAllTracks);
+
+    qDebug() << "ActivePanels: " << ActivePanels.size();
+    auto activePanelsNames = ActivePanels.keys();
+
+    QSet<QString> A;
+    for (auto it = activePanelsNames.begin(); it != activePanelsNames.end(); ++it)
+        A.insert(*it);
+    preferences->setActivePanels(A);
     preferences->setSignalServerUrlString(ui->signalServerUrl_lineEdit->text());
     preferences->setSignalServerLogin(ui->signalServerLogin_lineEdit->text());
     preferences->setSignalServerPassword(ui->signalServerPassword_lineEdit->text());
@@ -163,6 +180,13 @@ void PreferencesDialog::OnAccepted()
         ActiveAllTracks.set(Type_Video);
     if (ui->Tracks_Audio_All->isChecked())
         ActiveAllTracks.set(Type_Audio);
+
+    ActivePanels.clear();
+    for(auto checkbox : ui->panelsGroupBox->findChildren<QCheckBox*>())
+    {
+        if(checkbox->isChecked())
+            ActivePanels.insert(checkbox->text(), checkbox->property("filterchain").toString());
+    }
 
     Save();
 

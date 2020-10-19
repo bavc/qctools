@@ -15,8 +15,17 @@
 #include <QList>
 #include <tuple>
 
-typedef std::tuple<int, int> GroupAndType;
+typedef std::tuple<quint64, quint64> GroupAndType;
 typedef QList<GroupAndType> FilterSelectorsOrder;
+
+struct PanelInfo {
+    QString name;
+    QString yaxis;
+    QString filterchain;
+    QString version;
+    QString legend;
+    int panelType; // AVMEDIA_TYPE_VIDEO / AVMEDIA_TYPE_AUDIO
+};
 
 class Preferences : public QObject
 {
@@ -28,6 +37,13 @@ public:
 
     activealltracks activeAllTracks() const;
     void setActiveAllTracks(const activealltracks& alltracks);
+
+    QMap<QString, std::tuple<QString, QString, QString, QString, int>> getActivePanels() const;
+
+    QSet<QString> activePanels() const;
+    void setActivePanels(const QSet<QString>& activePanels);
+
+    QList<PanelInfo> availablePanels() const;
 
     FilterSelectorsOrder loadFilterSelectorsOrder();
     void saveFilterSelectorsOrder(const FilterSelectorsOrder& order);

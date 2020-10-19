@@ -6,6 +6,7 @@
 
 //---------------------------------------------------------------------------
 
+#include "Core/FFmpeg_Glue.h"
 #include "GUI/Plots.h"
 #include "GUI/Plot.h"
 #include "GUI/PlotLegend.h"
@@ -24,6 +25,7 @@
 #include <qwt_plot_canvas.h>
 #include <cmath>
 #include <clocale>
+#include <unordered_set>
 #include <QMouseEvent>
 #include <QInputDialog>
 #include <QTextDocument>
@@ -156,6 +158,9 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                 if (m_fileInfoData->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
                 {
                     Plot* plot = new Plot( streamPos, type, group, m_fileInfoData, this );
+                    connect(plot, &Plot::visibilityChanged, [plot](bool visible) {
+                        qDebug() << "Plot::visibilityChanged for " << plot << "visible: " << visible;
+                    });
 
                     const size_t plotType = plot->type();
                     const size_t plotGroup = plot->group();
@@ -265,7 +270,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
 
                     m_plotsCount++;
 
-                    qDebug() << "g: " << plot->group() << ", t: " << plot->type() << ", m_plotsCount: " << m_plotsCount;
+                    qDebug() << "created plot with group: " << plot->group() << ", type: " << plot->type() << ", m_plotsCount: " << m_plotsCount;
                 }
                 else
                 {
@@ -282,6 +287,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     m_commentsPlot = createCommentsPlot(fileInformation, &m_dataTypeIndex);
     m_commentsPlot->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Expanding );
     m_commentsPlot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
+    setCommentsVisible(false);
 
     connect( m_commentsPlot, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
     m_commentsPlot->canvas()->installEventFilter( this );
@@ -299,7 +305,98 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
         layout->addLayout(legendLayout, m_plotsCount, 1 );
     }
 
-    layout->addWidget( m_scaleWidget, m_plotsCount + 1, 0, 1, 2 );
+    auto mappedTopLeft = m_commentsPlot->canvas()->mapToParent(m_commentsPlot->plotLayout()->canvasRect().topLeft().toPoint());
+    auto mappedBottomRight = m_commentsPlot->canvas()->mapToParent(m_commentsPlot->plotLayout()->canvasRect().bottomRight().toPoint());
+
+    // qDebug() << "mappedTopLeft: " << mappedTopLeft;
+    // qDebug() << "mappedBottomRight: " << mappedBottomRight;
+
+    auto panelsCount = m_fileInfoData->panelOutputsByTitle().count();
+    auto& panelOutputsByTitle = m_fileInfoData->panelOutputsByTitle();
+    for(auto & item : panelOutputsByTitle.keys())
+    {
+        auto panelOutputIndex = panelOutputsByTitle[item];
+        auto metadata = m_fileInfoData->Glue->getOutputMetadata(panelOutputIndex);
+        auto yaxisIt = metadata.find("yaxis");
+        auto yaxis = yaxisIt != metadata.end() ? yaxisIt->second : "";
+        auto legendIt = metadata.find("legend");
+        auto legend = legendIt != metadata.end() ? legendIt->second : "";
+        auto panel_typeIt = metadata.find("panel_type");
+        auto isAudioPanel = panel_typeIt != metadata.end() ? (panel_typeIt->second == "audio") : false;
+
+        qDebug() << "panelTitle: " << QString::fromStdString(item);
+
+        auto m_PanelsView = new PanelsView(this, QString::fromStdString(item), QString::fromStdString(yaxis), QString::fromStdString(legend), m_commentsPlot);
+        m_PanelsView->setFrameShape(QFrame::Panel);
+        m_PanelsView->setLineWidth(2);
+        m_PanelsView->setFont(m_commentsPlot->axisWidget(QwtPlot::yLeft)->font());
+
+        auto leftMargin = m_commentsPlot->axisWidget(QwtPlot::yLeft)->margin();
+        auto leftSpacing = m_commentsPlot->axisWidget(QwtPlot::yLeft)->spacing();
+
+        mappedTopLeft.setX(mappedTopLeft.x() + leftMargin + leftSpacing);
+        mappedBottomRight.setX(mappedBottomRight.x() - leftMargin - leftSpacing);
+
+        auto right = m_PanelsView->width() - m_commentsPlot->width();
+
+        m_PanelsView->setContentsMargins(mappedTopLeft.x(), 0,
+                                         /*right*/
+                                         mappedBottomRight.x(), 0);
+
+        m_PanelsView->setMinimumHeight(100);
+        m_PanelsView->setVisible(false);
+        m_PanelsView->legend()->setVisible(false);
+
+        connect(m_PanelsView, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
+        connect(this, &Plots::visibleFramesChanged, m_PanelsView, &PanelsView::setVisibleFrames);
+
+        if(m_PanelsView)
+        {
+            layout->addWidget(m_PanelsView, m_plotsCount + m_PanelsViews.size() + 1, 0);
+
+            QVBoxLayout* legendLayout = new QVBoxLayout();
+            legendLayout->setContentsMargins(5, 0, 5, 0);
+            legendLayout->setSpacing(10);
+            legendLayout->setAlignment(Qt::AlignVCenter);
+            legendLayout->addWidget(m_PanelsView->legend());
+
+            layout->addLayout(legendLayout, m_plotsCount + m_PanelsViews.size() + 1, 1 );
+        }
+
+        if(isAudioPanel) {
+            m_PanelsView->setProvider([&, panelOutputIndex] {
+                auto panelsCount = m_fileInfoData->Glue->GetPanelFramesCount(panelOutputIndex);
+                return panelsCount;
+            }, [&, panelOutputIndex](int index) -> QImage {
+                FFmpeg_Glue::Image frameImage;
+                frameImage.frame = m_fileInfoData->Glue->GetPanelFrame(panelOutputIndex, index);
+                auto panelImage = QImage(frameImage.data(), frameImage.width(), frameImage.height(), frameImage.linesize(), QImage::Format_RGB888);
+
+                auto frameRate = m_fileInfoData->Glue->getAvgVideoFrameRate();
+                if(frameRate.isValid()) {
+                    return panelImage.scaled(panelImage.width() * frameRate.value() / 32, panelImage.height());
+                }
+                else return panelImage;
+            });
+
+        } else {
+            m_PanelsView->setProvider([&, panelOutputIndex] {
+                auto panelsCount = m_fileInfoData->Glue->GetPanelFramesCount(panelOutputIndex);
+                return panelsCount;
+            }, [&, panelOutputIndex](int index) -> QImage {
+                FFmpeg_Glue::Image frameImage;
+                frameImage.frame = m_fileInfoData->Glue->GetPanelFrame(panelOutputIndex, index);
+                auto panelImage = QImage(frameImage.data(), frameImage.width(), frameImage.height(), frameImage.linesize(), QImage::Format_RGB888);
+
+                return panelImage;
+            });
+        }
+        m_PanelsView->setVisibleFrames(0, numFrames() - 1);
+
+        m_PanelsViews.push_back(m_PanelsView);
+    }
+
+    layout->addWidget( m_scaleWidget, m_plotsCount + panelsCount + 1, 0, 1, 2 );
 
     // combo box for the axis format
     XAxisFormatBox* xAxisBox = new XAxisFormatBox();
@@ -308,15 +405,11 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
         this, SLOT( onXAxisFormatChanged( int ) ) );
 
     int axisBoxRow = layout->rowCount() - 1;
-#if 1
     // one row below to have space enough for bottom scale tick labels
-    layout->addWidget( xAxisBox, m_plotsCount + 1, 1 );
-#else
-    layout->addWidget( xAxisBox, layout_y, 1 );
-#endif
+    layout->addWidget( xAxisBox, m_plotsCount + panelsCount + 1, 1 );
 
     m_playerControl = new PlayerControl();
-    layout->addWidget(m_playerControl, m_plotsCount + 2, 0);
+    layout->addWidget(m_playerControl, m_plotsCount + panelsCount + 2, 0);
 
     layout->setColumnStretch( 0, 10 );
     layout->setColumnStretch( 1, 0 );
@@ -342,6 +435,8 @@ const QwtPlot* Plots::plot( size_t streamPos, size_t Group ) const
     return m_plots[streamPos]?m_plots[streamPos][Group]:NULL;
 }
 
+
+
 //---------------------------------------------------------------------------
 void Plots::refresh()
 {
@@ -356,6 +451,9 @@ void Plots::refresh()
                 updateSamples( m_plots[streamPos][i] );
             }
         }
+
+    for(auto m_PanelsView : m_PanelsViews)
+        m_PanelsView->refresh();
 
     setCursorPos( framePos() );
     replotAll();
@@ -380,6 +478,8 @@ void Plots::setVisibleFrames( int from, int to , bool force)
         if ( m_timeInterval.to == 0 )
             m_timeInterval.to = stats()->x_Max[m_dataTypeIndex] / stats()->x_Max[0] * to;
     }
+
+    Q_EMIT visibleFramesChanged(from, to);
 }
 
 //---------------------------------------------------------------------------
@@ -426,8 +526,13 @@ void Plots::setCursorPos( int newFramePos )
                 if (m_plots[streamPos][i])
                 m_plots[streamPos][i]->setCursorPos( x );
 
-            if(type == Type_Video)
+            if(type == Type_Video) {
                 m_commentsPlot->setCursorPos(x);
+
+                for(auto& panel : m_PanelsViews) {
+                    panel->setCursorPos(x);
+                }
+            }
         }
 
     m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
@@ -599,16 +704,34 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
                 {
                     if ( m_plots[streamPos][group] && m_plots[streamPos][group]->isVisibleTo( this ) )
                     {
-                        if ( object == m_plots[streamPos][group]->canvas() )
+                        if ( object == m_plots[streamPos][group]->canvas() ) {
                             alignXAxis( m_plots[streamPos][group] );
+                        }
 
                         break;
                     }
                 }
             }
 
-        if(m_commentsPlot && object == m_commentsPlot->canvas())
+        if(object == m_commentsPlot->canvas())
             alignXAxis(m_commentsPlot);
+
+        alignYAxes();
+
+        QTimer::singleShot(0, [&]() {
+            auto canvasRect = m_commentsPlot->plotLayout()->canvasRect();
+            auto mappedTopLeft = m_commentsPlot->canvas()->mapToParent(QPoint(0, 0));
+            auto mappedBottomRight = m_commentsPlot->canvas()->mapToParent(QPoint(canvasRect.width(), canvasRect.height()));
+
+            auto leftMargin = m_commentsPlot->axisWidget(QwtPlot::yLeft)->margin();
+            auto leftSpacing = m_commentsPlot->axisWidget(QwtPlot::yLeft)->spacing();
+
+            for(auto m_PanelsView : m_PanelsViews) {
+                m_PanelsView->setLeftOffset(leftMargin + leftSpacing);
+                m_PanelsView->setContentsMargins(mappedTopLeft.x(), 0, m_PanelsView->width() - mappedBottomRight.x(), 0);
+                m_PanelsView->setActualWidth(m_commentsPlot->canvas()->contentsRect().width());
+            }
+        });
     }
     else if(event->type() == QEvent::MouseButtonDblClick)
     {
@@ -629,29 +752,31 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
     return QWidget::eventFilter( object, event );
 }
 
-void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
+void Plots::changeOrder(QList<std::tuple<quint64, quint64>> newOrder)
 {
-    if(orderedFilterInfo.empty())
+    if(newOrder.empty())
     {
         qDebug() << "orderedFilterInfo is empty, do not reorder..";
         return;
     }
 
-    qDebug() << "changeOrder: items = " << orderedFilterInfo.count();
+    qDebug() << "changeOrder: items = " << newOrder.count();
 
     auto gridLayout = static_cast<QGridLayout*> (layout());
     auto rowsCount = gridLayout->rowCount();
 
     Q_ASSERT(m_plotsCount <= rowsCount);
 
-    qDebug() << "plotsCount: " << m_plotsCount;
+    qDebug() << "plotsCount: " << m_plotsCount << "commentsCount: " << 1 << "panelsCount: " << m_PanelsViews.size();
 
-    QList <std::tuple<size_t, size_t, size_t>> currentOrderedPlotsInfo;
-    QList <std::tuple<size_t, size_t, size_t>> expectedOrderedPlotsInfo;
+    QList <std::tuple<quint64, quint64, quint64>> currentOrderedPlotsInfo;
+    QList <std::tuple<quint64, quint64, quint64>> newOrderedPlotsInfo;
 
-    for(auto row = 0; row < m_plotsCount; ++row)
+    for(auto row = 0; row < (m_plotsCount + 1 + m_PanelsViews.size()); ++row)
     {
         auto plotItem = gridLayout->itemAtPosition(row, 0);
+        // qDebug() << "plotItem: " << plotItem;
+
         auto legendItem = gridLayout->itemAtPosition(row, 1);
 
         Q_ASSERT(plotItem);
@@ -663,49 +788,119 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
 
         auto commentsPlot = qobject_cast<CommentsPlot*> (plotItem->widget());
         if(commentsPlot)
-            currentOrderedPlotsInfo.push_back(std::make_tuple(0, Type_Max, 0));
+            currentOrderedPlotsInfo.push_back(std::make_tuple(0, Type_Comments, 0));
+
+        auto panelsView = qobject_cast<PanelsView*> (plotItem->widget());
+        if(panelsView)
+            currentOrderedPlotsInfo.push_back(std::make_tuple(qHash(panelsView->panelTitle()), Type_Panels, 0));
     }
 
-    currentOrderedPlotsInfo.push_back(std::make_tuple(0, Type_Max, 0));
+    // currentOrderedPlotsInfo.push_back(std::make_tuple(0, Type_Max, 0));
 
-    for(auto filterInfo : orderedFilterInfo)
+    qDebug() << "\tnewOrder: " << newOrder.length();
+    for(auto filterInfo : newOrder)
+    {
+        qDebug() << "\t\t" << QString("group: %1/type: %2")
+                    .arg(std::get<0>(filterInfo))
+                    .arg(std::get<1>(filterInfo));
+    }
+
+    qDebug() << "\tcurrentOrderedPlotsInfo: " << currentOrderedPlotsInfo.length();
+    for(auto filterInfo : currentOrderedPlotsInfo)
+    {
+        qDebug() << "\t\t" << QString("group: %1/type: %2")
+                    .arg(std::get<0>(filterInfo))
+                    .arg(std::get<1>(filterInfo));
+    }
+
+    for(auto filterInfo : newOrder)
     {
         for(auto plotInfo : currentOrderedPlotsInfo)
         {
-            if(std::get<0>(plotInfo) == std::get<0>(filterInfo) && std::get<1>(plotInfo) == std::get<1>(filterInfo))
+            auto plotGroup = std::get<0>(plotInfo);
+            auto filterGroup = std::get<0>(filterInfo);
+
+            auto plotType = std::get<1>(plotInfo);
+            auto filterType = std::get<1>(filterInfo);
+
+            if(plotGroup == filterGroup &&  plotType == filterType)
             {
-                expectedOrderedPlotsInfo.push_back(plotInfo);
+                newOrderedPlotsInfo.push_back(plotInfo);
+                break;
             }
         }
     }
 
-    Q_ASSERT(currentOrderedPlotsInfo.length() == expectedOrderedPlotsInfo.length());
-    if(currentOrderedPlotsInfo.length() != expectedOrderedPlotsInfo.length())
-        return;
-
-    for(auto i = 0; i < expectedOrderedPlotsInfo.length(); ++i)
+    // Q_ASSERT(currentOrderedPlotsInfo.length() == newOrderedPlotsInfo.length());
+    if(currentOrderedPlotsInfo.length() != newOrderedPlotsInfo.length())
     {
-        qDebug() << "cg: " << std::get<0>(currentOrderedPlotsInfo[i])
-                 << ", "
-                 << "ct: " << std::get<1>(currentOrderedPlotsInfo[i])
-                 << ", "
-                 << "cp: " << std::get<2>(currentOrderedPlotsInfo[i])
-                 << ", "
-                 << "eg: " << std::get<0>(expectedOrderedPlotsInfo[i])
-                 << ", "
-                 << "et: " << std::get<1>(expectedOrderedPlotsInfo[i])
-                 << ", "
-                 << "ep: " << std::get<2>(expectedOrderedPlotsInfo[i]);
+        auto currentSet = QSet<QString>();
+        auto newSet = QSet<QString>();
+
+        qDebug() << "\tcurrent: " << currentOrderedPlotsInfo.size();
+
+        for(auto i = 0; i < currentOrderedPlotsInfo.length(); ++i) {
+            qDebug() << "\t\t" << QString("group: %1/type: %2")
+                        .arg(std::get<0>(currentOrderedPlotsInfo[i]))
+                        .arg(std::get<1>(currentOrderedPlotsInfo[i]));
+
+            currentSet.insert(
+                        QString("group: %1/type: %2")
+                        .arg(std::get<0>(currentOrderedPlotsInfo[i]))
+                        .arg(std::get<1>(currentOrderedPlotsInfo[i]))
+                        );
+        }
+
+        qDebug() << "\tnew: " << newOrderedPlotsInfo.size();
+
+        for(auto i = 0; i < newOrderedPlotsInfo.length(); ++i) {
+            qDebug() << "\t\t" << QString("group: %1/type: %2")
+                        .arg(std::get<0>(newOrderedPlotsInfo[i]))
+                        .arg(std::get<1>(newOrderedPlotsInfo[i]));
+
+            newSet.insert(
+                        QString("group: %1/type: %2")
+                        .arg(std::get<0>(newOrderedPlotsInfo[i]))
+                        .arg(std::get<1>(newOrderedPlotsInfo[i]))
+                        );
+        }
+
+        auto newMinusCurrent = QSet<QString>(newSet).subtract(currentSet);
+        auto currentMinusNew= QSet<QString>(currentSet).subtract(newSet);
+
+        qDebug() << "newMinusCurrent: " << newMinusCurrent;
+        qDebug() << "currentMinusNew: " << currentMinusNew;
+
+        if(currentOrderedPlotsInfo.length() > newOrderedPlotsInfo.length())
+        {
+            for(auto i = 0; i < currentOrderedPlotsInfo.size(); ++i)
+            {
+                bool existsInNew = false;
+                for(auto j = 0; j < newOrderedPlotsInfo.length(); ++j) {
+                    if(newOrderedPlotsInfo[j] == currentOrderedPlotsInfo[i]) {
+                        existsInNew = true;
+                        break;
+                    }
+                }
+                if(!existsInNew) {
+                    newOrderedPlotsInfo.append(currentOrderedPlotsInfo[i]);
+                }
+            }
+        }
+        else
+        {
+            return;
+        }
     }
 
-    for(auto i = 0; i < expectedOrderedPlotsInfo.length(); ++i)
+    for(auto i = 0; i < newOrderedPlotsInfo.length(); ++i)
     {
-        if(expectedOrderedPlotsInfo[i] != currentOrderedPlotsInfo[i])
+        if(newOrderedPlotsInfo[i] != currentOrderedPlotsInfo[i])
         {
-            // search current item which we should put at expected position
-            for(auto j = 0; j < expectedOrderedPlotsInfo.length(); ++j)
+            // search current item which we should put at new position
+            for(auto j = 0; j < newOrderedPlotsInfo.length(); ++j)
             {
-                if(expectedOrderedPlotsInfo[i] == currentOrderedPlotsInfo[j])
+                if(newOrderedPlotsInfo[i] == currentOrderedPlotsInfo[j])
                 {
                     qDebug() << "i: " << i << ", j: " << j;
 
@@ -728,7 +923,7 @@ void Plots::changeOrder(QList<std::tuple<int, int> > orderedFilterInfo)
                     gridLayout->addItem(swapLegendItem, j, 1);
 
                     currentOrderedPlotsInfo[j] = currentOrderedPlotsInfo[i];
-                    currentOrderedPlotsInfo[i] = expectedOrderedPlotsInfo[i];
+                    currentOrderedPlotsInfo[i] = newOrderedPlotsInfo[i];
 
                     break;
                 }
@@ -924,6 +1119,72 @@ void Plots::setPlotVisible( size_t type, size_t group, bool on )
         }
 }
 
+void Plots::setCommentsVisible(bool visible)
+{
+    if(visible) {
+        m_commentsPlot->restorePlotHeight();
+    } else {
+        m_commentsPlot->setMinimumHeight(0);
+        m_commentsPlot->setMaximumHeight(0);
+    }
+    m_commentsPlot->legend()->setVisible(visible);
+}
+
+void Plots::updatePlotsVisibility(const QMap<QString, std::tuple<quint64, quint64> > &visiblePlots)
+{
+    qDebug() << "updatePlotsVisibility";
+    for(auto plotName : visiblePlots.keys()) {
+        qDebug() << "\tplotName: " << plotName;
+    }
+
+    class GroupAndTypeTupleHashFunction {
+    public:
+        size_t operator()(const std::tuple<quint64, quint64>& p) const
+        {
+            auto group = std::get<0>(p);
+            auto type = std::get<1>(p);
+
+            return (std::hash<unsigned long long>()(group)) ^ (std::hash<unsigned long long>()(type));
+        }
+    };
+
+    std::unordered_set<std::tuple<quint64, quint64>, GroupAndTypeTupleHashFunction> groupAndTypeSet;
+    for(auto groupAndType : visiblePlots.values())
+    {
+        groupAndTypeSet.insert(groupAndType);
+    }
+
+    for (quint64 type = 0; type<Type_Max; type++) {
+        for (quint64 group=0; group<PerStreamType[type].CountOfGroups; group++) {
+            auto tuple = std::tuple<quint64, quint64>(group, type);
+            bool visible = groupAndTypeSet.find(tuple) != groupAndTypeSet.end();
+            if(groupAndTypeSet.empty()) {
+                visible = PerStreamType[type].PerGroup[group].CheckedByDefault;
+            }
+            setPlotVisible(type, group, visible);
+        }
+    }
+
+    auto tuple = std::tuple<quint64, quint64>(0, Type_Comments);
+    bool visible = groupAndTypeSet.find(tuple) != groupAndTypeSet.end();
+    if(groupAndTypeSet.empty()) {
+        visible = true;
+    }
+
+    setCommentsVisible(visible);
+
+    for(size_t panelIndex = 0; panelIndex < panelsCount(); ++panelIndex) {
+        auto panel = panelsView(panelIndex);
+        auto panelTitle = panel->panelTitle();
+        qDebug() << "\tpanelTitle: " << panelTitle;
+        auto panelVisible = visiblePlots.contains(panelTitle);
+        qDebug() << "\tpanelVisible: " << panelVisible;
+
+        panel->setVisible(panelVisible);
+        panel->legend()->setVisible(panelVisible);
+    }
+}
+
 //---------------------------------------------------------------------------
 void Plots::zoomXAxis( ZoomTypes zoomType )
 {
@@ -941,7 +1202,7 @@ void Plots::zoomXAxis( ZoomTypes zoomType )
 
     if(m_zoomType == ZoomOneToOne)
     {
-        numVisibleFrames = plot(0, 0)->canvas()->contentsRect().width();
+        numVisibleFrames = m_commentsPlot->canvas()->contentsRect().width();
         m_zoomFactor = log(double(m_fileInfoData->Frames_Count_Get()) / numVisibleFrames) / log(2);
     }
 
@@ -1003,5 +1264,10 @@ void Plots::replotAll()
     {
         m_commentsPlot->setAxisScaleDiv( QwtPlot::xBottom, m_scaleWidget->scaleDiv() );
         m_commentsPlot->replot();
+    }
+
+    for(auto& panel : m_PanelsViews)
+    {
+        panel->refresh();
     }
 }

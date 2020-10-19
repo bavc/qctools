@@ -14,6 +14,8 @@
 #include <qwt_plot_grid.h>
 #include <QTextDocument>
 
+constexpr int plotHeight = 30;
+
 static inline void qwtDrawRhombSymbols( QPainter *painter,
     const QPointF *points, int numPoints, const QwtSymbol &symbol )
 {
@@ -197,7 +199,6 @@ CommentsPlot::CommentsPlot(FileInformation* fileInfo, CommonStats* stats, const 
     symbol->setPen( QPen( Qt::red, 1 ));
     symbol->setCachePolicy(QwtSymbol::NoCache);
 
-    int plotHeight = 30;
     symbol->setSize(QSize(11, plotHeight));
 
     curve->setSymbol( symbol );
@@ -299,6 +300,13 @@ void CommentsPlot::setCursorPos(double x)
     m_cursor->setPosition( x );
 }
 
+void CommentsPlot::restorePlotHeight()
+{
+    setMinimumHeight(plotHeight);
+    setMaximumHeight(plotHeight);
+    resize(size().width(), plotHeight);
+}
+
 CommentsPlotPicker::CommentsPlotPicker(QWidget *w, CommonStats *stats) : QwtPlotPicker(w), stats(stats)
 {
     setAxis( QwtPlot::xBottom, QwtPlot::yLeft );
@@ -344,7 +352,7 @@ QwtText CommentsPlotPicker::trackerTextF(const QPointF &pos) const
 
 QString CommentsPlotPicker::infoText(int index) const
 {
-    if(stats->comments[index])
+    if(stats->comments && stats->comments[index])
         return QString::fromUtf8(stats->comments[index]);
 
     return "";

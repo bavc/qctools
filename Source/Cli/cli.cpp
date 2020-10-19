@@ -274,7 +274,7 @@ int Cli::exec(QCoreApplication &a)
 
     std::cout << std::endl;
 
-    info = std::unique_ptr<FileInformation>(new FileInformation(signalServer.get(), input, filters, prefs.activeAllTracks()));
+    info = std::unique_ptr<FileInformation>(new FileInformation(signalServer.get(), input, filters, prefs.activeAllTracks(), prefs.getActivePanels()));
     info->setAutoCheckFileUploaded(false);
     info->setAutoUpload(false);
 
@@ -332,32 +332,124 @@ int Cli::exec(QCoreApplication &a)
                 attachmentFileName = name;
 
                 FFmpegVideoEncoder encoder;
+                FFmpegVideoEncoder::Metadata metadata;
+                metadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString("QCTools Report for %1").arg(QFileInfo(statsFile.data()->fileName()).fileName()));
+                metadata << FFmpegVideoEncoder::MetadataEntry(QString("creation_time"), QString("now"));
+
+                encoder.setMetadata(metadata);
+
                 int thumbnailsCount = info->Glue->Thumbnails_Size(0);
                 int thumbnailIndex = 0;
 
                 int num = 0;
                 int den = 0;
 
-                std::cout << std::endl << "generating QCTools report with thumbnails... " << std::endl;
-
-                progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
-                progress->setValue(0);
-
                 info->Glue->OutputThumbnailTimeBase_Get(num, den);
 
-                encoder.makeVideo(output, info->Glue->OutputThumbnailWidth_Get(), info->Glue->OutputThumbnailHeight_Get(), info->Glue->OutputThumbnailBitRate_Get(), num, den,
-                                  [&]() -> AVPacket* {
+                FFmpegVideoEncoder::Source source;
+                source.width = info->Glue->OutputThumbnailWidth_Get();
+                source.height = info->Glue->OutputThumbnailHeight_Get();
+                source.bitrate = info->Glue->OutputThumbnailBitRate_Get();
+
+                FFmpegVideoEncoder::Metadata streamMetadata;
+                streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString("Frame Thumbnails"));
+
+                source.metadata = streamMetadata;
+                source.num = num;
+                source.den = den;
+                source.getPacket = [&]() -> std::shared_ptr<AVPacket> {
+
+                    if(thumbnailIndex == 0) {
+                        std::cout << std::endl << "adding thumbnails to QCTools report... " << std::endl;
+
+                        progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
+                        progress->setValue(0);
+                    }
 
                     bool hasNext = thumbnailIndex < thumbnailsCount;
 
                     progress->setValue(100 * thumbnailIndex/ thumbnailsCount);
                     QCoreApplication::processEvents();
 
-                    if(!hasNext)
+                    if(!hasNext) {
                         return nullptr;
+                    }
 
                     return info->Glue->ThumbnailPacket_Get(0, thumbnailIndex++);
-                }, attachment, attachmentFileName);
+                };
+
+                QVector<FFmpegVideoEncoder::Source> sources;
+                sources.push_back(source);
+
+                for(auto& panelTitle : info->panelOutputsByTitle().keys())
+                {
+                    auto panelOutputIndex = info->panelOutputsByTitle()[panelTitle];
+                    auto panelFramesCount = info->Glue->GetPanelFramesCount(panelOutputIndex);
+                    if(panelFramesCount == 0)
+                        continue;
+
+                    auto frameSize = info->Glue->GetPanelFrameSize(panelOutputIndex, 0);
+                    auto panelsCount = info->Glue->GetPanelFramesCount(panelOutputIndex);
+                    auto panelIndex = 0;
+
+                    FFmpegVideoEncoder::Metadata streamMetadata;
+                    streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString::fromStdString(panelTitle));
+                    streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("filterchain"), QString::fromStdString(info->Glue->getOutputFilter(panelOutputIndex)));
+
+                    auto outputMetadata = info->Glue->getOutputMetadata(panelOutputIndex);
+                    auto versionIt = outputMetadata.find("version");
+                    auto yaxisIt = outputMetadata.find("yaxis");
+                    auto legendIt = outputMetadata.find("legend");
+                    auto panelTypeIt = outputMetadata.find("panel_type");
+                    auto version = versionIt != outputMetadata.end() ? versionIt->second : "";
+                    auto yaxis = yaxisIt != outputMetadata.end() ? yaxisIt->second : "";
+                    auto legend = legendIt != outputMetadata.end() ? legendIt->second : "";
+                    auto panelType = panelTypeIt != outputMetadata.end() ? panelTypeIt->second : "video";
+                    auto isAudioPanel = panelType != "video";
+
+                    streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("version"), QString::fromStdString(version));
+                    streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("yaxis"), QString::fromStdString(yaxis));
+                    streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("legend"), QString::fromStdString(legend));
+                    streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("panel_type"), QString::fromStdString(panelType));
+
+                    FFmpegVideoEncoder::Source panelSource;
+                    panelSource.metadata = streamMetadata;
+                    panelSource.width = info->panelSize().width();
+                    panelSource.height = info->panelSize().height();
+                    panelSource.bitrate = info->Glue->OutputThumbnailBitRate_Get() / info->panelSize().width();
+                    panelSource.num = num;
+                    panelSource.den = den;
+                    panelSource.getPacket = [panelIndex, panelsCount, panelOutputIndex, this]() mutable -> std::shared_ptr<AVPacket> {
+
+                        if(panelIndex == 0)
+                        {
+                            std::cout << std::endl << "adding panels to QCTools report... " << std::endl;
+
+                            progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
+                            progress->setValue(0);
+                        }
+
+                        bool hasNext = panelIndex < panelsCount;
+
+                        progress->setValue(100 * panelIndex / panelsCount);
+                        QCoreApplication::processEvents();
+
+                        if(!hasNext) {
+                            return nullptr;
+                        }
+
+                        auto frame = info->Glue->GetPanelFrame(panelOutputIndex, panelIndex);
+                        auto packet = info->Glue->encodePanelFrame(panelOutputIndex, frame.get());
+
+                        ++panelIndex;
+
+                        return packet;
+                    };
+
+                    sources.push_back(panelSource);
+                }
+
+                encoder.makeVideo(output, sources, attachment, attachmentFileName);
             }
 
             a.quit();

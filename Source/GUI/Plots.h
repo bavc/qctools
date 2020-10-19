@@ -13,6 +13,8 @@
 #include "Core/CommonStats.h"
 #include "Core/FileInformation.h"
 #include "GUI/Comments.h"
+#include "panelsview.h"
+#include <unordered_set>
 
 #include <QWidget>
 
@@ -90,9 +92,14 @@ public:
     PlayerControl*              playerControl();
 
     void                        setPlotVisible( size_t type, size_t group, bool on );
+    void setCommentsVisible(bool visible);
+    void updatePlotsVisibility(const QMap<QString, std::tuple<quint64, quint64>> & visiblePlots);
 
     const QwtPlot*              plot( size_t streamPos, size_t group ) const;
     CommentsPlot*               commentsPlot() const { return m_commentsPlot; }
+
+    PanelsView*                 panelsView(size_t index) const { return m_PanelsViews[index]; }
+    size_t                      panelsCount() const { return m_PanelsViews.size(); }
 
     void                        Zoom_Move( int Begin );
     void                        refresh();
@@ -103,7 +110,7 @@ public:
     int                         numFrames() const { return stats()->x_Current_Max; }
 
     virtual bool                eventFilter( QObject *, QEvent * );
-    void                        changeOrder(QList<std::tuple<int, int>> filterSelectorsInfo);
+    void                        changeOrder(QList<std::tuple<quint64, quint64>> filterSelectorsInfo);
 
     QJsonObject                 saveBarchartsProfile();
     void                        loadBarchartsProfile(const QJsonObject& profile);
@@ -111,6 +118,7 @@ public:
     void showEditBarchartProfileDialog(const size_t plotGroup, Plot* plot, const stream_info& streamInfo);
 
 Q_SIGNALS:
+    void visibleFramesChanged(int from, int to);
     void                        barchartProfileChanged();
 
 public Q_SLOTS:
@@ -140,6 +148,7 @@ private:
 private:
     PlotScaleWidget*            m_scaleWidget;
     CommentsPlot*               m_commentsPlot;
+    std::vector<PanelsView*>    m_PanelsViews;
     PlayerControl*              m_playerControl;
     Plot***                     m_plots; // pointer on an array of streams and groups per stream and Plot* per group
     int                         m_plotsCount;

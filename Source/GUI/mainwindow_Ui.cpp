@@ -62,7 +62,6 @@ const int MaxRecentFiles = 20;
 //
 //***************************************************************************
 
-//---------------------------------------------------------------------------
 void MainWindow::Ui_Init()
 {
     ui->setupUi(this);
@@ -242,8 +241,7 @@ void MainWindow::Ui_Init()
     // Window
     setWindowTitle("QCTools");
     setWindowIcon(QIcon(":/icon/logo.png"));
-    move(75, 75);
-    resize(QApplication::desktop()->screenGeometry().width()-150, QApplication::desktop()->screenGeometry().height()-150);
+
     //setUnifiedTitleAndToolBarOnMac(true); //Disabled because the toolbar dos not permit to move the window as expected by Mac users
 
     //ToolBar
@@ -254,89 +252,38 @@ void MainWindow::Ui_Init()
     //ToolTip
     if (ui->fileNamesBox)
         ui->fileNamesBox->hide();
+    if (ui->copyToClipboard_pushButton)
+        ui->copyToClipboard_pushButton->hide();
+    if (ui->setupFilters_pushButton)
+        ui->setupFilters_pushButton->hide();
 
     preferences = new Preferences(this);
 
-    QSet<QString> selectedFilters = QSet<QString>::fromList(preferences->loadSelectedFilters());
-
-    for (size_t type = 0; type < Type_Max; type++)
-        for ( int group = 0; group < PerStreamType[type].CountOfGroups; group++ ) // Group_Axis
+    for (quint64 type = 0; type < Type_Max; type++)
+    {
+        for ( quint64 group = 0; group < PerStreamType[type].CountOfGroups; group++ ) // Group_Axis
         {
-            QPushButton* CheckBox=new QPushButton(PerStreamType[type].PerGroup[group].Name);
+            auto name = PerStreamType[type].PerGroup[group].Name;
+            auto description = PerStreamType[type].PerGroup[group].Description;
+            auto selected = PerStreamType[type].PerGroup[group].CheckedByDefault;
 
-            QFontMetrics metrics(CheckBox->font());
-            CheckBox->setMinimumWidth(metrics.width(CheckBox->text()));
-            CheckBox->setCheckable(true);
-            CheckBox->setFlat(true);
-            CheckBox->setProperty("type", (quint64) type); // unfortunately QVariant doesn't support size_t
-            CheckBox->setProperty("group", (quint64) group);
-            CheckBox->setStyleSheet("\
-                QPushButton {\
-                    color: black;\
-                    padding-top: 8px;\
-                    padding-bottom: 8px;\
-                    border: solid;\
-                    border-color: lightgrey;\
-                    border-width: 0 0 0 1px;\
-                }\
-                QPushButton:checked{\
-                    background-color: grey;\
-                }\
-                QPushButton:hover{\
-                    background-color: lightgrey;\
-                }  \
-                ");
-
-            CheckBox->setToolTip(PerStreamType[type].PerGroup[group].Description);
-
-            if(!selectedFilters.empty())
-            {
-                auto checkboxText = CheckBox->text();
-                auto filterSelected = selectedFilters.contains(checkboxText);
-                CheckBox->setChecked(filterSelected);
-            } else
-            {
-                CheckBox->setChecked(PerStreamType[type].PerGroup[group].CheckedByDefault);
-            }
-
-            CheckBox->setVisible(false);
-            QObject::connect(CheckBox, SIGNAL(toggled(bool)), this, SLOT(on_check_toggled(bool)));
-            ui->horizontalLayout->addWidget(CheckBox);
-
-            CheckBoxes[type].push_back(CheckBox);
+            m_plotsChooser->add(name, type, group, description, selected);
         }
+    }
 
-    m_commentsCheckbox=new QPushButton("Comments");
-    QFontMetrics metrics(m_commentsCheckbox->font());
-    m_commentsCheckbox->setMinimumWidth(metrics.width(m_commentsCheckbox->text()));
+    m_plotsChooser->add("Comments", Type_Comments, 0, "comments", true);
 
-    m_commentsCheckbox->setProperty("type", (quint64) Type_Max);
-    m_commentsCheckbox->setProperty("group", (quint64) 0);
-    m_commentsCheckbox->setToolTip("comments");
-    m_commentsCheckbox->setFlat(true);
-    m_commentsCheckbox->setStyleSheet("\
-        QPushButton {\
-            color: black;\
-            padding-top: 8px;\
-            padding-bottom: 8px;\
-            border: solid;\
-            border-color: lightgrey;\
-            border-width: 0 1px 0 0;\
-        }\
-        QPushButton:checked{\
-            background-color: grey;\
-        }\
-        QPushButton:hover{\
-            background-color: lightgrey;\
-        }  \
-        ");
-    m_commentsCheckbox->setCheckable(true);
-    m_commentsCheckbox->setChecked(true);
-    m_commentsCheckbox->setVisible(false);
-    QObject::connect(m_commentsCheckbox, SIGNAL(toggled(bool)), this, SLOT(on_check_toggled(bool)));
-    ui->horizontalLayout->addWidget(m_commentsCheckbox);
+    for(auto panelInfo : preferences->availablePanels())
+    {
+        if(preferences->activePanels().contains(panelInfo.name))
+        {
+            m_plotsChooser->add(panelInfo.name, Type_Panels, qHash(panelInfo.name), panelInfo.name);
+        }
+    }
 
-    qDebug() << "checkboxes in layout: " << ui->horizontalLayout->count();
+    auto selectedFilters = preferences->loadSelectedFilters();
+    if(!selectedFilters.empty())
+        m_plotsChooser->selectFilters(selectedFilters);
 
     configureZoom();
 
@@ -363,6 +310,39 @@ void MainWindow::Ui_Init()
     //Preferences
     Prefs=new PreferencesDialog(preferences, connectionChecker, this);
     connect(Prefs, SIGNAL(saved()), this, SLOT(updateSignalServerSettings()));
+    connect(Prefs, &PreferencesDialog::saved, [&]() {
+
+        if(!PlotsArea)
+            return;
+
+        auto existingPanelsSet = QSet<QString>();
+        auto existingPanelsList = m_plotsChooser->getAvailableFilters([](quint64 type) -> bool {
+            return type == Type_Panels;
+        });
+
+        for(auto & panelName : existingPanelsList)
+        {
+            existingPanelsSet.insert(panelName);
+        }
+
+        auto panelsToAdd= preferences->activePanels().subtract(existingPanelsSet);
+        auto panelsToRemove = existingPanelsSet.subtract(preferences->activePanels());
+
+        for(size_t panelIndex = 0; !panelsToRemove.empty() && panelIndex < PlotsArea->panelsCount(); ++panelIndex) {
+            auto panel = PlotsArea->panelsView(panelIndex);
+            if(panelsToRemove.contains(panel->panelTitle())) {
+                panel->setVisible(false);
+                panel->legend()->setVisible(false);
+
+                m_plotsChooser->remove(panel->panelTitle());
+            }
+        }
+
+        for(auto newPanel : panelsToAdd)
+        {
+            m_plotsChooser->add(newPanel, Type_Panels, qHash(newPanel), newPanel, true);
+        }
+    });
 
     updateSignalServerSettings();
     updateConnectionIndicator();
@@ -469,37 +449,6 @@ void MainWindow::Zoom( bool on )
     configureZoom();
 }
 
-void MainWindow::changeFilterSelectorsOrder(QList<std::tuple<int, int> > filtersInfo)
-{
-    QSignalBlocker blocker(draggableBehaviour);
-
-    auto boxlayout = static_cast<QHBoxLayout*> (ui->horizontalLayout);
-
-    QList<QLayoutItem*> items;
-
-    for(std::tuple<int, int> groupAndType : filtersInfo)
-    {
-        int group = std::get<0>(groupAndType);
-        int type = std::get<1>(groupAndType);
-
-        auto rowsCount = boxlayout->count();
-        for(auto row = 0; row < rowsCount; ++row)
-        {
-            auto checkboxItem = boxlayout->itemAt(row);
-            if(checkboxItem->widget()->property("group") == group && checkboxItem->widget()->property("type") == type)
-            {
-                items.append(boxlayout->takeAt(row));
-                break;
-            }
-        }
-    };
-
-    for(auto item : items)
-    {
-        boxlayout->addItem(item);
-    }
-}
-
 QAction *MainWindow::createOpenRecentAction(const QString &fileName)
 {
     auto action = new QAction(fileName, this);
@@ -600,22 +549,6 @@ void MainWindow::Export_PDF()
         SaveFileName, "PDF", QSizeF(210, 297), 150);
     QDesktopServices::openUrl(QUrl("file:///"+SaveFileName, QUrl::TolerantMode));
     */
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::refreshDisplay()
-{
-    if (PlotsArea)
-    {
-        PlotsArea->commentsPlot()->setVisible(m_commentsCheckbox->isChecked());
-        PlotsArea->commentsPlot()->legend()->setVisible(m_commentsCheckbox->isChecked());
-
-        for (size_t type = 0; type<Type_Max; type++)
-            for (size_t group=0; group<PerStreamType[type].CountOfGroups; group++)
-                PlotsArea->setPlotVisible( type, group, CheckBoxes[type][group]->isChecked() );
-
-        PlotsArea->alignYAxes();
-    }
 }
 
 //---------------------------------------------------------------------------

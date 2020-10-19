@@ -45,7 +45,6 @@ void MainWindow::TimeOut ()
         createFilesList();
     if (ui->actionGraphsLayout->isChecked() && PlotsArea==NULL)
         createGraphsLayout();
-    refreshDisplay();
     Update();
 
     // this code seems to launch more parsings tasks
@@ -122,9 +121,7 @@ void MainWindow::TimeOut ()
             QStatusBar* StatusBar=statusBar();
             if (StatusBar)
                 StatusBar->showMessage(("Parsing complete"+Message_Total.str()).c_str(), 10000);
-            if (Files_Completed==Files.size())
-                QTimer::singleShot(0, this, SLOT(TimeOut_Refresh()));
-            else
+            if (Files_Completed != Files.size())
                 QTimer::singleShot(250, this, SLOT(TimeOut()));
         }
         if (FilesListArea)
@@ -133,11 +130,4 @@ void MainWindow::TimeOut ()
 
     if (PlotsArea)
         PlotsArea->refresh();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::TimeOut_Refresh ()
-{
-    // Hack for refreshing the plots, else plots are not aligned in some cases (e.g. very small file with sidecar stats file). TODO: find the source of the issue
-    refreshDisplay();
 }

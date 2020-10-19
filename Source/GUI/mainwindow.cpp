@@ -19,7 +19,6 @@
 #include <QPrinter>
 #include <QDesktopServices>
 #include <QUrl>
-#include <QCoreApplication>
 #include <QDropEvent>
 #include <QDragEnterEvent>
 #include <QMimeData>
@@ -35,6 +34,8 @@
 #include <QJsonDocument>
 #include <QScreen>
 #include <QDesktopWidget>
+#include <QClipboard>
+#include <QGuiApplication>
 
 #include "GUI/draggablechildrenbehaviour.h"
 #include "GUI/config.h"
@@ -45,42 +46,6 @@
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-QList<std::tuple<int, int>> MainWindow::getFilterSelectorsOrder(int start = 0, int end = -1)
-{
-    QList<std::tuple<int, int>> filtersInfo;
-    if(end == -1)
-        end = ui->horizontalLayout->count() - 1;
-
-    for(int i = start; i <= end; ++i)
-    {
-        auto o = ui->horizontalLayout->itemAt(i)->widget();
-        auto group = o->property("group").toInt();
-        auto type = o->property("type").toInt();
-
-        filtersInfo.push_back(std::make_tuple(group, type));
-    }
-
-    return filtersInfo;
-}
-
-QStringList MainWindow::getSelectedFilters() const
-{
-    QStringList selectedFilters;
-
-    for (size_t type = 0; type < Type_Max; type++)
-    {
-        for(auto checkbox : CheckBoxes[type])
-        {
-            if(checkbox->isChecked())
-                selectedFilters << checkbox->text();
-        }
-    }
-
-    if(m_commentsCheckbox->isChecked())
-        selectedFilters << m_commentsCheckbox->text();
-
-    return selectedFilters;
-}
 
 QAction *MainWindow::uploadAction() const
 {
@@ -115,6 +80,20 @@ MainWindow::MainWindow(QWidget *parent) :
     DragDrop_Image=NULL;
     DragDrop_Text=NULL;
 
+    m_plotsChooser = new PlotsChooser();
+    connect(m_plotsChooser, &PlotsChooser::orderChanged, [&]() {
+        QList<std::tuple<quint64, quint64>> filtersSelectors = m_plotsChooser->getFilterSelectorsOrder();
+
+        if(PlotsArea)
+            PlotsArea->changeOrder(filtersSelectors);
+    });
+    connect(m_plotsChooser, &PlotsChooser::selected, [&](bool visible, quint64 group, quint64 type) {
+        if(PlotsArea) {
+            setPlotVisible(group, type, visible);
+            PlotsArea->alignYAxes();
+        }
+    });
+
     m_player = new Player();
 
     QDesktopWidget desktop;
@@ -131,34 +110,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Deck
     DeckRunning=false;
-
-    draggableBehaviour = new DraggableChildrenBehaviour(ui->horizontalLayout);
-    connect(draggableBehaviour, &DraggableChildrenBehaviour::childPositionChanged, [&](QWidget* child, int oldPos, int newPos) {
-
-        Q_UNUSED(child);
-
-        int start = oldPos;
-        int end = newPos;
-
-        if(oldPos > newPos)
-        {
-            start = newPos;
-            end = oldPos;
-        }
-
-        QList<std::tuple<int, int>> filtersSelectors = getFilterSelectorsOrder();
-
-        if(PlotsArea)
-            PlotsArea->changeOrder(filtersSelectors);
-    });
 }
 
 //---------------------------------------------------------------------------
 MainWindow::~MainWindow()
 {
-    Prefs->saveFilterSelectorsOrder(getFilterSelectorsOrder());
-
-    preferences->saveSelectedFilters(getSelectedFilters());
+    preferences->saveFilterSelectorsOrder(m_plotsChooser->getFilterSelectorsOrder());
+    preferences->saveSelectedFilters(m_plotsChooser->getSelectedFilters());
     // Controls
 
     // Files (must be deleted first in order to stop ffmpeg processes)
@@ -378,13 +336,16 @@ void MainWindow::on_actionFilesList_triggered()
         ui->actionZoomOut->setVisible(false);
     if (ui->actionWindowOut)
         ui->actionWindowOut->setVisible(false);
-    for (size_t type = 0; type < Type_Max; type++)
-        for (size_t group=0; group<CheckBoxes[type].size(); group++)
-            CheckBoxes[type][group]->hide();
-    m_commentsCheckbox->hide();
+
+    m_plotsChooser->setVisible(false);
 
     if (ui->fileNamesBox)
         ui->fileNamesBox->hide();
+    if (ui->copyToClipboard_pushButton)
+        ui->copyToClipboard_pushButton->hide();
+    if (ui->setupFilters_pushButton)
+        ui->setupFilters_pushButton->hide();
+
     if (PlotsArea)
         PlotsArea->hide();
     if (TinyDisplayArea)
@@ -418,16 +379,14 @@ void MainWindow::on_actionGraphsLayout_triggered()
         ui->actionZoomOut->setVisible(true);
     if (ui->actionWindowOut)
         ui->actionWindowOut->setVisible(false);
-    for (size_t type = 0; type < Type_Max; type++)
-        for (size_t group=0; group<CheckBoxes[type].size(); group++)
-            if (CheckBoxes[type][group] && getFilesCurrentPos()<Files.size() && Files[getFilesCurrentPos()]->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup])
-                CheckBoxes[type][group]->show();
-
-    if(getFilesCurrentPos()<Files.size())
-        m_commentsCheckbox->show();
 
     if (ui->fileNamesBox)
         ui->fileNamesBox->show();
+    if (ui->copyToClipboard_pushButton)
+        ui->copyToClipboard_pushButton->show();
+    if (ui->setupFilters_pushButton)
+        ui->setupFilters_pushButton->show();
+
     if (PlotsArea)
         PlotsArea->show();
     if (TinyDisplayArea)
@@ -512,15 +471,7 @@ void MainWindow::on_fileNamesBox_currentIndexChanged(int index)
         return;
 
     createGraphsLayout();
-    refreshDisplay();
     Update();
-    QTimer::singleShot(0, this, SLOT(TimeOut_Refresh()));
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_check_toggled(bool checked)
-{
-    refreshDisplay();
 }
 
 //---------------------------------------------------------------------------
@@ -907,7 +858,20 @@ void MainWindow::resizeEvent(QResizeEvent *event)
         static QLabel* label = new QLabel();
         ui->statusBar->insertPermanentWidget(0, label);
 
-        label->setText(QString("MainWindow width = %1, height = %2").arg(width()).arg(height()));
+        label->setText(QString("MainWindow x = %1, y = %2, width = %3, height = %4").arg(x()).arg(y()).arg(width()).arg(height()));
+    }
+}
+
+void MainWindow::moveEvent(QMoveEvent *event)
+{
+    Q_UNUSED(event);
+
+    if(Config::instance().getDebug())
+    {
+        static QLabel* label = new QLabel();
+        ui->statusBar->insertPermanentWidget(0, label);
+
+        label->setText(QString("MainWindow x = %1, y = %2").arg(x()).arg(y()));
     }
 }
 
@@ -997,4 +961,18 @@ void MainWindow::on_actionShow_hide_filters_panel_triggered()
 {
     if(m_player->isVisible())
         m_player->showHideFilters();
+}
+
+void MainWindow::on_copyToClipboard_pushButton_clicked()
+{
+    QGuiApplication::clipboard()->setText(ui->fileNamesBox->currentText());
+}
+
+void MainWindow::on_setupFilters_pushButton_clicked()
+{
+    m_plotsChooser->setVisible(!m_plotsChooser->isVisible());
+    if(m_plotsChooser->isVisible()) {
+        auto newGeometry = QStyle::alignedRect(Qt::LayoutDirectionAuto, Qt::AlignCenter, m_plotsChooser->size(), geometry());
+        m_plotsChooser->setGeometry(newGeometry);
+    }
 }

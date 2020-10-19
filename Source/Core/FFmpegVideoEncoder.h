@@ -16,12 +16,22 @@ public:
     typedef QPair<QString, QString> MetadataEntry;
     typedef QList<MetadataEntry> Metadata;
 
+    struct Source {
+        int width;
+        int height;
+        int bitrate = { 0 };
+        int num;
+        int den;
+        Metadata metadata;
+        std::function<std::shared_ptr<AVPacket>()> getPacket;
+    };
+
     explicit FFmpegVideoEncoder(QObject *parent = nullptr);
     void setMetadata(const QList<MetadataEntry>& metadata);
 signals:
 
 public slots:
-    void makeVideo(const QString& video, int width, int height, int bitrate, int num, int den, std::function<AVPacket* ()> getPacket, const QByteArray& attachment, const QString& attachmentName);
+    void makeVideo(const QString& video, const QVector<Source>& sources, const QByteArray& attachment, const QString& attachmentName);
 
 private:
     Metadata m_metadata;

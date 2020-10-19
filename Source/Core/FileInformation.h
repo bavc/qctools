@@ -19,6 +19,7 @@
 #include <QFile>
 #include <QSharedPointer>
 #include <QFileInfo>
+#include <QSize>
 class CommonStats;
 class StreamsStats;
 class FormatStats;
@@ -46,7 +47,9 @@ public:
 
     // Constructor/Destructor
                                 FileInformation             (SignalServer* signalServer, const QString &fileName,
-                                                             activefilters ActiveFilters, activealltracks ActiveAllTracks, int FrameCount=0);
+                                                             activefilters ActiveFilters, activealltracks ActiveAllTracks,
+                                                             QMap<QString, std::tuple<QString, QString, QString, QString, int>> activePanels,
+                                                             int FrameCount=0);
                                 ~FileInformation            ();
 
     // Parsing
@@ -63,6 +66,7 @@ public:
 
     activefilters               ActiveFilters;
     activealltracks             ActiveAllTracks;
+
     size_t                      ReferenceStream_Pos_Get     () const {return ReferenceStream_Pos;}
     int                         Frames_Count_Get            (size_t Stats_Pos=(size_t)-1);
     int                         Frames_Pos_Get              (size_t Stats_Pos=(size_t)-1);
@@ -132,6 +136,8 @@ public:
 
     void readStats(QIODevice& StatsFromExternalData_FileName, bool StatsFromExternalData_FileName_IsCompressed);
 
+    QSize panelSize() const;
+    const QMap<std::string, int>& panelOutputsByTitle() const;
 public Q_SLOTS:
 
     void checkFileUploaded(const QString& fileName);
@@ -181,8 +187,11 @@ private:
     bool m_autoUpload;
     bool m_hasStats;
     bool m_commentsUpdated;
+    QSize m_panelSize;
 
     activefilters m_exportFilters;
+
+    QMap<std::string, int> m_panelOutputsByTitle;
 };
 
 #endif // GUI_FileInformation_H

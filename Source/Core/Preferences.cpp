@@ -11,6 +11,10 @@
 #include <QDataStream>
 #include <QDebug>
 #include <QSettings>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 #include "qblowfish.h"
 
@@ -26,10 +30,13 @@ QString KeySignalServerPassword = "SignalServerPassword";
 
 QString KeyActiveFilters = "ActiveFilters";
 QString KeyActiveAllTracks = "ActiveAllTracks";
+QString KeyActivePanels = "ActivePanels";
 QString KeyFilterSelectorsOrder = "filterSelectorsOrder";
 
 Preferences::Preferences(QObject *parent) : QObject(parent)
 {
+    Q_INIT_RESOURCE(coreresources);
+
     static struct RegisterMetatypes {
         RegisterMetatypes() {
             qRegisterMetaTypeStreamOperators<FilterSelectorsOrder>("FilterSelectorsOrder");
@@ -64,6 +71,95 @@ void Preferences::setActiveAllTracks(const activealltracks &alltracks)
 {
     QSettings settings;
     settings.setValue(KeyActiveAllTracks, (uint) alltracks.to_ulong());
+}
+
+QMap<QString, std::tuple<QString, QString, QString, QString, int>> Preferences::getActivePanels() const
+{
+    auto activePanelsMap = QMap<QString, std::tuple<QString, QString, QString, QString, int>>();
+    for(auto panelInfo : availablePanels())
+    {
+        if(activePanels().contains(panelInfo.name))
+            activePanelsMap[panelInfo.name] = std::tuple<QString, QString, QString, QString, int>(panelInfo.filterchain, panelInfo.version, panelInfo.yaxis, panelInfo.legend, panelInfo.panelType);
+    }
+    return activePanelsMap;
+}
+
+QSet<QString> Preferences::activePanels() const
+{
+    QSettings settings;
+
+    auto panelsCount = settings.value(KeyActivePanels + "Count", -1).toInt();
+
+    if(panelsCount == -1) {
+        return QSet<QString>{ QString("Tiled Center Column") };
+    }
+
+    QStringList panels;
+    auto count = settings.beginReadArray(KeyActivePanels);
+    for(auto i = 0; i < count; ++i)
+    {
+        settings.setArrayIndex(i);
+        auto panelName = settings.value("panel").toString();
+
+        panels << panelName;
+    }
+    settings.endArray();
+
+    QSet<QString> A;
+    for (auto it = panels.begin(); it != panels.end(); ++it)
+        A.insert(*it);
+    return A;
+}
+
+void Preferences::setActivePanels(const QSet<QString> &activePanels)
+{
+    QSettings settings;
+    settings.beginWriteArray(KeyActivePanels);
+
+    auto activePanelsList = activePanels.toList();
+    for(auto i = 0; i < activePanelsList.size(); ++i)
+    {
+        settings.setArrayIndex(i);
+        settings.setValue("panel", activePanelsList.at(i));
+    }
+
+    settings.endArray();
+
+    settings.setValue(KeyActivePanels + "Count", activePanels.size());
+}
+
+QList<PanelInfo> Preferences::availablePanels() const
+{
+    QList<PanelInfo> panels;
+
+    QFile file(":/panels.json");
+    if(file.exists() && file.open(QFile::ReadOnly))
+    {
+        QJsonParseError error;
+        QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &error);
+        if(error.error == QJsonParseError::NoError)
+        {
+            for(auto elem : doc.array()) {
+                auto panel = elem.toObject();
+                auto panelName = panel.value("name").toString();
+                auto panelFilterchain = panel.value("filterchain").toString();
+                auto panelYAxis = panel.value("yaxis").toString();
+                auto panelVersion = panel.value("version").toString();
+                auto panelType = panel.value("panel_type").toString() == "audio" ?
+                            1 /* AVMEDIA_TYPE_AUDIO */ : 0 /* AVMEDIA_TYPE_VIDEO */;
+                auto legend = panel.value("legend").toString();
+
+                PanelInfo panelInfo { panelName, panelYAxis, panelFilterchain, panelVersion, legend, panelType };
+                panels.append(panelInfo);
+
+            }
+
+        } else {
+            qDebug() << "parse error: " << error.errorString() << error.offset;
+        }
+    }
+
+    return panels;
 }
 
 FilterSelectorsOrder Preferences::loadFilterSelectorsOrder()
@@ -225,22 +321,27 @@ void Preferences::sync()
 
 QDataStream &operator<<(QDataStream &out, const FilterSelectorsOrder &order) {
 
-    qDebug() << "serializing total " << order.length() << ": \n";
+    qDebug() << "*** serializing filters order... ***";
 
     for(auto item : order) {
-        qDebug() << "g: " << std::get<0>(item) << ", t: " << std::get<1>(item);;
+        qDebug() << "\tgroup: " << std::get<0>(item) << ", type: " << std::get<1>(item);;
     }
 
     for(auto filterInfo : order)
         out << std::get<0>(filterInfo) << std::get<1>(filterInfo);
 
+    qDebug() << "**** serializing filters order: total " << order.length() << " done ****";
+
     return out;
 }
 QDataStream &operator>>(QDataStream &in, FilterSelectorsOrder &order) {
+
+    qDebug() << "*** deserializing filter order... ***";
+
     while(!in.atEnd())
     {
-        int group;
-        int type;
+        quint64 group;
+        quint64 type;
         in >> group;
         in >> type;
 
@@ -249,11 +350,11 @@ QDataStream &operator>>(QDataStream &in, FilterSelectorsOrder &order) {
             order.push_back(entry);
     }
 
-    qDebug() << "deserialized: total " << order.length() << "\n";
-
     for(auto item : order) {
-        qDebug() << "g: " << std::get<0>(item) << ", t: " << std::get<1>(item);
+        qDebug() << "\tgroup: " << std::get<0>(item) << ", type: " << std::get<1>(item);
     }
+
+    qDebug() << "**** deserializing filters order: total " << order.length() << "done ****";
 
     return in;
 }
