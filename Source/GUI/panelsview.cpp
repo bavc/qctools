@@ -268,10 +268,15 @@ void PanelsView::paintEvent(QPaintEvent *e)
 
 void PanelsView::wheelEvent(QWheelEvent *event)
 {
+    if(getPanelsCount() == 0)
+        return;
+
+    auto panelImageHeight = getPanelImage(0).height();
+
     if(event->delta() > 0) {
         auto newHeight = height() + 10;
-        if(newHeight > getPanelImage(0).height())
-            newHeight = getPanelImage(0).height();
+        if(newHeight > panelImageHeight)
+            newHeight = panelImageHeight;
 
         m_panelPixmap = QPixmap();
         this->setMinimumHeight(newHeight);
