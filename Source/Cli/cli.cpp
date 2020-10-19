@@ -20,6 +20,7 @@ int Cli::exec(QCoreApplication &a)
     bool showLongHelp = false;
     bool showShortHelp = false;
     bool showVersion = false;
+    bool createMkv = false;
 
     bool uploadToSignalServer = false;
     bool forceUploadToSignalServer = false;
@@ -58,6 +59,12 @@ int Cli::exec(QCoreApplication &a)
         } else if(a.arguments().at(i) == "-v")
         {
             showVersion = true;
+        } else if (a.arguments().at(i) == "-s")
+        {
+            createMkv = false;
+        } else if (a.arguments().at(i) == "-a")
+        {
+            createMkv = true;
         }
     }
 
@@ -96,7 +103,12 @@ int Cli::exec(QCoreApplication &a)
                 << "-o <output file>" << std::endl
                 << "    Specifies output file path, including extension. If no output file is" << std::endl
                 << "    declared, qctools will create an output named after the input file, suffixed" << std::endl
-                << "    with \".qctools.xml.gz\"." << std::endl
+                << "    with \".qctools.xml.gz\" (if -s used) or  \".qctools.mkv\" (if -a used)." << std::endl
+                << "-s" << std::endl
+                << "    Stats only (no thumbnails, no panels)." << std::endl
+                << "    Is default." << std::endl
+                << "-a" << std::endl
+                << "    All (stats + thumbnails + panels)." << std::endl
                 << "-f" << std::endl
                 << "    Specifies '+'-separated string of filters used. Example: -f signalstats+cropdetect" << std::endl
                 << "    The filters used in " << appName << " may also be declared via the qctools-gui (see the" << std::endl
@@ -190,10 +202,10 @@ int Cli::exec(QCoreApplication &a)
     if(input.isEmpty())
         return NoInput;
 
-    if(!input.endsWith(".qctools.xml.gz")) // skip output if input is already .qctools.xml.gz
+    if(!input.endsWith(".qctools.xml.gz") && !input.endsWith(".qctools.mkv")) // skip output if input is already .qctools.xml.gz
     {
         if(output.isEmpty())
-            output = input + ".qctools.xml.gz";
+            output = input + (createMkv ? ".qctools.mkv" : ".qctools.xml.gz");
     }
 
     bool mkvReport = output.endsWith(".qctools.mkv");
