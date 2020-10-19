@@ -26,7 +26,7 @@ int Cli::exec(QCoreApplication &a)
 
     QString checkUploadFileName;
 
-    for(int i = 0; i < a.arguments().length(); ++i)
+    for(int i = 1; i < a.arguments().length(); ++i)
     {
         if(a.arguments().at(i) == "-i" && (i + 1) < a.arguments().length())
         {
