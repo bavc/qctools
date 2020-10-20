@@ -168,15 +168,17 @@ private Q_SLOTS:
 
     void on_Toolbar_visibilityChanged(bool visible);
 
-    void on_actionImport_XmlGz_Prompt_triggered();
+    void on_actionExport_Mkv_Prompt_triggered();
+
+    void on_actionExport_Mkv_Sidecar_triggered();
+
+    void on_actionExport_Mkv_SidecarAll_triggered();
 
     void on_actionExport_XmlGz_Prompt_triggered();
 
     void on_actionExport_XmlGz_Sidecar_triggered();
 
     void on_actionExport_XmlGz_SidecarAll_triggered();
-
-    void on_actionExport_XmlGz_Custom_triggered();
 
     void on_actionPrint_triggered();
 
@@ -233,8 +235,6 @@ private Q_SLOTS:
     void on_actionClear_Recent_History_triggered();
 
     void on_actionReveal_file_location_triggered();
-
-    void on_actionExport_Mkv_Prompt_triggered();
 
     void on_actionGrab_frame_triggered();
 

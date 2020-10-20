@@ -180,12 +180,6 @@
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
    </widget>
-   <widget class="QMenu" name="menuImport">
-    <property name="title">
-     <string>Import</string>
-    </property>
-    <addaction name="actionImport_XmlGz_Prompt"/>
-   </widget>
    <widget class="QMenu" name="menuExport">
     <property name="title">
      <string>Export</string>
@@ -193,11 +187,21 @@
     <property name="toolTipsVisible">
      <bool>true</bool>
     </property>
-    <addaction name="actionExport_XmlGz_Prompt"/>
+    <widget class="QMenu" name="menuLegacy_outputs">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Legacy outputs</string>
+     </property>
+     <addaction name="actionExport_XmlGz_Prompt"/>
+     <addaction name="actionExport_XmlGz_Sidecar"/>
+     <addaction name="actionExport_XmlGz_SidecarAll"/>
+    </widget>
     <addaction name="actionExport_Mkv_Prompt"/>
-    <addaction name="actionExport_XmlGz_Sidecar"/>
-    <addaction name="actionExport_XmlGz_SidecarAll"/>
-    <addaction name="actionExport_XmlGz_Custom"/>
+    <addaction name="actionExport_Mkv_Sidecar"/>
+    <addaction name="actionExport_Mkv_SidecarAll"/>
+    <addaction name="menuLegacy_outputs"/>
     <addaction name="separator"/>
     <addaction name="actionSignalServer_status"/>
     <addaction name="actionUploadToSignalServer"/>
@@ -213,7 +217,6 @@
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
-   <addaction name="menuImport"/>
    <addaction name="menuOptions"/>
    <addaction name="menuExport"/>
    <addaction name="menuHelp"/>
@@ -414,20 +417,10 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>To .qctools.xml.gz...</string>
+    <string>To QCTools Report (.qctools.xml.gz)...</string>
    </property>
    <property name="menuRole">
     <enum>QAction::NoRole</enum>
-   </property>
-  </action>
-  <action name="actionImport_XmlGz_Prompt">
-   <property name="text">
-    <string>From .qctools.xml.gz...</string>
-   </property>
-  </action>
-  <action name="actionPreferences">
-   <property name="text">
-    <string>Preferences</string>
    </property>
   </action>
   <action name="actionExport_XmlGz_Sidecar">
@@ -435,23 +428,47 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>To sidecar .qctools.xml.gz</string>
+    <string>To sidecar QCTools Report (.qctools.xml.gz)</string>
+   </property>
+  </action>
+  <action name="actionExport_XmlGz_SidecarAll">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>All open files to sidecar QCTools Report (.qctools.xml.gz)</string>
+   </property>
+  </action>
+  <action name="actionExport_Mkv_Prompt">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>To QCTools Report (.qctools.mkv)...</string>
+   </property>
+  </action>
+  <action name="actionExport_Mkv_Sidecar">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>To sidecar QCTools Report (.qctools.mkv)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="actionExport_XmlGz_Custom">
+  <action name="actionExport_Mkv_SidecarAll">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>To prefered directory</string>
+    <string>All open files to sidecar QCTools Report (.qctools.mkv)</string>
    </property>
   </action>
-  <action name="actionExport_XmlGz_SidecarAll">
+  <action name="actionPreferences">
    <property name="text">
-    <string>To sidecar .qctools.xml.gz (All files)</string>
+    <string>Preferences</string>
    </property>
   </action>
   <action name="actionZoomOne">
@@ -552,11 +569,6 @@
   <action name="actionReveal_file_location">
    <property name="text">
     <string>Reveal file location</string>
-   </property>
-  </action>
-  <action name="actionExport_Mkv_Prompt">
-   <property name="text">
-    <string>To .qctools.mkv..</string>
    </property>
   </action>
   <action name="actionPlay_Pause">
