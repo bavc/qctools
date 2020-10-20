@@ -543,8 +543,11 @@ std::string FilterSelector::FiltersList_currentOptionChanged(int Picture_Current
                         break;
                     }
                     Modified_String.erase(InsertPos, BytesCount);
-                    if (Filters[Picture_Current].Args[OptionPos].Type==Args_Type_ClrPck)
-                        Modified_String.insert(InsertPos, ("0x"+QString::number(m_filterOptions.ColorValue[OptionPos], 16)).toUtf8().data());
+                    if (Filters[Picture_Current].Args[OptionPos].Type==Args_Type_ClrPck) {
+                        auto colorValue = QColor::fromRgb(m_filterOptions.ColorValue[OptionPos]).name(QColor::HexRgb).replace("#", "0x");
+
+                        Modified_String.insert(InsertPos, colorValue.toUtf8().data());
+                    }
                     else
                         Modified_String.insert(InsertPos, WithRadios[OptionPos]);
                 }
