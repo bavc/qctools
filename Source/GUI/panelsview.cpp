@@ -144,6 +144,8 @@ void PanelsView::onPickerMoved(const QPointF &pos)
         Q_EMIT cursorMoved( idx );
 }
 
+QColor fillColor("Cornsilk");
+
 void PanelsView::paintEvent(QPaintEvent *e)
 {
     QPainter p(this);
@@ -200,20 +202,25 @@ void PanelsView::paintEvent(QPaintEvent *e)
 
     if(m_panelPixmap.isNull())
     {
+        auto availableWidth = width() - (contentsMargins().left() + m_leftOffset + 1) - (contentsMargins().right() + m_leftOffset - 1);
+        auto availableHeight = height() - lineWidth();
+
         auto panelsCount = getPanelsCount();
         if(panelsCount == 0) {
+            m_panelPixmap = QPixmap(availableWidth, availableHeight);
+            m_panelPixmap.fill(fillColor);
+
+            p.drawPixmap(contentsMargins().left() + m_leftOffset + 1, lineWidth(), m_panelPixmap);
             return;
         }
 
-        auto availableWidth = width() - (contentsMargins().left() + m_leftOffset + 1) - (contentsMargins().right() + m_leftOffset - 1);
         auto sx = m_actualWidth == 0 ? 1 : ((qreal) availableWidth / m_actualWidth);
-        auto availableHeight = height() - lineWidth();
         auto sy = (qreal)availableHeight / getPanelImage(0).height();
 
         auto dx = availableWidth - m_actualWidth;
 
         m_panelPixmap = QPixmap(availableWidth, availableHeight);
-        m_panelPixmap.fill(Qt::black);
+        m_panelPixmap.fill(fillColor);
         QPainter p(&m_panelPixmap);
 
         /*
