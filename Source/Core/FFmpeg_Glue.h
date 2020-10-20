@@ -204,7 +204,6 @@ public:
     // Images
     Image Image_Get(size_t Pos) const;
 
-    std::vector<FFmpeg_Glue::AVFramePtr>& GetPanelFrames(int outputIndex) const;
     int GetPanelFramesCount(int outputIndex) const;
     FFmpeg_Glue::AVFramePtr GetPanelFrame(int outputIndex, int index) const;
     QSize GetPanelFrameSize(int outputIndex, int index) const;

@@ -240,10 +240,6 @@ void FFmpeg_Glue::outputdata::Process(AVFrame* DecodedFrame_)
         Stats->StatsFromFrame(FilteredFrame.get(), Stream->codec->width, Stream->codec->height);
     }
 
-    if(OutputMethod == Output_Panels && OutputFrame)
-    {
-        qDebug() << "panels";
-    }
     // Scale
     ApplyScale(OutputFrame);
 
@@ -416,8 +412,9 @@ void FFmpeg_Glue::outputdata::AddThumbnail()
 void FFmpeg_Glue::outputdata::AddPanel()
 {
     if(OutputFrame) {
+
         Panels.push_back(OutputFrame);
-        qDebug() << "added panel: " << index << this << OutputFrame->width << " x " << OutputFrame->height << " duration " << OutputFrame->pkt_duration;
+        // qDebug() << "added panel: " << index << this << OutputFrame->width << " x " << OutputFrame->height << " duration " << OutputFrame->pkt_duration;
     }
 }
 
@@ -850,26 +847,25 @@ FFmpeg_Glue::Image FFmpeg_Glue::Image_Get(size_t Pos) const
     return OutputDatas[Pos]->image;
 }
 
-std::vector<FFmpeg_Glue::AVFramePtr>& FFmpeg_Glue::GetPanelFrames(int outputIndex) const
-{
-    return OutputDatas[outputIndex]->Panels;
-}
-
 int FFmpeg_Glue::GetPanelFramesCount(int outputIndex) const
 {
+    QMutexLocker locker(mutex);
+
     return OutputDatas[outputIndex]->Panels.size();
 }
 
 FFmpeg_Glue::AVFramePtr FFmpeg_Glue::GetPanelFrame(int outputIndex, int index) const
 {
+    QMutexLocker locker(mutex);
+
     auto output = OutputDatas[outputIndex];
-    // qDebug() << "GetPanelFrame: " << outputIndex << index << output;
-    // qDebug() << "GetPanelFrame: " << output->Panels.size();
     return output->Panels[index];
 }
 
 QSize FFmpeg_Glue::GetPanelFrameSize(int outputIndex, int index) const
 {
+    QMutexLocker locker(mutex);
+
     auto output = OutputDatas[outputIndex];
     return QSize(output->Panels[index]->width, output->Panels[index]->height);
 }
@@ -1121,6 +1117,7 @@ bool FFmpeg_Glue::NextFrame()
     {
         AVPacket TempPacket=*Packet;
         auto packetStreamIndex = Packet->stream_index;
+        // qDebug() << "streamIndex: " << packetStreamIndex;
 
         if (Packet->stream_index<InputDatas.size() && InputDatas[packetStreamIndex] && InputDatas[packetStreamIndex]->Enabled)
         {
