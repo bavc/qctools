@@ -351,10 +351,6 @@ void MainWindow::Ui_Init()
     ui->actionWindowOut->setVisible(false);
     ui->actionPrint->setVisible(false);
 
-    // Not implemented action
-    if (ui->actionExport_XmlGz_Custom)
-        ui->actionExport_XmlGz_Custom->setVisible(false);
-
     QStringList recentFiles = preferences->recentFiles();
 
     int recentFilesIndex = recentFiles.length();
@@ -406,9 +402,6 @@ void MainWindow::configureZoom()
         }
 
         ui->actionGoTo->setEnabled(!Files.empty());
-        ui->actionExport_XmlGz_Prompt->setEnabled(!Files.empty());
-        ui->actionExport_XmlGz_Sidecar->setEnabled(!Files.empty());
-        ui->actionExport_XmlGz_Custom->setEnabled(!Files.empty());
         //ui->actionPrint->setEnabled(!Files.empty());
         return;
     }
@@ -417,9 +410,6 @@ void MainWindow::configureZoom()
     ui->actionZoomOut->setEnabled(true);
     ui->actionZoomIn->setEnabled( isPlotZoomable() );
     ui->actionGoTo->setEnabled(true);
-    ui->actionExport_XmlGz_Prompt->setEnabled(true);
-    ui->actionExport_XmlGz_Sidecar->setEnabled(true);
-    ui->actionExport_XmlGz_Custom->setEnabled(true);
     //ui->actionPrint->setEnabled(true);
 }
 

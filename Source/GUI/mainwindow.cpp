@@ -231,19 +231,6 @@ void MainWindow::on_Toolbar_visibilityChanged(bool visible)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_actionImport_XmlGz_Prompt_triggered()
-{
-    QString FileName=QFileDialog::getOpenFileName(this, "Import from .qctools.xml.gz / .qctools.mkv", "",
-                                                  "Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml);;\
-                                                   Statistic files with thumbnails (*.qctools.mkv)",
-                                                   0, QFileDialog::DontUseNativeDialog);
-    if (FileName.size()==0)
-        return;
-
-    processFile(FileName);
-}
-
-//---------------------------------------------------------------------------
 void MainWindow::on_actionExport_XmlGz_Prompt_triggered()
 {
     if (getFilesCurrentPos()>=Files.size() || !Files[getFilesCurrentPos()])
@@ -257,6 +244,37 @@ void MainWindow::on_actionExport_XmlGz_Prompt_triggered()
     statusBar()->showMessage("Exported to "+FileName);
 }
 
+//---------------------------------------------------------------------------
+void MainWindow::on_actionExport_XmlGz_Sidecar_triggered()
+{
+    if (getFilesCurrentPos() >= Files.size() || !Files[getFilesCurrentPos()])
+        return;
+
+    QString FileName = Files[getFilesCurrentPos()]->fileName() + ".qctools.xml.gz";
+
+    Files[getFilesCurrentPos()]->Export_XmlGz(FileName, Prefs->ActiveFilters);
+    statusBar()->showMessage("Exported to " + FileName);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionExport_XmlGz_SidecarAll_triggered()
+{
+    for (size_t Pos = 0; Pos < Files.size(); ++Pos)
+    {
+        auto file = Files[Pos];
+        bool parsed = file->parsed();
+        if (!parsed)
+            continue; // Does not export if not fully parsed
+
+        QString FileName = file->fileName() + ".qctools.xml.gz";
+
+        file->Export_XmlGz(FileName, Prefs->ActiveFilters);
+    }
+
+    statusBar()->showMessage("All files exported to sidecar file");
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::on_actionExport_Mkv_Prompt_triggered()
 {
     if (getFilesCurrentPos()>=Files.size() || !Files[getFilesCurrentPos()])
@@ -271,42 +289,33 @@ void MainWindow::on_actionExport_Mkv_Prompt_triggered()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_actionExport_XmlGz_Sidecar_triggered()
+void MainWindow::on_actionExport_Mkv_Sidecar_triggered()
 {
-    if (getFilesCurrentPos()>=Files.size() || !Files[getFilesCurrentPos()])
+    if (getFilesCurrentPos() >= Files.size() || !Files[getFilesCurrentPos()])
         return;
 
-    QString FileName=Files[getFilesCurrentPos()]->fileName() + ".qctools.xml.gz";
+    QString FileName = Files[getFilesCurrentPos()]->fileName() + ".qctools.mkv";
 
-    Files[getFilesCurrentPos()]->Export_XmlGz(FileName, Prefs->ActiveFilters);
-    statusBar()->showMessage("Exported to "+FileName);
-
+    Files[getFilesCurrentPos()]->Export_QCTools_Mkv(FileName, Prefs->ActiveFilters);
+    statusBar()->showMessage("Exported to " + FileName);
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_actionExport_XmlGz_SidecarAll_triggered()
+void MainWindow::on_actionExport_Mkv_SidecarAll_triggered()
 {
-    for (size_t Pos=0; Pos<Files.size(); ++Pos)
+    for (size_t Pos = 0; Pos < Files.size(); ++Pos)
     {
-        QString FileName=Files[Pos]->fileName() + ".qctools.xml.gz";
+        auto file = Files[Pos];
+        bool parsed = file->parsed();
+        if (!parsed)
+            continue; // Does not export if not fully parsed
 
-        Files[Pos]->Export_XmlGz(FileName, Prefs->ActiveFilters);
+        QString FileName = file->fileName() + ".qctools.mkv";
+
+        file->Export_QCTools_Mkv(FileName, Prefs->ActiveFilters);
     }
 
     statusBar()->showMessage("All files exported to sidecar file");
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_actionExport_XmlGz_Custom_triggered()
-{
-    if (getFilesCurrentPos()>=Files.size() || !Files[getFilesCurrentPos()])
-        return;
-
-    // TODO
-    // Temp
-    QString Name=Files[getFilesCurrentPos()]->fileName();
-    Name.replace(":", "");
-    statusBar()->showMessage("(Not implemeted) Export to ~/.qctools"+Name+".qctools.xml.gz");
 }
 
 //---------------------------------------------------------------------------
@@ -320,12 +329,16 @@ void MainWindow::on_actionFilesList_triggered()
 {
     if (ui->actionGoTo)
         ui->actionGoTo->setVisible(false);
+    if (ui->menuLegacy_outputs)
+        ui->menuLegacy_outputs->setVisible(false);
     if (ui->actionExport_XmlGz_Prompt)
         ui->actionExport_XmlGz_Prompt->setVisible(false);
     if (ui->actionExport_XmlGz_Sidecar)
         ui->actionExport_XmlGz_Sidecar->setVisible(false);
-    if (ui->actionExport_XmlGz_Custom)
-        ui->actionExport_XmlGz_Custom->setVisible(false);
+    if (ui->actionExport_Mkv_Prompt)
+        ui->actionExport_Mkv_Prompt->setVisible(false);
+    if (ui->actionExport_Mkv_Sidecar)
+        ui->actionExport_Mkv_Sidecar->setVisible(false);
     if (ui->actionPrint)
         ui->actionPrint->setVisible(false);
     if (ui->actionZoomIn)
@@ -353,6 +366,7 @@ void MainWindow::on_actionFilesList_triggered()
     if (FilesListArea && !Files.empty())
         FilesListArea->show();
 
+    updateExportAllAction();
     TimeOut();
 }
 
@@ -365,10 +379,10 @@ void MainWindow::on_actionGraphsLayout_triggered()
         ui->actionExport_XmlGz_Prompt->setVisible(true);
     if (ui->actionExport_XmlGz_Sidecar)
         ui->actionExport_XmlGz_Sidecar->setVisible(true);
-    //if (ui->actionExport_XmlGz_Custom) // Not implemented action
-    //    ui->actionExport_XmlGz_Custom->setVisible(true);
-    if (ui->actionExport_XmlGz_Prompt)
-        ui->actionExport_XmlGz_Prompt->setVisible(true);
+    if (ui->actionExport_Mkv_Prompt)
+        ui->actionExport_Mkv_Prompt->setVisible(true);
+    if (ui->actionExport_Mkv_Sidecar)
+        ui->actionExport_Mkv_Sidecar->setVisible(true);
     //if (ui->actionPrint)
     //    ui->actionPrint->setVisible(true);
     if (ui->actionZoomIn)
@@ -397,6 +411,7 @@ void MainWindow::on_actionGraphsLayout_triggered()
     if (ui->fileNamesBox)
         ui->fileNamesBox->setCurrentIndex(getFilesCurrentPos());
 
+    updateExportAllAction();
     TimeOut();
 }
 
@@ -472,6 +487,7 @@ void MainWindow::on_fileNamesBox_currentIndexChanged(int index)
 
     createGraphsLayout();
     Update();
+    updateExportActions();
 }
 
 //---------------------------------------------------------------------------
@@ -734,23 +750,25 @@ void MainWindow::updateSignalServerUploadProgress(qint64 value, qint64 total)
 
 void MainWindow::updateExportActions()
 {
+    bool exportEnabled = false;
     if (getFilesCurrentPos() != (size_t)-1)
     {
         auto file = Files[getFilesCurrentPos()];
         bool parsed = file->parsed();
         bool hasStats = file->hasStats();
-        bool exportEnabled = hasStats || parsed;
-
-        ui->actionExport_Mkv_Prompt->setEnabled(exportEnabled);
-        ui->actionExport_XmlGz_Custom->setEnabled(exportEnabled);
-        ui->actionExport_XmlGz_Prompt->setEnabled(exportEnabled);
-        ui->actionExport_XmlGz_Sidecar->setEnabled(exportEnabled);
+        exportEnabled = hasStats || parsed;
     }
+    ui->actionExport_XmlGz_Prompt->setEnabled(exportEnabled);
+    ui->actionExport_XmlGz_Sidecar->setEnabled(exportEnabled);
+    ui->actionExport_Mkv_Prompt->setEnabled(exportEnabled);
+    ui->actionExport_Mkv_Sidecar->setEnabled(exportEnabled);
+
+    ui->menuLegacy_outputs->setEnabled(ui->actionExport_XmlGz_Prompt->isEnabled() || ui->actionExport_XmlGz_Sidecar->isEnabled() || ui->actionExport_XmlGz_SidecarAll->isEnabled());
 }
 
 void MainWindow::updateExportAllAction()
 {
-    bool allParsedOrHaveStats = true;
+    bool allParsedOrHaveStats = !Files.empty();
     for(auto i = 0; i < Files.size(); ++i) {
         bool parsedOrHasStats = Files[i]->parsed() || Files[i]->hasStats();
         if(!parsedOrHasStats) {
@@ -760,6 +778,9 @@ void MainWindow::updateExportAllAction()
     }
 
     ui->actionExport_XmlGz_SidecarAll->setEnabled(allParsedOrHaveStats);
+    ui->actionExport_Mkv_SidecarAll->setEnabled(allParsedOrHaveStats);
+
+    ui->menuLegacy_outputs->setEnabled(ui->actionExport_XmlGz_Prompt->isEnabled() || ui->actionExport_XmlGz_Sidecar->isEnabled() || ui->actionExport_XmlGz_SidecarAll->isEnabled());
 }
 
 void MainWindow::showPlayer()

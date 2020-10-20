@@ -101,6 +101,7 @@ void MainWindow::closeFile()
         else
             setFilesCurrentPos(getFilesCurrentPos()<Files.size()?getFilesCurrentPos():getFilesCurrentPos()-1);
 
+        updateExportActions();
         TimeOut();
     }
 }
@@ -124,6 +125,7 @@ void MainWindow::closeAllFiles()
     createDragDrop();
     ui->actionFilesList->setChecked(false);
     ui->actionGraphsLayout->setChecked(false);
+    updateExportAllAction();
 }
 
 //---------------------------------------------------------------------------
