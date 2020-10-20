@@ -181,7 +181,7 @@ private:
 
     int m_index;
     QString m_exportFileName;
-    bool m_parsed;
+    std::atomic<bool> m_parsed;
 
     bool m_autoCheckFileUploaded;
     bool m_autoUpload;

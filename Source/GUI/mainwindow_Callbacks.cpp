@@ -107,6 +107,8 @@ void MainWindow::TimeOut ()
         CommonStats* Stats=Files[getFilesCurrentPos()]->ReferenceStat();
         if (Stats && Stats->State_Get()<1)
         {
+            qDebug() << "reading stats.... ";
+
             stringstream Message;
             Message<<"Parsing frame "<<Stats->x_Current;
             if (Stats->x_Current_Max)
@@ -116,8 +118,18 @@ void MainWindow::TimeOut ()
                 StatusBar->showMessage((Message.str()+Message_Total.str()).c_str());
             QTimer::singleShot(250, this, SLOT(TimeOut()));
         }
+        else if(!Files[getFilesCurrentPos()]->parsed())
+        {
+            qDebug() << "parsing.... ";
+            QStatusBar* StatusBar=statusBar();
+            if (StatusBar)
+                StatusBar->showMessage("Parsing...");
+            QTimer::singleShot(250, this, SLOT(TimeOut()));
+        }
         else
         {
+            qDebug() << "parsing done.... ";
+
             QStatusBar* StatusBar=statusBar();
             if (StatusBar)
                 StatusBar->showMessage(("Parsing complete"+Message_Total.str()).c_str(), 10000);
