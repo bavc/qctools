@@ -17,6 +17,8 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QTimer>
+#include <QFileDialog>
+#include <QDesktopServices>
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -43,6 +45,16 @@ PreferencesDialog::PreferencesDialog(Preferences* preferences, SignalServerConne
 PreferencesDialog::~PreferencesDialog()
 {
     delete ui;
+}
+
+QString PreferencesDialog::QCvaultPathString() const
+{
+    return preferences->QCvaultPathString();
+}
+
+QString PreferencesDialog::defaultQCvaultPathString() const
+{
+    return preferences->defaultQCvaultPathString();
 }
 
 bool PreferencesDialog::isSignalServerEnabled() const
@@ -116,6 +128,19 @@ void PreferencesDialog::Load()
     ui->Tracks_Audio_First->setChecked(!ActiveAllTracks[Type_Audio]);
     ui->Tracks_Audio_All->setChecked(ActiveAllTracks[Type_Audio]);
 
+    if (QCvaultPathString().isEmpty())
+        ui->QCvaultPath_None->setChecked(true);
+    else if (QCvaultPathString()==defaultQCvaultPathString())
+    {
+        ui->QCvaultPath_lineEdit->setText(defaultQCvaultPathString());
+        ui->QCvaultPath_Default->setChecked(true);
+    }
+    else
+    {
+        ui->QCvaultPath_lineEdit->setText(QCvaultPathString());
+        ui->QCvaultPath_Custom->setChecked(true);
+    }
+
     ui->signalServerUrl_lineEdit->setText(signalServerUrlString());
     ui->signalServerLogin_lineEdit->setText(signalServerLogin());
     ui->signalServerPassword_lineEdit->setText(signalServerPassword());
@@ -135,6 +160,9 @@ void PreferencesDialog::Save()
     for (auto it = activePanelsNames.begin(); it != activePanelsNames.end(); ++it)
         A.insert(*it);
     preferences->setActivePanels(A);
+
+    preferences->setQCvaultPathString(ui->QCvaultPath_lineEdit->text());
+
     preferences->setSignalServerUrlString(ui->signalServerUrl_lineEdit->text());
     preferences->setSignalServerLogin(ui->signalServerLogin_lineEdit->text());
     preferences->setSignalServerPassword(ui->signalServerPassword_lineEdit->text());
@@ -259,4 +287,51 @@ void PreferencesDialog::on_signalServerUrl_lineEdit_editingFinished()
         ui->signalServerUrl_lineEdit->setText(url);
         ui->signalServerUrl_lineEdit->blockSignals(false);
     }
+}
+
+void PreferencesDialog::on_QCvaultPath_None_toggled(bool checked)
+{
+    if (checked)
+    {
+        ui->QCvaultPath_lineEdit->setText(QString());
+        ui->QCvaultPath_lineEdit->setEnabled(false);
+        ui->QCvaultPath_select->setEnabled(false);
+        ui->QCvaultPath_open->setEnabled(false);
+    }
+}
+
+void PreferencesDialog::on_QCvaultPath_Default_toggled(bool checked)
+{
+    if (checked)
+    {
+        ui->QCvaultPath_lineEdit->setText(defaultQCvaultPathString());
+        ui->QCvaultPath_lineEdit->setEnabled(false);
+        ui->QCvaultPath_select->setEnabled(false);
+        ui->QCvaultPath_open->setEnabled(true);
+    }
+}
+
+void PreferencesDialog::on_QCvaultPath_Custom_toggled(bool checked)
+{
+    if (checked)
+    {
+        //ui->QCvaultPath_lineEdit->setEnabled(true);
+        ui->QCvaultPath_select->setEnabled(true);
+        ui->QCvaultPath_open->setEnabled(true);
+    }
+}
+
+void PreferencesDialog::on_QCvaultPath_select_clicked(bool checked)
+{
+    QString Directory = QFileDialog::getExistingDirectory(this, "Select QCvault directory",
+                                                                ui->QCvaultPath_lineEdit->text(),
+                                                                QFileDialog::ShowDirsOnly
+                                                                | QFileDialog::DontResolveSymlinks);
+    if (!Directory.isEmpty())
+        ui->QCvaultPath_lineEdit->setText(Directory);
+}
+
+void PreferencesDialog::on_QCvaultPath_open_clicked(bool checked)
+{
+    QDesktopServices::openUrl(ui->QCvaultPath_lineEdit->text());
 }

@@ -49,6 +49,7 @@ public:
                                 FileInformation             (SignalServer* signalServer, const QString &fileName,
                                                              activefilters ActiveFilters, activealltracks ActiveAllTracks,
                                                              QMap<QString, std::tuple<QString, QString, QString, QString, int>> activePanels,
+                                                             const QString &cacheFileNamePrefix,
                                                              int FrameCount=0);
                                 ~FileInformation            ();
 
