@@ -101,7 +101,6 @@ void MainWindow::closeFile()
         else
             setFilesCurrentPos(getFilesCurrentPos()<Files.size()?getFilesCurrentPos():getFilesCurrentPos()-1);
 
-        updateExportActions();
         TimeOut();
     }
 }
