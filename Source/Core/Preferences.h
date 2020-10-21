@@ -57,6 +57,11 @@ public:
     bool isSignalServerAutoUploadEnabled() const;
     void setSignalServerAutoUploadEnabled(bool enabled);
 
+    QString QCvaultPathString(bool* IssueWithDefaultQCvaultPath = nullptr) const;
+    void setQCvaultPathString(const QString & urlString);
+    QString defaultQCvaultPathString() const;
+    QString createQCvaultFileNameString(const QString & input, const QString & cacheDir = QString()) const;
+
     QString signalServerUrlString() const;
     void setSignalServerUrlString(const QString & urlString);
 

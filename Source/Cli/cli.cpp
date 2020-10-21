@@ -2,6 +2,7 @@
 #include "version.h"
 #include "Core/FFmpegVideoEncoder.h"
 #include "Core/FFmpeg_Glue.h"
+#include <QDir>
 
 Cli::Cli() : indexOfStreamWithKnownFrameCount(0), statsFileBytesWritten(0), statsFileBytesTotal(0), statsFileBytesUploaded(0), statsFileBytesToUpload(0)
 {
@@ -12,6 +13,7 @@ int Cli::exec(QCoreApplication &a)
 {
     std::string appName = "qcli";
     std::string copyright = "Copyright (C): 2013-2020, BAVC.\nCopyright (C): 2018-2020, RiceCapades LLC & MediaArea.net SARL.";
+    Preferences prefs;
 
     Preferences prefs;
 
@@ -23,6 +25,8 @@ int Cli::exec(QCoreApplication &a)
     bool showShortHelp = false;
     bool showVersion = false;
     bool createMkv = true;
+    QString useQCvault;
+    bool ignoreQCvault = false;
     bool configIsSet = false;
     bool configHasIssues = false;
 
@@ -63,6 +67,76 @@ int Cli::exec(QCoreApplication &a)
         } else if(a.arguments().at(i) == "-v")
         {
             showVersion = true;
+        }
+        else if (a.arguments().at(i) == "-qcvault")
+        {
+            ++i;
+            if (i >= a.arguments().length())
+            {
+                std::cout << "Missing argument after last option." << std::endl;
+                configHasIssues = true;
+                continue;
+            }
+
+            useQCvault = a.arguments().at(i);
+            if (useQCvault == "default")
+            {
+                useQCvault = prefs.defaultQCvaultPathString();
+                if (useQCvault.isEmpty())
+                {
+                    std::cout << "QCvault location can not be found." << std::endl;
+                    configHasIssues = true;
+                    continue;
+                }
+            }
+        } else if (a.arguments().at(i) == "-clear-qcvault")
+        {
+            configIsSet = true;
+
+            prefs.setQCvaultPathString(QString());
+            useQCvault = prefs.QCvaultPathString();
+            if (!useQCvault.isEmpty())
+            {
+                std::cout << "QCvault location can not be saved." << std::endl;
+                configHasIssues = true;
+                continue;
+            }
+            std::cout << "QCvault cleared." << std::endl;
+        } else if (a.arguments().at(i) == "-set-qcvault")
+        {
+            ++i;
+            if (i >= a.arguments().length() || a.arguments().at(i).isEmpty())
+            {
+                std::cout << "Missing argument after last option." << std::endl;
+                configHasIssues = true;
+                continue;
+            }
+            configIsSet = true;
+
+            prefs.setQCvaultPathString(a.arguments().at(i));
+            useQCvault = prefs.QCvaultPathString();
+            if (useQCvault.isEmpty())
+            {
+                std::cout << "QCvault location can not be saved." << std::endl;
+                configHasIssues = true;
+                continue;
+            }
+            std::cout << "QCvault set to " << useQCvault.toStdString() << std::endl;
+        } else if (a.arguments().at(i) == "-show-qcvault")
+        {
+            configIsSet = true;
+            bool HasError;
+            auto QCvaultPathString = prefs.QCvaultPathString(&HasError);
+            if (HasError)
+            {
+                std::cout << "Default QCvault location not available, use -qcvault instead, analyzing stopped." << std::endl;
+                configHasIssues = true;
+                continue;
+            }
+            if (QCvaultPathString.isEmpty())
+                std::cout << "QCvault path is not set." << std::endl;
+            else
+                std::cout << "QCvault path is " << QCvaultPathString.toStdString() << '.' << std::endl;
         } else if (a.arguments().at(i) == "-s")
         {
             createMkv = false;
@@ -178,6 +252,21 @@ int Cli::exec(QCoreApplication &a)
         }
     }
 
+    // QCvault
+    if (!ignoreQCvault && useQCvault.isEmpty())
+    {
+        bool HasError;
+        useQCvault = prefs.QCvaultPathString(&HasError);
+        if (HasError)
+        {
+            std::cout << "App local data location not available, use -qcvault instead, analyzing stopped.. " << std::endl;
+            configHasIssues = true;
+        }
+    }
+
+    if (configHasIssues)
+        return InvalidInput;
+
     if(!showLongHelp)
     {
         if(a.arguments().length() == 1 || (checkUploadFileName.isEmpty() && input.isEmpty()))
@@ -195,6 +284,9 @@ int Cli::exec(QCoreApplication &a)
 
     if(showLongHelp || showShortHelp)
     {
+        if (configIsSet)
+            return Success;
+
         if(showShortHelp)
         {
             std::cout <<
@@ -219,6 +311,16 @@ int Cli::exec(QCoreApplication &a)
                 << "-a" << std::endl
                 << "    All (stats + thumbnails + panels)." << std::endl
                 << "    Is default." << std::endl
+                << "-qcvault <QCvault path>" << std::endl
+                << "    Use the indicated path as the QCvault location." << std::endl
+                << "    Use \"-qcvault default\" for using the standard QCvault location." << std::endl
+                << "-set-qcvault <QCvault path>" << std::endl
+                << "    Register the indicated path as the QCvault location." << std::endl
+                << "    Use \"-set-qcvault default\" for using the standard QCvault location." << std::endl
+                << "-show-qcvault" << std::endl
+                << "    Show the registered QCvault location." << std::endl
+                << "-clear-qcvault" << std::endl
+                << "    Clear the QCvault location. Default directory becomes the input directory." << std::endl
                 << "-show-panels" << std::endl
                 << "    Show the available panels." << std::endl
                 << "    First column is an index to be used with -activate-panel or -deactivate-panel." << std::endl
@@ -323,6 +425,30 @@ int Cli::exec(QCoreApplication &a)
 
     if(!input.endsWith(".qctools.xml.gz") && !input.endsWith(".qctools.mkv")) // skip output if input is already .qctools.xml.gz
     {
+        if (!useQCvault.isEmpty())
+        {
+            if (!output.isEmpty())
+            {
+                std::cout << "-qcvault and -o can not be used at same time, analyzing stopped." << std::endl;
+                return InvalidInput;
+            }
+
+            auto fileNameQCvault = prefs.createQCvaultFileNameString(input, useQCvault);
+            if (fileNameQCvault.isEmpty())
+            {
+                std::cout << "Problem while creating output file name, analyzing stopped." << std::endl;
+                return InvalidInput;
+            }
+
+            output = fileNameQCvault + (createMkv ? ".qctools.mkv" : ".qctools.xml.gz");
+            auto outPath = QFileInfo(output).dir();
+            if (!outPath.mkpath("."))
+            {
+                std::cout << "Can not create output directory, analyzing stopped." << std::endl;
+                return InvalidInput;
+            }
+        }
+
         if(output.isEmpty())
             output = input + (createMkv ? ".qctools.mkv" : ".qctools.xml.gz");
     }
@@ -405,7 +531,7 @@ int Cli::exec(QCoreApplication &a)
 
     std::cout << std::endl;
 
-    info = std::unique_ptr<FileInformation>(new FileInformation(signalServer.get(), input, filters, prefs.activeAllTracks(), prefs.getActivePanels()));
+    info = std::unique_ptr<FileInformation>(new FileInformation(signalServer.get(), input, filters, prefs.activeAllTracks(), prefs.getActivePanels(), prefs.createQCvaultFileNameString(input)));
     info->setAutoCheckFileUploaded(false);
     info->setAutoUpload(false);
 
@@ -413,7 +539,7 @@ int Cli::exec(QCoreApplication &a)
 
     if(!info->isValid())
     {
-        std::cout << "invalid input, analyzing aborted.. " << std::endl;
+        std::cout << "invalid input, analyzing stopped.. " << std::endl;
         return InvalidInput;
     }
 

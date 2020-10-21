@@ -174,6 +174,10 @@ private Q_SLOTS:
 
     void on_actionExport_Mkv_SidecarAll_triggered();
 
+    void on_actionExport_Mkv_QCvault_triggered();
+
+    void on_actionExport_Mkv_QCvaultAll_triggered();
+
     void on_actionExport_XmlGz_Prompt_triggered();
 
     void on_actionExport_XmlGz_Sidecar_triggered();
