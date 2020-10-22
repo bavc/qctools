@@ -68,12 +68,15 @@ class CommentsPlot : public QwtPlot {
     Q_OBJECT
 public:
     CommentsPlot(FileInformation* fileInfo, CommonStats* stats, const int* dataTypeIndex = nullptr);
+    virtual ~CommentsPlot();
 
     int frameAt( double x ) const;
     void setCursorPos( double x );
     void restorePlotHeight();
 
-    PlotLegend *legend() { return m_legend; }
+    PlotLegend *plotLegend() { return m_plotLegend; }
+    QWidget* legend() { return m_legend; }
+    void setLegend(QWidget* item) { m_legend = item; }
 
 Q_SIGNALS:
     void cursorMoved(int index);
@@ -86,7 +89,8 @@ private:
     const QwtPlotCurve* curve( int index ) const;
 
     PlotCursor* m_cursor;
-    PlotLegend* m_legend;
+    PlotLegend* m_plotLegend;
+    QWidget* m_legend { nullptr };
 };
 
 CommentsPlot* createCommentsPlot(FileInformation* fileInfo, const int* dataTypeIndex);

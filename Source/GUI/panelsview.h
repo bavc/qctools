@@ -338,6 +338,7 @@ class PanelsView : public QFrame
     Q_OBJECT
 public:
     explicit PanelsView(QWidget *parent = nullptr, const QString & panelTitle = QString(), const QString & yaxis = QString(), const QString & legend = QString(), CommentsPlot* plot = nullptr);
+    virtual ~PanelsView();
     void setProvider(const std::function<int()>& getPanelsCount,
                      const std::function<QImage(int)>& getPanelImage);
 
@@ -347,7 +348,9 @@ public:
 
     QString panelTitle() const { return m_panelTitle; }
     uint panelGroup() const { return m_panelGroup; }
-    PlotLegend *legend() { return m_legend; }
+    PlotLegend *plotLegend() { return m_plotLegend; }
+    QWidget* legend() { return m_legend; }
+    void setLegend(QWidget* item) { m_legend = item; }
 
 public Q_SLOTS:
     void setVisibleFrames(int from, int to);
@@ -367,7 +370,8 @@ Q_SIGNALS:
 private:
 
     QPixmap m_panelPixmap;
-    PlotLegend* m_legend;
+    PlotLegend* m_plotLegend;
+    QWidget* m_legend { nullptr };
     PlotCursor* m_PlotCursor;
     CommentsPlot* m_plot;
     QString m_panelTitle;

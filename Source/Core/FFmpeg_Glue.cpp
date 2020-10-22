@@ -1625,6 +1625,21 @@ std::vector<int> FFmpeg_Glue::findAudioStreams()
     });
 }
 
+int FFmpeg_Glue::findInputStreamByOutput(size_t pos) const
+{
+    auto output = OutputDatas[pos];
+    auto stream = output->Stream;
+
+    for(auto i = 0; i < InputDatas.size(); ++i)
+    {
+        auto intput = InputDatas[i];
+        if(intput->Stream == output->Stream)
+            return i;
+    }
+
+    return -1;
+}
+
 //---------------------------------------------------------------------------
 int FFmpeg_Glue::BitRate_Get()
 {

@@ -63,7 +63,7 @@ PanelsView::PanelsView(QWidget *parent, const QString& panelTitle, const QString
         m_topYLabel = splitted[2];
     }
 
-    m_legend = new PlotLegend();
+    m_plotLegend = new PlotLegend();
 
     /*
     connect( this, SIGNAL( legendDataChanged( const QVariant &, const QList<QwtLegendData> & ) ),
@@ -73,7 +73,12 @@ PanelsView::PanelsView(QWidget *parent, const QString& panelTitle, const QString
     QwtLegendData titleData;
     titleData.setValue(QwtLegendData::TitleRole, legend);
 
-    m_legend->updateLegend(QVariant("title"), QList<QwtLegendData> { titleData });
+    m_plotLegend->updateLegend(QVariant("title"), QList<QwtLegendData> { titleData });
+}
+
+PanelsView::~PanelsView()
+{
+    delete m_legend;
 }
 
 void PanelsView::setProvider(const std::function<int ()> &getPanelsCount, const std::function<QImage (int)> &getPanelImage)

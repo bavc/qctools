@@ -531,10 +531,10 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
     connect( axisWidget( QwtPlot::xBottom ), SIGNAL( scaleDivChanged() ), SLOT( onXScaleChanged() ) );
 
     // legend
-    m_legend = new PlotLegend();
+    m_plotLegend = new PlotLegend();
     
     connect( this, SIGNAL( legendDataChanged( const QVariant &, const QList<QwtLegendData> & ) ),
-         m_legend, SLOT( updateLegend( const QVariant &, const QList<QwtLegendData> & ) ) );
+         m_plotLegend, SLOT( updateLegend( const QVariant &, const QList<QwtLegendData> & ) ) );
 
     updateLegend();
 
