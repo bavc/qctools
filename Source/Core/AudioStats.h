@@ -19,15 +19,20 @@ using namespace std;
 struct AVFrame;
 struct AVStream;
 
+namespace tinyxml2 {
+    class XMLElement;
+}
+
 class AudioStats : public CommonStats
 {
 public:
     // Constructor / Destructor
     AudioStats(size_t FrameCount=0, double Duration=0, AVStream* stream = NULL);
+    AudioStats(int streamIndex);
     ~AudioStats();
 
     // External data
-    void                        StatsFromExternalData(const char* Data, size_t Size);
+    virtual void parseFrame(tinyxml2::XMLElement* frame);
     void                        StatsFromFrame(struct AVFrame* Frame, int Width, int Height);
     void                        TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos);
     string                      StatsToXML(const activefilters& filters);

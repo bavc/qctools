@@ -966,6 +966,14 @@ void Plots::changeOrder(QList<std::tuple<quint64, quint64>> newOrder)
 
     assert(newOrderedPlotsInfo.length() == currentOrderedPlotsInfo.length());
 
+    qDebug() << "\teffective new order: " << newOrderedPlotsInfo.size();
+
+    for(auto i = 0; i < newOrderedPlotsInfo.length(); ++i) {
+        qDebug() << "\t\t" << QString("group: %1/type: %2")
+                    .arg(std::get<0>(newOrderedPlotsInfo[i]))
+                    .arg(std::get<1>(newOrderedPlotsInfo[i]));
+    }
+
     for(auto i = 0; i < newOrderedPlotsInfo.length(); ++i)
     {
         if(newOrderedPlotsInfo[i] != currentOrderedPlotsInfo[i])

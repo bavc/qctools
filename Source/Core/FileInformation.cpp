@@ -105,12 +105,6 @@ void FileInformation::readStats(QIODevice& StatsFromExternalData_File, bool Stat
     streamsStats = new StreamsStats();
     formatStats = new FormatStats();
 
-    //Stats init
-    VideoStats* Video=new VideoStats();
-    Stats.push_back(Video);
-    AudioStats* Audio=new AudioStats();
-    Stats.push_back(Audio);
-
     //XML init
     const char*  Xml_HeaderFooter="</frames></ffprobe:ffprobe><ffprobe:ffprobe><frames>";
     const size_t Xml_HeaderSize=25;
@@ -198,8 +192,20 @@ void FileInformation::readStats(QIODevice& StatsFromExternalData_File, bool Stat
             Xml_Size+=Xml_HeaderSize+Xml_FooterSize;
             Xml_SizeForParsing+=Xml_FooterSize;
 
-            Video->StatsFromExternalData(Xml, Xml_SizeForParsing);
-            Audio->StatsFromExternalData(Xml, Xml_SizeForParsing);
+            CommonStats::statsFromExternalData(Xml, Xml_SizeForParsing, [&](auto type, auto index) -> CommonStats* {
+                if(Stats.size() <= index)
+                    Stats.resize(index + 1);
+
+                if(!Stats[index])
+                {
+                    if(type == Type_Video)
+                        Stats[index] = new VideoStats(index);
+                    else if(type == Type_Audio)
+                        Stats[index] = new AudioStats(index);
+                }
+
+                return Stats[index];
+            });
 
             //Cut the parsed content
             memmove(Xml, Xml+Xml_SizeForParsing, Xml_Size-Xml_SizeForParsing);
@@ -216,8 +222,9 @@ void FileInformation::readStats(QIODevice& StatsFromExternalData_File, bool Stat
     }
 
     //Inform the parser that parsing is finished
-    Video->StatsFromExternalData_Finish();
-    Audio->StatsFromExternalData_Finish();
+    for(auto stats : Stats)
+        if(stats)
+            stats->StatsFromExternalData_Finish();
 
     //Parse formats
     formatStats->readFromXML(Xml, Xml_Pointer - Xml);

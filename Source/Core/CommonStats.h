@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <algorithm>
 #include <cctype>
+#include <functional>
 #include <Core/Core.h>
 
 using namespace std;
@@ -22,6 +23,11 @@ using namespace std;
 struct AVFrame;
 struct AVStream;
 struct per_item;
+class XMLElement;
+
+namespace tinyxml2 {
+    class XMLElement;
+}
 
 class CommonStats
 {
@@ -59,8 +65,11 @@ public:
     string                      Count2_Get(size_t Pos);
     string                      Percent_Get(size_t Pos);
 
+    static void statsFromExternalData(const char* Data, size_t Size, const std::function<CommonStats*(int, size_t)>& statsGetter);
+
+    virtual void parseFrame(tinyxml2::XMLElement* frame) = 0;
+
     // External data
-    virtual void                StatsFromExternalData(const char* Data, size_t Size) = 0;
             void                StatsFromExternalData_Finish() {Frequency=1; StatsFinish();}
     virtual void                StatsFromFrame(struct AVFrame* Frame, int Width, int Height) = 0;
     virtual void                TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos) = 0;

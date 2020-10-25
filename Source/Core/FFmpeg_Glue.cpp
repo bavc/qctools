@@ -965,7 +965,7 @@ void FFmpeg_Glue::ModifyOutput(size_t InputPos, size_t OutputPos, int Scale_Widt
     qDebug() << "created output: " << OutputData << "input pos: " << InputPos << "output pos: " << OutputPos << "filter: " << Filter.c_str();
 
     OutputData->Stream=InputData->Stream;
-    if (OutputMethod==Output_Stats && Stats)
+    if (OutputMethod==Output_Stats && Stats && Stats->size() > InputPos)
         OutputData->Stats=(*Stats)[InputPos];
 
     delete OutputDatas[OutputPos];

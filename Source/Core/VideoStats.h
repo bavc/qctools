@@ -20,15 +20,20 @@ struct AVFrame;
 struct AVStream;
 struct AVFormatContext;
 
+namespace tinyxml2 {
+    class XMLElement;
+}
+
 class VideoStats : public CommonStats
 {
 public:
     // Constructor / Destructor
     VideoStats(size_t FrameCount=0, double Duration=0, AVStream* stream = NULL);
+    VideoStats(int streamIndex);
     ~VideoStats();
 
     // External data
-    void                        StatsFromExternalData(const char* Data, size_t Size);
+    virtual void parseFrame(tinyxml2::XMLElement* frame);
     void                        StatsFromFrame(struct AVFrame* Frame, int Width, int Height);
     void                        TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos);
     string                      StatsToXML(const activefilters& filters);
