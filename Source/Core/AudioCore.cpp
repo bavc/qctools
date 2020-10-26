@@ -54,6 +54,13 @@ struct per_group AudioPerGroup [Group_AudioMax]=
         "that this value is plotted per audio frame and not per audio sample.",
         ActiveFilter_Audio_astats,
     },
+    //zero crossings
+    {
+        Item_Zero_Crossing1,         2,   "-0.5",    "0.5",  6,  "Audio Zero Crossing Rate",  true,
+        "For the first two channels of an audio track this graph plots the rate\n"
+        "of zero crossings against the number of audio samples.",
+        ActiveFilter_Audio_astats,
+    },
     //astats diff
     {
         Item_Min_difference,        3,    "0",    "1",  3,  "Audio Sample-to-Sample Differences", false,
@@ -94,6 +101,8 @@ const struct per_item AudioPerItem [Item_AudioMax]=
     { Group_astats_lvlchs,Group_AudioMax, "Audio Max Level (Ch1)",      "lavfi.astats.1.Max_level",             6,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
     { Group_astats_lvlchs,Group_AudioMax, "Audio Min Level (Ch2)",      "lavfi.astats.2.Min_level",             6,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
     { Group_astats_lvlchs,Group_AudioMax, "Audio Max Level (Ch2)",      "lavfi.astats.2.Max_level",             6,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
+    { Group_astats_zeros, Group_AudioMax, "Audio Zero Crossing (ch 1)", "lavfi.astats.1.Zero_crossings_rate",   6,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
+    { Group_astats_zeros, Group_AudioMax, "Audio Zero Crossing (ch 2)", "lavfi.astats.2.Zero_crossings_rate",   6,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
     { Group_adif,         Group_AudioMax, "Difference Min",             "lavfi.astats.Overall.Min_difference",  6,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
     { Group_adif,         Group_AudioMax, "Difference Max",             "lavfi.astats.Overall.Max_difference",  6,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
     { Group_adif,         Group_AudioMax, "Difference Mean",            "lavfi.astats.Overall.Mean_difference", 6,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
