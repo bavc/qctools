@@ -974,14 +974,31 @@ void Plots::changeOrder(QList<std::tuple<quint64, quint64>> newOrder)
                     .arg(std::get<1>(newOrderedPlotsInfo[i]));
     }
 
+    auto offset = 0;
     for(auto i = 0; i < newOrderedPlotsInfo.length(); ++i)
     {
-        if(newOrderedPlotsInfo[i] != currentOrderedPlotsInfo[i])
+        auto newOrderedPlotInto = newOrderedPlotsInfo[i];
+        auto currentOrderedPlotInfo = currentOrderedPlotsInfo[i];
+
+        qDebug() << "newOrderedPlotInfo: " << std::get<0>(newOrderedPlotInto) << "/" << std::get<1>(newOrderedPlotInto);
+
+        if(newOrderedPlotInto != currentOrderedPlotInfo)
         {
-            // search current item which we should put at new position
-            for(auto j = 0; j < newOrderedPlotsInfo.length(); ++j)
+            // if previously ordered plot is the same as new one (multi-track case)
+            // then start searching for related plot right after position where we found previous one
+            if(i > 0 && newOrderedPlotsInfo[i - 1] == newOrderedPlotInto)
             {
-                if(newOrderedPlotsInfo[i] == currentOrderedPlotsInfo[j])
+                ++offset;
+            } else {
+                offset = 0;
+            }
+
+            // search current item which we should put at new position
+            for(auto j = offset; j < newOrderedPlotsInfo.length(); ++j)
+            {
+                currentOrderedPlotInfo = currentOrderedPlotsInfo[j];
+
+                if(newOrderedPlotInto == currentOrderedPlotInfo)
                 {
                     qDebug() << "i: " << i << ", j: " << j;
 
@@ -1003,9 +1020,12 @@ void Plots::changeOrder(QList<std::tuple<quint64, quint64>> newOrder)
                     currentOrderedPlotsInfo[j] = currentOrderedPlotsInfo[i];
                     currentOrderedPlotsInfo[i] = newOrderedPlotsInfo[i];
 
+                    offset = j;
                     break;
                 }
             }
+        } else {
+            qDebug() << "newOrderedPlotInto == currentOrderedPlotInfo";
         }
     }
 
