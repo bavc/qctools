@@ -192,7 +192,7 @@ void FileInformation::readStats(QIODevice& StatsFromExternalData_File, bool Stat
             Xml_Size+=Xml_HeaderSize+Xml_FooterSize;
             Xml_SizeForParsing+=Xml_FooterSize;
 
-            CommonStats::statsFromExternalData(Xml, Xml_SizeForParsing, [&](auto type, auto index) -> CommonStats* {
+            CommonStats::statsFromExternalData(Xml, Xml_SizeForParsing, [&](int type, size_t index) -> CommonStats* {
                 if(Stats.size() <= index)
                     Stats.resize(index + 1);
 
