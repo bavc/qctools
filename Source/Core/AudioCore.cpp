@@ -29,12 +29,20 @@ struct per_group AudioPerGroup [Group_AudioMax]=
         "phase and 1 means channels are in phase.",
         ActiveFilter_Audio_aphasemeter,
     },
-    //astats levels
+    //astats dc offset
     {
-        Item_DC_offset,             3,   "-1",    "1",  3,  "Levels",  true,
+        Item_DC_offset,             1,   nullptr,    nullptr,  6,  "Audio DC Offset",  true,
         "For selected audio tracks this graph plots the DC offset (mean\n"
         "amplitude displacement from zero), minimal sample level, and \n"
         "maximum sample level. Note that this value is plotted per audio\n"
+        "frame and not per audio sample.",
+        ActiveFilter_Audio_astats,
+    },
+    //astats levels
+    {
+        Item_Min_level,             2,   "-1",    "1",  6,  "Audio Levels (Overall)",  true,
+        "For selected audio tracks this graph plots the minimal sample level,\n"
+        "and maximum sample level. Note that this value is plotted per audio\n"
         "frame and not per audio sample.",
         ActiveFilter_Audio_astats,
     },
@@ -71,15 +79,15 @@ const struct per_item AudioPerItem [Item_AudioMax]=
     //Y
     { Group_R128,         Group_AudioMax,   "R128.M",     "lavfi.r128.M",                         3,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_EbuR128 },
     { Group_aphasemeter,  Group_AudioMax,   "Phase",      "lavfi.aphasemeter.phase",              3,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_aphasemeter },
-    { Group_astats_levels,Group_AudioMax,   "DC Offset",  "lavfi.astats.Overall.DC_offset",       3,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
-    { Group_astats_levels,Group_AudioMax,   "Min Level",  "lavfi.astats.Overall.Min_level",       3,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
-    { Group_astats_levels,Group_AudioMax,   "Max Level",  "lavfi.astats.Overall.Max_level",       3,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
     { Group_adif,         Group_AudioMax,   "ADIF Min",    "lavfi.astats.Overall.Min_difference", 3,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
     { Group_adif,         Group_AudioMax,   "ADIF Max",    "lavfi.astats.Overall.Max_difference", 3,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
     { Group_adif,         Group_AudioMax,   "ADIF Mean",   "lavfi.astats.Overall.Mean_difference",3,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
     { Group_astats_RMS,   Group_AudioMax,   "Peak Level", "lavfi.astats.Overall.Peak_level",      3,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
     { Group_astats_RMS,   Group_AudioMax,   "RMS Peak",   "lavfi.astats.Overall.RMS_peak",        3,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
     { Group_astats_RMS,   Group_AudioMax,   "RMS Trough", "lavfi.astats.Overall.RMS_trough",      3,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
+    { Group_astats_dc,    Group_AudioMax, "Audio DC Offset",            "lavfi.astats.Overall.DC_offset",       6,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
+    { Group_astats_levels,Group_AudioMax, "Audio Min Level",            "lavfi.astats.Overall.Min_level",       6,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
+    { Group_astats_levels,Group_AudioMax, "Audio Max Level",            "lavfi.astats.Overall.Max_level",       6,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Audio_astats },
     //{ Group_R128,   Group_AudioMax,       "R128.S",         "lavfi.r128.S",             0,   false,  DBL_MAX, DBL_MAX },
     //{ Group_R128,   Group_AudioMax,       "R128.I",         "lavfi.r128.I",             0,   true,   DBL_MAX, DBL_MAX },
     //U

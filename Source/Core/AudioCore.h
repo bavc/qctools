@@ -41,6 +41,7 @@ enum AudioGroup
 {
     Group_R128,
     Group_aphasemeter,
+    Group_astats_dc,
     Group_astats_levels,
     Group_adif,
     Group_astats_RMS,
