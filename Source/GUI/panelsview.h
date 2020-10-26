@@ -381,7 +381,7 @@ private:
     QString m_topYLabel;
     QString m_middleYLabel;
 
-    int m_leftOffset;
+    int m_leftOffset { 0 };
     int m_startFrame;
     int m_endFrame;
     int m_actualWidth;

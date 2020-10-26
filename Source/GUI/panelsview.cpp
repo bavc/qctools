@@ -153,12 +153,17 @@ QColor fillColor("Cornsilk");
 
 void PanelsView::paintEvent(QPaintEvent *e)
 {
+    const auto leftMargin = contentsMargins().left();
+    const auto rightMargin = contentsMargins().right();
+    const auto w = width();
+    const auto h = height();
+
     QPainter p(this);
 
-    p.drawRect(QRect(contentsMargins().left(),
+    p.drawRect(QRect(leftMargin,
                      lineWidth() - 1,
-                     width() - (contentsMargins().left() + contentsMargins().right() + 1),
-                     height() - (lineWidth() - 1) * 2));
+                     w - (leftMargin + rightMargin + 1),
+                     h - (lineWidth() - 1) * 2));
 
     p.save();
     auto font = this->font();
@@ -167,75 +172,62 @@ void PanelsView::paintEvent(QPaintEvent *e)
 
     if(!m_topYLabel.isEmpty())
     {
-        auto rect = metrics.boundingRect(QRect(0, 0, contentsMargins().left(), height()),
+        auto rect = metrics.boundingRect(QRect(0, 0, leftMargin, h),
                                                    Qt::TextWordWrap, m_topYLabel);
 
         auto topYLabelWidth = rect.width();
-        auto topYLabelHeight = rect.height();
 
         p.setPen(Qt::black);
-        p.drawText(QRect(contentsMargins().left() - m_leftOffset / 2 - topYLabelWidth,
+        p.drawText(QRect(leftMargin - m_leftOffset / 2 - topYLabelWidth,
                           lineWidth(), rect.width(), rect.height()), m_topYLabel);
     }
 
     if(!m_middleYLabel.isEmpty())
     {
-        auto rect = metrics.boundingRect(QRect(0, 0, contentsMargins().left(), height()),
+        auto rect = metrics.boundingRect(QRect(0, 0, leftMargin, h),
                                                    Qt::TextWordWrap, m_middleYLabel);
 
         auto middleYLabelWidth = rect.width();
-        auto middleYLabelHeight = rect.height();
 
         p.setPen(Qt::black);
-        p.drawText(QRect(contentsMargins().left() - m_leftOffset / 2 - middleYLabelWidth,
-                          height() / 2 - (lineWidth() -1) - rect.height() / 2, rect.width(), rect.height()), m_middleYLabel);
+        p.drawText(QRect(leftMargin - m_leftOffset / 2 - middleYLabelWidth,
+                          h / 2 - (lineWidth() -1) - rect.height() / 2, rect.width(), rect.height()), m_middleYLabel);
     }
 
     if(!m_bottomYLabel.isEmpty())
     {
-        auto rect = metrics.boundingRect(QRect(0, 0, contentsMargins().left(), height()),
+        auto rect = metrics.boundingRect(QRect(0, 0, leftMargin, h),
                                                    Qt::TextWordWrap, m_bottomYLabel);
 
         auto bottomYLabelWidth = rect.width();
         auto bottomYLabelHeight = rect.height();
 
-        p.drawText(QRect(contentsMargins().left() - m_leftOffset / 2 - bottomYLabelWidth,
-                          height() - (lineWidth() - 1) - rect.height(), rect.width(), rect.height()), m_bottomYLabel);
+        p.drawText(QRect(leftMargin - m_leftOffset / 2 - bottomYLabelWidth,
+                          h - (lineWidth() - 1) - rect.height(), rect.width(), rect.height()), m_bottomYLabel);
     }
 
     p.restore();
 
     if(m_panelPixmap.isNull())
     {
-        auto availableWidth = width() - (contentsMargins().left() + m_leftOffset + 1) - (contentsMargins().right() + m_leftOffset - 1);
-        auto availableHeight = height() - lineWidth();
+        auto availableWidth = w - (leftMargin + m_leftOffset + 1) - (rightMargin + m_leftOffset - 1);
+        auto availableHeight = h - lineWidth();
 
         auto panelsCount = getPanelsCount();
         if(panelsCount == 0) {
             m_panelPixmap = QPixmap(availableWidth, availableHeight);
             m_panelPixmap.fill(fillColor);
 
-            p.drawPixmap(contentsMargins().left() + m_leftOffset + 1, lineWidth(), m_panelPixmap);
+            p.drawPixmap(leftMargin + m_leftOffset + 1, lineWidth(), m_panelPixmap);
             return;
         }
 
         auto sx = m_actualWidth == 0 ? 1 : ((qreal) availableWidth / m_actualWidth);
         auto sy = (qreal)availableHeight / getPanelImage(0).height();
 
-        auto dx = availableWidth - m_actualWidth;
-
         m_panelPixmap = QPixmap(availableWidth, availableHeight);
         m_panelPixmap.fill(fillColor);
         QPainter p(&m_panelPixmap);
-
-        /*
-        QRect viewport(contentsMargins().left() + m_leftOffset + 1,
-                       lineWidth(),
-                       width() - (contentsMargins().right() + m_leftOffset - 1),
-                       availableHeight);
-
-        p.setViewport(viewport);
-        */
 
         auto totalFrames = m_endFrame - m_startFrame;
         auto zx = (qreal) m_actualWidth / totalFrames;
@@ -247,15 +239,6 @@ void PanelsView::paintEvent(QPaintEvent *e)
         int startPanelOffset, startPanelIndex, endPanelLength, endPanelIndex;
         getPanelsBounds(startPanelIndex, startPanelOffset, endPanelIndex, endPanelLength);
 
-        // qDebug() << "contentsMargins: " << contentsMargins() << "totalFrames: " << totalFrames;
-
-        /*
-        qDebug() << "startPanelIndex: " << startPanelIndex << "startPanelOffset: " << startPanelOffset
-                 << "endPanelIndex: " << endPanelIndex << "endPanelLength: " << endPanelLength << "availableWidth: " << availableWidth << "actual: " << m_actualWidth
-                 << "height: " << availableHeight;
-        */
-
-        // p.fillRect(QRect(0, 0, width(), height()), Qt::green);
         int x = 0;
         int y = 0;
 
@@ -270,16 +253,13 @@ void PanelsView::paintEvent(QPaintEvent *e)
 
                 QRect sr(imageXOffset, 0, imageWidth, imageHeight);
                 p.drawImage(QPointF(x, y), image, sr);
-                //p.fillRect(x, 0, imageWidth, image.height(), Qt::red);
-
-                //qDebug() << "x: " << x << "sr: " << sr;
                 x += (sr.width() - imageXOffset);
             }
         }
     }
 
-    qDebug() << "painting... ";
-    p.drawPixmap(contentsMargins().left() + m_leftOffset + 1, lineWidth(), m_panelPixmap);
+    // qDebug() << "painting... ";
+    p.drawPixmap(leftMargin + m_leftOffset + 1, lineWidth(), m_panelPixmap);
 }
 
 void PanelsView::wheelEvent(QWheelEvent *event)
