@@ -239,13 +239,18 @@ CommentsPlot::CommentsPlot(FileInformation* fileInfo, CommonStats* stats, const 
 
     connect( axisWidget( QwtPlot::xBottom ), SIGNAL( scaleDivChanged() ), SLOT( onXScaleChanged() ) );
 
-    m_legend = new PlotLegend();
-    m_legend->setMaximumHeight(plotHeight);
+    m_plotLegend = new PlotLegend();
+    m_plotLegend->setMaximumHeight(plotHeight);
 
     connect( this, SIGNAL( legendDataChanged( const QVariant &, const QList<QwtLegendData> & ) ),
-         m_legend, SLOT( updateLegend( const QVariant &, const QList<QwtLegendData> & ) ) );
+         m_plotLegend, SLOT( updateLegend( const QVariant &, const QList<QwtLegendData> & ) ) );
 
     updateLegend();
+}
+
+CommentsPlot::~CommentsPlot()
+{
+    delete m_legend;
 }
 
 int CommentsPlot::frameAt(double x) const

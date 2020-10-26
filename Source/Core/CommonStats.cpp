@@ -398,6 +398,54 @@ string CommonStats::Percent_Get(size_t Pos)
     return str.str();
 }
 
+void CommonStats::statsFromExternalData(const char *Data, size_t Size, const std::function<CommonStats*(int, size_t)>& statsGetter)
+{
+    // AudioStats from external data
+    // XML input
+    XMLDocument Document;
+    if (Document.Parse(Data, Size))
+       return;
+
+    auto Root=Document.FirstChildElement("ffprobe:ffprobe");
+    if (Root)
+    {
+        auto Frames=Root->FirstChildElement("frames");
+        if (Frames)
+        {
+            auto Frame=Frames->FirstChildElement();
+            while (Frame)
+            {
+                if (!strcmp(Frame->Value(), "frame"))
+                {
+                    const char* media_type=Frame->Attribute("media_type");
+                    if (media_type)
+                    {
+                        const char* stream_index_value = Frame->Attribute("stream_index");
+                        if(stream_index_value)
+                        {
+                            auto streamIndex = std::stoi(stream_index_value);
+                            CommonStats* stats = nullptr;
+
+                            if(!strcmp(media_type, "video"))
+                            {
+                                stats = statsGetter(Type_Video, streamIndex);
+                            }
+                            else if(!strcmp(media_type, "audio"))
+                            {
+                                stats = statsGetter(Type_Audio, streamIndex);
+                            }
+
+                            stats->parseFrame(Frame);
+                        }
+                    }
+                }
+
+                Frame=Frame->NextSiblingElement();
+            }
+        }
+    }
+}
+
 //***************************************************************************
 // Memory management
 //***************************************************************************

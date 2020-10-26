@@ -508,11 +508,15 @@ QList<std::tuple<quint64, quint64> > PlotsChooser::getFilterSelectorsOrder(int s
 
 void PlotsChooser::changeOrder(QList<std::tuple<quint64, quint64>> filtersInfo)
 {
-    auto model = m_sourceModel;
-    auto newOrder = std::vector<int>();
+    qDebug() << "PlotsChooser::changeOrder...";
 
-    for(std::tuple<quint64, quint64> groupAndType : filtersInfo)
+    auto model = m_sourceModel;
+    model->beginModelReset();
+
+    for(auto i = 0; i < filtersInfo.size(); ++i)
     {
+        auto& groupAndType = filtersInfo[i];
+
         quint64 group = std::get<0>(groupAndType);
         quint64 type = std::get<1>(groupAndType);
 
@@ -523,20 +527,12 @@ void PlotsChooser::changeOrder(QList<std::tuple<quint64, quint64>> filtersInfo)
             auto modelType = model->data(model->index(row, NAME_COLUMN), TypeRole).toULongLong();
 
             if(modelGroup == group && modelType == type) {
-                newOrder.push_back(row);
                 qDebug() << "new order: " << "group: " << group << "type: " << type << "row: " << row;
+
+                model->moveRow(QModelIndex(), row, QModelIndex(), i);
             }
         }
     };
 
-    model->beginModelReset();
-    for(auto i = 0; i < newOrder.size(); ++i) {
-        auto newIndex = i;
-        auto oldIndex = newOrder[i];
-
-        if(newIndex != oldIndex) {
-            model->moveRow(QModelIndex(), oldIndex, QModelIndex(), newIndex);
-        }
-    }
     model->endModelReset();
 }

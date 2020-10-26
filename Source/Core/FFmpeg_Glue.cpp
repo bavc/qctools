@@ -965,7 +965,7 @@ void FFmpeg_Glue::ModifyOutput(size_t InputPos, size_t OutputPos, int Scale_Widt
     qDebug() << "created output: " << OutputData << "input pos: " << InputPos << "output pos: " << OutputPos << "filter: " << Filter.c_str();
 
     OutputData->Stream=InputData->Stream;
-    if (OutputMethod==Output_Stats && Stats)
+    if (OutputMethod==Output_Stats && Stats && Stats->size() > InputPos)
         OutputData->Stats=(*Stats)[InputPos];
 
     delete OutputDatas[OutputPos];
@@ -1623,6 +1623,21 @@ std::vector<int> FFmpeg_Glue::findAudioStreams()
     return findStreams([](AVStream* stream) -> bool {
         return stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO;
     });
+}
+
+int FFmpeg_Glue::findInputStreamByOutput(size_t pos) const
+{
+    auto output = OutputDatas[pos];
+    auto stream = output->Stream;
+
+    for(auto i = 0; i < InputDatas.size(); ++i)
+    {
+        auto intput = InputDatas[i];
+        if(intput->Stream == output->Stream)
+            return i;
+    }
+
+    return -1;
 }
 
 //---------------------------------------------------------------------------

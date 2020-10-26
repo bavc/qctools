@@ -166,11 +166,24 @@ FilterSelectorsOrder Preferences::loadFilterSelectorsOrder()
 {
     QSettings settings;
     auto order = settings.value(KeyFilterSelectorsOrder, QVariant::fromValue(FilterSelectorsOrder())).value<FilterSelectorsOrder>();
+
+    qDebug() << "Preferences::loadFilterSelectorsOrder... ";
+
+    for(auto groupAndType : order) {
+        qDebug() << "\tgroup: " << std::get<0>(groupAndType) << ", type: " << std::get<1>(groupAndType);
+    }
+
     return order;
 }
 
 void Preferences::saveFilterSelectorsOrder(const FilterSelectorsOrder &order)
 {
+    qDebug() << "Preferences::saveFilterSelectorsOrder... ";
+
+    for(auto groupAndType : order) {
+        qDebug() << "\tgroup: " << std::get<0>(groupAndType) << ", type: " << std::get<1>(groupAndType);
+    }
+
     QSettings settings;
     settings.setValue(KeyFilterSelectorsOrder, QVariant::fromValue(order));
 }

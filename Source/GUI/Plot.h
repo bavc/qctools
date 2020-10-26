@@ -447,7 +447,9 @@ public:
     size_t type() const { return m_type; }
     size_t group() const { return m_group; }
 
-    PlotLegend *legend() { return m_legend; }
+    PlotLegend *plotLegend() { return m_plotLegend; }
+    QWidget* legend() { return m_legend; }
+    void setLegend(QWidget* item) { m_legend = item; }
 
     int frameAt( double x ) const;
 
@@ -483,7 +485,8 @@ private:
     PlotCursor*             m_cursor;
     QCheckBox*              m_barchartPlotCheckbox;
 
-    PlotLegend*             m_legend;
+    PlotLegend*             m_plotLegend;
+    QWidget*                m_legend { nullptr };
     const FileInformation*  m_fileInformation;
 
     bool                    m_barchart;

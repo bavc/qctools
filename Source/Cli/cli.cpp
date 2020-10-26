@@ -514,70 +514,73 @@ int Cli::exec(QCoreApplication &a)
 
                 for(auto& panelTitle : info->panelOutputsByTitle().keys())
                 {
-                    auto panelOutputIndex = info->panelOutputsByTitle()[panelTitle];
-                    auto panelFramesCount = info->Glue->GetPanelFramesCount(panelOutputIndex);
-                    if(panelFramesCount == 0)
-                        continue;
+                    auto panelOutputIndexes = info->panelOutputsByTitle()[panelTitle];
+                    for(auto panelOutputIndex : panelOutputIndexes)
+                    {
+                        auto panelFramesCount = info->Glue->GetPanelFramesCount(panelOutputIndex);
+                        if(panelFramesCount == 0)
+                            continue;
 
-                    auto frameSize = info->Glue->GetPanelFrameSize(panelOutputIndex, 0);
-                    auto panelsCount = info->Glue->GetPanelFramesCount(panelOutputIndex);
-                    auto panelIndex = 0;
+                        auto frameSize = info->Glue->GetPanelFrameSize(panelOutputIndex, 0);
+                        auto panelsCount = info->Glue->GetPanelFramesCount(panelOutputIndex);
+                        auto panelIndex = 0;
 
-                    FFmpegVideoEncoder::Metadata streamMetadata;
-                    streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString::fromStdString(panelTitle));
-                    streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("filterchain"), QString::fromStdString(info->Glue->getOutputFilter(panelOutputIndex)));
+                        FFmpegVideoEncoder::Metadata streamMetadata;
+                        streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString::fromStdString(panelTitle));
+                        streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("filterchain"), QString::fromStdString(info->Glue->getOutputFilter(panelOutputIndex)));
 
-                    auto outputMetadata = info->Glue->getOutputMetadata(panelOutputIndex);
-                    auto versionIt = outputMetadata.find("version");
-                    auto yaxisIt = outputMetadata.find("yaxis");
-                    auto legendIt = outputMetadata.find("legend");
-                    auto panelTypeIt = outputMetadata.find("panel_type");
-                    auto version = versionIt != outputMetadata.end() ? versionIt->second : "";
-                    auto yaxis = yaxisIt != outputMetadata.end() ? yaxisIt->second : "";
-                    auto legend = legendIt != outputMetadata.end() ? legendIt->second : "";
-                    auto panelType = panelTypeIt != outputMetadata.end() ? panelTypeIt->second : "video";
-                    auto isAudioPanel = panelType != "video";
+                        auto outputMetadata = info->Glue->getOutputMetadata(panelOutputIndex);
+                        auto versionIt = outputMetadata.find("version");
+                        auto yaxisIt = outputMetadata.find("yaxis");
+                        auto legendIt = outputMetadata.find("legend");
+                        auto panelTypeIt = outputMetadata.find("panel_type");
+                        auto version = versionIt != outputMetadata.end() ? versionIt->second : "";
+                        auto yaxis = yaxisIt != outputMetadata.end() ? yaxisIt->second : "";
+                        auto legend = legendIt != outputMetadata.end() ? legendIt->second : "";
+                        auto panelType = panelTypeIt != outputMetadata.end() ? panelTypeIt->second : "video";
+                        auto isAudioPanel = panelType != "video";
 
-                    streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("version"), QString::fromStdString(version));
-                    streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("yaxis"), QString::fromStdString(yaxis));
-                    streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("legend"), QString::fromStdString(legend));
-                    streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("panel_type"), QString::fromStdString(panelType));
+                        streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("version"), QString::fromStdString(version));
+                        streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("yaxis"), QString::fromStdString(yaxis));
+                        streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("legend"), QString::fromStdString(legend));
+                        streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("panel_type"), QString::fromStdString(panelType));
 
-                    FFmpegVideoEncoder::Source panelSource;
-                    panelSource.metadata = streamMetadata;
-                    panelSource.width = info->panelSize().width();
-                    panelSource.height = info->panelSize().height();
-                    panelSource.bitrate = info->Glue->OutputThumbnailBitRate_Get() / info->panelSize().width();
-                    panelSource.num = num;
-                    panelSource.den = den;
-                    panelSource.getPacket = [panelIndex, panelsCount, panelOutputIndex, this]() mutable -> std::shared_ptr<AVPacket> {
+                        FFmpegVideoEncoder::Source panelSource;
+                        panelSource.metadata = streamMetadata;
+                        panelSource.width = info->panelSize().width();
+                        panelSource.height = info->panelSize().height();
+                        panelSource.bitrate = info->Glue->OutputThumbnailBitRate_Get() / info->panelSize().width();
+                        panelSource.num = num;
+                        panelSource.den = den;
+                        panelSource.getPacket = [panelIndex, panelsCount, panelOutputIndex, this]() mutable -> std::shared_ptr<AVPacket> {
 
-                        if(panelIndex == 0)
-                        {
-                            std::cout << std::endl << "adding panels to QCTools report... " << std::endl;
+                            if(panelIndex == 0)
+                            {
+                                std::cout << std::endl << "adding panels to QCTools report... " << std::endl;
 
-                            progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
-                            progress->setValue(0);
-                        }
+                                progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
+                                progress->setValue(0);
+                            }
 
-                        bool hasNext = panelIndex < panelsCount;
+                            bool hasNext = panelIndex < panelsCount;
 
-                        progress->setValue(100 * panelIndex / panelsCount);
-                        QCoreApplication::processEvents();
+                            progress->setValue(100 * panelIndex / panelsCount);
+                            QCoreApplication::processEvents();
 
-                        if(!hasNext) {
-                            return nullptr;
-                        }
+                            if(!hasNext) {
+                                return nullptr;
+                            }
 
-                        auto frame = info->Glue->GetPanelFrame(panelOutputIndex, panelIndex);
-                        auto packet = info->Glue->encodePanelFrame(panelOutputIndex, frame.get());
+                            auto frame = info->Glue->GetPanelFrame(panelOutputIndex, panelIndex);
+                            auto packet = info->Glue->encodePanelFrame(panelOutputIndex, frame.get());
 
-                        ++panelIndex;
+                            ++panelIndex;
 
-                        return packet;
-                    };
+                            return packet;
+                        };
 
-                    sources.push_back(panelSource);
+                        sources.push_back(panelSource);
+                    }
                 }
 
                 encoder.makeVideo(output, sources, attachment, attachmentFileName);

@@ -256,6 +256,7 @@ public:
     std::vector<int>            findMediaStreams();
     std::vector<int>            findVideoStreams();
     std::vector<int>            findAudioStreams();
+    int findInputStreamByOutput(size_t pos) const;
     int                         BitRate_Get();
 
     // Video information
