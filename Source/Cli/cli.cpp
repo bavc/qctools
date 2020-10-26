@@ -13,6 +13,8 @@ int Cli::exec(QCoreApplication &a)
     std::string appName = "qcli";
     std::string copyright = "Copyright (C): 2013-2020, BAVC.\nCopyright (C): 2018-2020, RiceCapades LLC & MediaArea.net SARL.";
 
+    Preferences prefs;
+
     QString input;
     QString output;
     QStringList filterStrings;
@@ -21,6 +23,8 @@ int Cli::exec(QCoreApplication &a)
     bool showShortHelp = false;
     bool showVersion = false;
     bool createMkv = true;
+    bool configIsSet = false;
+    bool configHasIssues = false;
 
     bool uploadToSignalServer = false;
     bool forceUploadToSignalServer = false;
@@ -65,6 +69,112 @@ int Cli::exec(QCoreApplication &a)
         } else if (a.arguments().at(i) == "-a")
         {
             createMkv = true;
+        } else if (a.arguments().at(i) == "-show-panels")
+        {
+            configIsSet = true;
+            cout << "List of available panels:" << endl;
+            auto availablePanels = prefs.availablePanels();
+            auto activePanels = prefs.activePanels();
+            for (auto availablePanel = availablePanels.constBegin(); availablePanel != availablePanels.constEnd(); ++availablePanel)
+            {
+                std::cout << availablePanel - availablePanels.constBegin() + 1 << " | " << (activePanels.find(availablePanel->name) != activePanels.end() ? "Active | " : "       | ") << availablePanel->name.toStdString() << std::endl;
+            }
+        } else if (a.arguments().at(i) == "-activate-panel")
+        {
+            ++i;
+            if (i >= a.arguments().length())
+            {
+                std::cout << "Missing argument after last option." << std::endl;
+                configHasIssues = true;
+                continue;
+            }
+            configIsSet = true;
+
+            // Get panel name
+            auto index = a.arguments().at(i).toInt();
+            QString panelName;
+            auto availablePanels = prefs.availablePanels();
+            if (a.arguments().at(i).toLower() == "all")
+            {
+                // add panel name to list
+                QSet<QString> activePanels;
+                for (auto availablePanel = availablePanels.constBegin(); availablePanel != availablePanels.constEnd(); ++availablePanel)
+                    activePanels.insert(availablePanel->name);
+                prefs.setActivePanels(activePanels);
+                std::cout << "All panels activated." << std::endl;
+            }
+            else
+            {
+                for (auto availablePanel = availablePanels.constBegin(); availablePanel != availablePanels.constEnd(); ++availablePanel)
+                {
+                    if (index == availablePanel - availablePanels.constBegin() + 1 || a.arguments().at(i) == availablePanel->name)
+                    {
+                        panelName = availablePanel->name;
+                        break;
+                    }
+                }
+                if (panelName.isEmpty())
+                {
+                    std::cout << "Invalid panel name or index." << std::endl;
+                    configHasIssues = true;
+                    continue;
+                }
+
+                // add panel name to list
+                auto activePanels = prefs.activePanels();
+                auto panelNameInActivePanels = activePanels.insert(panelName);
+                prefs.setActivePanels(activePanels);
+                std::cout << "Panel " << panelName.toStdString() << " activated." << std::endl;
+            }
+        } else if (a.arguments().at(i) == "-deactivate-panel")
+        {
+            ++i;
+            if (i >= a.arguments().length())
+            {
+                std::cout << "Missing argument after last option." << std::endl;
+                configHasIssues = true;
+                continue;
+            }
+            configIsSet = true;
+
+            if (a.arguments().at(i).toLower() == "all")
+            {
+                // add panel name to list
+                QSet<QString> activePanels;
+                prefs.setActivePanels(activePanels);
+                std::cout << "All panels deactivated." << std::endl;
+            }
+            else
+            {
+                // Get panel name
+                auto index = a.arguments().at(i).toInt();
+                QString panelName;
+                auto availablePanels = prefs.availablePanels();
+                for (auto availablePanel = availablePanels.constBegin(); availablePanel != availablePanels.constEnd(); ++availablePanel)
+                {
+                    if (index == availablePanel - availablePanels.constBegin() + 1 || a.arguments().at(i) == availablePanel->name)
+                    {
+                        panelName = availablePanel->name;
+                        break;
+                    }
+                }
+                if (panelName.isEmpty())
+                {
+                    std::cout << "Invalid panel name or index." << std::endl;
+                    configHasIssues = true;
+                    continue;
+                }
+
+                // remove panel name from list
+                auto activePanels = prefs.activePanels();
+                auto panelNameInActivePanels = activePanels.find(panelName);
+                if (panelNameInActivePanels != activePanels.end())
+                {
+                    activePanels.remove(*panelNameInActivePanels);
+                    prefs.setActivePanels(activePanels);
+                }
+                std::cout << "Panel " << panelName.toStdString() << " deactivated." << std::endl;
+            }
         }
     }
 
@@ -109,6 +219,17 @@ int Cli::exec(QCoreApplication &a)
                 << "-a" << std::endl
                 << "    All (stats + thumbnails + panels)." << std::endl
                 << "    Is default." << std::endl
+                << "-show-panels" << std::endl
+                << "    Show the available panels." << std::endl
+                << "    First column is an index to be used with -activate-panel or -deactivate-panel." << std::endl
+                << "    Second column is the status of the panel (\"active\" if the panel is used during analysis)." << std::endl
+                << "    Third column is the name of the panel" << std::endl
+                << "-activate-panel <panel name or index>" << std::endl
+                << "    Register the panel as active." << std::endl
+                << "    Use \"all\" panel name for registering all panels as active." << std::endl
+                << "-deactivate-panel <panel name or index>" << std::endl
+                << "    Register the panel as not active." << std::endl
+                << "    Use \"all\" panel name for registering all panels as not active." << std::endl
                 << "-f" << std::endl
                 << "    Specifies '+'-separated string of filters used. Example: -f signalstats+cropdetect" << std::endl
                 << "    The filters used in " << appName << " may also be declared via the qctools-gui (see the" << std::endl
@@ -164,8 +285,6 @@ int Cli::exec(QCoreApplication &a)
     }
 
     std::cout << appName << " " << (VERSION) << std::endl;
-
-    Preferences prefs;
 
     signalServer = std::unique_ptr<SignalServer>(new SignalServer());
 
