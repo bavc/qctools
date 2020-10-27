@@ -82,9 +82,9 @@ public:
         }
         else if(i.column() == ICON_COLUMN && (r == Qt::DecorationRole || r == Qt::SizeHintRole))
         {
-            static auto graphsIcon = QPixmap(":/icon/signalserver_success.png").scaled(IconSize, IconSize);
-            static auto commentsIcon = QPixmap(":/icon/signalserver_not_uploaded.png").scaled(IconSize, IconSize);
-            static auto panelsIcon = QPixmap(":/icon/signalserver_error.png").scaled(IconSize, IconSize);
+            static auto graphsIcon = QPixmap(":/icon/chart_chart.png").scaled(IconSize, IconSize);
+            static auto commentsIcon = QPixmap(":/icon/signalserver_success.png").scaled(IconSize, IconSize);
+            static auto panelsIcon = QPixmap(":/icon/graph_layout.png").scaled(IconSize, IconSize);
 
             auto type = row.type;
             QPixmap pixmap;
