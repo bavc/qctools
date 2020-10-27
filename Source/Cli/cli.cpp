@@ -25,6 +25,8 @@ int Cli::exec(QCoreApplication &a)
     bool createMkv = true;
     QString useQCvault;
     bool ignoreQCvault = false;
+    auto activeAllTracks = prefs.activeAllTracks();
+    bool setActiveAllTracks = false;
     bool configIsSet = false;
     bool configHasIssues = false;
 
@@ -247,6 +249,94 @@ int Cli::exec(QCoreApplication &a)
                 }
                 std::cout << "Panel " << panelName.toStdString() << " deactivated." << std::endl;
             }
+        } else if (a.arguments().at(i) == "-video")
+        {
+            ++i;
+            if (i >= a.arguments().length())
+            {
+                std::cout << "Missing argument after last option." << std::endl;
+                configHasIssues = true;
+                continue;
+            }
+
+            if (a.arguments().at(i) == "1")
+                activeAllTracks.set(Type_Video, false);
+            else if (a.arguments().at(i) == "all")
+                activeAllTracks.set(Type_Video, true);
+            else
+            {
+                std::cout << "-video option argument must be either 1 or all" << std::endl;
+                configHasIssues = true;
+                continue;
+            }
+        } else if (a.arguments().at(i) == "-set-video")
+        {
+            ++i;
+            if (i >= a.arguments().length())
+            {
+                std::cout << "Missing argument after last option." << std::endl;
+                configHasIssues = true;
+                continue;
+            }
+            configIsSet = true;
+
+            if (a.arguments().at(i) == "1")
+                activeAllTracks.set(Type_Video, false);
+            else if (a.arguments().at(i) == "all")
+                activeAllTracks.set(Type_Video, true);
+            else
+            {
+                std::cout << "-set-video option argument must be either 1 or all" << std::endl;
+                configHasIssues = true;
+                continue;
+            }
+
+            std::cout << (a.arguments().at(i) == "1" ? "First video track will be analyzed." : "All video tracks will be analyzed.") << std::endl;
+            setActiveAllTracks = true;
+        } else if (a.arguments().at(i) == "-audio")
+        {
+            ++i;
+            if (i >= a.arguments().length())
+            {
+                std::cout << "Missing argument after last option." << std::endl;
+                configHasIssues = true;
+                continue;
+            }
+
+            if (a.arguments().at(i) == "1")
+                activeAllTracks.set(Type_Audio, false);
+            else if (a.arguments().at(i) == "all")
+                activeAllTracks.set(Type_Audio, true);
+            else
+            {
+                std::cout << "-audio option argument must be either 1 or all" << std::endl;
+                configHasIssues = true;
+                continue;
+            }
+        } else if (a.arguments().at(i) == "-set-audio")
+        {
+            ++i;
+            if (i >= a.arguments().length())
+            {
+                std::cout << "Missing argument after last option." << std::endl;
+                configHasIssues = true;
+                continue;
+            }
+            configIsSet = true;
+
+            if (a.arguments().at(i) == "1")
+                activeAllTracks.set(Type_Audio, false);
+            else if (a.arguments().at(i) == "all")
+                activeAllTracks.set(Type_Audio, true);
+            else
+            {
+                std::cout << "-set-audio option argument must be either 1 or all" << std::endl;
+                configHasIssues = true;
+                continue;
+            }
+
+            std::cout << (a.arguments().at(i) == "1" ? "First audio track will be analyzed." : "All audio tracks will be analyzed.") << std::endl;
+            setActiveAllTracks = true;
         }
     }
 
@@ -260,6 +350,12 @@ int Cli::exec(QCoreApplication &a)
             std::cout << "App local data location not available, use -qcvault instead, analyzing stopped.. " << std::endl;
             configHasIssues = true;
         }
+    }
+
+    // Single/all video/audio tracks
+    if (setActiveAllTracks)
+    {
+        prefs.setActiveAllTracks(activeAllTracks);
     }
 
     if (configHasIssues)
@@ -330,6 +426,14 @@ int Cli::exec(QCoreApplication &a)
                 << "-deactivate-panel <panel name or index>" << std::endl
                 << "    Register the panel as not active." << std::endl
                 << "    Use \"all\" panel name for registering all panels as not active." << std::endl
+                << "-video <1 or all>" << std::endl
+                << "    Analyze only the first video track or all video tracks." << std::endl
+                << "-set-video <1 or all>" << std::endl
+                << "    Register the choice of analyzing either the first video track or all video tracks." << std::endl
+                << "-audio <1 or all>" << std::endl
+                << "    Analyze only the first video track or all audio tracks." << std::endl
+                << "-set-audio <1 or all>" << std::endl
+                << "    Register the choice of analyzing either the first audio track or all audio tracks." << std::endl
                 << "-f" << std::endl
                 << "    Specifies '+'-separated string of filters used. Example: -f signalstats+cropdetect" << std::endl
                 << "    The filters used in " << appName << " may also be declared via the qctools-gui (see the" << std::endl
@@ -529,7 +633,7 @@ int Cli::exec(QCoreApplication &a)
 
     std::cout << std::endl;
 
-    info = std::unique_ptr<FileInformation>(new FileInformation(signalServer.get(), input, filters, prefs.activeAllTracks(), prefs.getActivePanels(), prefs.createQCvaultFileNameString(input)));
+    info = std::unique_ptr<FileInformation>(new FileInformation(signalServer.get(), input, filters, activeAllTracks, prefs.getActivePanels(), prefs.createQCvaultFileNameString(input)));
     info->setAutoCheckFileUploaded(false);
     info->setAutoUpload(false);
 
