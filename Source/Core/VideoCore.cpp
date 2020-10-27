@@ -115,6 +115,15 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "16-240 for U and V.",
         ActiveFilter_Video_signalstats,
     },
+    //Bit depths
+    {
+        Item_YBITS,     3,    "0",  "16",  4,  "Active Bit Depths", false,
+        "These graphs show how many consecutive lower bits of used, per\n"
+        "frame per plane. For instance, a 10-bit v210 video which plots at\n"
+        "8 may reveal that some processing before encoding the v210 removed\n"
+        "the least significant two bits.",
+        ActiveFilter_Video_signalstats,
+    },
     //CropW
     {
         Item_Crop_x1,   2,    "0",  nullptr,  4,  "CropW", false,
@@ -284,6 +293,10 @@ const struct per_item VideoPerItem [Item_VideoMax]=
     { Group_TOUT,    Group_VideoMax,       "TOUT",          "lavfi.signalstats.TOUT",    8,  false,    0.005, DBL_MAX, ActiveFilter_Video_signalstats },
     { Group_VREP,    Group_VideoMax,       "VREP",          "lavfi.signalstats.VREP",    8,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats },
     { Group_BRNG,    Group_VideoMax,       "BRNG",          "lavfi.signalstats.BRNG",    8,  true,      0.05, DBL_MAX, ActiveFilter_Video_signalstats },
+    //Bitdepths
+    { Group_YUVB,    Group_VideoMax,       "V Active Bits", "lavfi.signalstats.VBITDEPTH",    0,  true,   DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats },
+    { Group_YUVB,    Group_VideoMax,       "U Active Bits", "lavfi.signalstats.UBITDEPTH",    0,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats },
+    { Group_YUVB,    Group_VideoMax,       "Y Active Bits", "lavfi.signalstats.YBITDEPTH",    0,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats },
     //Crop
     { Group_CropW,   Group_VideoMax,       "Crop Left",     "lavfi.cropdetect.x1",       0,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_cropdetect },
     { Group_CropW,   Group_VideoMax,       "Crop Right",    "lavfi.cropdetect.x2",       0,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_cropdetect  },
