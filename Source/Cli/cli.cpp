@@ -15,8 +15,6 @@ int Cli::exec(QCoreApplication &a)
     std::string copyright = "Copyright (C): 2013-2020, BAVC.\nCopyright (C): 2018-2020, RiceCapades LLC & MediaArea.net SARL.";
     Preferences prefs;
 
-    Preferences prefs;
-
     QString input;
     QString output;
     QStringList filterStrings;
