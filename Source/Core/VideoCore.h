@@ -53,6 +53,9 @@ enum VideoItem
     //Item_HEAD,
     Item_VREP,
     Item_BRNG,
+    Item_YBITS,
+    Item_UBITS,
+    Item_VBITS,
     //Crop
     Item_Crop_x1,
     Item_Crop_x2,
@@ -120,6 +123,7 @@ enum VideoGroup
     //Group_HEAD,
     Group_VREP,
     Group_BRNG,
+    Group_YUVB,
     Group_CropW,
     Group_CropH,
     Group_CropF,
