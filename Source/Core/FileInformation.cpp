@@ -24,6 +24,7 @@
 #include <QUrl>
 #include <QBuffer>
 #include <QPair>
+#include <QDir>
 #include <zlib.h>
 #include <zconf.h>
 
@@ -251,6 +252,7 @@ const QMap<std::string, QVector<int>> &FileInformation::panelOutputsByTitle() co
 
 FileInformation::FileInformation (SignalServer* signalServer, const QString &FileName_, activefilters ActiveFilters_, activealltracks ActiveAllTracks_,
                                   QMap<QString, std::tuple<QString, QString, QString, QString, int>> activePanels,
+                                  const QString &QCvaultFileNamePrefix,
                                   int FrameCount) :
     FileName(FileName_),
     ActiveFilters(ActiveFilters_),
@@ -346,6 +348,40 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         {
             attachment = FFmpeg_Glue::getAttachment(FileName + dotQctoolsDotMkv, StatsFromExternalData_FileName);
             glueFileName = glueFileName + dotQctoolsDotMkv.toStdString();
+        }
+        else if (!QCvaultFileNamePrefix.isEmpty())
+        {
+            auto QCvaultFileName = QFileInfo(QCvaultFileNamePrefix).fileName();
+            QDir QCvaultPath = QFileInfo(QCvaultFileNamePrefix).absolutePath();
+            auto fileNameWithoutPath = QFileInfo(FileName).fileName();
+            while (QCvaultFileName.size() >= fileNameWithoutPath.size())
+            {
+                // Is there compatible file names in QCvault path
+                auto list = QCvaultPath.entryList(QStringList(QCvaultFileName + "*" + dotQctoolsDotMkv), QDir::Files, QDir::Name);
+                if (list.size() == 1)
+                {
+                    attachment = FFmpeg_Glue::getAttachment(QCvaultPath.absolutePath() + "/" + list[0], StatsFromExternalData_FileName);
+                    glueFileName = (QCvaultPath.absolutePath() + "/" + list[0]).toStdString();
+                    break;
+                }
+                list = QCvaultPath.entryList(QStringList(QCvaultFileName + "*" + dotQctoolsDotXmlDotGz), QDir::Files, QDir::Name);
+                if (list.size() == 1)
+                {
+                    StatsFromExternalData_FileName = QCvaultPath.absolutePath() + "/" + list[0] + dotQctoolsDotXmlDotGz;
+                    StatsFromExternalData_FileName_IsCompressed = true;
+                    break;
+                }
+
+                for (auto QCvaultFileNamePos = QCvaultFileName.size() - 1; QCvaultFileNamePos; QCvaultFileNamePos--)
+                {
+                    auto Character = QCvaultFileName.at(QCvaultFileNamePos);
+                    if (Character == '.')
+                    {
+                        QCvaultFileName.resize(QCvaultFileNamePos);
+                        break;
+                    }
+                }
+            }
         }
     }
 

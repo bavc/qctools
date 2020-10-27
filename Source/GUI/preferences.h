@@ -31,6 +31,9 @@ public:
     bool isSignalServerEnabled() const;
     bool isSignalServerAutoUploadEnabled() const;
 
+    QString QCvaultPathString() const;
+    QString defaultQCvaultPathString() const;
+
     QString signalServerUrlString() const;
     QString signalServerLogin() const;
     QString signalServerPassword() const;
@@ -52,6 +55,11 @@ private Q_SLOTS:
     void OnAccepted();
     void OnRejected();
     void on_signalServerUrl_lineEdit_editingFinished();
+    void on_QCvaultPath_None_toggled(bool checked);
+    void on_QCvaultPath_Default_toggled(bool checked);
+    void on_QCvaultPath_Custom_toggled(bool checked);
+    void on_QCvaultPath_select_clicked(bool checked = false);
+    void on_QCvaultPath_open_clicked(bool checked = false);
 };
 
 #endif // PREFERENCES_DIALOG_H
