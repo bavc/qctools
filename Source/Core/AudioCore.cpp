@@ -56,7 +56,7 @@ struct per_group AudioPerGroup [Group_AudioMax]=
     },
     //zero crossings
     {
-        Item_Zero_Crossing1,         2,   "-0.5",    "0.5",  6,  "Audio Zero Crossing Rate",  true,
+        Item_Zero_Crossing1,         2,   "0",  "0.5",  6,  "Audio Zero Crossing Rate",  true,
         "For the first two channels of an audio track this graph plots the rate\n"
         "of zero crossings against the number of audio samples.",
         ActiveFilter_Audio_astats,
