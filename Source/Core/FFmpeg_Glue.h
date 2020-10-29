@@ -251,6 +251,8 @@ public:
     FrameRate getAvgVideoFrameRate() const;
 
     int getStreamType(int streamIndex) const;
+    int sampleRate(int streamIndex) const;
+
     std::vector<StreamInfo>     findStreams(StreamType type);
     std::vector<int>            findStreams(const std::function<bool(AVStream* stream)>& criteria);
     std::vector<int>            findMediaStreams();

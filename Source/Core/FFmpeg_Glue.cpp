@@ -1554,6 +1554,11 @@ int FFmpeg_Glue::getStreamType(int streamIndex) const
     return InputDatas[streamIndex]->Stream->codecpar->codec_type;
 }
 
+int FFmpeg_Glue::sampleRate(int streamIndex) const
+{
+    return InputDatas[streamIndex]->Stream->codecpar->sample_rate;
+}
+
 std::vector<FFmpeg_Glue::StreamInfo> FFmpeg_Glue::findStreams(StreamType type)
 {
     std::vector<StreamInfo> streamInfos;
