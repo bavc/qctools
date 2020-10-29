@@ -504,6 +504,8 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                         filter.replace(QString("${PANEL_WIDTH}"), QString::number(m_panelSize.width()));
                     while(filter.indexOf(QString("${AUDIO_FRAME_RATE}")) != -1)
                         filter.replace(QString("${AUDIO_FRAME_RATE}"), QString::number(32));
+                    while(filter.indexOf(QString("${AUDIO_SAMPLE_RATE}")) != -1)
+                        filter.replace(QString("${AUDIO_SAMPLE_RATE}"), QString::number(Glue->sampleRate(streamIndex)));
                     while(filter.indexOf(QString("${DEFAULT_HEIGHT}")) != -1)
                         filter.replace(QString("${DEFAULT_HEIGHT}"), QString::number(360));
 
