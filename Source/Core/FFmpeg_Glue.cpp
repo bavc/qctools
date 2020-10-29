@@ -930,8 +930,19 @@ void FFmpeg_Glue::AddOutput(int Scale_Width, int Scale_Height, outputmethod Outp
 
         if (InputData && InputData->Type==FilterType)
         {
+            auto filter = Filter;
+            qDebug() << "FFmpeg_Glue::AddOutput => original filter: " << QString::fromStdString(Filter);
+
+            auto pos = -1;
+            static std::string audioSampleRate = "${AUDIO_SAMPLE_RATE}";
+
+            while((pos = filter.find(audioSampleRate)) != -1)
+                filter.replace(pos, audioSampleRate.length(), std::to_string(sampleRate(InputPos)));
+
+            qDebug() << "FFmpeg_Glue::AddOutput => modified filter: " << QString::fromStdString(filter);
+
             OutputDatas.push_back(NULL);
-            ModifyOutput(InputPos, OutputDatas.size()-1, Scale_Width, Scale_Height, OutputMethod, FilterType, Filter);
+            ModifyOutput(InputPos, OutputDatas.size()-1, Scale_Width, Scale_Height, OutputMethod, FilterType, filter);
         }
     }
 }
@@ -1552,6 +1563,11 @@ FFmpeg_Glue::FrameRate FFmpeg_Glue::getAvgVideoFrameRate() const
 int FFmpeg_Glue::getStreamType(int streamIndex) const
 {
     return InputDatas[streamIndex]->Stream->codecpar->codec_type;
+}
+
+int FFmpeg_Glue::sampleRate(int streamIndex) const
+{
+    return InputDatas[streamIndex]->Stream->codecpar->sample_rate;
 }
 
 std::vector<FFmpeg_Glue::StreamInfo> FFmpeg_Glue::findStreams(StreamType type)
