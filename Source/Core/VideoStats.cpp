@@ -151,7 +151,7 @@ void VideoStats::parseFrame(tinyxml2::XMLElement *Frame)
     setWidth(Width);
 
     int Height;
-    Attribute=Frame->Attribute("width");
+    Attribute=Frame->Attribute("height");
     if (Attribute)
         Height=std::atoi(Attribute);
     else

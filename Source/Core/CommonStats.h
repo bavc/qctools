@@ -164,6 +164,7 @@ public:
     typedef std::string StringStatsKey;
 
     void initializeAdditionalStats();
+    void updateAdditionalStats(StatsValueInfo::Type type, size_t oldSize, size_t size);
     void processAdditionalStats(const char* key, const char* value, bool statsMapInitialized);
     void writeAdditionalStats(std::stringstream& stream, size_t index);
 

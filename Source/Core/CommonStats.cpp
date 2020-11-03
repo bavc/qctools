@@ -196,6 +196,18 @@ void CommonStats::processAdditionalStats(const char* key, const char* value, boo
         };
         statsValueInfoByKeys[key] = stats;
         statsKeysByIndexByValueType[type][stats.index] = key;
+    } else if(statsValueInfoByKeys.find(key)==statsValueInfoByKeys.end()) {
+        auto type = StatsValueInfo::typeFromKey(key, value);
+        auto oldSize = lastStatsIndexByValueType[type];
+
+        auto stats = StatsValueInfo {
+            lastStatsIndexByValueType[type]++, type, value
+        };
+        statsValueInfoByKeys[key] = stats;
+        statsKeysByIndexByValueType[type][stats.index] = key;
+
+        auto size = lastStatsIndexByValueType[type];
+        updateAdditionalStats(type, oldSize, size);
     } else {
         auto stats = statsValueInfoByKeys[key];
         if(stats.type == StatsValueInfo::Int) {
@@ -236,6 +248,58 @@ void CommonStats::writeAdditionalStats(stringstream &stream, size_t index)
 
             stream<<"            <tag key=\"" << key << "\" value=\"" << value << "\"/>\n";
         }
+    }
+}
+
+void CommonStats::updateAdditionalStats(StatsValueInfo::Type type, size_t oldSize, size_t size)
+{
+    if (type==StatsValueInfo::Int)
+    {
+        auto additionalIntStats_Old = additionalIntStats;
+        additionalIntStats = new int*[size];
+        for (size_t j = 0; j < size; ++j)
+        {
+            additionalIntStats[j] = new int[Data_Reserved];
+            memset(&additionalIntStats[j][0], 0x00, Data_Reserved * sizeof(int));
+            if (size < oldSize)
+            {
+                memcpy(additionalIntStats[j], additionalIntStats_Old[j], Data_Reserved * sizeof(int));
+                delete[] additionalIntStats_Old[j];
+            }
+        }
+        delete[] additionalIntStats_Old;
+    }
+    else if (type==StatsValueInfo::Double)
+    {
+        auto additionalDoubleStats_Old = additionalDoubleStats;
+        additionalDoubleStats = new double*[size];
+        for (size_t j = 0; j < size; ++j)
+        {
+            additionalDoubleStats[j] = new double[Data_Reserved];
+            memset(&additionalDoubleStats[j][0], 0x00, Data_Reserved * sizeof(double));
+            if (size < oldSize)
+            {
+                memcpy(additionalDoubleStats[j], additionalDoubleStats_Old[j], Data_Reserved * sizeof(double));
+                delete[] additionalDoubleStats_Old[j];
+            }
+        }
+        delete[] additionalDoubleStats_Old;
+    }
+    else if (type==StatsValueInfo::String)
+    {
+        auto additionalStringStats_Old = additionalStringStats;
+        additionalStringStats = new char**[size];
+        for (size_t j = 0; j < size; ++j)
+        {
+            additionalStringStats[j] = new char*[Data_Reserved];
+            memset(&additionalStringStats[j][0], 0x00, Data_Reserved * sizeof(char*));
+            if (size < oldSize)
+            {
+                memcpy(additionalStringStats[j], additionalStringStats_Old[j], Data_Reserved * sizeof(char*));
+                delete[] additionalStringStats_Old[j];
+            }
+        }
+        delete[] additionalStringStats_Old;
     }
 }
 
