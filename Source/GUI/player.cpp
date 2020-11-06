@@ -716,7 +716,11 @@ void Player::applyFilter()
     } else {
         for(int i = 0; i < definedFilters.length(); ++i) {
             if(ui->fitToGrid_checkBox->isChecked()) {
-                filterString += replaceFilterTokens(QString("[x%1]%2,scale=${width}:${height}[y%1];")).arg(i + 1).arg(definedFilters[i]);
+                if(i == 0) {
+                    filterString += replaceFilterTokens(QString("[x%1]%2[y%1];")).arg(i + 1).arg(definedFilters[i]);
+                } else {
+                    filterString += replaceFilterTokens(QString("[x%1]%2[z%1];[z%1][y1]scale2ref[y%1][y1];")).arg(i + 1).arg(definedFilters[i]);
+                }
             } else {
                 filterString += QString("[x%1]%2[y%1];").arg(i + 1).arg(definedFilters[i]);
             }
