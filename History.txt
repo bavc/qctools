@@ -1,3 +1,26 @@
+1.2,
+=== Thanks to TIB – Leibniz Information Centre for Science and Technology for their vision and support on this release ===
++ Adds panel tracks which show timeline-based images that depict audio or video tracks (PR #651). Initial tracks supported are:
+  | - Tiled Center Column
+  | - Tiled Center Column (Field Split)
+  | - Tiled Center Row
+  | - Horizontal Blur
+  | - Audio Waveform (Linear)
+  | - Audio Waveform (Logarithmic)
+  | - Audio NormalizedAudio Histogram
++ Move toggle for graph/panel display from a toolbar to a popup window (PR #651)
++ Add a graph of zero-crossing rate for audio tracks (PR #669/675)
++ Add a graph of active video bitdepth (PR #672)
++ Add a QCVault feature to qcli and QCTools to save QCTools reports in a selected folder or to a sidecar file
++ Change default QCTools reporting format from gzipped xml (.xml.gz) to Matroska (.qctools.mkv) (PR #660)
++ Added options to qcli for panel and track selection, reading/setting preferences shared with qctools (PR #666, 667)
+x Fix astats plotting issues by evaluating audio data as floats(PR #669)
+x Fix selection of fill/highlight color in qctools player (PR #663)
+x Fix when plotting audio sample tracks that are not 48kHz when the ebur128 graph is enabled (PR #675)
+x Fix to provide graphs for more than one audio or video track (PR #668)
+x Fix a crash when expected metadata was not avaialble for first few frames (PR #677)
+x Fix stack overflow when skimming graphs (PR #630)
+
 1.1, 2020-03-05
 === Thanks to New York Public Library and the Hirshhorn Museum and Sculpture Garden for their support ===
 + Player is refactored to QtAV/mdk

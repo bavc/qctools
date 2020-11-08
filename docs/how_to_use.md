@@ -37,6 +37,20 @@ QCTool's analysis methods depend on filters from FFmpeg's libavfilter library. T
 
 Enabling all filters naturally provides more data, but results in a slower analysis and larger files. The EBU R.128 values represent perceived volume whereas the `astats` filters include metrics on actual volume (so the use of EBU R128 may not be considered essential if `astats` is in use). Additionally `PSNR` and `SSIM` both cover similar metrics by quantifying the difference between the two fields of the frame (the image of the odd-numbered lines vs the image of the even-numbered lines); `SSIM` is recommended.
 
+### Panels
+
+QCTools generates panels of images that are stacked horizontal to depict the timeline of audiovisual content in various ways. The panel tracks will reveal an image where the x-axis (viewing from left to right) will represent the timeline of the audiovisual content and the y-axis (viewing from top to bottom) is conditionally determined by the panel.
+
+| filter name | track type | application in QCTools |
+| Tiled Center Column | video | This image shows the center column from each subsequent image of the video timeline. |
+| Tiled Center Column (Field Split) | video | Similar to 'Tiled Center Column'; however, the image is adjusted so that odd lines of video (the top field of an interlaced video) are shown at the top of the image and the even lines of video (the bottom field) are shown at the bottom. |
+| Tiled Center Row | video | This image shows the center row from each subsequent image of the video timeline. The images are rotated 90 degrees counter-clockwise in the panel viewer, so the left edge of the frame's central row is on the bottom of the panel image and the right edge is at the top. |
+| Horizontal Blur | video | Each column of this panel shows a variation of a Laplacian convolve of the image rotated 90 degrees counter clockwise. The lower part of the panel image depicts the left part of the source image and the top part of the panel image depicts the right part of the source image. In the panel image, brighter pixels depict content that is more in focus while darker pixels represent content that is flat or blurry. |
+| Audio Waveform (Linear) | audio | This is a visualization of the audio waveform on a linear plot, each channel of the track is stacked upon one another. |
+| Audio Waveform (Logarithmic) | audio | This is a visualization of the audio waveform on a logarithmic plot, each channel of the track is stacked upon one another. |
+| Audio Normalized Cross-correlation | audio | This image shows the normalized cross-correlation between two channels of the audio track. Very high values (in green) show highly correlated audio, whereas very low values show highly correlated audio that is out of phase, and values in the center show that the audio is not correlated. |
+| Audio Histogram | audio | A volume histogram for the audio track. |
+
 ### Tracks
 
 The 'Tracks' Preference pane allows the user to set if they would like to analyze only the first track or all tracks of video and audio. Setting QCTools to analyze only the first track will result in a faster analyze but the other tracks would be ignored.
