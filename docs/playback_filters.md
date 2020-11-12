@@ -112,7 +112,7 @@ For video that uses the YUV colorspace and decode in a broadcast range. On an 8-
 
 ## Broadcast Range Pixels {#broadcast-range-pixels}
 
-This is the same presentation as 'Normal' except that pixels that are outside of broadcast range are highlighted as white. Again here, you have the option of selecting **'Field'** to display field 1 (top) and field 2 (bottom) separately.
+This is the same presentation as 'Normal' except that pixels that are outside of broadcast range are highlighted. Again here, you have the option of selecting **'Field'** to display field 1 (top) and field 2 (bottom) separately.
 
 ![Broadcast Range Pixels](media/playbackfilter_broadcast_range_pixels.jpg)
 
@@ -230,13 +230,13 @@ Displays an image obtained from the temporal difference between successive frame
 
 ## Temporal Outlier Pixels {#temporal-outlier-pixels}
 
-This is the same presentation as 'Normal' except that pixels that are labelled as temporal outliers are highlighted as white. Temporal outliers are pixels that significantly differ from their neighbors and often correspond to tape damage or playback error. Select **'Field'** to see the fields displayed separately.
+This is the same presentation as 'Normal' except that pixels that are labelled as temporal outliers are highlighted. Temporal outliers are pixels that significantly differ from their neighbors and often correspond to tape damage or playback error. Select **'Field'** to see the fields displayed separately.
 
 ![Temporal Outlier Pixels](media/playbackfilter_temporal_outlier_pixels_1.jpg)
 
 ## Value Highlight {#value-highlight}
 
-This filter selects a video plane and highlights values with a specified range of minimum value to maximum value. The original image of the plane will be presented in grayscale and values within the range will be highlighted as yellow; for instance to highlight Y values below NTSC broadcast range, set plane to Y, min to 0 and max to 16. The resulting image will highlight Y values below broadcast range in yellow.
+This filter selects a video plane and highlights values with a specified range of minimum value to maximum value. The original image of the plane will be presented in grayscale and values within the range will be highlighted as yellow; for instance to highlight Y values below NTSC broadcast range, set plane to Y, min to 0 and max to 16. The resulting image will highlight Y values below broadcast range in turquoise.
 
 ![Value Highlight](media/playbackfilter_value_highlight.jpg)
 
@@ -267,7 +267,7 @@ The Vectorscope Target is similar to the **Vectorscope** filter but a box is dra
 
 ## Vertical Line Repetitions {#vertical-line-repeititons}
 
-This filter displays repetitive lines of video data.
+This filter highlights repetitive lines of video data.
 
 ![Vertical Line Repetitions](media/playbackfilter_vertical_line_repetitions_2.jpg)
 
