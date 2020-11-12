@@ -773,8 +773,8 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "signalstats=out=tout:c=${2}",
-            "il=l=d:c=d,signalstats=out=tout:c=${2}",
+            "format=yuv444p,signalstats=out=tout:c=${2}",
+            "format=yuv444p,il=l=d:c=d,signalstats=out=tout:c=${2}",
         },
     },
     {
@@ -790,8 +790,8 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "signalstats=out=vrep:c=${2}",
-            "signalstats=out=vrep:c=${2},il=l=d:c=d",
+            "format=yuv444p,signalstats=out=vrep:c=${2}",
+            "format=yuv444p,signalstats=out=vrep:c=${2},il=l=d:c=d",
         },
     },
     {
