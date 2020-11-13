@@ -558,7 +558,7 @@ const filter Filters[] =
             { Args_Type_Yuv,      0,   0,   0,   0, "Plane" },
             { Args_Type_Slider, 235,   0, 255,   1, "Min"},
             { Args_Type_Slider, 255,   0, 255,   1, "Max"},
-            { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
+            { Args_Type_ClrPck, 0x40e0d0,   0,   0,   0, ""},
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
@@ -729,7 +729,7 @@ const filter Filters[] =
         0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
+            { Args_Type_ClrPck, 0x40e0d0,   0,   0,   0, ""},
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
@@ -765,7 +765,7 @@ const filter Filters[] =
         0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
+            { Args_Type_ClrPck, 0x40e0d0,   0,   0,   0, ""},
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
@@ -773,8 +773,8 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "signalstats=out=tout:c=${2}",
-            "il=l=d:c=d,signalstats=out=tout:c=${2}",
+            "format=yuv444p,signalstats=out=tout:c=${2}",
+            "format=yuv444p,il=l=d:c=d,signalstats=out=tout:c=${2}",
         },
     },
     {
@@ -782,7 +782,7 @@ const filter Filters[] =
         0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_ClrPck, 0xFFFF00,   0,   0,   0, ""},
+            { Args_Type_ClrPck, 0x40e0d0,   0,   0,   0, ""},
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
@@ -790,8 +790,8 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "signalstats=out=vrep:c=${2}",
-            "signalstats=out=vrep:c=${2},il=l=d:c=d",
+            "format=yuv444p,signalstats=out=vrep:c=${2}",
+            "format=yuv444p,signalstats=out=vrep:c=${2},il=l=d:c=d",
         },
     },
     {
