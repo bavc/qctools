@@ -42,7 +42,7 @@ jobs:
 
     - name: Set Qt5 environment path
       run: |
-        echo "::add-path::/usr/local/opt/qt5/bin"
+        echo "/usr/local/opt/qt5/bin" >> $GITHUB_PATH
 
     - name: Build QCTools
       env:
@@ -312,14 +312,14 @@ jobs:
     - name: Set vswhere path
       run: |
         $VsPath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer"
-        echo "::add-path::$VsPath"
+        echo "$VsPath" >> $GITHUB_PATH
 
     - name: Set MSVC x86_64 paths
       run: |
         $LinkGlob = "VC\Tools\MSVC\*\bin\Hostx64\x64"
         $LinkPath = vswhere -latest -products * -find "$LinkGlob" |
                     Select-Object -Last 1
-        echo "::add-path::$LinkPath"
+        echo "$LinkPath" >> $GITHUB_PATH
 
     - name: Install jom
       run: |
