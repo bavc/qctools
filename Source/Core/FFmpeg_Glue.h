@@ -281,7 +281,6 @@ public:
     int                         OutputThumbnailWidth_Get() const;
     int                         OutputThumbnailHeight_Get() const;
     int                         OutputThumbnailBitRate_Get() const;
-    void                        OutputThumbnailTimeBase_Get(int& num, int& den) const;
 
     std::string getOutputFilter(int pos) const;
     std::map<std::string, std::string> getOutputMetadata(int pos) const;

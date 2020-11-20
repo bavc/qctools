@@ -1992,19 +1992,6 @@ int FFmpeg_Glue::OutputThumbnailBitRate_Get() const
     return 0;
 }
 
-void FFmpeg_Glue::OutputThumbnailTimeBase_Get(int &num, int &den) const
-{
-    outputdata* OutputData=OutputDatas[0];
-    num = 0;
-    den = 1;
-
-    if (OutputData)
-    {
-        num = OutputData->Output_CodecContext->time_base.num;
-        den = OutputData->Output_CodecContext->time_base.den;
-    }
-}
-
 std::string FFmpeg_Glue::getOutputFilter(int pos) const
 {
     return OutputDatas[pos]->Filter;

@@ -703,7 +703,7 @@ int Cli::exec(QCoreApplication &a)
                 int num = 0;
                 int den = 0;
 
-                info->Glue->OutputThumbnailTimeBase_Get(num, den);
+                info->Glue->getOutputTimeBase(0, num, den);
 
                 FFmpegVideoEncoder::Source source;
                 source.width = info->Glue->OutputThumbnailWidth_Get();

@@ -815,8 +815,7 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
 
     int num = 0;
     int den = 0;
-
-    Glue->OutputThumbnailTimeBase_Get(num, den);
+    Glue->getOutputTimeBase(0, num, den);
 
     FFmpegVideoEncoder::Metadata metadata;
     metadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString("QCTools Report for %1").arg(QFileInfo(fileName()).fileName()));
