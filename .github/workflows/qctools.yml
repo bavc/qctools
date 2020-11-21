@@ -94,7 +94,7 @@ jobs:
     - name: Install Qt 5.15
       uses: jurplel/install-qt-action@v2
       with: 
-        version: 5.15.1
+        version: 5.15.2
 
     - name: Build qwt
       run: |
@@ -197,7 +197,7 @@ jobs:
     - name: Install Qt 5.15
       uses: jurplel/install-qt-action@v2
       with:
-        version: 5.15.1
+        version: 5.15.2
 
     - name: Cleanup
       run: |
@@ -247,7 +247,7 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with:
         arch: win64_mingw81
-        version: 5.15.1
+        version: 5.15.2
 
     - name: Install FFmpeg
       run: |
@@ -344,7 +344,7 @@ jobs:
     - name: Install Qt 5.15
       uses: jurplel/install-qt-action@v2
       with: 
-        version: 5.15.1
+        version: 5.15.2
 
     - name: Install FFmpeg
       run: |
