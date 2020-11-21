@@ -92,7 +92,7 @@ jobs:
         brew install ${{ matrix.packages }} nasm
 
     - name: Install Qt 5.15
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v2.10.0
       with: 
         version: 5.15.2
 
