@@ -302,33 +302,19 @@ jobs:
             -c protocol.version=2 \
             submodule update --init --force --recursive --depth=1
 
-    - name: Install Python 3.7 version
-      uses: actions/setup-python@v1
-      with:
-        python-version: '3.7'
-        architecture: 'x64'
-
-    - name: Set vswhere path
-      run: |
-        $VsPath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer"
-        echo "$VsPath" >> $GITHUB_PATH
-
-    - name: Set MSVC x86_64 paths
-      run: |
-        $LinkGlob = "VC\Tools\MSVC\*\bin\Hostx64\x64"
-        $LinkPath = vswhere -latest -products * -find "$LinkGlob" |
-                    Select-Object -Last 1
-        echo "$LinkPath" >> $GITHUB_PATH
 
     - name: Install jom
       run: |
         choco install jom
 
+    - name: Init vs environment
+      uses: egor-tensin/vs-shell@v2
+      with:
+        arch: x64
+
     - name: Build and install zlib
       shell: cmd
       run: |
-        set "VS_PATH=C:\\Program Files (x86)\\Microsoft Visual Studio\\2019"
-        cmd /k "%VS_PATH%\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
         git clone --depth 1 https://github.com/madler/zlib ../zlib-dev
         cd ../zlib-dev
         mkdir build
@@ -360,8 +346,6 @@ jobs:
 
     - name: Download and configure qwt
       run: |
-        set "VS_PATH=C:\\Program Files (x86)\\Microsoft Visual Studio\\2019"
-        cmd /k "%VS_PATH%\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
         git clone --depth 1 https://github.com/opencor/qwt ../qwt
         cd ../qwt
         qmake -r
@@ -369,8 +353,6 @@ jobs:
     - name: Build qwt
       shell: cmd
       run: |
-        set "VS_PATH=C:\\Program Files (x86)\\Microsoft Visual Studio\\2019"
-        cmd /k "%VS_PATH%\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
         cd ../qwt
         jom -j12
 
@@ -382,7 +364,5 @@ jobs:
     - name: Build QCTools
       shell: cmd
       run: |
-        set "VS_PATH=C:\\Program Files (x86)\\Microsoft Visual Studio\\2019"
-        cmd /k "%VS_PATH%\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
         cd Project/QtCreator
         jom -j12
