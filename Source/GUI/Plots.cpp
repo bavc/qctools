@@ -180,7 +180,35 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
 
                     updateSamples( plot );
 
-                    connect( plot, SIGNAL( cursorMoved( int ) ), SLOT( onCursorMoved( int ) ) );
+                    connect(plot, &Plot::cursorMoved, [this, plot](const QPointF& point, int framePos) {
+
+                        // search for video plot
+                        Plot* videoPlot = nullptr;
+                        if(plot->type() == Type_Audio) {
+                            for ( size_t streamPos = 0; streamPos < m_fileInfoData->Stats.size(); streamPos++ )
+                            {
+                                if (m_fileInfoData->Stats[streamPos] && m_fileInfoData->Stats[streamPos]->Type_Get() == Type_Video);
+                                {
+                                    size_t type = m_fileInfoData->Stats[streamPos]->Type_Get();
+                                    size_t countOfGroups = PerStreamType[type].CountOfGroups;
+                                    for ( size_t group = 0; group < countOfGroups; group++ )
+                                    {
+                                        if (m_fileInfoData->ActiveFilters[PerStreamType[type].PerGroup[group].ActiveFilterGroup]) {
+                                            videoPlot = m_plots[streamPos][group];
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+
+                            if(videoPlot)
+                                framePos = videoPlot->frameAt(point.x());
+                        }
+
+                        onCursorMoved(framePos);
+
+                    });
 
                     plot->canvas()->installEventFilter( this );
 

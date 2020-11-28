@@ -813,7 +813,7 @@ void Plot::onPickerMoved( const QPointF& pos )
 {
     const int idx = frameAt( pos.x() );
     if ( idx >= 0 )
-        Q_EMIT cursorMoved( idx );
+        Q_EMIT cursorMoved(pos, idx);
 }
 
 static int indexLower( double x, const QwtSeriesData<QPointF> &data )
