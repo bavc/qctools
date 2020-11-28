@@ -246,7 +246,7 @@ void CommonStats::writeAdditionalStats(stringstream &stream, size_t index)
             auto key = statsKeysByIndexByValueType[StatsValueInfo::String][i];
             auto value = additionalStringStats[i][index];
 
-            stream<<"            <tag key=\"" << key << "\" value=\"" << value << "\"/>\n";
+            stream<<"            <tag key=\"" << key << "\" value=\"" << (value != nullptr ? value : "nan") << "\"/>\n";
         }
     }
 }
