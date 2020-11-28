@@ -42,7 +42,7 @@ jobs:
 
     - name: Set Qt5 environment path
       run: |
-        echo "::add-path::/usr/local/opt/qt5/bin"
+        echo "/usr/local/opt/qt5/bin" >> $GITHUB_PATH
 
     - name: Build QCTools
       env:
@@ -89,12 +89,11 @@ jobs:
 
     - name: Install dependencies
       run: |
-        brew install ${{ matrix.packages }} nasm
+        brew install ${{ matrix.packages }} nasm qt
 
-    - name: Install Qt 5.15
-      uses: jurplel/install-qt-action@v2
-      with: 
-        version: 5.15.1
+    - name: Set Qt5 environment path
+      run: |
+        echo "/usr/local/opt/qt5/bin" >> $GITHUB_PATH
 
     - name: Build qwt
       run: |
@@ -197,7 +196,7 @@ jobs:
     - name: Install Qt 5.15
       uses: jurplel/install-qt-action@v2
       with:
-        version: 5.15.1
+        version: 5.15.2
 
     - name: Cleanup
       run: |
@@ -247,7 +246,7 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with:
         arch: win64_mingw81
-        version: 5.15.1
+        version: 5.15.2
 
     - name: Install FFmpeg
       run: |
@@ -303,33 +302,19 @@ jobs:
             -c protocol.version=2 \
             submodule update --init --force --recursive --depth=1
 
-    - name: Install Python 3.7 version
-      uses: actions/setup-python@v1
-      with:
-        python-version: '3.7'
-        architecture: 'x64'
-
-    - name: Set vswhere path
-      run: |
-        $VsPath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer"
-        echo "::add-path::$VsPath"
-
-    - name: Set MSVC x86_64 paths
-      run: |
-        $LinkGlob = "VC\Tools\MSVC\*\bin\Hostx64\x64"
-        $LinkPath = vswhere -latest -products * -find "$LinkGlob" |
-                    Select-Object -Last 1
-        echo "::add-path::$LinkPath"
 
     - name: Install jom
       run: |
         choco install jom
 
+    - name: Init vs environment
+      uses: egor-tensin/vs-shell@v2
+      with:
+        arch: x64
+
     - name: Build and install zlib
       shell: cmd
       run: |
-        set "VS_PATH=C:\\Program Files (x86)\\Microsoft Visual Studio\\2019"
-        call "%VS_PATH%\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
         git clone --depth 1 https://github.com/madler/zlib ../zlib-dev
         cd ../zlib-dev
         mkdir build
@@ -344,7 +329,7 @@ jobs:
     - name: Install Qt 5.15
       uses: jurplel/install-qt-action@v2
       with: 
-        version: 5.15.1
+        version: 5.15.2
 
     - name: Install FFmpeg
       run: |
@@ -368,8 +353,6 @@ jobs:
     - name: Build qwt
       shell: cmd
       run: |
-        set "VS_PATH=C:\\Program Files (x86)\\Microsoft Visual Studio\\2019"
-        call "%VS_PATH%\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
         cd ../qwt
         jom -j12
 
@@ -381,7 +364,5 @@ jobs:
     - name: Build QCTools
       shell: cmd
       run: |
-        set "VS_PATH=C:\\Program Files (x86)\\Microsoft Visual Studio\\2019"
-        call "%VS_PATH%\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
         cd Project/QtCreator
         jom -j12
