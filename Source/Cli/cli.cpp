@@ -692,7 +692,7 @@ int Cli::exec(QCoreApplication &a)
 
                 FFmpegVideoEncoder encoder;
                 FFmpegVideoEncoder::Metadata metadata;
-                metadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString("QCTools Report for %1").arg(QFileInfo(statsFile.data()->fileName()).fileName()));
+                metadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString("QCTools Report for %1").arg(QFileInfo(info->fileName()).fileName()));
                 metadata << FFmpegVideoEncoder::MetadataEntry(QString("creation_time"), QString("now"));
 
                 encoder.setMetadata(metadata);
