@@ -460,7 +460,7 @@ public:
     bool isBarchart() const;
 
 Q_SIGNALS:
-    void cursorMoved( int index );
+    void cursorMoved(const QPointF& point, int index);
     void visibilityChanged(bool visible);
 
 public Q_SLOTS:
