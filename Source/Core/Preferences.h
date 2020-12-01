@@ -75,6 +75,7 @@ public:
     void setRecentFiles(const QStringList& recentFiles);
 
     void sync();
+    void resetSettings();
 };
 
 Q_DECLARE_METATYPE(GroupAndType)

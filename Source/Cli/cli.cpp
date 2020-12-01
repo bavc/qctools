@@ -68,6 +68,10 @@ int Cli::exec(QCoreApplication &a)
         {
             showVersion = true;
         }
+        else if(a.arguments().at(i) == "--resetsettings")
+        {
+            Preferences().resetSettings();
+        }
         else if (a.arguments().at(i) == "-qcvault")
         {
             ++i;

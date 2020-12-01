@@ -15,6 +15,7 @@
 #include <QtCore/QtPlugin>
 
 #include <Core/logging.h>
+#include <Core/Preferences.h>
 #ifdef __MACOSX__
     #include <ApplicationServices/ApplicationServices.h>
 #endif //__MACOSX__
@@ -39,6 +40,10 @@ int main(int argc, char *argv[])
         else if(strcmp(argv[Pos], "--log") == 0)
         {
             logging.enable();
+        }
+        else if(strcmp(argv[Pos], "--resetsettings") == 0)
+        {
+            Preferences().resetSettings();
         }
         else
         {
