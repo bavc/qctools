@@ -71,6 +71,8 @@ int Cli::exec(QCoreApplication &a)
         else if(a.arguments().at(i) == "--resetsettings")
         {
             Preferences().resetSettings();
+            std::cout << "Settings cleared." << std::endl;
+            configIsSet = true;
         }
         else if (a.arguments().at(i) == "-qcvault")
         {
