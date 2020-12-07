@@ -399,6 +399,13 @@ void Preferences::sync()
     settings.sync();
 }
 
+void Preferences::resetSettings()
+{
+    QSettings settings;
+    settings.clear();
+    settings.sync();
+}
+
 QDataStream &operator<<(QDataStream &out, const FilterSelectorsOrder &order) {
 
     qDebug() << "*** serializing filters order... ***";

@@ -68,6 +68,12 @@ int Cli::exec(QCoreApplication &a)
         {
             showVersion = true;
         }
+        else if(a.arguments().at(i) == "--resetsettings")
+        {
+            Preferences().resetSettings();
+            std::cout << "Settings cleared." << std::endl;
+            configIsSet = true;
+        }
         else if (a.arguments().at(i) == "-qcvault")
         {
             ++i;
@@ -453,6 +459,8 @@ int Cli::exec(QCoreApplication &a)
                 << std::endl
                 << "-y" << std::endl
                 << "    Force creation of <qctools-report> even if it already exists" << std::endl
+                << "-resetsettings" << std::endl
+                << "    Reset application settings" << std::endl
                 << std::endl;
 
             std::cout
