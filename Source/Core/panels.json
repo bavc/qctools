@@ -51,7 +51,7 @@
         "name" : "Audio Normalized Cross-correlation",
         "legend" : "Audio Normalized\nCross-correlation",
         "yaxis" : "Out of Phase Correlation:Uncorrelated:In Phase Correlation",
-        "filterchain" : "channelsplit,axcorrelate=algo=fast,showwaves=mode=point:colors=white:size=${PANEL_WIDTH}x${DEFAULT_HEIGHT}:scale=lin:draw=full:rate=${AUDIO_FRAME_RATE}/${PANEL_WIDTH},format=rgb24,geq=r=if(gt(p(X\\,Y)\\,128)\\,Y*256/${DEFAULT_HEIGHT}\\,0):g=if(gt(p(X\\,Y)\\,128)\\,256-(Y*256/${DEFAULT_HEIGHT})\\,0):b=0,setsar=1/1,format=rgb24",
+        "filterchain" : "aformat=channel_layouts=stereo,channelsplit,axcorrelate=algo=fast,showwaves=mode=point:colors=white:size=${PANEL_WIDTH}x${DEFAULT_HEIGHT}:scale=lin:draw=full:rate=${AUDIO_FRAME_RATE}/${PANEL_WIDTH},format=rgb24,geq=r=if(gt(p(X\\,Y)\\,128)\\,Y*256/${DEFAULT_HEIGHT}\\,0):g=if(gt(p(X\\,Y)\\,128)\\,256-(Y*256/${DEFAULT_HEIGHT})\\,0):b=0,setsar=1/1,format=rgb24,setpts=N/(${PANEL_WIDTH}/${AUDIO_FRAME_RATE})/TB",
         "panel_type" : "audio",
         "version" : "1.0"
     },
