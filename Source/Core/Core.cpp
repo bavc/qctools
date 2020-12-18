@@ -11,7 +11,7 @@
 #include <string.h>
 
 //---------------------------------------------------------------------------
-const char* Version="1.1.0";
+const char* Version="1.2.0";
 
 //---------------------------------------------------------------------------
 const struct stream_info PerStreamType    [Type_Max] =

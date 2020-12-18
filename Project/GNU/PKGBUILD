@@ -2,7 +2,7 @@
 # Maintainer: MediaArea.net SARL <info@mediaarea.net>
 
 pkgname=qctools
-pkgver=1.1
+pkgver=1.2
 pkgrel=1
 pkgdesc="QCTools (Quality Control Tools for Video Preservation)"
 url="http://mediaarea.net"
