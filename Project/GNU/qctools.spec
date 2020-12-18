@@ -1,4 +1,4 @@
-%define qctools_version           1.1
+%define qctools_version           1.2
 
 Name:           qctools
 Version:        %{qctools_version}

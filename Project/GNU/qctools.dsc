@@ -2,7 +2,7 @@ Format: 1.0
 Source: qctools
 Binary: qctools, qctools-dbg
 Architecture: any
-Version: 1.1
+Version: 1.2
 Maintainer: MediaArea.net SARL <info@mediaarea.net>
 Homepage: http://www.bavc.org/qctools
 Standards-Version: 3.7.3
@@ -11,8 +11,8 @@ Package-List:
  qctools deb utils optional arch=any
  qctools-dbg deb debug optional arch=any
 Checksums-Sha1:
- 0000000000000000000000000000000000000000 000000 qctools_1.1.tar.gz
+ 0000000000000000000000000000000000000000 000000 qctools_1.2.tar.gz
 Checksums-Sha256:
- 0000000000000000000000000000000000000000000000000000000000000000 000000 qctools_1.1.tar.gz
+ 0000000000000000000000000000000000000000000000000000000000000000 000000 qctools_1.2.tar.gz
 Files:
- 00000000000000000000000000000000 000000 qctools_1.1.tar.gz
+ 00000000000000000000000000000000 000000 qctools_1.2.tar.gz

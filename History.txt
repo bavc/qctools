@@ -1,4 +1,4 @@
-1.2,
+1.2, 2020-12-18
 === Thanks to TIB – Leibniz Information Centre for Science and Technology for their vision and support on this release ===
 + Adds panel tracks which show timeline-based images that depict audio or video tracks (PR #651). Initial tracks supported are:
   | - Tiled Center Column
