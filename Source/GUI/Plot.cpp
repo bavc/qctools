@@ -52,7 +52,11 @@ public:
         QwtPlotPicker(plot->canvas()),
         m_fileInformation(fileInformation)
     {
+#if QWT_VERSION >= 0x060200
+        setAxes( QwtPlot::xBottom, QwtPlot::yLeft );
+#else
         setAxis( QwtPlot::xBottom, QwtPlot::yLeft );
+#endif
         setRubberBand( QwtPlotPicker::CrossRubberBand );
         setRubberBandPen( QColor( Qt::green ) );
 

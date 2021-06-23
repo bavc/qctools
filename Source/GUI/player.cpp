@@ -6,7 +6,6 @@
 #include "GUI/filterselector.h"
 #include "GUI/Comments.h"
 #include "GUI/Plots.h"
-#include <cfloat>
 #include <QDir>
 #include <QAction>
 #include <QStandardPaths>
@@ -15,7 +14,9 @@
 #include <QGraphicsItem>
 #include <QGraphicsObject>
 #include <QFileDialog>
+#include <QVideoSurfaceFormat>
 #include "draggablechildrenbehaviour.h"
+#include <float.h>
 
 const int MaxFilters = 6;
 const int DefaultFirstFilterIndex = 0;
@@ -40,6 +41,7 @@ public:
     std::function<void()> m_leaveAction;
 };
 
+/*
 class ScopedMute
 {
 public:
@@ -66,41 +68,47 @@ private:
     bool m_muted = {false};
     ScopedAction* m_action;
 };
+*/
 
 Player::Player(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Player),
     m_fileInformation(nullptr), m_commentsPlot(nullptr), m_seekOnFileInformationPositionChange(true), m_handlePlayPauseClick(true), m_ignorePositionChanges(false)
 {
-    QtAV::setLogLevel(QtAV::LogOff);
-
     ui->setupUi(this);
-    m_unit = 1;
 
     ui->commentsPlaceHolderFrame->setLayout(new QHBoxLayout);
     ui->commentsPlaceHolderFrame->layout()->setMargin(0);
 
-    m_player = new QtAV::AVPlayer(ui->scrollArea);
-    m_vo = new QtAV::VideoOutput(ui->scrollArea);
-    connect(m_vo, SIGNAL(videoFrameSizeChanged()), this, SLOT(updateVideoOutputSize()));
+    m_audioOutput.reset(new QAVAudioOutput);
 
-    ui->scrollArea->setWidget(m_vo->widget());
+    m_w = new VideoWidget(ui->scrollArea);
+    m_vr = new VideoRenderer();
+    m_o = new MediaObject(m_vr);
+    m_w->setMediaObject(m_o);
+
+    m_player = new MediaPlayer();
+
+    QObject::connect(m_player, &QAVPlayer::audioFrame, m_player, [this](const QAVAudioFrame &frame) {
+        m_audioOutput->play(frame);
+    });
+
+   QObject::connect(m_player, &QAVPlayer::videoFrame, m_player, [this](const QAVVideoFrame &frame) {
+       if (m_vr->m_surface == nullptr)
+           return;
+
+       videoFrame = frame.convertTo(AV_PIX_FMT_RGB32);
+       if (!m_vr->m_surface->isActive() || m_vr->m_surface->surfaceFormat().frameSize() != videoFrame.size())
+           m_vr->m_surface->start({videoFrame.size(), videoFrame.pixelFormat(), videoFrame.handleType()});
+       if (m_vr->m_surface->isActive())
+           m_vr->m_surface->present(videoFrame);
+   });
+
+    ui->scrollArea->setWidget(m_w);
     ui->scrollArea->widget()->setGeometry(0, 0, 100, 100);
 
-    m_player->setRenderer(m_vo);
-    m_player->setSeekType(QtAV::AnyFrameSeek);
-    m_player->setMediaEndAction(QtAV::MediaEndAction_Pause);
-    m_player->setAsyncLoad(false);
-    m_player->setNotifyInterval(10);
-
-    m_videoFilter = new QtAV::LibAVFilterVideo(this);
-    m_audioFilter = new QtAV::LibAVFilterAudio(this);
-
-    m_player->installFilter(m_videoFilter);
-    m_player->installFilter(m_audioFilter);
-
-    connect(m_player, &QtAV::AVPlayer::stateChanged, [this](QtAV::AVPlayer::State state) {
-        if(state == QtAV::AVPlayer::PlayingState) {
+    connect(m_player, &QAVPlayer::stateChanged, [this](QAVPlayer::State state) {
+        if(state == QAVPlayer::PlayingState) {
             ui->playPause_pushButton->setIcon(QIcon(":/icon/pause.png"));
         } else {
             ui->playPause_pushButton->setIcon(QIcon(":/icon/play.png"));
@@ -148,15 +156,6 @@ Player::Player(QWidget *parent) :
     connect(m_player, SIGNAL(positionChanged(qint64)), SLOT(updateSlider(qint64)));
 
     ui->speed_label->installEventFilter(this);
-
-    connect(m_player, &QtAV::AVPlayer::started, [this](){
-      // m_player->masterClock()->setClockAuto(false);
-      // m_player->masterClock()->setClockType(QtAV::AVClock::ExternalClock);
-      updateSlider();
-    });
-
-    // connect(m_player, SIGNAL(started()), SLOT(updateSlider()));
-    // connect(m_player, SIGNAL(notifyIntervalChanged()), SLOT(updateSliderUnit()));
 
     connect(ui->arrangementButtonGroup, SIGNAL(buttonToggled(QAbstractButton*, bool)), this, SLOT(applyFilter()));
 
@@ -225,8 +224,6 @@ Player::Player(QWidget *parent) :
 Player::~Player()
 {
     m_player->stop();
-    m_player->removeEventFilter(m_videoFilter);
-    m_player->removeEventFilter(m_audioFilter);
     delete ui;
 }
 
@@ -345,32 +342,8 @@ void Player::playPaused(qint64 ms)
 
     ui->playerSlider->setDisabled(true);
 
-    {
-        PropertyWaiter<QtAV::AVPlayer::State> waiter(m_player, "QtAV::AVPlayer::State", "state", QtAV::AVPlayer::PlayingState);
-        m_player->play();
-        waiter.wait();
-    }
-
-    QApplication::processEvents();
-
-    {
-        PropertyWaiter<QtAV::AVPlayer::State> waiter(m_player, "QtAV::AVPlayer::State", "state", QtAV::AVPlayer::PausedState);
-        m_player->pause();
-        waiter.wait();
-    }
-
-    QApplication::processEvents();
-
-    {
-        SignalWaiter waiter(m_player, "seekFinished(qint64)");
-        m_player->seek(qint64(ms));
-        waiter.wait();        
-    }
-
-    if(m_player->displayPosition() > ms)
-        m_player->stepBackward();
-    else if(m_player->displayPosition() < ms)
-        m_player->stepForward();
+    m_player->seek(ms);
+    m_player->pause();
 
     ui->playerSlider->setDisabled(false);
 
@@ -427,14 +400,9 @@ void Player::setFile(FileInformation *fileInfo)
         stopAndWait();
 
         m_player->setFile(fileInfo->fileName());
-        ScopedMute mute(m_player);
-
-        m_player->load();
 
         m_framesCount = m_fileInformation->Glue->VideoFrameCount_Get();
         ui->playerSlider->setMaximum(m_player->duration());
-
-        m_unit = 1; // qreal(m_player->duration()) / m_framesCount;
 
         auto ms = frameToMs(m_fileInformation->Frames_Pos_Get());
 
@@ -459,7 +427,7 @@ void Player::playPause()
         m_player->play();
         return;
     }
-    m_player->pause(!m_player->isPaused());
+    m_player->pause();
 }
 
 void Player::seekBySlider(int value)
@@ -467,7 +435,7 @@ void Player::seekBySlider(int value)
     if (!m_player->isPlaying())
         return;
 
-    auto newValue = qint64(value*m_unit);
+    auto newValue = qint64(value);
 
     auto framePos = msToFrame(newValue);
 
@@ -584,22 +552,19 @@ void Player::updateSlider(qint64 value)
     if(m_ignorePositionChanges)
         return;
 
-    auto displayPosition = m_player->displayPosition();
+    auto displayPosition = m_player->position();
     value = displayPosition;
 
-    auto newValue = int(qreal(value)/m_unit);
+    auto newValue = value;
     if(ui->playerSlider->value() == newValue)
         return;
 
     if(!ui->playerSlider->isEnabled() || ui->playerSlider->isSliderDown())
         return;
 
-    // qDebug() << "update slider: " << newValue;
-
-    // ui->playerSlider->setRange(0, int(m_player->duration()/m_unit));
     ui->playerSlider->setValue(newValue);
 
-    auto position = m_player->displayPosition();
+    auto position = m_player->position();
     auto framePos = msToFrame(position);
 
     m_seekOnFileInformationPositionChange = false;
@@ -607,10 +572,9 @@ void Player::updateSlider(qint64 value)
     m_seekOnFileInformationPositionChange = true;
 
     auto framesCount = m_fileInformation->Frames_Count_Get();
-    // qDebug() << "framesCount: " << framesCount << "framesPos: " << framePos;
 
     if((framePos + 1) == framesCount) {
-        m_player->pause(true);
+        m_player->pause();
         m_handlePlayPauseClick = false;
         ui->playPause_pushButton->animateClick(0);
         QTimer::singleShot(0, [&]() {
@@ -624,21 +588,16 @@ void Player::updateSlider(qint64 value)
 
 void Player::updateSlider()
 {
-    updateSlider(m_player->displayPosition());
-}
-
-void Player::updateSliderUnit()
-{
-    // m_unit = m_player->notifyInterval();
-    // updateSlider();
+    updateSlider(m_player->position());
 }
 
 void Player::updateVideoOutputSize()
 {
     QSize newSize;
 
-    auto filteredFrameWidth = m_vo->videoFrameSize().width();
-    auto filteredFrameHeight = m_vo->videoFrameSize().height();
+    // 2DO:
+    auto filteredFrameWidth = videoFrame.width(); // m_vo->videoFrameSize().width();
+    auto filteredFrameHeight = videoFrame.height(); // m_vo->videoFrameSize().height();
 
     if(!ui->fitToScreen_radioButton->isChecked()) {
         double multiplier = ((double) ui->scalePercentage_spinBox->value()) / 100;
@@ -658,6 +617,14 @@ void Player::updateVideoOutputSize()
     geometry.setSize(newSize);
 
     ui->scrollArea->widget()->setGeometry(geometry);
+
+    m_vr->m_surface->stop();
+
+    QVideoSurfaceFormat format(videoFrame.size(), videoFrame.pixelFormat(), videoFrame.handleType());
+    format.setPixelAspectRatio(newSize.width(), newSize.height());
+
+    m_vr->m_surface->start(format);
+    m_vr->m_surface->present(videoFrame);
 }
 
 void Player::applyFilter()
@@ -769,7 +736,7 @@ void Player::handleFileInformationPositionChanges()
 
         auto ms = frameToMs(m_fileInformation->Frames_Pos_Get());
 
-        if(ms != m_player->displayPosition())
+        if(ms != m_player->position())
         {
             m_ignorePositionChanges = true;
 
@@ -777,7 +744,7 @@ void Player::handleFileInformationPositionChanges()
             if(prevMs < 0)
                 prevMs = 0;
 
-            ScopedMute mute(m_player);
+            // ScopedMute mute(m_player);
 
             SignalWaiter waiter(m_player, "seekFinished(qint64)");
             m_player->seek(qint64(prevMs));
@@ -785,7 +752,7 @@ void Player::handleFileInformationPositionChanges()
 
             QApplication::processEvents();
 
-            while(ms > m_player->displayPosition())
+            while(ms > m_player->position())
             {
                 {
                     SignalWaiter waiter(m_player, "stepFinished()", 1000);
@@ -836,7 +803,7 @@ void Player::on_scalePercentage_spinBox_valueChanged(int value)
 {
     double multiplier = ((double) value) / 100;
 
-    QSize newSize = QSize(m_vo->videoFrameSize().width(), m_vo->videoFrameSize().height()) * multiplier;
+    QSize newSize = QSize(videoFrame.width(), videoFrame.height()) * multiplier;
     QSize currentSize = ui->scrollArea->widget()->size();
 
     if(newSize != currentSize)
@@ -916,6 +883,9 @@ void Player::handleFilterChange(FilterSelector *filterSelector, int filterIndex)
 
 void Player::stopAndWait()
 {
+    m_player->stop();
+
+    /*
     {
         PropertyWaiter<QtAV::AVPlayer::State> waiter(m_player, "QtAV::AVPlayer::State", "state", QtAV::AVPlayer::StoppedState);
         m_player->stop();
@@ -923,6 +893,7 @@ void Player::stopAndWait()
     }
 
     QApplication::processEvents();
+    */
 }
 
 qint64 Player::timeStringToMs(const QString &timeValue)
@@ -984,20 +955,11 @@ qint64 Player::timeStringToMs(const QString &timeValue)
 
 void Player::setFilter(const QString &filter)
 {
-    m_videoFilter->setOptions(filter);
-    m_audioFilter->setOptions(filter);
-
-    if(m_player->isPaused()) {
-
-        auto sliderValue = (qint64)ui->playerSlider->value();
-        qDebug() << "slider value: " << sliderValue;
-
-        stopAndWait();
-
-        playPaused(sliderValue * m_unit);
-        QTimer::singleShot(0, this, [&]() {
-            updateVideoOutputSize();
-        });
+    m_player->setFilter(filter);
+    if(m_player->isPaused())
+    {
+        m_player->seek(m_player->position());
+        m_player->pause();
     }
 }
 
@@ -1009,7 +971,6 @@ QString Player::replaceFilterTokens(const QString &filterString)
     str.replace(QString("${height}"), QString::number(m_fileInformation->Glue->Height_Get()));
     str.replace(QString("${dar}"), QString::number(m_fileInformation->Glue->DAR_Get()));
 
-    //    QSize windowSize = imageLabels[Pos]->pixmapSize();
     QSize windowSize = ui->scrollArea->widget()->size();
 
     str.replace(QString("${window_width}"), QString::number(windowSize.width()));
@@ -1064,41 +1025,18 @@ void Player::on_graphmonitor_checkBox_clicked(bool checked)
 void Player::on_goToStart_pushButton_clicked()
 {
     qDebug() << "go to start... ";
-
-    ScopedMute mute(m_player);
-
-    {
-        SignalWaiter waiter(m_player, "seekFinished(qint64)");
-        m_player->seek(qint64(0));
-        waiter.wait();
-    }
-
-    QApplication::processEvents();
-
-    if(m_player->displayPosition() > 0)
-    {
-        SignalWaiter waiter(m_player, "stepFinished()", 1000);
-        m_player->stepBackward();
-        waiter.wait();
-    }
-    else if(m_player->displayPosition() < 0)
-    {
-        SignalWaiter waiter(m_player, "stepFinished()", 1000);
-        m_player->stepForward();
-        waiter.wait();
-    }
-
+    m_player->seek(0);
     qDebug() << "go to start... done. ";
 }
 
 void Player::on_goToEnd_pushButton_clicked()
 {
-    m_player->seek(m_player->startPosition() + m_player->duration());
+    m_player->seek(m_player->duration() - 1);
 }
 
 void Player::on_prev_pushButton_clicked()
 {
-    auto newPosition = m_player->displayPosition() - 1;
+    auto newPosition = m_player->position() - 1;
     qDebug() << "expected new position: " << newPosition;
     qDebug() << "stepping backward...";
     m_player->stepBackward();
@@ -1106,7 +1044,7 @@ void Player::on_prev_pushButton_clicked()
 
 void Player::on_next_pushButton_clicked()
 {
-    auto newPosition = m_player->displayPosition() + 1;
+    auto newPosition = m_player->position() + 1;
     qDebug() << "expected new position: " << newPosition;
     qDebug() << "stepping forward...";
     m_player->stepForward();
@@ -1143,6 +1081,7 @@ void Player::on_goToTime_lineEdit_returnPressed()
 
 void Player::on_export_pushButton_clicked()
 {
+    /*
     auto fileName = QFileDialog::getSaveFileName(this, "Export video frame", "", "*.png");
     if(!fileName.isEmpty()) {
         m_player->videoCapture()->setAutoSave(false);
@@ -1154,4 +1093,5 @@ void Player::on_export_pushButton_clicked()
         m_player->videoCapture()->capture();
         waiter.wait();
     }
+    */
 }

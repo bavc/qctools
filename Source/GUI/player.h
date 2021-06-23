@@ -2,10 +2,16 @@
 #define PLAYER_H
 
 #include <QMainWindow>
+#include <QMediaService>
 #include <QPushButton>
 #include <QTimer>
+#include <QVideoRendererControl>
+#include <QVideoWidget>
 #include <QWidget>
-#include <QtAV>
+#include <QUrl>
+#include <QAbstractVideoSurface>
+#include <QtAVPlayer/qavaudiooutput.h>
+#include <QtAVPlayer/qavplayer.h>
 
 class FileInformation;
 class FilterSelector;
@@ -15,6 +21,108 @@ class CommentsPlot;
 namespace Ui {
 class Player;
 }
+
+class VideoRenderer : public QVideoRendererControl
+{
+public:
+    QAbstractVideoSurface *surface() const override
+    {
+        return m_surface;
+    }
+
+    void setSurface(QAbstractVideoSurface *surface) override
+    {
+        m_surface = surface;
+    }
+
+    QAbstractVideoSurface *m_surface = nullptr;
+};
+
+class MediaObject;
+class MediaService : public QMediaService
+{
+public:
+    MediaService(VideoRenderer *vr, QObject* parent = nullptr)
+        : QMediaService(parent)
+        , m_renderer(vr)
+    {
+    }
+
+    QMediaControl* requestControl(const char *name) override
+    {
+        if (qstrcmp(name, QVideoRendererControl_iid) == 0)
+            return m_renderer;
+
+        return nullptr;
+    }
+
+    void releaseControl(QMediaControl *) override
+    {
+    }
+
+    VideoRenderer *m_renderer = nullptr;
+};
+
+class VideoWidget : public QVideoWidget
+{
+public:
+    VideoWidget(QWidget* parent = nullptr) : QVideoWidget(parent) {
+    }
+
+    bool setMediaObject(QMediaObject *object) override
+    {
+        return QVideoWidget::setMediaObject(object);
+    }
+};
+
+class MediaObject : public QMediaObject
+{
+public:
+    explicit MediaObject(VideoRenderer *vr, QObject* parent = nullptr)
+        : QMediaObject(parent, new MediaService(vr, parent))
+    {
+    }
+};
+
+class MediaPlayer : public QAVPlayer {
+    Q_OBJECT
+public:
+    MediaPlayer() {
+        t.setInterval(100);
+        connect(&t, &QTimer::timeout, [this]() {
+            if(position() != prevPos) {
+                prevPos = position();
+                Q_EMIT positionChanged(prevPos);
+            }
+        });
+        t.start();
+    }
+
+    bool isPlaying () const {
+        return state() == QAVPlayer::PlayingState;
+    }
+
+    bool isPaused() const {
+        return state() == QAVPlayer::PausedState;
+    }
+
+    void setFile(const QString& file) {
+        m_file = file;
+        setSource(m_file);
+    }
+
+    QString file() const {
+        return m_file;
+    }
+
+Q_SIGNALS:
+    void positionChanged(qint64);
+
+private:
+    QString m_file;
+    qint64 prevPos { 0 };
+    QTimer t;
+};
 
 class Player : public QMainWindow
 {
@@ -52,7 +160,6 @@ protected:
 private Q_SLOTS:
     void updateSlider(qint64 value);
     void updateSlider();
-    void updateSliderUnit();
     void updateVideoOutputSize();
     void applyFilter();
     void handleFileInformationPositionChanges();
@@ -101,15 +208,17 @@ private:
 private:
     Ui::Player *ui;
 
-    QtAV::VideoOutput *m_vo;
-    QtAV::AVPlayer *m_player;
+    VideoWidget* m_w;
+    MediaObject* m_o;
+    VideoRenderer* m_vr;
+    MediaPlayer* m_player;
+
+    QScopedPointer<QAVAudioOutput> m_audioOutput;
+    QVideoFrame videoFrame;
+
     bool m_handlePlayPauseClick;
 
-    qreal m_unit;
     int m_framesCount;
-
-    QtAV::LibAVFilterVideo* m_videoFilter;
-    QtAV::LibAVFilterAudio* m_audioFilter;
 
     FileInformation* m_fileInformation;
     FilterSelector* m_filterSelectors[6];

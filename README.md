@@ -24,7 +24,7 @@ Go to http://bavc.org/qctools or [Releases](https://github.com/bavc/qctools/rele
 
 Of if you have homebrew, get the latest release by running:
 ```
-brew cask install qctools
+brew install qctools
 ```
 
 ## development builds via daily builds

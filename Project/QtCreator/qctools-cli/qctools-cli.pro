@@ -9,7 +9,6 @@ CONFIG -= app_bundle
 
 TEMPLATE = app
 
-include(../brew.pri)
 message("PWD = " $$PWD)
 
 # link against libqctools

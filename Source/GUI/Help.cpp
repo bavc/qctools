@@ -18,7 +18,6 @@
 #include <QTabWidget>
 #include <QFile>
 #include <QLabel>
-#include <QtAV>
 #include "CMarkdown.h"
 //---------------------------------------------------------------------------
 
@@ -130,7 +129,7 @@ Help::Help(QWidget * parent)
                 .arg(QString::fromStdString(libsVersion));
     }
 
-    label->setHtml(QString("%1<br>*******************<br>%2<br>*******************<br>%3").arg(ffmpegGlueVersionInfo).arg(QtAV::aboutQtAV_HTML()).arg(QtAV::aboutFFmpeg_HTML()));
+    label->setHtml(QString("%1<br>*******************<br>").arg(ffmpegGlueVersionInfo));
     Central->addTab(label, tr("Version"));
 
     L->addWidget(Central);

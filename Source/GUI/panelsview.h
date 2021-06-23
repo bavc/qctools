@@ -5,11 +5,14 @@
 
 #include <QFrame>
 #include <QSize>
+#include <QPen>
 #include <functional>
 #include <qwt_legend.h>
 #include <qwt_picker_machine.h>
 #include <qwt_plot.h>
 #include <qwt_plot_picker.h>
+#include <qwt_text.h>
+#include <qwt_scale_map.h>
 
 class QwtPlot;
 class PlotCursor;
@@ -48,7 +51,7 @@ public:
         setAxis( xAxis, yAxis );
 
         setRubberBand( QwtPlotPicker::CrossRubberBand );
-        setRubberBandPen( QColor( Qt::green ) );
+        setRubberBandPen( QPen(QColor( Qt::green )) );
 
         setTrackerMode( QwtPicker::AlwaysOn );
         setTrackerPen( QColor( Qt::black ) );
