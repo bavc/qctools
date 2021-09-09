@@ -127,11 +127,11 @@ V DIF = Difference of V Channel between two frames
 ## Saturation {#saturation}
 
 | Filter Domain | Filter Name(s) | Range |
-| Saturation | Sat | 0-181.02 |
+| Saturation | Sat | 0-181.02 (8-bit); 0-724.08 (10-bit) |
 
-Saturation is a measure of the degree to which a color is diluted with white light; in other words--how vivid or 'true' a color is. Other terms, like 'bright', 'pale', 'pastel' 'washed out', etc. may be used to be speak to the quality of Saturation. A vectorscope view is a good way to see Saturation data--a large plot area indicates much saturation while a small plot area indicates little to none. A Saturation rate of 128 is considered illegal because data in this range can't be translated to/from camera data, and a videotape is technically incapable of storing values in this range (or beyond).
+Saturation is a measure of the degree to which a color is diluted with white light; in other words--how vivid or 'true' a color is. Other terms, like 'bright', 'pale', 'pastel' 'washed out', etc. may be used to be speak to the quality of Saturation. A vectorscope view is a good way to see Saturation data--a large plot area indicates much saturation while a small plot area indicates little to none. A Saturation rate above 128 for 8-bit content or 512 for 10-bit content is considered illegal because data in this range can't be translated to/from camera data, and a videotape is technically incapable of storing values in this range (or beyond).
 
-The saturation graph offers two plot lines to denote specific ranges of saturation levels. The purple dash-dot line near 89 represents the approximate limit of broadcast-safe saturation. Color bars at 75% should plot at this level. At 118 is a red dash-dot line to mark the limit of the YUV colorspace in bt601 to properly convert back to RBG. Saturation levels that exceed the red dash-dot line would result in either negative or overflow numbers when converted back to RGB and thus need to be clipped.
+The saturation graph offers two plot lines to denote specific ranges of saturation levels. The purple dash-dot line near 89 (for 8-bit) or 356 (for 10-bit) represents the approximate limit of broadcast-safe saturation. Color bars at 75% should plot at this level. A red dash-dot line near 118 (for 8-bit) or 472 (for 10-bit) marks the limit of the YUV colorspace in bt601 to properly convert back to RBG. Saturation levels that exceed the red dash-dot line would result in either negative or overflow numbers when converted back to RGB and thus need to be clipped.
 
 ## Hue {#hue}
 
