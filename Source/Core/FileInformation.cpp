@@ -372,6 +372,9 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                     break;
                 }
 
+                if ( QCvaultFileName.size() == 1)
+                    break;
+
                 for (auto QCvaultFileNamePos = QCvaultFileName.size() - 1; QCvaultFileNamePos; QCvaultFileNamePos--)
                 {
                     auto Character = QCvaultFileName.at(QCvaultFileNamePos);

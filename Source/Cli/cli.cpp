@@ -642,7 +642,7 @@ int Cli::exec(QCoreApplication &a)
 
     std::cout << std::endl;
 
-    info = std::unique_ptr<FileInformation>(new FileInformation(signalServer.get(), input, filters, activeAllTracks, prefs.getActivePanels(), prefs.createQCvaultFileNameString(input)));
+    info = std::unique_ptr<FileInformation>(new FileInformation(signalServer.get(), input, filters, activeAllTracks, prefs.getActivePanels(), useQCvault.isEmpty() ? QString() : prefs.createQCvaultFileNameString(input)));
     info->setAutoCheckFileUploaded(false);
     info->setAutoUpload(false);
 
