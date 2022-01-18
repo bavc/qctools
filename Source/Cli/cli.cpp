@@ -43,6 +43,7 @@ int Cli::exec(QCoreApplication &a)
             ++i;
         } else if(a.arguments().at(i) == "-o" && (i + 1) < a.arguments().length())
         {
+            ignoreQCvault = true;
             output = a.arguments().at(i + 1);
             ++i;
         } else if(a.arguments().at(i) == "-y")
@@ -641,7 +642,7 @@ int Cli::exec(QCoreApplication &a)
 
     std::cout << std::endl;
 
-    info = std::unique_ptr<FileInformation>(new FileInformation(signalServer.get(), input, filters, activeAllTracks, prefs.getActivePanels(), prefs.createQCvaultFileNameString(input)));
+    info = std::unique_ptr<FileInformation>(new FileInformation(signalServer.get(), input, filters, activeAllTracks, prefs.getActivePanels(), useQCvault.isEmpty() ? QString() : prefs.createQCvaultFileNameString(input)));
     info->setAutoCheckFileUploaded(false);
     info->setAutoUpload(false);
 
