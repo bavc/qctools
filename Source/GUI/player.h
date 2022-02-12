@@ -212,6 +212,7 @@ private:
     MediaObject* m_o;
     VideoRenderer* m_vr;
     MediaPlayer* m_player;
+    bool m_mute { false };
 
     QScopedPointer<QAVAudioOutput> m_audioOutput;
     QVideoFrame videoFrame;

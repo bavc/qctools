@@ -90,7 +90,8 @@ Player::Player(QWidget *parent) :
     m_player = new MediaPlayer();
 
     QObject::connect(m_player, &QAVPlayer::audioFrame, m_player, [this](const QAVAudioFrame &frame) {
-        m_audioOutput->play(frame);
+        if(!ui->playerSlider->isSliderDown() && !m_mute)
+            m_audioOutput->play(frame);
     });
 
    QObject::connect(m_player, &QAVPlayer::videoFrame, m_player, [this](const QAVVideoFrame &frame) {
@@ -311,10 +312,16 @@ public:
 
     }
 
-    void wait() {
+    void wait(const std::function<void()>& exec = {}) {
         if(_timeout != -1)
             _timer.start();
 
+        if(exec)
+        {
+            QTimer::singleShot(0, [exec]() {
+                exec();
+            });
+        }
         _loop.exec();
     }
 
@@ -399,16 +406,28 @@ void Player::setFile(FileInformation *fileInfo)
 
         stopAndWait();
 
+        connect(m_player, &QAVPlayer::mediaStatusChanged, this, [&](auto mediaStatus) {
+            qDebug() << "mediaStatus: " << mediaStatus;
+
+            if(mediaStatus == QAVPlayer::LoadedMedia) {
+                m_framesCount = m_fileInformation->Glue->VideoFrameCount_Get();
+                ui->playerSlider->setMaximum(m_player->duration());
+                qDebug() << "duration: " << m_player->duration();
+            }
+        }, Qt::UniqueConnection);
+
         m_player->setFile(fileInfo->fileName());
 
-        m_framesCount = m_fileInformation->Glue->VideoFrameCount_Get();
-        ui->playerSlider->setMaximum(m_player->duration());
+        SignalWaiter waiter(m_player, "seeked(qint64)");
+        m_mute = true;
 
         auto ms = frameToMs(m_fileInformation->Frames_Pos_Get());
-
-        playPaused(ms);
-
         qDebug() << "seek finished at " << ms;
+
+        waiter.wait([this, ms]() {
+            playPaused(ms);
+        });
+        m_mute = false;
 
         connect(m_fileInformation, &FileInformation::positionChanged, this, &Player::handleFileInformationPositionChanges);
 
@@ -432,9 +451,6 @@ void Player::playPause()
 
 void Player::seekBySlider(int value)
 {
-    if (!m_player->isPlaying())
-        return;
-
     auto newValue = qint64(value);
 
     auto framePos = msToFrame(newValue);
@@ -746,22 +762,8 @@ void Player::handleFileInformationPositionChanges()
 
             // ScopedMute mute(m_player);
 
-            SignalWaiter waiter(m_player, "seekFinished(qint64)");
             m_player->seek(qint64(prevMs));
-            waiter.wait();
-
-            QApplication::processEvents();
-
-            while(ms > m_player->position())
-            {
-                {
-                    SignalWaiter waiter(m_player, "stepFinished()", 1000);
-                    m_player->stepForward();
-                    waiter.wait();
-                }
-            }
             m_ignorePositionChanges = false;
-
             ui->playerSlider->setValue(ms);
         }
     }
@@ -1081,17 +1083,8 @@ void Player::on_goToTime_lineEdit_returnPressed()
 
 void Player::on_export_pushButton_clicked()
 {
-    /*
     auto fileName = QFileDialog::getSaveFileName(this, "Export video frame", "", "*.png");
     if(!fileName.isEmpty()) {
-        m_player->videoCapture()->setAutoSave(false);
-        connect(m_player->videoCapture(), &QtAV::VideoCapture::imageCaptured, this, [&](const QImage& image) {
-            image.save(fileName);
-        }, Qt::UniqueConnection);
-
-        SignalWaiter waiter(m_player->videoCapture(), "imageCaptured(const QImage&)");
-        m_player->videoCapture()->capture();
-        waiter.wait();
+        videoFrame.image().save(fileName);
     }
-    */
 }
