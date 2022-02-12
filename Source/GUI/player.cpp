@@ -970,6 +970,12 @@ QString Player::replaceFilterTokens(const QString &filterString)
     str.replace(QString("${width}"), QString::number(m_fileInformation->Glue->Width_Get()));
     str.replace(QString("${height}"), QString::number(m_fileInformation->Glue->Height_Get()));
     str.replace(QString("${dar}"), QString::number(m_fileInformation->Glue->DAR_Get()));
+    str.replace(QString("${pix_fmt}"), QString::fromStdString(m_fileInformation->Glue->PixFormatName_Get()));
+    int BitsPerRawSample = m_fileInformation->Glue->BitsPerRawSample_Get();
+    if (BitsPerRawSample == 0) {
+        BitsPerRawSample = 8; //Workaround when BitsPerRawSample is unknown, we hope it is 8-bit.
+    }
+    str.replace(QString("${bitdepth}"), QString::number(BitsPerRawSample));
 
     QSize windowSize = ui->scrollArea->widget()->size();
 
