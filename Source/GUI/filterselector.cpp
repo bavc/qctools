@@ -647,7 +647,16 @@ void FilterSelector::FiltersList_currentIndexChanged(int FilterPos, QGridLayout*
                 }
                 else
                   Max=Filters[FilterPos].Args[OptionPos].Max;
-            } else
+            } 
+            else if (strcmp(Filters[FilterPos].Name, "Bit Plane") == 0 || strcmp(Filters[FilterPos].Name, "Bit Plane Noise") == 0)
+            {
+                int BitsPerRawSample = FileInfoData->Glue->BitsPerRawSample_Get();
+                if (BitsPerRawSample == 0) {
+                    BitsPerRawSample = 8; //Workaround when BitsPerRawSample is unknown, we hope it is 8-bit.
+                }
+                Max = BitsPerRawSample;
+            }
+            else
                 if (MaxTemp == "Line")
                 {
                     bool SelectWidth = false;

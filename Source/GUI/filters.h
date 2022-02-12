@@ -389,16 +389,16 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,\
-            lutyuv=\
-                y=if(eq(${2}\\,-1)\\,512\\,if(eq(${2}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${2}))*pow(2\\,${2}))):\
-                u=if(eq(${3}\\,-1)\\,512\\,if(eq(${3}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${3}))*pow(2\\,${3}))):\
-                v=if(eq(${4}\\,-1)\\,512\\,if(eq(${4}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${4}))*pow(2\\,${4}))),format=yuv444p",
-            "il=l=d:c=d,format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,\
-            lutyuv=\
-                y=if(eq(${2}\\,-1)\\,512\\,if(eq(${2}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${2}))*pow(2\\,${2}))):\
-                u=if(eq(${3}\\,-1)\\,512\\,if(eq(${3}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${3}))*pow(2\\,${3}))):\
-                v=if(eq(${4}\\,-1)\\,512\\,if(eq(${4}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${4}))*pow(2\\,${4}))),format=yuv444p",
+            "format=${pix_fmt},\
+            lut=\
+                c0=if(eq(${2}\\,-1)\\,(maxval+minval)/2\\,if(eq(${2}\\,0)\\,val\\,if(eq(bitand(val\\,pow(2\\,${bitdepth}-${2}))\\,0)\\,minval\\,maxval))):\
+                c1=if(eq(${3}\\,-1)\\,(maxval+minval)/2\\,if(eq(${3}\\,0)\\,val\\,if(eq(bitand(val\\,pow(2\\,${bitdepth}-${3}))\\,0)\\,minval\\,maxval))):\
+                c2=if(eq(${4}\\,-1)\\,(maxval+minval)/2\\,if(eq(${4}\\,0)\\,val\\,if(eq(bitand(val\\,pow(2\\,${bitdepth}-${4}))\\,0)\\,minval\\,maxval)))",
+            "il=l=d:c=d,format=${pix_fmt},\
+            lut=\
+                c0=if(eq(${2}\\,-1)\\,(maxval+minval)/2\\,if(eq(${2}\\,0)\\,val\\,if(eq(bitand(val\\,pow(2\\,${bitdepth}-${2}))\\,0)\\,minval\\,maxval))):\
+                c1=if(eq(${3}\\,-1)\\,(maxval+minval)/2\\,if(eq(${3}\\,0)\\,val\\,if(eq(bitand(val\\,pow(2\\,${bitdepth}-${3}))\\,0)\\,minval\\,maxval))):\
+                c2=if(eq(${4}\\,-1)\\,(maxval+minval)/2\\,if(eq(${4}\\,0)\\,val\\,if(eq(bitand(val\\,pow(2\\,${bitdepth}-${4}))\\,0)\\,minval\\,maxval)))",
         },
     },
     {
@@ -480,7 +480,6 @@ const filter Filters[] =
         0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            // TODO: Adjust slider max to bit depth.
             { Args_Type_Slider,   1,   1,  16,   1, "Bit position" },
             { Args_Type_YuvA,     0,   0,   0,   0, "Plane"},
             { Args_Type_None,     0,   0,   0,   0, nullptr },
@@ -489,10 +488,10 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "bitplanenoise=bitplane=${2}:filter=1,extractplanes=${3},format=yuv444p",
-            "bitplanenoise=bitplane=${2}:filter=1",
-            "il=l=d:c=d,bitplanenoise=bitplane=${2}:filter=1,format=yuv444p,extractplanes=${3},format=yuv444p",
-            "il=l=d:c=d,bitplanenoise=bitplane=${2}:filter=1",
+            "bitplanenoise=bitplane=${bitdepth}+1-${2}:filter=1,format=yuv444p,extractplanes=${3}",
+            "bitplanenoise=bitplane=${bitdepth}+1-${2}:filter=1",
+            "il=l=d:c=d,bitplanenoise=bitplane=${bitdepth}-${2}:filter=1,format=yuv444p,extractplanes=${3}",
+            "il=l=d:c=d,bitplanenoise=bitplane=${bitdepth}-${2}:filter=1",
 
         },
     },
