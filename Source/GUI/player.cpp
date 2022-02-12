@@ -663,7 +663,7 @@ void Player::applyFilter()
     ui->plainTextEdit->appendPlainText(QString("*** layout ***: \n\n%1").arg(layout));
 
     QString splits[] = {
-        "%1",
+        "sws_flags=neighbor;%1",
         "sws_flags=neighbor;%1split=2[x1][x2];",
         "sws_flags=neighbor;%1split=3[x1][x2][x3];",
         "sws_flags=neighbor;%1split=4[x1][x2][x3][x4];",
