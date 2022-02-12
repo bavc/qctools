@@ -406,7 +406,7 @@ void Player::setFile(FileInformation *fileInfo)
 
         stopAndWait();
 
-        connect(m_player, &QAVPlayer::mediaStatusChanged, this, [&](auto mediaStatus) {
+        connect(m_player, &QAVPlayer::mediaStatusChanged, this, [&](QAVPlayer::MediaStatus mediaStatus) {
             qDebug() << "mediaStatus: " << mediaStatus;
 
             if(mediaStatus == QAVPlayer::LoadedMedia) {
