@@ -323,7 +323,31 @@ std::string FilterSelector::FiltersList_currentOptionChanged(int Picture_Current
             {
                 if (m_filterOptions.Radios[OptionPos][OptionPos2] && m_filterOptions.Radios[OptionPos][OptionPos2]->isChecked())
                 {
-                    if (string(Filters[Picture_Current].Name)=="Extract Planes Equalized" || string(Filters[Picture_Current].Name)=="Bit Plane Noise" || string(Filters[Picture_Current].Name)=="Value Highlight" || string(Filters[Picture_Current].Name)=="Field Difference" || string(Filters[Picture_Current].Name)=="Temporal Difference" || string(Filters[Picture_Current].Name)=="Bit Plane (10 slices)")
+                    if (string(Filters[Picture_Current].Name)=="Extract Planes Equalized" || string(Filters[Picture_Current].Name)=="Value Highlight")
+                    {
+                        int IsRGB = FileInfoData->Glue->IsRGB_Get();
+                        if (IsRGB != 0)
+                        {
+                            switch (OptionPos2)
+                            {
+                            case 0: WithRadios[OptionPos]="r"; break;
+                            case 1: WithRadios[OptionPos]="g"; break;
+                            case 2: WithRadios[OptionPos]="b"; break;
+                            default:;
+                            }
+                        }
+                        else
+                        {
+                            switch (OptionPos2)
+                            {
+                            case 0: WithRadios[OptionPos]="y"; break;
+                            case 1: WithRadios[OptionPos]="u"; break;
+                            case 2: WithRadios[OptionPos]="v"; break;
+                            default:;
+                            }
+                        }
+                    }
+                    else if (string(Filters[Picture_Current].Name)=="Bit Plane Noise" || string(Filters[Picture_Current].Name)=="Field Difference" || string(Filters[Picture_Current].Name)=="Temporal Difference" || string(Filters[Picture_Current].Name)=="Bit Plane (10 slices)")
                     {
                         switch (OptionPos2)
                         {
@@ -614,7 +638,7 @@ void FilterSelector::FiltersList_currentIndexChanged(int FilterPos, QGridLayout*
             int Max;
             const char* SliderName = Filters[FilterPos].Args[OptionPos].Name;
             QString MaxTemp(Filters[FilterPos].Args[OptionPos].Name);
-            if(strcmp(Filters[FilterPos].Name, "Limiter") == 0)
+            if(strcmp(Filters[FilterPos].Name, "Limiter") == 0 || strcmp(Filters[FilterPos].Name, "Value Highlight") == 0)
             {
                 if (MaxTemp == "Min" || MaxTemp == "Max")
                 {
@@ -732,7 +756,7 @@ void FilterSelector::FiltersList_currentIndexChanged(int FilterPos, QGridLayout*
                 m_filterOptions.Radios[OptionPos][OptionPos2]=new QRadioButton();
                 m_filterOptions.Radios[OptionPos][OptionPos2]->setFont(Font);
                 int IsRGB = FileInfoData->Glue->IsRGB_Get();
-                if(strcmp(Filters[FilterPos].Name, "Histogram") == 0 && IsRGB != 0)
+                if((strcmp(Filters[FilterPos].Name, "Histogram") == 0 || strcmp(Filters[FilterPos].Name, "Extract Planes Equalized") == 0 || strcmp(Filters[FilterPos].Name, "Value Highlight") == 0 || strcmp(Filters[FilterPos].Name, "Waveform") == 0) && IsRGB != 0)
                 {
                     switch (OptionPos2)
                     {
