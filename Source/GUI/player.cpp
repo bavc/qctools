@@ -976,6 +976,7 @@ QString Player::replaceFilterTokens(const QString &filterString)
         BitsPerRawSample = 8; //Workaround when BitsPerRawSample is unknown, we hope it is 8-bit.
     }
     str.replace(QString("${bitdepth}"), QString::number(BitsPerRawSample));
+    str.replace(QString("${isRGB}"), QString::number(m_fileInformation->Glue->IsRGB_Get()));
 
     QSize windowSize = ui->scrollArea->widget()->size();
 

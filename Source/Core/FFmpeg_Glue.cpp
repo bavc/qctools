@@ -2374,6 +2374,23 @@ string FFmpeg_Glue::ColorRange_Get()
     }
 }
 
+int FFmpeg_Glue::IsRGB_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
+        return 0;
+
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(InputData->Stream->codec->pix_fmt);
+    return (desc->flags & AV_PIX_FMT_FLAG_RGB);
+}
+
 int FFmpeg_Glue::BitsPerRawSample_Get(int streamType)
 {
     inputdata* InputData=NULL;

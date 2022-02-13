@@ -291,6 +291,7 @@ public:
     string                      PixFormatName_Get();
     string                      ColorSpace_Get();
     string                      ColorRange_Get();
+    int                         IsRGB_Get();
     int                         BitsPerRawSample_Get(int streamType = Type_Video);
 
     // Audio information
