@@ -554,8 +554,8 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "extractplanes=${2},format=rgb24,lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)",
-            "extractplanes=${2},format=rgb24,il=l=d:c=d,lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)",
+                       "split[vhmask][vhpic];color=color=${5}[vhcolor];[vhpic]extractplanes=${2}[vhpic1];[vhcolor][vhpic1]scale2ref[vhcolor1][vhpic1];[vhmask]format=${pix_fmt},extractplanes=${2},lut=c0=if(between(val\\,${3}\\,${4})\\,minval\\,maxval),[vhpic1]alphamerge,[vhcolor1]overlay",
+            "il=l=d:c=d,split[vhmask][vhpic];color=color=${5}[vhcolor];[vhpic]extractplanes=${2}[vhpic1];[vhcolor][vhpic1]scale2ref[vhcolor1][vhpic1];[vhmask]format=${pix_fmt},extractplanes=${2},lut=c0=if(between(val\\,${3}\\,${4})\\,minval\\,maxval),[vhpic1]alphamerge,[vhcolor1]overlay",
         },
     },
     {
