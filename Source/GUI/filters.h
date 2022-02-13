@@ -94,30 +94,22 @@ const filter Filters[] =
         0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Toggle,   0,   0,   0,   0, "RGB" },
             { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
             { Args_Type_LogLin,   0,   0,   0,   0, "Levels" },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
+            { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            // field N, rgb, N, all planes N
-            "histogram=level_height=${height}-12:components=${3}:levels_mode=${4}",
-            // field N, rgb, N, all planes Y
-            "histogram=level_height=${height}:levels_mode=${4}",
-            // field N, rgb, Y, all planes N
-            "format=rgb24,histogram=level_height=${height}:components=${3}:levels_mode=${4}",
-            // field N, rgb, Y, all planes Y
-            "format=rgb24,histogram=level_height=${height}:levels_mode=${4}",
-            // field Y, rgb, N, all planes N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram=components=${3}:levels_mode=${4}[a2];[b1]histogram=components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
-            // field Y, rgb, N, all planes Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram=levels_mode=${4}[a2];[b1]histogram=levels_mode=${4}[b2];[a2][b2]hstack",
-            // field Y, rgb, Y, all planes N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=rgb24,histogram=components=${3}:levels_mode=${4}[a2];[b1]format=rgb24,histogram=components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
-            // field Y, rgb, Y, all planes Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=rgb24,histogram=levels_mode=${4}[a2];[b1]format=rgb24,histogram=levels_mode=${4}[b2];[a2][b2]hstack",
+            // field N, all planes N
+            "format=${pix_fmt},histogram=level_height=${height}-12:components=${2}:levels_mode=${3}",
+            // field N, all planes Y
+            "format=${pix_fmt},histogram=level_height=${height}:levels_mode=${3}",
+            // field Y, all planes N
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},histogram=components=${2}:levels_mode=${3}[a2];[b1]format=${pix_fmt},histogram=components=${2}:levels_mode=${3}[b2];[a2][b2]vstack",
+            // field Y, all planes Y
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},histogram=levels_mode=${3}[a2];[b1]format=${pix_fmt},histogram=levels_mode=${3}[b2];[a2][b2]hstack",
         },
     },
     {
