@@ -364,8 +364,8 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:intensity=${4}",
-            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:intensity=${4}",
+                      ",extractplanes=${2},histeq=strength=${3}:intensity=${4}",
+            "il=l=d:c=d,extractplanes=${2},histeq=strength=${3}:intensity=${4}",
         },
     },
     {
