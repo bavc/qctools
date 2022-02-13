@@ -745,14 +745,14 @@ void FilterSelector::FiltersList_currentIndexChanged(int FilterPos, QGridLayout*
                 }
                 else
                 {
-            switch (OptionPos2)
-            {
-                case 0: m_filterOptions.Radios[OptionPos][OptionPos2]->setText("Y"); break;
-                case 1: m_filterOptions.Radios[OptionPos][OptionPos2]->setText("U"); break;
-                case 2: m_filterOptions.Radios[OptionPos][OptionPos2]->setText("V"); break;
-                case 3: m_filterOptions.Radios[OptionPos][OptionPos2]->setText("A"); break;
-                default:;
-            }
+                    switch (OptionPos2)
+                    {
+                        case 0: m_filterOptions.Radios[OptionPos][OptionPos2]->setText("Y"); break;
+                        case 1: m_filterOptions.Radios[OptionPos][OptionPos2]->setText("U"); break;
+                        case 2: m_filterOptions.Radios[OptionPos][OptionPos2]->setText("V"); break;
+                        case 3: m_filterOptions.Radios[OptionPos][OptionPos2]->setText("A"); break;
+                        default:;
+                    }
                 }
                 if (OptionPos2==m_previousValues[FilterPos].Values[OptionPos])
                     m_filterOptions.Radios[OptionPos][OptionPos2]->setChecked(true);
