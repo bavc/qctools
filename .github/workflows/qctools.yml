@@ -38,7 +38,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        brew install ${{ matrix.packages }} pkg-config ffmpeg qwt
+        brew install ${{ matrix.packages }} pkg-config ffmpeg@4 qwt
 
     - name: Set Qt5 environment path
       run: |
@@ -104,7 +104,7 @@ jobs:
 
     - name: Build FFmpeg
       run: |
-        git clone --depth 1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
+        git clone --depth 1 https://github.com/FFmpeg/FFmpeg ../ffmpeg --branch release/4.4
         cd ../ffmpeg
         ./configure --enable-gpl \
                     --enable-static \
