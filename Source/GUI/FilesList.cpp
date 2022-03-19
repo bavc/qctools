@@ -71,7 +71,7 @@ enum col_names
     Col_FieldOrder,
     Col_DAR,
     Col_SAR,
-    Col_PixFormat,
+    Col_PixFormatName,
     Col_ColorSpace,
     Col_ColorRange,
     Col_FramesDivDuration,
@@ -251,7 +251,7 @@ void FilesList::UpdateAll()
         QString     FieldOrder;
         QString     DAR_String;
         QString     SAR;
-        QString     PixFormat;
+        QString     PixFormatName;
         QString     ColorSpace;
         QString     ColorRange;
         QString     AudioFormat;
@@ -278,7 +278,7 @@ void FilesList::UpdateAll()
             double FramesDivDurationd=          Main->Files[Files_Pos]->Glue->FramesDivDuration_Get();
             RFrameRate=                         Main->Files[Files_Pos]->Glue->RVideoFrameRate_Get().c_str();
             AvgFrameRate=                       Main->Files[Files_Pos]->Glue->AvgVideoFrameRate_Get().c_str();
-            PixFormat=                          Main->Files[Files_Pos]->Glue->PixFormat_Get().c_str();
+            PixFormatName=                      Main->Files[Files_Pos]->Glue->PixFormatName_Get().c_str();
             ColorSpace=                         Main->Files[Files_Pos]->Glue->ColorSpace_Get().c_str();
             ColorRange=                         Main->Files[Files_Pos]->Glue->ColorRange_Get().c_str();
             AudioFormat=                        Main->Files[Files_Pos]->Glue->AudioFormat_Get().c_str();
@@ -343,7 +343,7 @@ void FilesList::UpdateAll()
         setItem((int)Files_Pos, Col_FieldOrder,     new TableWidgetItem(FieldOrder));
         setItem((int)Files_Pos, Col_DAR,            new TableWidgetItem(DAR_String));
         setItem((int)Files_Pos, Col_SAR,            new TableWidgetItem(SAR));
-        setItem((int)Files_Pos, Col_PixFormat,      new TableWidgetItem(PixFormat));
+        setItem((int)Files_Pos, Col_PixFormatName,  new TableWidgetItem(PixFormatName));
         setItem((int)Files_Pos, Col_ColorSpace,     new TableWidgetItem(ColorSpace));
         setItem((int)Files_Pos, Col_ColorRange,     new TableWidgetItem(ColorRange));
         setItem((int)Files_Pos, Col_FramesDivDuration, new TableWidgetItem(FramesDivDuration));

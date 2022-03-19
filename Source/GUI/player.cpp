@@ -696,7 +696,7 @@ void Player::applyFilter()
     ui->plainTextEdit->appendPlainText(QString("*** layout ***: \n\n%1").arg(layout));
 
     QString splits[] = {
-        "%1",
+        "sws_flags=neighbor;%1",
         "sws_flags=neighbor;%1split=2[x1][x2];",
         "sws_flags=neighbor;%1split=3[x1][x2][x3];",
         "sws_flags=neighbor;%1split=4[x1][x2][x3][x4];",
@@ -989,6 +989,13 @@ QString Player::replaceFilterTokens(const QString &filterString)
     str.replace(QString("${width}"), QString::number(m_fileInformation->Glue->Width_Get()));
     str.replace(QString("${height}"), QString::number(m_fileInformation->Glue->Height_Get()));
     str.replace(QString("${dar}"), QString::number(m_fileInformation->Glue->DAR_Get()));
+    str.replace(QString("${pix_fmt}"), QString::fromStdString(m_fileInformation->Glue->PixFormatName_Get()));
+    int BitsPerRawSample = m_fileInformation->Glue->BitsPerRawSample_Get();
+    if (BitsPerRawSample == 0) {
+        BitsPerRawSample = 8; //Workaround when BitsPerRawSample is unknown, we hope it is 8-bit.
+    }
+    str.replace(QString("${bitdepth}"), QString::number(BitsPerRawSample));
+    str.replace(QString("${isRGB}"), QString::number(m_fileInformation->Glue->IsRGB_Get()));
 
     QSize windowSize = ui->scrollArea->widget()->size();
 

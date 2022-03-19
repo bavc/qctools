@@ -2282,6 +2282,26 @@ string FFmpeg_Glue::PixFormat_Get()
     }
 }
 
+//---------------------------------------------------------------------------
+string FFmpeg_Glue::PixFormatName_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
+        return string();
+
+    const AVPixFmtDescriptor* Desc=av_pix_fmt_desc_get(InputData->Stream->codec->pix_fmt);
+    if (!Desc)
+        return string();
+    return Desc->name;
+}
+
 QString FFmpeg_Glue::FrameType_Get() const
 {
     inputdata* InputData=NULL;
@@ -2352,6 +2372,23 @@ string FFmpeg_Glue::ColorRange_Get()
         case AVCOL_RANGE_NB: return "Not part of ABI";
         default: return string();
     }
+}
+
+int FFmpeg_Glue::IsRGB_Get()
+{
+    inputdata* InputData=NULL;
+    for (size_t Pos=0; Pos<InputDatas.size(); Pos++)
+        if (InputDatas[Pos] && InputDatas[Pos]->Type==AVMEDIA_TYPE_VIDEO)
+        {
+            InputData=InputDatas[Pos];
+            break;
+        }
+
+    if (InputData==NULL || InputData->Stream==NULL || InputData->Stream->codec==NULL)
+        return 0;
+
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(InputData->Stream->codec->pix_fmt);
+    return (desc->flags & AV_PIX_FMT_FLAG_RGB);
 }
 
 int FFmpeg_Glue::BitsPerRawSample_Get(int streamType)

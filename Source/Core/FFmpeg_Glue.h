@@ -288,8 +288,10 @@ public:
 
     QString                     FrameType_Get() const;
     string                      PixFormat_Get();
+    string                      PixFormatName_Get();
     string                      ColorSpace_Get();
     string                      ColorRange_Get();
+    int                         IsRGB_Get();
     int                         BitsPerRawSample_Get(int streamType = Type_Video);
 
     // Audio information

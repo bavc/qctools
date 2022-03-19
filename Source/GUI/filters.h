@@ -94,30 +94,22 @@ const filter Filters[] =
         0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Toggle,   0,   0,   0,   0, "RGB" },
             { Args_Type_YuvA,     3,   0,   0,   0, "Plane" },
             { Args_Type_LogLin,   0,   0,   0,   0, "Levels" },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
+            { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            // field N, rgb, N, all planes N
-            "histogram=level_height=${height}-12:components=${3}:levels_mode=${4}",
-            // field N, rgb, N, all planes Y
-            "histogram=level_height=${height}:levels_mode=${4}",
-            // field N, rgb, Y, all planes N
-            "format=rgb24,histogram=level_height=${height}:components=${3}:levels_mode=${4}",
-            // field N, rgb, Y, all planes Y
-            "format=rgb24,histogram=level_height=${height}:levels_mode=${4}",
-            // field Y, rgb, N, all planes N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram=components=${3}:levels_mode=${4}[a2];[b1]histogram=components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
-            // field Y, rgb, N, all planes Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]histogram=levels_mode=${4}[a2];[b1]histogram=levels_mode=${4}[b2];[a2][b2]hstack",
-            // field Y, rgb, Y, all planes N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=rgb24,histogram=components=${3}:levels_mode=${4}[a2];[b1]format=rgb24,histogram=components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
-            // field Y, rgb, Y, all planes Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=rgb24,histogram=levels_mode=${4}[a2];[b1]format=rgb24,histogram=levels_mode=${4}[b2];[a2][b2]hstack",
+            // field N, all planes N
+            "format=${pix_fmt},histogram=level_height=${height}-12:components=${2}:levels_mode=${3}",
+            // field N, all planes Y
+            "format=${pix_fmt},histogram=level_height=${height}:levels_mode=${3}",
+            // field Y, all planes N
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},histogram=components=${2}:levels_mode=${3}[a2];[b1]format=${pix_fmt},histogram=components=${2}:levels_mode=${3}[b2];[a2][b2]vstack",
+            // field Y, all planes Y
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},histogram=levels_mode=${3}[a2];[b1]format=${pix_fmt},histogram=levels_mode=${3}[b2];[a2][b2]hstack",
         },
     },
     {
@@ -165,21 +157,21 @@ const filter Filters[] =
         },
         {
             // field N, all planes N, vertical N
-            "waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}",
+            "format=${pix_fmt},waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}",
             // field N, all planes N, vertical Y
-            "waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}",
+            "format=${pix_fmt},waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}",
             // field N, all planes Y, vertical N
-            "waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay",
+            "format=${pix_fmt},waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay",
             // field N, all planes Y, vertical Y
-            "waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay",
+            "format=${pix_fmt},waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay",
             // field Y, all planes N, vertical N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[a2];[b1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b2];[a2][b2]vstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[a2];[b1]format=${pix_fmt},waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b2];[a2][b2]vstack",
             // field Y, all planes N, vertical Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[a2];[b1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b2];[a2][b2]vstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[a2];[b1]format=${pix_fmt},waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b2];[a2][b2]vstack",
             // field Y, all planes Y, vertical N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[a2];[b1]waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[b2];[a2][b2]vstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[a2];[b1]format=${pix_fmt},waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[b2];[a2][b2]vstack",
             // field Y, all planes Y, vertical Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[a2];[b1]waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[b2];[b2][a2]vstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[a2];[b1]format=${pix_fmt},waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[b2];[b2][a2]vstack",
         },
     },
     {
@@ -197,11 +189,11 @@ const filter Filters[] =
         },
         {
             "crop=${3}:${4}:${1}:${2},\
-            waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1",
+            format=${pix_fmt},waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1",
             "split[a][b];\
             [a]lutyuv=y=val/4,scale=${width}:${height},setsar=1/1,format=yuv444p|yuv444p10le,drawbox=w=${3}:h=${4}:x=${1}:y=${2}:color=invert:thickness=1[a1];\
             [b]crop=${3}:${4}:${1}:${2},\
-            waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1[b1];\
+            format=${pix_fmt},waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1[b1];\
             [a1][b1]blend=addition",
         },
     },
@@ -218,10 +210,10 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "               crop=iw:1:0:${1}:0:1,waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
-            "split[a][b];[a]crop=iw:1:0:${1}:0:1,waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=iw:${height},drawbox=y=${1}:w=iw:h=1:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
-            "               crop=1:ih:${1}:0:0:1,waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
-            "split[a][b];[a]crop=1:ih:${1}:0:0:1,waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=${width}:${height},drawbox=x=${1}:w=1:h=ih:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
+            "               crop=iw:1:0:${1}:0:1,format=${pix_fmt},waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
+            "split[a][b];[a]crop=iw:1:0:${1}:0:1,format=${pix_fmt},waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=iw:${height},drawbox=y=${1}:w=iw:h=1:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
+            "               crop=1:ih:${1}:0:0:1,format=${pix_fmt},waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
+            "split[a][b];[a]crop=1:ih:${1}:0:0:1,format=${pix_fmt},waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=${width}:${height},drawbox=x=${1}:w=1:h=ih:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
         },
     },
     {
@@ -372,8 +364,8 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:intensity=${4}",
-            "il=l=d:c=d,format=yuv444p|yuv422p|yuv420p|yuv444p|yuv410p,extractplanes=${2},histeq=strength=${3}:intensity=${4}",
+                      ",extractplanes=${2},histeq=strength=${3}:intensity=${4}",
+            "il=l=d:c=d,extractplanes=${2},histeq=strength=${3}:intensity=${4}",
         },
     },
     {
@@ -389,16 +381,16 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,\
-            lutyuv=\
-                y=if(eq(${2}\\,-1)\\,512\\,if(eq(${2}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${2}))*pow(2\\,${2}))):\
-                u=if(eq(${3}\\,-1)\\,512\\,if(eq(${3}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${3}))*pow(2\\,${3}))):\
-                v=if(eq(${4}\\,-1)\\,512\\,if(eq(${4}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${4}))*pow(2\\,${4}))),format=yuv444p",
-            "il=l=d:c=d,format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,\
-            lutyuv=\
-                y=if(eq(${2}\\,-1)\\,512\\,if(eq(${2}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${2}))*pow(2\\,${2}))):\
-                u=if(eq(${3}\\,-1)\\,512\\,if(eq(${3}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${3}))*pow(2\\,${3}))):\
-                v=if(eq(${4}\\,-1)\\,512\\,if(eq(${4}\\,0)\\,val\\,bitand(val\\,pow(2\\,10-${4}))*pow(2\\,${4}))),format=yuv444p",
+            "format=${pix_fmt},\
+            lut=\
+                c0=if(eq(${2}\\,-1)\\,(maxval+minval)/2\\,if(eq(${2}\\,0)\\,val\\,if(eq(bitand(val\\,pow(2\\,${bitdepth}-${2}))\\,0)\\,minval\\,maxval))):\
+                c1=if(eq(${3}\\,-1)\\,(maxval+minval)/2\\,if(eq(${3}\\,0)\\,val\\,if(eq(bitand(val\\,pow(2\\,${bitdepth}-${3}))\\,0)\\,minval\\,maxval))):\
+                c2=if(eq(${4}\\,-1)\\,(maxval+minval)/2\\,if(eq(${4}\\,0)\\,val\\,if(eq(bitand(val\\,pow(2\\,${bitdepth}-${4}))\\,0)\\,minval\\,maxval)))",
+            "il=l=d:c=d,format=${pix_fmt},\
+            lut=\
+                c0=if(eq(${2}\\,-1)\\,(maxval+minval)/2\\,if(eq(${2}\\,0)\\,val\\,if(eq(bitand(val\\,pow(2\\,${bitdepth}-${2}))\\,0)\\,minval\\,maxval))):\
+                c1=if(eq(${3}\\,-1)\\,(maxval+minval)/2\\,if(eq(${3}\\,0)\\,val\\,if(eq(bitand(val\\,pow(2\\,${bitdepth}-${3}))\\,0)\\,minval\\,maxval))):\
+                c2=if(eq(${4}\\,-1)\\,(maxval+minval)/2\\,if(eq(${4}\\,0)\\,val\\,if(eq(bitand(val\\,pow(2\\,${bitdepth}-${4}))\\,0)\\,minval\\,maxval)))",
         },
     },
     {
@@ -480,7 +472,6 @@ const filter Filters[] =
         0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            // TODO: Adjust slider max to bit depth.
             { Args_Type_Slider,   1,   1,  16,   1, "Bit position" },
             { Args_Type_YuvA,     0,   0,   0,   0, "Plane"},
             { Args_Type_None,     0,   0,   0,   0, nullptr },
@@ -489,10 +480,10 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "bitplanenoise=bitplane=${2}:filter=1,extractplanes=${3},format=yuv444p",
-            "bitplanenoise=bitplane=${2}:filter=1",
-            "il=l=d:c=d,bitplanenoise=bitplane=${2}:filter=1,format=yuv444p,extractplanes=${3},format=yuv444p",
-            "il=l=d:c=d,bitplanenoise=bitplane=${2}:filter=1",
+            "bitplanenoise=bitplane=${bitdepth}+1-${2}:filter=1,format=yuv444p,extractplanes=${3}",
+            "bitplanenoise=bitplane=${bitdepth}+1-${2}:filter=1",
+            "il=l=d:c=d,bitplanenoise=bitplane=${bitdepth}-${2}:filter=1,format=yuv444p,extractplanes=${3}",
+            "il=l=d:c=d,bitplanenoise=bitplane=${bitdepth}-${2}:filter=1",
 
         },
     },
@@ -563,8 +554,8 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "extractplanes=${2},format=rgb24,lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)",
-            "extractplanes=${2},format=rgb24,il=l=d:c=d,lutrgb=r=if(between(val\\,${3}\\,${4})\\,${5R}\\,val):g=if(between(val\\,${3}\\,${4})\\,${5G}\\,val):b=if(between(val\\,${3}\\,${4})\\,${5B}\\,val)",
+                       "split[vhmask][vhpic];color=color=${5}[vhcolor];[vhpic]extractplanes=${2}[vhpic1];[vhcolor][vhpic1]scale2ref[vhcolor1][vhpic1];[vhmask]format=${pix_fmt},extractplanes=${2},lut=c0=if(between(val\\,${3}\\,${4})\\,minval\\,maxval),[vhpic1]alphamerge,[vhcolor1]overlay",
+            "il=l=d:c=d,split[vhmask][vhpic];color=color=${5}[vhcolor];[vhpic]extractplanes=${2}[vhpic1];[vhcolor][vhpic1]scale2ref[vhcolor1][vhpic1];[vhmask]format=${pix_fmt},extractplanes=${2},lut=c0=if(between(val\\,${3}\\,${4})\\,minval\\,maxval),[vhpic1]alphamerge,[vhcolor1]overlay",
         },
     },
     {
