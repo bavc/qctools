@@ -36,7 +36,11 @@ void DraggableChildrenBehaviour::newDrag(QWidget *watched)
     mimeData->setData(draggableOldIndexMimeType, QByteArray::number(layout->indexOf(watched)));
 
     drag->setMimeData(mimeData);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     drag->start();
+#else
+    drag->exec();
+#endif // QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 }
 
 bool DraggableChildrenBehaviour::eventFilter(QObject *watched, QEvent *event)

@@ -2,25 +2,19 @@
 #define PLAYER_H
 
 #include <QMainWindow>
-#include <QMediaService>
 #include <QPushButton>
 #include <QTimer>
-#include <QVideoRendererControl>
-#include <QVideoWidget>
 #include <QWidget>
 #include <QUrl>
-#include <QAbstractVideoSurface>
+#include <QVideoWidget>
 #include <QtAVPlayer/qavaudiooutput.h>
 #include <QtAVPlayer/qavplayer.h>
 
-class FileInformation;
-class FilterSelector;
-class DraggableChildrenBehaviour;
-class CommentsPlot;
-
-namespace Ui {
-class Player;
-}
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#include <QMediaService>
+#include <QVideoRendererControl>
+#include <QAbstractVideoSurface>
+#include <QVideoSurfaceFormat>
 
 class VideoRenderer : public QVideoRendererControl
 {
@@ -83,6 +77,19 @@ public:
     {
     }
 };
+
+#else
+#include <QVideoSink>
+#endif //
+
+class FileInformation;
+class FilterSelector;
+class DraggableChildrenBehaviour;
+class CommentsPlot;
+
+namespace Ui {
+class Player;
+}
 
 class MediaPlayer : public QAVPlayer {
     Q_OBJECT
@@ -208,9 +215,14 @@ private:
 private:
     Ui::Player *ui;
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     VideoWidget* m_w;
     MediaObject* m_o;
     VideoRenderer* m_vr;
+#else
+    QVideoWidget* m_w;
+#endif
+
     MediaPlayer* m_player;
     bool m_mute { false };
 

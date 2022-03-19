@@ -72,7 +72,7 @@ FilterSelector::FilterSelector(QWidget *parent, const std::function<bool(const c
     for(int i = 0; i < filtersGroups.length(); ++i)
     {
         FiltersGroup & filterGroup = filtersGroups[i];
-        qSort(filterGroup.begin(), filterGroup.end(), Sort::filterInfoLessThan);
+        std::sort(filterGroup.begin(), filterGroup.end(), Sort::filterInfoLessThan);
 
         for(FiltersGroup::const_iterator it = filterGroup.cbegin(); it != filterGroup.cend(); ++it)
         {
@@ -96,7 +96,6 @@ FilterSelector::FilterSelector(QWidget *parent, const std::function<bool(const c
     m_filterOptions.FiltersList->setMaxVisibleItems(25);
 
     Layout = new QGridLayout();
-    Layout->setMargin(0);
     Layout->setContentsMargins(0, 0, 0, 0);
     setLayout(Layout);
 

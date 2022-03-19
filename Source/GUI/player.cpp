@@ -14,7 +14,6 @@
 #include <QGraphicsItem>
 #include <QGraphicsObject>
 #include <QFileDialog>
-#include <QVideoSurfaceFormat>
 #include "draggablechildrenbehaviour.h"
 #include <float.h>
 
@@ -78,15 +77,19 @@ Player::Player(QWidget *parent) :
     ui->setupUi(this);
 
     ui->commentsPlaceHolderFrame->setLayout(new QHBoxLayout);
-    ui->commentsPlaceHolderFrame->layout()->setMargin(0);
+    ui->commentsPlaceHolderFrame->layout()->setContentsMargins(0, 0, 0, 0);
 
     m_audioOutput.reset(new QAVAudioOutput);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     m_w = new VideoWidget(ui->scrollArea);
     m_vr = new VideoRenderer();
     m_o = new MediaObject(m_vr);
     m_w->setMediaObject(m_o);
+#else
 
+#endif //
+    m_w = new QVideoWidget(ui->scrollArea);
     m_player = new MediaPlayer();
 
     QObject::connect(m_player, &QAVPlayer::audioFrame, m_player, [this](const QAVAudioFrame &frame) {
@@ -95,14 +98,22 @@ Player::Player(QWidget *parent) :
     });
 
    QObject::connect(m_player, &QAVPlayer::videoFrame, m_player, [this](const QAVVideoFrame &frame) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
        if (m_vr->m_surface == nullptr)
            return;
+#endif
 
        videoFrame = frame.convertTo(AV_PIX_FMT_RGB32);
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
        if (!m_vr->m_surface->isActive() || m_vr->m_surface->surfaceFormat().frameSize() != videoFrame.size())
            m_vr->m_surface->start({videoFrame.size(), videoFrame.pixelFormat(), videoFrame.handleType()});
        if (m_vr->m_surface->isActive())
            m_vr->m_surface->present(videoFrame);
+#else
+        m_w->videoSink()->setVideoFrame(videoFrame);
+#endif
+
    });
 
     ui->scrollArea->setWidget(m_w);
@@ -592,7 +603,11 @@ void Player::updateSlider(qint64 value)
     if((framePos + 1) == framesCount) {
         m_player->pause();
         m_handlePlayPauseClick = false;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         ui->playPause_pushButton->animateClick(0);
+#else
+        ui->playPause_pushButton->click();
+#endif // QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         QTimer::singleShot(0, [&]() {
             m_handlePlayPauseClick = true;
             ui->playPause_pushButton->setIcon(QIcon(":/icon/play.png"));
@@ -634,6 +649,7 @@ void Player::updateVideoOutputSize()
 
     ui->scrollArea->widget()->setGeometry(geometry);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     m_vr->m_surface->stop();
 
     QVideoSurfaceFormat format(videoFrame.size(), videoFrame.pixelFormat(), videoFrame.handleType());
@@ -641,6 +657,7 @@ void Player::updateVideoOutputSize()
 
     m_vr->m_surface->start(format);
     m_vr->m_surface->present(videoFrame);
+#endif // QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 }
 
 void Player::applyFilter()
@@ -1083,8 +1100,15 @@ void Player::on_goToTime_lineEdit_returnPressed()
 
 void Player::on_export_pushButton_clicked()
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     auto fileName = QFileDialog::getSaveFileName(this, "Export video frame", "", "*.png");
     if(!fileName.isEmpty()) {
-        videoFrame.image().save(fileName);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        auto image = videoFrame.image();
+#else
+        auto image = videoFrame.toImage();
+#endif // QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        image.save(fileName);
     }
+#endif //
 }

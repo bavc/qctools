@@ -41,11 +41,13 @@ Preferences::Preferences(QObject *parent) : QObject(parent)
 {
     Q_INIT_RESOURCE(coreresources);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     static struct RegisterMetatypes {
         RegisterMetatypes() {
             qRegisterMetaTypeStreamOperators<FilterSelectorsOrder>("FilterSelectorsOrder");
         }
     } registerMetatypes;
+#endif // QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 
     //Loading preferences
     QCoreApplication::setOrganizationName("MediaArea");
@@ -120,7 +122,11 @@ void Preferences::setActivePanels(const QSet<QString> &activePanels)
     QSettings settings;
     settings.beginWriteArray(KeyActivePanels);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     auto activePanelsList = activePanels.toList();
+#else
+    auto activePanelsList = QList(activePanels.begin(), activePanels.end());
+#endif // QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     for(auto i = 0; i < activePanelsList.size(); ++i)
     {
         settings.setArrayIndex(i);

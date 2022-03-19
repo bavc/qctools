@@ -213,6 +213,13 @@ QTAVPLAYER_LIB=$$absolute_path($$OUT_PWD/../qctools-QtAVPlayer)
 message('using UseQtAVPlayerLib')
 include(../qctools-QtAVPlayer/UseQtAVPlayerLib.pri)
 
+greaterThan(QT_MAJOR_VERSION, 5) {
+    win32-msvc* {
+        message("/ENTRY:mainCRTStartup")
+        QMAKE_LFLAGS_WINDOWS += /ENTRY:mainCRTStartup
+    }
+}
+
 win32-g++* {
     LIBS += -lbcrypt -lwsock32 -lws2_32
 }

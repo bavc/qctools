@@ -238,7 +238,7 @@ protected:
 class PlotCurve : public QwtPlotCurve {
     // QwtPlotCurve interface
 public:
-    explicit PlotCurve( const QString &title = QString::null ) : QwtPlotCurve(title), m_index(0), m_count(0) {
+    explicit PlotCurve( const QString &title = QString() ) : QwtPlotCurve(title), m_index(0), m_count(0) {
 
     }
     explicit PlotCurve( const QwtText &title ) : QwtPlotCurve(title), m_index(0), m_count(0) {
@@ -618,7 +618,11 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
 
     QwtPlotPanner *panner = new CustomPanner( this->canvas() );
     panner->setOrientations(Qt::Vertical);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     panner->setMouseButton( Qt::MidButton );
+#else
+    panner->setMouseButton( Qt::MiddleButton );
+#endif // QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 }
 
 //---------------------------------------------------------------------------

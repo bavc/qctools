@@ -36,7 +36,6 @@ Info::Info(QWidget *parent, const struct per_group* plotGroup, const struct per_
     // Info
     QGridLayout* Layout=new QGridLayout();
     Layout->setSpacing(0);
-    Layout->setMargin(0);
     Layout->setContentsMargins(0,0,0,0);
 
     QFont Font=QFont();

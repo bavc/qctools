@@ -370,7 +370,11 @@ PlotsChooser::~PlotsChooser()
 
 void PlotsChooser::selectFilters(const QStringList &selectedFilters)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QSet<QString> selectedFiltersSet = QSet<QString>::fromList(selectedFilters);
+#else
+    QSet<QString> selectedFiltersSet = QSet<QString>(selectedFilters.begin(), selectedFilters.end());
+#endif // QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     auto model = static_cast<FilteringModel*> (ui->tableView->model());
     // auto model = sfpModel->sourceModel();
 

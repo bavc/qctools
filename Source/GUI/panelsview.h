@@ -123,13 +123,13 @@ public:
         switch ( rubberBand() )
         {
             case HLineRubberBand:
-                text.sprintf( "%.4f", pos.y() );
+                text = QString::asprintf( "%.4f", pos.y() );
                 break;
             case VLineRubberBand:
-                text.sprintf( "%.4f", pos.x() );
+                text = QString::asprintf( "%.4f", pos.x() );
                 break;
             default:
-                text.sprintf( "%.4f, %.4f", pos.x(), pos.y() );
+                text = QString::asprintf( "%.4f, %.4f", pos.x(), pos.y() );
         }
         return QwtText( text );
     }

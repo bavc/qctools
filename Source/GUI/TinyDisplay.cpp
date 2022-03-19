@@ -15,7 +15,6 @@
 #include <QToolButton>
 #include <QLabel>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QVector>
 
 TinyDisplay::TinyDisplay(QWidget *parent, FileInformation* FileInformationData_)
@@ -30,7 +29,6 @@ TinyDisplay::TinyDisplay(QWidget *parent, FileInformation* FileInformationData_)
 
     Layout = new QHBoxLayout();
     Layout->setSpacing(1);
-    Layout->setMargin(1);
     Layout->setContentsMargins(1, 0, 1, 0);
 
     scaledLogo = QPixmap(":/icon/logo.jpg").scaled(72, 72);

@@ -1,6 +1,6 @@
 win32 {
     exists($$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty) {
-        greaterThan(QT_MINOR_VERSION, 8): {
+        greaterThan(QT_MINOR_VERSION, 8) || greaterThan(QT_MAJOR_VERSION, 5): {
             ZLIB_INCLUDE_PATH = $$absolute_path($$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib/src)
             greaterThan(QT_MINOR_VERSION, 13): {
                 zlibPri = $$absolute_path($$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib.pri)

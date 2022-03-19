@@ -14,7 +14,7 @@
 #include <QPushButton>
 #include <QDialogButtonBox>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QTabWidget>
 #include <QFile>
 #include <QLabel>
@@ -30,10 +30,13 @@
 Help::Help(QWidget * parent)
 : QDialog(parent)
 {
-    move(QApplication::desktop()->screenGeometry().width()/5, y());
-    resize(QApplication::desktop()->screenGeometry().width()-QApplication::desktop()->screenGeometry().width()/5*2, QApplication::desktop()->screenGeometry().height()*3/4);
+    auto screen = QApplication::primaryScreen();
+    auto screenGeometry = screen->geometry();
 
-    setWindowFlags(windowFlags()&(0xFFFFFFFF-Qt::WindowContextHelpButtonHint));
+    move(screenGeometry.width()/5, y());
+    resize(screenGeometry.width()-screenGeometry.width()/5*2, screenGeometry.height()*3/4);
+
+    setWindowFlags(windowFlags()& ~Qt::WindowContextHelpButtonHint);
     setWindowTitle("QCTools help");
 
     Close=new QPushButton("&Close");

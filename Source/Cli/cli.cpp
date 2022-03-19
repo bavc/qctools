@@ -874,7 +874,7 @@ int Cli::exec(QCoreApplication &a)
             progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
             progress->setValue(0);
 
-            info->upload(output);
+            info->upload(QFileInfo(output));
             a.exec();
 
             std::cout << std::endl;

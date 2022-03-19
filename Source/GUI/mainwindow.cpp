@@ -33,9 +33,12 @@
 #include <QMessageBox>
 #include <QJsonDocument>
 #include <QScreen>
-#include <QDesktopWidget>
 #include <QClipboard>
 #include <QGuiApplication>
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#include <QDesktopWidget>
+#endif
 
 #include "GUI/draggablechildrenbehaviour.h"
 #include "GUI/config.h"
@@ -96,10 +99,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_player = new Player();
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QDesktopWidget desktop;
     auto screenNumber = desktop.screenNumber(m_player);
     auto screenGeometry = desktop.screenGeometry(screenNumber);
-
+#else
+    auto screenGeometry = m_player->screen()->geometry();
+#endif
     m_player->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, screenGeometry.size() * 0.9, screenGeometry));
 
     // UI
@@ -617,7 +623,7 @@ void MainWindow::on_actionUploadToSignalServerAll_triggered()
             QFileInfo info(statsFileName);
             if(info.exists(statsFileName))
             {
-                file->upload(statsFileName);
+                file->upload(info);
             }
             else
             {

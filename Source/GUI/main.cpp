@@ -6,7 +6,6 @@
 
 //---------------------------------------------------------------------------
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QScreen>
 #include <QtPlugin>
 #include <iostream>
@@ -53,9 +52,8 @@ int main(int argc, char *argv[])
 
     MainWindow w(NULL);
 
-    QDesktopWidget desktop;
-    auto screenNumber = desktop.screenNumber(&w);
-    auto availableGeometry = desktop.availableGeometry(screenNumber);
+    auto screen = QApplication::primaryScreen();
+    auto availableGeometry = screen->availableGeometry();
     auto newSize = availableGeometry.size() * 0.95;
     auto newGeometry = QStyle::alignedRect(Qt::LayoutDirectionAuto, Qt::AlignCenter, newSize, availableGeometry);
 
