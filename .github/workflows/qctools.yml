@@ -56,6 +56,56 @@ jobs:
         qmake ..
         make -j4
 
+  build-macos-brew-Qt6:
+
+    strategy:
+      matrix:
+        compiler: ['clang-9']
+        include:
+          - compiler: clang-9
+            packages: llvm@9
+            env: { 'CC': 'clang-9', 'CXX': 'clang++-9' }
+
+    runs-on: macos-latest
+
+    env: ${{ matrix.env }}
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch: 1
+
+    - name: Checkout submodules
+      shell: bash
+      run: |
+        GIT_PATH=https://github.com/.extraheader
+        AUTH_HEADER="$(git config --local --get http.$GIT_PATH)"
+        git submodule sync --recursive
+        git -c "http.extraheader=$AUTH_HEADER" \
+            -c protocol.version=2 \
+            submodule update --init --force --recursive --depth=1
+
+    - name: Install dependencies
+      run: |
+        brew install ${{ matrix.packages }} pkg-config qt ffmpeg
+
+    - name: Install qwt
+      run: |
+        brew install qwt
+
+    - name: Set Qt6 environment path
+      run: |
+        echo "/usr/local/opt/qt6/bin" >> $GITHUB_PATH
+
+    - name: Build QCTools
+      env:
+        USE_BREW: true
+      run: |
+        cd Project/QtCreator
+        mkdir build
+        cd build
+        qmake ..
+        make -j4
 
   build-macos-no-brew:
 
@@ -127,6 +177,75 @@ jobs:
         qmake .. 
         make -j4
 
+  build-macos-no-brew-Qt6:
+
+    strategy:
+      matrix:
+        compiler: ['clang-9']
+        include:
+          - compiler: clang-9
+            packages: llvm@9
+            env: { 'CC': 'clang-9', 'CXX': 'clang++-9' }
+
+    runs-on: macos-latest
+
+    env: ${{ matrix.env }}
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch: 1
+
+    - name: Checkout submodules
+      shell: bash
+      run: |
+        GIT_PATH=https://github.com/.extraheader
+        AUTH_HEADER="$(git config --local --get http.$GIT_PATH)"
+        git submodule sync --recursive
+        git -c "http.extraheader=$AUTH_HEADER" \
+            -c protocol.version=2 \
+            submodule update --init --force --recursive --depth=1
+
+    - name: Install dependencies
+      run: |
+        brew install ${{ matrix.packages }} nasm qt
+
+    - name: Set Qt6 environment path
+      run: |
+        echo "/usr/local/opt/qt6/bin" >> $GITHUB_PATH
+
+    - name: Build qwt
+      run: |
+        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        cd ../qwt
+        qmake -r
+        make -j4
+
+    - name: Build FFmpeg
+      run: |
+        git clone --depth 1 --branch n4.4 https://github.com/FFmpeg/FFmpeg ../ffmpeg
+        cd ../ffmpeg
+        ./configure --enable-gpl \
+                    --enable-static \
+                    --disable-shared \
+                    --disable-autodetect \
+                    --disable-securetransport \
+                    --disable-videotoolbox \
+                    --disable-doc \
+                    --disable-ffplay \
+                    --disable-ffprobe \
+                    --disable-debug
+        make -j12
+
+    - name: Build QCTools
+      env:
+        USE_BREW: false
+      run: |
+        cd Project/QtCreator
+        mkdir build
+        cd build
+        qmake .. 
+        make -j4
 
   build-linux:
 
@@ -216,6 +335,93 @@ jobs:
         qmake
         make -j4
 
+  build-linux-Qt6:
+
+    strategy:
+      matrix:
+        compiler: ['gcc-9']
+        include:
+          - compiler: gcc-9
+            packages: gcc-9 g++-9
+            env: { 'CC': 'gcc-9', 'CXX': 'g++-9' }
+
+    runs-on: ubuntu-latest
+
+    env: ${{ matrix.env }}
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch: 1
+    - name: Checkout submodules
+      shell: bash
+      run: |
+        GIT_PATH=https://github.com/.extraheader
+        AUTH_HEADER="$(git config --local --get http.$GIT_PATH)"
+        git submodule sync --recursive
+        git -c "http.extraheader=$AUTH_HEADER" \
+            -c protocol.version=2 \
+            submodule update --init --force --recursive --depth=1
+
+    - name: Install Python 3.7 version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
+
+    - name: Add Clang apt repository
+      if: matrix.compiler == 'clang-9'
+      run: |
+        echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main" \
+        | sudo tee -a /etc/apt/sources.list.d/llvm.list
+        curl -L https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+        sudo apt-get update
+
+    - name: Install compiler and FFmpeg dependencies
+      run: |
+        sudo apt-get update &&
+        sudo apt-get install -y ${{ matrix.packages }}
+
+    - name: Install Qt 6.2
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 6.2.0
+
+    - name: Cleanup
+      run: |
+        sudo apt-get clean -y
+        sudo rm -rf /var/lib/apt/lists/*
+
+    - name: Build qwt
+      run: |
+        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        cd ../qwt
+        qmake -r
+        make -j4
+
+    - name: Build FFmpeg
+      run: |
+        git clone --depth 1 --branch n4.4 https://github.com/FFmpeg/FFmpeg ../ffmpeg
+        cd ../ffmpeg
+        ./configure --enable-gpl \
+                    --enable-shared \
+                    --disable-static \
+                    --disable-autodetect \
+                    --disable-securetransport \
+                    --disable-videotoolbox \
+                    --disable-doc \
+                    --disable-ffplay \
+                    --disable-ffprobe \
+                    --disable-debug \
+                    --disable-x86asm
+
+        make -j12
+
+    - name: Build QCTools
+      run: |
+        cd Project/QtCreator
+        qmake
+        make -j4
 
   build-windows-mingw:
 
@@ -284,6 +490,72 @@ jobs:
         cd Project/QtCreator
         mingw32-make
 
+  build-windows-mingw-Qt6:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch: 1
+
+    - name: Checkout submodules
+      shell: bash
+      run: |
+        GIT_PATH=https://github.com/.extraheader
+        AUTH_HEADER="$(git config --local --get http.$GIT_PATH)"
+        git submodule sync --recursive
+        git -c "http.extraheader=$AUTH_HEADER" \
+            -c protocol.version=2 \
+            submodule update --init --force --recursive --depth=1
+
+    - name: Install Qt 6.2
+      uses: jurplel/install-qt-action@v2
+      with:
+        arch: win64_mingw81
+        version: 6.2.0
+
+    - name: Install wget & unzip
+      run: |
+        choco install wget unzip xidel
+
+    - name: Install FFmpeg
+      shell: cmd
+      run: |
+        cd ..
+        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "//a[contains(@href, '-gpl-shared-4.4.zip')]/@href[1]" --silent > ffmpeg.url
+        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "(//a[contains(@href, '-gpl-shared-4.4.zip')])[1]/substring(., 0, string-length(.) - 3)" --silent > ffmpeg.name
+        set /P FFMPEG_URL=< ffmpeg.url
+        set /P FFMPEG_NAME=< ffmpeg.name
+        wget https://github.com%FFMPEG_URL%
+        unzip %FFMPEG_NAME%.zip
+        ren %FFMPEG_NAME% ffmpeg
+        dir ffmpeg
+
+    - name: Download and configure qwt
+      run: |
+        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        copy .github\workflows\qwtconfig.pri ..\qwt
+        cd ../qwt
+        qmake -r
+
+    - name: Build qwt
+      shell: cmd
+      run: |
+        cd ../qwt
+        mingw32-make -j4
+
+    - name: Configure QCTools
+      shell: cmd
+      run: |
+        cd Project/QtCreator
+        qmake
+
+    - name: Build QCTools
+      shell: cmd
+      run: |
+        cd Project/QtCreator
+        mingw32-make
 
   build-windows-vs:
 
@@ -327,6 +599,90 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with: 
         version: 5.15.2
+
+    - name: Install wget & unzip
+      run: |
+        choco install wget unzip xidel
+
+    - name: Install FFmpeg
+      shell: cmd
+      run: |
+        cd ..
+        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "//a[contains(@href, '-gpl-shared-4.4.zip')]/@href[1]" --silent > ffmpeg.url
+        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "(//a[contains(@href, '-gpl-shared-4.4.zip')])[1]/substring(., 0, string-length(.) - 3)" --silent > ffmpeg.name
+        set /P FFMPEG_URL=< ffmpeg.url
+        set /P FFMPEG_NAME=< ffmpeg.name
+        wget https://github.com%FFMPEG_URL%
+        unzip %FFMPEG_NAME%.zip
+        ren %FFMPEG_NAME% ffmpeg
+        dir ffmpeg
+
+    - name: Download and configure qwt
+      run: |
+        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        cd ../qwt
+        qmake -r
+
+    - name: Build qwt
+      shell: cmd
+      run: |
+        cd ../qwt
+        nmake
+
+    - name: Configure QCTools
+      shell: cmd
+      run: |
+        cd Project/QtCreator
+        qmake
+
+    - name: Build QCTools
+      shell: cmd
+      run: |
+        cd Project/QtCreator
+        nmake
+
+  build-windows-vs-Qt6:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch: 1
+
+    - name: Checkout submodules
+      shell: bash
+      run: |
+        GIT_PATH=https://github.com/.extraheader
+        AUTH_HEADER="$(git config --local --get http.$GIT_PATH)"
+        git submodule sync --recursive
+        git -c "http.extraheader=$AUTH_HEADER" \
+            -c protocol.version=2 \
+            submodule update --init --force --recursive --depth=1
+
+    - name: Init vs environment
+      uses: egor-tensin/vs-shell@v2
+      with:
+        arch: x64
+
+    - name: Build and install zlib
+      shell: cmd
+      run: |
+        git clone --depth 1 https://github.com/madler/zlib ../zlib-dev
+        cd ../zlib-dev
+        mkdir build
+        cd build
+        cmake -G "NMake Makefiles" ^
+              -DCMAKE_INSTALL_PREFIX="%GITHUB_WORKSPACE%\..\zlib" ^
+              -DBUILD_SHARED_LIBS=0 ^
+              -DCMAKE_BUILD_TYPE=Release ^
+              ..
+        nmake install
+
+    - name: Install Qt 6.2
+      uses: jurplel/install-qt-action@v2
+      with: 
+        version: 6.2
 
     - name: Install wget & unzip
       run: |
