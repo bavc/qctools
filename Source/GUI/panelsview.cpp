@@ -232,9 +232,9 @@ void PanelsView::paintEvent(QPaintEvent *e)
         auto totalFrames = m_endFrame - m_startFrame;
         auto zx = (qreal) m_actualWidth / totalFrames;
 
-        QMatrix scalingViewMatrix(sx, 0, 0, sy, 0, 0);
-        QMatrix scalingZoomMatrix(zx, 0, 0, 1, 0, 0);
-        p.setMatrix(scalingViewMatrix * scalingZoomMatrix);
+        QTransform scalingViewMatrix(sx, 0, 0, sy, 0, 0);
+        QTransform scalingZoomMatrix(zx, 0, 0, 1, 0, 0);
+        p.setTransform(scalingViewMatrix * scalingZoomMatrix);
 
         int startPanelOffset, startPanelIndex, endPanelLength, endPanelIndex;
         getPanelsBounds(startPanelIndex, startPanelOffset, endPanelIndex, endPanelLength);
@@ -268,8 +268,13 @@ void PanelsView::wheelEvent(QWheelEvent *event)
         return;
 
     auto panelImageHeight = getPanelImage(0).height();
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    auto delta = event->delta();
+#else
+    auto delta = event->pixelDelta().y();
+#endif //
 
-    if(event->delta() > 0) {
+    if(delta > 0) {
         auto newHeight = height() + 10;
         if(newHeight > panelImageHeight)
             newHeight = panelImageHeight;
@@ -277,7 +282,7 @@ void PanelsView::wheelEvent(QWheelEvent *event)
         m_panelPixmap = QPixmap();
         this->setMinimumHeight(newHeight);
     }
-    else if(event->delta() < 0)
+    else if(delta < 0)
     {
         auto newHeight = height() - 10;
         if(newHeight < 100)

@@ -314,7 +314,11 @@ void CommentsPlot::restorePlotHeight()
 
 CommentsPlotPicker::CommentsPlotPicker(QWidget *w, CommonStats *stats) : QwtPlotPicker(w), stats(stats)
 {
+#if QWT_VERSION >= 0x060200
+    setAxes( QwtPlot::xBottom, QwtPlot::yLeft );
+#else
     setAxis( QwtPlot::xBottom, QwtPlot::yLeft );
+#endif
     setRubberBand( QwtPlotPicker::CrossRubberBand );
     setRubberBandPen( QColor( Qt::green ) );
 

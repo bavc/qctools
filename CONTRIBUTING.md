@@ -29,7 +29,7 @@ Get a QCTools repo (or use your own copy):
 
 Build QCTools via homebrew install process:  
 `cd Project/QtCreator/`  
-`export QCTOOLS_USE_BREW=true && qmake && make`  
+`export USE_BREW=true && qmake && make`  
 `open QCTools.app`  
 
 After testing, push your changes to your fork/branch and [submit a pull request](https://github.com/bavc/qctools/compare?expand=1) and describe your proposed changes. Then you will have to wait for a maintainer to review your code.

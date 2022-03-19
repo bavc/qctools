@@ -12,6 +12,7 @@
 #include <Core/CommonStats.h>
 #include <Core/Core.h>
 #include "Core/VideoCore.h"
+#include <QDebug>
 #include <QEvent>
 #include <QJSEngine>
 #include <QJSValue>
@@ -19,9 +20,12 @@
 #include <qwt_plot.h>
 #include <qwt_series_data.h>
 #include <qwt_widget_overlay.h>
+#include <qwt_scale_map.h>
+#include <math.h>
 #include <cassert>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QPainter>
 
 class QwtPlotCurve;
 class PlotCursor;

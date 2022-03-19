@@ -8,7 +8,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <float.h>
 #include <QFileDialog>
 #include <QLabel>
 #include <QCheckBox>
@@ -20,12 +19,13 @@
 
 #include "Core/Core.h"
 #include "Core/FFmpeg_Glue.h"
+#include "GUI/player.h"
 #include "GUI/Plots.h"
 #include "GUI/draggablechildrenbehaviour.h"
 #include "GUI/preferences.h"
 #include "GUI/barchartprofilesmodel.h"
-#include "GUI/player.h"
 #include "GUI/playercontrol.h"
+#include <float.h>
 
 //---------------------------------------------------------------------------
 

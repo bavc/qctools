@@ -35,7 +35,6 @@
 #include <QDialog>
 #include <QShortcut>
 #include <QToolButton>
-#include <QDesktopWidget>
 #include <QHBoxLayout>
 #include <QComboBox>
 #include <QCheckBox>
@@ -234,7 +233,6 @@ void MainWindow::Ui_Init()
 
     // Config
     ui->verticalLayout->setSpacing(0);
-    ui->verticalLayout->setMargin(0);
     ui->verticalLayout->setStretch(0, 1);
     ui->verticalLayout->setContentsMargins(0,0,0,0);
 

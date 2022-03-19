@@ -10,9 +10,9 @@ Install submodules
 
     $ git submodule update --init --recursive
 
-set QCTOOLS_USE_BREW environment variable:
+set USE_BREW environment variable:
 
-    $ export QCTOOLS_USE_BREW=true
+    $ export USE_BREW=true
 
 Build the main application
 
@@ -24,4 +24,4 @@ Build the main application
 
 Or from within the build directory, run:
 
-    $ export QCTOOLS_USE_BREW=true ; qmake ../ && make
+    $ export USE_BREW=true ; qmake ../ && make

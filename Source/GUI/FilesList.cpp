@@ -360,7 +360,7 @@ void FilesList::UpdateAll()
             QTableWidgetItem* Item=item((int)Files_Pos, Pos);
             if (Item)
             {
-                Item->setFlags(Item->flags()&((Qt::ItemFlags)-1-Qt::ItemIsEditable));
+                Item->setFlags(Item->flags()&(~Qt::ItemIsSelectable & ~Qt::ItemIsEditable));
                 Item->setFont(Font);
             }
         }
@@ -423,7 +423,7 @@ void FilesList::Update(size_t Files_Pos)
                                             break;
                 default:    ;
             }
-            Item->setFlags(Item->flags()&((Qt::ItemFlags)-1-Qt::ItemIsEditable));
+            Item->setFlags(Item->flags()&(~Qt::ItemIsSelectable & ~Qt::ItemIsEditable));
             setItem((int)Files_Pos, Col, Item);
         }
 }

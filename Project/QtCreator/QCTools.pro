@@ -1,35 +1,53 @@
 TEMPLATE = subdirs
 
-QTAV = $$(QTAV)
-isEmpty(QTAV) {
-#    QTAV=$$absolute_path(../../../QtAV) // the same level of folder as qctools
-    QTAV=$$absolute_path(qctools-qtav)
-} else {
-    QTAV=$$absolute_path($$QTAV)
+USE_BREW = $$(USE_BREW)
+!isEmpty(USE_BREW):equals(USE_BREW, true) {
+    message("DEFINES += USE_BREW")
+    DEFINES += USE_BREW
 }
 
-message('QTAV: ' $$QTAV)
-message('QMAKE_COPY: ' $$QMAKE_COPY)
-message('QMAKE_COPY_FILE: ' $$QMAKE_COPY_FILE)
-message('QMAKE_MKDIR_CMD: ' $$QMAKE_MKDIR_CMD)
-
-oldConf = $$cat($$QTAV/.qmake.conf.backup, lines)
-isEmpty(oldConf) {
-    oldConf = $$cat($$QTAV/.qmake.conf, lines)
-    message('writting backup of original .qmake.conf')
-    write_file($$QTAV/.qmake.conf.backup, oldConf)
-} else {
-    message('reading backup of original .qmake.conf.backup')
-}
-
-message('oldConf: ' $$oldConf)
-write_file($$QTAV/.qmake.conf, oldConf)
-
-include(brew.pri)
 include(ffmpeg.pri)
+
+QTAVPLAYER = $$absolute_path($$_PRO_FILE_PWD_/qctools-QtAVPlayer)
+message('QTAVPLAYER: ' $$QTAVPLAYER)
+
+QTAVPLAYERLIB = $$absolute_path($$_PRO_FILE_PWD_/qctools-QtAVPlayer-lib)
+message('QTAVPLAYER library support files: ' $$QTAVPLAYERLIB)
+
+defineReplace(nativePath) {
+    OUT_NATIVE_PATH = $$1
+    # Replace slashes in paths with backslashes for Windows
+    win32:OUT_NATIVE_PATH ~= s,/,\\,g
+    return($$OUT_NATIVE_PATH)
+}
+
+win32: {
+    system('xcopy $$nativePath($$QTAVPLAYERLIB/*) $$nativePath($$QTAVPLAYER/) /E /Y')
+    message('xcopy $$nativePath($$QTAVPLAYERLIB/*) $$nativePath($$QTAVPLAYER/) /E /Y')
+} else {
+    macx: {
+        system('cp -R $$shell_path($$QTAVPLAYERLIB/*) $$shell_path($$QTAVPLAYER/)')
+        message('cp -R $$shell_path($$QTAVPLAYERLIB/*) $$shell_path($$QTAVPLAYER/)')
+    } else {
+        system('cp -r -u $$shell_path($$QTAVPLAYERLIB/*) $$shell_path($$QTAVPLAYER/)')
+        message('cp -r -u $$shell_path($$QTAVPLAYERLIB/*) $$shell_path($$QTAVPLAYER/)')
+    }
+}
 
 contains(DEFINES, USE_BREW) {
     message('using ffmpeg from brew via PKGCONFIG')
+
+    oldConf = $$cat($$QTAVPLAYER/.qmake.conf.backup, lines)
+    isEmpty(oldConf) {
+        oldConf = $$cat($$QTAVPLAYER/.qmake.conf, lines)
+        message('writting backup of original .qmake.conf')
+        write_file($$QTAVPLAYER/.qmake.conf.backup, oldConf)
+    } else {
+        message('reading backup of original .qmake.conf.backup')
+    }
+
+    message('oldConf: ' $$oldConf)
+    write_file($$QTAVPLAYER/.qmake.conf, oldConf)
 
     pkgConfig = "PKGCONFIG += libavdevice libavcodec libavfilter libavformat libpostproc libswresample libswscale libavcodec libavutil"
     linkPkgConfig = "CONFIG += link_pkgconfig"
@@ -37,61 +55,24 @@ contains(DEFINES, USE_BREW) {
     message('pkgConfig: ' $$pkgConfig)
     message('linkPkgConfig: ' $$linkPkgConfig)
 
-    write_file($$QTAV/.qmake.conf, pkgConfig, append)
-    write_file($$QTAV/.qmake.conf, linkPkgConfig, append)
+    write_file($$QTAVPLAYER/.qmake.conf, pkgConfig, append)
+    write_file($$QTAVPLAYER/.qmake.conf, linkPkgConfig, append)
 } else {
-    ffmpegIncludes = "INCLUDEPATH+=$$FFMPEG_INCLUDES"
-    ffmpegLibs = "LIBS+=$$FFMPEG_LIBS"
-
-    message('ffmpegIncludes: ' $$ffmpegIncludes)
-    message('ffmpegLibs: ' $$ffmpegLibs)
-
-    staticffmpeg = "CONFIG += static_ffmpeg"
-    message('staticffmpeg: ' $$ffmpegLibs)
-
-    write_file($$QTAV/.qmake.conf, ffmpegIncludes, append)
-    write_file($$QTAV/.qmake.conf, ffmpegLibs, append)
-    write_file($$QTAV/.qmake.conf, staticffmpeg, append)
-
-    # to fix building QtAV with the latest ffmpeg
-    limitMacros = "DEFINES += __STDC_LIMIT_MACROS"
-    write_file($$QTAV/.qmake.conf, limitMacros, append)
+    message('including $$QTAVPLAYER/QtAVPlayerLib.pri')
+    include($$QTAVPLAYER/QtAVPlayerLib.pri)
 }
-
-linux: {
-fpic = "QMAKE_CXXFLAGS += -fPIC"
-write_file($$QTAV/.qmake.conf, fpic, append)
-}
-
-noExamples = CONFIG*=no-examples
-write_file($$QTAV/.qmake.conf, noExamples, append)
-
-noTests = CONFIG*=no-tests
-write_file($$QTAV/.qmake.conf, noTests, append)
-
-mac: {
-noVideoToolbox = "CONFIG*=no-videotoolbox"
-write_file($$QTAV/.qmake.conf, noVideoToolbox, append)
-}
-
-qtav = "QTAV=$$QTAV"
-write_file(qctools-gui/.qmake.conf, qtav)
-
-#write_file(qctools-cli/.qmake.conf, ffmpegConfig)
-#write_file(qctools-gui/.qmake.conf, ffmpegConfig)
-#write_file(qctools-lib/.qmake.conf, ffmpegConfig)
 
 SUBDIRS = \
-        qctools-qtav \
+        qctools-qtavplayer \
         qctools-lib \
         qctools-cli \
         qctools-gui
 
-qctools-qtav.file = qctools-qtav/QtAV.pro
+qctools-qtavplayer.file = qctools-QtAVPlayer/QtAVPlayerLib.pro
 
 qctools-lib.subdir = qctools-lib
 qctools-cli.subdir = qctools-cli
 qctools-gui.subdir = qctools-gui
 
 qctools-cli.depends = qctools-lib
-qctools-gui.depends = qctools-qtav qctools-lib
+qctools-gui.depends = qctools-qtavplayer qctools-lib

@@ -5,11 +5,14 @@
 
 #include <QFrame>
 #include <QSize>
+#include <QPen>
 #include <functional>
 #include <qwt_legend.h>
 #include <qwt_picker_machine.h>
 #include <qwt_plot.h>
 #include <qwt_plot_picker.h>
+#include <qwt_text.h>
+#include <qwt_scale_map.h>
 
 class QwtPlot;
 class PlotCursor;
@@ -48,7 +51,7 @@ public:
         setAxis( xAxis, yAxis );
 
         setRubberBand( QwtPlotPicker::CrossRubberBand );
-        setRubberBandPen( QColor( Qt::green ) );
+        setRubberBandPen( QPen(QColor( Qt::green )) );
 
         setTrackerMode( QwtPicker::AlwaysOn );
         setTrackerPen( QColor( Qt::black ) );
@@ -120,13 +123,13 @@ public:
         switch ( rubberBand() )
         {
             case HLineRubberBand:
-                text.sprintf( "%.4f", pos.y() );
+                text = QString::asprintf( "%.4f", pos.y() );
                 break;
             case VLineRubberBand:
-                text.sprintf( "%.4f", pos.x() );
+                text = QString::asprintf( "%.4f", pos.x() );
                 break;
             default:
-                text.sprintf( "%.4f, %.4f", pos.x(), pos.y() );
+                text = QString::asprintf( "%.4f, %.4f", pos.x(), pos.y() );
         }
         return QwtText( text );
     }
