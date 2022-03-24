@@ -87,9 +87,8 @@ Player::Player(QWidget *parent) :
     m_o = new MediaObject(m_vr);
     m_w->setMediaObject(m_o);
 #else
-
-#endif //
     m_w = new QVideoWidget(ui->scrollArea);
+#endif //
     m_player = new MediaPlayer();
 
     QObject::connect(m_player, &QAVPlayer::audioFrame, m_player, [this](const QAVAudioFrame &frame) {
