@@ -881,7 +881,6 @@ const filter Filters[] =
             "readvitc=scan_max=${1},readeia608=scan_max=${1}:spw=${2}:chp=1,crop=iw:${1}:0:0,scale=${width}:${height}:flags=neighbor,drawtext=fontfile=${fontfile}:fontcolor=white:fontsize=36:box=1:boxcolor=black@0.5:x=(w-tw)/2:y=h*3/4-ascent:text=Line %{metadata\\\\:lavfi.readeia608.0.line\\\\:-} %{metadata\\\\:lavfi.readeia608.0.cc\\\\:------} - Line %{metadata\\\\:lavfi.readeia608.1.line\\\\:-} %{metadata\\\\:lavfi.readeia608.1.cc\\\\:------},drawtext=fontfile=${fontfile}:fontcolor=white:fontsize=36:box=1:boxcolor=black@0.5:x=(w-tw)/2:y=h*3/4-ascent*3:text=VITC %{metadata\\\\:lavfi.readvitc.tc_str\\\\:-- -- -- --}",
         },
     },
-/*
     {
         "(Separator)",
         -1,
@@ -911,7 +910,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "showspectrum=slide=scroll:mode=separate:color=intensity:saturation=${1}:win_func=${2}",
+            "nullsink;[0:a:0]showspectrum=slide=scroll:mode=separate:color=intensity:saturation=${1}:win_func=${2}",
         },
     },
     {
@@ -927,8 +926,8 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "showwaves=mode=${3}:n=${2}:s=${width}x${height}:split_channels=0,negate",
-            "showwaves=mode=${3}:n=${2}:s=${width}x${height}:split_channels=1,negate",
+            "nullsink;[0:a:0]showwaves=mode=${3}:n=${2}:s=${width}x${height}:split_channels=0,negate",
+            "nullsink;[0:a:0]showwaves=mode=${3}:n=${2}:s=${width}x${height}:split_channels=1,negate",
         },
     },
     {
@@ -944,7 +943,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "showcqt=fullhd=0",
+            "nullsink;[0:a:0]showcqt=fullhd=0",
         },
     },
     {
@@ -960,7 +959,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "avectorscope=m=lissajous:s=512x512:zoom=${1}",
+            "nullsink;[0:a:0]avectorscope=m=lissajous:s=512x512:zoom=${1}",
         },
     },
     {
@@ -976,7 +975,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "aphasemeter=mpc=red:video=1[out0][out1];[out0]anullsink;[out1]copy",
+            "nullsink;[0:a:0]aphasemeter=mpc=red:video=1[out0][out1];[out0]anullsink;[out1]copy",
         },
     },
     {
@@ -992,7 +991,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "showfreqs=mode=line:win_size=w1024",
+            "nullsink;[0:a:0]showfreqs=mode=line:win_size=w1024",
         },
     },
     {
@@ -1008,7 +1007,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "showvolume",
+            "nullsink;[0:a:0]showvolume",
         },
     },
     {
@@ -1024,7 +1023,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "abitscope,drawgrid=w=iw:h=ih/8:t=1:c=gray@0.9",
+            "nullsink;[0:a:0]abitscope,drawgrid=w=iw:h=ih/8:t=1:c=gray@0.9",
         },
     },
     {
@@ -1040,10 +1039,9 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "ebur128=video=1:meter=${1}[out0][out1];[out1]anullsink;[out0]copy",
+            "nullsink;[0:a:0]ebur128=video=1:meter=${1}[out0][out1];[out1]anullsink;[out0]copy",
         },
     },
-*/
     {
         "(End)",
         -1,
