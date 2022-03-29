@@ -386,6 +386,7 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with:
         version: 6.2.0
+        modules: 'addons.qtmultimedia'
 
     - name: Cleanup
       run: |
@@ -514,6 +515,7 @@ jobs:
       with:
         arch: win64_mingw81
         version: 6.2.0
+        modules: 'addons.qtmultimedia'
 
     - name: Install wget & unzip
       run: |
@@ -682,7 +684,8 @@ jobs:
     - name: Install Qt 6.2
       uses: jurplel/install-qt-action@v2
       with: 
-        version: 6.2
+        version: 6.2.0
+        modules: 'addons.qtmultimedia'
 
     - name: Install wget & unzip
       run: |
