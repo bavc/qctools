@@ -35,7 +35,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        brew install ${{ matrix.packages }} pkg-config qt5 ffmpeg
+        brew install ${{ matrix.packages }} pkg-config qt5 ffmpeg@4
 
     - name: Install qwt-qt5
       run: |
@@ -87,7 +87,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        brew install ${{ matrix.packages }} pkg-config qt ffmpeg
+        brew install ${{ matrix.packages }} pkg-config qt ffmpeg@4
 
     - name: Install qwt
       run: |
