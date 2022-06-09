@@ -494,6 +494,13 @@ void MainWindow::addFile(const QString &FileName)
 
     // Launch analysis
     FileInformation* Temp=new FileInformation(signalServer, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks, preferences->getActivePanels(), preferences->createQCvaultFileNameString(FileName));
+    if (!Temp->isValid() && !Temp->hasStats())
+    {
+        delete Temp; //Temp=NULL;
+        QMessageBox::warning(this, "Can't open file", QString("File %1 is invalid or unsupported").arg(FileName));
+        return;
+    }
+
     connect(Temp, SIGNAL(positionChanged()), this, SLOT(Update()), Qt::DirectConnection); // direct connection is required here to get Update called from separate thread
     connect(Temp, SIGNAL(parsingCompleted(bool)), this, SLOT(updateExportAllAction()));
 
