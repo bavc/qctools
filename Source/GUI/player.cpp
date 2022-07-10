@@ -652,7 +652,6 @@ void Player::updateVideoOutputSize()
     m_vr->m_surface->stop();
 
     QVideoSurfaceFormat format(videoFrame.size(), videoFrame.pixelFormat(), videoFrame.handleType());
-    format.setPixelAspectRatio(newSize.width(), newSize.height());
 
     m_vr->m_surface->start(format);
     m_vr->m_surface->present(videoFrame);
