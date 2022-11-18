@@ -12,9 +12,13 @@
 #include "Core/AudioStats.h"
 #include "Core/FormatStats.h"
 #include "Core/StreamsStats.h"
-#include <libavcodec/codec_id.h>
 
 #include "FFmpegVideoEncoder.h"
+
+extern "C" {
+#include <libavcodec/codec_id.h>
+#include "libavformat/avformat.h"
+}
 
 #include <QProcess>
 #include <QFileInfo>
@@ -425,6 +429,106 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     if(glueFileName  == "-")
         glueFileName  = "pipe:0";
 
+#if 1
+    AVFormatContext* FormatContext = nullptr;
+    if (avformat_open_input(&FormatContext, glueFileName.c_str(), NULL, NULL)>=0)
+    {
+        if (avformat_find_stream_info(FormatContext, NULL)>=0) {
+
+            for(auto i = 0; i < FormatContext->nb_streams; ++i) {
+                auto stream = FormatContext->streams[i];
+
+                AVCodec* Codec=avcodec_find_decoder(stream->codec->codec_id);
+                if (Codec)
+                    avcodec_open2(stream->codec, Codec, NULL);
+
+                auto Duration = 0;
+                auto FrameCount = stream->nb_frames;
+                if (stream->duration != AV_NOPTS_VALUE)
+                    Duration=((double)stream->duration)*stream->time_base.num/stream->time_base.den;
+
+                // If duration is not known, estimating it
+                if (Duration==0 && FormatContext->duration!=AV_NOPTS_VALUE)
+                    Duration=((double)FormatContext->duration)/AV_TIME_BASE;
+
+                // If frame count is not known, estimating it
+                if (FrameCount==0 && stream->avg_frame_rate.num && stream->avg_frame_rate.den && Duration)
+                    FrameCount=Duration*stream->avg_frame_rate.num/stream->avg_frame_rate.den;
+                if (FrameCount==0
+                 && ((stream->time_base.num==1 && stream->time_base.den>=24 && stream->time_base.den<=60)
+                  || (stream->time_base.num==1001 && stream->time_base.den>=24000 && stream->time_base.den<=60000)))
+                    FrameCount=stream->duration;
+
+                if(stream->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
+                    auto Stat=new VideoStats(FrameCount, Duration, stream);
+                    Stats.push_back(Stat);
+                } else if(stream->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
+                    auto Stat=new AudioStats(FrameCount, Duration, stream);
+                    Stats.push_back(Stat);
+                }
+            }
+
+            streamsStats = new StreamsStats(FormatContext);
+            formatStats = new FormatStats(FormatContext);
+        }
+
+        avformat_close_input(&FormatContext);
+    }
+
+    mediaParser = new MediaParser(this);
+    mediaParser->setSource(glueFileName.c_str());
+    mediaParser->setFilter(QString::fromStdString(Filters[0]));
+
+    QObject::connect(mediaParser, &MediaParser::videoFrame, mediaParser, [this](const QAVVideoFrame &frame) {
+         auto stat = Stats[0];
+
+         stat->TimeStampFromFrame(frame.frame(), Frames_Pos);
+         stat->StatsFromFrame(frame.frame(), frame.size().width(), frame.size().height());
+
+         ++Frames_Pos;
+    }, Qt::DirectConnection);
+
+    mediaParser->play();
+
+    /*
+    Frames_Pos=0;
+
+    m_audioParser = new QAVPlayer();
+    m_audioParser->setSource(glueFileName.c_str());
+    m_audioParser->setSynced(false);
+    m_audioParser->setFilter(QString::fromStdString(Filters[1]));
+
+    QObject::connect(m_audioParser, &QAVPlayer::audioFrame, m_audioParser, [this](const QAVAudioFrame &frame) {
+        auto stat = Stats[1];
+
+        stat->TimeStampFromFrame(frame.frame(), AudioFrames_Pos);
+        stat->StatsFromFrame(frame.frame(), 0, 0);
+
+        ++AudioFrames_Pos;
+        // nothing here
+    }, Qt::DirectConnection);
+
+    m_videoParser = new QAVPlayer();
+    m_videoParser->setSource(glueFileName.c_str());
+    m_videoParser->setSynced(false);
+    m_videoParser->setFilter(QString::fromStdString(Filters[0]));
+
+   QObject::connect(m_videoParser, &QAVPlayer::videoFrame, m_videoParser, [this](const QAVVideoFrame &frame) {
+        auto stat = Stats[0];
+
+        stat->TimeStampFromFrame(frame.frame(), Frames_Pos);
+        stat->StatsFromFrame(frame.frame(), frame.size().width(), frame.size().height());
+
+        ++Frames_Pos;
+   }, Qt::DirectConnection);
+
+   m_videoParser->play();
+   m_audioParser->play();
+   */
+
+#endif //
+
+#if 0
     qDebug() << "opening " << glueFileName .c_str();
     Glue=new FFmpeg_Glue(glueFileName , ActiveAllTracks, &Stats, &streamsStats, &formatStats, Stats.empty());
     if (!glueFileName .empty() && Glue->ContainerFormat_Get().empty())
@@ -560,6 +664,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
             }
         }
     }
+#endif //
 
     // Looking for the reference stream (video or audio)
     ReferenceStream_Pos=0;
@@ -1054,8 +1159,25 @@ bool FileInformation::PlayBackFilters_Available ()
     return Glue;
 }
 
+size_t FileInformation::VideoFrameCount_Get()
+{
+    for(auto i = 0; i < Stats.size(); ++i) {
+        auto stat = Stats[i];
+        if(stat->Type_Get() == Type_Video)
+            return stat->x_Current_Max;
+    }
+
+    return 0;
+}
+
+bool FileInformation::IsRGB_Get()
+{
+    return true; // 2DO!!! streamsStats->IsRGB_Get();
+}
+
 qreal FileInformation::averageFrameRate() const
 {
+    /* 2DO !!!
     if(!Glue)
         return 0;
 
@@ -1064,11 +1186,28 @@ qreal FileInformation::averageFrameRate() const
         return splitted[0].toDouble();
 
     return splitted[0].toDouble() / splitted[1].toDouble();
+    */
+
+    return 25;
+}
+
+double FileInformation::TimeStampOfCurrentFrame() const
+{
+    for(auto i = 0; i < Stats.size(); ++i) {
+        auto stat = Stats[i];
+        if(stat->Type_Get() == Type_Video) {
+            auto videoStat = static_cast<VideoStats*>(stat);
+            return videoStat->FirstTimeStamp;
+        }
+    }
+
+    return DBL_MAX;
 }
 
 bool FileInformation::isValid() const
 {
-    return Glue != 0;
+    return true; // 2DO !!!
+    // return Glue != 0;
 }
 
 int FileInformation::BitsPerRawSample(int streamType) const

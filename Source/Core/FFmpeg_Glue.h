@@ -358,16 +358,16 @@ public:
     static double               GetDAR(const FFmpeg_Glue::AVFramePtr & frame);
 
 private:
-    QMutex* mutex;
+    QMutex* mutex { nullptr };
 
     std::vector<inputdata*>     InputDatas;
     std::vector<outputdata*>    OutputDatas;
     bool                        InputDatas_Copy;
 
     // FFmpeg pointers - Input
-    AVFormatContext*            FormatContext;
-    AVPacket*                   Packet;
-    AVFrame*                    Frame;
+    AVFormatContext*            FormatContext { nullptr };
+    AVPacket*                   Packet { nullptr };
+    AVFrame*                    Frame { nullptr };
 
     // In
     string                      FileName;

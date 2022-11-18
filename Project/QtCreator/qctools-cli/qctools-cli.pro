@@ -1,4 +1,4 @@
-QT += core network
+QT += core network multimedia concurrent
 QT -= gui
 
 CONFIG += c++11
@@ -79,3 +79,9 @@ macx:LIBS += -liconv \
 
 HEADERS += \
     version.h
+
+QTAVPLAYER_SRC=$$absolute_path(../qctools-QtAVPlayer)
+QTAVPLAYER_LIB=$$absolute_path($$OUT_PWD/../qctools-QtAVPlayer)
+
+message('using UseQtAVPlayerLib')
+include(../qctools-QtAVPlayer/UseQtAVPlayerLib.pri)

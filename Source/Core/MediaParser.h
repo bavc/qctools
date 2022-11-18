@@ -251,9 +251,7 @@ class QAVPlayerPrivate : public QObject {
     Q_OBJECT
 
 public:
-    QAVPlayerPrivate(QObject* parent = nullptr) : QObject(parent) {
-
-    }
+    QAVPlayerPrivate(QObject* parent = nullptr);
     void setSource(const QString &url, QIODevice *dev = nullptr);
 
     void wait(bool v);
@@ -290,6 +288,10 @@ public:
     bool doPlayStep(double refPts, bool master, QAVPacketQueue &queue, bool &sync, QAVStreamFrame &frame);
     void doPlayVideo();
     void doPlayAudio();
+
+    void terminate();
+    void setDuration(double d);
+
 Q_SIGNALS:
 
     void sourceChanged(const QString &url);
@@ -316,7 +318,7 @@ Q_SIGNALS:
     void audioFrame(const QAVAudioFrame &frame);
     void subtitleFrame(const QAVSubtitleFrame &frame);
 
-private:
+protected:
     QString url;
     QScopedPointer<QAVIODevice> dev;
     QAVPlayer::MediaStatus _mediaStatus = QAVPlayer::NoMedia;
@@ -333,7 +335,7 @@ private:
     double pendingPosition = 0;
     bool pendingSeek = false;
     mutable QMutex positionMutex;
-    bool synced = true;
+    bool synced = false;
 
     int _videoStream = -1;
     int _audioStream = -1;
@@ -367,6 +369,9 @@ class MediaParser : public QAVPlayerPrivate {
 public:
     MediaParser(QObject* parent = nullptr) : QAVPlayerPrivate(parent) {}
 
+    void setFilter(const QString &desc);
+    void seek(qint64 pos);
+    void play();
 };
 
 #endif // 

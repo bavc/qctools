@@ -78,13 +78,17 @@ public:
     bool                        Frames_Pos_Plus             ();
     bool                        Frames_Pos_AtEnd            ();
     bool                        PlayBackFilters_Available   ();
+    size_t                      VideoFrameCount_Get         ();
+    bool                        IsRGB_Get                   ();
 
     qreal                       averageFrameRate        () const;
+    double                      TimeStampOfCurrentFrame () const;
+
 
     bool isValid() const;
 
     // FFmpeg glue
-    FFmpeg_Glue*                Glue;
+    FFmpeg_Glue*                Glue { nullptr };
 
     std::vector<CommonStats*>   Stats;
 
@@ -172,7 +176,8 @@ private:
 
     QString                     FileName;
     size_t                      ReferenceStream_Pos;
-    int                         Frames_Pos;
+    int                         Frames_Pos {0};
+    int                         AudioFrames_Pos {0};
 
     // FFmpeg part
     bool                        WantToStop;

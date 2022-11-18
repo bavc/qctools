@@ -390,7 +390,7 @@ void Player::setFile(FileInformation *fileInfo)
         m_commentsPlot = createCommentsPlot(m_fileInformation, nullptr);
         m_commentsPlot->enableAxis(QwtPlot::yLeft, false);
         m_commentsPlot->enableAxis(QwtPlot::xBottom, true);
-        m_commentsPlot->setAxisScale(QwtPlot::xBottom, 0, m_fileInformation->Glue->VideoFrameCount_Get());
+        m_commentsPlot->setAxisScale(QwtPlot::xBottom, 0, m_fileInformation->VideoFrameCount_Get());
         m_commentsPlot->setAxisAutoScale(QwtPlot::xBottom, false);
 
         m_commentsPlot->setFrameShape(QFrame::NoFrame);
@@ -420,7 +420,7 @@ void Player::setFile(FileInformation *fileInfo)
             qDebug() << "mediaStatus: " << mediaStatus;
 
             if(mediaStatus == QAVPlayer::LoadedMedia) {
-                m_framesCount = m_fileInformation->Glue->VideoFrameCount_Get();
+                m_framesCount = m_fileInformation->VideoFrameCount_Get();
                 ui->playerSlider->setMaximum(m_player->duration());
                 qDebug() << "duration: " << m_player->duration();
             }
@@ -557,7 +557,7 @@ void Player::updateInfoLabels()
         Milliseconds=(int)(m_fileInformation->ReferenceStat()->x[1][framesPos]*1000);
     else
     {
-        double TimeStamp = m_fileInformation->Glue->TimeStampOfCurrentFrame(0);
+        double TimeStamp = m_fileInformation->TimeStampOfCurrentFrame();
         if (TimeStamp!=DBL_MAX)
             Milliseconds=(int)(TimeStamp*1000);
     }

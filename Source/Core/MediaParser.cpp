@@ -1,5 +1,3 @@
-#include "libavformat/avformat.h"
-
 #include <QProcess>
 #include <QFileInfo>
 #include <QDebug>
@@ -44,6 +42,7 @@
 #include <QtConcurrent>
 
 extern "C" {
+#include "libavformat/avformat.h"
 #include <libavutil/time.h>
 #include <libavcodec/avcodec.h>
 }
@@ -61,6 +60,11 @@ static QString err_str(int err)
 }
 
 Q_LOGGING_CATEGORY(lcAVPlayer, "qt.QtAVParser")
+
+QAVPlayerPrivate::QAVPlayerPrivate(QObject *parent) : QObject(parent) {
+    videoQueue.reset(new QAVPacketFrameQueue(demuxer));
+    audioQueue.reset(new QAVPacketFrameQueue(demuxer));
+}
 
 void QAVPlayerPrivate::setSource(const QString &url, QIODevice *dev)
 {
@@ -295,7 +299,7 @@ void QAVPlayerPrivate::doLoad() {
         return;
     }
 
-//        applyFilter();
+    applyFilter();
 //        dispatch([this] {
 //            qCDebug(lcAVPlayer) << "[" << url << "]: Loaded, seekable:" << demuxer.seekable() << ", duration:" << demuxer.duration();
 //            setSeekable(demuxer.seekable());
@@ -648,6 +652,44 @@ void QAVPlayerPrivate::doPlayAudio()
     qCDebug(lcAVPlayer) << __FUNCTION__ << "finished";
 }
 
+void QAVPlayerPrivate::terminate()
+{
+    qCDebug(lcAVPlayer) << __FUNCTION__;
+    setState(QAVPlayer::StoppedState);
+    quit = true;
+    wait(false);
+    videoFrameRate = 0.0;
+    videoQueue->clear();
+    videoQueue->abort();
+    audioQueue->clear();
+    audioQueue->abort();
+    if (dev)
+        dev->abort(true);
+    loaderFuture.waitForFinished();
+    demuxerFuture.waitForFinished();
+    videoPlayFuture.waitForFinished();
+    audioPlayFuture.waitForFinished();
+    pendingPosition = 0;
+    pendingSeek = false;
+    pendingMediaStatuses.clear();
+    filterGraph.reset();
+    setDuration(0);
+    error = QAVPlayer::NoError;
+    dev.reset();
+    eof = false;
+}
+
+void QAVPlayerPrivate::setDuration(double d)
+{
+    if (qFuzzyCompare(_duration, d))
+        return;
+
+    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << _duration << "->" << d;
+    _duration = d;
+
+    Q_EMIT durationChanged(_duration);
+}
+
 #endif
 
 bool QAVQueueClock::sync(bool sync, double pts, double speed, double master)
@@ -716,4 +758,56 @@ QAVPacket QAVPacketQueue::dequeue()
     m_bytes -= packet.packet()->size + sizeof(packet);
     m_duration -= packet.duration();
     return packet;
+}
+
+void MediaParser::setFilter(const QString &desc)
+{
+    {
+        QMutexLocker locker(&stateMutex);
+        if (filterDesc == desc)
+            return;
+
+        qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << filterDesc << "->" << desc;
+        filterDesc = desc;
+    }
+
+    Q_EMIT filterChanged(desc);
+    if (mediaStatus() != QAVPlayer::NoMedia)
+        applyFilter();
+}
+
+void MediaParser::seek(qint64 pos)
+{
+    if ((duration() > 0 && pos > duration()) || currentError() == QAVPlayer::ResourceError)
+        return;
+
+    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << "pos:" << pos;
+    {
+        QMutexLocker locker(&positionMutex);
+        pendingSeek = true;
+        pendingPosition = pos / 1000.0;
+    }
+
+    setPendingMediaStatus(SeekingMedia);
+    wait(false);
+    if (mediaStatus() != QAVPlayer::NoMedia)
+        applyFilter();
+}
+
+void MediaParser::play()
+{
+    if (url.isEmpty() || currentError() == QAVPlayer::ResourceError)
+        return;
+
+    qCDebug(lcAVPlayer) << __FUNCTION__;
+    if (setState(QAVPlayer::PlayingState)) {
+        if (isEndOfFile()) {
+            qCDebug(lcAVPlayer) << "Playing from beginning";
+            seek(0);
+        }
+        setPendingMediaStatus(PlayingMedia);
+    }
+    wait(false);
+    if (mediaStatus() != QAVPlayer::NoMedia)
+        applyFilter();
 }
