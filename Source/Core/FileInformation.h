@@ -26,6 +26,7 @@ class FormatStats;
 class FFmpeg_Glue;
 
 typedef QSharedPointer<QFile> SharedFile;
+class MediaParser;
 
 //---------------------------------------------------------------------------
 class FileInformation : public QThread
@@ -179,6 +180,7 @@ private:
     SignalServer* signalServer;
     QSharedPointer<CheckFileUploadedOperation> checkFileUploadedOperation;
     QSharedPointer<UploadFileOperation> uploadOperation;
+    MediaParser* mediaParser { nullptr };
 
     int m_index;
     QString m_exportFileName;

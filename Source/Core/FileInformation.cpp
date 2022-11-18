@@ -37,6 +37,7 @@
 #include <QEventLoop>
     #include <algorithm>
 #endif
+#include "MediaParser.h"
 
 //***************************************************************************
 // Simultaneous parsing
@@ -53,40 +54,6 @@ void FileInformation::run()
     {
         runExport();
     }
-}
-
-void FileInformation::runParse()
-{
-    if(signalServer->enabled() && m_autoCheckFileUploaded)
-    {
-        QString statsFileName = fileName() + ".qctools.xml.gz";
-        QFileInfo fileInfo(statsFileName);
-
-        checkFileUploaded(fileInfo.fileName());
-    }
-
-    {
-        int frameNumber = 1;
-
-        for (;;)
-        {
-            if (Glue)
-            {
-                if (!Glue->NextFrame())
-                    break;
-
-                ++frameNumber;
-            }
-            if (WantToStop)
-                break;
-            yieldCurrentThread();
-        }
-    }
-
-    ActiveParsing_Count--;
-    m_parsed = !WantToStop;
-
-    Q_EMIT parsingCompleted(WantToStop == false);
 }
 
 void FileInformation::runExport()
@@ -1381,4 +1348,39 @@ void FileInformation::setExportFilters(const activefilters &exportFilters)
 bool FileInformation::commentsUpdated() const
 {
     return m_commentsUpdated;
+}
+
+void FileInformation::runParse()
+{
+    if(signalServer->enabled() && m_autoCheckFileUploaded)
+    {
+        QString statsFileName = fileName() + ".qctools.xml.gz";
+        QFileInfo fileInfo(statsFileName);
+
+        checkFileUploaded(fileInfo.fileName());
+    }
+
+    // mediaParser = new MediaParser(this);
+    {
+        int frameNumber = 1;
+
+        for (;;)
+        {
+            if (Glue)
+            {
+                if (!Glue->NextFrame())
+                    break;
+
+                ++frameNumber;
+            }
+            if (WantToStop)
+                break;
+            yieldCurrentThread();
+        }
+    }
+
+    ActiveParsing_Count--;
+    m_parsed = !WantToStop;
+
+    Q_EMIT parsingCompleted(WantToStop == false);
 }

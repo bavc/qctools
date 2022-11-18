@@ -1,4 +1,4 @@
-QT = core network
+QT = core network multimedia concurrent
 
 TARGET = qctools
 TEMPLATE = lib
@@ -41,8 +41,8 @@ HEADERS = \
     $$SOURCES_PATH/Core/SignalServer.h \
     $$SOURCES_PATH/Core/Preferences.h \
     $$SOURCES_PATH/Core/FFmpegVideoEncoder.h \
-    $$SOURCES_PATH/Core/logging.h
-
+    $$SOURCES_PATH/Core/logging.h \
+    $$SOURCES_PATH/Core/MediaParser.h
 
 SOURCES = \
     $$SOURCES_PATH/ThirdParty/tinyxml2/tinyxml2.cpp \
@@ -64,10 +64,17 @@ SOURCES = \
     $$SOURCES_PATH/Core/SignalServer.cpp \
     $$SOURCES_PATH/Core/Preferences.cpp \
     $$SOURCES_PATH/Core/FFmpegVideoEncoder.cpp \
-    $$SOURCES_PATH/Core/logging.cpp
+    $$SOURCES_PATH/Core/logging.cpp \
+    $$SOURCES_PATH/Core/MediaParser.cpp
 
 
 include($$SOURCES_PATH/ThirdParty/qblowfish/qblowfish.pri)
 
 RESOURCES += \
     $$SOURCES_PATH/Core/coreresources.qrc
+
+QTAVPLAYER_SRC=$$absolute_path(../qctools-QtAVPlayer)
+QTAVPLAYER_LIB=$$absolute_path($$OUT_PWD/../qctools-QtAVPlayer)
+
+message('using UseQtAVPlayerLib')
+include(../qctools-QtAVPlayer/UseQtAVPlayerLib.pri)
