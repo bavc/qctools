@@ -20,12 +20,18 @@
 #include <QSharedPointer>
 #include <QFileInfo>
 #include <QSize>
+#include <QPixmap>
+#include <map>
+#include <string>
+
+class QAVVideoFrame;
 class CommonStats;
 class StreamsStats;
 class FormatStats;
 class FFmpeg_Glue;
 
 typedef QSharedPointer<QFile> SharedFile;
+class QAVPlayer;
 
 //---------------------------------------------------------------------------
 class FileInformation : public QThread
@@ -63,6 +69,7 @@ public:
 
     // Infos
     QByteArray Picture_Get (size_t Pos);
+    QPixmap getThumbnail(size_t pos);
     QString	fileName() const;
 
     activefilters               ActiveFilters;
@@ -77,13 +84,17 @@ public:
     bool                        Frames_Pos_Plus             ();
     bool                        Frames_Pos_AtEnd            ();
     bool                        PlayBackFilters_Available   ();
+    size_t                      VideoFrameCount_Get         ();
+    bool                        IsRGB_Get                   ();
 
     qreal                       averageFrameRate        () const;
+    double                      TimeStampOfCurrentFrame () const;
+
 
     bool isValid() const;
 
     // FFmpeg glue
-    FFmpeg_Glue*                Glue;
+    FFmpeg_Glue*                Glue { nullptr };
 
     std::vector<CommonStats*>   Stats;
 
@@ -139,6 +150,10 @@ public:
 
     QSize panelSize() const;
     const QMap<std::string, QVector<int>>& panelOutputsByTitle() const;
+    const std::map<std::string, std::string> & getPanelOutputMetadata(size_t index) const;
+    size_t getPanelFramesCount(size_t index) const;
+    QAVVideoFrame getPanelFrame(size_t index, size_t panelFrameIndex) const;
+
 public Q_SLOTS:
 
     void checkFileUploaded(const QString& fileName);
@@ -171,7 +186,8 @@ private:
 
     QString                     FileName;
     size_t                      ReferenceStream_Pos;
-    int                         Frames_Pos;
+    int                         Frames_Pos {0};
+    int                         AudioFrames_Pos {0};
 
     // FFmpeg part
     bool                        WantToStop;
@@ -193,6 +209,13 @@ private:
     activefilters m_exportFilters;
 
     QMap<std::string, QVector<int>> m_panelOutputsByTitle;
+    QVector<std::map<std::string, std::string>> m_panelMetadata;
+    QVector<QVector<QAVVideoFrame>> m_panelFrames;
+
+    std::vector<QByteArray> m_thumbnails;
+    std::vector<QPixmap> m_thumbnails_pixmap;
+
+    QAVPlayer* m_mediaParser;
 };
 
 #endif // GUI_FileInformation_H

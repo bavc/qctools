@@ -1,4 +1,6 @@
 #include "cli.h"
+#include <QVideoFrame>
+#include "QAVVideoFrame.h"
 #include "version.h"
 #include "Core/FFmpegVideoEncoder.h"
 #include "Core/FFmpeg_Glue.h"
@@ -754,19 +756,18 @@ int Cli::exec(QCoreApplication &a)
                     auto panelOutputIndexes = info->panelOutputsByTitle()[panelTitle];
                     for(auto panelOutputIndex : panelOutputIndexes)
                     {
-                        auto panelFramesCount = info->Glue->GetPanelFramesCount(panelOutputIndex);
+                        auto panelFramesCount = info->getPanelFramesCount(panelOutputIndex);
                         if(panelFramesCount == 0)
                             continue;
 
-                        auto frameSize = info->Glue->GetPanelFrameSize(panelOutputIndex, 0);
-                        auto panelsCount = info->Glue->GetPanelFramesCount(panelOutputIndex);
+                        auto panelsCount = info->getPanelFramesCount(panelOutputIndex);
                         auto panelIndex = 0;
 
                         FFmpegVideoEncoder::Metadata streamMetadata;
                         streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString::fromStdString(panelTitle));
                         streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("filterchain"), QString::fromStdString(info->Glue->getOutputFilter(panelOutputIndex)));
 
-                        auto outputMetadata = info->Glue->getOutputMetadata(panelOutputIndex);
+                        auto outputMetadata = info->getPanelOutputMetadata(panelOutputIndex);
                         auto versionIt = outputMetadata.find("version");
                         auto yaxisIt = outputMetadata.find("yaxis");
                         auto legendIt = outputMetadata.find("legend");
@@ -808,8 +809,8 @@ int Cli::exec(QCoreApplication &a)
                                 return nullptr;
                             }
 
-                            auto frame = info->Glue->GetPanelFrame(panelOutputIndex, panelIndex);
-                            auto packet = info->Glue->encodePanelFrame(panelOutputIndex, frame.get());
+                            auto frame = info->getPanelFrame(panelOutputIndex, panelIndex);
+                            auto packet = info->Glue->encodePanelFrame(panelOutputIndex, frame.frame());
 
                             ++panelIndex;
 

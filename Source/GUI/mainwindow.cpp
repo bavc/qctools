@@ -853,7 +853,7 @@ void MainWindow::on_actionNavigateNextComment_triggered()
     if (getFilesCurrentPos()>=Files.size())
         return;
 
-    auto framesCount = Files[getFilesCurrentPos()]->Glue->VideoFrameCount_Get();
+    auto framesCount = Files[getFilesCurrentPos()]->VideoFrameCount_Get();
     auto currentPos = Files[getFilesCurrentPos()]->Frames_Pos_Get();
     while(++currentPos < framesCount)
     {

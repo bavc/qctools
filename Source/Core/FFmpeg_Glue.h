@@ -138,7 +138,6 @@ public:
         bool                    Enabled;
         string                  Filter;
         string                  Title;
-        std::map<std::string, std::string> metadata;
 
         // FFmpeg pointers - Input
         int                     Type;
@@ -203,10 +202,6 @@ public:
 
     // Images
     Image Image_Get(size_t Pos) const;
-
-    int GetPanelFramesCount(int outputIndex) const;
-    FFmpeg_Glue::AVFramePtr GetPanelFrame(int outputIndex, int index) const;
-    QSize GetPanelFrameSize(int outputIndex, int index) const;
     FFmpeg_Glue::AVPacketPtr encodePanelFrame(int outputIndex, AVFrame* frame);
 
     struct bytes
@@ -283,7 +278,6 @@ public:
     int                         OutputThumbnailBitRate_Get() const;
 
     std::string getOutputFilter(int pos) const;
-    std::map<std::string, std::string> getOutputMetadata(int pos) const;
     void getOutputTimeBase(int pos, int& num, int& den) const;
 
     QString                     FrameType_Get() const;
@@ -358,16 +352,16 @@ public:
     static double               GetDAR(const FFmpeg_Glue::AVFramePtr & frame);
 
 private:
-    QMutex* mutex;
+    QMutex* mutex { nullptr };
 
     std::vector<inputdata*>     InputDatas;
     std::vector<outputdata*>    OutputDatas;
     bool                        InputDatas_Copy;
 
     // FFmpeg pointers - Input
-    AVFormatContext*            FormatContext;
-    AVPacket*                   Packet;
-    AVFrame*                    Frame;
+    AVFormatContext*            FormatContext { nullptr };
+    AVPacket*                   Packet { nullptr };
+    AVFrame*                    Frame { nullptr };
 
     // In
     string                      FileName;

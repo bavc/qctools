@@ -17,6 +17,7 @@
 #include "GUI/barchartconditioninput.h"
 #include "Core/Core.h"
 #include "Core/VideoCore.h"
+#include "QAVVideoFrame.h"
 #include "playercontrol.h"
 #include <QComboBox>
 #include <QGridLayout>
@@ -370,21 +371,22 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
         auto panelOutputIndexs = panelOutputsByTitle[item];
         for(auto panelOutputIndex : panelOutputIndexs)
         {
-            auto metadata = m_fileInfoData->Glue->getOutputMetadata(panelOutputIndex);
+            auto metadata = m_fileInfoData->getPanelOutputMetadata(panelOutputIndex);
             auto yaxisIt = metadata.find("yaxis");
             auto yaxis = yaxisIt != metadata.end() ? yaxisIt->second : "";
             auto legendIt = metadata.find("legend");
             auto legend = legendIt != metadata.end() ? legendIt->second : "";
             auto panel_typeIt = metadata.find("panel_type");
             auto isAudioPanel = panel_typeIt != metadata.end() ? (panel_typeIt->second == "audio") : false;
+            auto input_streamIt = metadata.find("input_stream");
+            auto input_stream = input_streamIt != metadata.end() ? input_streamIt->second : "unknown";
 
             qDebug() << "panelTitle: " << QString::fromStdString(item);
 
             ++panelsCount;
 
-            auto inputStream = m_fileInfoData->Glue->findInputStreamByOutput(panelOutputIndex);
             auto m_PanelsView = new PanelsView(this, QString::fromStdString(item), QString::fromStdString(yaxis), QString::fromStdString(legend), m_commentsPlot);
-            m_PanelsView->setObjectName(QString("Panels Plot for stream %1 of type %2, group %3, title: %4").arg(inputStream).arg(Type_Panels).arg(qHash(m_PanelsView->panelTitle())).arg(m_PanelsView->panelTitle()));
+            m_PanelsView->setObjectName(QString("Panels Plot for stream %1 of type %2, group %3, title: %4").arg(QString::fromStdString(input_stream)).arg(Type_Panels).arg(qHash(m_PanelsView->panelTitle())).arg(m_PanelsView->panelTitle()));
 
             qDebug() << "added panelView: " << m_PanelsView->objectName();
 
@@ -432,12 +434,12 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
 
             if(isAudioPanel) {
                 m_PanelsView->setProvider([&, panelOutputIndex] {
-                    auto panelsCount = m_fileInfoData->Glue->GetPanelFramesCount(panelOutputIndex);
+                    auto panelsCount = m_fileInfoData->getPanelFramesCount(panelOutputIndex);
                     return panelsCount;
                 }, [&, panelOutputIndex](int index) -> QImage {
-                    FFmpeg_Glue::Image frameImage;
-                    frameImage.frame = m_fileInfoData->Glue->GetPanelFrame(panelOutputIndex, index);
-                    auto panelImage = QImage(frameImage.data(), frameImage.width(), frameImage.height(), frameImage.linesize(), QImage::Format_RGB888);
+                    auto frame = m_fileInfoData->getPanelFrame(panelOutputIndex, index);
+                    auto panelImage = QImage(*frame.frame()->data, frame.frame()->width, frame.frame()->height,
+                                             *frame.frame()->linesize, QImage::Format_RGB888);
 
                     auto frameRate = m_fileInfoData->Glue->getAvgVideoFrameRate();
                     if(frameRate.isValid()) {
@@ -448,12 +450,12 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
 
             } else {
                 m_PanelsView->setProvider([&, panelOutputIndex] {
-                    auto panelsCount = m_fileInfoData->Glue->GetPanelFramesCount(panelOutputIndex);
+                    auto panelsCount = m_fileInfoData->getPanelFramesCount(panelOutputIndex);
                     return panelsCount;
                 }, [&, panelOutputIndex](int index) -> QImage {
-                    FFmpeg_Glue::Image frameImage;
-                    frameImage.frame = m_fileInfoData->Glue->GetPanelFrame(panelOutputIndex, index);
-                    auto panelImage = QImage(frameImage.data(), frameImage.width(), frameImage.height(), frameImage.linesize(), QImage::Format_RGB888);
+                    auto frame = m_fileInfoData->getPanelFrame(panelOutputIndex, index);
+                    auto panelImage = QImage(*frame.frame()->data, frame.frame()->width, frame.frame()->height,
+                                             *frame.frame()->linesize, QImage::Format_RGB888);
 
                     return panelImage;
                 });

@@ -847,29 +847,6 @@ FFmpeg_Glue::Image FFmpeg_Glue::Image_Get(size_t Pos) const
     return OutputDatas[Pos]->image;
 }
 
-int FFmpeg_Glue::GetPanelFramesCount(int outputIndex) const
-{
-    QMutexLocker locker(mutex);
-
-    return OutputDatas[outputIndex]->Panels.size();
-}
-
-FFmpeg_Glue::AVFramePtr FFmpeg_Glue::GetPanelFrame(int outputIndex, int index) const
-{
-    QMutexLocker locker(mutex);
-
-    auto output = OutputDatas[outputIndex];
-    return output->Panels[index];
-}
-
-QSize FFmpeg_Glue::GetPanelFrameSize(int outputIndex, int index) const
-{
-    QMutexLocker locker(mutex);
-
-    auto output = OutputDatas[outputIndex];
-    return QSize(output->Panels[index]->width, output->Panels[index]->height);
-}
-
 FFmpeg_Glue::AVPacketPtr FFmpeg_Glue::encodePanelFrame(int outputIndex, AVFrame *frame)
 {
     auto output = OutputDatas[outputIndex];
@@ -1995,11 +1972,6 @@ int FFmpeg_Glue::OutputThumbnailBitRate_Get() const
 std::string FFmpeg_Glue::getOutputFilter(int pos) const
 {
     return OutputDatas[pos]->Filter;
-}
-
-std::map<std::string, std::string> FFmpeg_Glue::getOutputMetadata(int pos) const
-{
-    return OutputDatas[pos]->metadata;
 }
 
 void FFmpeg_Glue::getOutputTimeBase(int pos, int &num, int &den) const

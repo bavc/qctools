@@ -1,4 +1,5 @@
 #include "Core/StreamsStats.h"
+#include "libavutil/pixdesc.h"
 
 extern "C"
 {

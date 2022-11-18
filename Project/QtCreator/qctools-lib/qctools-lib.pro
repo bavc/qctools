@@ -1,4 +1,4 @@
-QT = core network
+QT = core network multimedia concurrent
 
 TARGET = qctools
 TEMPLATE = lib
@@ -71,3 +71,11 @@ include($$SOURCES_PATH/ThirdParty/qblowfish/qblowfish.pri)
 
 RESOURCES += \
     $$SOURCES_PATH/Core/coreresources.qrc
+
+include(../ffmpeg.pri)
+
+QTAVPLAYER_SRC=$$absolute_path(../qctools-QtAVPlayer)
+QTAVPLAYER_LIB=$$absolute_path($$OUT_PWD/../qctools-QtAVPlayer)
+
+message('using UseQtAVPlayerLib')
+include(../qctools-QtAVPlayer/UseQtAVPlayerLib.pri)

@@ -631,7 +631,7 @@ void MainWindow::Update()
             Milliseconds=(int)(fileInfo->ReferenceStat()->x[1][framesPos]*1000);
         else
         {
-            double TimeStamp = fileInfo->Glue->TimeStampOfCurrentFrame(0);
+            double TimeStamp = fileInfo->TimeStampOfCurrentFrame();
             if (TimeStamp!=DBL_MAX)
                 Milliseconds=(int)(TimeStamp*1000);
         }

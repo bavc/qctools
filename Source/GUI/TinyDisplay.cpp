@@ -173,7 +173,9 @@ void TinyDisplay::Update(bool updateBigDisplay)
                     if (!needsUpdate && (diff < total_thumbs && i < total_thumbs - diff)) {
                         thumbnails[i]->setIcon(thumbnails[i+diff]->icon());
                     } else {
-                        QPixmap pixmap = toPixmap(FileInfoData->Picture_Get(framePos - center + i));
+                        // QPixmap pixmap = toPixmap(FileInfoData->Picture_Get(framePos - center + i));
+                        QPixmap pixmap = FileInfoData->getThumbnail(framePos - center + i);
+                        pixmap.save(QString("test%1.png").arg(framePos));
                         thumbnails[i]->setIcon(pixmap.copy(0, 0, 72, 72));
                     }
                 } else {
@@ -191,7 +193,8 @@ void TinyDisplay::Update(bool updateBigDisplay)
                     if (diff < total_thumbs && i - (int) diff >= 0) {
                         thumbnails[ui]->setIcon(thumbnails[ui-diff]->icon());
 					} else {
-                        QPixmap pixmap = toPixmap(FileInfoData->Picture_Get(framePos - center + ui));
+                        // QPixmap pixmap = toPixmap(FileInfoData->Picture_Get(framePos - center + ui));
+                        QPixmap pixmap = FileInfoData->getThumbnail(framePos - center + ui);
                         thumbnails[ui]->setIcon(pixmap.copy(0, 0, 72, 72));
 					}
                 } else {
