@@ -39,7 +39,6 @@ class FileInformation : public QThread
     //thread part
     Q_OBJECT
     void run();
-    void runParse();
     void runExport();
 
 public:
@@ -68,7 +67,6 @@ public:
     void                        Export_QCTools_Mkv          (const QString &ExportFileName, const activefilters& filters);
 
     // Infos
-    QByteArray Picture_Get (size_t Pos);
     QPixmap getThumbnail(size_t pos);
     QString	fileName() const;
 
@@ -189,9 +187,6 @@ private:
     int                         Frames_Pos {0};
     int                         AudioFrames_Pos {0};
 
-    // FFmpeg part
-    bool                        WantToStop;
-
     SignalServer* signalServer;
     QSharedPointer<CheckFileUploadedOperation> checkFileUploadedOperation;
     QSharedPointer<UploadFileOperation> uploadOperation;
@@ -212,7 +207,7 @@ private:
     QVector<std::map<std::string, std::string>> m_panelMetadata;
     QVector<QVector<QAVVideoFrame>> m_panelFrames;
 
-    std::vector<QByteArray> m_thumbnails;
+    std::vector<QAVVideoFrame> m_thumbnails_frames;
     std::vector<QPixmap> m_thumbnails_pixmap;
 
     QAVPlayer* m_mediaParser;

@@ -17,7 +17,19 @@
 
 extern "C" {
 #include <libavcodec/codec_id.h>
-#include "libavformat/avformat.h"
+#include <libavformat/avformat.h>
+
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+#include <libswscale/swscale.h>
+
+#include <libavfilter/avfilter.h>
+#include <libavfilter/buffersink.h>
+#include <libavfilter/buffersrc.h>
+
+#include <libavutil/pixfmt.h>
+#include <libavutil/imgutils.h>
+#include <libavutil/ffversion.h>
 }
 
 #include <QProcess>
@@ -53,48 +65,10 @@ static int ActiveParsing_Count=0;
 
 void FileInformation::run()
 {
-    if(m_jobType == FileInformation::Parsing)
-    {
-        runParse();
-    }
-    else if(m_jobType == FileInformation::Exporting)
+    if(m_jobType == FileInformation::Exporting)
     {
         runExport();
     }
-}
-
-void FileInformation::runParse()
-{
-    if(signalServer->enabled() && m_autoCheckFileUploaded)
-    {
-        QString statsFileName = fileName() + ".qctools.xml.gz";
-        QFileInfo fileInfo(statsFileName);
-
-        checkFileUploaded(fileInfo.fileName());
-    }
-
-    {
-        int frameNumber = 1;
-
-        for (;;)
-        {
-            if (Glue)
-            {
-                if (!Glue->NextFrame())
-                    break;
-
-                ++frameNumber;
-            }
-            if (WantToStop)
-                break;
-            yieldCurrentThread();
-        }
-    }
-
-    ActiveParsing_Count--;
-    m_parsed = !WantToStop;
-
-    Q_EMIT parsingCompleted(WantToStop == false);
 }
 
 void FileInformation::runExport()
@@ -484,50 +458,52 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     if(glueFileName  == "-")
         glueFileName  = "pipe:0";
 
-#if 1
-    AVFormatContext* FormatContext = nullptr;
-    if (avformat_open_input(&FormatContext, glueFileName.c_str(), NULL, NULL)>=0)
+    if(!streamsStats && !formatStats)
     {
-        if (avformat_find_stream_info(FormatContext, NULL)>=0) {
+        AVFormatContext* FormatContext = nullptr;
+        if (avformat_open_input(&FormatContext, glueFileName.c_str(), NULL, NULL)>=0)
+        {
+            if (avformat_find_stream_info(FormatContext, NULL)>=0) {
 
-            for(auto i = 0; i < FormatContext->nb_streams; ++i) {
-                auto stream = FormatContext->streams[i];
+                for(auto i = 0; i < FormatContext->nb_streams; ++i) {
+                    auto stream = FormatContext->streams[i];
 
-                AVCodec* Codec=avcodec_find_decoder(stream->codec->codec_id);
-                if (Codec)
-                    avcodec_open2(stream->codec, Codec, NULL);
+                    AVCodec* Codec=avcodec_find_decoder(stream->codec->codec_id);
+                    if (Codec)
+                        avcodec_open2(stream->codec, Codec, NULL);
 
-                auto Duration = 0;
-                auto FrameCount = stream->nb_frames;
-                if (stream->duration != AV_NOPTS_VALUE)
-                    Duration=((double)stream->duration)*stream->time_base.num/stream->time_base.den;
+                    auto Duration = 0;
+                    auto FrameCount = stream->nb_frames;
+                    if (stream->duration != AV_NOPTS_VALUE)
+                        Duration=((double)stream->duration)*stream->time_base.num/stream->time_base.den;
 
-                // If duration is not known, estimating it
-                if (Duration==0 && FormatContext->duration!=AV_NOPTS_VALUE)
-                    Duration=((double)FormatContext->duration)/AV_TIME_BASE;
+                    // If duration is not known, estimating it
+                    if (Duration==0 && FormatContext->duration!=AV_NOPTS_VALUE)
+                        Duration=((double)FormatContext->duration)/AV_TIME_BASE;
 
-                // If frame count is not known, estimating it
-                if (FrameCount==0 && stream->avg_frame_rate.num && stream->avg_frame_rate.den && Duration)
-                    FrameCount=Duration*stream->avg_frame_rate.num/stream->avg_frame_rate.den;
-                if (FrameCount==0
-                 && ((stream->time_base.num==1 && stream->time_base.den>=24 && stream->time_base.den<=60)
-                  || (stream->time_base.num==1001 && stream->time_base.den>=24000 && stream->time_base.den<=60000)))
-                    FrameCount=stream->duration;
+                    // If frame count is not known, estimating it
+                    if (FrameCount==0 && stream->avg_frame_rate.num && stream->avg_frame_rate.den && Duration)
+                        FrameCount=Duration*stream->avg_frame_rate.num/stream->avg_frame_rate.den;
+                    if (FrameCount==0
+                     && ((stream->time_base.num==1 && stream->time_base.den>=24 && stream->time_base.den<=60)
+                      || (stream->time_base.num==1001 && stream->time_base.den>=24000 && stream->time_base.den<=60000)))
+                        FrameCount=stream->duration;
 
-                if(stream->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
-                    auto Stat=new VideoStats(FrameCount, Duration, stream);
-                    Stats.push_back(Stat);
-                } else if(stream->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
-                    auto Stat=new AudioStats(FrameCount, Duration, stream);
-                    Stats.push_back(Stat);
+                    if(stream->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
+                        auto Stat=new VideoStats(FrameCount, Duration, stream);
+                        Stats.push_back(Stat);
+                    } else if(stream->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
+                        auto Stat=new AudioStats(FrameCount, Duration, stream);
+                        Stats.push_back(Stat);
+                    }
                 }
+
+                streamsStats = new StreamsStats(FormatContext);
+                formatStats = new FormatStats(FormatContext);
             }
 
-            streamsStats = new StreamsStats(FormatContext);
-            formatStats = new FormatStats(FormatContext);
+            avformat_close_input(&FormatContext);
         }
-
-        avformat_close_input(&FormatContext);
     }
 
     Frames_Pos=0;
@@ -642,7 +618,6 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                              );
                              */
 
-#if 1
     QObject::connect(m_mediaParser, &QAVPlayer::audioFrame, m_mediaParser, [this](const QAVAudioFrame &frame) {
         qDebug() << "audio frame came from: " << frame.filterName();
 
@@ -680,27 +655,29 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
        }
        else {
            QImage img(frame.frame()->data[0], frame.frame()->width, frame.frame()->height, frame.frame()->linesize[0], QImage::Format_RGB888);
-           /*
-           QFile f(QString("out%1.png").arg(Frames_Pos));
-           f.open(QFile::WriteOnly);
-           img.save(&f, "png");
-           */
-           QByteArray arr(img.byteCount(), Qt::Uninitialized); // or resize if it already exists
-           memcpy(arr.data(), img.constBits(), img.byteCount());
 
-           // QByteArray arr = QByteArray::fromRawData((const char*)img.bits(), img.sizeInBytes());
-           m_thumbnails.push_back(arr);
+           m_thumbnails_frames.push_back(frame);
            m_thumbnails_pixmap.push_back(QPixmap::fromImage(img));
        }
    }, 
    //Qt::QueuedConnection
    Qt::DirectConnection
    );
-#endif //
 
-   // QApplication::processEvents(QEventLoop::AllEvents, 200);
-   m_mediaParser->play();
-#endif //
+   QObject::connect(m_mediaParser, &QAVPlayer::mediaStatusChanged, [this](QAVPlayer::MediaStatus status) {
+        if(status == QAVPlayer::EndOfMedia) {
+            m_parsed = true;
+            Q_EMIT parsingCompleted(true);
+        }
+   });
+
+   QObject::connect(m_mediaParser, &QAVPlayer::stateChanged, [this](QAVPlayer::State state) {
+        if(state == QAVPlayer::PlayingState) {
+            ++ActiveParsing_Count;
+        } else if(state == QAVPlayer::StoppedState) {
+            --ActiveParsing_Count;
+        }
+   });
 
 #if 0
     qDebug() << "opening " << glueFileName .c_str();
@@ -856,14 +833,17 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     }
 
     Frames_Pos=0;
-    WantToStop=false;
-    // startParse();
+
+    if(!StatsFromExternalData_IsOpen)
+        startParse();
 }
 
 //---------------------------------------------------------------------------
 FileInformation::~FileInformation ()
 {
-    WantToStop=true;
+    if(m_mediaParser->state() == QAVPlayer::PlayingState)
+        m_mediaParser->stop();
+
     bool result = wait();
     assert(result);
 
@@ -889,13 +869,9 @@ void FileInformation::startParse ()
         Max-=2;
     else
         Max=1;
-    if (!isRunning() && ActiveParsing_Count<Max)
+    if (ActiveParsing_Count<Max)
     {
-        if(Glue)
-        {
-            start();
-            ActiveParsing_Count++;
-        }
+        m_mediaParser->play();
     }
 }
 
@@ -1045,6 +1021,186 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName, const activef
     m_commentsUpdated = false;
 }
 
+struct Output {
+    struct AVPacketDeleter {
+        void operator()(AVPacket* packet) {
+            if (packet)
+            {
+                av_packet_unref(packet);
+                av_packet_free(&packet);
+            }
+        }
+    };
+
+    typedef std::shared_ptr<AVFrame> AVFramePtr;
+    typedef std::shared_ptr<AVPacket> AVPacketPtr;
+
+    bool scaleBeforeEncoding = { false }; // used to change format before encoding
+    SwsContext* ScaleContext = { nullptr };
+    AVCodecContext* Output_CodecContext = { nullptr };
+    AVFramePtr ScaledFrame;
+
+    AVFilterGraph* FilterGraph = { nullptr };
+
+    int Scale_OutputPixelFormat = { AV_PIX_FMT_YUVJ420P };
+    int Output_PixelFormat = { AV_PIX_FMT_YUVJ420P };
+    int Output_CodecID = { AV_CODEC_ID_MJPEG };
+    int Width = { 0 };
+    int Height = { 0 };
+    int timeBaseNum = { 0 };
+    int timeBaseDen = { 0 };
+
+    ~Output() {
+        if (Output_CodecContext)
+            avcodec_free_context(&Output_CodecContext);
+
+        // FFmpeg pointers - Scale
+        if (ScaledFrame)
+            ScaledFrame.reset();
+
+        if (ScaleContext)
+            sws_freeContext(ScaleContext);
+
+        // FFmpeg pointers - Filter
+        if (FilterGraph)
+            avfilter_graph_free(&FilterGraph);
+    }
+
+    bool Scale_Init(AVFrame* frame) {
+        if (!frame)
+            return false;
+
+        // Init
+        ScaleContext = sws_getContext(frame->width, frame->height,
+                                        (AVPixelFormat)frame->format,
+                                        Width, Height,
+                                        (AVPixelFormat) Scale_OutputPixelFormat,
+                                        SWS_FAST_BILINEAR, NULL, NULL, NULL);
+
+        // All is OK
+        return true;
+    }
+
+    bool initEncoder(const QSize& size)
+    {
+        if(Output_CodecContext)
+            return true;
+
+        //
+        AVCodec *Output_Codec=avcodec_find_encoder((AVCodecID) Output_CodecID);
+        if (!Output_Codec)
+            return false;
+        Output_CodecContext=avcodec_alloc_context3 (Output_Codec);
+        if (!Output_CodecContext)
+            return false;
+        Output_CodecContext->qmin          = 8;
+        Output_CodecContext->qmax          = 12;
+        Output_CodecContext->width         = size.width();
+        Output_CodecContext->height        = size.height();
+        Output_CodecContext->pix_fmt       = (AVPixelFormat) Output_PixelFormat;
+        Output_CodecContext->time_base.num = timeBaseNum;
+        Output_CodecContext->time_base.den = timeBaseDen;
+
+        qDebug() << "initEncoder: " << Output_CodecID << Output_CodecContext->width << Output_CodecContext->height <<
+            Output_CodecContext->pix_fmt << Output_CodecContext->time_base.num << Output_CodecContext->time_base.den;
+
+        if (avcodec_open2(Output_CodecContext, Output_Codec, NULL) < 0)
+            return false;
+
+        // All is OK
+        return true;
+    }
+
+    std::unique_ptr<AVPacket, Output::AVPacketDeleter> encodeFrame(AVFrame* frame, bool* ok = nullptr)
+    {
+        if(ok)
+            *ok = true;
+
+        auto outPacket = std::unique_ptr<AVPacket, AVPacketDeleter>(av_packet_alloc(), AVPacketDeleter());
+        av_init_packet (outPacket.get());
+
+        outPacket->data = nullptr;
+        outPacket->size = 0;
+
+        struct NoDeleter {
+            static void free(AVFrame* frame) {
+                Q_UNUSED(frame)
+            }
+        };
+
+        AVFramePtr Frame(frame, NoDeleter::free);
+
+        if(scaleBeforeEncoding)
+        {
+            if (ScaleContext || Scale_Init(frame))
+            {
+                struct ScaledFrameDeleter {
+                    static void free(AVFrame* frame) {
+                        if(frame) {
+                            av_freep(&frame->data[0]);
+                            av_frame_free(&frame);
+                        }
+                    }
+                };
+
+                auto scaledFrame = AVFramePtr(av_frame_alloc(), ScaledFrameDeleter::free);
+                av_frame_copy_props(scaledFrame.get(), Frame.get());
+
+                scaledFrame->width = Width;
+                scaledFrame->height= Height;
+                scaledFrame->format=(AVPixelFormat)Scale_OutputPixelFormat;
+
+                av_image_alloc(scaledFrame->data, scaledFrame->linesize, scaledFrame->width, scaledFrame->height, (AVPixelFormat) Scale_OutputPixelFormat, 1);
+                if (sws_scale(ScaleContext, Frame->data, Frame->linesize, 0, Frame->height, scaledFrame->data, scaledFrame->linesize)<0)
+                {
+                    scaledFrame.reset();
+                }
+                else
+                {
+                    Frame = scaledFrame;
+                }
+
+            }
+        }
+
+        if (!Output_CodecContext && !initEncoder(QSize(Frame->width, Frame->height)))
+        {
+            if(ok)
+                *ok = false;
+
+            return outPacket;
+        }
+
+        int got_packet=0;
+        int result = avcodec_send_frame(Output_CodecContext, Frame.get());
+        if (result < 0)
+        {
+            char buffer[256];
+            qDebug() << av_make_error_string(buffer, sizeof buffer, result);
+
+            if(ok)
+                *ok = false;
+
+            return outPacket;
+        }
+
+        result = avcodec_receive_packet(Output_CodecContext, outPacket.get());
+        if (result != 0)
+        {
+            char buffer[256];
+            qDebug() << av_make_error_string(buffer, sizeof buffer, result);
+
+            if(ok)
+                *ok = false;
+
+            return outPacket;
+        }
+
+        outPacket->duration = Frame->pkt_duration;
+        return outPacket;
+    }
+};
+
 void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const activefilters &filters)
 {
     QByteArray attachment;
@@ -1059,12 +1215,8 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
     Export_XmlGz(QString(), filters);
 
     FFmpegVideoEncoder encoder;
-    int thumbnailsCount = Glue->Thumbnails_Size(0);
+    int thumbnailsCount = m_thumbnails_pixmap.size();
     int thumbnailIndex = 0;
-
-    int num = 0;
-    int den = 0;
-    Glue->getOutputTimeBase(0, num, den);
 
     FFmpegVideoEncoder::Metadata metadata;
     metadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString("QCTools Report for %1").arg(QFileInfo(fileName()).fileName()));
@@ -1077,24 +1229,53 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
     FFmpegVideoEncoder::Metadata streamMetadata;
     streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString("Frame Thumbnails"));
 
+    auto timeBase = QString::fromStdString(streamsStats->getStreams().begin()->get()->getTime_base());
+    auto timeBaseSplitted = timeBase.split("/");
+    int num = timeBaseSplitted[0].toInt();
+    int den = timeBaseSplitted[1].toInt();
+
+    auto codecTimeBase = QString::fromStdString(streamsStats->getStreams().begin()->get()->getCodec_Time_Base());
+    auto codecTimeBaseSplitted = codecTimeBase.split("/");
+    int codecNum = codecTimeBaseSplitted[0].toInt();
+    int codecDen = codecTimeBaseSplitted[1].toInt();
+
     source.metadata = streamMetadata;
-    source.width = Glue->OutputThumbnailWidth_Get();
-    source.height = Glue->OutputThumbnailHeight_Get();
-    source.bitrate = Glue->OutputThumbnailBitRate_Get();
+    source.width = m_thumbnails_pixmap.empty() ? 0 : m_thumbnails_pixmap[0].width();
+    source.height = m_thumbnails_pixmap.empty() ? 0 : m_thumbnails_pixmap[0].height();
+
     source.num = num;
     source.den = den;
+
+    QVector<std::shared_ptr<Output>> outputs;
+
+    std::shared_ptr<Output> thumbnailsOutput = std::make_shared<Output>();
+    thumbnailsOutput->scaleBeforeEncoding = true;
+    outputs.push_back(thumbnailsOutput);
+
     source.getPacket = [&]() -> std::shared_ptr<AVPacket> {
         bool hasNext = thumbnailIndex < thumbnailsCount;
 
         if(!hasNext)
             return nullptr;
 
-        return Glue->ThumbnailPacket_Get(0, thumbnailIndex++);
+        auto frame = m_thumbnails_frames[thumbnailIndex];
+
+        thumbnailsOutput->timeBaseDen = codecDen;
+        thumbnailsOutput->timeBaseNum = codecNum;
+        thumbnailsOutput->Width = frame.frame()->width;
+        thumbnailsOutput->Height = frame.frame()->height;
+
+        auto packet = thumbnailsOutput->encodeFrame(frame.frame());
+
+        ++thumbnailIndex;
+
+        return packet;
     };
 
     QVector<FFmpegVideoEncoder::Source> sources;
     sources.push_back(source);
 
+#if 1
     for(auto& panelTitle : panelOutputsByTitle().keys())
     {
         auto panelOutputIndexes = panelOutputsByTitle()[panelTitle];
@@ -1108,7 +1289,17 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
 
             FFmpegVideoEncoder::Metadata streamMetadata;
             streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString::fromStdString(panelTitle));
-            streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("filterchain"), QString::fromStdString(Glue->getOutputFilter(panelOutputIndex)));
+
+            QString filterChain;
+            QString filterOutputName = QString(" [panel_%1]").arg(panelOutputIndex);
+            for(auto i = 0; i < m_mediaParser->filters().size(); ++i) {
+                auto filter = m_mediaParser->filters().at(i);
+                if(filter.endsWith(filterOutputName)) {
+                    filterChain = filter.remove(filterOutputName);
+                    break;
+                }
+            }
+            streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("filterchain"), filterChain);
 
             auto outputMetadata = m_panelMetadata[panelOutputIndex];
             auto versionIt = outputMetadata.find("version");
@@ -1131,13 +1322,24 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
             panelSource.width = panelSize().width();
             panelSource.height = panelSize().height();
 
-            int num = 0;
-            int den = 0;
-            Glue->getOutputTimeBase(panelOutputIndex, num, den);
+            // 2do: take related stream instead of first one
+            auto timeBase = QString::fromStdString(streamsStats->getStreams().begin()->get()->getTime_base());
+            auto timeBaseSplitted = timeBase.split("/");
+            int num = timeBaseSplitted[0].toInt();
+            int den = timeBaseSplitted[1].toInt();
+
+            auto codecTimeBase = QString::fromStdString(streamsStats->getStreams().begin()->get()->getCodec_Time_Base());
+            auto codecTimeBaseSplitted = codecTimeBase.split("/");
+            int codecNum = codecTimeBaseSplitted[0].toInt();
+            int codecDen = codecTimeBaseSplitted[1].toInt();
+
+            std::shared_ptr<Output> output = std::make_shared<Output>();
+            output->scaleBeforeEncoding = true;
+            outputs.push_back(output);
 
             panelSource.num = num;
             panelSource.den = den;
-            panelSource.getPacket = [panelIndex, panelsCount, panelOutputIndex, this]() mutable -> std::shared_ptr<AVPacket> {
+            panelSource.getPacket = [output, codecNum, codecDen, panelIndex, panelsCount, panelOutputIndex, this]() mutable -> std::shared_ptr<AVPacket> {
                 bool hasNext = panelIndex < panelsCount;
 
                 if(!hasNext) {
@@ -1145,7 +1347,13 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
                 }
 
                 auto frame = getPanelFrame(panelOutputIndex, panelIndex);
-                auto packet = Glue->encodePanelFrame(panelOutputIndex, frame.frame());
+
+                output->timeBaseDen = codecDen;
+                output->timeBaseNum = codecNum;
+                output->Width = frame.frame()->width;
+                output->Height = frame.frame()->height;
+
+                auto packet = output->encodeFrame(frame.frame());
 
                 ++panelIndex;
 
@@ -1155,6 +1363,7 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
             sources.push_back(panelSource);
         }
     }
+#endif //
 
     encoder.makeVideo(ExportFileName, sources, attachment, attachmentFileName);
 
@@ -1166,13 +1375,6 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-QByteArray FileInformation::Picture_Get (size_t Pos)
-{
-    if (!Glue || Pos>=ReferenceStat()->x_Current || Pos>=/*Glue->Thumbnails_Size(0)*/ m_thumbnails.size())
-        return QByteArray();
-
-    return m_thumbnails[Pos]; // Glue->Thumbnail_Get(0, Pos);
-}
 
 QPixmap FileInformation::getThumbnail(size_t pos)
 {
