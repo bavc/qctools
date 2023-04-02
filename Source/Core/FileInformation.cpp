@@ -525,7 +525,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     filters.append("aformat=sample_fmts=flt|fltp,astats=metadata=1:reset=1:length=0.4");
     filters.append("scale=72:72,format=rgb24 [thumbnails]");
 
-    auto codecHeight = m_mediaParser->videoStreams()[0].stream()->codecpar->height;
+    auto codecHeight = m_mediaParser->currentVideoStreams()[0].stream()->codecpar->height;
     qDebug() << "codec height: " << codecHeight;
     m_panelSize.setHeight(codecHeight);
     QSet<int> visitedStreamTypes;
