@@ -2574,46 +2574,6 @@ string FFmpeg_Glue::FFmpeg_LibsVersion()
     return LibsVersion.str();
 }
 
-QByteArray FFmpeg_Glue::getAttachment(const QString &fileName, QString& attachmentFileName)
-{
-    ensureFFMpegInitialized();
-
-    QByteArray attachment;
-
-    // Open file
-    AVFormatContext* formatContext = nullptr;
-    auto fileNameString = fileName.toStdString();
-
-    auto result = avformat_open_input(&formatContext, fileNameString.c_str(), NULL, NULL);
-    if (result >= 0)
-    {
-        if (avformat_find_stream_info(formatContext, NULL)>=0)
-        {
-            for(auto i = 0; i < formatContext->nb_streams; ++i)
-            {
-                if(formatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_ATTACHMENT) {
-                    auto st = formatContext->streams[i];
-                    if(st->codecpar->extradata_size != 0) {
-                        attachment = QByteArray((const char*) st->codecpar->extradata, st->codecpar->extradata_size);
-                        AVDictionaryEntry *e = av_dict_get(st->metadata, "filename", NULL, 0);
-                        if(e) {
-                            attachmentFileName = e->value;
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-    } else {
-        char errbuf[255];
-        qDebug() << "Could not open file: " << av_make_error_string(errbuf, sizeof errbuf, result) << "\n";
-    }
-
-    avformat_close_input(&formatContext);
-
-    return attachment;
-}
-
 int FFmpeg_Glue::guessBitsPerRawSampleFromFormat(int pixelFormat)
 {
     switch(pixelFormat) {

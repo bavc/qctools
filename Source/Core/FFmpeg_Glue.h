@@ -303,7 +303,6 @@ public:
     static string               FFmpeg_Configuration();
     static string               FFmpeg_LibsVersion();
 
-    static QByteArray           getAttachment(const QString& fileName, QString& attachmentFileName);
     static int                  guessBitsPerRawSampleFromFormat(int pixelFormat);
     static int                  bitsPerAudioSample(int audioFormat);
     static bool                 isFloatAudioSampleFormat(int audioFormat);
