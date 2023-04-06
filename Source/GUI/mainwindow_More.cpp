@@ -18,7 +18,6 @@
 #include <QStandardPaths>
 
 #include "Core/Core.h"
-#include "Core/FFmpeg_Glue.h"
 #include "GUI/player.h"
 #include "GUI/Plots.h"
 #include "GUI/draggablechildrenbehaviour.h"

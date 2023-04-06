@@ -1,7 +1,6 @@
 #include "player.h"
 #include "ui_player.h"
 #include "Core/FileInformation.h"
-#include "Core/FFmpeg_Glue.h"
 #include "Core/CommonStats.h"
 #include "GUI/filterselector.h"
 #include "GUI/Comments.h"
@@ -984,16 +983,16 @@ QString Player::replaceFilterTokens(const QString &filterString)
 {
     QString str = filterString;
 
-    str.replace(QString("${width}"), QString::number(m_fileInformation->Glue->Width_Get()));
-    str.replace(QString("${height}"), QString::number(m_fileInformation->Glue->Height_Get()));
-    str.replace(QString("${dar}"), QString::number(m_fileInformation->Glue->DAR_Get()));
-    str.replace(QString("${pix_fmt}"), QString::fromStdString(m_fileInformation->Glue->PixFormatName_Get()));
-    int BitsPerRawSample = m_fileInformation->Glue->BitsPerRawSample_Get();
+    str.replace(QString("${width}"), QString::number(m_fileInformation->width()));
+    str.replace(QString("${height}"), QString::number(m_fileInformation->height()));
+    str.replace(QString("${dar}"), QString::number(m_fileInformation->dar()));
+    str.replace(QString("${pix_fmt}"), QString::fromStdString(m_fileInformation->pixFormatName()));
+    int BitsPerRawSample = m_fileInformation->bitsPerRawSample();
     if (BitsPerRawSample == 0) {
         BitsPerRawSample = 8; //Workaround when BitsPerRawSample is unknown, we hope it is 8-bit.
     }
     str.replace(QString("${bitdepth}"), QString::number(BitsPerRawSample));
-    str.replace(QString("${isRGB}"), QString::number(m_fileInformation->Glue->IsRGB_Get()));
+    str.replace(QString("${isRGB}"), QString::number(m_fileInformation->isRgbSet()));
 
     QSize windowSize = ui->scrollArea->widget()->size();
 

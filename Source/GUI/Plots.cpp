@@ -6,7 +6,6 @@
 
 //---------------------------------------------------------------------------
 
-#include "Core/FFmpeg_Glue.h"
 #include "GUI/Plots.h"
 #include "GUI/Plot.h"
 #include "GUI/PlotLegend.h"
@@ -441,7 +440,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                     auto panelImage = QImage(*frame.frame()->data, frame.frame()->width, frame.frame()->height,
                                              *frame.frame()->linesize, QImage::Format_RGB888);
 
-                    auto frameRate = m_fileInfoData->Glue->getAvgVideoFrameRate();
+                    auto frameRate = m_fileInfoData->getAvgVideoFrameRate();
                     if(frameRate.isValid()) {
                         return panelImage.scaled(panelImage.width() * frameRate.value() / 32, panelImage.height());
                     }

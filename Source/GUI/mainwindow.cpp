@@ -8,7 +8,6 @@
 #include "mainwindow.h"
 #include "player.h"
 #include "ui_mainwindow.h"
-#include "Core/FFmpeg_Glue.h"
 #include "GUI/Plots.h"
 #include "GUI/preferences.h"
 
@@ -519,7 +518,7 @@ void MainWindow::on_fileNamesBox_currentIndexChanged(int index)
 
     if(isFileSelected()) {
 
-        if(Files[index]->Glue) {
+        if(Files[index]->isValid()) {
             m_player->setFile(Files[index]);
         } else {
             m_player->setFile(nullptr);
@@ -990,7 +989,7 @@ bool MainWindow::isFileSelected(size_t pos) const
 
 bool MainWindow::hasMediaFile() const
 {
-    return Files[files_CurrentPos]->Glue;
+    return Files[files_CurrentPos]->isValid();
 }
 
 void MainWindow::on_actionClear_Recent_History_triggered()

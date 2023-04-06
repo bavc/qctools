@@ -8,7 +8,7 @@
 
 //---------------------------------------------------------------------------
 #include "GUI/Help.h"
-#include "Core/FFmpeg_Glue.h"
+#include "Core/FileInformation.h"
 #include <QTextBrowser>
 #include <QVBoxLayout>
 #include <QPushButton>
@@ -119,11 +119,11 @@ Help::Help(QWidget * parent)
     QString ffmpegGlueVersionInfo = QString("<h3>QCTools ffmpeg integration</h3><p>%1</p><p>%2</p><p>%3</p><p>%4</p><p>%5</p>");
 
     {
-        auto version = FFmpeg_Glue::FFmpeg_Version();
-        auto year = FFmpeg_Glue::FFmpeg_Year();
-        auto compiler = FFmpeg_Glue::FFmpeg_Compiler();
-        auto configuration = FFmpeg_Glue::FFmpeg_Configuration();
-        auto libsVersion = FFmpeg_Glue::FFmpeg_LibsVersion();
+        auto version = FFmpeg_Version();
+        auto year = FFmpeg_Year();
+        auto compiler = FFmpeg_Compiler();
+        auto configuration = FFmpeg_Configuration();
+        auto libsVersion = FFmpeg_LibsVersion();
 
         ffmpegGlueVersionInfo = ffmpegGlueVersionInfo.arg(QString::fromStdString(version))
                 .arg(year)

@@ -14,7 +14,6 @@
 #include "Core/CommonStats.h"
 #include "Core/VideoCore.h"
 #include "Core/AudioCore.h"
-#include "Core/FFmpeg_Glue.h"
 #include <QFileInfo>
 #include <QHeaderView>
 #include <QMenu>
@@ -262,30 +261,30 @@ void FilesList::UpdateAll()
 
         QFileInfo   FileInfo(Main->Files[Files_Pos]->fileName());
 
-        if (Main->Files[Files_Pos]->Glue)
+        if (Main->Files[Files_Pos]->isValid())
         {
             // Data from FFmpeg
-            Format=                             Main->Files[Files_Pos]->Glue->ContainerFormat_Get().c_str();
-            StreamCount=QString::number(        Main->Files[Files_Pos]->Glue->StreamCount_Get());
-            BitRate=QString::number(            Main->Files[Files_Pos]->Glue->BitRate_Get());
-            int Milliseconds=(int)(             Main->Files[Files_Pos]->Glue->VideoDuration_Get()*1000);
-            VideoFormat=                        Main->Files[Files_Pos]->Glue->VideoFormat_Get().c_str();
-            Width=QString::number(              Main->Files[Files_Pos]->Glue->Width_Get());
-            Height=QString::number(             Main->Files[Files_Pos]->Glue->Height_Get());
-            FieldOrder=                         Main->Files[Files_Pos]->Glue->FieldOrder_Get().c_str();
-            double DAR=                         Main->Files[Files_Pos]->Glue->DAR_Get();
-            SAR=                                Main->Files[Files_Pos]->Glue->SAR_Get().c_str();
-            double FramesDivDurationd=          Main->Files[Files_Pos]->Glue->FramesDivDuration_Get();
-            RFrameRate=                         Main->Files[Files_Pos]->Glue->RVideoFrameRate_Get().c_str();
-            AvgFrameRate=                       Main->Files[Files_Pos]->Glue->AvgVideoFrameRate_Get().c_str();
-            PixFormatName=                      Main->Files[Files_Pos]->Glue->PixFormatName_Get().c_str();
-            ColorSpace=                         Main->Files[Files_Pos]->Glue->ColorSpace_Get().c_str();
-            ColorRange=                         Main->Files[Files_Pos]->Glue->ColorRange_Get().c_str();
-            AudioFormat=                        Main->Files[Files_Pos]->Glue->AudioFormat_Get().c_str();
-            SampleFormat=                       Main->Files[Files_Pos]->Glue->SampleFormat_Get().c_str();
-            double SamplingRate=                Main->Files[Files_Pos]->Glue->SamplingRate_Get();
-            ChannelLayout=                      Main->Files[Files_Pos]->Glue->ChannelLayout_Get().c_str();
-            double ABitDepth=                   Main->Files[Files_Pos]->Glue->ABitDepth_Get();
+            Format=                             Main->Files[Files_Pos]->containerFormat.c_str();
+            StreamCount=QString::number(        Main->Files[Files_Pos]->streamCount );
+            BitRate=QString::number(            Main->Files[Files_Pos]->bitRate );
+            int Milliseconds=(int)(             Main->Files[Files_Pos]->duration()*1000 );
+            VideoFormat=                        Main->Files[Files_Pos]->videoFormat().c_str();
+            Width=QString::number(              Main->Files[Files_Pos]->width());
+            Height=QString::number(             Main->Files[Files_Pos]->height());
+            FieldOrder=                         Main->Files[Files_Pos]->fieldOrder().c_str();
+            double DAR=                         Main->Files[Files_Pos]->dar();
+            SAR=                                Main->Files[Files_Pos]->sar().c_str();
+            double FramesDivDurationd=          Main->Files[Files_Pos]->framesDivDuration();
+            RFrameRate=                         Main->Files[Files_Pos]->rvideoFrameRate().c_str();
+            AvgFrameRate=                       Main->Files[Files_Pos]->avgVideoFrameRate().c_str();
+            PixFormatName=                      Main->Files[Files_Pos]->pixFormatName().c_str();
+            ColorSpace=                         Main->Files[Files_Pos]->colorSpace().c_str();
+            ColorRange=                         Main->Files[Files_Pos]->colorRange().c_str();
+            AudioFormat=                        Main->Files[Files_Pos]->audioFormat().c_str();
+            SampleFormat=                       Main->Files[Files_Pos]->sampleFormat().c_str();
+            double SamplingRate=                Main->Files[Files_Pos]->samplingRate();
+            ChannelLayout=                      Main->Files[Files_Pos]->channelLayout().c_str();
+            double ABitDepth=                   Main->Files[Files_Pos]->abitDepth();
 
             // Parsing
             FramesDivDuration=QString::number(FramesDivDurationd, 'f', 3);

@@ -27,7 +27,6 @@ HEADERS = \
     $$SOURCES_PATH/Core/AudioStats.h \
     $$SOURCES_PATH/Core/CommonStats.h \
     $$SOURCES_PATH/Core/Core.h \
-    $$SOURCES_PATH/Core/FFmpeg_Glue.h \
     $$SOURCES_PATH/Core/VideoCore.h \
     $$SOURCES_PATH/Core/VideoStats.h \
     $$SOURCES_PATH/Core/FormatStats.h \
@@ -50,7 +49,6 @@ SOURCES = \
     $$SOURCES_PATH/Core/AudioStats.cpp \
     $$SOURCES_PATH/Core/CommonStats.cpp \
     $$SOURCES_PATH/Core/Core.cpp \
-    $$SOURCES_PATH/Core/FFmpeg_Glue.cpp \
     $$SOURCES_PATH/Core/VideoCore.cpp \
     $$SOURCES_PATH/Core/VideoStats.cpp \
     $$SOURCES_PATH/Core/FormatStats.cpp \
