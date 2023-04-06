@@ -342,7 +342,7 @@ void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
 
     pkt_pos[x_Current] = Frame->pkt_pos;
     pkt_size[x_Current] = Frame->pkt_size;
-    pkt_pts[x_Current] = Frame->pkt_pts;
+    pkt_pts[x_Current] = Frame->pts;
 
     y[Item_pkt_size][x_Current] = pkt_size[x_Current];
 
