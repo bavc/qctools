@@ -819,19 +819,6 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                     }
                     orderedStreams.append(&*streamIt);
 
-                    auto stream = FormatContext->streams[i];
-                    AVCodec* Codec=avcodec_find_decoder(stream->codec->codec_id);
-                    if (Codec)
-                        avcodec_open2(stream->codec, Codec, NULL);
-
-                    auto OldFrameCount = FormatContext->streams[i]->nb_frames;
-                    auto OldDuration = 0;
-
-                    if (stream->duration != AV_NOPTS_VALUE)
-                        OldDuration=((double)stream->duration)*stream->time_base.num/stream->time_base.den;
-
-                    qDebug() << "old FrameCount: " << OldFrameCount << "duration: " << OldDuration;
-
                     auto Duration = 0;
                     auto FrameCount = streamIt->stream()->nb_frames;
                     if (streamIt->stream()->duration != AV_NOPTS_VALUE)
