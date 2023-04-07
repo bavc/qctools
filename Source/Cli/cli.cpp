@@ -1,10 +1,7 @@
 #include "cli.h"
-#include <QVideoFrame>
-#include "QAVVideoFrame.h"
+#include <qavplayer.h>
 #include "version.h"
-#include "Core/FFmpegVideoEncoder.h"
 #include "Core/CommonStats.h"
-#include "Core/StreamsStats.h"
 #include "Core/FileInformation.h"
 #include <QDir>
 

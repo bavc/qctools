@@ -46,6 +46,7 @@ extern "C" {
 #include <QBuffer>
 #include <QPair>
 #include <QDir>
+#include <QEventLoop>
 #include <zlib.h>
 #include <zconf.h>
 
@@ -54,14 +55,11 @@ extern "C" {
 #include <sstream>
 #include <iostream>
 #include <cassert>
-#ifdef _WIN32
 #include <QEventLoop>
-    #include <algorithm>
+#include <algorithm>
 #include <qavplayer.h>
 #include <qavcodec_p.h>
-
-#include <QtWidgets/QApplication>
-#endif
+#include <float.h>
 
 // extracted from FFMpeg_Glue:
 
@@ -919,7 +917,10 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                 {
                     it.value().append(m_panelMetadata.size() - 1);
                 } else {
-                    m_panelOutputsByTitle[panelTitle.toStdString()] = QVector<int> { m_panelMetadata.size() - 1 };
+                    QVector<int> panelOutputs;
+                    panelOutputs.append(m_panelMetadata.size() - 1);
+
+                    m_panelOutputsByTitle[panelTitle.toStdString()] = panelOutputs;
                 }
             }
         }
@@ -952,7 +953,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
                     ++Frames_Pos;
                 } else if(frame.filterName().startsWith("panel")) {
-                    auto index = frame.filterName().midRef(5).toInt();
+                    auto index = frame.filterName().mid(5).toInt();
                     while(m_panelFrames.size() <= index)
                         m_panelFrames.append(QVector<QAVVideoFrame>());
 
@@ -1307,7 +1308,7 @@ struct Output {
             return true;
 
         //
-        AVCodec *Output_Codec=avcodec_find_encoder((AVCodecID) Output_CodecID);
+        auto *Output_Codec=avcodec_find_encoder((AVCodecID) Output_CodecID);
         if (!Output_Codec)
             return false;
         Output_CodecContext=avcodec_alloc_context3 (Output_Codec);

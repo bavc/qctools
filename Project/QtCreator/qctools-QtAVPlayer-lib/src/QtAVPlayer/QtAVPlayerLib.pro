@@ -5,6 +5,11 @@ QT = multimedia concurrent
 # Needed for QAbstractVideoBuffer
 equals(QT_MAJOR_VERSION, 6): QT += multimedia-private
 QT_PRIVATE += gui-private
+!macx: CONFIG += c++1z
+macx: {
+CONFIG -= c++11
+CONFIG += c++17
+}
 
 INCLUDEPATH += $$absolute_path($$PWD/..)
 message ("INCLUDEPATH: " $$INCLUDEPATH)

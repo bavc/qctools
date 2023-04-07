@@ -75,5 +75,4 @@ include(../ffmpeg.pri)
 QTAVPLAYER_SRC=$$absolute_path(../qctools-QtAVPlayer)
 QTAVPLAYER_LIB=$$absolute_path($$OUT_PWD/../qctools-QtAVPlayer)
 
-message('using UseQtAVPlayerLib')
-include(../qctools-QtAVPlayer/UseQtAVPlayerLib.pri)
+INCLUDEPATH += $$absolute_path($$QTAVPLAYER_SRC/src) $$absolute_path($$QTAVPLAYER_SRC/src/QtAVPlayer)

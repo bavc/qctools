@@ -129,7 +129,7 @@ QWT_CONFIG     -= QwtDesigner
 ######################################################################
 
 win32 {
-    QWT_CONFIG     += QwtDesignerSelfContained
+    QWT_CONFIG     -= QwtDesignerSelfContained
 }
 
 ######################################################################
@@ -148,7 +148,7 @@ QWT_CONFIG     -= QwtExamples
 # Otherwise you have to build them from the playground directory.
 ######################################################################
 
-QWT_CONFIG     += QwtPlayground
+QWT_CONFIG     -= QwtPlayground
 
 ######################################################################
 # If you want to auto build the tests, enable the line below

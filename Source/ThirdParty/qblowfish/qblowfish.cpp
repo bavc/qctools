@@ -26,6 +26,7 @@
 
 #include "qblowfish.h"
 #include "qblowfish_p.h"
+#include <limits>
 #include <QtEndian>
 #include <QDebug>
 
