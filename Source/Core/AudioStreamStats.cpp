@@ -16,6 +16,7 @@ extern "C"
 #include <libavutil/pixdesc.h>
 #include <libavutil/bprint.h>
 #include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
 }
 #include "tinyxml2.h"
 #include <sstream>

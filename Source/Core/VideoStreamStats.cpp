@@ -15,6 +15,7 @@ extern "C"
 #include <libavutil/pixdesc.h>
 #include <libavutil/rational.h>
 #include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
 }
 #include <qavplayer.h>
 #include <qavcodec_p.h>
