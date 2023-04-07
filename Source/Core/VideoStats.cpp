@@ -261,7 +261,7 @@ void VideoStats::parseFrame(tinyxml2::XMLElement *Frame)
 
 void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
 {
-    AVDictionary * m=av_frame_get_metadata (Frame);
+    AVDictionary * m= Frame->metadata;
     AVDictionaryEntry* e=NULL;
     bool statsMapInitialized = !statsValueInfoByKeys.empty();
 
