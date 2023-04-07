@@ -215,7 +215,7 @@ std::string CommonStreamStats::getCodec_Time_Base() const
 std::string CommonStreamStats::getCodec_TagString() const
 {
     char val_str[128];
-    av_get_codec_tag_string(val_str, sizeof(val_str), codec_tag);
+    av_fourcc_make_string(val_str, codec_tag);
 
     return val_str;
 }
