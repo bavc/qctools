@@ -777,58 +777,6 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     if(glueFileName  == "-")
         glueFileName  = "pipe:0";
 
-    if(!streamsStats && !formatStats)
-    {
-        AVFormatContext* FormatContext = nullptr;
-        if (avformat_open_input(&FormatContext, glueFileName.c_str(), NULL, NULL)>=0)
-        {            
-            if (avformat_find_stream_info(FormatContext, NULL)>=0) {
-
-                containerFormat = FormatContext->iformat->long_name;
-                streamCount = FormatContext->nb_streams;
-                bitRate = FormatContext->bit_rate;
-
-                for(auto i = 0; i < FormatContext->nb_streams; ++i) {
-                    auto stream = FormatContext->streams[i];
-
-                    AVCodec* Codec=avcodec_find_decoder(stream->codec->codec_id);
-                    if (Codec)
-                        avcodec_open2(stream->codec, Codec, NULL);
-
-                    auto Duration = 0;
-                    auto FrameCount = stream->nb_frames;
-                    if (stream->duration != AV_NOPTS_VALUE)
-                        Duration=((double)stream->duration)*stream->time_base.num/stream->time_base.den;
-
-                    // If duration is not known, estimating it
-                    if (Duration==0 && FormatContext->duration!=AV_NOPTS_VALUE)
-                        Duration=((double)FormatContext->duration)/AV_TIME_BASE;
-
-                    // If frame count is not known, estimating it
-                    if (FrameCount==0 && stream->avg_frame_rate.num && stream->avg_frame_rate.den && Duration)
-                        FrameCount=Duration*stream->avg_frame_rate.num/stream->avg_frame_rate.den;
-                    if (FrameCount==0
-                     && ((stream->time_base.num==1 && stream->time_base.den>=24 && stream->time_base.den<=60)
-                      || (stream->time_base.num==1001 && stream->time_base.den>=24000 && stream->time_base.den<=60000)))
-                        FrameCount=stream->duration;
-
-                    if(stream->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
-                        auto Stat=new VideoStats(FrameCount, Duration, stream);
-                        Stats.push_back(Stat);
-                    } else if(stream->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
-                        auto Stat=new AudioStats(FrameCount, Duration, stream);
-                        Stats.push_back(Stat);
-                    }
-                }
-
-                streamsStats = new StreamsStats(FormatContext);
-                formatStats = new FormatStats(FormatContext);
-            }
-
-            avformat_close_input(&FormatContext);
-        }
-    }
-
     Frames_Pos=0;
 
     m_mediaParser = new QAVPlayer();
@@ -842,6 +790,81 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         QObject::disconnect(c);
     });
     loop.exec();
+
+    if(!streamsStats && !formatStats)
+    {
+        auto streams = m_mediaParser->availableVideoStreams();
+        streams.append(m_mediaParser->availableAudioStreams());
+        streams.append(m_mediaParser->availableSubtitleStreams());
+
+        AVFormatContext* FormatContext = nullptr;
+        if (avformat_open_input(&FormatContext, glueFileName.c_str(), NULL, NULL)>=0)
+        {
+            QVector<QAVStream*> orderedStreams;
+            if (avformat_find_stream_info(FormatContext, NULL)>=0) {
+
+                containerFormat = FormatContext->iformat->long_name;
+                streamCount = FormatContext->nb_streams;
+                bitRate = FormatContext->bit_rate;
+
+                for(auto i = 0; i < FormatContext->nb_streams; ++i) {
+                    auto streamIt = std::find_if(streams.begin(), streams.end(), [i](QAVStream& stream) {
+                        return stream.stream()->index == i;
+                    });
+
+                    if(streamIt == streams.end()) {
+                        qDebug() << "error: it should never happen";
+                        assert(false);
+                        continue;
+                    }
+                    orderedStreams.append(&*streamIt);
+
+                    auto stream = FormatContext->streams[i];
+                    AVCodec* Codec=avcodec_find_decoder(stream->codec->codec_id);
+                    if (Codec)
+                        avcodec_open2(stream->codec, Codec, NULL);
+
+                    auto OldFrameCount = FormatContext->streams[i]->nb_frames;
+                    auto OldDuration = 0;
+
+                    if (stream->duration != AV_NOPTS_VALUE)
+                        OldDuration=((double)stream->duration)*stream->time_base.num/stream->time_base.den;
+
+                    qDebug() << "old FrameCount: " << OldFrameCount << "duration: " << OldDuration;
+
+                    auto Duration = 0;
+                    auto FrameCount = streamIt->stream()->nb_frames;
+                    if (streamIt->stream()->duration != AV_NOPTS_VALUE)
+                        Duration= ((double)streamIt->stream()->duration)*streamIt->stream()->time_base.num/streamIt->stream()->time_base.den;
+
+                    // If duration is not known, estimating it
+                    if (Duration==0 && FormatContext->duration!=AV_NOPTS_VALUE)
+                        Duration=((double)FormatContext->duration)/AV_TIME_BASE;
+
+                    // If frame count is not known, estimating it
+                    if (FrameCount==0 && streamIt->stream()->avg_frame_rate.num && streamIt->stream()->avg_frame_rate.den && Duration)
+                        FrameCount=Duration*streamIt->stream()->avg_frame_rate.num/streamIt->stream()->avg_frame_rate.den;
+                    if (FrameCount==0
+                        && ((streamIt->stream()->time_base.num==1 && streamIt->stream()->time_base.den>=24 && streamIt->stream()->time_base.den<=60)
+                            || (streamIt->stream()->time_base.num==1001 && streamIt->stream()->time_base.den>=24000 && streamIt->stream()->time_base.den<=60000)))
+                        FrameCount=streamIt->stream()->duration;
+
+                    if(streamIt->stream()->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+                        auto Stat=new VideoStats(FrameCount, Duration, &*streamIt);
+                        Stats.push_back(Stat);
+                    } else if(streamIt->stream()->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+                        auto Stat=new AudioStats(FrameCount, Duration, &*streamIt);
+                        Stats.push_back(Stat);
+                    }
+                }
+
+                streamsStats = new StreamsStats(orderedStreams, FormatContext);
+                formatStats = new FormatStats(FormatContext);
+            }
+
+            avformat_close_input(&FormatContext);
+        }
+    }
 
     if(attachment.isEmpty()) {
 

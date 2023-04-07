@@ -12,19 +12,20 @@
 #include <string>
 #include <list>
 #include <memory>
+#include <QVector>
 
 #include "Core/CommonStreamStats.h"
 
 struct AVFormatContext;
 class QXmlStreamWriter;
 class CommonStreamStats;
-
+class QAVStream;
 class StreamsStats {
 
 public:
     typedef std::unique_ptr<CommonStreamStats> CommonStreamStatsPtr;
 
-    StreamsStats(AVFormatContext* context = NULL);
+    StreamsStats(QVector<QAVStream*> streams = {}, AVFormatContext* context = NULL);
     ~StreamsStats();
 
     bool readFromXML(const char* data, size_t size);

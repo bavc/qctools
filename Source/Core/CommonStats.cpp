@@ -11,14 +11,11 @@
 //---------------------------------------------------------------------------
 extern "C"
 {
-#ifndef INT64_C
-#define INT64_C(c) (c ## LL)
-#define UINT64_C(c) (c ## ULL)
-#endif
-
 #include <libavutil/frame.h>
 #include <libavformat/avformat.h>
 }
+#include <qavplayer.h>
+#include <qavcodec_p.h>
 
 #include "Core/Core.h"
 #include "tinyxml2.h"
@@ -34,10 +31,10 @@ using namespace tinyxml2;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t CountOfGroups_, size_t CountOfItems_, size_t FrameCount, double Duration, AVStream* stream)
+CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t CountOfGroups_, size_t CountOfItems_, size_t FrameCount, double Duration, QAVStream* stream)
     :
-    Frequency(stream ? (((double)stream->time_base.den) / stream->time_base.num) : 0),
-    streamIndex(stream ? stream->index : -1),
+    Frequency(stream ? (((double)stream->stream()->time_base.den) / stream->stream()->time_base.num) : 0),
+    streamIndex(stream ? stream->stream()->index : -1),
     Type(Type_),
     PerItem(PerItem_),
     CountOfGroups(CountOfGroups_),

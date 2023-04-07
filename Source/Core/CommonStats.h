@@ -17,11 +17,12 @@
 #include <cctype>
 #include <functional>
 #include <Core/Core.h>
+#include <qavplayer.h>
 
 using namespace std;
 
 struct AVFrame;
-struct AVStream;
+class QAVStream;
 struct per_item;
 class XMLElement;
 
@@ -33,7 +34,7 @@ class CommonStats
 {
 public:
     // Constructor / Destructor
-    CommonStats(const struct per_item* PerItem, int Type, size_t CountOfGroups, size_t CountOfItems, size_t FrameCount=0, double Duration=0, AVStream* stream = NULL);
+    CommonStats(const struct per_item* PerItem, int Type, size_t CountOfGroups, size_t CountOfItems, size_t FrameCount=0, double Duration=0, QAVStream* stream = NULL);
     virtual ~CommonStats();
 
     // Data

@@ -12,13 +12,9 @@
 //---------------------------------------------------------------------------
 extern "C"
 {
-#ifndef INT64_C
-#define INT64_C(c) (c ## LL)
-#define UINT64_C(c) (c ## ULL)
-#endif
-
 #include <libavutil/frame.h>
 }
+#include <qavplayer.h>
 
 #include "tinyxml2.h"
 #include <sstream>
@@ -35,7 +31,7 @@ using namespace tinyxml2;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-AudioStats::AudioStats (size_t FrameCount, double Duration, AVStream* stream)
+AudioStats::AudioStats (size_t FrameCount, double Duration, QAVStream* stream)
     :
     CommonStats(AudioPerItem, Type_Audio, Group_AudioMax, Item_AudioMax, FrameCount, Duration, stream)
 {

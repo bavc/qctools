@@ -12,14 +12,10 @@
 //---------------------------------------------------------------------------
 extern "C"
 {
-#ifndef INT64_C
-#define INT64_C(c) (c ## LL)
-#define UINT64_C(c) (c ## ULL)
-#endif
-
 #include <libavutil/frame.h>
 #include <libavutil/pixdesc.h>
 }
+#include <qavplayer.h>"
 
 #include "tinyxml2.h"
 #include <sstream>
@@ -35,7 +31,7 @@ using namespace tinyxml2;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-VideoStats::VideoStats (size_t FrameCount, double Duration, AVStream* stream)
+VideoStats::VideoStats (size_t FrameCount, double Duration, QAVStream* stream)
     :
     CommonStats(VideoPerItem, Type_Video, Group_VideoMax, Item_VideoMax, FrameCount, Duration, stream)
 {

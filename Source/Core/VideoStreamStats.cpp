@@ -11,16 +11,13 @@
 //---------------------------------------------------------------------------
 extern "C"
 {
-#ifndef INT64_C
-#define INT64_C(c) (c ## LL)
-#define UINT64_C(c) (c ## ULL)
-#endif
-
 #include <libavutil/frame.h>
 #include <libavutil/pixdesc.h>
 #include <libavutil/rational.h>
 #include <libavformat/avformat.h>
 }
+#include <qavplayer.h>
+#include <qavcodec_p.h>
 
 #include "tinyxml2.h"
 #include <sstream>
@@ -101,37 +98,37 @@ VideoStreamStats::VideoStreamStats(XMLElement *streamElement) : CommonStreamStat
         refs = refs_value;
 }
 
-VideoStreamStats::VideoStreamStats(AVStream* stream, AVFormatContext *context) : CommonStreamStats(stream),
-    width(stream != NULL ? std::to_string(stream->codecpar->width) : ""),
-    height(stream != NULL ? std::to_string(stream->codecpar->height) : ""),
-    coded_width(stream != NULL ? std::to_string(stream->codec->coded_width) : ""),
-    coded_height(stream != NULL ? std::to_string(stream->codec->coded_height) : ""),
-    has_b_frames(stream != NULL ? std::to_string(stream->codecpar->video_delay) : ""),
+VideoStreamStats::VideoStreamStats(QAVStream* stream, AVFormatContext *context) : CommonStreamStats(stream),
+    width(stream != NULL ? std::to_string(stream->stream()->codecpar->width) : ""),
+    height(stream != NULL ? std::to_string(stream->stream()->codecpar->height) : ""),
+    coded_width(stream != NULL ? std::to_string(stream->codec()->avctx()->coded_width) : ""),
+    coded_height(stream != NULL ? std::to_string(stream->codec()->avctx()->coded_height) : ""),
+    has_b_frames(stream != NULL ? std::to_string(stream->stream()->codecpar->video_delay) : ""),
     sample_aspect_ratio(""),
     display_aspect_ratio(""),
     pix_fmt(""),
-    level(stream != NULL ? std::to_string(stream->codecpar->level) : ""),
-    field_order(stream != NULL ? field_order_to_string(stream->codecpar->field_order) : ""),
-    refs(stream != NULL ? std::to_string(stream->codec->refs) : "")
+    level(stream != NULL ? std::to_string(stream->stream()->codecpar->level) : ""),
+    field_order(stream != NULL ? field_order_to_string(stream->stream()->codecpar->field_order) : ""),
+    refs(stream != NULL ? std::to_string(stream->codec()->avctx()->refs) : "")
 {
     if(stream != NULL)
     {
-        AVRational sar = av_guess_sample_aspect_ratio(context, stream, NULL);
+        AVRational sar = av_guess_sample_aspect_ratio(context, stream->stream(), NULL);
         sample_aspect_ratio = rational_to_string(sar, ':');
 
-        if(stream->codec->sample_aspect_ratio.den)
+        if(stream->codec()->avctx()->sample_aspect_ratio.den)
         {
             AVRational dar;
 
             av_reduce(&dar.num, &dar.den,
-                      stream->codecpar->width  * sar.num,
-                      stream->codecpar->height * sar.den,
+                      stream->stream()->codecpar->width  * sar.num,
+                      stream->stream()->codecpar->height * sar.den,
                       1024*1024);
 
             display_aspect_ratio = rational_to_string(dar, ':');
         }
 
-        const char* s = av_get_pix_fmt_name((AVPixelFormat) stream->codecpar->format);
+        const char* s = av_get_pix_fmt_name((AVPixelFormat) stream->stream()->codecpar->format);
         if(!s)
             s = "unknown";
 
