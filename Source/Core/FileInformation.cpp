@@ -102,11 +102,11 @@ std::string FFmpeg_Configuration()
 #endif
 }
 
-void LibsVersion_Inject(stringstream &LibsVersion, const char* Name, int Value)
+void LibsVersion_Inject(std::stringstream &LibsVersion, const char* Name, int Value)
 {
     LibsVersion<<' ' << Name << "=\"" << Value << '\"';
 }
-void LibsVersion_Inject(stringstream &LibsVersion, const char* Name, const char* Value)
+void LibsVersion_Inject(std::stringstream &LibsVersion, const char* Name, const char* Value)
 {
     LibsVersion<<' ' << Name << "=\"" << Value << '\"';
 }
@@ -143,7 +143,7 @@ do {                                                                            
 //---------------------------------------------------------------------------
 std::string FFmpeg_LibsVersion()
 {
-    stringstream LibsVersion;
+    std::stringstream LibsVersion;
     LIBSVERSION(avutil,     AVUTIL);
     LIBSVERSION(avcodec,    AVCODEC);
     LIBSVERSION(avformat,   AVFORMAT);
@@ -490,7 +490,7 @@ const QMap<std::string, QVector<int>> &FileInformation::panelOutputsByTitle() co
     return m_panelOutputsByTitle;
 }
 
-const std::map<string, string> &FileInformation::getPanelOutputMetadata(size_t index) const
+const std::map<std::string, std::string> &FileInformation::getPanelOutputMetadata(size_t index) const
 {
     return m_panelMetadata[index];
 }
@@ -546,9 +546,9 @@ QByteArray getAttachment(const QString &fileName, QString& attachmentFileName)
     return attachment;
 }
 
-std::map<string, string> getStreamMetadata(AVStream* stream)
+std::map<std::string, std::string> getStreamMetadata(AVStream* stream)
 {
-    std::map<string, string> metadata;
+    std::map<std::string, std::string> metadata;
 
     auto tags = stream->metadata;
     if (!tags)
@@ -605,7 +605,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     static const QString dotQctoolsDotMkv = ".qctools.mkv";
 
     QByteArray attachment;
-    string glueFileName = FileName.toUtf8().data();
+    std::string glueFileName = FileName.toUtf8().data();
 
     if (FileName.endsWith(dotQctoolsDotXmlDotGz))
     {
@@ -725,9 +725,9 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
     // Running FFmpeg
     #ifdef _WIN32
-        replace(glueFileName.begin(), glueFileName .end(), '/', '\\' );
+        std::replace(glueFileName.begin(), glueFileName .end(), '/', '\\' );
     #endif
-    string Filters[Type_Max];
+    std::string Filters[Type_Max];
     if (!StatsFromExternalData_IsOpen)
     {
         if (ActiveFilters[ActiveFilter_Video_signalstats])
@@ -1116,7 +1116,7 @@ void FileInformation::startExport(const QString &exportFileName)
 //---------------------------------------------------------------------------
 void FileInformation::Export_XmlGz (const QString &ExportFileName, const activefilters& filters)
 {
-    stringstream Data;
+    std::stringstream Data;
 
     // Header
     Data<<"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
@@ -1183,7 +1183,7 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName, const activef
         name = info.fileName();
     }
 
-    string DataS=Data.str();
+    std::string DataS=Data.str();
     uLongf Buffer_Size=65536;
 
     if(file->open(QIODevice::ReadWrite))
@@ -1674,7 +1674,7 @@ std::string FileInformation::pixFormatName() const
 
     const AVPixFmtDescriptor* Desc=av_pix_fmt_desc_get((AVPixelFormat) stream.stream()->codecpar->format);
     if (!Desc)
-        return string();
+        return std::string();
     return Desc->name;
 
 }
@@ -1736,7 +1736,7 @@ std::string FileInformation::fieldOrder() const
         case AV_FIELD_BB:   return "BFF: bottom displayed first, bottom coded first";
         case AV_FIELD_TB:   return "TFF: top displayed first, coded interleaved";
         case AV_FIELD_BT:   return "BFF: bottom displayed first, coded interleaved";
-        default: return string();
+        default: return std::string();
         }
 }
 
@@ -1755,7 +1755,7 @@ std::string FileInformation::sar() const
         return "Und";
     else if (stream.stream()->codecpar->sample_aspect_ratio.num)
     {
-        ostringstream convert;
+        std::ostringstream convert;
         convert << stream.stream()->codecpar->sample_aspect_ratio.num << "/" << stream.stream()->codecpar->sample_aspect_ratio.den;
         return convert.str();
     }
@@ -1763,7 +1763,7 @@ std::string FileInformation::sar() const
         return "Und";
     else
     {
-        ostringstream convert;
+        std::ostringstream convert;
         convert << stream.stream()->codecpar->sample_aspect_ratio.num << "/" << stream.stream()->codecpar->sample_aspect_ratio.den;
         return convert.str();
     }
@@ -1788,7 +1788,7 @@ double FileInformation::framesDivDuration() const
     return 0;
 }
 
-string FileInformation::rvideoFrameRate() const
+std::string FileInformation::rvideoFrameRate() const
 {
     auto videoStreams = m_mediaParser->availableVideoStreams();
     if(videoStreams.empty())
@@ -1797,19 +1797,19 @@ string FileInformation::rvideoFrameRate() const
     auto stream = videoStreams[0];
 
     if (stream.codec()->codec()->long_name == NULL)
-        return string();
+        return std::string();
 
     if (stream.stream()->r_frame_rate.num==0)
         return "Und";
     else
     {
-        ostringstream convert;
+        std::ostringstream convert;
         convert << stream.stream()->r_frame_rate.num << "/" << stream.stream()->r_frame_rate.den;
         return convert.str();
     }
 }
 
-string FileInformation::avgVideoFrameRate() const
+std::string FileInformation::avgVideoFrameRate() const
 {
     auto videoStreams = m_mediaParser->availableVideoStreams();
     if(videoStreams.empty())
@@ -1818,9 +1818,9 @@ string FileInformation::avgVideoFrameRate() const
     auto stream = videoStreams[0];
 
     if (stream.codec()->codec()->long_name == NULL)
-        return string();
+        return std::string();
 
-    ostringstream convert;
+    std::ostringstream convert;
     if (stream.stream()->avg_frame_rate.num==0)
         return "Und";
     else
@@ -1830,7 +1830,7 @@ string FileInformation::avgVideoFrameRate() const
     }
 }
 
-string FileInformation::colorSpace() const
+std::string FileInformation::colorSpace() const
 {
     auto videoStreams = m_mediaParser->availableVideoStreams();
     if(videoStreams.empty())
@@ -1852,11 +1852,11 @@ string FileInformation::colorSpace() const
     case AVCOL_SPC_BT2020_NCL: return "ITU-R BT2020 non-constant luminance system";
     case AVCOL_SPC_BT2020_CL: return "ITU-R BT2020 constant luminance system";
     case AVCOL_SPC_NB: return "Not part of ABI.";
-    default: return string();
+    default: return std::string();
     }
 }
 
-string FileInformation::colorRange() const
+std::string FileInformation::colorRange() const
 {
     auto videoStreams = m_mediaParser->availableVideoStreams();
     if(videoStreams.empty())
@@ -1870,11 +1870,11 @@ string FileInformation::colorRange() const
     case AVCOL_RANGE_MPEG: return "Broadcast Range"; // full: "Broadcast Range (219*2^n-1)"
     case AVCOL_RANGE_JPEG: return "Full Range"; // full: "Full Range (2^n-1)"
     case AVCOL_RANGE_NB: return "Not part of ABI";
-    default: return string();
+    default: return std::string();
     }
 }
 
-string FileInformation::audioFormat() const
+std::string FileInformation::audioFormat() const
 {
     auto audioStreams = m_mediaParser->availableAudioStreams();
     if(audioStreams.empty())
@@ -1888,7 +1888,7 @@ string FileInformation::audioFormat() const
     return stream.codec()->codec()->long_name;
 }
 
-string FileInformation::sampleFormat() const
+std::string FileInformation::sampleFormat() const
 {
     auto audioStreams = m_mediaParser->availableAudioStreams();
     if(audioStreams.empty())
@@ -1913,7 +1913,7 @@ string FileInformation::sampleFormat() const
     case AV_SAMPLE_FMT_FLTP: return "float, planar";
     case AV_SAMPLE_FMT_DBLP: return "double, planar";
     case AV_SAMPLE_FMT_NB: return "number of sample formats";
-    default: return string();
+    default: return std::string();
     }
 }
 
@@ -1928,7 +1928,7 @@ double FileInformation::samplingRate() const
     return stream.stream()->codecpar->sample_rate;
 }
 
-string FileInformation::channelLayout() const
+std::string FileInformation::channelLayout() const
 {
     auto audioStreams = m_mediaParser->availableAudioStreams();
     if(audioStreams.empty())
@@ -1968,7 +1968,7 @@ string FileInformation::channelLayout() const
     case AV_CH_LAYOUT_7POINT1_WIDE: return "7.1(wide-side)";
     case AV_CH_LAYOUT_OCTAGONAL: return "octagonal";
     case AV_CH_LAYOUT_STEREO_DOWNMIX: return "downmix";
-    default: return string();
+    default: return std::string();
     }
 }
 

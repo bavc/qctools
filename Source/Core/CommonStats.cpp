@@ -218,7 +218,7 @@ void CommonStats::processAdditionalStats(const char* key, const char* value, boo
     }
 }
 
-void CommonStats::writeAdditionalStats(stringstream &stream, size_t index)
+void CommonStats::writeAdditionalStats(std::stringstream &stream, size_t index)
 {
     if(additionalIntStats) {
         for(size_t i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::Int].size(); ++i) {
@@ -396,65 +396,65 @@ void CommonStats::StatsFinish ()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-string CommonStats::Average_Get(size_t Pos)
+std::string CommonStats::Average_Get(size_t Pos)
 {
     if (x_Current == 0 || Pos >= CountOfItems) {
-        return string();
+        return std::string();
     }
 
     double Value = Stats_Totals[Pos] / x_Current;
-    stringstream str;
-    str << fixed;
-    str << setprecision(PerItem[Pos].DigitsAfterComma);
+    std::stringstream str;
+    str << std::fixed;
+    str << std::setprecision(PerItem[Pos].DigitsAfterComma);
     str << Value;
     return str.str();
 }
 
 //---------------------------------------------------------------------------
-string CommonStats::Average_Get(size_t Pos, size_t Pos2)
+std::string CommonStats::Average_Get(size_t Pos, size_t Pos2)
 {
     if (x_Current == 0 || Pos >= CountOfItems) {
-        return string();
+        return std::string();
     }
 
     double Value = (Stats_Totals[Pos] - Stats_Totals[Pos2]) / x_Current;
-    stringstream str;
-    str << fixed;
-    str << setprecision(PerItem[Pos].DigitsAfterComma);
+    std::stringstream str;
+    str << std::fixed;
+    str << std::setprecision(PerItem[Pos].DigitsAfterComma);
     str << Value;
     return str.str();
 }
 
 //---------------------------------------------------------------------------
-string CommonStats::Count_Get(size_t Pos)
+std::string CommonStats::Count_Get(size_t Pos)
 {
     if (x_Current==0)
-        return string();
+        return std::string();
 
-    stringstream str;
+    std::stringstream str;
     str<<Stats_Counts[Pos];
     return str.str();
 }
 
 //---------------------------------------------------------------------------
-string CommonStats::Count2_Get(size_t Pos)
+std::string CommonStats::Count2_Get(size_t Pos)
 {
     if (x_Current==0)
-        return string();
+        return std::string();
 
-    stringstream str;
+    std::stringstream str;
     str<<Stats_Counts2[Pos];
     return str.str();
 }
 
 //---------------------------------------------------------------------------
-string CommonStats::Percent_Get(size_t Pos)
+std::string CommonStats::Percent_Get(size_t Pos)
 {
     if (x_Current==0)
-        return string();
+        return std::string();
 
     double Value=((double)Stats_Counts[Pos])/x_Current;
-    stringstream str;
+    std::stringstream str;
     str<<Value*100<<"%";
     return str.str();
 }

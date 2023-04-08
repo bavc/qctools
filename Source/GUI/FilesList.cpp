@@ -241,7 +241,7 @@ void FilesList::UpdateAll()
         QString     FramesDivDuration;
         QString     RFrameRate;
         QString     AvgFrameRate;
-        string      Duration;
+        std::string      Duration;
         QString     ShortFileName;
         QString     FileSize;
         QString     VideoFormat;
@@ -394,7 +394,7 @@ void FilesList::Update(size_t Files_Pos)
         return;
     }
 
-    stringstream Message;
+    std::stringstream Message;
     Message<<(int)(Stats->State_Get()*100)<<"%";
     setItem((int)Files_Pos, Col_Processed, new QTableWidgetItem(QString::fromStdString(Message.str())));
     

@@ -17,7 +17,6 @@
 #include <QPointer>
 
 #include <vector>
-using namespace std;
 
 #include "Core/Core.h"
 #include "Core/FileInformation.h"

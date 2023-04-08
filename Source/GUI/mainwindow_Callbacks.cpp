@@ -60,7 +60,7 @@ void MainWindow::TimeOut ()
     bool DeckRunning_New=false;
 
     // Status
-    stringstream Message_Total;
+    std::stringstream Message_Total;
     int Files_Completed=0;
     if (Files.size()>1)
     {
@@ -98,7 +98,7 @@ void MainWindow::TimeOut ()
         {
             qDebug() << "reading stats.... ";
 
-            stringstream Message;
+            std::stringstream Message;
             Message<<"Parsing frame "<<Stats->x_Current;
             if (Stats->x_Current_Max)
                 Message<<"/"<<Stats->x_Current_Max<<" ("<<(int)((double)Stats->x_Current)*100/Stats->x_Current_Max<<"%)";

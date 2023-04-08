@@ -14,7 +14,6 @@
 #include <string>
 #include <vector>
 #include <stdint.h>
-using namespace std;
 
 struct AVFrame;
 class QAVStream;
@@ -36,7 +35,7 @@ public:
     virtual void parseFrame(tinyxml2::XMLElement* frame);
     void                        StatsFromFrame(struct AVFrame* Frame, int Width, int Height);
     void                        TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos);
-    string                      StatsToXML(const activefilters& filters);
+    std::string                      StatsToXML(const activefilters& filters);
 
     int getWidth() const;
     void setWidth(int getWidth);

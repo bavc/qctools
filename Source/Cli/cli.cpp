@@ -707,7 +707,7 @@ int Cli::exec(QCoreApplication &a)
                         if(thumbnailIndex == 0) {
                             std::cout << std::endl << "adding thumbnails to QCTools report... " << std::endl;
 
-                            progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
+                            progress = std::unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
                             progress->setValue(0);
                         }
                         progress->setValue(100 * thumbnailIndex/ thumbnailsCount);
@@ -717,7 +717,7 @@ int Cli::exec(QCoreApplication &a)
                         {
                             std::cout << std::endl << "adding panels to QCTools report... " << std::endl;
 
-                            progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
+                            progress = std::unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
                             progress->setValue(0);
                         }
 
@@ -775,7 +775,7 @@ int Cli::exec(QCoreApplication &a)
             QObject::connect(info.get(), SIGNAL(signalServerUploadProgressChanged(qint64, qint64)), this, SLOT(onSignalServerUploadProgressChanged(qint64, qint64)));
 
             std::cout << "uploading... " << std::endl;
-            progress = unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
+            progress = std::unique_ptr<ProgressBar>(new ProgressBar(0, 100, 50, "%"));
             progress->setValue(0);
 
             info->upload(QFileInfo(output));

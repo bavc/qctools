@@ -19,8 +19,6 @@
 #include <Core/Core.h>
 #include <qavplayer.h>
 
-using namespace std;
-
 struct AVFrame;
 class QAVStream;
 struct per_item;
@@ -60,11 +58,11 @@ public:
     double                      State_Get();
 
     // Stats
-    string                      Average_Get(size_t Pos);
-    string                      Average_Get(size_t Pos, size_t Pos2);
-    string                      Count_Get(size_t Pos);
-    string                      Count2_Get(size_t Pos);
-    string                      Percent_Get(size_t Pos);
+    std::string                      Average_Get(size_t Pos);
+    std::string                      Average_Get(size_t Pos, size_t Pos2);
+    std::string                      Count_Get(size_t Pos);
+    std::string                      Count2_Get(size_t Pos);
+    std::string                      Percent_Get(size_t Pos);
 
     static void statsFromExternalData(const char* Data, size_t Size, const std::function<CommonStats*(int, size_t)>& statsGetter);
 
@@ -75,7 +73,7 @@ public:
     virtual void                StatsFromFrame(struct AVFrame* Frame, int Width, int Height) = 0;
     virtual void                TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos) = 0;
     virtual void                StatsFinish();
-    virtual string              StatsToXML(const activefilters& filters) = 0;
+    virtual std::string              StatsToXML(const activefilters& filters) = 0;
 
     struct StatsValueInfo {
         size_t index;
