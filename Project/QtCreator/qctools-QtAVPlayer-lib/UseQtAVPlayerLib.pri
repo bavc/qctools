@@ -33,7 +33,7 @@ if(equals(MAKEFILE_GENERATOR, MSVC.NET)|equals(MAKEFILE_GENERATOR, MSBUILD)) {
 }
 
 QTAVLIBNAME = QtAVPlayer
-mac: {
+mac:CONFIG(app_bundle) {
   qtavplayerlibs.pattern = $$QTAVPLAYER_BUILD_DIR/$$QTLIBPREFIX$${QTAVLIBNAME}*.$$QMAKE_EXTENSION_SHLIB*
   message('qtavplayerlibs.pattern: ' $$qtavplayerlibs.pattern)
 
