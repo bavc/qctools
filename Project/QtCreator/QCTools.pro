@@ -74,5 +74,6 @@ qctools-lib.subdir = qctools-lib
 qctools-cli.subdir = qctools-cli
 qctools-gui.subdir = qctools-gui
 
+qctools-lib.depends = qctools-qtavplayer
 qctools-cli.depends = qctools-lib
-qctools-gui.depends = qctools-qtavplayer qctools-lib
+qctools-gui.depends = qctools-lib
