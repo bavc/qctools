@@ -21,7 +21,7 @@ win32 {
         }
 
         win32-g++* {
-            LIBS += -lz
+            LIBS += $${THIRD_PARTY_PATH}/zlib/lib/libzlibstatic.a
         }
     }
 
