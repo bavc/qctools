@@ -15,7 +15,7 @@ extern "C"
 #include <libavutil/frame.h>
 #include <libavutil/pixdesc.h>
 }
-#include <qavplayer.h>"
+#include <qavplayer.h>
 
 #include "tinyxml2.h"
 #include <sstream>
