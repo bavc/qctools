@@ -48,7 +48,7 @@ static FormatStats::Metadata extractMetadata(AVDictionary *tags)
 }
 
 FormatStats::FormatStats(AVFormatContext *context) :
-    filename(context != NULL ? context->url : ""),
+    filename(context != NULL && context->url != nullptr ? context->url : ""),
     nb_streams(context != NULL ? context->nb_streams : 0),
     nb_programs(context != NULL ? context->nb_programs : 0),
     format_name(context != NULL ? context->iformat->name : ""),
