@@ -29,23 +29,13 @@ static std::string rational_to_string(AVRational r, char sep) {
     return std::to_string(r.num).append(1, sep).append(std::to_string(r.den));
 }
 
-static CommonStreamStats::Metadata extractMetadata(AVDictionary *tags)
+static CommonStreamStats::Metadata extractMetadata(QMap<QString, QString> tags)
 {
     CommonStreamStats::Metadata metadata;
 
-    if (!tags)
-        return metadata;
-
-    AVDictionaryEntry *tag = NULL;
-
-    while ((tag = av_dict_get(tags, "", tag, AV_DICT_IGNORE_SUFFIX))) {
-        if(tag->key && tag->value)
-        {
-            metadata.push_back(std::pair<std::string, std::string>(tag->key, tag->value));
-        } else
-        {
-            break;
-        }
+    auto map = tags.toStdMap();
+    for(auto& pair : map) {
+        metadata.push_back(std::make_pair(pair.first.toStdString(), pair.second.toStdString()));
     }
 
     return metadata;
@@ -171,7 +161,7 @@ CommonStreamStats::CommonStreamStats(QAVStream* stream) :
     start_time(stream != NULL ? std::to_string(stream->stream()->start_time * av_q2d(stream->stream()->time_base)) : ""),
     disposition(stream ? stream->stream()->disposition : 0),
     bits_per_raw_sample(stream ? stream->stream()->codecpar->bits_per_raw_sample : 0),
-    metadata(stream ? extractMetadata(stream->stream()->metadata) : Metadata())
+    metadata(stream ? extractMetadata(stream->metadata()) : Metadata())
 {
 
 }
