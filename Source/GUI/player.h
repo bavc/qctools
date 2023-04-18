@@ -102,7 +102,13 @@ public:
                 Q_EMIT positionChanged(prevPos);
             }
         });
-        t.start();
+        connect(this, &QAVPlayer::stateChanged, [this](QAVPlayer::State state) {
+            if(state == QAVPlayer::PlayingState) {
+                t.start();
+            } else if(state == QAVPlayer::StoppedState) {
+                t.stop();
+            }
+        });
     }
 
     bool isPlaying () const {
