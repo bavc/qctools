@@ -231,7 +231,7 @@ private:
     JobTypes m_jobType;
 
     QString                     FileName;
-    size_t                      ReferenceStream_Pos;
+    size_t                      ReferenceStream_Pos {0};
     int                         Frames_Pos {0};
     int                         AudioFrames_Pos {0};
 

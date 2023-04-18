@@ -775,8 +775,6 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     if(glueFileName  == "-")
         glueFileName  = "pipe:0";
 
-    Frames_Pos=0;
-
     m_mediaParser = new QAVPlayer();
     m_mediaParser->setSource(glueFileName.c_str());
     m_mediaParser->setSynced(false);
@@ -932,7 +930,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
                 auto stat = Stats[1];
 
-                stat->TimeStampFromFrame(frame.frame(), AudioFrames_Pos);
+                stat->TimeStampFromFrame(frame.frame(), stat->x_Current);
                 stat->StatsFromFrame(frame.frame(), 0, 0);
 
                 ++AudioFrames_Pos;
@@ -948,7 +946,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                 if(frame.filterName() == "stats") {
                     auto stat = Stats[0];
 
-                    stat->TimeStampFromFrame(frame.frame(), Frames_Pos);
+                    stat->TimeStampFromFrame(frame.frame(), stat->x_Current);
                     stat->StatsFromFrame(frame.frame(), frame.size().width(), frame.size().height());
 
                     ++Frames_Pos;
@@ -1056,8 +1054,6 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         if (ReferenceStream_Pos>=Stats.size())
             Stats.clear(); //Removing all, as we can not sync with video or audio
     }
-
-    Frames_Pos=0;
 
     if(!StatsFromExternalData_IsOpen || !attachment.isEmpty())
         startParse();
