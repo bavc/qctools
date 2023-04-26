@@ -804,6 +804,10 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                 bitRate = FormatContext->bit_rate;
 
                 for(auto i = 0; i < FormatContext->nb_streams; ++i) {
+                    auto codec_type = FormatContext->streams[i]->codecpar->codec_type;
+                    if(codec_type != AVMEDIA_TYPE_VIDEO && codec_type != AVMEDIA_TYPE_AUDIO)
+                        continue;
+
                     auto streamIt = std::find_if(streams.begin(), streams.end(), [i](QAVStream& stream) {
                         return stream.stream()->index == i;
                     });
