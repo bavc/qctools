@@ -817,6 +817,11 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                         assert(false);
                         continue;
                     }
+
+                    if(streamIt->codec()->codec() == nullptr) {
+                        qDebug() << "error: codec is null for stream" << i << "... skipping";
+                        continue;
+                    }
                     orderedStreams.append(&*streamIt);
 
                     auto Duration = 0;
@@ -1712,6 +1717,9 @@ std::string FileInformation::videoFormat() const
 
     auto stream = videoStreams[0];
 
+    if(stream.codec()->codec() == nullptr)
+        return "unknown";
+
     if (stream.codec()->codec()->long_name == nullptr)
         return std::string();
 
@@ -1797,6 +1805,9 @@ std::string FileInformation::rvideoFrameRate() const
 
     auto stream = videoStreams[0];
 
+    if(stream.codec()->codec() == nullptr)
+        return "unknown";
+
     if (stream.codec()->codec()->long_name == NULL)
         return std::string();
 
@@ -1817,6 +1828,9 @@ std::string FileInformation::avgVideoFrameRate() const
         return 0;
 
     auto stream = videoStreams[0];
+
+    if(stream.codec()->codec() == nullptr)
+        return "unknown";
 
     if (stream.codec()->codec()->long_name == NULL)
         return std::string();
@@ -1883,6 +1897,9 @@ std::string FileInformation::audioFormat() const
 
     auto stream = audioStreams[0];
 
+    if(stream.codec()->codec() == nullptr)
+        return "unknown";
+
     if (stream.codec()->codec()->long_name == nullptr)
         return std::string();
 
@@ -1896,6 +1913,9 @@ std::string FileInformation::sampleFormat() const
         return std::string();
 
     auto stream = audioStreams[0];
+
+    if(stream.codec()->codec() == nullptr)
+        return "unknown";
 
     if (stream.codec()->codec()->long_name == nullptr)
         return std::string();
@@ -1936,6 +1956,9 @@ std::string FileInformation::channelLayout() const
         return std::string();
 
     auto stream = audioStreams[0];
+
+    if(stream.codec()->codec() == nullptr)
+        return "unknown";
 
     if (stream.codec()->codec()->long_name == nullptr)
         return std::string();

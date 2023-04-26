@@ -806,14 +806,16 @@ bool Plots::eventFilter( QObject *object, QEvent *event )
         QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
         if(mouseEvent->button() == Qt::LeftButton)
         {
-            showEditFrameCommentsDialog(parentWidget(), m_fileInfoData, m_fileInfoData->ReferenceStat(), framePos());
+            if(m_fileInfoData->ReferenceStat()->x_Current_Max != 0)
+                showEditFrameCommentsDialog(parentWidget(), m_fileInfoData, m_fileInfoData->ReferenceStat(), framePos());
         }
     } else if(event->type() == QEvent::KeyPress)
     {
         QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
         if(keyEvent->key() == Qt::Key_M)
         {
-            showEditFrameCommentsDialog(parentWidget(), m_fileInfoData, m_fileInfoData->ReferenceStat(), framePos());
+            if(m_fileInfoData->ReferenceStat()->x_Current_Max != 0)
+                showEditFrameCommentsDialog(parentWidget(), m_fileInfoData, m_fileInfoData->ReferenceStat(), framePos());
         }
     }
 
