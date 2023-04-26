@@ -857,12 +857,15 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
         QList<QString> filters;
         filters.append("signalstats=stat=tout+vrep+brng,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1][b1]psnr [stats]");
-        filters.append("aformat=sample_fmts=flt|fltp,astats=metadata=1:reset=1:length=0.4");
+        if(!m_mediaParser->currentAudioStreams().empty())
+            filters.append("aformat=sample_fmts=flt|fltp,astats=metadata=1:reset=1:length=0.4");
         filters.append("scale=72:72,format=rgb24 [thumbnails]");
 
-        auto codecHeight = m_mediaParser->currentVideoStreams()[0].stream()->codecpar->height;
-        qDebug() << "codec height: " << codecHeight;
-        m_panelSize.setHeight(codecHeight);
+        if(!m_mediaParser->currentVideoStreams().empty()) {
+            auto codecHeight = m_mediaParser->currentVideoStreams()[0].stream()->codecpar->height;
+            qDebug() << "codec height: " << codecHeight;
+            m_panelSize.setHeight(codecHeight);
+        }
         QSet<int> visitedStreamTypes;
 
         for(auto & streamStat : Stats)
@@ -882,9 +885,6 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                     continue;
 
                 auto sampleRate = 0;
-                if(streamType == AVMEDIA_TYPE_AUDIO) {
-                    auto audioStreamStats = (AudioStats*) streamStat;
-                }
                 auto filter = std::get<0>(activePanels[panelTitle]);
                 while(filter.indexOf(QString("${PANEL_WIDTH}")) != -1)
                     filter.replace(QString("${PANEL_WIDTH}"), QString::number(m_panelSize.width()));
