@@ -47,6 +47,7 @@ extern "C" {
 #include <QPair>
 #include <QDir>
 #include <QEventLoop>
+#include <QVideoFrame>
 #include <zlib.h>
 #include <zconf.h>
 
@@ -950,7 +951,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
             );
 
         QObject::connect(m_mediaParser, &QAVPlayer::videoFrame, m_mediaParser, [this](const QAVVideoFrame &frame) {
-                qDebug() << "video frame came from: " << frame.filterName();
+                qDebug() << "video frame came from: " << frame.filterName() << frame.stream() << "Frames_Pos = " << Frames_Pos;
 
                 if(frame.filterName() == "stats") {
                     auto stat = Stats[0];
@@ -970,7 +971,15 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                     qDebug() << "m_panelFrames[index]: " << m_panelFrames[index].size() << index;
                 }
                 else {
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+                    QVideoFrame vf = frame;
+                    QImage img = vf.toImage();
+#elif QT_VERSION > QT_VERSION_CHECK(5, 13, 0)
+                    QVideoFrame vf = frame;
+                    QImage img = vf.image();
+#else
                     QImage img(frame.frame()->data[0], frame.frame()->width, frame.frame()->height, frame.frame()->linesize[0], QImage::Format_RGB888);
+#endif //
 
                     m_thumbnails_frames.push_back(frame);
                     m_thumbnails_pixmap.push_back(QPixmap::fromImage(img));
@@ -1021,7 +1030,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         }
 
         QObject::connect(m_mediaParser, &QAVPlayer::videoFrame, m_mediaParser, [this](const QAVVideoFrame &frame) {
-                qDebug() << "video frame came from: " << frame.filterName() << frame.stream();
+                qDebug() << "video frame came from: " << frame.filterName() << frame.stream() << "Frames_Pos = " << Frames_Pos;
 
                 if(frame.stream().index() == 0) {
                     auto data = frame.frame()->data[0];
