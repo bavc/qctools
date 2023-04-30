@@ -119,6 +119,8 @@ void PreferencesDialog::Load()
     ui->Filters_Video_Deflicker->setChecked(ActiveFilters[ActiveFilter_Video_Deflicker]);
     ui->Filters_Video_Entropy->setChecked(ActiveFilters[ActiveFilter_Video_Entropy]);
     ui->Filters_Video_EntropyDiff->setChecked(ActiveFilters[ActiveFilter_Video_EntropyDiff]);
+    ui->Filters_Video_blockdetect->setChecked(ActiveFilters[ActiveFilter_Video_blockdetect]);
+    ui->Filters_Video_blurdetect->setChecked(ActiveFilters[ActiveFilter_Video_blurdetect]);
     ui->Filters_Audio_EbuR128->setChecked(ActiveFilters[ActiveFilter_Audio_EbuR128]);
     ui->Filters_Audio_aphasemeter->setChecked(ActiveFilters[ActiveFilter_Audio_aphasemeter]);
     ui->Filters_Audio_astats->setChecked(ActiveFilters[ActiveFilter_Audio_astats]);
@@ -196,6 +198,10 @@ void PreferencesDialog::OnAccepted()
         ActiveFilters.set(ActiveFilter_Video_Entropy);
     if (ui->Filters_Video_EntropyDiff->isChecked())
         ActiveFilters.set(ActiveFilter_Video_EntropyDiff);
+    if (ui->Filters_Video_blockdetect->isChecked())
+        ActiveFilters.set(ActiveFilter_Video_blockdetect);
+    if (ui->Filters_Video_blurdetect->isChecked())
+        ActiveFilters.set(ActiveFilter_Video_blurdetect);
     if (ui->Filters_Audio_EbuR128->isChecked())
         ActiveFilters.set(ActiveFilter_Audio_EbuR128);
     if (ui->Filters_Audio_aphasemeter->isChecked())

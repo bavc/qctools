@@ -88,6 +88,20 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QCheckBox" name="Filters_Video_blockdetect">
+              <property name="text">
+               <string>Block Detection (evaluation of blockiness of each frame)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="Filters_Video_blurdetect">
+              <property name="text">
+               <string>Blur Detection (evaluation of blurriness of each frame)</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
          </layout>

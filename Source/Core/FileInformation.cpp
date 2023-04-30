@@ -740,6 +740,10 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
             Filters[0]+=",entropy=mode=normal";
         if (ActiveFilters[ActiveFilter_Video_EntropyDiff])
             Filters[0]+=",entropy=mode=diff";
+        if (ActiveFilters[ActiveFilter_Video_blockdetect])
+            Filters[0]+=",blockdetect";
+        if (ActiveFilters[ActiveFilter_Video_blurdetect])
+            Filters[0]+=",blurdetect";
         if (ActiveFilters[ActiveFilter_Video_Psnr] && ActiveFilters[ActiveFilter_Video_Ssim])
         {
             Filters[0]+=",split[a][b];[a]field=top[a1];[b]field=bottom,split[b1][b2];[a1][b1]psnr[c1];[c1][b2]ssim";
