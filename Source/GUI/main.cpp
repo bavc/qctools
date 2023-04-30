@@ -24,6 +24,8 @@
 
 int main(int argc, char *argv[])
 {
+    qputenv("QT_AVPLAYER_NO_HWDEVICE", "1");
+
     QApplication a(argc, argv);
     Logging logging;
 
