@@ -103,6 +103,9 @@ enum VideoItem
     //pkt_duration_time & pkt_size
     Item_pkt_duration_time,
     Item_pkt_size,
+    // block and blur
+    Item_blockdetect,
+    Item_blurdetect,
     //Internal
     Item_VideoMax
 };
@@ -138,6 +141,8 @@ enum VideoGroup
     Group_ENTRD,
     Group_pkt_duration_time,
     Group_pkt_size,
+    Group_blockdetect,
+    Group_blurdetect,
     Group_VideoMax
 };
 
