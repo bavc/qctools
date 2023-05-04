@@ -1,3 +1,5 @@
+message('entering qctools-gui.pro')
+
 QT       += core gui network multimedia multimediawidgets
 
 #QT += avwidgets
@@ -235,3 +237,5 @@ macx:LIBS += -liconv \
              -framework CoreAudio \
              -framework CoreVideo \
              -framework VideoDecodeAcceleration
+
+message('leaving qctools-gui.pro')
