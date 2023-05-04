@@ -1,4 +1,4 @@
-QT += core gui multimedia network
+QT += core multimedia network
 #QT -= gui
 
 CONFIG += c++11

@@ -47,7 +47,6 @@ extern "C" {
 #include <QPair>
 #include <QDir>
 #include <QEventLoop>
-#include <QVideoFrame>
 #include <zlib.h>
 #include <zconf.h>
 
@@ -970,19 +969,9 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                     qDebug() << "panel frame pts: " << frame.frame()->pts;
                     qDebug() << "m_panelFrames[index]: " << m_panelFrames[index].size() << index;
                 }
-                else {
-#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
-                    QVideoFrame vf = frame;
-                    QImage img = vf.toImage();
-#elif QT_VERSION > QT_VERSION_CHECK(5, 13, 0)
-                    QVideoFrame vf = frame;
-                    QImage img = vf.image();
-#else
-                    QImage img(frame.frame()->data[0], frame.frame()->width, frame.frame()->height, frame.frame()->linesize[0], QImage::Format_RGB888);
-#endif //
-
+                else
+                {
                     m_thumbnails_frames.push_back(frame);
-                    m_thumbnails_pixmap.push_back(QPixmap::fromImage(img));
                 }
             },
             //Qt::QueuedConnection
@@ -1033,14 +1022,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                 qDebug() << "video frame came from: " << frame.filterName() << frame.stream() << "Frames_Pos = " << Frames_Pos;
 
                 if(frame.stream().index() == 0) {
-                    auto data = frame.frame()->data[0];
-                    auto width = frame.frame()->width;
-                    auto height = frame.frame()->height;
-
-                    QImage img(frame.frame()->data[0], frame.frame()->width, frame.frame()->height, frame.frame()->linesize[0], QImage::Format_RGB888);
-
                     m_thumbnails_frames.push_back(frame);
-                    m_thumbnails_pixmap.push_back(QPixmap::fromImage(img));
 
                     ++Frames_Pos;
                 } else {
@@ -1457,7 +1439,7 @@ void FileInformation::Export_QCTools_Mkv(const QString &ExportFileName, const ac
 void FileInformation::makeMkvReport(QString exportFileName, QByteArray attachment, QString attachmentFileName, const std::function<void(int, int)>& thumbnailsCallback, const std::function<void(int, int)>& panelsCallback)
 {
     FFmpegVideoEncoder encoder;
-    int thumbnailsCount = m_thumbnails_pixmap.size();
+    int thumbnailsCount = m_thumbnails_frames.size();
     int thumbnailIndex = 0;
 
     FFmpegVideoEncoder::Metadata metadata;
@@ -1482,8 +1464,8 @@ void FileInformation::makeMkvReport(QString exportFileName, QByteArray attachmen
     int codecDen = codecTimeBaseSplitted[1].toInt();
 
     source.metadata = streamMetadata;
-    source.width = m_thumbnails_pixmap.empty() ? 0 : m_thumbnails_pixmap[0].width();
-    source.height = m_thumbnails_pixmap.empty() ? 0 : m_thumbnails_pixmap[0].height();
+    source.width = m_thumbnails_frames.empty() ? 0 : m_thumbnails_frames[0].size().width();
+    source.height = m_thumbnails_frames.empty() ? 0 : m_thumbnails_frames[0].size().height();
 
     source.num = num;
     source.den = den;
@@ -1624,12 +1606,12 @@ size_t FileInformation::thumbnailsCount() {
 
 //---------------------------------------------------------------------------
 
-QPixmap FileInformation::getThumbnail(size_t pos)
+QAVVideoFrame FileInformation::getThumbnail(size_t pos)
 {
-    if (pos>=ReferenceStat()->x_Current || pos>=/*Glue->Thumbnails_Size(0)*/ m_thumbnails_pixmap.size())
-        return QPixmap();
+    if (pos>=ReferenceStat()->x_Current || pos>= m_thumbnails_frames.size())
+        return QAVVideoFrame();
 
-    return m_thumbnails_pixmap[pos];
+    return m_thumbnails_frames[pos];
 }
 
 QString FileInformation::fileName() const

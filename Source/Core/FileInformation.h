@@ -20,7 +20,6 @@
 #include <QSharedPointer>
 #include <QFileInfo>
 #include <QSize>
-#include <QPixmap>
 #include <map>
 #include <string>
 
@@ -74,7 +73,7 @@ public:
 
     size_t thumbnailsCount();
     // Infos
-    QPixmap getThumbnail(size_t pos);
+    QAVVideoFrame getThumbnail(size_t pos);
     QString	fileName() const;
 
     // extracted from FFMpeg_Glue
@@ -256,7 +255,6 @@ private:
     QVector<QVector<QAVVideoFrame>> m_panelFrames;
 
     std::vector<QAVVideoFrame> m_thumbnails_frames;
-    std::vector<QPixmap> m_thumbnails_pixmap;
 
     QAVPlayer* m_mediaParser;
 };

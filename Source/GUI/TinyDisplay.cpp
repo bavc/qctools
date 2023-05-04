@@ -133,6 +133,20 @@ QPixmap toPixmap(const QByteArray& bytes)
     return pixmap;
 }
 
+QPixmap toPixmap(QAVVideoFrame frame) {
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+    QVideoFrame vf = frame;
+    QImage img = vf.toImage();
+#elif QT_VERSION > QT_VERSION_CHECK(5, 13, 0)
+    QVideoFrame vf = frame;
+    QImage img = vf.image();
+#else
+    QImage img(frame.frame()->data[0], frame.frame()->width, frame.frame()->height, frame.frame()->linesize[0], QImage::Format_RGB888);
+#endif //
+
+    return QPixmap::fromImage(img);
+}
+
 void TinyDisplay::Update(bool updateBigDisplay)
 {
     if (!FileInfoData->ReferenceStat())
@@ -173,7 +187,7 @@ void TinyDisplay::Update(bool updateBigDisplay)
                     if (!needsUpdate && (diff < total_thumbs && i < total_thumbs - diff)) {
                         thumbnails[i]->setIcon(thumbnails[i+diff]->icon());
                     } else {
-                        QPixmap pixmap = FileInfoData->getThumbnail(framePos - center + i);
+                        QPixmap pixmap = toPixmap(FileInfoData->getThumbnail(framePos - center + i));
                         thumbnails[i]->setIcon(pixmap.copy(0, 0, 72, 72));
                     }
                 } else {
@@ -191,7 +205,7 @@ void TinyDisplay::Update(bool updateBigDisplay)
                     if (diff < total_thumbs && i - (int) diff >= 0) {
                         thumbnails[ui]->setIcon(thumbnails[ui-diff]->icon());
 					} else {
-                        QPixmap pixmap = FileInfoData->getThumbnail(framePos - center + ui);
+                        QPixmap pixmap = toPixmap(FileInfoData->getThumbnail(framePos - center + ui));
                         thumbnails[ui]->setIcon(pixmap.copy(0, 0, 72, 72));
 					}
                 } else {
