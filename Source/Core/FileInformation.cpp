@@ -647,7 +647,12 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
     if (StatsFromExternalData_FileName.size()==0)
     {
-        if (QFile::exists(FileName + dotQctoolsDotXmlDotGz))
+        if (QFile::exists(FileName + dotQctoolsDotMkv))
+        {
+            attachment = getAttachment(FileName + dotQctoolsDotMkv, StatsFromExternalData_FileName);
+            glueFileName = glueFileName + dotQctoolsDotMkv.toStdString();
+        }
+        else if (QFile::exists(FileName + dotQctoolsDotXmlDotGz))
         {
             StatsFromExternalData_FileName=FileName + dotQctoolsDotXmlDotGz;
             StatsFromExternalData_FileName_IsCompressed=true;
@@ -660,11 +665,6 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         {
             StatsFromExternalData_FileName=FileName + dotXmlDotGz;
             StatsFromExternalData_FileName_IsCompressed=true;
-        }
-        else if (QFile::exists(FileName + dotQctoolsDotMkv))
-        {
-            attachment = getAttachment(FileName + dotQctoolsDotMkv, StatsFromExternalData_FileName);
-            glueFileName = glueFileName + dotQctoolsDotMkv.toStdString();
         }
         else if (!QCvaultFileNamePrefix.isEmpty())
         {
