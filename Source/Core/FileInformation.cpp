@@ -997,9 +997,11 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         auto availableVideoStreams = m_mediaParser->availableVideoStreams();
         m_mediaParser->setVideoStreams(availableVideoStreams);
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 13, 0)
         QList<QString> filters;
         filters.append("format=rgb24");
         m_mediaParser->setFilters(filters);
+#endif //
 
         for(auto i = 0; i < availableVideoStreams.count(); ++i) {
             if(i == 0)
