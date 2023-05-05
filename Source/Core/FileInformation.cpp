@@ -976,7 +976,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
             );
 
         QObject::connect(m_mediaParser, &QAVPlayer::videoFrame, m_mediaParser, [this](const QAVVideoFrame &frame) {
-                qDebug() << "video frame came from: " << frame.filterName() << frame.stream() << frame.stream().index() << "Frames_Pos = " << Frames_Pos;
+                qDebug() << "video frame came from: " << frame.filterName() << frame.stream() << frame.stream().index();
 
                 if(frame.filterName() == "stats") {
                     auto stat = Stats[frame.stream().index()];
@@ -984,7 +984,6 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                     stat->TimeStampFromFrame(frame.frame(), stat->x_Current);
                     stat->StatsFromFrame(frame.frame(), frame.size().width(), frame.size().height());
 
-                    ++Frames_Pos;
                 } else if(frame.filterName().startsWith("panel")) {
                     auto index = frame.filterName().mid(5).toInt();
                     while(m_panelFrames.size() <= index)
