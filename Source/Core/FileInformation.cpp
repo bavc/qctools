@@ -789,9 +789,20 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
     if(!streamsStats && !formatStats)
     {
+        auto allVideoTracks = ActiveAllTracks[AVMEDIA_TYPE_VIDEO];
+        auto allAudioTracks = ActiveAllTracks[AVMEDIA_TYPE_AUDIO];
+
+        if(allVideoTracks)
+            m_mediaParser->setVideoStreams(m_mediaParser->availableVideoStreams());
+
+        if(allAudioTracks)
+            m_mediaParser->setAudioStreams(m_mediaParser->availableAudioStreams());
+
+        qDebug() << "m_mediaParser->currentVideoStreams(): " << m_mediaParser->currentVideoStreams().size();
+        qDebug() << "m_mediaParser->currentAudioStreams(): " << m_mediaParser->currentAudioStreams().size();
+
         auto streams = m_mediaParser->availableVideoStreams();
         streams.append(m_mediaParser->availableAudioStreams());
-        streams.append(m_mediaParser->availableSubtitleStreams());
 
         AVFormatContext* FormatContext = nullptr;
         if (avformat_open_input(&FormatContext, glueFileName.c_str(), NULL, NULL)>=0)
@@ -802,6 +813,9 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                 containerFormat = FormatContext->iformat->long_name;
                 streamCount = FormatContext->nb_streams;
                 bitRate = FormatContext->bit_rate;
+
+                size_t VideoPos=0;
+                size_t AudioPos=0;
 
                 for(auto i = 0; i < FormatContext->nb_streams; ++i) {
                     auto codec_type = FormatContext->streams[i]->codecpar->codec_type;
@@ -841,13 +855,19 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                             || (streamIt->stream()->time_base.num==1001 && streamIt->stream()->time_base.den>=24000 && streamIt->stream()->time_base.den<=60000)))
                         FrameCount=streamIt->stream()->duration;
 
+                    CommonStats* Stat = nullptr;
+
                     if(streamIt->stream()->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-                        auto Stat=new VideoStats(FrameCount, Duration, &*streamIt);
-                        Stats.push_back(Stat);
+                        if (!VideoPos || ActiveAllTracks[Type_Video])
+                            Stat = new VideoStats(FrameCount, Duration, &*streamIt);
+                        ++VideoPos;
                     } else if(streamIt->stream()->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-                        auto Stat=new AudioStats(FrameCount, Duration, &*streamIt);
-                        Stats.push_back(Stat);
+                        if (!AudioPos || ActiveAllTracks[Type_Audio])
+                            Stat = new AudioStats(FrameCount, Duration, &*streamIt);
+                        ++AudioPos;
                     }
+
+                    Stats.push_back(Stat);
                 }
 
                 streamsStats = new StreamsStats(orderedStreams, FormatContext);
@@ -875,6 +895,9 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
         for(auto & streamStat : Stats)
         {
+            if(streamStat == nullptr)
+                continue;
+
             auto streamType = streamStat->Type_Get();
             auto allTracks = ActiveAllTracks[streamType == AVMEDIA_TYPE_VIDEO ? Type_Video : Type_Audio];
 
@@ -935,25 +958,23 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         m_mediaParser->setFilters(filters);
 
         QObject::connect(m_mediaParser, &QAVPlayer::audioFrame, m_mediaParser, [this](const QAVAudioFrame &frame) {
-                qDebug() << "audio frame came from: " << frame.filterName();
+                qDebug() << "audio frame came from: " << frame.filterName() << frame.stream() << frame.stream().index();
 
-                auto stat = Stats[1];
+                auto stat = Stats[frame.stream().index()];
 
                 stat->TimeStampFromFrame(frame.frame(), stat->x_Current);
                 stat->StatsFromFrame(frame.frame(), 0, 0);
 
-                ++AudioFrames_Pos;
-                // nothing here
             },
             // Qt::QueuedConnection
             Qt::DirectConnection
             );
 
         QObject::connect(m_mediaParser, &QAVPlayer::videoFrame, m_mediaParser, [this](const QAVVideoFrame &frame) {
-                qDebug() << "video frame came from: " << frame.filterName() << frame.stream() << "Frames_Pos = " << Frames_Pos;
+                qDebug() << "video frame came from: " << frame.filterName() << frame.stream() << frame.stream().index() << "Frames_Pos = " << Frames_Pos;
 
                 if(frame.filterName() == "stats") {
-                    auto stat = Stats[0];
+                    auto stat = Stats[frame.stream().index()];
 
                     stat->TimeStampFromFrame(frame.frame(), stat->x_Current);
                     stat->StatsFromFrame(frame.frame(), frame.size().width(), frame.size().height());

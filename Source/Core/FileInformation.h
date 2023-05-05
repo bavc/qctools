@@ -232,7 +232,6 @@ private:
     QString                     FileName;
     size_t                      ReferenceStream_Pos {0};
     int                         Frames_Pos {0};
-    int                         AudioFrames_Pos {0};
 
     SignalServer* signalServer;
     QSharedPointer<CheckFileUploadedOperation> checkFileUploadedOperation;
