@@ -882,8 +882,13 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
         QList<QString> filters;
         filters.append("signalstats=stat=tout+vrep+brng,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1][b1]psnr [stats]");
-        if(!m_mediaParser->currentAudioStreams().empty())
-            filters.append("aformat=sample_fmts=flt|fltp,astats=metadata=1:reset=1:length=0.4");
+
+        // temporarily disable audio filter for multi-stream media files cause it breaks other filters
+        if(m_mediaParser->currentAudioStreams().size() <= 1) {
+            if(!m_mediaParser->currentAudioStreams().empty())
+                filters.append("aformat=sample_fmts=flt|fltp,astats=metadata=1:reset=1:length=0.4");
+        }
+
         filters.append("scale=72:72,format=rgb24 [thumbnails]");
 
         if(!m_mediaParser->currentVideoStreams().empty()) {
