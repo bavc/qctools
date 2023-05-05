@@ -1005,6 +1005,11 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
         QObject::connect(m_mediaParser, &QAVPlayer::mediaStatusChanged, [this](QAVPlayer::MediaStatus status) {
             if(status == QAVPlayer::EndOfMedia) {
+
+                for (size_t Pos=0; Pos<Stats.size(); Pos++)
+                    if (Stats[Pos])
+                        Stats[Pos]->StatsFinish();
+
                 m_parsed = true;
                 Q_EMIT parsingCompleted(true);
             }
