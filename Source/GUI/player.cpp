@@ -1054,30 +1054,48 @@ void Player::on_graphmonitor_checkBox_clicked(bool checked)
 
 void Player::on_goToStart_pushButton_clicked()
 {
-    qDebug() << "go to start... ";
-    m_player->seek(0);
-    qDebug() << "go to start... done. ";
+    qDebug() << "go to start... " << m_player->position();
+    SignalWaiter waiter(m_player, "seeked(qint64)");
+    waiter.wait([&]() {
+        m_player->seek(0);
+    });
+    qDebug() << "go to start... done. " << m_player->position();
+    m_player->specifyPosition(m_player->position());
 }
 
 void Player::on_goToEnd_pushButton_clicked()
 {
-    m_player->seek(m_player->duration() - 1);
+    qDebug() << "go to end... " << m_player->position();
+    SignalWaiter waiter(m_player, "seeked(qint64)");
+    waiter.wait([&]() {
+        m_player->seek(m_player->duration());
+    });
+    qDebug() << "go to end... done. " << m_player->position();
+    m_player->specifyPosition(m_player->position());
 }
 
 void Player::on_prev_pushButton_clicked()
 {
     auto newPosition = m_player->position() - 1;
-    qDebug() << "expected new position: " << newPosition;
-    qDebug() << "stepping backward...";
-    m_player->stepBackward();
+    qDebug() << "stepping backward..." << m_player->position();
+    SignalWaiter waiter(m_player, "stepped(qint64)");
+    waiter.wait([&]() {
+        m_player->stepBackward();
+    });
+    qDebug() << "stepping backward... done. " << m_player->position();
+    m_player->specifyPosition(m_player->position());
 }
 
 void Player::on_next_pushButton_clicked()
 {
     auto newPosition = m_player->position() + 1;
-    qDebug() << "expected new position: " << newPosition;
-    qDebug() << "stepping forward...";
-    m_player->stepForward();
+    qDebug() << "stepping forward..." << m_player->position();
+    SignalWaiter waiter(m_player, "stepped(qint64)");
+    waiter.wait([&]() {
+        m_player->stepForward();
+    });
+    qDebug() << "stepping forward... done. " << m_player->position();
+    m_player->specifyPosition(m_player->position());
 }
 
 void Player::on_fitToGrid_checkBox_toggled(bool checked)

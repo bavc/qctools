@@ -128,6 +128,13 @@ public:
         return m_file;
     }
 
+    void specifyPosition(qint64 pos) {
+        if(prevPos != pos) {
+            prevPos = pos;
+            Q_EMIT positionChanged(prevPos);
+        }
+    }
+
 Q_SIGNALS:
     void positionChanged(qint64);
 
