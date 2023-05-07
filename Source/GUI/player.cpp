@@ -125,6 +125,16 @@ Player::Player(QWidget *parent) :
         }
     });
 
+    connect(m_player, &QAVPlayer::mediaStatusChanged, this, [&](QAVPlayer::MediaStatus mediaStatus) {
+        qDebug() << "mediaStatus: " << mediaStatus;
+
+        if(mediaStatus == QAVPlayer::LoadedMedia) {
+            m_framesCount = m_fileInformation->VideoFrameCount_Get();
+            ui->playerSlider->setMaximum(m_player->duration());
+            qDebug() << "duration: " << m_player->duration();
+        }
+    });
+
     connect(ui->playerSlider, SIGNAL(sliderMoved(int)), SLOT(seekBySlider(int)));
     connect(ui->playerSlider, SIGNAL(sliderPressed()), SLOT(seekBySlider()));
 
@@ -139,28 +149,28 @@ Player::Player(QWidget *parent) :
     nextAction->setShortcuts({ QKeySequence(Qt::Key_Right) });
     connect(nextAction, &QAction::triggered, this, [this]() {
         ui->next_pushButton->animateClick();
-    }, Qt::UniqueConnection);
+    });
     addAction(nextAction);
 
     auto* prevAction = new QAction(this);
     prevAction->setShortcuts({ QKeySequence(Qt::Key_Left) });
     connect(prevAction, &QAction::triggered, this, [this]() {
         ui->prev_pushButton->animateClick();
-    }, Qt::UniqueConnection);
+    });
     addAction(prevAction);
 
     auto* gotostartAction = new QAction(this);
     gotostartAction->setShortcuts({ QKeySequence(Qt::CTRL + Qt::Key_Left), QKeySequence(Qt::Key_Slash) });
     connect(gotostartAction, &QAction::triggered, this, [this]() {
         ui->goToStart_pushButton->animateClick();
-    }, Qt::UniqueConnection);
+    });
     addAction(gotostartAction);
 
     auto* gotoendAction = new QAction(this);
     gotoendAction->setShortcuts({ QKeySequence(Qt::CTRL + Qt::Key_Right), QKeySequence(Qt::Key_BracketRight) });
     connect(gotoendAction, &QAction::triggered, this, [this]() {
         ui->goToEnd_pushButton->animateClick();
-    }, Qt::UniqueConnection);
+    });
     addAction(gotoendAction);
 
     connect(m_player, SIGNAL(positionChanged(qint64)), SLOT(updateSlider(qint64)));
@@ -414,16 +424,6 @@ void Player::setFile(FileInformation *fileInfo)
         m_filterSelectors[3]->selectCurrentFilterByName("Vectorscope");
 
         stopAndWait();
-
-        connect(m_player, &QAVPlayer::mediaStatusChanged, this, [&](QAVPlayer::MediaStatus mediaStatus) {
-            qDebug() << "mediaStatus: " << mediaStatus;
-
-            if(mediaStatus == QAVPlayer::LoadedMedia) {
-                m_framesCount = m_fileInformation->VideoFrameCount_Get();
-                ui->playerSlider->setMaximum(m_player->duration());
-                qDebug() << "duration: " << m_player->duration();
-            }
-        }, Qt::UniqueConnection);
 
         m_player->setFile(fileInfo->fileName());
 

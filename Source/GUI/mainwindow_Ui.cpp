@@ -71,59 +71,59 @@ void MainWindow::Ui_Init()
     QShortcut *shortcutF = new QShortcut(QKeySequence(Qt::Key_F), this);
     QObject::connect(shortcutF, SIGNAL(activated()), this, SLOT(on_Full_triggered()));
 
-    connect(ui->actionPlay_Pause, &QAction::triggered, this, [this]() {
+    connect(ui->actionPlay_Pause, &QAction::triggered, this, [this](bool checked) {
         this->PlotsArea->playerControl()->playPauseButton()->animateClick();
-    }, Qt::UniqueConnection);
+    });
 
     auto* playAction = new QAction(this);
     playAction->setShortcuts({ QKeySequence(Qt::Key_Space), QKeySequence("K") });
-    connect(playAction, &QAction::triggered, this, [this]() {
+    connect(playAction, &QAction::triggered, this, [this](bool checked) {
         this->PlotsArea->playerControl()->playPauseButton()->animateClick();
-    }, Qt::UniqueConnection);
+    });
     addAction(playAction);
 
-    connect(ui->actionNext, &QAction::triggered, [this]() {
+    connect(ui->actionNext, &QAction::triggered, [this](bool checked) {
         this->PlotsArea->playerControl()->nextFrameButton()->animateClick();
     });
 
     auto* nextAction = new QAction(this);
     nextAction->setShortcuts({ QKeySequence(Qt::Key_Right) });
-    connect(nextAction, &QAction::triggered, this, [this]() {
+    connect(nextAction, &QAction::triggered, this, [this](bool checked) {
         this->PlotsArea->playerControl()->nextFrameButton()->animateClick();
-    }, Qt::UniqueConnection);
+    });
     addAction(nextAction);
 
-    connect(ui->actionPrev, &QAction::triggered, [this]() {
+    connect(ui->actionPrev, &QAction::triggered, [this](bool checked) {
         this->PlotsArea->playerControl()->prevFrameButton()->animateClick();
     });
 
     auto* prevAction = new QAction(this);
     prevAction->setShortcuts({ QKeySequence(Qt::Key_Left) });
-    connect(prevAction, &QAction::triggered, this, [this]() {
+    connect(prevAction, &QAction::triggered, this, [this](bool checked) {
         this->PlotsArea->playerControl()->prevFrameButton()->animateClick();
-    }, Qt::UniqueConnection);
+    });
     addAction(prevAction);
 
-    connect(ui->actionGo_to_start, &QAction::triggered, [this]() {
+    connect(ui->actionGo_to_start, &QAction::triggered, [this](bool checked) {
         this->PlotsArea->playerControl()->goToStartButton()->animateClick();
     });
 
     auto* gotostartAction = new QAction(this);
     gotostartAction->setShortcuts({ QKeySequence(Qt::CTRL + Qt::Key_Left), QKeySequence(Qt::Key_Slash) });
-    connect(gotostartAction, &QAction::triggered, this, [this]() {
+    connect(gotostartAction, &QAction::triggered, this, [this](bool checked) {
         this->PlotsArea->playerControl()->goToStartButton()->animateClick();
-    }, Qt::UniqueConnection);
+    });
     addAction(gotostartAction);
 
-    connect(ui->actionGo_to_end, &QAction::triggered, [this]() {
+    connect(ui->actionGo_to_end, &QAction::triggered, [this](bool checked) {
         this->PlotsArea->playerControl()->goToEndButton()->animateClick();
     });
 
     auto* gotoendAction = new QAction(this);
     gotoendAction->setShortcuts({ QKeySequence(Qt::CTRL + Qt::Key_Right), QKeySequence(Qt::Key_BracketRight) });
-    connect(gotoendAction, &QAction::triggered, this, [this]() {
+    connect(gotoendAction, &QAction::triggered, this, [this](bool checked) {
         this->PlotsArea->playerControl()->goToEndButton()->animateClick();
-    }, Qt::UniqueConnection);
+    });
     addAction(gotoendAction);
 
     // Drag n drop
