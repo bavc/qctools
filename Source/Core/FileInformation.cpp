@@ -881,10 +881,12 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     if(attachment.isEmpty()) {
 
         QList<QString> filters;
-        filters.append("signalstats=stat=tout+vrep+brng,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1][b1]psnr [stats]");
 
-        if(!m_mediaParser->currentAudioStreams().empty())
-            filters.append("aformat=sample_fmts=flt|fltp,astats=metadata=1:reset=1:length=0.4");
+        if(!Filters[0].empty())
+            filters.append(QString("%1 [stats]").arg(QString::fromStdString(Filters[0])));
+
+        if(!Filters[1].empty() && !m_mediaParser->currentAudioStreams().empty())
+            filters.append(QString::fromStdString(Filters[1]));
 
         filters.append("scale=72:72,format=rgb24 [thumbnails]");
 
