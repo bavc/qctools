@@ -104,12 +104,19 @@ Player::Player(QWidget *parent) :
        videoFrame = frame.convertTo(AV_PIX_FMT_RGB32);
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-       if (!m_vr->m_surface->isActive() || m_vr->m_surface->surfaceFormat().frameSize() != videoFrame.size())
+       if (!m_vr->m_surface->isActive() || m_vr->m_surface->surfaceFormat().frameSize() != videoFrame.size()) {
            m_vr->m_surface->start({videoFrame.size(), videoFrame.pixelFormat(), videoFrame.handleType()});
+           updateVideoOutputSize();
+       }
        if (m_vr->m_surface->isActive())
            m_vr->m_surface->present(videoFrame);
 #else
-        m_w->videoSink()->setVideoFrame(videoFrame);
+       if(m_w->videoSink()->videoFrame().size() != videoFrame.size()) {
+           m_w->videoSink()->setVideoFrame(videoFrame);
+           updateVideoOutputSize();
+       } else {
+           m_w->videoSink()->setVideoFrame(videoFrame);
+       }
 #endif
 
    });
