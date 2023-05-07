@@ -22,52 +22,6 @@ const int DefaultSecondFilterIndex = 4;
 const int DefaultThirdFilterIndex = 0;
 const int DefaultForthFilterIndex = 0;
 
-class ScopedAction
-{
-public:
-    ScopedAction(const std::function<void()>& enterAction = {}, const std::function<void()>& leaveAction = {}) : m_enterAction(enterAction), m_leaveAction(leaveAction) {
-        if(m_enterAction)
-            m_enterAction();
-    }
-
-    ~ScopedAction() {
-        if(m_leaveAction)
-            m_leaveAction();
-    }
-
-    std::function<void()> m_enterAction;
-    std::function<void()> m_leaveAction;
-};
-
-/*
-class ScopedMute
-{
-public:
-    ScopedMute(QtAV::AVPlayer* player) : m_action(nullptr) {
-        if(player && player->audio()) {
-            m_action = new ScopedAction([this, player] {
-                if(!player->audio()->isMute()) {
-                    player->audio()->setMute(true);
-                    m_muted = true;
-                }
-            }, [this, player] {
-                if(m_muted)
-                    player->audio()->setMute(false);
-            });
-        }
-    }
-
-    ~ScopedMute() {
-        if(m_action)
-            delete m_action;
-    }
-
-private:
-    bool m_muted = {false};
-    ScopedAction* m_action;
-};
-*/
-
 Player::Player(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Player),
@@ -675,7 +629,8 @@ void Player::applyFilter()
         if(!filter)
             continue;
 
-        auto filterString = replaceFilterTokens(filter->getFilter());
+        auto rawFilter = filter->getFilter();
+        auto filterString = replaceFilterTokens(rawFilter);
         auto empty = filterString.isEmpty();
         if(!empty)
             definedFilters.append(filterString);
@@ -986,6 +941,35 @@ void Player::setFilter(const QString &filter)
     }
 }
 
+QString getPixFmtLookupValue(QString pixFormatName, int index) {
+    static QMap<QString, QStringList> pixFmtLookup = []() -> QMap<QString, QStringList> {
+        QMap<QString, QStringList> map;
+
+        QFile file(":/pixFmtLookup.csv");
+        if(file.exists()) {
+            if(file.open(QFile::ReadOnly)) {
+                QTextStream stream(&file);
+                while(!stream.atEnd()) {
+                    auto entry = stream.readLine();
+                    auto splitted = entry.split(",");
+                    if(splitted.length() == 5) {
+                        map[splitted[0]] = splitted;
+                    }
+                }
+            }
+        }
+
+        return map;
+    }();
+
+    if(pixFmtLookup.contains(pixFormatName)) {
+        auto value = pixFmtLookup[pixFormatName][index];
+        return value;
+    }
+
+    return "unk";
+}
+
 QString Player::replaceFilterTokens(const QString &filterString)
 {
     QString str = filterString;
@@ -994,6 +978,15 @@ QString Player::replaceFilterTokens(const QString &filterString)
     str.replace(QString("${height}"), QString::number(m_fileInformation->height()));
     str.replace(QString("${dar}"), QString::number(m_fileInformation->dar()));
     str.replace(QString("${pix_fmt}"), QString::fromStdString(m_fileInformation->pixFormatName()));
+    if(str.contains(QString("${pix_fmt:1}")))
+        str.replace(QString("${pix_fmt:1}"), getPixFmtLookupValue(QString::fromStdString(m_fileInformation->pixFormatName()), 1));
+    if(str.contains(QString("${pix_fmt:2}")))
+        str.replace(QString("${pix_fmt:2}"), getPixFmtLookupValue(QString::fromStdString(m_fileInformation->pixFormatName()), 2));
+    if(str.contains(QString("${pix_fmt:3}")))
+        str.replace(QString("${pix_fmt:3}"), getPixFmtLookupValue(QString::fromStdString(m_fileInformation->pixFormatName()), 3));
+    if(str.contains(QString("${pix_fmt:4}")))
+        str.replace(QString("${pix_fmt:4}"), getPixFmtLookupValue(QString::fromStdString(m_fileInformation->pixFormatName()), 4));
+
     int BitsPerRawSample = m_fileInformation->bitsPerRawSample();
     if (BitsPerRawSample == 0) {
         BitsPerRawSample = 8; //Workaround when BitsPerRawSample is unknown, we hope it is 8-bit.
