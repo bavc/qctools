@@ -753,7 +753,7 @@ void FilterSelector::FiltersList_currentIndexChanged(int FilterPos, QGridLayout*
             {
                 m_filterOptions.Radios[OptionPos][OptionPos2]=new QRadioButton();
                 m_filterOptions.Radios[OptionPos][OptionPos2]->setFont(Font);
-                int IsRGB = FileInfoData->IsRGB_Get();
+                int IsRGB = FileInfoData->isRgbSet();
                 if((strcmp(Filters[FilterPos].Name, "Histogram") == 0 || strcmp(Filters[FilterPos].Name, "Extract Planes Equalized") == 0 || strcmp(Filters[FilterPos].Name, "Value Highlight") == 0 || strcmp(Filters[FilterPos].Name, "Waveform") == 0) && IsRGB != 0)
                 {
                     switch (OptionPos2)

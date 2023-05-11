@@ -2193,11 +2193,6 @@ size_t FileInformation::VideoFrameCount_Get()
     return 0;
 }
 
-bool FileInformation::IsRGB_Get()
-{
-    return true; // 2DO!!! streamsStats->IsRGB_Get();
-}
-
 qreal FileInformation::averageFrameRate() const
 {
     /* 2DO !!!

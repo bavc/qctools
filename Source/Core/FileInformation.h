@@ -133,7 +133,6 @@ public:
     bool                        Frames_Pos_AtEnd            ();
     bool                        PlayBackFilters_Available   ();
     size_t                      VideoFrameCount_Get         ();
-    bool                        IsRGB_Get                   ();
 
     qreal                       averageFrameRate        () const;
     double                      TimeStampOfCurrentFrame () const;
