@@ -870,16 +870,6 @@ void Player::handleFilterChange(FilterSelector *filterSelector, int filterIndex)
 void Player::stopAndWait()
 {
     m_player->stop();
-
-    /*
-    {
-        PropertyWaiter<QtAV::AVPlayer::State> waiter(m_player, "QtAV::AVPlayer::State", "state", QtAV::AVPlayer::StoppedState);
-        m_player->stop();
-        waiter.wait();
-    }
-
-    QApplication::processEvents();
-    */
 }
 
 qint64 Player::timeStringToMs(const QString &timeValue)
