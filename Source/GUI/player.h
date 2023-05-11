@@ -109,6 +109,12 @@ public:
                 t.stop();
             }
         }, Qt::QueuedConnection);
+        connect(this, &QAVPlayer::mediaStatusChanged, this, [this](QAVPlayer::MediaStatus status) {
+            if(status == QAVPlayer::EndOfMedia) {
+                prevPos = position();
+                Q_EMIT positionChanged(prevPos);
+            }
+        }, Qt::QueuedConnection);
     }
 
     bool isPlaying () const {
