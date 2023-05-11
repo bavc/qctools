@@ -364,7 +364,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-                      ",extractplanes=${2},histeq=strength=${3}:intensity=${4}",
+                       "extractplanes=${2},histeq=strength=${3}:intensity=${4}",
             "il=l=d:c=d,extractplanes=${2},histeq=strength=${3}:intensity=${4}",
         },
     },

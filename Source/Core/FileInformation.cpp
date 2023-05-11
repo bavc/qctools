@@ -757,7 +757,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         if (ActiveFilters[ActiveFilter_Audio_aphasemeter])
             Filters[1]+=",aphasemeter=video=0";
         if (ActiveFilters[ActiveFilter_Audio_EbuR128])
-            Filters[1]+=",ebur128=metadata=1,aformat=sample_fmts=flt|fltp:sample_rates=${AUDIO_SAMPLE_RATE}";
+            Filters[1]+=",ebur128=metadata=1,aformat=sample_fmts=flt|fltp";
         Filters[1].erase(0, 1); // remove first comma
 
         m_panelSize.setWidth(512);

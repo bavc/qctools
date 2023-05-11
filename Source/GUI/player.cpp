@@ -984,6 +984,8 @@ QString Player::replaceFilterTokens(const QString &filterString)
         str.replace(QString("${pix_fmt:3}"), getPixFmtLookupValue(QString::fromStdString(m_fileInformation->pixFormatName()), 3));
     if(str.contains(QString("${pix_fmt:4}")))
         str.replace(QString("${pix_fmt:4}"), getPixFmtLookupValue(QString::fromStdString(m_fileInformation->pixFormatName()), 4));
+    if(str.contains(QString("${pix_fmt:5}")))
+        str.replace(QString("${pix_fmt:5}"), getPixFmtLookupValue(QString::fromStdString(m_fileInformation->pixFormatName()), 5));
 
     int BitsPerRawSample = m_fileInformation->bitsPerRawSample();
     if (BitsPerRawSample == 0) {
