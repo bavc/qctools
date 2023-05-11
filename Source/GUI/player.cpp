@@ -399,6 +399,8 @@ void Player::setFile(FileInformation *fileInfo)
         });
         m_mute = false;
 
+        updateInfoLabels();
+
         connect(m_fileInformation, &FileInformation::positionChanged, this, &Player::handleFileInformationPositionChanges);
 
     }
