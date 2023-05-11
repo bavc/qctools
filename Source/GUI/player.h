@@ -192,6 +192,8 @@ private Q_SLOTS:
 
     void on_normalScale_radioButton_toggled(bool value);
 
+    void on_freeScale_radioButton_toggled(bool value);
+
     void on_scalePercentage_spinBox_valueChanged(int value);
 
     void on_scalePercentage_horizontalSlider_valueChanged(int value);

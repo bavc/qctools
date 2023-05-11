@@ -777,6 +777,14 @@ void Player::on_normalScale_radioButton_toggled(bool value)
     }
 }
 
+void Player::on_freeScale_radioButton_toggled(bool value)
+{
+    if(value)
+    {
+        updateVideoOutputSize();
+    }
+}
+
 void Player::on_scalePercentage_spinBox_valueChanged(int value)
 {
     double multiplier = ((double) value) / 100;
