@@ -974,6 +974,7 @@ QString Player::replaceFilterTokens(const QString &filterString)
 
     str.replace(QString("${width}"), QString::number(m_fileInformation->width()));
     str.replace(QString("${height}"), QString::number(m_fileInformation->height()));
+    str.replace(QString("${framerate}"), QString::number(m_player->videoFrameRate()));
     str.replace(QString("${dar}"), QString::number(m_fileInformation->dar()));
     str.replace(QString("${pix_fmt}"), QString::fromStdString(m_fileInformation->pixFormatName()));
     if(str.contains(QString("${pix_fmt:1}")))
