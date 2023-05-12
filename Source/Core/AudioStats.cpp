@@ -12,13 +12,9 @@
 //---------------------------------------------------------------------------
 extern "C"
 {
-#ifndef INT64_C
-#define INT64_C(c) (c ## LL)
-#define UINT64_C(c) (c ## ULL)
-#endif
-
 #include <libavutil/frame.h>
 }
+#include <qavplayer.h>
 
 #include "tinyxml2.h"
 #include <sstream>
@@ -35,7 +31,7 @@ using namespace tinyxml2;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-AudioStats::AudioStats (size_t FrameCount, double Duration, AVStream* stream)
+AudioStats::AudioStats (size_t FrameCount, double Duration, QAVStream* stream)
     :
     CommonStats(AudioPerItem, Type_Audio, Group_AudioMax, Item_AudioMax, FrameCount, Duration, stream)
 {
@@ -238,7 +234,7 @@ void AudioStats::StatsFromFrame (struct AVFrame* Frame, int, int)
 
     pkt_pos[x_Current] = Frame->pkt_pos;
     pkt_size[x_Current] = Frame->pkt_size;
-    pkt_pts[x_Current] = Frame->pkt_pts;
+    pkt_pts[x_Current] = Frame->pts;
 
     if (x_Max[0]<=x[0][x_Current])
     {
@@ -263,7 +259,7 @@ void AudioStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
 
     x[0][FramePos]=FramePos;
 
-    int64_t ts=(Frame->pkt_pts == AV_NOPTS_VALUE)?Frame->pkt_dts : Frame->pkt_pts; // Using DTS is PTS is not available
+    int64_t ts=(Frame->pts == AV_NOPTS_VALUE)?Frame->pkt_dts : Frame->pts; // Using DTS is PTS is not available
     if (ts==AV_NOPTS_VALUE && FramePos)
         ts=(int64_t)((FirstTimeStamp+x[1][FramePos-1]+durations[FramePos-1])*Frequency); // If time stamp is not present, creating a fake one from last frame duration
     if (ts!=AV_NOPTS_VALUE)
@@ -291,16 +287,16 @@ void AudioStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
 
 //---------------------------------------------------------------------------
 
-string AudioStats::StatsToXML (const activefilters& filters)
+std::string AudioStats::StatsToXML (const activefilters& filters)
 {
-    stringstream Data;
+    std::stringstream Data;
 
     // Per frame (note: the XML header and footer are not created here)
     for (size_t x_Pos=0; x_Pos<x_Current; ++x_Pos)
     {
-        stringstream pkt_pts_time; pkt_pts_time<<fixed<<setprecision(7)<<(x[1][x_Pos]+FirstTimeStamp);
-        stringstream pkt_duration_time; pkt_duration_time<<fixed<<setprecision(7)<<durations[x_Pos];
-        stringstream key_frame; key_frame<< (key_frames[x_Pos]? '1' : '0');
+        std::stringstream pkt_pts_time; pkt_pts_time<<std::fixed<<std::setprecision(7)<<(x[1][x_Pos]+FirstTimeStamp);
+        std::stringstream pkt_duration_time; pkt_duration_time<<std::fixed<<std::setprecision(7)<<durations[x_Pos];
+        std::stringstream key_frame; key_frame<< (key_frames[x_Pos]? '1' : '0');
 
         Data<<"        <frame media_type=\"audio\"";
         Data << " stream_index=\"" << streamIndex << "\"";

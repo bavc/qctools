@@ -1,12 +1,9 @@
 #include "Core/StreamsStats.h"
+#include <qavstream.h>
 
 extern "C"
 {
-#ifndef INT64_C
-#define INT64_C(c) (c ## LL)
-#define UINT64_C(c) (c ## ULL)
-#endif
-
+#include <libavutil/pixdesc.h>
 #include <libavutil/rational.h>
 #include <libavutil/avutil.h>
 #include <libavformat/avformat.h>
@@ -29,19 +26,20 @@ extern "C"
 
 using namespace tinyxml2;
 
-StreamsStats::StreamsStats(AVFormatContext *context)
+StreamsStats::StreamsStats(QVector<QAVStream*> qavstreams, AVFormatContext *context)
 {
     if(context != NULL)
     {
-        for (size_t pos = 0; pos < context->nb_streams; ++pos)
+        for (size_t pos = 0; pos < qavstreams.count(); ++pos)
         {
-            switch (context->streams[pos]->codecpar->codec_type)
+            auto qavstream = qavstreams[pos];
+            switch (qavstream->stream()->codecpar->codec_type)
             {
                 case AVMEDIA_TYPE_VIDEO:
-                    streams.push_back(std::unique_ptr<VideoStreamStats>(new VideoStreamStats(context->streams[pos], context)));
+                    streams.push_back(std::unique_ptr<VideoStreamStats>(new VideoStreamStats(qavstream, context)));
                     break;
                 case AVMEDIA_TYPE_AUDIO:
-                    streams.push_back(std::unique_ptr<AudioStreamStats>(new AudioStreamStats(context->streams[pos], context)));
+                    streams.push_back(std::unique_ptr<AudioStreamStats>(new AudioStreamStats(qavstream, context)));
                     break;
                 default:
                     qDebug() << "only Audio / Video streams are supported for now.. skipping stream of index = " << pos << " and of type = " << context->streams[pos]->codecpar->codec_type;

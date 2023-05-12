@@ -6,8 +6,24 @@
 #include <QString>
 #include <QList>
 #include <functional>
+#include <memory>
 
-#include "FFmpeg_Glue.h"
+extern "C" {
+#include <libavcodec/codec_id.h>
+#include <libavformat/avformat.h>
+
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+#include <libswscale/swscale.h>
+
+#include <libavfilter/avfilter.h>
+#include <libavfilter/buffersink.h>
+#include <libavfilter/buffersrc.h>
+
+#include <libavutil/pixfmt.h>
+#include <libavutil/imgutils.h>
+#include <libavutil/ffversion.h>
+}
 
 class FFmpegVideoEncoder : public QObject
 {

@@ -13,12 +13,12 @@
 namespace tinyxml2 {
     class XMLElement;
 }
-
+class QAVStream;
 class VideoStreamStats : public CommonStreamStats
 {
 public:
     VideoStreamStats(tinyxml2::XMLElement* streamElement);
-    VideoStreamStats(AVStream* stream, AVFormatContext *context);
+    VideoStreamStats(QAVStream* stream, AVFormatContext *context);
 
     virtual void writeStreamInfoToXML(QXmlStreamWriter* writer);
 

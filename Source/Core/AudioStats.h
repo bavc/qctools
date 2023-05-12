@@ -14,10 +14,9 @@
 #include <string>
 #include <vector>
 #include <stdint.h>
-using namespace std;
 
 struct AVFrame;
-struct AVStream;
+class QAVStream;
 
 namespace tinyxml2 {
     class XMLElement;
@@ -27,7 +26,7 @@ class AudioStats : public CommonStats
 {
 public:
     // Constructor / Destructor
-    AudioStats(size_t FrameCount=0, double Duration=0, AVStream* stream = NULL);
+    AudioStats(size_t FrameCount=0, double Duration=0, QAVStream* stream = NULL);
     AudioStats(int streamIndex);
     ~AudioStats();
 
@@ -35,7 +34,7 @@ public:
     virtual void parseFrame(tinyxml2::XMLElement* frame);
     void                        StatsFromFrame(struct AVFrame* Frame, int Width, int Height);
     void                        TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos);
-    string                      StatsToXML(const activefilters& filters);
+    std::string                      StatsToXML(const activefilters& filters);
 };
 
 #endif // Stats_H

@@ -12,14 +12,10 @@
 //---------------------------------------------------------------------------
 extern "C"
 {
-#ifndef INT64_C
-#define INT64_C(c) (c ## LL)
-#define UINT64_C(c) (c ## ULL)
-#endif
-
 #include <libavutil/frame.h>
 #include <libavutil/pixdesc.h>
 }
+#include <qavplayer.h>
 
 #include "tinyxml2.h"
 #include <sstream>
@@ -35,7 +31,7 @@ using namespace tinyxml2;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-VideoStats::VideoStats (size_t FrameCount, double Duration, AVStream* stream)
+VideoStats::VideoStats (size_t FrameCount, double Duration, QAVStream* stream)
     :
     CommonStats(VideoPerItem, Type_Video, Group_VideoMax, Item_VideoMax, FrameCount, Duration, stream)
 {
@@ -261,7 +257,7 @@ void VideoStats::parseFrame(tinyxml2::XMLElement *Frame)
 
 void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
 {
-    AVDictionary * m=av_frame_get_metadata (Frame);
+    AVDictionary * m= Frame->metadata;
     AVDictionaryEntry* e=NULL;
     bool statsMapInitialized = !statsValueInfoByKeys.empty();
 
@@ -282,13 +278,13 @@ void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
             double value=std::atof(e->value);
 
             // Special cases: crop: x2, y2
-            if (string(e->key)=="lavfi.cropdetect.x2")
+            if (std::string(e->key)=="lavfi.cropdetect.x2")
                 y[j][x_Current]=Width-value;
-            else if (string(e->key)=="lavfi.cropdetect.y2")
+            else if (std::string(e->key)=="lavfi.cropdetect.y2")
                 y[j][x_Current]=Height-value;
-            else if (string(e->key)=="lavfi.cropdetect.w")
+            else if (std::string(e->key)=="lavfi.cropdetect.w")
                 y[j][x_Current]=Width-value;
-            else if (string(e->key)=="lavfi.cropdetect.h")
+            else if (std::string(e->key)=="lavfi.cropdetect.h")
                 y[j][x_Current]=Height-value;
             else
                 y[j][x_Current]=value;
@@ -342,7 +338,7 @@ void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
 
     pkt_pos[x_Current] = Frame->pkt_pos;
     pkt_size[x_Current] = Frame->pkt_size;
-    pkt_pts[x_Current] = Frame->pkt_pts;
+    pkt_pts[x_Current] = Frame->pts;
 
     y[Item_pkt_size][x_Current] = pkt_size[x_Current];
 
@@ -434,18 +430,18 @@ void VideoStats::setHeight(int height)
 }
 
 //---------------------------------------------------------------------------
-string VideoStats::StatsToXML (const activefilters& filters)
+std::string VideoStats::StatsToXML (const activefilters& filters)
 {
-    stringstream Data;
+    std::stringstream Data;
 
     // Per frame (note: the XML header and footer are not created here)
-    stringstream widthStream; widthStream<<width; // Note: we use the same value for all frame, we should later use the right value per frame
-    stringstream heightStream; heightStream<<height; // Note: we use the same value for all frame, we should later use the right value per frame
+    std::stringstream widthStream; widthStream<<width; // Note: we use the same value for all frame, we should later use the right value per frame
+    std::stringstream heightStream; heightStream<<height; // Note: we use the same value for all frame, we should later use the right value per frame
     for (size_t x_Pos=0; x_Pos<x_Current; ++x_Pos)
     {
-        stringstream pkt_pts_time; pkt_pts_time<<fixed<<setprecision(7)<<(x[1][x_Pos]+FirstTimeStamp);
-        stringstream pkt_duration_time; pkt_duration_time<<fixed<<setprecision(7)<<durations[x_Pos];
-        stringstream key_frame; key_frame<<key_frames[x_Pos]?'1':'0';
+        std::stringstream pkt_pts_time; pkt_pts_time<<std::fixed<<std::setprecision(7)<<(x[1][x_Pos]+FirstTimeStamp);
+        std::stringstream pkt_duration_time; pkt_duration_time<<std::fixed<<std::setprecision(7)<<durations[x_Pos];
+        std::stringstream key_frame; key_frame<<key_frames[x_Pos]?'1':'0';
         Data<<"        <frame media_type=\"video\"";
         Data << " stream_index=\"" << streamIndex << "\"";
 

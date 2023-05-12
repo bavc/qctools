@@ -1,3 +1,5 @@
+message('entering ffmpeg.pri')
+
 USE_BREW = $$(USE_BREW)
 
 macx:!isEmpty(USE_BREW):equals(USE_BREW, true) {
@@ -14,6 +16,8 @@ macx:!isEmpty(USE_BREW):equals(USE_BREW, true) {
     isEmpty(FFMPEG) {
         FFMPEG=$$absolute_path(../../../ffmpeg)
         message('FFMPEG: ' $$FFMPEG)
+    } else {
+        message('specified FFMPEG: ' $$FFMPEG)
     }
 
     exists($$FFMPEG/include) {
@@ -70,3 +74,5 @@ macx:!isEmpty(USE_BREW):equals(USE_BREW, true) {
     message('ffmpeg.pri INCLUDEPATH: ' $$INCLUDEPATH)
     message('ffmpeg.pri LIBS: ' $$LIBS)
 }
+
+message('leaving ffmpeg.pri')

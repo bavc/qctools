@@ -18,6 +18,12 @@ extern "C"
 #include <libavutil/imgutils.h>
 #include <libavutil/ffversion.h>
 
+#include <libavdevice/avdevice.h>
+#include <libavcodec/avcodec.h>
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(59, 0, 0)
+#include <libavcodec/bsf.h>
+#endif //
+
 #ifndef WITH_SYSTEM_FFMPEG
 #include <config.h>
 #else
@@ -33,7 +39,11 @@ extern "C"
 
 FFmpegVideoEncoder::FFmpegVideoEncoder(QObject *parent) : QObject(parent)
 {
+#if (LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58,9,100))
     av_register_all();
+    avcodec_register_all();
+#endif
+    avdevice_register_all();
 }
 
 void FFmpegVideoEncoder::setMetadata(const Metadata &metadata)
@@ -115,9 +125,6 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, const QVector<Source>& 
             qDebug() << "Could not allocate stream\n";
             return;
         }
-
-        // this seems to be needed for certain codecs, as otherwise they don't have relevant options set
-        avcodec_get_context_defaults3(videoStream->codec, videoCodec);
 
         videoStream->id = oc->nb_streams-1;
 

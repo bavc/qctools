@@ -19,13 +19,13 @@
     #include <ApplicationServices/ApplicationServices.h>
 #endif //__MACOSX__
 
-using namespace std;
-
 #include "mainwindow.h"
 #include "config.h"
 
 int main(int argc, char *argv[])
 {
+    qputenv("QT_AVPLAYER_NO_HWDEVICE", "1");
+
     QApplication a(argc, argv);
     Logging logging;
 

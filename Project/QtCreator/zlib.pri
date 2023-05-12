@@ -1,4 +1,7 @@
 win32 {
+    message("QT_INSTALL_PREFIX = " $$[QT_INSTALL_PREFIX])
+    message("3rdparty path = " $$absolute_path($$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty))
+
     exists($$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty) {
         greaterThan(QT_MINOR_VERSION, 8) || greaterThan(QT_MAJOR_VERSION, 5): {
             ZLIB_INCLUDE_PATH = $$absolute_path($$[QT_INSTALL_PREFIX]/../src/qtbase/src/3rdparty/zlib/src)
@@ -21,7 +24,7 @@ win32 {
         }
 
         win32-g++* {
-            LIBS += -lz
+            LIBS += $${THIRD_PARTY_PATH}/zlib/lib/libzlibstatic.a
         }
     }
 

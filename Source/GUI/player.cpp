@@ -1,7 +1,6 @@
 #include "player.h"
 #include "ui_player.h"
 #include "Core/FileInformation.h"
-#include "Core/FFmpeg_Glue.h"
 #include "Core/CommonStats.h"
 #include "GUI/filterselector.h"
 #include "GUI/Comments.h"
@@ -22,52 +21,6 @@ const int DefaultFirstFilterIndex = 0;
 const int DefaultSecondFilterIndex = 4;
 const int DefaultThirdFilterIndex = 0;
 const int DefaultForthFilterIndex = 0;
-
-class ScopedAction
-{
-public:
-    ScopedAction(const std::function<void()>& enterAction = {}, const std::function<void()>& leaveAction = {}) : m_enterAction(enterAction), m_leaveAction(leaveAction) {
-        if(m_enterAction)
-            m_enterAction();
-    }
-
-    ~ScopedAction() {
-        if(m_leaveAction)
-            m_leaveAction();
-    }
-
-    std::function<void()> m_enterAction;
-    std::function<void()> m_leaveAction;
-};
-
-/*
-class ScopedMute
-{
-public:
-    ScopedMute(QtAV::AVPlayer* player) : m_action(nullptr) {
-        if(player && player->audio()) {
-            m_action = new ScopedAction([this, player] {
-                if(!player->audio()->isMute()) {
-                    player->audio()->setMute(true);
-                    m_muted = true;
-                }
-            }, [this, player] {
-                if(m_muted)
-                    player->audio()->setMute(false);
-            });
-        }
-    }
-
-    ~ScopedMute() {
-        if(m_action)
-            delete m_action;
-    }
-
-private:
-    bool m_muted = {false};
-    ScopedAction* m_action;
-};
-*/
 
 Player::Player(QWidget *parent) :
     QMainWindow(parent),
@@ -105,12 +58,19 @@ Player::Player(QWidget *parent) :
        videoFrame = frame.convertTo(AV_PIX_FMT_RGB32);
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-       if (!m_vr->m_surface->isActive() || m_vr->m_surface->surfaceFormat().frameSize() != videoFrame.size())
+       if (!m_vr->m_surface->isActive() || m_vr->m_surface->surfaceFormat().frameSize() != videoFrame.size()) {
            m_vr->m_surface->start({videoFrame.size(), videoFrame.pixelFormat(), videoFrame.handleType()});
+           updateVideoOutputSize();
+       }
        if (m_vr->m_surface->isActive())
            m_vr->m_surface->present(videoFrame);
 #else
-        m_w->videoSink()->setVideoFrame(videoFrame);
+       if(m_w->videoSink()->videoFrame().size() != videoFrame.size()) {
+           m_w->videoSink()->setVideoFrame(videoFrame);
+           updateVideoOutputSize();
+       } else {
+           m_w->videoSink()->setVideoFrame(videoFrame);
+       }
 #endif
 
    });
@@ -123,6 +83,16 @@ Player::Player(QWidget *parent) :
             ui->playPause_pushButton->setIcon(QIcon(":/icon/pause.png"));
         } else {
             ui->playPause_pushButton->setIcon(QIcon(":/icon/play.png"));
+        }
+    });
+
+    connect(m_player, &QAVPlayer::mediaStatusChanged, this, [&](QAVPlayer::MediaStatus mediaStatus) {
+        qDebug() << "mediaStatus: " << mediaStatus;
+
+        if(mediaStatus == QAVPlayer::LoadedMedia) {
+            m_framesCount = m_fileInformation->VideoFrameCount_Get();
+            ui->playerSlider->setMaximum(m_player->duration());
+            qDebug() << "duration: " << m_player->duration();
         }
     });
 
@@ -140,28 +110,28 @@ Player::Player(QWidget *parent) :
     nextAction->setShortcuts({ QKeySequence(Qt::Key_Right) });
     connect(nextAction, &QAction::triggered, this, [this]() {
         ui->next_pushButton->animateClick();
-    }, Qt::UniqueConnection);
+    });
     addAction(nextAction);
 
     auto* prevAction = new QAction(this);
     prevAction->setShortcuts({ QKeySequence(Qt::Key_Left) });
     connect(prevAction, &QAction::triggered, this, [this]() {
         ui->prev_pushButton->animateClick();
-    }, Qt::UniqueConnection);
+    });
     addAction(prevAction);
 
     auto* gotostartAction = new QAction(this);
     gotostartAction->setShortcuts({ QKeySequence(Qt::CTRL + Qt::Key_Left), QKeySequence(Qt::Key_Slash) });
     connect(gotostartAction, &QAction::triggered, this, [this]() {
         ui->goToStart_pushButton->animateClick();
-    }, Qt::UniqueConnection);
+    });
     addAction(gotostartAction);
 
     auto* gotoendAction = new QAction(this);
     gotoendAction->setShortcuts({ QKeySequence(Qt::CTRL + Qt::Key_Right), QKeySequence(Qt::Key_BracketRight) });
     connect(gotoendAction, &QAction::triggered, this, [this]() {
         ui->goToEnd_pushButton->animateClick();
-    }, Qt::UniqueConnection);
+    });
     addAction(gotoendAction);
 
     connect(m_player, SIGNAL(positionChanged(qint64)), SLOT(updateSlider(qint64)));
@@ -390,7 +360,7 @@ void Player::setFile(FileInformation *fileInfo)
         m_commentsPlot = createCommentsPlot(m_fileInformation, nullptr);
         m_commentsPlot->enableAxis(QwtPlot::yLeft, false);
         m_commentsPlot->enableAxis(QwtPlot::xBottom, true);
-        m_commentsPlot->setAxisScale(QwtPlot::xBottom, 0, m_fileInformation->Glue->VideoFrameCount_Get());
+        m_commentsPlot->setAxisScale(QwtPlot::xBottom, 0, m_fileInformation->VideoFrameCount_Get());
         m_commentsPlot->setAxisAutoScale(QwtPlot::xBottom, false);
 
         m_commentsPlot->setFrameShape(QFrame::NoFrame);
@@ -416,16 +386,6 @@ void Player::setFile(FileInformation *fileInfo)
 
         stopAndWait();
 
-        connect(m_player, &QAVPlayer::mediaStatusChanged, this, [&](QAVPlayer::MediaStatus mediaStatus) {
-            qDebug() << "mediaStatus: " << mediaStatus;
-
-            if(mediaStatus == QAVPlayer::LoadedMedia) {
-                m_framesCount = m_fileInformation->Glue->VideoFrameCount_Get();
-                ui->playerSlider->setMaximum(m_player->duration());
-                qDebug() << "duration: " << m_player->duration();
-            }
-        }, Qt::UniqueConnection);
-
         m_player->setFile(fileInfo->fileName());
 
         SignalWaiter waiter(m_player, "seeked(qint64)");
@@ -438,6 +398,8 @@ void Player::setFile(FileInformation *fileInfo)
             playPaused(ms);
         });
         m_mute = false;
+
+        updateInfoLabels();
 
         connect(m_fileInformation, &FileInformation::positionChanged, this, &Player::handleFileInformationPositionChanges);
 
@@ -557,7 +519,7 @@ void Player::updateInfoLabels()
         Milliseconds=(int)(m_fileInformation->ReferenceStat()->x[1][framesPos]*1000);
     else
     {
-        double TimeStamp = m_fileInformation->Glue->TimeStampOfCurrentFrame(0);
+        double TimeStamp = m_fileInformation->TimeStampOfCurrentFrame();
         if (TimeStamp!=DBL_MAX)
             Milliseconds=(int)(TimeStamp*1000);
     }
@@ -669,7 +631,8 @@ void Player::applyFilter()
         if(!filter)
             continue;
 
-        auto filterString = replaceFilterTokens(filter->getFilter());
+        auto rawFilter = filter->getFilter();
+        auto filterString = replaceFilterTokens(rawFilter);
         auto empty = filterString.isEmpty();
         if(!empty)
             definedFilters.append(filterString);
@@ -816,6 +779,14 @@ void Player::on_normalScale_radioButton_toggled(bool value)
     }
 }
 
+void Player::on_freeScale_radioButton_toggled(bool value)
+{
+    if(value)
+    {
+        updateVideoOutputSize();
+    }
+}
+
 void Player::on_scalePercentage_spinBox_valueChanged(int value)
 {
     double multiplier = ((double) value) / 100;
@@ -901,16 +872,6 @@ void Player::handleFilterChange(FilterSelector *filterSelector, int filterIndex)
 void Player::stopAndWait()
 {
     m_player->stop();
-
-    /*
-    {
-        PropertyWaiter<QtAV::AVPlayer::State> waiter(m_player, "QtAV::AVPlayer::State", "state", QtAV::AVPlayer::StoppedState);
-        m_player->stop();
-        waiter.wait();
-    }
-
-    QApplication::processEvents();
-    */
 }
 
 qint64 Player::timeStringToMs(const QString &timeValue)
@@ -980,20 +941,61 @@ void Player::setFilter(const QString &filter)
     }
 }
 
+QString getPixFmtLookupValue(QString pixFormatName, int index) {
+    static QMap<QString, QStringList> pixFmtLookup = []() -> QMap<QString, QStringList> {
+        QMap<QString, QStringList> map;
+
+        QFile file(":/pixFmtLookup.csv");
+        if(file.exists()) {
+            if(file.open(QFile::ReadOnly)) {
+                QTextStream stream(&file);
+                while(!stream.atEnd()) {
+                    auto entry = stream.readLine();
+                    auto splitted = entry.split(",");
+                    if(splitted.length() == 5) {
+                        map[splitted[0]] = splitted;
+                    }
+                }
+            }
+        }
+
+        return map;
+    }();
+
+    if(pixFmtLookup.contains(pixFormatName)) {
+        auto value = pixFmtLookup[pixFormatName][index];
+        return value;
+    }
+
+    return "unk";
+}
+
 QString Player::replaceFilterTokens(const QString &filterString)
 {
     QString str = filterString;
 
-    str.replace(QString("${width}"), QString::number(m_fileInformation->Glue->Width_Get()));
-    str.replace(QString("${height}"), QString::number(m_fileInformation->Glue->Height_Get()));
-    str.replace(QString("${dar}"), QString::number(m_fileInformation->Glue->DAR_Get()));
-    str.replace(QString("${pix_fmt}"), QString::fromStdString(m_fileInformation->Glue->PixFormatName_Get()));
-    int BitsPerRawSample = m_fileInformation->Glue->BitsPerRawSample_Get();
+    str.replace(QString("${width}"), QString::number(m_fileInformation->width()));
+    str.replace(QString("${height}"), QString::number(m_fileInformation->height()));
+    str.replace(QString("${framerate}"), QString::number(m_player->videoFrameRate()));
+    str.replace(QString("${dar}"), QString::number(m_fileInformation->dar()));
+    str.replace(QString("${pix_fmt}"), QString::fromStdString(m_fileInformation->pixFormatName()));
+    if(str.contains(QString("${pix_fmt:1}")))
+        str.replace(QString("${pix_fmt:1}"), getPixFmtLookupValue(QString::fromStdString(m_fileInformation->pixFormatName()), 1));
+    if(str.contains(QString("${pix_fmt:2}")))
+        str.replace(QString("${pix_fmt:2}"), getPixFmtLookupValue(QString::fromStdString(m_fileInformation->pixFormatName()), 2));
+    if(str.contains(QString("${pix_fmt:3}")))
+        str.replace(QString("${pix_fmt:3}"), getPixFmtLookupValue(QString::fromStdString(m_fileInformation->pixFormatName()), 3));
+    if(str.contains(QString("${pix_fmt:4}")))
+        str.replace(QString("${pix_fmt:4}"), getPixFmtLookupValue(QString::fromStdString(m_fileInformation->pixFormatName()), 4));
+    if(str.contains(QString("${pix_fmt:5}")))
+        str.replace(QString("${pix_fmt:5}"), getPixFmtLookupValue(QString::fromStdString(m_fileInformation->pixFormatName()), 5));
+
+    int BitsPerRawSample = m_fileInformation->bitsPerRawSample();
     if (BitsPerRawSample == 0) {
         BitsPerRawSample = 8; //Workaround when BitsPerRawSample is unknown, we hope it is 8-bit.
     }
     str.replace(QString("${bitdepth}"), QString::number(BitsPerRawSample));
-    str.replace(QString("${isRGB}"), QString::number(m_fileInformation->Glue->IsRGB_Get()));
+    str.replace(QString("${isRGB}"), QString::number(m_fileInformation->isRgbSet()));
 
     QSize windowSize = ui->scrollArea->widget()->size();
 
@@ -1048,30 +1050,48 @@ void Player::on_graphmonitor_checkBox_clicked(bool checked)
 
 void Player::on_goToStart_pushButton_clicked()
 {
-    qDebug() << "go to start... ";
-    m_player->seek(0);
-    qDebug() << "go to start... done. ";
+    qDebug() << "go to start... " << m_player->position();
+    SignalWaiter waiter(m_player, "seeked(qint64)");
+    waiter.wait([&]() {
+        m_player->seek(0);
+    });
+    qDebug() << "go to start... done. " << m_player->position();
+    m_player->specifyPosition(m_player->position());
 }
 
 void Player::on_goToEnd_pushButton_clicked()
 {
-    m_player->seek(m_player->duration() - 1);
+    qDebug() << "go to end... " << m_player->position();
+    SignalWaiter waiter(m_player, "seeked(qint64)");
+    waiter.wait([&]() {
+        m_player->seek(m_player->duration());
+    });
+    qDebug() << "go to end... done. " << m_player->position();
+    m_player->specifyPosition(m_player->position());
 }
 
 void Player::on_prev_pushButton_clicked()
 {
     auto newPosition = m_player->position() - 1;
-    qDebug() << "expected new position: " << newPosition;
-    qDebug() << "stepping backward...";
-    m_player->stepBackward();
+    qDebug() << "stepping backward..." << m_player->position();
+    SignalWaiter waiter(m_player, "stepped(qint64)");
+    waiter.wait([&]() {
+        m_player->stepBackward();
+    });
+    qDebug() << "stepping backward... done. " << m_player->position();
+    m_player->specifyPosition(m_player->position());
 }
 
 void Player::on_next_pushButton_clicked()
 {
     auto newPosition = m_player->position() + 1;
-    qDebug() << "expected new position: " << newPosition;
-    qDebug() << "stepping forward...";
-    m_player->stepForward();
+    qDebug() << "stepping forward..." << m_player->position();
+    SignalWaiter waiter(m_player, "stepped(qint64)");
+    waiter.wait([&]() {
+        m_player->stepForward();
+    });
+    qDebug() << "stepping forward... done. " << m_player->position();
+    m_player->specifyPosition(m_player->position());
 }
 
 void Player::on_fitToGrid_checkBox_toggled(bool checked)

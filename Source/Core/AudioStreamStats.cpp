@@ -7,21 +7,17 @@
 //---------------------------------------------------------------------------
 #include "Core/AudioStreamStats.h"
 //---------------------------------------------------------------------------
-
+#include <qavplayer.h>
+#include <qavstream.h>
 //---------------------------------------------------------------------------
 extern "C"
 {
-#ifndef INT64_C
-#define INT64_C(c) (c ## LL)
-#define UINT64_C(c) (c ## ULL)
-#endif
-
 #include <libavutil/frame.h>
 #include <libavutil/pixdesc.h>
 #include <libavutil/bprint.h>
 #include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
 }
-
 #include "tinyxml2.h"
 #include <sstream>
 #include <iomanip>
@@ -63,12 +59,12 @@ AudioStreamStats::AudioStreamStats(XMLElement *streamElement) : CommonStreamStat
         bits_per_sample = std::stoi(bits_per_sample_value);
 }
 
-AudioStreamStats::AudioStreamStats(AVStream* stream, AVFormatContext *context) : CommonStreamStats(stream),
+AudioStreamStats::AudioStreamStats(QAVStream* stream, AVFormatContext *context) : CommonStreamStats(stream),
     sample_fmt_string(""),
-    sample_rate(stream != NULL ? stream->codecpar->sample_rate : 0),
-    channels(stream != NULL ? stream->codecpar->channels : 0),
+    sample_rate(stream != NULL ? stream->stream()->codecpar->sample_rate : 0),
+    channels(stream != NULL ? stream->stream()->codecpar->channels : 0),
     channel_layout(""),
-    bits_per_sample(stream != NULL ? av_get_bits_per_sample(stream->codecpar->codec_id) : 0)
+    bits_per_sample(stream != NULL ? av_get_bits_per_sample(stream->stream()->codecpar->codec_id) : 0)
 {
     Q_UNUSED(context);
 
@@ -77,7 +73,7 @@ AudioStreamStats::AudioStreamStats(AVStream* stream, AVFormatContext *context) :
 
     if(stream)
     {
-        sample_fmt = stream->codecpar->format;
+        sample_fmt = stream->stream()->codecpar->format;
         const char* s = av_get_sample_fmt_name((AVSampleFormat) sample_fmt);
         if (s)
             sample_fmt_string = s;
@@ -87,9 +83,9 @@ AudioStreamStats::AudioStreamStats(AVStream* stream, AVFormatContext *context) :
         AVBPrint pbuf;
         av_bprint_init(&pbuf, 1, AV_BPRINT_SIZE_UNLIMITED);
 
-        if (stream->codecpar->channel_layout) {
+        if (stream->stream()->codecpar->channel_layout) {
             av_bprint_clear(&pbuf);
-            av_bprint_channel_layout(&pbuf, stream->codecpar->channels, stream->codecpar->channel_layout);
+            av_bprint_channel_layout(&pbuf, stream->stream()->codecpar->channels, stream->stream()->codecpar->channel_layout);
             channel_layout = pbuf.str;
         } else {
             channel_layout = "unknown";

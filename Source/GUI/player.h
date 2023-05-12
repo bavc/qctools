@@ -102,7 +102,19 @@ public:
                 Q_EMIT positionChanged(prevPos);
             }
         });
-        t.start();
+        connect(this, &QAVPlayer::stateChanged, this, [this](QAVPlayer::State state) {
+            if(state == QAVPlayer::PlayingState) {
+                t.start();
+            } else if(state == QAVPlayer::StoppedState) {
+                t.stop();
+            }
+        }, Qt::QueuedConnection);
+        connect(this, &QAVPlayer::mediaStatusChanged, this, [this](QAVPlayer::MediaStatus status) {
+            if(status == QAVPlayer::EndOfMedia) {
+                prevPos = position();
+                Q_EMIT positionChanged(prevPos);
+            }
+        }, Qt::QueuedConnection);
     }
 
     bool isPlaying () const {
@@ -120,6 +132,13 @@ public:
 
     QString file() const {
         return m_file;
+    }
+
+    void specifyPosition(qint64 pos) {
+        if(prevPos != pos) {
+            prevPos = pos;
+            Q_EMIT positionChanged(prevPos);
+        }
     }
 
 Q_SIGNALS:
@@ -178,6 +197,8 @@ private Q_SLOTS:
     void on_fitToScreen_radioButton_toggled(bool value);
 
     void on_normalScale_radioButton_toggled(bool value);
+
+    void on_freeScale_radioButton_toggled(bool value);
 
     void on_scalePercentage_spinBox_valueChanged(int value);
 

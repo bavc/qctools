@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>panels.json</file>
+        <file>pixFmtLookup.csv</file>
     </qresource>
 </RCC>

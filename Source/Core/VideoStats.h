@@ -14,10 +14,9 @@
 #include <string>
 #include <vector>
 #include <stdint.h>
-using namespace std;
 
 struct AVFrame;
-struct AVStream;
+class QAVStream;
 struct AVFormatContext;
 
 namespace tinyxml2 {
@@ -28,7 +27,7 @@ class VideoStats : public CommonStats
 {
 public:
     // Constructor / Destructor
-    VideoStats(size_t FrameCount=0, double Duration=0, AVStream* stream = NULL);
+    VideoStats(size_t FrameCount=0, double Duration=0, QAVStream* stream = NULL);
     VideoStats(int streamIndex);
     ~VideoStats();
 
@@ -36,7 +35,7 @@ public:
     virtual void parseFrame(tinyxml2::XMLElement* frame);
     void                        StatsFromFrame(struct AVFrame* Frame, int Width, int Height);
     void                        TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos);
-    string                      StatsToXML(const activefilters& filters);
+    std::string                      StatsToXML(const activefilters& filters);
 
     int getWidth() const;
     void setWidth(int getWidth);

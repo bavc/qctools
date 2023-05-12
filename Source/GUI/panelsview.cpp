@@ -244,9 +244,12 @@ void PanelsView::paintEvent(QPaintEvent *e)
 
         for(auto i = startPanelIndex; i <= endPanelIndex; ++i) {
 
+            qDebug() << "getPanelsCount(): " << getPanelsCount();
             if(i < getPanelsCount())
             {
                 auto image = getPanelImage(i);
+                qDebug() << "getPanelImage: " << i << image.width() << image.height();
+
                 auto imageXOffset = ((i == startPanelIndex) ? startPanelOffset : 0);
                 auto imageWidth = ((i == endPanelIndex) ? endPanelLength : image.width());
                 auto imageHeight = image.height();

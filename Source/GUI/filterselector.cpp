@@ -1,7 +1,6 @@
 #include "filterselector.h"
 
 #include "Core/FileInformation.h"
-#include "Core/FFmpeg_Glue.h"
 #include <QButtonGroup>
 #include <QColorDialog>
 #include <QGridLayout>
@@ -266,8 +265,8 @@ std::string FilterSelector::FiltersList_currentOptionChanged(int Picture_Current
     WithSliders[1]=-2;
     WithSliders[2]=-2;
     WithSliders[3]=-2;
-    string WithRadios[Args_Max];
-    string Modified_String;
+    std::string WithRadios[Args_Max];
+    std::string Modified_String;
     for (size_t OptionPos=0; OptionPos<Args_Max; OptionPos++)
     {
         switch (Filters[Picture_Current].Args[OptionPos].Type)
@@ -278,11 +277,11 @@ std::string FilterSelector::FiltersList_currentOptionChanged(int Picture_Current
             m_previousValues[Picture_Current].Values[OptionPos]=m_filterOptions.Checks[OptionPos]->isChecked()?1:0;
 
             // Special case: "Line", max is source width or height
-            if (string(Filters[Picture_Current].Args[OptionPos].Name)=="Columns")
+            if (std::string(Filters[Picture_Current].Args[OptionPos].Name)=="Columns")
                 for (size_t OptionPos2=0; OptionPos2<Args_Max; OptionPos2++)
-                    if (Filters[Picture_Current].Args[OptionPos2].Type!=Args_Type_None && string(Filters[Picture_Current].Args[OptionPos2].Name)=="Line")
+                    if (Filters[Picture_Current].Args[OptionPos2].Type!=Args_Type_None && std::string(Filters[Picture_Current].Args[OptionPos2].Name)=="Line")
                     {
-                        m_filterOptions.Sliders_SpinBox[OptionPos2]->ChangeMax(m_filterOptions.Checks[OptionPos]->isChecked()?FileInfoData->Glue->Width_Get():FileInfoData->Glue->Height_Get());
+                        m_filterOptions.Sliders_SpinBox[OptionPos2]->ChangeMax(m_filterOptions.Checks[OptionPos]->isChecked()?FileInfoData->width():FileInfoData->height());
                         // Infinite loop in that case
                         //m_filterOptions.Sliders_SpinBox[OptionPos2]->setValue(m_filterOptions.Sliders_SpinBox[OptionPos2]->maximum()/2);
                     }
@@ -305,7 +304,7 @@ std::string FilterSelector::FiltersList_currentOptionChanged(int Picture_Current
                 {
                     WithRadios[OptionPos]=m_filterOptions.Radios[OptionPos][OptionPos2]->text().toUtf8().data();
                     size_t X_Pos=WithRadios[OptionPos].find('x');
-                    if (X_Pos!=string::npos)
+                    if (X_Pos!=std::string::npos)
                         WithRadios[OptionPos].resize(X_Pos);
                     m_previousValues[Picture_Current].Values[OptionPos]=OptionPos2;
                     break;
@@ -322,9 +321,9 @@ std::string FilterSelector::FiltersList_currentOptionChanged(int Picture_Current
             {
                 if (m_filterOptions.Radios[OptionPos][OptionPos2] && m_filterOptions.Radios[OptionPos][OptionPos2]->isChecked())
                 {
-                    if (string(Filters[Picture_Current].Name)=="Extract Planes Equalized" || string(Filters[Picture_Current].Name)=="Value Highlight")
+                    if (std::string(Filters[Picture_Current].Name)=="Extract Planes Equalized" || std::string(Filters[Picture_Current].Name)=="Value Highlight")
                     {
-                        int IsRGB = FileInfoData->Glue->IsRGB_Get();
+                        int IsRGB = FileInfoData->isRgbSet();
                         if (IsRGB != 0)
                         {
                             switch (OptionPos2)
@@ -346,7 +345,7 @@ std::string FilterSelector::FiltersList_currentOptionChanged(int Picture_Current
                             }
                         }
                     }
-                    else if (string(Filters[Picture_Current].Name)=="Bit Plane Noise" || string(Filters[Picture_Current].Name)=="Field Difference" || string(Filters[Picture_Current].Name)=="Temporal Difference" || string(Filters[Picture_Current].Name)=="Bit Plane (10 slices)")
+                    else if (std::string(Filters[Picture_Current].Name)=="Bit Plane Noise" || std::string(Filters[Picture_Current].Name)=="Field Difference" || std::string(Filters[Picture_Current].Name)=="Temporal Difference" || std::string(Filters[Picture_Current].Name)=="Bit Plane (10 slices)")
                     {
                         switch (OptionPos2)
                         {
@@ -356,7 +355,7 @@ std::string FilterSelector::FiltersList_currentOptionChanged(int Picture_Current
                         default:;
                         }
                     }
-                    else if (string(Filters[Picture_Current].Name)=="Bit Plane Noise Graph")
+                    else if (std::string(Filters[Picture_Current].Name)=="Bit Plane Noise Graph")
                     {
                         switch (OptionPos2)
                         {
@@ -472,13 +471,13 @@ std::string FilterSelector::FiltersList_currentOptionChanged(int Picture_Current
                 {
                     size_t InsertPos=Modified_String.find(ToFind2);
                     size_t BytesCount=4;
-                    if (InsertPos==string::npos)
+                    if (InsertPos==std::string::npos)
                     {
                         InsertPos=Modified_String.find(ToFind1);
-                        if (InsertPos!=string::npos)
+                        if (InsertPos!=std::string::npos)
                             BytesCount=2;
                     }
-                    if (InsertPos==string::npos)
+                    if (InsertPos==std::string::npos)
                         break;
                     Modified_String.erase(InsertPos, BytesCount);
                     Modified_String.insert(InsertPos, QString::number(WithSliders[OptionPos]).toUtf8());
@@ -508,13 +507,13 @@ std::string FilterSelector::FiltersList_currentOptionChanged(int Picture_Current
                 {
                     size_t InsertPos=Modified_String.find(ToFind2);
                     size_t BytesCount=4;
-                    if (InsertPos==string::npos)
+                    if (InsertPos==std::string::npos)
                     {
                         InsertPos=Modified_String.find(ToFind1);
-                        if (InsertPos!=string::npos)
+                        if (InsertPos!=std::string::npos)
                             BytesCount=2;
                     }
-                    if (InsertPos==string::npos)
+                    if (InsertPos==std::string::npos)
                     {
                         // Special case RGB
                         for (;;)
@@ -525,7 +524,7 @@ std::string FilterSelector::FiltersList_currentOptionChanged(int Picture_Current
                             ToFind3[2]='1'+OptionPos;
                             ToFind3[3]='\0';
                             InsertPos=Modified_String.find(ToFind3);
-                            if (InsertPos==string::npos)
+                            if (InsertPos==std::string::npos)
                                 break;
 
                             if (InsertPos+6<Modified_String.size() && (Modified_String[InsertPos+3]=='R' || Modified_String[InsertPos+3]=='G' ||Modified_String[InsertPos+3]=='B') && Modified_String[InsertPos+4]=='}')
@@ -557,9 +556,9 @@ std::string FilterSelector::FiltersList_currentOptionChanged(int Picture_Current
 
                 // Special case: removing fake "extractplanes=all,"
                 size_t RemovePos=Modified_String.find("crop=iw:256:0:all,");
-                if (RemovePos==string::npos)
+                if (RemovePos==std::string::npos)
                     RemovePos=Modified_String.find("extractplanes=all,");
-                if (RemovePos!=string::npos)
+                if (RemovePos!=std::string::npos)
                     Modified_String.erase(RemovePos, 18);
             }
                 break;
@@ -613,10 +612,10 @@ void FilterSelector::FiltersList_currentIndexChanged(int FilterPos, QGridLayout*
 
             //Special case : default for Line Select is Height/2
             if (Filters[FilterPos].Args[OptionPos].Name && std::string(Filters[FilterPos].Args[OptionPos].Name)=="Line")
-                m_previousValues[FilterPos].Values[OptionPos]=FileInfoData->Glue->Height_Get()/2;
+                m_previousValues[FilterPos].Values[OptionPos]=FileInfoData->height()/2;
             //Special case : default for Color Matrix is Width/2
             if (Filters[FilterPos].Args[OptionPos].Name && std::string(Filters[FilterPos].Args[OptionPos].Name)=="Reveal")
-                m_previousValues[FilterPos].Values[OptionPos]=FileInfoData->Glue->Width_Get()/2;
+                m_previousValues[FilterPos].Values[OptionPos]=FileInfoData->width()/2;
         }
 
         switch (Filters[FilterPos].Args[OptionPos].Type)
@@ -641,7 +640,7 @@ void FilterSelector::FiltersList_currentIndexChanged(int FilterPos, QGridLayout*
             {
                 if (MaxTemp == "Min" || MaxTemp == "Max")
                 {
-                    int BitsPerRawSample = FileInfoData->Glue->BitsPerRawSample_Get();
+                    int BitsPerRawSample = FileInfoData->bitsPerRawSample();
                     if (BitsPerRawSample == 0) {
                         BitsPerRawSample = 8; //Workaround when BitsPerRawSample is unknown, we hope it is 8-bit.
                     }
@@ -654,12 +653,12 @@ void FilterSelector::FiltersList_currentIndexChanged(int FilterPos, QGridLayout*
             } 
             else if (strcmp(Filters[FilterPos].Name, "Bit Plane") == 0 || strcmp(Filters[FilterPos].Name, "Bit Plane Noise") == 0)
             {
-                int BitsPerRawSample = FileInfoData->Glue->BitsPerRawSample_Get();
+                int BitsPerRawSample = FileInfoData->bitsPerRawSample();
                 if (BitsPerRawSample == 0) {
                     BitsPerRawSample = 8; //Workaround when BitsPerRawSample is unknown, we hope it is 8-bit.
                 }
                 Max = BitsPerRawSample;
-                int IsRGB = FileInfoData->Glue->IsRGB_Get();
+                int IsRGB = FileInfoData->isRgbSet();
                 if (IsRGB != 0) {
                     if (MaxTemp == "Y bit position" )
                         SliderName="R bit position";
@@ -674,16 +673,16 @@ void FilterSelector::FiltersList_currentIndexChanged(int FilterPos, QGridLayout*
                 {
                     bool SelectWidth = false;
                     for (size_t OptionPos2 = 0; OptionPos2 < Args_Max; OptionPos2++)
-                        if (Filters[FilterPos].Args[OptionPos2].Type != Args_Type_None && string(Filters[FilterPos].Args[OptionPos2].Name) == "Vertical")
+                        if (Filters[FilterPos].Args[OptionPos2].Type != Args_Type_None && std::string(Filters[FilterPos].Args[OptionPos2].Name) == "Vertical")
                             SelectWidth = Filters[FilterPos].Args[OptionPos2].Default ? true : false;
-                    Max = SelectWidth ? FileInfoData->Glue->Width_Get() : FileInfoData->Glue->Height_Get();
+                    Max = SelectWidth ? FileInfoData->width() : FileInfoData->height();
                 }
                 else if (MaxTemp == "x" || MaxTemp == "x offset" || MaxTemp == "Reveal" || MaxTemp == "w")
-                    Max = FileInfoData->Glue->Width_Get();
+                    Max = FileInfoData->width();
                 else if (MaxTemp == "y" || MaxTemp == "s" || MaxTemp == "h")
-                    Max = FileInfoData->Glue->Height_Get();
-                else if (MaxTemp.contains("bit position", Qt::CaseInsensitive) && FileInfoData->Glue->BitsPerRawSample_Get() != 0)
-                    Max = FileInfoData->Glue->BitsPerRawSample_Get();
+                    Max = FileInfoData->height();
+                else if (MaxTemp.contains("bit position", Qt::CaseInsensitive) && FileInfoData->bitsPerRawSample() != 0)
+                    Max = FileInfoData->bitsPerRawSample();
                 else
                     Max=Filters[FilterPos].Args[OptionPos].Max;
 
@@ -754,7 +753,7 @@ void FilterSelector::FiltersList_currentIndexChanged(int FilterPos, QGridLayout*
             {
                 m_filterOptions.Radios[OptionPos][OptionPos2]=new QRadioButton();
                 m_filterOptions.Radios[OptionPos][OptionPos2]->setFont(Font);
-                int IsRGB = FileInfoData->Glue->IsRGB_Get();
+                int IsRGB = FileInfoData->isRgbSet();
                 if((strcmp(Filters[FilterPos].Name, "Histogram") == 0 || strcmp(Filters[FilterPos].Name, "Extract Planes Equalized") == 0 || strcmp(Filters[FilterPos].Name, "Value Highlight") == 0 || strcmp(Filters[FilterPos].Name, "Waveform") == 0) && IsRGB != 0)
                 {
                     switch (OptionPos2)

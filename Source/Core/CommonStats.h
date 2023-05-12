@@ -17,11 +17,10 @@
 #include <cctype>
 #include <functional>
 #include <Core/Core.h>
-
-using namespace std;
+#include <qavplayer.h>
 
 struct AVFrame;
-struct AVStream;
+class QAVStream;
 struct per_item;
 class XMLElement;
 
@@ -33,7 +32,7 @@ class CommonStats
 {
 public:
     // Constructor / Destructor
-    CommonStats(const struct per_item* PerItem, int Type, size_t CountOfGroups, size_t CountOfItems, size_t FrameCount=0, double Duration=0, AVStream* stream = NULL);
+    CommonStats(const struct per_item* PerItem, int Type, size_t CountOfGroups, size_t CountOfItems, size_t FrameCount=0, double Duration=0, QAVStream* stream = NULL);
     virtual ~CommonStats();
 
     // Data
@@ -59,11 +58,11 @@ public:
     double                      State_Get();
 
     // Stats
-    string                      Average_Get(size_t Pos);
-    string                      Average_Get(size_t Pos, size_t Pos2);
-    string                      Count_Get(size_t Pos);
-    string                      Count2_Get(size_t Pos);
-    string                      Percent_Get(size_t Pos);
+    std::string                      Average_Get(size_t Pos);
+    std::string                      Average_Get(size_t Pos, size_t Pos2);
+    std::string                      Count_Get(size_t Pos);
+    std::string                      Count2_Get(size_t Pos);
+    std::string                      Percent_Get(size_t Pos);
 
     static void statsFromExternalData(const char* Data, size_t Size, const std::function<CommonStats*(int, size_t)>& statsGetter);
 
@@ -74,7 +73,7 @@ public:
     virtual void                StatsFromFrame(struct AVFrame* Frame, int Width, int Height) = 0;
     virtual void                TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos) = 0;
     virtual void                StatsFinish();
-    virtual string              StatsToXML(const activefilters& filters) = 0;
+    virtual std::string              StatsToXML(const activefilters& filters) = 0;
 
     struct StatsValueInfo {
         size_t index;

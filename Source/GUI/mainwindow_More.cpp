@@ -18,7 +18,6 @@
 #include <QStandardPaths>
 
 #include "Core/Core.h"
-#include "Core/FFmpeg_Glue.h"
 #include "GUI/player.h"
 #include "GUI/Plots.h"
 #include "GUI/draggablechildrenbehaviour.h"
@@ -410,7 +409,7 @@ void MainWindow::createGraphsLayout()
             image.save(fileName);
         }
 
-    }, Qt::UniqueConnection);
+    });
 
     static QIcon pauseButton(":/icon/pause.png");
     static QIcon playButton(":/icon/play.png");
@@ -421,31 +420,31 @@ void MainWindow::createGraphsLayout()
             m_playbackSimulationTimer.stop();
             PlotsArea->playerControl()->playPauseButton()->setIcon(m_playbackSimulationTimer.isActive() ? pauseButton : playButton);
         }
-    }, Qt::UniqueConnection);
+    });
 
     connect(PlotsArea->playerControl()->goToEndButton(), &QPushButton::clicked, this, [this]() {
         auto fileInfo = getCurrenFileInformation();
         fileInfo->Frames_Pos_Set(fileInfo->ReferenceStat()->x_Current_Max);
-    }, Qt::UniqueConnection);
+    });
 
     connect(PlotsArea->playerControl()->goToStartButton(), &QPushButton::clicked, this, [this]() {
         auto fileInfo = getCurrenFileInformation();
         fileInfo->Frames_Pos_Set(0);
-    }, Qt::UniqueConnection);
+    });
 
     connect(PlotsArea->playerControl()->prevFrameButton(), &QPushButton::clicked, this, [this]() {
         auto fileInfo = getCurrenFileInformation();
         fileInfo->Frames_Pos_Minus();
-    }, Qt::UniqueConnection);
+    });
 
     connect(PlotsArea->playerControl()->nextFrameButton(), &QPushButton::clicked, this, [this]() {
         auto fileInfo = getCurrenFileInformation();
         fileInfo->Frames_Pos_Plus();
-    }, Qt::UniqueConnection);
+    });
 
     connect(m_player->playPauseButton(), &QPushButton::clicked, this, [this]() {
         PlotsArea->playerControl()->playPauseButton()->setIcon(m_player->playPauseButton()->icon());
-    }, Qt::UniqueConnection);
+    });
 
     connect(PlotsArea->playerControl()->playPauseButton(), &QPushButton::clicked, this, [this]() {
         if(isFileSelected()) {
@@ -464,7 +463,7 @@ void MainWindow::createGraphsLayout()
                 m_player->playPauseButton()->animateClick();
             }
         }
-    }, Qt::UniqueConnection);
+    });
 
     auto goToTime_lineEdit = PlotsArea->playerControl()->lineEdit();
     connect(PlotsArea->playerControl()->lineEdit(), &QLineEdit::returnPressed, this, [this, goToTime_lineEdit]() {
@@ -631,7 +630,7 @@ void MainWindow::Update()
             Milliseconds=(int)(fileInfo->ReferenceStat()->x[1][framesPos]*1000);
         else
         {
-            double TimeStamp = fileInfo->Glue->TimeStampOfCurrentFrame(0);
+            double TimeStamp = fileInfo->TimeStampOfCurrentFrame();
             if (TimeStamp!=DBL_MAX)
                 Milliseconds=(int)(TimeStamp*1000);
         }

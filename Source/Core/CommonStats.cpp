@@ -11,14 +11,11 @@
 //---------------------------------------------------------------------------
 extern "C"
 {
-#ifndef INT64_C
-#define INT64_C(c) (c ## LL)
-#define UINT64_C(c) (c ## ULL)
-#endif
-
 #include <libavutil/frame.h>
 #include <libavformat/avformat.h>
 }
+#include <qavplayer.h>
+#include <qavcodec_p.h>
 
 #include "Core/Core.h"
 #include "tinyxml2.h"
@@ -34,10 +31,10 @@ using namespace tinyxml2;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t CountOfGroups_, size_t CountOfItems_, size_t FrameCount, double Duration, AVStream* stream)
+CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t CountOfGroups_, size_t CountOfItems_, size_t FrameCount, double Duration, QAVStream* stream)
     :
-    Frequency(stream ? (((double)stream->time_base.den) / stream->time_base.num) : 0),
-    streamIndex(stream ? stream->index : -1),
+    Frequency(stream ? (((double)stream->stream()->time_base.den) / stream->stream()->time_base.num) : 0),
+    streamIndex(stream ? stream->stream()->index : -1),
     Type(Type_),
     PerItem(PerItem_),
     CountOfGroups(CountOfGroups_),
@@ -221,7 +218,7 @@ void CommonStats::processAdditionalStats(const char* key, const char* value, boo
     }
 }
 
-void CommonStats::writeAdditionalStats(stringstream &stream, size_t index)
+void CommonStats::writeAdditionalStats(std::stringstream &stream, size_t index)
 {
     if(additionalIntStats) {
         for(size_t i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::Int].size(); ++i) {
@@ -399,65 +396,65 @@ void CommonStats::StatsFinish ()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-string CommonStats::Average_Get(size_t Pos)
+std::string CommonStats::Average_Get(size_t Pos)
 {
     if (x_Current == 0 || Pos >= CountOfItems) {
-        return string();
+        return std::string();
     }
 
     double Value = Stats_Totals[Pos] / x_Current;
-    stringstream str;
-    str << fixed;
-    str << setprecision(PerItem[Pos].DigitsAfterComma);
+    std::stringstream str;
+    str << std::fixed;
+    str << std::setprecision(PerItem[Pos].DigitsAfterComma);
     str << Value;
     return str.str();
 }
 
 //---------------------------------------------------------------------------
-string CommonStats::Average_Get(size_t Pos, size_t Pos2)
+std::string CommonStats::Average_Get(size_t Pos, size_t Pos2)
 {
     if (x_Current == 0 || Pos >= CountOfItems) {
-        return string();
+        return std::string();
     }
 
     double Value = (Stats_Totals[Pos] - Stats_Totals[Pos2]) / x_Current;
-    stringstream str;
-    str << fixed;
-    str << setprecision(PerItem[Pos].DigitsAfterComma);
+    std::stringstream str;
+    str << std::fixed;
+    str << std::setprecision(PerItem[Pos].DigitsAfterComma);
     str << Value;
     return str.str();
 }
 
 //---------------------------------------------------------------------------
-string CommonStats::Count_Get(size_t Pos)
+std::string CommonStats::Count_Get(size_t Pos)
 {
     if (x_Current==0)
-        return string();
+        return std::string();
 
-    stringstream str;
+    std::stringstream str;
     str<<Stats_Counts[Pos];
     return str.str();
 }
 
 //---------------------------------------------------------------------------
-string CommonStats::Count2_Get(size_t Pos)
+std::string CommonStats::Count2_Get(size_t Pos)
 {
     if (x_Current==0)
-        return string();
+        return std::string();
 
-    stringstream str;
+    std::stringstream str;
     str<<Stats_Counts2[Pos];
     return str.str();
 }
 
 //---------------------------------------------------------------------------
-string CommonStats::Percent_Get(size_t Pos)
+std::string CommonStats::Percent_Get(size_t Pos)
 {
     if (x_Current==0)
-        return string();
+        return std::string();
 
     double Value=((double)Stats_Counts[Pos])/x_Current;
-    stringstream str;
+    std::stringstream str;
     str<<Value*100<<"%";
     return str.str();
 }

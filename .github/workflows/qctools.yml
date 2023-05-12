@@ -11,8 +11,8 @@ jobs:
         compiler: ['clang-9']
         include:
           - compiler: clang-9
-            packages: llvm@9
-            env: { 'CC': 'clang-9', 'CXX': 'clang++-9' }
+            packages: llvm@13
+            env: { 'CC': 'clang', 'CXX': 'clang++' }
 
     runs-on: macos-latest
 
@@ -35,7 +35,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        brew install ${{ matrix.packages }} pkg-config qt5 ffmpeg
+        brew install ${{ matrix.packages }} pkg-config ffmpeg
 
     - name: Install qwt-qt5
       run: |
@@ -54,7 +54,7 @@ jobs:
         mkdir build
         cd build
         qmake ..
-        make -j4
+        make CC=$CC CXX=$CXX -j4
 
   build-macos-brew-Qt6:
 
@@ -114,8 +114,8 @@ jobs:
         compiler: ['clang-9']
         include:
           - compiler: clang-9
-            packages: llvm@9
-            env: { 'CC': 'clang-9', 'CXX': 'clang++-9' }
+            packages: llvm@13
+            env: { 'CC': 'clang', 'CXX': 'clang++' }
 
     runs-on: macos-latest
 
@@ -175,7 +175,7 @@ jobs:
         mkdir build
         cd build
         qmake .. 
-        make -j4
+        make CC=$CC CXX=$CXX -j4
 
   build-macos-no-brew-Qt6:
 
@@ -281,22 +281,25 @@ jobs:
         python-version: '3.7'
         architecture: 'x64'
 
-    - name: Add Clang apt repository
-      if: matrix.compiler == 'clang-9'
-      run: |
-        echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main" \
-        | sudo tee -a /etc/apt/sources.list.d/llvm.list
-        curl -L https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-        sudo apt-get update
-
     - name: Install compiler and FFmpeg dependencies
       run: |
         sudo apt-get update &&
-        sudo apt-get install -y ${{ matrix.packages }}
+        sudo apt-get install -y ${{ matrix.packages }} \
+                                libunwind-dev \
+                                libavcodec-dev \
+                                libavformat-dev \
+                                libavdevice-dev \
+                                libegl1-mesa-dev \
+                                libglew-dev \
+                                libxv-dev \
+                                libraw1394-dev \
+                                libavc1394-dev \
+                                libiec61883-dev
 
     - name: Install Qt 5.15
       uses: jurplel/install-qt-action@v2
       with:
+        arch: win64_mingw81
         version: 5.15.2
 
     - name: Cleanup
@@ -369,23 +372,25 @@ jobs:
         python-version: '3.7'
         architecture: 'x64'
 
-    - name: Add Clang apt repository
-      if: matrix.compiler == 'clang-9'
-      run: |
-        echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main" \
-        | sudo tee -a /etc/apt/sources.list.d/llvm.list
-        curl -L https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-        sudo apt-get update
-
     - name: Install compiler and FFmpeg dependencies
       run: |
         sudo apt-get update &&
-        sudo apt-get install -y ${{ matrix.packages }}
+        sudo apt-get install -y ${{ matrix.packages }} \
+                                libunwind-dev \
+                                libgstreamer-plugins-base1.0-dev \
+                                libavcodec-dev \
+                                libavformat-dev \
+                                libavdevice-dev \
+                                libegl1-mesa-dev \
+                                libglew-dev \
+                                libxkbcommon-dev \
+                                libxv-dev
 
     - name: Install Qt 6.2
       uses: jurplel/install-qt-action@v2
       with:
         version: 6.2.0
+        modules: 'addons.qtmultimedia qt5compat'
 
     - name: Cleanup
       run: |
@@ -442,6 +447,20 @@ jobs:
             -c protocol.version=2 \
             submodule update --init --force --recursive --depth=1
 
+    - name: Build and install zlib
+      shell: cmd
+      run: |
+        git clone --depth 1 https://github.com/madler/zlib ../zlib-dev
+        cd ../zlib-dev
+        mkdir build
+        cd build
+        cmake -G "Unix Makefiles" ^
+              -DCMAKE_INSTALL_PREFIX="%GITHUB_WORKSPACE%\..\zlib" ^
+              -DBUILD_SHARED_LIBS=0 ^
+              -DCMAKE_BUILD_TYPE=Release ^
+              ..
+        make install
+
     - name: Install Qt 5.15
       uses: jurplel/install-qt-action@v2
       with:
@@ -456,8 +475,8 @@ jobs:
       shell: cmd
       run: |
         cd ..
-        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "//a[contains(@href, '-gpl-shared-4.4.zip')]/@href[1]" --silent > ffmpeg.url
-        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "(//a[contains(@href, '-gpl-shared-4.4.zip')])[1]/substring(., 0, string-length(.) - 3)" --silent > ffmpeg.name
+        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "//a[contains(@href, '-gpl-shared.zip')]/@href[1]" --silent > ffmpeg.url
+        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "(//a[contains(@href, '-gpl-shared.zip')])[1]/substring(., 0, string-length(.) - 3)" --silent > ffmpeg.name
         set /P FFMPEG_URL=< ffmpeg.url
         set /P FFMPEG_NAME=< ffmpeg.name
         wget https://github.com%FFMPEG_URL%
@@ -509,11 +528,26 @@ jobs:
             -c protocol.version=2 \
             submodule update --init --force --recursive --depth=1
 
+    - name: Build and install zlib
+      shell: cmd
+      run: |
+        git clone --depth 1 https://github.com/madler/zlib ../zlib-dev
+        cd ../zlib-dev
+        mkdir build
+        cd build
+        cmake -G "Unix Makefiles" ^
+              -DCMAKE_INSTALL_PREFIX="%GITHUB_WORKSPACE%\..\zlib" ^
+              -DBUILD_SHARED_LIBS=0 ^
+              -DCMAKE_BUILD_TYPE=Release ^
+              ..
+        make install
+
     - name: Install Qt 6.2
       uses: jurplel/install-qt-action@v2
       with:
         arch: win64_mingw81
         version: 6.2.0
+        modules: 'addons.qtmultimedia'
 
     - name: Install wget & unzip
       run: |
@@ -523,8 +557,8 @@ jobs:
       shell: cmd
       run: |
         cd ..
-        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "//a[contains(@href, '-gpl-shared-4.4.zip')]/@href[1]" --silent > ffmpeg.url
-        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "(//a[contains(@href, '-gpl-shared-4.4.zip')])[1]/substring(., 0, string-length(.) - 3)" --silent > ffmpeg.name
+        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "//a[contains(@href, '-gpl-shared.zip')]/@href[1]" --silent > ffmpeg.url
+        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "(//a[contains(@href, '-gpl-shared.zip')])[1]/substring(., 0, string-length(.) - 3)" --silent > ffmpeg.name
         set /P FFMPEG_URL=< ffmpeg.url
         set /P FFMPEG_NAME=< ffmpeg.name
         wget https://github.com%FFMPEG_URL%
@@ -608,8 +642,8 @@ jobs:
       shell: cmd
       run: |
         cd ..
-        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "//a[contains(@href, '-gpl-shared-4.4.zip')]/@href[1]" --silent > ffmpeg.url
-        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "(//a[contains(@href, '-gpl-shared-4.4.zip')])[1]/substring(., 0, string-length(.) - 3)" --silent > ffmpeg.name
+        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "//a[contains(@href, '-gpl-shared.zip')]/@href[1]" --silent > ffmpeg.url
+        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "(//a[contains(@href, '-gpl-shared.zip')])[1]/substring(., 0, string-length(.) - 3)" --silent > ffmpeg.name
         set /P FFMPEG_URL=< ffmpeg.url
         set /P FFMPEG_NAME=< ffmpeg.name
         wget https://github.com%FFMPEG_URL%
@@ -620,6 +654,7 @@ jobs:
     - name: Download and configure qwt
       run: |
         git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        copy .github\workflows\qwtconfig.pri ..\qwt
         cd ../qwt
         qmake -r
 
@@ -682,7 +717,8 @@ jobs:
     - name: Install Qt 6.2
       uses: jurplel/install-qt-action@v2
       with: 
-        version: 6.2
+        version: 6.2.0
+        modules: 'addons.qtmultimedia'
 
     - name: Install wget & unzip
       run: |
@@ -692,8 +728,8 @@ jobs:
       shell: cmd
       run: |
         cd ..
-        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "//a[contains(@href, '-gpl-shared-4.4.zip')]/@href[1]" --silent > ffmpeg.url
-        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "(//a[contains(@href, '-gpl-shared-4.4.zip')])[1]/substring(., 0, string-length(.) - 3)" --silent > ffmpeg.name
+        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "//a[contains(@href, '-gpl-shared.zip')]/@href[1]" --silent > ffmpeg.url
+        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "(//a[contains(@href, '-gpl-shared.zip')])[1]/substring(., 0, string-length(.) - 3)" --silent > ffmpeg.name
         set /P FFMPEG_URL=< ffmpeg.url
         set /P FFMPEG_NAME=< ffmpeg.name
         wget https://github.com%FFMPEG_URL%
@@ -704,6 +740,7 @@ jobs:
     - name: Download and configure qwt
       run: |
         git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        copy .github\workflows\qwtconfig.pri ..\qwt
         cd ../qwt
         qmake -r
 

@@ -1,13 +1,10 @@
 TARGET = QtAVPlayer
 MODULE = QtAVPlayer
 
-QT = multimedia concurrent
-equals(QT_MAJOR_VERSION, 6): QT += multimedia-private
-QT_PRIVATE += gui-private
-
 INCLUDEPATH += $$absolute_path($$PWD/..)
-message ("INCLUDEPATH: " $$INCLUDEPATH)
+QT = concurrent
 
+CONFIG += C++1z
 #QMAKE_USE += ffmpeg
 
 PRIVATE_HEADERS += \
@@ -37,7 +34,8 @@ PRIVATE_HEADERS += \
     qavaudioinputfilter_p.h \ 
     qavvideooutputfilter_p.h \
     qavaudiooutputfilter_p.h \
-    qaviodevice_p.h
+    qaviodevice_p.h \
+    qavfilters_p.h
 
 PUBLIC_HEADERS += \
     qavaudioformat.h \
@@ -47,12 +45,10 @@ PUBLIC_HEADERS += \
     qavaudioframe.h \
     qavsubtitleframe.h \
     qtavplayerglobal.h \
-    qavaudiooutput.h \
     qavstream.h \
     qavplayer.h
 
 SOURCES += \
-    qavaudiooutput.cpp \
     qavplayer.cpp \
     qavcodec.cpp \
     qavframecodec.cpp \
@@ -78,16 +74,25 @@ SOURCES += \
     qavvideooutputfilter.cpp \
     qavaudiooutputfilter.cpp \
     qaviodevice.cpp \
-    qavstream.cpp
+    qavstream.cpp \
+    qavfilters.cpp
 
-qtConfig(va_x11):qtConfig(opengl): {
-    QMAKE_USE += va_x11 x11
+qtConfig(multimedia) {
+    QT += multimedia
+    # Needed for QAbstractVideoBuffer
+    equals(QT_MAJOR_VERSION, 6): QT += multimedia-private
+    HEADERS += qavaudiooutput.h
+    SOURCES += qavaudiooutput.cpp
+}
+
+qtConfig(va_x11):qtConfig(opengl) {
+    QMAKE_USE += va_x11 x11 opengl
     PRIVATE_HEADERS += qavhwdevice_vaapi_x11_glx_p.h
     SOURCES += qavhwdevice_vaapi_x11_glx.cpp
 }
 
-qtConfig(va_drm):qtConfig(egl): {
-    QMAKE_USE += va_drm egl
+qtConfig(va_drm):qtConfig(egl) {
+    QMAKE_USE += va_drm egl opengl
     PRIVATE_HEADERS += qavhwdevice_vaapi_drm_egl_p.h
     SOURCES += qavhwdevice_vaapi_drm_egl.cpp
 }
@@ -103,11 +108,16 @@ win32 {
     SOURCES += qavhwdevice_d3d11.cpp
 }
 
+qtConfig(vdpau) {
+    PRIVATE_HEADERS += qavhwdevice_vdpau_p.h
+    SOURCES += qavhwdevice_vdpau.cpp
+}
+
 android {
     PRIVATE_HEADERS += qavhwdevice_mediacodec_p.h
     SOURCES += qavhwdevice_mediacodec.cpp
 
-    LIBS += -lavcodec -lavformat -lswscale -lavutil -lswresample
+    LIBS += -lavdevice -lavformat -lavutil -lavcodec -lavfilter -lswscale  -lswresample
     equals(ANDROID_TARGET_ARCH, armeabi-v7a): \
         LIBS += -L$$(AVPLAYER_ANDROID_LIB_ARMEABI_V7A)
 

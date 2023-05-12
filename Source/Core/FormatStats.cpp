@@ -48,7 +48,7 @@ static FormatStats::Metadata extractMetadata(AVDictionary *tags)
 }
 
 FormatStats::FormatStats(AVFormatContext *context) :
-    filename(context != NULL ? context->filename : ""),
+    filename(context != NULL && context->url != nullptr ? context->url : ""),
     nb_streams(context != NULL ? context->nb_streams : 0),
     nb_programs(context != NULL ? context->nb_programs : 0),
     format_name(context != NULL ? context->iformat->name : ""),
@@ -57,7 +57,7 @@ FormatStats::FormatStats(AVFormatContext *context) :
     duration(context != NULL ? std::to_string( (context->duration * av_q2d( {1, AV_TIME_BASE} )) ) : ""),
     size(context != NULL ? (context->pb ? avio_size(context->pb) : -1) : -1),
     bit_rate(context != NULL ? (context->bit_rate > 0 ? context->bit_rate : -1) : -1),
-    probe_score(context != NULL ? (av_format_get_probe_score(context)) : 0),
+    probe_score(context != NULL ? context->probe_score : 0),
     metadata(context != NULL ? (extractMetadata(context->metadata)) : Metadata())
 {
 

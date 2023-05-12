@@ -9,7 +9,6 @@
 #include "ui_mainwindow.h"
 #include "Core/Core.h"
 #include "Core/CommonStats.h"
-#include "Core/FFmpeg_Glue.h"
 #include "GUI/Plots.h"
 
 #include <QFileDialog>
@@ -61,7 +60,7 @@ void MainWindow::TimeOut ()
     bool DeckRunning_New=false;
 
     // Status
-    stringstream Message_Total;
+    std::stringstream Message_Total;
     int Files_Completed=0;
     if (Files.size()>1)
     {
@@ -84,16 +83,6 @@ void MainWindow::TimeOut ()
             else
                 Message_Total<<"100%";
         }
-
-        //Thumbnails_Modulo
-        if (VideoFrameCount_Total / Thumbnails_Modulo > 512*1024) //Arbitrary value
-        {
-            for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
-            {
-                Thumbnails_Modulo<<=1;
-                Files[Files_Pos]->Glue->Thumbnails_Modulo_Change(Thumbnails_Modulo);
-            }
-        }
     }
     for (size_t Files_Pos=0; Files_Pos<Files.size(); Files_Pos++)
     {
@@ -109,7 +98,7 @@ void MainWindow::TimeOut ()
         {
             qDebug() << "reading stats.... ";
 
-            stringstream Message;
+            std::stringstream Message;
             Message<<"Parsing frame "<<Stats->x_Current;
             if (Stats->x_Current_Max)
                 Message<<"/"<<Stats->x_Current_Max<<" ("<<(int)((double)Stats->x_Current)*100/Stats->x_Current_Max<<"%)";

@@ -1,5 +1,7 @@
-QT += core network
-QT -= gui
+message('entering qctools-cli.pro')
+
+QT += core multimedia network
+#QT -= gui
 
 CONFIG += c++11
 
@@ -32,7 +34,6 @@ THIRD_PARTY_PATH = $$absolute_path($$SOURCES_PATH/../..)
 message("qctools: THIRD_PARTY_PATH = " $$absolute_path($$THIRD_PARTY_PATH))
 
 INCLUDEPATH += $$SOURCES_PATH
-include(../ffmpeg.pri)
 
 HEADERS += $$SOURCES_PATH/Cli/version.h \
            $$SOURCES_PATH/Cli/cli.h
@@ -79,3 +80,14 @@ macx:LIBS += -liconv \
 
 HEADERS += \
     version.h
+
+message('qctools-lib: including ffmpeg')
+include(../ffmpeg.pri)
+
+QTAVPLAYER_SRC=$$absolute_path(../qctools-QtAVPlayer)
+QTAVPLAYER_LIB=$$absolute_path($$OUT_PWD/../qctools-QtAVPlayer)
+
+message('using UseQtAVPlayerLib')
+include(../qctools-QtAVPlayer/UseQtAVPlayerLib.pri)
+
+message('leaving qctools-cli.pro')

@@ -1,4 +1,4 @@
-QT = core network
+QT = core network multimedia concurrent
 
 TARGET = qctools
 TEMPLATE = lib
@@ -27,7 +27,6 @@ HEADERS = \
     $$SOURCES_PATH/Core/AudioStats.h \
     $$SOURCES_PATH/Core/CommonStats.h \
     $$SOURCES_PATH/Core/Core.h \
-    $$SOURCES_PATH/Core/FFmpeg_Glue.h \
     $$SOURCES_PATH/Core/VideoCore.h \
     $$SOURCES_PATH/Core/VideoStats.h \
     $$SOURCES_PATH/Core/FormatStats.h \
@@ -50,7 +49,6 @@ SOURCES = \
     $$SOURCES_PATH/Core/AudioStats.cpp \
     $$SOURCES_PATH/Core/CommonStats.cpp \
     $$SOURCES_PATH/Core/Core.cpp \
-    $$SOURCES_PATH/Core/FFmpeg_Glue.cpp \
     $$SOURCES_PATH/Core/VideoCore.cpp \
     $$SOURCES_PATH/Core/VideoStats.cpp \
     $$SOURCES_PATH/Core/FormatStats.cpp \
@@ -71,3 +69,8 @@ include($$SOURCES_PATH/ThirdParty/qblowfish/qblowfish.pri)
 
 RESOURCES += \
     $$SOURCES_PATH/Core/coreresources.qrc
+
+QTAVPLAYER_SRC=$$absolute_path(../qctools-QtAVPlayer)
+QTAVPLAYER_LIB=$$absolute_path($$OUT_PWD/../qctools-QtAVPlayer)
+
+INCLUDEPATH += $$absolute_path($$QTAVPLAYER_SRC/src) $$absolute_path($$QTAVPLAYER_SRC/src/QtAVPlayer)

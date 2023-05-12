@@ -20,12 +20,22 @@
 #include <QSharedPointer>
 #include <QFileInfo>
 #include <QSize>
+#include <map>
+#include <string>
+
+class QAVVideoFrame;
 class CommonStats;
 class StreamsStats;
 class FormatStats;
-class FFmpeg_Glue;
 
 typedef QSharedPointer<QFile> SharedFile;
+class QAVPlayer;
+
+std::string FFmpeg_Version();
+int FFmpeg_Year();
+std::string FFmpeg_Compiler();
+std::string FFmpeg_Configuration();
+std::string FFmpeg_LibsVersion();
 
 //---------------------------------------------------------------------------
 class FileInformation : public QThread
@@ -33,7 +43,6 @@ class FileInformation : public QThread
     //thread part
     Q_OBJECT
     void run();
-    void runParse();
     void runExport();
 
 public:
@@ -60,16 +69,62 @@ public:
     // Dumps
     void                        Export_XmlGz                (const QString &ExportFileName, const activefilters& filters);
     void                        Export_QCTools_Mkv          (const QString &ExportFileName, const activefilters& filters);
+    void makeMkvReport(QString exportFileName, QByteArray attachment, QString attachmentFileName, const std::function<void(int, int)>& thumbnailsCallback = {}, const std::function<void(int, int)>& panelsCallback = {});
 
+    size_t thumbnailsCount();
     // Infos
-    QByteArray Picture_Get (size_t Pos);
+    QAVVideoFrame getThumbnail(size_t pos);
     QString	fileName() const;
+
+    // extracted from FFMpeg_Glue
+    int width() const;
+    int height() const;
+    int bitsPerRawSample() const;
+    double dar() const;
+    std::string pixFormatName() const;
+    int isRgbSet() const;
+
+    std::string containerFormat;
+    int streamCount { 0 };
+    int bitRate { 0 };
+
+    double duration() const;
+    std::string videoFormat() const;
+    std::string fieldOrder() const;
+    std::string sar() const;
+
+    struct FrameRate {
+        FrameRate(int  num, int den) : num(num), den(den) {}
+
+        int num;
+        int den;
+
+        double value() {
+            return double(num) / den;
+        }
+
+        bool isValid() const {
+            return num > 0 && den > 0;
+        }
+    };
+
+    FrameRate getAvgVideoFrameRate() const;
+    double framesDivDuration() const;
+    std::string rvideoFrameRate() const;
+    std::string avgVideoFrameRate() const;
+    std::string colorSpace() const;
+    std::string colorRange() const;
+    std::string audioFormat() const;
+    std::string sampleFormat() const;
+    double samplingRate() const;
+    std::string channelLayout() const;
+    double abitDepth() const;
 
     activefilters               ActiveFilters;
     activealltracks             ActiveAllTracks;
 
     size_t                      ReferenceStream_Pos_Get     () const {return ReferenceStream_Pos;}
-    int                         Frames_Count_Get            (size_t Stats_Pos=(size_t)-1);
+    int                         Frames_Count_Get            (size_t Stats_Pos=(size_t)-1) const;
     int                         Frames_Pos_Get              (size_t Stats_Pos=(size_t)-1);
     QString                     Frame_Type_Get              (size_t Stats_Pos=(size_t)-1, size_t frameIndex = (size_t)-1) const;
     void                        Frames_Pos_Set              (int Frames_Pos, size_t Stats_Pos=(size_t)-1);
@@ -77,13 +132,13 @@ public:
     bool                        Frames_Pos_Plus             ();
     bool                        Frames_Pos_AtEnd            ();
     bool                        PlayBackFilters_Available   ();
+    size_t                      VideoFrameCount_Get         ();
 
     qreal                       averageFrameRate        () const;
+    double                      TimeStampOfCurrentFrame () const;
+
 
     bool isValid() const;
-
-    // FFmpeg glue
-    FFmpeg_Glue*                Glue;
 
     std::vector<CommonStats*>   Stats;
 
@@ -139,6 +194,10 @@ public:
 
     QSize panelSize() const;
     const QMap<std::string, QVector<int>>& panelOutputsByTitle() const;
+    const std::map<std::string, std::string> & getPanelOutputMetadata(size_t index) const;
+    size_t getPanelFramesCount(size_t index) const;
+    QAVVideoFrame getPanelFrame(size_t index, size_t panelFrameIndex) const;
+
 public Q_SLOTS:
 
     void checkFileUploaded(const QString& fileName);
@@ -170,11 +229,8 @@ private:
     JobTypes m_jobType;
 
     QString                     FileName;
-    size_t                      ReferenceStream_Pos;
-    int                         Frames_Pos;
-
-    // FFmpeg part
-    bool                        WantToStop;
+    size_t                      ReferenceStream_Pos {0};
+    int                         Frames_Pos {0};
 
     SignalServer* signalServer;
     QSharedPointer<CheckFileUploadedOperation> checkFileUploadedOperation;
@@ -193,6 +249,12 @@ private:
     activefilters m_exportFilters;
 
     QMap<std::string, QVector<int>> m_panelOutputsByTitle;
+    QVector<std::map<std::string, std::string>> m_panelMetadata;
+    QVector<QVector<QAVVideoFrame>> m_panelFrames;
+
+    std::vector<QAVVideoFrame> m_thumbnails_frames;
+
+    QAVPlayer* m_mediaParser;
 };
 
 #endif // GUI_FileInformation_H

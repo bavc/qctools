@@ -1,4 +1,6 @@
 TEMPLATE = subdirs
+message('entering QCTools.pro')
+message('QCTools.pro INCLUDEPATH: ' $$INCLUDEPATH)
 
 USE_BREW = $$(USE_BREW)
 !isEmpty(USE_BREW):equals(USE_BREW, true) {
@@ -74,5 +76,8 @@ qctools-lib.subdir = qctools-lib
 qctools-cli.subdir = qctools-cli
 qctools-gui.subdir = qctools-gui
 
+qctools-lib.depends = qctools-qtavplayer
 qctools-cli.depends = qctools-lib
-qctools-gui.depends = qctools-qtavplayer qctools-lib
+qctools-gui.depends = qctools-lib
+
+message('leaving QCTools.pro')

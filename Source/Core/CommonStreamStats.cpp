@@ -7,20 +7,15 @@
 //---------------------------------------------------------------------------
 #include "Core/CommonStreamStats.h"
 //---------------------------------------------------------------------------
-
+#include <qavplayer.h>
+#include <qavstream.h>
+#include <qavcodec_p.h>
 //---------------------------------------------------------------------------
 extern "C"
 {
-#ifndef INT64_C
-#define INT64_C(c) (c ## LL)
-#define UINT64_C(c) (c ## ULL)
-#endif
-
 #include <libavutil/frame.h>
 #include <libavformat/avformat.h>
 }
-
-#include "Core/Core.h"
 #include "tinyxml2.h"
 #include <sstream>
 #include <iomanip>
@@ -34,23 +29,13 @@ static std::string rational_to_string(AVRational r, char sep) {
     return std::to_string(r.num).append(1, sep).append(std::to_string(r.den));
 }
 
-static CommonStreamStats::Metadata extractMetadata(AVDictionary *tags)
+static CommonStreamStats::Metadata extractMetadata(QMap<QString, QString> tags)
 {
     CommonStreamStats::Metadata metadata;
 
-    if (!tags)
-        return metadata;
-
-    AVDictionaryEntry *tag = NULL;
-
-    while ((tag = av_dict_get(tags, "", tag, AV_DICT_IGNORE_SUFFIX))) {
-        if(tag->key && tag->value)
-        {
-            metadata.push_back(std::pair<std::string, std::string>(tag->key, tag->value));
-        } else
-        {
-            break;
-        }
+    auto map = tags.toStdMap();
+    for(auto& pair : map) {
+        metadata.push_back(std::make_pair(pair.first.toStdString(), pair.second.toStdString()));
     }
 
     return metadata;
@@ -163,20 +148,20 @@ CommonStreamStats::CommonStreamStats(XMLElement *streamElement) :
     }
 }
 
-CommonStreamStats::CommonStreamStats(AVStream* stream) :
-    stream_index(stream->index),
-    codec_name(stream ? stream->codec->codec->name : ""),
-    codec_long_name(stream ? stream->codec->codec->long_name : ""),
-    codec_tag(stream ? stream->codec->codec_tag : 0),
-    r_frame_rate(stream != NULL ? rational_to_string(stream->r_frame_rate, '/') : ""),
-    avg_frame_rate(stream != NULL ? rational_to_string(stream->avg_frame_rate, '/') : ""),
-    time_base(stream != NULL ? rational_to_string(stream->time_base, '/') : ""),
-    start_pts(stream != NULL ? std::to_string(stream->start_time) : ""),
-    start_time(stream != NULL ? std::to_string(stream->start_time * av_q2d(stream->time_base)) : ""),
-    codec_time_base(stream ? rational_to_string(stream->codec->time_base, '/') : ""),
-    disposition(stream ? stream->disposition : 0),
-    bits_per_raw_sample(stream ? stream->codec->bits_per_raw_sample : 0),
-    metadata(stream ? extractMetadata(stream->metadata) : Metadata())
+CommonStreamStats::CommonStreamStats(QAVStream* stream) :
+    stream_index(stream->index()),
+    codec_name(stream ? stream->codec()->codec()->name : ""),
+    codec_long_name(stream ? stream->codec()->codec()->long_name : ""),
+    codec_time_base(stream ? rational_to_string(stream->stream()->time_base, '/') : ""),
+    codec_tag(stream ? stream->stream()->codecpar->codec_tag : 0),
+    r_frame_rate(stream != NULL ? rational_to_string(stream->stream()->r_frame_rate, '/') : ""),
+    avg_frame_rate(stream != NULL ? rational_to_string(stream->stream()->avg_frame_rate, '/') : ""),
+    time_base(stream != NULL ? rational_to_string(stream->stream()->time_base, '/') : ""),
+    start_pts(stream != NULL ? std::to_string(stream->stream()->start_time) : ""),
+    start_time(stream != NULL ? std::to_string(stream->stream()->start_time * av_q2d(stream->stream()->time_base)) : ""),
+    disposition(stream ? stream->stream()->disposition : 0),
+    bits_per_raw_sample(stream ? stream->stream()->codecpar->bits_per_raw_sample : 0),
+    metadata(stream ? extractMetadata(stream->metadata()) : Metadata())
 {
 
 }
@@ -220,7 +205,7 @@ std::string CommonStreamStats::getCodec_Time_Base() const
 std::string CommonStreamStats::getCodec_TagString() const
 {
     char val_str[128];
-    av_get_codec_tag_string(val_str, sizeof(val_str), codec_tag);
+    av_fourcc_make_string(val_str, codec_tag);
 
     return val_str;
 }
