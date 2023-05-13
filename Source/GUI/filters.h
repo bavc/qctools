@@ -48,25 +48,41 @@ const filter Filters[] =
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Metadata" },
-            { Args_Type_None,     0,   0,   0,   0, nullptr },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Title/Action Safe" },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            // field=0, metadata=0
+            // field=0, metadata=0, safe=0
             "format=yuv444p,scale",
-            // field=0, metadata=1
+            // field=0, metadata=0, safe=1
+            "format=yuv444p,scale,\
+             drawbox=color=yellow:x='iw*(((100-93)/2)/100)':y='ih*(((100-93)/2)/100)':width='iw*(93/100)':height='ih*(93/100)':thickness=1,drawbox=color=green:x='iw*(((100-90)/2)/100)':y='ih*(((100-90)/2)/100)':width='iw*(90/100)':height='ih*(90/100)':thickness=1",
+            // field=0, metadata=1, safe=0
                        "format=yuv444p,scale,drawtext=fontfile=${fontfile}:box=1:boxborderw=4:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=4:text=PTS=%{pts\\\\:hms}\
                                             ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=20:text=size=%{eif\\\\:w\\\\:d}x%{eif\\\\:h\\\\:d} dar=${dar}\
            ,cropdetect=reset_count=1:round=1,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=36:text=cropdetect wxh=%{metadata\\\\:lavfi.cropdetect.w}x%{metadata\\\\:lavfi.cropdetect.h} x\\,y=%{metadata\\\\:lavfi.cropdetect.x}\\,%{metadata\\\\:lavfi.cropdetect.y}\
                            ,idet=half_life=1,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=52:text=interlacement \(single\)\\\\: %{metadata\\\\:lavfi.idet.single.current_frame}\
                                             ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=68:text=interlacement \(multiple\)\\\\: %{metadata\\\\:lavfi.idet.multiple.current_frame}\
                                             ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=84:text=interlacement \(repeat field\)\\\\: %{metadata\\\\:lavfi.idet.repeated.current_frame}",
-            // field=1, metadata=0
+            // field=0, metadata=1, safe=1
+                       "format=yuv444p,scale,drawtext=fontfile=${fontfile}:box=1:boxborderw=4:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=4:text=PTS=%{pts\\\\:hms}\
+                                            ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=20:text=size=%{eif\\\\:w\\\\:d}x%{eif\\\\:h\\\\:d} dar=${dar}\
+           ,cropdetect=reset_count=1:round=1,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=36:text=cropdetect wxh=%{metadata\\\\:lavfi.cropdetect.w}x%{metadata\\\\:lavfi.cropdetect.h} x\\,y=%{metadata\\\\:lavfi.cropdetect.x}\\,%{metadata\\\\:lavfi.cropdetect.y}\
+                           ,idet=half_life=1,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=52:text=interlacement \(single\)\\\\: %{metadata\\\\:lavfi.idet.single.current_frame}\
+                                            ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=68:text=interlacement \(multiple\)\\\\: %{metadata\\\\:lavfi.idet.multiple.current_frame}\
+                                            ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=84:text=interlacement \(repeat field\)\\\\: %{metadata\\\\:lavfi.idet.repeated.current_frame}\
+                                            ,drawbox=color=yellow:x='iw*(((100-93)/2)/100)':y='ih*(((100-93)/2)/100)':width='iw*(93/100)':height='ih*(93/100)':thickness=1,drawbox=color=green:x='iw*(((100-90)/2)/100)':y='ih*(((100-90)/2)/100)':width='iw*(90/100)':height='ih*(90/100)':thickness=1",
+            // field=1, metadata=0, safe=0
             "format=yuv444p,scale,il=l=d:c=d",
-            // field=1, metadata=1
+            // field=1, metadata=0, safe=1
+            "format=yuv444p,scale,split[t][b]\
+                ;[t]field=top,drawbox=color=yellow:x='iw*(((100-93)/2)/100)':y='ih*(((100-93)/2)/100)':width='iw*(93/100)':height='ih*(93/100)':thickness=1,drawbox=color=green:x='iw*(((100-90)/2)/100)':y='ih*(((100-90)/2)/100)':width='iw*(90/100)':height='ih*(90/100)':thickness=1[t2]\
+                ;[b]field=bottom,drawbox=color=yellow:x='iw*(((100-93)/2)/100)':y='ih*(((100-93)/2)/100)':width='iw*(93/100)':height='ih*(93/100)':thickness=1,drawbox=color=green:x='iw*(((100-90)/2)/100)':y='ih*(((100-90)/2)/100)':width='iw*(90/100)':height='ih*(90/100)':thickness=1[b2]\
+           ;[t2][b2]vstack",
+            // field=1, metadata=1, safe=0
             "format=yuv444p,scale,split[t][b],[t]field=top[t1];[b]field=bottom[b1]\
                                         ;[t1]drawtext=fontfile=${fontfile}:box=1:boxborderw=4:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=4:text=PTS=%{pts\\\\:hms}\
                                             ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=20:text=size=%{eif\\\\:w\\\\:d}x%{eif\\\\:h\\\\:d}\
@@ -74,6 +90,17 @@ const filter Filters[] =
                                         ;[b1]drawtext=fontfile=${fontfile}:box=1:boxborderw=4:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=4:text=PTS=%{pts\\\\:hms}\
                                             ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=20:text=size=%{eif\\\\:w\\\\:d}x%{eif\\\\:h\\\\:d}\
            ,cropdetect=reset_count=1:round=1,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=36:text=cropdetect wxh=%{metadata\\\\:lavfi.cropdetect.w}x%{metadata\\\\:lavfi.cropdetect.h} x\\,y=%{metadata\\\\:lavfi.cropdetect.x}\\,%{metadata\\\\:lavfi.cropdetect.y}[b2]\
+           ;[t2][b2]vstack",
+            // field=1, metadata=1, safe=1
+            "format=yuv444p,scale,split[t][b],[t]field=top[t1];[b]field=bottom[b1]\
+                                        ;[t1]drawtext=fontfile=${fontfile}:box=1:boxborderw=4:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=4:text=PTS=%{pts\\\\:hms}\
+                                            ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=20:text=size=%{eif\\\\:w\\\\:d}x%{eif\\\\:h\\\\:d}\
+           ,cropdetect=reset_count=1:round=1,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=36:text=cropdetect wxh=%{metadata\\\\:lavfi.cropdetect.w}x%{metadata\\\\:lavfi.cropdetect.h} x\\,y=%{metadata\\\\:lavfi.cropdetect.x}\\,%{metadata\\\\:lavfi.cropdetect.y},\
+            drawbox=color=yellow:x='iw*(((100-93)/2)/100)':y='ih*(((100-93)/2)/100)':width='iw*(93/100)':height='ih*(93/100)':thickness=1,drawbox=color=green:x='iw*(((100-90)/2)/100)':y='ih*(((100-90)/2)/100)':width='iw*(90/100)':height='ih*(90/100)':thickness=1[t2]\
+                                        ;[b1]drawtext=fontfile=${fontfile}:box=1:boxborderw=4:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=4:text=PTS=%{pts\\\\:hms}\
+                                            ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=20:text=size=%{eif\\\\:w\\\\:d}x%{eif\\\\:h\\\\:d}\
+           ,cropdetect=reset_count=1:round=1,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=36:text=cropdetect wxh=%{metadata\\\\:lavfi.cropdetect.w}x%{metadata\\\\:lavfi.cropdetect.h} x\\,y=%{metadata\\\\:lavfi.cropdetect.x}\\,%{metadata\\\\:lavfi.cropdetect.y},\
+            drawbox=color=yellow:x='iw*(((100-93)/2)/100)':y='ih*(((100-93)/2)/100)':width='iw*(93/100)':height='ih*(93/100)':thickness=1,drawbox=color=green:x='iw*(((100-90)/2)/100)':y='ih*(((100-90)/2)/100)':width='iw*(90/100)':height='ih*(90/100)':thickness=1[b2]\
            ;[t2][b2]vstack",
         },
     },

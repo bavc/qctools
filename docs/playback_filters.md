@@ -79,6 +79,8 @@ This view simply shows the video as QCTools interprets it, no special effects or
 
 The **Metadata** option will overlay some metadata onto the image, including the presentation timestamp, frame size, and metadata from filters that perform crop detection and interlacement pattern detection.
 
+The **Action/Title Safe** option will overlay boxes to show the Action Safe and Title Safe areas as defined by SMPTE ST 2046-1 (2009). The Safe Action Area is a box that includes 93%  of the width and height and is drawn in yellow. The Safe Title Area is a box that includes 90% of the width and height and is drawn in green. Thanks much to @bbgdzxng1 for supporting this feature.
+
 ## Bit Plane {#bit-plane}
 
 This filter selects the bit position of each plane for display. Selecting 'None' for a plane will replace all values with 0x80 (middle gray for Y and no color for U or V). Selecting 'All' will send the display plane as is. Selecting 'Bit [1-8]' will display only that specific bit position of each pixel of the plane. For the Y plane a pixel will display as black if that bit is '0' or white if that bit is '1'. For U a pixel will be yellow-green if '0' purple if '1'. For V a pixel will be green for '0' and red for '1'.
