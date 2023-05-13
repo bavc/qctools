@@ -1,3 +1,4 @@
+input_pix_fmt,plane_count,bit_depth,local_test,waveform_pix_fmt,pixel_format_type,vectorscope_pix_fmt
 yuv420p,3,12,0,yuv420p,2,yuv420p
 yuyv422,3,16,0,yuyv422,2,yuyv422
 rgb24,3,24,0,rgb24,1,yuv444p
