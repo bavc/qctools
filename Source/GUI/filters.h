@@ -157,21 +157,21 @@ const filter Filters[] =
         },
         {
             // field N, overlay N, all planes N
-            "thistogram=components=${3}:levels_mode=${4}",
+            "format=${pix_fmt:4},thistogram=components=${3}:levels_mode=${4}",
             // field N, overlay N, all planes Y
-            "thistogram=levels_mode=${4}",
+            "format=${pix_fmt:4},thistogram=levels_mode=${4}",
             // field N, overlay Y, all planes N
-            "thistogram=display_mode=overlay:components=${3}:levels_mode=${4}",
+            "format=${pix_fmt:4},thistogram=display_mode=overlay:components=${3}:levels_mode=${4}",
             // field N, overlay Y, all planes Y
-            "thistogram=display_mode=overlay:levels_mode=${4}",
+            "format=${pix_fmt:4},thistogram=display_mode=overlay:levels_mode=${4}",
             // field Y, overlay N, all planes N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=components=${3}:levels_mode=${4}[a2];[b1]thistogram=components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
+            "format=${pix_fmt:4},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=components=${3}:levels_mode=${4}[a2];[b1]thistogram=components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
             // field Y, overlay N, all planes Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=levels_mode=${4}[a2];[b1]thistogram=levels_mode=${4}[b2];[a2][b2]hstack",
+            "format=${pix_fmt:4},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=levels_mode=${4}[a2];[b1]thistogram=levels_mode=${4}[b2];[a2][b2]hstack",
             // field Y, overlay Y, all planes N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=display_mode=overlay:components=${3}:levels_mode=${4}[a2];[b1]thistogram=display_mode=overlay:components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
+            "format=${pix_fmt:4},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=display_mode=overlay:components=${3}:levels_mode=${4}[a2];[b1]thistogram=display_mode=overlay:components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
             // field Y, overlay Y, all planes Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=display_mode=overlay:levels_mode=${4}[a2];[b1]thistogram=display_mode=overlay:levels_mode=${4}[b2];[a2][b2]vstack",
+            "format=${pix_fmt:4},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=display_mode=overlay:levels_mode=${4}[a2];[b1]thistogram=display_mode=overlay:levels_mode=${4}[b2];[a2][b2]vstack",
         },
     },
     {
