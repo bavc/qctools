@@ -280,7 +280,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "split[h][l];[l]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=0:h=${6}[l1];[h]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=${6}:h=1[h1];[l1][h1]hstack",
+            "format=${pix_fmt:6},split[h][l];[l]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=0:h=${6}[l1];[h]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=${6}:h=1[h1];[l1][h1]hstack",
             "format=${pix_fmt:6},split[a][b];\
             [a]field=top,split[th][tl];\
             [b]field=bottom,split[bh][bl];\
