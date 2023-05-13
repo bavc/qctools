@@ -952,7 +952,7 @@ QString getPixFmtLookupValue(QString pixFormatName, int index) {
                 while(!stream.atEnd()) {
                     auto entry = stream.readLine();
                     auto splitted = entry.split(",");
-                    if(splitted.length() == 5) {
+                    if(splitted.length() == 6) {
                         map[splitted[0]] = splitted;
                     }
                 }
