@@ -952,7 +952,7 @@ QString getPixFmtLookupValue(QString pixFormatName, int index) {
                 while(!stream.atEnd()) {
                     auto entry = stream.readLine();
                     auto splitted = entry.split(",");
-                    if(splitted.length() == 6) {
+                    if(splitted.length() == 7) {
                         map[splitted[0]] = splitted;
                     }
                 }
@@ -989,6 +989,8 @@ QString Player::replaceFilterTokens(const QString &filterString)
         str.replace(QString("${pix_fmt:4}"), getPixFmtLookupValue(QString::fromStdString(m_fileInformation->pixFormatName()), 4));
     if(str.contains(QString("${pix_fmt:5}")))
         str.replace(QString("${pix_fmt:5}"), getPixFmtLookupValue(QString::fromStdString(m_fileInformation->pixFormatName()), 5));
+    if(str.contains(QString("${pix_fmt:6}")))
+        str.replace(QString("${pix_fmt:6}"), getPixFmtLookupValue(QString::fromStdString(m_fileInformation->pixFormatName()), 6));
 
     int BitsPerRawSample = m_fileInformation->bitsPerRawSample();
     if (BitsPerRawSample == 0) {
