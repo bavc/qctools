@@ -134,13 +134,13 @@ const filter Filters[] =
         },
         {
             // field N, all planes N
-            "format=${pix_fmt},histogram=level_height=${height}-12:components=${2}:levels_mode=${3}",
+            "format=${pix_fmt},histogram=colors_mode=coloronwhite:level_height=${height}-12:components=${2}:levels_mode=${3}",
             // field N, all planes Y
-            "format=${pix_fmt},histogram=level_height=${height}:levels_mode=${3}",
+            "format=${pix_fmt},histogram=colors_mode=coloronwhite:level_height=${height}:levels_mode=${3}",
             // field Y, all planes N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},histogram=components=${2}:levels_mode=${3}[a2];[b1]format=${pix_fmt},histogram=components=${2}:levels_mode=${3}[b2];[a2][b2]vstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},histogram=colors_mode=coloronwhite:components=${2}:levels_mode=${3}[a2];[b1]format=${pix_fmt},histogram=colors_mode=coloronwhite:components=${2}:levels_mode=${3}[b2];[a2][b2]vstack",
             // field Y, all planes Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},histogram=levels_mode=${3}[a2];[b1]format=${pix_fmt},histogram=levels_mode=${3}[b2];[a2][b2]hstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},histogram=colors_mode=coloronwhite:levels_mode=${3}[a2];[b1]format=${pix_fmt},histogram=colors_mode=coloronwhite:levels_mode=${3}[b2];[a2][b2]hstack",
         },
     },
     {
