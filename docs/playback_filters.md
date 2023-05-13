@@ -33,7 +33,7 @@ The QCTools preview window is intended as an analytical playback environment tha
 [Normal](#normal)  
 [Oscilloscope](#oscilloscope)  
 [Pixel Offset Subtraction](#pixel-offset-subtraction)  
-[Pixel Scope](#pixel-scope)  X
+[Pixel Scope](#pixel-scope)  
 [Sample Range](#sample-range)  
 [Saturation Highlight](#saturation-highlight)  
 [Temporal Difference](#temporal-difference)  
@@ -209,6 +209,10 @@ Provides a 2D Video Oscilloscope. Useful to measure spatial impulse, step respon
 Displays an image by subtracting the offset level from each successive pixel.
 
 ![Pixel Offset Subtraction](media/playbackfilter_pixel_offset_subtraction.jpg)
+
+## Pixel Scope {#pixel-scope}
+
+Displays an image using FFmpeg's (pixscope)[https://ffmpeg.org/ffmpeg-filters.html#pixscope] filter. Note that if the image is less than 640x480, it will be scaled up to that size before displaying it in the scope.
 
 ## Sample Range {#sample-range}
 
