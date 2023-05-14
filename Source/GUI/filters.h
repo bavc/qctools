@@ -603,8 +603,8 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-                       "split[vhmask][vhpic];color=color=${5}[vhcolor];[vhpic]extractplanes=${2}[vhpic1];[vhcolor][vhpic1]scale2ref[vhcolor1][vhpic1];[vhmask]format=${pix_fmt},extractplanes=${2},lut=c0=if(between(val\\,${3}\\,${4})\\,minval\\,maxval),[vhpic1]alphamerge,[vhcolor1]overlay",
-            "il=l=d:c=d,split[vhmask][vhpic];color=color=${5}[vhcolor];[vhpic]extractplanes=${2}[vhpic1];[vhcolor][vhpic1]scale2ref[vhcolor1][vhpic1];[vhmask]format=${pix_fmt},extractplanes=${2},lut=c0=if(between(val\\,${3}\\,${4})\\,minval\\,maxval),[vhpic1]alphamerge,[vhcolor1]overlay",
+                       "split[vhrmask][vhrpic];color=color=${5}[vhrcolor];[vhrpic]extractplanes=${2}[vhrpic1];[vhrcolor][vhrpic1]scale2ref[vhrcolor1][vhrpic1];[vhrmask]format=${pix_fmt},extractplanes=${2},lut=c0=if(between(val\\,${3}\\,${4})\\,minval\\,maxval),[vhrpic1]alphamerge,[vhrcolor1]overlay",
+            "il=l=d:c=d,split[vhrmask][vhrpic];color=color=${5}[vhrcolor];[vhrpic]extractplanes=${2}[vhrpic1];[vhrcolor][vhrpic1]scale2ref[vhrcolor1][vhrpic1];[vhrmask]format=${pix_fmt},extractplanes=${2},lut=c0=if(between(val\\,${3}\\,${4})\\,minval\\,maxval),[vhrpic1]alphamerge,[vhrcolor1]overlay",
         },
     },
     {
