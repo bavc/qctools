@@ -792,10 +792,10 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-                       "lutyuv=y=if(gt(val\\,maxval)\\,val-maxval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2,histeq=strength=1",
-                       "lutyuv=y=if(lt(val\\,minval)\\,val+minval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2,histeq=strength=1",
-            "il=l=d:c=d,lutyuv=y=if(gt(val\\,maxval)\\,val-maxval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2,histeq=strength=1",
-            "il=l=d:c=d,lutyuv=y=if(lt(val\\,minval)\\,val+minval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2,histeq=strength=1",
+                       "lutyuv=y=if(gt(val\\,maxval)\\,((maxval-minval+1)/(pow(2\\,${bitdepth})-maxval+1))*(val-maxval+1)+minval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2",
+                       "lutyuv=y=if(lt(val\\,minval)\\,((maxval-minval+1)/minval+1)*(val+1)+minval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2",
+            "il=l=d:c=d,lutyuv=y=if(gt(val\\,maxval)\\,((maxval-minval+1)/(pow(2\\,${bitdepth})-maxval+1))*(val-maxval+1)+minval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2",
+            "il=l=d:c=d,lutyuv=y=if(lt(val\\,minval)\\,((maxval-minval+1)/minval+1)*(val+1)+minval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2",
         },
     },
     {
