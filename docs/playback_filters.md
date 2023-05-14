@@ -46,6 +46,7 @@ The QCTools preview window is intended as an analytical playback environment tha
 [Vertical Line Repetitions](#vertical-line-repetitions)  
 [Vertical Repetition Pixels](#vertical-repetition-pixels)  
 [Waveform](#waveform)  
+[Waveform Target](#waveform-target)  
 [Zoom](#zoom)  
 
 # Arrangement
