@@ -420,6 +420,8 @@ void MainWindow::on_actionFilesList_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionGraphsLayout_triggered()
 {
+    qDebug() << "on_actionGraphsLayout_triggered()";
+
     if (ui->actionGoTo)
         ui->actionGoTo->setVisible(true);
     if (ui->actionExport_XmlGz_Prompt)

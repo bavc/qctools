@@ -39,6 +39,8 @@
 //---------------------------------------------------------------------------
 void MainWindow::TimeOut ()
 {
+    qDebug() << "MainWindow::TimeOut";
+
     // Configuring plots
     if (ui->actionFilesList->isChecked() && FilesListArea==NULL)
         createFilesList();
