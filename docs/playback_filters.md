@@ -85,7 +85,7 @@ The **Action/Title Safe** option will overlay boxes to show the Action Safe and 
 
 ## Bit Plane {#bit-plane}
 
-This filter selects the bit position of each plane for display. Selecting 'None' for a plane will replace all values with 0x80 (middle gray for Y and no color for U or V). Selecting 'All' will send the display plane as is. Selecting 'Bit [1-8]' will display only that specific bit position of each pixel of the plane. For the Y plane a pixel will display as black if that bit is '0' or white if that bit is '1'. For U a pixel will be yellow-green if '0' purple if '1'. For V a pixel will be green for '0' and red for '1'.
+This filter selects the bit position of each plane for display. Selecting 'None' for a plane will replace all values with a neutral middle gray. Selecting 'All' will send the display plane as is. Selecting 'Bit N' (where N is the number of a bit position) will display only that specific bit position of each pixel of the plane. For example, the Y plane a pixel will display as black if that bit is '0' or white if that bit is '1', for U a pixel will be yellow-green if '0' purple if '1', for V a pixel will be green for '0' and red for '1' (RGB pixel formats are supported as well).
 Generally lossy video codecs will show blocky structured patterns at higher numbered bit positions. See the [bit plane article](https://en.wikipedia.org/wiki/Bit_plane) in Wikipedia for more information about the application of bit plane filtering.
 
 ![Bit Plane](media/1A_seattle_parade_transfer_a_messedup-1.jpg)
@@ -94,7 +94,7 @@ Generally lossy video codecs will show blocky structured patterns at higher numb
 
 ## Bit Plane 10 slices {#bit-plane-10-slices}
 
-This filter is similar to **Bit Plane**, but it shows a section of each of the first 10 bit planes at once in the selected plane. The slices are presented in most-significant to least-significant order as left to right (or top to bottom if 'Rows' is selected). Each of the 10 bit planes is marked by a green border. If the **Slice** option is enabled, the video will be sliced into 10 parts with a different bit position (from 1 to 10) presented in each slice, if **slice** is unchecked then the video is repeated as a full frame ten times with a different bit position presented in each iteration. The **Show 2** will present each bit plane with the subsequent bit plane.
+This filter is similar to **Bit Plane**, but it shows a section of each of the first 10 bit planes at once in the selected plane. The slices are presented in most-significant to least-significant order as left to right (or top to bottom if 'Rows' is selected). Each of the 10 bit planes is marked by a green border. If the **Slice** option is enabled, the video will be sliced into 10 parts with a different bit position (from 1 to 10) presented in each slice, if **slice** is unchecked then the video is repeated as a full frame ten times with a different bit position presented in each iteration (this will display as a very wide image, so it's recommended to uncheck 'Fit to Grid' with this option). The **Show 2** will present each bit plane with the subsequent bit plane. Note that if the input video is uses less than 10 bits per sample, then part of the image will be blank.
 
 ![Bit Plane 10 Slices](media/playbackfilter_bit_plane_10_slices.jpg)
 

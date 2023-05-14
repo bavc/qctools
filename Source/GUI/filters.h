@@ -439,64 +439,61 @@ const filter Filters[] =
         },
         {
           // Slice N Show 2 N
-          "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,\
+          "format=${pix_fmt},\
           split=10[b0][b1][b2][b3][b4][b5][b6][b7][b8][b9];\
-          [b0]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-1))*pow(2\\,1)[b0c];\
-          [b1]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-2))*pow(2\\,2)[b1c];\
-          [b2]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-3))*pow(2\\,3)[b2c];\
-          [b3]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-4))*pow(2\\,4)[b3c];\
-          [b4]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-5))*pow(2\\,5)[b4c];\
-          [b5]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-6))*pow(2\\,6)[b5c];\
-          [b6]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-7))*pow(2\\,7)[b6c];\
-          [b7]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-8))*pow(2\\,8)[b7c];\
-          [b8]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-9))*pow(2\\,9)[b8c];\
-          [b9]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-10))*pow(2\\,10)[b9c];\
+          [b0]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-1))*pow(2\\,1)[b0c];\
+          [b1]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-2))*pow(2\\,2)[b1c];\
+          [b2]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-3))*pow(2\\,3)[b2c];\
+          [b3]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-4))*pow(2\\,4)[b3c];\
+          [b4]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-5))*pow(2\\,5)[b4c];\
+          [b5]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-6))*pow(2\\,6)[b5c];\
+          [b6]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-7))*pow(2\\,7)[b6c];\
+          [b7]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-8))*pow(2\\,8)[b7c];\
+          [b8]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-9))*pow(2\\,9)[b8c];\
+          [b9]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-10))*pow(2\\,10)[b9c];\
           [b0c][b1c][b2c][b3c][b4c][b5c][b6c][b7c][b8c][b9c]hstack=10",
           // Slice Y Show 2 N
-          "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,\
+          "format=${pix_fmt},\
           split=10[b0][b1][b2][b3][b4][b5][b6][b7][b8][b9];\
-          [b0]crop=iw/10:ih:(iw/10)*0:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-1))*pow(2\\,1)[b0c];\
-          [b1]crop=iw/10:ih:(iw/10)*1:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-2))*pow(2\\,2)[b1c];\
-          [b2]crop=iw/10:ih:(iw/10)*2:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-3))*pow(2\\,3)[b2c];\
-          [b3]crop=iw/10:ih:(iw/10)*3:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-4))*pow(2\\,4)[b3c];\
-          [b4]crop=iw/10:ih:(iw/10)*4:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-5))*pow(2\\,5)[b4c];\
-          [b5]crop=iw/10:ih:(iw/10)*5:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-6))*pow(2\\,6)[b5c];\
-          [b6]crop=iw/10:ih:(iw/10)*6:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-7))*pow(2\\,7)[b6c];\
-          [b7]crop=iw/10:ih:(iw/10)*7:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-8))*pow(2\\,8)[b7c];\
-          [b8]crop=iw/10:ih:(iw/10)*8:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-9))*pow(2\\,9)[b8c];\
-          [b9]crop=iw/10:ih:(iw/10)*9:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-10))*pow(2\\,10)[b9c];\
+          [b0]crop=iw/10:ih:(iw/10)*0:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-1))*pow(2\\,1)[b0c];\
+          [b1]crop=iw/10:ih:(iw/10)*1:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-2))*pow(2\\,2)[b1c];\
+          [b2]crop=iw/10:ih:(iw/10)*2:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-3))*pow(2\\,3)[b2c];\
+          [b3]crop=iw/10:ih:(iw/10)*3:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-4))*pow(2\\,4)[b3c];\
+          [b4]crop=iw/10:ih:(iw/10)*4:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-5))*pow(2\\,5)[b4c];\
+          [b5]crop=iw/10:ih:(iw/10)*5:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-6))*pow(2\\,6)[b5c];\
+          [b6]crop=iw/10:ih:(iw/10)*6:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-7))*pow(2\\,7)[b6c];\
+          [b7]crop=iw/10:ih:(iw/10)*7:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-8))*pow(2\\,8)[b7c];\
+          [b8]crop=iw/10:ih:(iw/10)*8:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-9))*pow(2\\,9)[b8c];\
+          [b9]crop=iw/10:ih:(iw/10)*9:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-10))*pow(2\\,10)[b9c];\
           [b0c][b1c][b2c][b3c][b4c][b5c][b6c][b7c][b8c][b9c]hstack=10,format=yuv444p,drawgrid=w=iw/10:h=ih:t=2:c=green@0.5",
           // Slice N Show 2 Y
-          "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,\
+          "format=${pix_fmt},\
           split=10[b0][b1][b2][b3][b4][b5][b6][b7][b8][b9];\
-          [b0]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-1))*pow(2\\,1)[b0c];\
-          [b1]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-2))*pow(2\\,2)[b1c];\
-          [b2]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-3))*pow(2\\,3)[b2c];\
-          [b3]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-4))*pow(2\\,4)[b3c];\
-          [b4]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-5))*pow(2\\,5)[b4c];\
-          [b5]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-6))*pow(2\\,6)[b5c];\
-          [b6]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-7))*pow(2\\,7)[b6c];\
-          [b7]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-8))*pow(2\\,8)[b7c];\
-          [b8]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-9))*pow(2\\,9)[b8c];\
-          [b9]lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-10))*pow(2\\,10)[b9c];\
-          [b0c][b1c][b2c][b3c][b4c][b5c][b6c][b7c][b8c][b9c]hstack=10,split=3[b1][bt1][bd1];\
-          [bt1]crop=${width}*9:${height}:0:0[bt2];[bd1]crop=${width}*9:${height}:${width}:0[bd2];\
-          [bt2][bd2]blend=all_mode=average,pad=${width}*10:${height}:${width}/2:0[btd];\
-          [b1][btd]xstack=layout=0_0|0_h0",
+          [b0]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-1)+pow(2\\,${bitdepth}-2))*pow(2\\,1)[b0c];\
+          [b1]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-2)+pow(2\\,${bitdepth}-3))*pow(2\\,2)[b1c];\
+          [b2]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-3)+pow(2\\,${bitdepth}-4))*pow(2\\,3)[b2c];\
+          [b3]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-4)+pow(2\\,${bitdepth}-5))*pow(2\\,4)[b3c];\
+          [b4]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-5)+pow(2\\,${bitdepth}-6))*pow(2\\,5)[b4c];\
+          [b5]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-6)+pow(2\\,${bitdepth}-7))*pow(2\\,6)[b5c];\
+          [b6]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-7)+pow(2\\,${bitdepth}-8))*pow(2\\,7)[b6c];\
+          [b7]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-8)+pow(2\\,${bitdepth}-9))*pow(2\\,8)[b7c];\
+          [b8]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-9)+pow(2\\,${bitdepth}-10))*pow(2\\,9)[b8c];\
+          [b9]lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-10))*pow(2\\,10)[b9c];\
+          [b0c][b1c][b2c][b3c][b4c][b5c][b6c][b7c][b8c][b9c]hstack=10",
           // Slice Y Show 2 Y
-          "format=yuv420p10le|yuv422p10le|yuv444p10le|yuv440p10le,\
+          "format=${pix_fmt},\
           split=10[b0][b1][b2][b3][b4][b5][b6][b7][b8][b9];\
-          [b0]crop=iw/10:ih:(iw/10)*0:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-1)+pow(2\\,10-2))*pow(2\\,1)[b0c];\
-          [b1]crop=iw/10:ih:(iw/10)*1:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-2)+pow(2\\,10-3))*pow(2\\,2)[b1c];\
-          [b2]crop=iw/10:ih:(iw/10)*2:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-3)+pow(2\\,10-4))*pow(2\\,3)[b2c];\
-          [b3]crop=iw/10:ih:(iw/10)*3:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-4)+pow(2\\,10-5))*pow(2\\,4)[b3c];\
-          [b4]crop=iw/10:ih:(iw/10)*4:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-5)+pow(2\\,10-6))*pow(2\\,5)[b4c];\
-          [b5]crop=iw/10:ih:(iw/10)*5:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-6)+pow(2\\,10-7))*pow(2\\,6)[b5c];\
-          [b6]crop=iw/10:ih:(iw/10)*6:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-7)+pow(2\\,10-8))*pow(2\\,7)[b6c];\
-          [b7]crop=iw/10:ih:(iw/10)*7:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-8)+pow(2\\,10-9))*pow(2\\,8)[b7c];\
-          [b8]crop=iw/10:ih:(iw/10)*8:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-9)+pow(2\\,10-10))*pow(2\\,9)[b8c];\
-          [b9]crop=iw/10:ih:(iw/10)*9:0,lutyuv=y=512:u=512:v=512:${1}=bitand(val\\,pow(2\\,10-10)+pow(2\\,10-11))*pow(2\\,10)[b9c];\
-          [b0c][b1c][b2c][b3c][b4c][b5c][b6c][b7c][b8c][b9c]hstack=10,format=yuv444p,drawgrid=w=iw/10:h=ih:t=2:c=green@0.5",
+          [b0]crop=iw/10:ih:(iw/10)*0:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-1)+pow(2\\,${bitdepth}-2))*pow(2\\,1)[b0c];\
+          [b1]crop=iw/10:ih:(iw/10)*1:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-2)+pow(2\\,${bitdepth}-3))*pow(2\\,2)[b1c];\
+          [b2]crop=iw/10:ih:(iw/10)*2:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-3)+pow(2\\,${bitdepth}-4))*pow(2\\,3)[b2c];\
+          [b3]crop=iw/10:ih:(iw/10)*3:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-4)+pow(2\\,${bitdepth}-5))*pow(2\\,4)[b3c];\
+          [b4]crop=iw/10:ih:(iw/10)*4:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-5)+pow(2\\,${bitdepth}-6))*pow(2\\,5)[b4c];\
+          [b5]crop=iw/10:ih:(iw/10)*5:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-6)+pow(2\\,${bitdepth}-7))*pow(2\\,6)[b5c];\
+          [b6]crop=iw/10:ih:(iw/10)*6:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-7)+pow(2\\,${bitdepth}-8))*pow(2\\,7)[b6c];\
+          [b7]crop=iw/10:ih:(iw/10)*7:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-8)+pow(2\\,${bitdepth}-9))*pow(2\\,8)[b7c];\
+          [b8]crop=iw/10:ih:(iw/10)*8:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-9)+pow(2\\,${bitdepth}-10))*pow(2\\,9)[b8c];\
+          [b9]crop=iw/10:ih:(iw/10)*9:0,lut=c0=pow(2\\,${bitdepth}-1):c1=pow(2\\,${bitdepth}-1):c2=pow(2\\,${bitdepth}-1):${1}=bitand(val\\,pow(2\\,${bitdepth}-10))*pow(2\\,10)[b9c];\
+          [b0c][b1c][b2c][b3c][b4c][b5c][b6c][b7c][b8c][b9c]hstack=10,drawgrid=w=iw/10:h=ih:t=2:c=green@0.5",
         },
     },
     {
