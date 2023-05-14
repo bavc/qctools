@@ -76,7 +76,6 @@ Player::Player(QWidget *parent) :
    });
 
     ui->scrollArea->setWidget(m_w);
-    ui->scrollArea->widget()->setGeometry(0, 0, 100, 100);
 
     connect(m_player, &QAVPlayer::stateChanged, [this](QAVPlayer::State state) {
         if(state == QAVPlayer::PlayingState) {
@@ -466,6 +465,31 @@ void Player::showHideFilters()
 
 void Player::showEvent(QShowEvent *event)
 {
+    // workaround for blank screen on 2nd show
+    m_w->deleteLater();
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    m_w = new VideoWidget(ui->scrollArea);
+
+    m_vr->deleteLater();
+    m_vr = new VideoRenderer();
+
+    m_o->deleteLater();
+    m_o = new MediaObject(m_vr);
+
+    m_w->setMediaObject(m_o);
+#else
+    m_w = new QVideoWidget(ui->scrollArea);
+#endif //
+
+    ui->scrollArea->setWidget(m_w);
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+
+#else
+    m_w->videoSink()->setVideoFrame(videoFrame);
+#endif //
+
     updateVideoOutputSize();
 }
 
