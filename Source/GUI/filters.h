@@ -219,13 +219,14 @@ const filter Filters[] =
             { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
         },
         {
-            "crop=${3}:${4}:${1}:${2},\
+            "crop=${3}:${4}:${1}:${2},scale=${width}:${height},\
             format=${pix_fmt:4},waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1",
             "split[a][b];\
-            [a]lutyuv=y=val/4,scale=${width}:${height},setsar=1/1,format=yuv444p|yuv444p10le,drawbox=w=${3}:h=${4}:x=${1}:y=${2}:color=invert:thickness=1[a1];\
-            [b]crop=${3}:${4}:${1}:${2},\
-            format=${pix_fmt:4},waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1[b1];\
-            [a1][b1]blend=addition",
+            [a]format=yuv444p,lutyuv=y=val/4,drawbox=w=${3}:h=${4}:x=${1}:y=${2}:color=invert:thickness=1[a1];\
+            [b]crop=${3}:${4}:${1}:${2},scale=${width}:${height},\
+            format=${pix_fmt:4},waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b1];\
+            [a1][b1]scale2ref[a2][b1];\
+            [a2][b1]blend=addition",
         },
     },
     {
