@@ -16,7 +16,7 @@ The QCTools preview window is intended as an analytical playback environment tha
 [Bit Plane Noise](#bit-plane-noise)  
 [Broadcast Illegal Focus](#broadcast-illegal-focus)  
 [Broadcast Range Pixels](#broadcast-range-pixels)  
-[Chroma Delay](#chroma-delay)  
+[Chroma Shift](#chroma-shift)  
 [CIE Scope](#cie-scope)  
 [Color Matrix](#color-matrix)  
 [Corners](#corners)  
@@ -124,9 +124,9 @@ This filter plots the range of visible colors as defined by the Committee Intern
 
 ![CIE Scope](media/playbackfilter_CIE_scope.jpg)
 
-## Chroma Delay {#chroma-delay}
+## Chroma Shift {#chroma-shift}
 
-This filter allows the Cb and Cr planes to be offset left or right to check if the color data is properly timed to the luminence data. The 'chroma shift' value can be used to shift the Cb and Cr color planes up to 128 pixel columns to the left or right. When 'interleave' is enabled the Y and Cb planes are both presented in grayscale interleaved by line, so the alignment of the planes may be seen in an alternate way. Unchecking 'interleave' will presented the planes rendered properly with the shifted chroma.
+This filter allows the Cb and Cr planes to be offset horizontally or veritcally to check if the color data is properly timed to the luminence data. See FFmpeg's documentation on [chroma shift](https://ffmpeg.org/ffmpeg-filters.html#chromashift).
 
 ## Color Matrix {#color-matrix}
 
