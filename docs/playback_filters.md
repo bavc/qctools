@@ -208,7 +208,7 @@ Provides a 2D Video Oscilloscope. Useful to measure spatial impulse, step respon
 
 ## Pixel Offset Subtraction {#pixel-offset-subtraction}
 
-Displays an image by subtracting the offset level from each successive pixel.
+Displays the difference betweeen a frame and the same frame offset vertically or horizontally by a specified amount. Vertical and horizontal offsets may be specified independently for luma and chroma. When all offsets are set the zero, the image should be gray (i.e. no difference).
 
 ![Pixel Offset Subtraction](media/playbackfilter_pixel_offset_subtraction.jpg)
 
