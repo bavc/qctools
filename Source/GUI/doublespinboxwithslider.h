@@ -27,7 +27,13 @@ public:
     void hidePopup ();
 
 protected:
-    void enterEvent (QEvent* event);
+    void enterEvent (
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        QEvent* event
+#else
+        QEnterEvent* event
+#endif //
+    );
     void leaveEvent (QEvent* event);
     void keyPressEvent (QKeyEvent* event);
     void moveEvent (QMoveEvent * event);
