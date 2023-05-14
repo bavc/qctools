@@ -578,6 +578,23 @@ const filter Filters[] =
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_Yuv,      0,   0,   0,   0, "Plane" },
+            { Args_Type_Slider, 235,   0, 255,   1, "Value"},
+            { Args_Type_ClrPck, 0x40e0d0,   0,   0,   0, ""},
+            { Args_Type_None,     0,   0,   0,   0, nullptr },
+            { Args_Type_None,     0,   0,   0,   0, nullptr },
+            { Args_Type_None,     0,   0,   0,   0, nullptr },
+        },
+        {
+                       "split[vhmask][vhpic];color=color=${4}[vhcolor];[vhpic]extractplanes=${2}[vhpic1];[vhcolor][vhpic1]scale2ref[vhcolor1][vhpic1];[vhmask]format=${pix_fmt},extractplanes=${2},lut=c0=if(eq(val\\,${3})\\,minval\\,maxval),[vhpic1]alphamerge,[vhcolor1]overlay",
+            "il=l=d:c=d,split[vhmask][vhpic];color=color=${4}[vhcolor];[vhpic]extractplanes=${2}[vhpic1];[vhcolor][vhpic1]scale2ref[vhcolor1][vhpic1];[vhmask]format=${pix_fmt},extractplanes=${2},lut=c0=if(eq(val\\,${3})\\,minval\\,maxval),[vhpic1]alphamerge,[vhcolor1]overlay",
+        },
+    },
+    {
+        "Value Highlight (Range)",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Yuv,      0,   0,   0,   0, "Plane" },
             { Args_Type_Slider, 235,   0, 255,   1, "Min"},
             { Args_Type_Slider, 255,   0, 255,   1, "Max"},
             { Args_Type_ClrPck, 0x40e0d0,   0,   0,   0, ""},

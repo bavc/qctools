@@ -39,6 +39,7 @@ The QCTools preview window is intended as an analytical playback environment tha
 [Temporal Difference](#temporal-difference)  
 [Temporal Outlier Pixels](#temporal-outlier-pixels)  
 [Value Highlight](#value-highlight)  
+[Value Highlight (Range)](#value-highlight-range)  
 [Vectorscope](#vectorscope)  
 [Vectorscope High/Low](#vectorscope-highlow)  
 [Vectorscope Target](#vectorscope-target)  
@@ -242,7 +243,11 @@ This is the same presentation as 'Normal' except that pixels that are labelled a
 
 ## Value Highlight {#value-highlight}
 
-This filter selects a video plane and highlights values with a specified range of minimum value to maximum value. The original image of the plane will be presented in grayscale and values within the range will be highlighted as yellow; for instance to highlight Y values below NTSC broadcast range, set plane to Y, min to 0 and max to 16. The resulting image will highlight Y values below broadcast range in turquoise.
+This filter selects a video plane and highlights a specific value. The original image of the plane will be presented in grayscale and value will be highlighted as the selected color.
+
+## Value Highlight (Range) {#value-highlight-range}
+
+This filter selects a video plane and highlights values with a specified range of minimum value to maximum value. The original image of the plane will be presented in grayscale and values within the range will be highlighted as the selected color; for instance to highlight Y values below NTSC broadcast range, set plane to Y, min to 0 and max to 16 (16 for 8 bit video or 64 for 10 bit video) and the resulting image will highlight Y values below broadcast range.
 
 ![Value Highlight](media/playbackfilter_value_highlight.jpg)
 
