@@ -321,7 +321,7 @@ std::string FilterSelector::FiltersList_currentOptionChanged(int Picture_Current
             {
                 if (m_filterOptions.Radios[OptionPos][OptionPos2] && m_filterOptions.Radios[OptionPos][OptionPos2]->isChecked())
                 {
-                    if (std::string(Filters[Picture_Current].Name)=="Extract Planes Equalized" || std::string(Filters[Picture_Current].Name)=="Value Highlight" || std::string(Filters[Picture_Current].Name)=="Value Highlight (Range)" || std::string(Filters[Picture_Current].Name)=="Bit Plane Noise" || std::string(Filters[Picture_Current].Name)=="Field Difference" || std::string(Filters[Picture_Current].Name)=="Temporal Difference" || std::string(Filters[Picture_Current].Name)=="Bit Plane (10 slices)")
+                    if (std::string(Filters[Picture_Current].Name)=="Extract Planes Equalized" || std::string(Filters[Picture_Current].Name)=="Value Highlight" || std::string(Filters[Picture_Current].Name)=="Value Highlight (Range)" || std::string(Filters[Picture_Current].Name)=="Bit Plane Noise" || std::string(Filters[Picture_Current].Name)=="Field Difference" || std::string(Filters[Picture_Current].Name)=="Temporal Difference")
                     {
                         int IsRGB = FileInfoData->isRgbSet();
                         if (IsRGB != 0)
@@ -343,6 +343,16 @@ std::string FilterSelector::FiltersList_currentOptionChanged(int Picture_Current
                             case 2: WithRadios[OptionPos]="v"; break;
                             default:;
                             }
+                        }
+                    }
+                    else if (std::string(Filters[Picture_Current].Name)=="Bit Plane (10 slices)")
+                    {
+                        switch (OptionPos2)
+                        {
+                        case 0: WithRadios[OptionPos]="c0"; break;
+                        case 1: WithRadios[OptionPos]="c1"; break;
+                        case 2: WithRadios[OptionPos]="c2"; break;
+                        default:;
                         }
                     }
                     else if (std::string(Filters[Picture_Current].Name)=="Bit Plane Noise Graph")
