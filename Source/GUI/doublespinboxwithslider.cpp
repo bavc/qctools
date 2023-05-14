@@ -89,7 +89,13 @@ DoubleSpinBoxWithSlider::~DoubleSpinBoxWithSlider()
 }
 
 //---------------------------------------------------------------------------
-void DoubleSpinBoxWithSlider::enterEvent (QEvent* event)
+void DoubleSpinBoxWithSlider::enterEvent (
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QEvent* event
+#else
+    QEnterEvent* event
+#endif //
+    )
 {
     if (Slider==NULL)
     {
