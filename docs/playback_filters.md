@@ -300,12 +300,6 @@ The waveform player provides the following options:
 * Filter: The waveform filter can be adjusted to different displays. The default is 'lowpass'. See [FFmpeg's waveform documentation](https://ffmpeg.org/ffmpeg-filters.html#waveform) for information on each option.
 * Peak: If enabled, the waveform will outline the extent of the plotted values to show an envelope around the plotted values. Peak may be adjusted to outline the extent frame-per-frame or over time.
 
-## Waveform / Vectorscope {#waveform-vectorscope}
-
-This filter plots the Waveform and Vectorscope on top of each other so that both are shown in one display. The brightness of both the waveform and vectorscope may be adjusted for clarity.
-
-![Waveform / Vectorscope](media/playbackfilter_waveform_vectorscope.jpg)
-
 ## Waveform Target {#waveform-target}
 
 The Waveform Target is similar to the **Waveform** filter but a box is drawn over the image by setting an x and y coordinate and size of the box. The waveform image drawn will depict the waveform plotting of only the samples within the box. The original image may be shown as a background to the vectorscope by enabling the 'Background' checkbox.
