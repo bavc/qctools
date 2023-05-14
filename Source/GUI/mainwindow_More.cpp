@@ -367,8 +367,10 @@ void MainWindow::createGraphsLayout()
     if (PlotsArea)
     {
         PlotsArea->changeOrder(filtersInfo);
-        if (!ui->actionGraphsLayout->isChecked())
+        if (!ui->actionGraphsLayout->isChecked()) {
+            qDebug() << "if (!ui->actionGraphsLayout->isChecked()) PlotsArea->hide()";
             PlotsArea->hide();
+        }
 
         ui->verticalLayout->addWidget(PlotsArea);
         if(ui->actionGraphsLayout->isChecked()) {
@@ -519,6 +521,8 @@ void MainWindow::addFile(const QString &FileName)
 //---------------------------------------------------------------------------
 void MainWindow::addFile_finish()
 {
+    qDebug() << "addFile_finish()";
+
     if (FilesListArea)
     {
         FilesListArea->UpdateAll();

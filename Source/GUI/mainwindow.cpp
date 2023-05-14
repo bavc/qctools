@@ -372,6 +372,8 @@ void MainWindow::on_actionPrint_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionFilesList_triggered()
 {
+    qDebug() << "MainWindow::on_actionFilesList_triggered";
+
     if (ui->actionGoTo)
         ui->actionGoTo->setVisible(false);
     if (ui->menuLegacy_outputs)
@@ -406,8 +408,10 @@ void MainWindow::on_actionFilesList_triggered()
     if (ui->setupFilters_pushButton)
         ui->setupFilters_pushButton->hide();
 
-    if (PlotsArea)
+    if (PlotsArea) {
+        qDebug() << "on_actionFilesList_triggered PlotsArea->hide()";
         PlotsArea->hide();
+    }
     if (TinyDisplayArea)
         TinyDisplayArea->hide();
     if (FilesListArea && !Files.empty())
