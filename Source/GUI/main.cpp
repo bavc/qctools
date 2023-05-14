@@ -63,7 +63,9 @@ int main(int argc, char *argv[])
     {
         w.addFile(file);
     }
-    w.addFile_finish();
+    if(files.size() > 0)
+        w.addFile_finish();
+
     qDebug() << "size: " << w.size() << "pos: " << w.pos();
 
     w.show();
