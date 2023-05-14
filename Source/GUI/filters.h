@@ -48,21 +48,41 @@ const filter Filters[] =
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_Toggle,   0,   0,   0,   0, "Metadata" },
-            { Args_Type_None,     0,   0,   0,   0, nullptr },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Title/Action Safe" },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
+            // field=0, metadata=0, safe=0
             "format=yuv444p,scale",
+            // field=0, metadata=0, safe=1
+            "format=yuv444p,scale,\
+             drawbox=color=yellow:x='iw*(((100-93)/2)/100)':y='ih*(((100-93)/2)/100)':width='iw*(93/100)':height='ih*(93/100)':thickness=1,drawbox=color=green:x='iw*(((100-90)/2)/100)':y='ih*(((100-90)/2)/100)':width='iw*(90/100)':height='ih*(90/100)':thickness=1",
+            // field=0, metadata=1, safe=0
                        "format=yuv444p,scale,drawtext=fontfile=${fontfile}:box=1:boxborderw=4:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=4:text=PTS=%{pts\\\\:hms}\
                                             ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=20:text=size=%{eif\\\\:w\\\\:d}x%{eif\\\\:h\\\\:d} dar=${dar}\
            ,cropdetect=reset_count=1:round=1,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=36:text=cropdetect wxh=%{metadata\\\\:lavfi.cropdetect.w}x%{metadata\\\\:lavfi.cropdetect.h} x\\,y=%{metadata\\\\:lavfi.cropdetect.x}\\,%{metadata\\\\:lavfi.cropdetect.y}\
                            ,idet=half_life=1,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=52:text=interlacement \(single\)\\\\: %{metadata\\\\:lavfi.idet.single.current_frame}\
                                             ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=68:text=interlacement \(multiple\)\\\\: %{metadata\\\\:lavfi.idet.multiple.current_frame}\
                                             ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=84:text=interlacement \(repeat field\)\\\\: %{metadata\\\\:lavfi.idet.repeated.current_frame}",
+            // field=0, metadata=1, safe=1
+                       "format=yuv444p,scale,drawtext=fontfile=${fontfile}:box=1:boxborderw=4:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=4:text=PTS=%{pts\\\\:hms}\
+                                            ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=20:text=size=%{eif\\\\:w\\\\:d}x%{eif\\\\:h\\\\:d} dar=${dar}\
+           ,cropdetect=reset_count=1:round=1,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=36:text=cropdetect wxh=%{metadata\\\\:lavfi.cropdetect.w}x%{metadata\\\\:lavfi.cropdetect.h} x\\,y=%{metadata\\\\:lavfi.cropdetect.x}\\,%{metadata\\\\:lavfi.cropdetect.y}\
+                           ,idet=half_life=1,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=52:text=interlacement \(single\)\\\\: %{metadata\\\\:lavfi.idet.single.current_frame}\
+                                            ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=68:text=interlacement \(multiple\)\\\\: %{metadata\\\\:lavfi.idet.multiple.current_frame}\
+                                            ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=84:text=interlacement \(repeat field\)\\\\: %{metadata\\\\:lavfi.idet.repeated.current_frame}\
+                                            ,drawbox=color=yellow:x='iw*(((100-93)/2)/100)':y='ih*(((100-93)/2)/100)':width='iw*(93/100)':height='ih*(93/100)':thickness=1,drawbox=color=green:x='iw*(((100-90)/2)/100)':y='ih*(((100-90)/2)/100)':width='iw*(90/100)':height='ih*(90/100)':thickness=1",
+            // field=1, metadata=0, safe=0
             "format=yuv444p,scale,il=l=d:c=d",
+            // field=1, metadata=0, safe=1
+            "format=yuv444p,scale,split[t][b]\
+                ;[t]field=top,drawbox=color=yellow:x='iw*(((100-93)/2)/100)':y='ih*(((100-93)/2)/100)':width='iw*(93/100)':height='ih*(93/100)':thickness=1,drawbox=color=green:x='iw*(((100-90)/2)/100)':y='ih*(((100-90)/2)/100)':width='iw*(90/100)':height='ih*(90/100)':thickness=1[t2]\
+                ;[b]field=bottom,drawbox=color=yellow:x='iw*(((100-93)/2)/100)':y='ih*(((100-93)/2)/100)':width='iw*(93/100)':height='ih*(93/100)':thickness=1,drawbox=color=green:x='iw*(((100-90)/2)/100)':y='ih*(((100-90)/2)/100)':width='iw*(90/100)':height='ih*(90/100)':thickness=1[b2]\
+           ;[t2][b2]vstack",
+            // field=1, metadata=1, safe=0
             "format=yuv444p,scale,split[t][b],[t]field=top[t1];[b]field=bottom[b1]\
                                         ;[t1]drawtext=fontfile=${fontfile}:box=1:boxborderw=4:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=4:text=PTS=%{pts\\\\:hms}\
                                             ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=20:text=size=%{eif\\\\:w\\\\:d}x%{eif\\\\:h\\\\:d}\
@@ -70,6 +90,17 @@ const filter Filters[] =
                                         ;[b1]drawtext=fontfile=${fontfile}:box=1:boxborderw=4:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=4:text=PTS=%{pts\\\\:hms}\
                                             ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=20:text=size=%{eif\\\\:w\\\\:d}x%{eif\\\\:h\\\\:d}\
            ,cropdetect=reset_count=1:round=1,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=36:text=cropdetect wxh=%{metadata\\\\:lavfi.cropdetect.w}x%{metadata\\\\:lavfi.cropdetect.h} x\\,y=%{metadata\\\\:lavfi.cropdetect.x}\\,%{metadata\\\\:lavfi.cropdetect.y}[b2]\
+           ;[t2][b2]vstack",
+            // field=1, metadata=1, safe=1
+            "format=yuv444p,scale,split[t][b],[t]field=top[t1];[b]field=bottom[b1]\
+                                        ;[t1]drawtext=fontfile=${fontfile}:box=1:boxborderw=4:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=4:text=PTS=%{pts\\\\:hms}\
+                                            ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=20:text=size=%{eif\\\\:w\\\\:d}x%{eif\\\\:h\\\\:d}\
+           ,cropdetect=reset_count=1:round=1,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=36:text=cropdetect wxh=%{metadata\\\\:lavfi.cropdetect.w}x%{metadata\\\\:lavfi.cropdetect.h} x\\,y=%{metadata\\\\:lavfi.cropdetect.x}\\,%{metadata\\\\:lavfi.cropdetect.y},\
+            drawbox=color=yellow:x='iw*(((100-93)/2)/100)':y='ih*(((100-93)/2)/100)':width='iw*(93/100)':height='ih*(93/100)':thickness=1,drawbox=color=green:x='iw*(((100-90)/2)/100)':y='ih*(((100-90)/2)/100)':width='iw*(90/100)':height='ih*(90/100)':thickness=1[t2]\
+                                        ;[b1]drawtext=fontfile=${fontfile}:box=1:boxborderw=4:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=4:text=PTS=%{pts\\\\:hms}\
+                                            ,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=20:text=size=%{eif\\\\:w\\\\:d}x%{eif\\\\:h\\\\:d}\
+           ,cropdetect=reset_count=1:round=1,drawtext=fontfile=${fontfile}:box=1:boxborderw=2:boxcolor=black@0.5:fontcolor=white:fontsize=16:x=4:y=36:text=cropdetect wxh=%{metadata\\\\:lavfi.cropdetect.w}x%{metadata\\\\:lavfi.cropdetect.h} x\\,y=%{metadata\\\\:lavfi.cropdetect.x}\\,%{metadata\\\\:lavfi.cropdetect.y},\
+            drawbox=color=yellow:x='iw*(((100-93)/2)/100)':y='ih*(((100-93)/2)/100)':width='iw*(93/100)':height='ih*(93/100)':thickness=1,drawbox=color=green:x='iw*(((100-90)/2)/100)':y='ih*(((100-90)/2)/100)':width='iw*(90/100)':height='ih*(90/100)':thickness=1[b2]\
            ;[t2][b2]vstack",
         },
     },
@@ -103,13 +134,13 @@ const filter Filters[] =
         },
         {
             // field N, all planes N
-            "format=${pix_fmt},histogram=level_height=${height}-12:components=${2}:levels_mode=${3}",
+            "format=${pix_fmt},histogram=colors_mode=coloronwhite:level_height=${height}-12:components=${2}:levels_mode=${3}",
             // field N, all planes Y
-            "format=${pix_fmt},histogram=level_height=${height}:levels_mode=${3}",
+            "format=${pix_fmt},histogram=colors_mode=coloronwhite:level_height=${height}:levels_mode=${3}",
             // field Y, all planes N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},histogram=components=${2}:levels_mode=${3}[a2];[b1]format=${pix_fmt},histogram=components=${2}:levels_mode=${3}[b2];[a2][b2]vstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},histogram=colors_mode=coloronwhite:components=${2}:levels_mode=${3}[a2];[b1]format=${pix_fmt},histogram=colors_mode=coloronwhite:components=${2}:levels_mode=${3}[b2];[a2][b2]vstack",
             // field Y, all planes Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},histogram=levels_mode=${3}[a2];[b1]format=${pix_fmt},histogram=levels_mode=${3}[b2];[a2][b2]hstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},histogram=colors_mode=coloronwhite:levels_mode=${3}[a2];[b1]format=${pix_fmt},histogram=colors_mode=coloronwhite:levels_mode=${3}[b2];[a2][b2]hstack",
         },
     },
     {
@@ -126,21 +157,21 @@ const filter Filters[] =
         },
         {
             // field N, overlay N, all planes N
-            "thistogram=components=${3}:levels_mode=${4}",
+            "format=${pix_fmt:4},thistogram=components=${3}:levels_mode=${4}",
             // field N, overlay N, all planes Y
-            "thistogram=levels_mode=${4}",
+            "format=${pix_fmt:4},thistogram=levels_mode=${4}",
             // field N, overlay Y, all planes N
-            "thistogram=display_mode=overlay:components=${3}:levels_mode=${4}",
+            "format=${pix_fmt:4},thistogram=display_mode=overlay:components=${3}:levels_mode=${4}",
             // field N, overlay Y, all planes Y
-            "thistogram=display_mode=overlay:levels_mode=${4}",
+            "format=${pix_fmt:4},thistogram=display_mode=overlay:levels_mode=${4}",
             // field Y, overlay N, all planes N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=components=${3}:levels_mode=${4}[a2];[b1]thistogram=components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
+            "format=${pix_fmt:4},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=components=${3}:levels_mode=${4}[a2];[b1]thistogram=components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
             // field Y, overlay N, all planes Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=levels_mode=${4}[a2];[b1]thistogram=levels_mode=${4}[b2];[a2][b2]hstack",
+            "format=${pix_fmt:4},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=levels_mode=${4}[a2];[b1]thistogram=levels_mode=${4}[b2];[a2][b2]hstack",
             // field Y, overlay Y, all planes N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=display_mode=overlay:components=${3}:levels_mode=${4}[a2];[b1]thistogram=display_mode=overlay:components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
+            "format=${pix_fmt:4},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=display_mode=overlay:components=${3}:levels_mode=${4}[a2];[b1]thistogram=display_mode=overlay:components=${3}:levels_mode=${4}[b2];[a2][b2]vstack",
             // field Y, overlay Y, all planes Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=display_mode=overlay:levels_mode=${4}[a2];[b1]thistogram=display_mode=overlay:levels_mode=${4}[b2];[a2][b2]vstack",
+            "format=${pix_fmt:4},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]thistogram=display_mode=overlay:levels_mode=${4}[a2];[b1]thistogram=display_mode=overlay:levels_mode=${4}[b2];[a2][b2]vstack",
         },
     },
     {
@@ -157,21 +188,21 @@ const filter Filters[] =
         },
         {
             // field N, all planes N, vertical N
-            "format=${pix_fmt},waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}",
+            "format=${pix_fmt:4},waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}",
             // field N, all planes N, vertical Y
-            "format=${pix_fmt},waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}",
+            "format=${pix_fmt:4},waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}",
             // field N, all planes Y, vertical N
-            "format=${pix_fmt},waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay",
+            "format=${pix_fmt:4},waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay",
             // field N, all planes Y, vertical Y
-            "format=${pix_fmt},waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay",
+            "format=${pix_fmt:4},waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay",
             // field Y, all planes N, vertical N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[a2];[b1]format=${pix_fmt},waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b2];[a2][b2]vstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt:4},waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[a2];[b1]format=${pix_fmt:4},waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b2];[a2][b2]vstack",
             // field Y, all planes N, vertical Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[a2];[b1]format=${pix_fmt},waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b2];[a2][b2]vstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt:4},waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[a2];[b1]format=${pix_fmt:4},waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b2];[a2][b2]vstack",
             // field Y, all planes Y, vertical N
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[a2];[b1]format=${pix_fmt},waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[b2];[a2][b2]vstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt:4},waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[a2];[b1]format=${pix_fmt:4},waveform=intensity=${2}:mode=column:mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[b2];[a2][b2]vstack",
             // field Y, all planes Y, vertical Y
-            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt},waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[a2];[b1]format=${pix_fmt},waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[b2];[b2][a2]vstack",
+            "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]format=${pix_fmt:4},waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[a2];[b1]format=${pix_fmt:4},waveform=intensity=${2}:mode=row:   mirror=1:c=${3}:f=${5}:graticule=green:flags=numbers+dots:scale=${6}:display=overlay[b2];[b2][a2]vstack",
         },
     },
     {
@@ -188,13 +219,14 @@ const filter Filters[] =
             { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
         },
         {
-            "crop=${3}:${4}:${1}:${2},\
-            format=${pix_fmt},waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1",
+            "crop=${3}:${4}:${1}:${2},scale=${width}:${height},\
+            format=${pix_fmt:4},waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1",
             "split[a][b];\
-            [a]lutyuv=y=val/4,scale=${width}:${height},setsar=1/1,format=yuv444p|yuv444p10le,drawbox=w=${3}:h=${4}:x=${1}:y=${2}:color=invert:thickness=1[a1];\
-            [b]crop=${3}:${4}:${1}:${2},\
-            format=${pix_fmt},waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1[b1];\
-            [a1][b1]blend=addition",
+            [a]format=yuv444p,lutyuv=y=val/4,drawbox=w=${3}:h=${4}:x=${1}:y=${2}:color=invert:thickness=1[a1];\
+            [b]crop=${3}:${4}:${1}:${2},scale=${width}:${height},\
+            format=${pix_fmt:4},waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b1];\
+            [a1][b1]scale2ref[a2][b1];\
+            [a2][b1]blend=addition",
         },
     },
     {
@@ -210,10 +242,10 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "               crop=iw:1:0:${1}:0:1,format=${pix_fmt},waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
-            "split[a][b];[a]crop=iw:1:0:${1}:0:1,format=${pix_fmt},waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=iw:${height},drawbox=y=${1}:w=iw:h=1:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
-            "               crop=1:ih:${1}:0:0:1,format=${pix_fmt},waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
-            "split[a][b];[a]crop=1:ih:${1}:0:0:1,format=${pix_fmt},waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=${width}:${height},drawbox=x=${1}:w=1:h=ih:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
+            "               crop=iw:1:0:${1}:0:1,format=${pix_fmt:4},waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
+            "split[a][b];[a]crop=iw:1:0:${1}:0:1,format=${pix_fmt:4},waveform=intensity=${2}:mode=column:mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=iw:${height},drawbox=y=${1}:w=iw:h=1:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
+            "               crop=1:ih:${1}:0:0:1,format=${pix_fmt:4},waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5}",
+            "split[a][b];[a]crop=1:ih:${1}:0:0:1,format=${pix_fmt:4},waveform=intensity=${2}:mode=row:   mirror=1:components=7:display=overlay:graticule=green:flags=numbers+dots:scale=${5},scale=${width}:${height},drawbox=x=${1}:w=1:h=ih:color=yellow,setsar=1/1[a1];[b]lutyuv=y=val/2,setsar=1/1[b1];[a1][b1]blend=addition",
         },
     },
     {
@@ -246,8 +278,8 @@ const filter Filters[] =
             { Args_Type_None,        0,   0,       0,   0, nullptr },
         },
         {
-            "pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5},format=rgb24",
-            "il=l=d:c=d,pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5},format=rgb24",
+            "scale='max(640\\,iw)':'max(480\\,ih)',pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5},format=rgb24",
+            "il=l=d:c=d,scale='max(640\\,iw)':'max(480\\,ih)',pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5},format=rgb24",
         },
     },
     {
@@ -263,8 +295,8 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
-            "format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name[a2];[b1]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name[b2];[a2][b2]vstack,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            "format=${pix_fmt:6},vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            "format=${pix_fmt:6},split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name[a2];[b1]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name[b2];[a2][b2]vstack,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
         },
     },
     {
@@ -280,8 +312,8 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "split[h][l];[l]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=0:h=${6}[l1];[h]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=${6}:h=1[h1];[l1][h1]hstack",
-            "format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,split[a][b];\
+            "format=${pix_fmt:6},split[h][l];[l]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=0:h=${6}[l1];[h]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=${6}:h=1[h1];[l1][h1]hstack",
+            "format=${pix_fmt:6},split[a][b];\
             [a]field=top,split[th][tl];\
             [b]field=bottom,split[bh][bl];\
             [th]vectorscope=i=${2}:mode=${3}:envelope=${4}:colorspace=${5}:graticule=green:flags=name:l=${6}:h=1[th1];\
@@ -308,11 +340,11 @@ const filter Filters[] =
         },
         {
             "crop=${3}:${4}:${1}:${2},\
-            format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            format=${pix_fmt:6},vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
             "split[a][b];\
-            [a]lutyuv=y=val/4,scale=${width}:${height},setsar=1/1,format=yuv444p|yuv444p10le,drawbox=w=${3}:h=${4}:x=${1}:y=${2}:color=invert:thickness=1[a1];\
+            [a]lutyuv=y=val/4,scale=${width}:${height},setsar=1/1,format=${pix_fmt:6},drawbox=w=${3}:h=${4}:x=${1}:y=${2}:color=invert:thickness=1[a1];\
             [b]crop=${3}:${4}:${1}:${2},\
-            format=yuv422p|yuv422p10le|yuv420p|yuv411p|yuv444p|yuv444p10le,vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height},setsar=1/1[b1];\
+            format=${pix_fmt:6},vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height},setsar=1/1[b1];\
             [a1][b1]blend=addition",
         },
     },
@@ -480,9 +512,9 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "bitplanenoise=bitplane=${bitdepth}+1-${2}:filter=1,format=yuv444p,extractplanes=${3}",
+            "bitplanenoise=bitplane=${bitdepth}+1-${2}:filter=1,extractplanes=${3}",
             "bitplanenoise=bitplane=${bitdepth}+1-${2}:filter=1",
-            "il=l=d:c=d,bitplanenoise=bitplane=${bitdepth}-${2}:filter=1,format=yuv444p,extractplanes=${3}",
+            "il=l=d:c=d,bitplanenoise=bitplane=${bitdepth}-${2}:filter=1,extractplanes=${3}",
             "il=l=d:c=d,bitplanenoise=bitplane=${bitdepth}-${2}:filter=1",
 
         },
@@ -547,6 +579,23 @@ const filter Filters[] =
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
             { Args_Type_Yuv,      0,   0,   0,   0, "Plane" },
+            { Args_Type_Slider, 235,   0, 255,   1, "Value"},
+            { Args_Type_ClrPck, 0x40e0d0,   0,   0,   0, ""},
+            { Args_Type_None,     0,   0,   0,   0, nullptr },
+            { Args_Type_None,     0,   0,   0,   0, nullptr },
+            { Args_Type_None,     0,   0,   0,   0, nullptr },
+        },
+        {
+                       "split[vhmask][vhpic];color=color=${4}[vhcolor];[vhpic]extractplanes=${2}[vhpic1];[vhcolor][vhpic1]scale2ref[vhcolor1][vhpic1];[vhmask]format=${pix_fmt},extractplanes=${2},lut=c0=if(eq(val\\,${3})\\,minval\\,maxval),[vhpic1]alphamerge,[vhcolor1]overlay",
+            "il=l=d:c=d,split[vhmask][vhpic];color=color=${4}[vhcolor];[vhpic]extractplanes=${2}[vhpic1];[vhcolor][vhpic1]scale2ref[vhcolor1][vhpic1];[vhmask]format=${pix_fmt},extractplanes=${2},lut=c0=if(eq(val\\,${3})\\,minval\\,maxval),[vhpic1]alphamerge,[vhcolor1]overlay",
+        },
+    },
+    {
+        "Value Highlight (Range)",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Yuv,      0,   0,   0,   0, "Plane" },
             { Args_Type_Slider, 235,   0, 255,   1, "Min"},
             { Args_Type_Slider, 255,   0, 255,   1, "Max"},
             { Args_Type_ClrPck, 0x40e0d0,   0,   0,   0, ""},
@@ -554,8 +603,8 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-                       "split[vhmask][vhpic];color=color=${5}[vhcolor];[vhpic]extractplanes=${2}[vhpic1];[vhcolor][vhpic1]scale2ref[vhcolor1][vhpic1];[vhmask]format=${pix_fmt},extractplanes=${2},lut=c0=if(between(val\\,${3}\\,${4})\\,minval\\,maxval),[vhpic1]alphamerge,[vhcolor1]overlay",
-            "il=l=d:c=d,split[vhmask][vhpic];color=color=${5}[vhcolor];[vhpic]extractplanes=${2}[vhpic1];[vhcolor][vhpic1]scale2ref[vhcolor1][vhpic1];[vhmask]format=${pix_fmt},extractplanes=${2},lut=c0=if(between(val\\,${3}\\,${4})\\,minval\\,maxval),[vhpic1]alphamerge,[vhcolor1]overlay",
+                       "split[vhrmask][vhrpic];color=color=${5}[vhrcolor];[vhrpic]extractplanes=${2}[vhrpic1];[vhrcolor][vhrpic1]scale2ref[vhrcolor1][vhrpic1];[vhrmask]format=${pix_fmt},extractplanes=${2},lut=c0=if(between(val\\,${3}\\,${4})\\,minval\\,maxval),[vhrpic1]alphamerge,[vhrcolor1]overlay",
+            "il=l=d:c=d,split[vhrmask][vhrpic];color=color=${5}[vhrcolor];[vhrpic]extractplanes=${2}[vhrpic1];[vhrcolor][vhrpic1]scale2ref[vhrcolor1][vhrpic1];[vhrmask]format=${pix_fmt},extractplanes=${2},lut=c0=if(between(val\\,${3}\\,${4})\\,minval\\,maxval),[vhrpic1]alphamerge,[vhrcolor1]overlay",
         },
     },
     {
@@ -594,22 +643,20 @@ const filter Filters[] =
         },
     },
     {
-        "Chroma Delay",
+        "Chroma Shift",
         0,
         {
             { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Slider,   0,-128, 128,   1, "Chroma Shift"},
-            { Args_Type_Toggle,   1,   0,   0,   0, "Interleave" },
-            { Args_Type_None,          0,   0,   0,   0, nullptr },
-            { Args_Type_None,          0,   0,   0,   0, nullptr },
+            { Args_Type_Slider,   0,-128, 128,   1, "Cr Horiz"},
+            { Args_Type_Slider,   0,-128, 128,   1, "Cr Vert"},
+            { Args_Type_Slider,   0,-128, 128,   1, "Cb Horiz"},
+            { Args_Type_Slider,   0,-128, 128,   1, "Cb Vert"},
             { Args_Type_None,          0,   0,   0,   0, nullptr },
             { Args_Type_None,          0,   0,   0,   0, nullptr },
         },
         {
-            "format=yuv444p,pad=w=iw+256:h=ih:x=128,geq=lum=lum(X\\,Y):cb=cb(X-${2}\\,Y):cr=cr(X-${2}\\,Y)",
-            "format=yuv444p,split[y][u];[y]extractplanes=y,pad=w=iw+256:h=ih:x=128,format=yuv444p[y1];[u]extractplanes=u,histeq,pad=w=iw+256:h=ih:x=${2}+128:y=0,format=yuv444p[u1];[y1][u1]vstack,il=l=i:c=i",
-            "il=l=d:c=d,format=yuv444p,pad=w=iw+256:h=ih:x=128,geq=lum=lum(X\\,Y):cb=cb(X-${2}\\,Y):cr=cr(X-${2}\\,Y)",
-            "il=l=d:c=d,format=yuv444p,split[y][u];[y]extractplanes=y,pad=w=iw+256:h=ih:x=128,format=yuv444p[y1];[u]extractplanes=u,histeq,pad=w=iw+256:h=ih:x=${2}+128:y=0,format=yuv444p[u1];[y1][u1]vstack,il=l=i:c=i",
+            "format=yuv444p,chromashift=cbh=${2}:cbv=${3}:crh=${4}:crv=${5}",
+            "il=l=d:c=d,format=yuv444p,chromashift=cbh=${2}:cbv=${3}:crh=${4}:crv=${5}",
         },
     },
     {
@@ -712,7 +759,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "geq=lum=lum(X\\,Y)-lum(X-${1}\\,Y-${2})+128:cb=cb(X\\,Y)-cb(X-${3}\\,Y-${4})+128:cr=cr(X\\,Y)-cr(X-${3}\\,Y-${4})+128,histeq=strength=${5}",
+            "geq=lum=lum(X\\,Y)-lum(X-${1}\\,Y-${2})+pow(2\\,${bitdepth}-1):cb=cb(X\\,Y)-cb(X-${3}\\,Y-${4})+pow(2\\,${bitdepth}-1):cr=cr(X\\,Y)-cr(X-${3}\\,Y-${4})+pow(2\\,${bitdepth}-1),histeq=strength=${5}",
         },
     },
     {
@@ -745,10 +792,10 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-                       "lutyuv=y=if(gt(val\\,maxval)\\,val-maxval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2,histeq=strength=1",
-                       "lutyuv=y=if(lt(val\\,minval)\\,val+minval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2,histeq=strength=1",
-            "il=l=d:c=d,lutyuv=y=if(gt(val\\,maxval)\\,val-maxval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2,histeq=strength=1",
-            "il=l=d:c=d,lutyuv=y=if(lt(val\\,minval)\\,val+minval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2,histeq=strength=1",
+                       "lutyuv=y=if(gt(val\\,maxval)\\,((maxval-minval+1)/(pow(2\\,${bitdepth})-maxval+1))*(val-maxval+1)+minval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2",
+                       "lutyuv=y=if(lt(val\\,minval)\\,((maxval-minval+1)/minval+1)*(val+1)+minval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2",
+            "il=l=d:c=d,lutyuv=y=if(gt(val\\,maxval)\\,((maxval-minval+1)/(pow(2\\,${bitdepth})-maxval+1))*(val-maxval+1)+minval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2",
+            "il=l=d:c=d,lutyuv=y=if(lt(val\\,minval)\\,((maxval-minval+1)/minval+1)*(val+1)+minval\\,0):u=(maxval+minval)/2:v=(maxval+minval)/2",
         },
     },
     {

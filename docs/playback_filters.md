@@ -16,7 +16,7 @@ The QCTools preview window is intended as an analytical playback environment tha
 [Bit Plane Noise](#bit-plane-noise)  
 [Broadcast Illegal Focus](#broadcast-illegal-focus)  
 [Broadcast Range Pixels](#broadcast-range-pixels)  
-[Chroma Delay](#chroma-delay)  
+[Chroma Shift](#chroma-shift)  
 [CIE Scope](#cie-scope)  
 [Color Matrix](#color-matrix)  
 [Corners](#corners)  
@@ -33,18 +33,20 @@ The QCTools preview window is intended as an analytical playback environment tha
 [Normal](#normal)  
 [Oscilloscope](#oscilloscope)  
 [Pixel Offset Subtraction](#pixel-offset-subtraction)  
-[Pixel Scope](#pixel-scope)  X
+[Pixel Scope](#pixel-scope)  
 [Sample Range](#sample-range)  
 [Saturation Highlight](#saturation-highlight)  
 [Temporal Difference](#temporal-difference)  
 [Temporal Outlier Pixels](#temporal-outlier-pixels)  
 [Value Highlight](#value-highlight)  
+[Value Highlight (Range)](#value-highlight-range)  
 [Vectorscope](#vectorscope)  
 [Vectorscope High/Low](#vectorscope-highlow)  
 [Vectorscope Target](#vectorscope-target)  
 [Vertical Line Repetitions](#vertical-line-repetitions)  
 [Vertical Repetition Pixels](#vertical-repetition-pixels)  
 [Waveform](#waveform)  
+[Waveform Target](#waveform-target)  
 [Zoom](#zoom)  
 
 # Arrangement
@@ -78,6 +80,8 @@ This filter enables the hue and saturation levels to be adjusted. Hue adjustment
 This view simply shows the video as QCTools interprets it, no special effects or filtering are added. In this view, however, you also have the option of enabling a **'Field'** display which splits the two video fields for the selected frame and displays them as discrete images. Thus all odd-numbered video lines appear are resorted to appear on the top of the image and the even-numbered lines appear on the bottom. Since many analog video issues occur differently between the two interlaced fields, splitting the fields into two distinct images can make it easier to see if a given issue is from problems with the analog video playback device (such as a head clog where the two fields would react very differently) and tape damage (where the two fields would react similarly).
 
 The **Metadata** option will overlay some metadata onto the image, including the presentation timestamp, frame size, and metadata from filters that perform crop detection and interlacement pattern detection.
+
+The **Action/Title Safe** option will overlay boxes to show the Action Safe and Title Safe areas as defined by SMPTE ST 2046-1 (2009). The Safe Action Area is a box that includes 93%  of the width and height and is drawn in yellow. The Safe Title Area is a box that includes 90% of the width and height and is drawn in green. Thanks much to @bbgdzxng1 for supporting this feature.
 
 ## Bit Plane {#bit-plane}
 
@@ -122,9 +126,9 @@ This filter plots the range of visible colors as defined by the Committee Intern
 
 ![CIE Scope](media/playbackfilter_CIE_scope.jpg)
 
-## Chroma Delay {#chroma-delay}
+## Chroma Shift {#chroma-shift}
 
-This filter allows the Cb and Cr planes to be offset left or right to check if the color data is properly timed to the luminence data. The 'chroma shift' value can be used to shift the Cb and Cr color planes up to 128 pixel columns to the left or right. When 'interleave' is enabled the Y and Cb planes are both presented in grayscale interleaved by line, so the alignment of the planes may be seen in an alternate way. Unchecking 'interleave' will presented the planes rendered properly with the shifted chroma.
+This filter allows the Cb and Cr planes to be offset horizontally or veritcally to check if the color data is properly timed to the luminence data. See FFmpeg's documentation on [chroma shift](https://ffmpeg.org/ffmpeg-filters.html#chromashift).
 
 ## Color Matrix {#color-matrix}
 
@@ -206,9 +210,13 @@ Provides a 2D Video Oscilloscope. Useful to measure spatial impulse, step respon
 
 ## Pixel Offset Subtraction {#pixel-offset-subtraction}
 
-Displays an image by subtracting the offset level from each successive pixel.
+Displays the difference betweeen a frame and the same frame offset vertically or horizontally by a specified amount. Vertical and horizontal offsets may be specified independently for luma and chroma. When all offsets are set the zero, the image should be gray (i.e. no difference).
 
 ![Pixel Offset Subtraction](media/playbackfilter_pixel_offset_subtraction.jpg)
+
+## Pixel Scope {#pixel-scope}
+
+Displays an image using FFmpeg's (pixscope)[https://ffmpeg.org/ffmpeg-filters.html#pixscope] filter. Note that if the image is less than 640x480, it will be scaled up to that size before displaying it in the scope.
 
 ## Sample Range {#sample-range}
 
@@ -236,7 +244,11 @@ This is the same presentation as 'Normal' except that pixels that are labelled a
 
 ## Value Highlight {#value-highlight}
 
-This filter selects a video plane and highlights values with a specified range of minimum value to maximum value. The original image of the plane will be presented in grayscale and values within the range will be highlighted as yellow; for instance to highlight Y values below NTSC broadcast range, set plane to Y, min to 0 and max to 16. The resulting image will highlight Y values below broadcast range in turquoise.
+This filter selects a video plane and highlights a specific value. The original image of the plane will be presented in grayscale and value will be highlighted as the selected color.
+
+## Value Highlight (Range) {#value-highlight-range}
+
+This filter selects a video plane and highlights values with a specified range of minimum value to maximum value. The original image of the plane will be presented in grayscale and values within the range will be highlighted as the selected color; for instance to highlight Y values below NTSC broadcast range, set plane to Y, min to 0 and max to 16 (16 for 8 bit video or 64 for 10 bit video) and the resulting image will highlight Y values below broadcast range.
 
 ![Value Highlight](media/playbackfilter_value_highlight.jpg)
 
@@ -287,12 +299,6 @@ The waveform player provides the following options:
 * Vertical: If checked then the waveform will plot on rows rather than columns. It is the equivalent of rotating the video image by 90 degrees and applying a waveform to the result.
 * Filter: The waveform filter can be adjusted to different displays. The default is 'lowpass'. See [FFmpeg's waveform documentation](https://ffmpeg.org/ffmpeg-filters.html#waveform) for information on each option.
 * Peak: If enabled, the waveform will outline the extent of the plotted values to show an envelope around the plotted values. Peak may be adjusted to outline the extent frame-per-frame or over time.
-
-## Waveform / Vectorscope {#waveform-vectorscope}
-
-This filter plots the Waveform and Vectorscope on top of each other so that both are shown in one display. The brightness of both the waveform and vectorscope may be adjusted for clarity.
-
-![Waveform / Vectorscope](media/playbackfilter_waveform_vectorscope.jpg)
 
 ## Waveform Target {#waveform-target}
 
