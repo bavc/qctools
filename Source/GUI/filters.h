@@ -741,7 +741,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "geq=lum=lum(X\\,Y)-lum(X-${1}\\,Y-${2})+128:cb=cb(X\\,Y)-cb(X-${3}\\,Y-${4})+128:cr=cr(X\\,Y)-cr(X-${3}\\,Y-${4})+128,histeq=strength=${5}",
+            "geq=lum=lum(X\\,Y)-lum(X-${1}\\,Y-${2})+pow(2\\,${bitdepth}-1):cb=cb(X\\,Y)-cb(X-${3}\\,Y-${4})+pow(2\\,${bitdepth}-1):cr=cr(X\\,Y)-cr(X-${3}\\,Y-${4})+pow(2\\,${bitdepth}-1),histeq=strength=${5}",
         },
     },
     {
