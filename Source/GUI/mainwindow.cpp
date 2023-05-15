@@ -166,6 +166,9 @@ void MainWindow::on_actionOpen_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionClose_triggered()
 {
+    if(m_player->isVisible())
+        return m_player->hide();
+
     closeFile();
     if (FilesListArea && ui->actionFilesList->isChecked())
         FilesListArea->UpdateAll();
