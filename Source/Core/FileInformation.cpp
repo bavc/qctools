@@ -603,7 +603,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     static const QString dotQctoolsDotMkv = ".qctools.mkv";
 
     QByteArray attachment;
-    std::string glueFileName = FileName.toUtf8().data();
+    auto mediaFileName = FileName;
 
     if (FileName.endsWith(dotQctoolsDotXmlDotGz))
     {
@@ -650,7 +650,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         if (QFile::exists(FileName + dotQctoolsDotMkv))
         {
             attachment = getAttachment(FileName + dotQctoolsDotMkv, StatsFromExternalData_FileName);
-            glueFileName = glueFileName + dotQctoolsDotMkv.toStdString();
+            mediaFileName = mediaFileName + dotQctoolsDotMkv;
         }
         else if (QFile::exists(FileName + dotQctoolsDotXmlDotGz))
         {
@@ -678,7 +678,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                 if (list.size() == 1)
                 {
                     attachment = getAttachment(QCvaultPath.absolutePath() + "/" + list[0], StatsFromExternalData_FileName);
-                    glueFileName = (QCvaultPath.absolutePath() + "/" + list[0]).toStdString();
+                    mediaFileName = (QCvaultPath.absolutePath() + "/" + list[0]);
                     break;
                 }
                 list = QCvaultPath.entryList(QStringList(QCvaultFileName + "*" + dotQctoolsDotXmlDotGz), QDir::Files, QDir::Name);
@@ -721,10 +721,6 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     // External data optional input
     bool StatsFromExternalData_IsOpen=StatsFromExternalData_File->open(QIODevice::ReadOnly);
 
-    // Running FFmpeg
-    #ifdef _WIN32
-        std::replace(glueFileName.begin(), glueFileName .end(), '/', '\\' );
-    #endif
     std::string Filters[Type_Max];
     if (!StatsFromExternalData_IsOpen)
     {
@@ -772,11 +768,11 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         }
     }
 
-    if(glueFileName  == "-")
-        glueFileName  = "pipe:0";
+    if(mediaFileName  == "-")
+        mediaFileName  = "pipe:0";
 
     m_mediaParser = new QAVPlayer();
-    m_mediaParser->setSource(glueFileName.c_str());
+    m_mediaParser->setSource(mediaFileName);
     m_mediaParser->setSynced(false);
 
     QEventLoop loop;
@@ -805,7 +801,8 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         streams.append(m_mediaParser->availableAudioStreams());
 
         AVFormatContext* FormatContext = nullptr;
-        if (avformat_open_input(&FormatContext, glueFileName.c_str(), NULL, NULL)>=0)
+        auto stdMediaFileName = mediaFileName.toStdString();
+        if (avformat_open_input(&FormatContext, stdMediaFileName.c_str(), NULL, NULL)>=0)
         {
             QVector<QAVStream*> orderedStreams;
             if (avformat_find_stream_info(FormatContext, NULL)>=0) {
