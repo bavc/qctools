@@ -567,6 +567,25 @@ std::map<std::string, std::string> getStreamMetadata(AVStream* stream)
     return metadata;
 }
 
+static const QString dotDpx = ".dpx";
+
+bool isDpx(QString mediaFileName) {
+    return mediaFileName.endsWith(dotDpx, Qt::CaseInsensitive);
+}
+
+QString adjustDpxFileName(QString mediaFileName) {
+    auto offset = mediaFileName.length() - dotDpx.length() - 1;
+    auto numberOfDigits = 0;
+    while(offset >= 0 && mediaFileName[offset].isNumber()) {
+        --offset;
+        ++numberOfDigits;
+    }
+    auto fmt = QString::asprintf("%0%dd", numberOfDigits);
+    mediaFileName.replace(offset + 1, numberOfDigits, fmt);
+
+    return mediaFileName;
+}
+
 FileInformation::FileInformation (SignalServer* signalServer, const QString &FileName_, activefilters ActiveFilters_, activealltracks ActiveAllTracks_,
                                   QMap<QString, std::tuple<QString, QString, QString, QString, int>> activePanels,
                                   const QString &QCvaultFileNamePrefix,
@@ -768,19 +787,10 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         }
     }
 
-    static const QString dotDpx = ".dpx";
-
     if(mediaFileName  == "-")
         mediaFileName  = "pipe:0";
-    else if(mediaFileName.endsWith(dotDpx, Qt::CaseInsensitive)) {
-        auto offset = mediaFileName.length() - dotDpx.length() - 1;
-        auto numberOfDigits = 0;
-        while(offset >= 0 && mediaFileName[offset].isNumber()) {
-            --offset;
-            ++numberOfDigits;
-        }
-        auto fmt = QString::asprintf("%0%dd", numberOfDigits);
-        mediaFileName.replace(offset + 1, numberOfDigits, fmt);
+    else if(isDpx(mediaFileName)) {
+        mediaFileName = adjustDpxFileName(mediaFileName);
     }
 
     m_mediaParser = new QAVPlayer();

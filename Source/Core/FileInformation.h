@@ -37,6 +37,9 @@ std::string FFmpeg_Compiler();
 std::string FFmpeg_Configuration();
 std::string FFmpeg_LibsVersion();
 
+bool isDpx(QString mediaFileName);
+QString adjustDpxFileName(QString mediaFileName);
+
 //---------------------------------------------------------------------------
 class FileInformation : public QThread
 {
@@ -197,7 +200,7 @@ public:
     const std::map<std::string, std::string> & getPanelOutputMetadata(size_t index) const;
     size_t getPanelFramesCount(size_t index) const;
     QAVVideoFrame getPanelFrame(size_t index, size_t panelFrameIndex) const;
-
+        
 public Q_SLOTS:
 
     void checkFileUploaded(const QString& fileName);
