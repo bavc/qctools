@@ -768,8 +768,20 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         }
     }
 
+    static const QString dotDpx = ".dpx";
+
     if(mediaFileName  == "-")
         mediaFileName  = "pipe:0";
+    else if(mediaFileName.endsWith(dotDpx, Qt::CaseInsensitive)) {
+        auto offset = mediaFileName.length() - dotDpx.length() - 1;
+        auto numberOfDigits = 0;
+        while(offset >= 0 && mediaFileName[offset].isNumber()) {
+            --offset;
+            ++numberOfDigits;
+        }
+        auto fmt = QString::asprintf("%0%dd", numberOfDigits);
+        mediaFileName.replace(offset + 1, numberOfDigits, fmt);
+    }
 
     m_mediaParser = new QAVPlayer();
     m_mediaParser->setSource(mediaFileName);
