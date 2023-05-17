@@ -40,19 +40,11 @@
 //---------------------------------------------------------------------------
 void MainWindow::openFile()
 {
-    QFileDialog::Option options = QFileDialog::Option(0);
-
-#if defined(Q_OS_WIN) || defined(Q_OS_MACX)
-    // for Windows and Mac (to resolve 'gray-out files' issue (https://github.com/bavc/qctools/issues/293) use the Qt builtin dialog which displays files,
-    // other platforms should use the native dialog.
-    options = QFileDialog::DontUseNativeDialog;
-#endif
-
     QStringList List=QFileDialog::getOpenFileNames(this, "Open file", "", "All (*.*);;\
                                                                            Audio files (*.wav);;\
                                                                            Statistic files (*.qctools.xml *.qctools.xml.gz *.xml.gz *.xml);;\
                                                                            Statistic files with thumbnails (*.qctools.mkv);;\
-                                                                           Video files (*.avi *.mkv *.mov *.mxf *.mp4 *.ts *.m2ts)", 0, options);
+                                                                           Video files (*.avi *.mkv *.mov *.mxf *.mp4 *.ts *.m2ts)", 0);
     if (List.empty())
         return;
 

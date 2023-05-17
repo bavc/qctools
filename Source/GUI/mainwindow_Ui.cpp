@@ -524,7 +524,7 @@ void MainWindow::Export_PDF()
     if (getFilesCurrentPos()>=Files.size() || !Files[getFilesCurrentPos()])
         return;
 
-    QString SaveFileName=QFileDialog::getSaveFileName(this, "Acrobat Reader file (PDF)", Files[getFilesCurrentPos()]->fileName() + ".qctools.pdf", "PDF (*.pdf)", 0, QFileDialog::DontUseNativeDialog);
+    QString SaveFileName=QFileDialog::getSaveFileName(this, "Acrobat Reader file (PDF)", Files[getFilesCurrentPos()]->fileName() + ".qctools.pdf", "PDF (*.pdf)", 0);
 
     if (SaveFileName.isEmpty())
         return;
