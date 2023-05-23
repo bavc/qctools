@@ -50,16 +50,6 @@
       <property name="resizeAnchor">
        <enum>QGraphicsView::AnchorViewCenter</enum>
       </property>
-      <widget class="QWidget" name="scrollAreaWidgetContents" native="true">
-       <property name="geometry">
-        <rect>
-         <x>201</x>
-         <y>93</y>
-         <width>300</width>
-         <height>246</height>
-        </rect>
-       </property>
-      </widget>
      </widget>
     </item>
     <item row="1" column="0">
