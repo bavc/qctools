@@ -16,6 +16,7 @@
 #include <QAbstractVideoSurface>
 #include <QVideoSurfaceFormat>
 
+class QGraphicsVideoItem;
 class VideoRenderer : public QVideoRendererControl
 {
 public:
@@ -150,6 +151,7 @@ private:
     QTimer t;
 };
 
+class SelectionArea;
 class Player : public QMainWindow
 {
     Q_OBJECT
@@ -236,6 +238,8 @@ private:
 private:
     Ui::Player *ui;
 
+    QGraphicsVideoItem* m_w;
+/*
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     VideoWidget* m_w;
     MediaObject* m_o;
@@ -243,6 +247,7 @@ private:
 #else
     QVideoWidget* m_w;
 #endif
+*/
 
     MediaPlayer* m_player;
     bool m_mute { false };
@@ -262,6 +267,7 @@ private:
     bool m_seekOnFileInformationPositionChange;
     bool m_ignorePositionChanges;
 
+    SelectionArea* m_selectionArea;
     QTimer m_filterUpdateTimer;
 };
 

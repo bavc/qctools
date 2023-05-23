@@ -13,14 +13,13 @@
 #include <QGraphicsItem>
 #include <QGraphicsObject>
 #include <QFileDialog>
+#include <QGraphicsView>
+#include <QGraphicsVideoItem>
 #include "draggablechildrenbehaviour.h"
+#include "SelectionArea.h"
 #include <float.h>
 
 const int MaxFilters = 6;
-const int DefaultFirstFilterIndex = 0;
-const int DefaultSecondFilterIndex = 4;
-const int DefaultThirdFilterIndex = 0;
-const int DefaultForthFilterIndex = 0;
 
 Player::Player(QWidget *parent) :
     QMainWindow(parent),
@@ -34,6 +33,14 @@ Player::Player(QWidget *parent) :
 
     m_audioOutput.reset(new QAVAudioOutput);
 
+    QGraphicsScene* scene = new QGraphicsScene(ui->graphicsView);
+    ui->graphicsView->setScene(scene);
+
+    m_w = new QGraphicsVideoItem();
+    m_w->setSize(QSize(300, 300));
+    scene->addItem(m_w);
+
+    /*
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     m_w = new VideoWidget(ui->scrollArea);
     m_vr = new VideoRenderer();
@@ -42,6 +49,7 @@ Player::Player(QWidget *parent) :
 #else
     m_w = new QVideoWidget(ui->scrollArea);
 #endif //
+    */
     m_player = new MediaPlayer();
 
     QObject::connect(m_player, &QAVPlayer::audioFrame, m_player, [this](const QAVAudioFrame &frame) {
@@ -49,33 +57,28 @@ Player::Player(QWidget *parent) :
             m_audioOutput->play(frame);
     });
 
-   QObject::connect(m_player, &QAVPlayer::videoFrame, m_player, [this](const QAVVideoFrame &frame) {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-       if (m_vr->m_surface == nullptr)
-           return;
-#endif
+    QObject::connect(m_player, &QAVPlayer::videoFrame, m_player, [this](const QAVVideoFrame &frame) {
 
-       videoFrame = frame.convertTo(AV_PIX_FMT_RGB32);
+        videoFrame = frame.convertTo(AV_PIX_FMT_RGB32);
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-       if (!m_vr->m_surface->isActive() || m_vr->m_surface->surfaceFormat().frameSize() != videoFrame.size()) {
-           m_vr->m_surface->start({videoFrame.size(), videoFrame.pixelFormat(), videoFrame.handleType()});
-           updateVideoOutputSize();
-       }
-       if (m_vr->m_surface->isActive())
-           m_vr->m_surface->present(videoFrame);
+        auto surface = m_w->videoSurface();
+        if (!surface->isActive() || surface->surfaceFormat().frameSize() != videoFrame.size()) {
+            surface->start({videoFrame.size(), videoFrame.pixelFormat(), videoFrame.handleType()});
+            updateVideoOutputSize();
+        }
+        if (surface->isActive())
+            surface->present(videoFrame);
 #else
-       if(m_w->videoSink()->videoFrame().size() != videoFrame.size()) {
-           m_w->videoSink()->setVideoFrame(videoFrame);
-           updateVideoOutputSize();
-       } else {
-           m_w->videoSink()->setVideoFrame(videoFrame);
-       }
+            if(m_w->videoSink()->videoFrame().size() != videoFrame.size()) {
+                m_w->videoSink()->setVideoFrame(videoFrame);
+                updateVideoOutputSize();
+            } else {
+                m_w->videoSink()->setVideoFrame(videoFrame);
+            }
 #endif
 
-   });
-
-    ui->scrollArea->setWidget(m_w);
+    });
 
     connect(m_player, &QAVPlayer::stateChanged, [this](QAVPlayer::State state) {
         if(state == QAVPlayer::PlayingState) {
@@ -199,6 +202,27 @@ Player::Player(QWidget *parent) :
 
     m_filterUpdateTimer.setSingleShot(true);
     connect(&m_filterUpdateTimer, &QTimer::timeout, this, &Player::applyFilter);
+
+    auto selectionArea = new SelectionAreaGraphicsObject(m_w);
+    selectionArea->setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges /*| QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable */);
+    selectionArea->setGeometry(QRectF(0, 0, 200, 200));
+    selectionArea->showDebugOverlay(true);
+    selectionArea->setAcceptHoverEvents(true);
+    // selectionArea->setAcceptedMouseButtons(Qt::NoButton);
+
+    /*
+    auto widget = new QWidget();
+    widget->setAttribute(Qt::WA_TranslucentBackground);
+    widget->setGeometry(QRect(0, 0, 500, 500));
+    // widget->setGeometry(m_w->boundingRect().toRect());
+
+    m_selectionArea = new SelectionArea(widget);
+    m_selectionArea->setGeometry(0, 0, 100, 100);
+    m_selectionArea->showDebugOverlay(true);
+
+    auto proxy = ui->graphicsView->scene()->addWidget(widget);
+    */
+    // auto proxy = ui->graphicsView->scene()->addWidget(m_selectionArea);
 }
 
 Player::~Player()
@@ -465,6 +489,7 @@ void Player::showHideFilters()
 
 void Player::showEvent(QShowEvent *event)
 {
+    /*
     // workaround for blank screen on 2nd show
     m_w->deleteLater();
 
@@ -483,6 +508,7 @@ void Player::showEvent(QShowEvent *event)
 #endif //
 
     ui->scrollArea->setWidget(m_w);
+    */
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 
@@ -619,7 +645,7 @@ void Player::updateVideoOutputSize()
         double multiplier = ((double) ui->scalePercentage_spinBox->value()) / 100;
         newSize = QSize(filteredFrameWidth, filteredFrameHeight) * multiplier;
     } else {
-        auto availableSize = ui->scrollArea->viewport()->size() - QSize(1, 1);
+        auto availableSize = ui->graphicsView->viewport()->size() - QSize(1, 1);
 
         auto scaleFactor = double(availableSize.width()) / filteredFrameWidth;
         newSize = QSize(availableSize.width(), scaleFactor * filteredFrameHeight);
@@ -629,18 +655,18 @@ void Player::updateVideoOutputSize()
         }
     }
 
-    auto geometry = ui->scrollArea->widget()->geometry();
+    auto geometry = m_w->boundingRect();
     geometry.setSize(newSize);
 
-    ui->scrollArea->widget()->setGeometry(geometry);
-
+    m_w->setSize(geometry.size());
+    m_w->scene()->setSceneRect(m_w->scene()->itemsBoundingRect());
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    m_vr->m_surface->stop();
+    m_w->videoSurface()->stop();
 
     QVideoSurfaceFormat format(videoFrame.size(), videoFrame.pixelFormat(), videoFrame.handleType());
 
-    m_vr->m_surface->start(format);
-    m_vr->m_surface->present(videoFrame);
+    m_w->videoSurface()->start(format);
+    m_w->videoSurface()->present(videoFrame);
 #endif // QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 }
 
@@ -816,7 +842,7 @@ void Player::on_scalePercentage_spinBox_valueChanged(int value)
     double multiplier = ((double) value) / 100;
 
     QSize newSize = QSize(videoFrame.width(), videoFrame.height()) * multiplier;
-    QSize currentSize = ui->scrollArea->widget()->size();
+    QSize currentSize = m_w->size().toSize();
 
     if(newSize != currentSize)
     {
@@ -1023,7 +1049,7 @@ QString Player::replaceFilterTokens(const QString &filterString)
     str.replace(QString("${bitdepth}"), QString::number(BitsPerRawSample));
     str.replace(QString("${isRGB}"), QString::number(m_fileInformation->isRgbSet()));
 
-    QSize windowSize = ui->scrollArea->widget()->size();
+    QSize windowSize = m_w->size().toSize();
 
     str.replace(QString("${window_width}"), QString::number(windowSize.width()));
     str.replace(QString("${window_height}"), QString::number(windowSize.height()));
