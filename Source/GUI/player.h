@@ -10,13 +10,14 @@
 #include <QtAVPlayer/qavaudiooutput.h>
 #include <QtAVPlayer/qavplayer.h>
 
+class QGraphicsVideoItem;
+
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QMediaService>
 #include <QVideoRendererControl>
 #include <QAbstractVideoSurface>
 #include <QVideoSurfaceFormat>
 
-class QGraphicsVideoItem;
 class VideoRenderer : public QVideoRendererControl
 {
 public:
