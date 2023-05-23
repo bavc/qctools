@@ -206,6 +206,13 @@ QString FilterSelector::getFilterName()
 
     return QString();
 }
+int FilterSelector::getFilterType()
+{
+    if(m_currentFilterIndex != -1)
+        return Filters[m_currentFilterIndex].Type;
+
+    return -1;
+}
 
 void FilterSelector::on_FiltersOptions_click()
 {
