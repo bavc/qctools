@@ -569,7 +569,11 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="xSpinBox"/>
+         <widget class="QDoubleSpinBox" name="xDoubleSpinBox">
+          <property name="decimals">
+           <number>0</number>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="yLabel">
@@ -579,7 +583,11 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="ySpinBox"/>
+         <widget class="QDoubleSpinBox" name="yDoubleSpinBox">
+          <property name="decimals">
+           <number>0</number>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="wLabel">
@@ -589,7 +597,11 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="wSpinBox"/>
+         <widget class="QDoubleSpinBox" name="wDoubleSpinBox">
+          <property name="decimals">
+           <number>0</number>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="hLabel">
@@ -599,7 +611,11 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="hSpinBox"/>
+         <widget class="QDoubleSpinBox" name="hDoubleSpinBox">
+          <property name="decimals">
+           <number>0</number>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="horizontalSpacer_5">

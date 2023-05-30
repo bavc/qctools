@@ -107,17 +107,17 @@ Player::Player(QWidget *parent) :
                 m_selectionAreaGeometry = QRect(dx, dy, w, h);
                 m_selectionArea->setGeometry(m_selectionAreaGeometry);
 
-                ui->xSpinBox->setValue(dx);
-                ui->xSpinBox->setMaximum(m_videoFrameSize.width());
+                ui->xDoubleSpinBox->setValue(dx);
+                ui->xDoubleSpinBox->setMaximum(m_videoFrameSize.width());
 
-                ui->ySpinBox->setValue(dy);
-                ui->ySpinBox->setMaximum(m_videoFrameSize.height());
+                ui->yDoubleSpinBox->setValue(dy);
+                ui->yDoubleSpinBox->setMaximum(m_videoFrameSize.height());
 
-                ui->wSpinBox->setValue(w);
-                ui->wSpinBox->setMaximum(m_videoFrameSize.width());
+                ui->wDoubleSpinBox->setValue(w);
+                ui->wDoubleSpinBox->setMaximum(m_videoFrameSize.width());
 
-                ui->hSpinBox->setValue(h);
-                ui->hSpinBox->setMaximum(m_videoFrameSize.height());
+                ui->hDoubleSpinBox->setValue(h);
+                ui->hDoubleSpinBox->setMaximum(m_videoFrameSize.height());
             }
             qDebug() << "videoFrameSize: " << m_videoFrameSize;
         }
@@ -246,10 +246,10 @@ Player::Player(QWidget *parent) :
         w /= m_scaleFactor;
         h /= m_scaleFactor;
 
-        ui->xSpinBox->setValue(x);
-        ui->ySpinBox->setValue(y);
-        ui->wSpinBox->setValue(w);
-        ui->hSpinBox->setValue(h);
+        ui->xDoubleSpinBox->setValue(x);
+        ui->yDoubleSpinBox->setValue(y);
+        ui->wDoubleSpinBox->setValue(w);
+        ui->hDoubleSpinBox->setValue(h);
     });
 
     connect(m_selectionArea, &SelectionAreaGraphicsObject::geometryChangeFinished, this, [this]() {
@@ -730,10 +730,10 @@ void Player::applyFilter()
                 auto& wSpinBox = m_filterSelectors[i]->getOptions().Sliders_SpinBox[wIndex];
                 auto& hSpinBox = m_filterSelectors[i]->getOptions().Sliders_SpinBox[hIndex];
 
-                connect(ui->xSpinBox, &QSpinBox::valueChanged, xSpinBox, &DoubleSpinBoxWithSlider::setValue, Qt::UniqueConnection);
-                connect(ui->ySpinBox, &QSpinBox::valueChanged, ySpinBox, &DoubleSpinBoxWithSlider::setValue, Qt::UniqueConnection);
-                connect(ui->wSpinBox, &QSpinBox::valueChanged, wSpinBox, &DoubleSpinBoxWithSlider::setValue, Qt::UniqueConnection);
-                connect(ui->hSpinBox, &QSpinBox::valueChanged, hSpinBox, &DoubleSpinBoxWithSlider::setValue, Qt::UniqueConnection);
+                connect(ui->xDoubleSpinBox, SIGNAL(valueChanged(double)), xSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                connect(ui->yDoubleSpinBox, SIGNAL(valueChanged(double)), ySpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                connect(ui->wDoubleSpinBox, SIGNAL(valueChanged(double)), wSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                connect(ui->hDoubleSpinBox, SIGNAL(valueChanged(double)), hSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
             }
         }
     }
