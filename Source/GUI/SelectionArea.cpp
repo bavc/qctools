@@ -275,6 +275,11 @@ SelectionAreaGraphicsObject::~SelectionAreaGraphicsObject()
     delete moveCursor;
 }
 
+QRectF SelectionAreaGraphicsObject::geometry() const
+{
+    return m_boundingRect;
+}
+
 void SelectionAreaGraphicsObject::showDebugOverlay(bool enable)
 {
     debugOverlay = enable;
@@ -284,9 +289,11 @@ void SelectionAreaGraphicsObject::setGeometry(const QRectF &geometry)
 {
     if(m_boundingRect != geometry) {
         prepareGeometryChange();
-        qDebug() << "apply geometry: " << geometry;
-        m_boundingRect = geometry;
+        m_boundingRect = QRectF(0, 0, geometry.width(), geometry.height());
         update();
+
+        setX(geometry.x());
+        setY(geometry.y());
     }
 }
 
@@ -394,10 +401,6 @@ void SelectionAreaGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event
         }
     }
 
-    setX(currentGeometry.x());
-    setY(currentGeometry.y());
-
-    currentGeometry.moveTo(0, 0);
     setGeometry(currentGeometry);
     Q_EMIT geometryChanged(currentGeometry.toRect());
 }

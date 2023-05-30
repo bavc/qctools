@@ -57,6 +57,7 @@ public:
     void selectCurrentFilterByName(const char* filterName);
 
     QString getFilter();
+    QString getFilterName();
 
 Q_SIGNALS:
     void filterChanged(const QString& filterString);

@@ -86,6 +86,7 @@ public:
     };
     Q_ENUM(TrackerHit);
 
+    QRectF geometry() const;
 public Q_SLOTS:
     void showDebugOverlay(bool enable);
     void setGeometry(const QRectF& geometry);

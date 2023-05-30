@@ -19,6 +19,14 @@
 #include "SelectionArea.h"
 #include <float.h>
 
+extern "C" {
+#include <libavfilter/buffersrc.h>
+#include <libavfilter/buffersink.h>
+#include <libavutil/avassert.h>
+#include <libavutil/bprint.h>
+#include <libavformat/avformat.h>
+}
+
 const int MaxFilters = 6;
 
 Player::Player(QWidget *parent) :
@@ -40,16 +48,6 @@ Player::Player(QWidget *parent) :
     m_w->setSize(QSize(300, 300));
     scene->addItem(m_w);
 
-    /*
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    m_w = new VideoWidget(ui->scrollArea);
-    m_vr = new VideoRenderer();
-    m_o = new MediaObject(m_vr);
-    m_w->setMediaObject(m_o);
-#else
-    m_w = new QVideoWidget(ui->scrollArea);
-#endif //
-    */
     m_player = new MediaPlayer();
 
     QObject::connect(m_player, &QAVPlayer::audioFrame, m_player, [this](const QAVAudioFrame &frame) {
@@ -95,6 +93,33 @@ Player::Player(QWidget *parent) :
             m_framesCount = m_fileInformation->VideoFrameCount_Get();
             ui->playerSlider->setMaximum(m_player->duration());
             qDebug() << "duration: " << m_player->duration();
+
+            m_videoFrameSize = QSize(0, 0);
+            if(!m_player->currentVideoStreams().empty()) {
+                auto firstVideoStream = m_player->currentVideoStreams()[0];
+                m_videoFrameSize = QSize(firstVideoStream.stream()->codecpar->width, firstVideoStream.stream()->codecpar->height);
+
+                auto w = m_videoFrameSize.width() / 2;
+                auto h = m_videoFrameSize.height() / 2;
+                auto dx = (m_videoFrameSize.width() - w) / 2;
+                auto dy = (m_videoFrameSize.height() - h) / 2;
+
+                m_selectionAreaGeometry = QRect(dx, dy, w, h);
+                m_selectionArea->setGeometry(m_selectionAreaGeometry);
+
+                ui->xSpinBox->setValue(dx);
+                ui->xSpinBox->setMaximum(m_videoFrameSize.width());
+
+                ui->ySpinBox->setValue(dy);
+                ui->ySpinBox->setMaximum(m_videoFrameSize.height());
+
+                ui->wSpinBox->setValue(w);
+                ui->wSpinBox->setMaximum(m_videoFrameSize.width());
+
+                ui->hSpinBox->setValue(h);
+                ui->hSpinBox->setMaximum(m_videoFrameSize.height());
+            }
+            qDebug() << "videoFrameSize: " << m_videoFrameSize;
         }
     });
 
@@ -203,26 +228,42 @@ Player::Player(QWidget *parent) :
     m_filterUpdateTimer.setSingleShot(true);
     connect(&m_filterUpdateTimer, &QTimer::timeout, this, &Player::applyFilter);
 
-    auto selectionArea = new SelectionAreaGraphicsObject(m_w);
-    selectionArea->setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges /*| QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable */);
-    selectionArea->setGeometry(QRectF(0, 0, 200, 200));
-    selectionArea->showDebugOverlay(true);
-    selectionArea->setAcceptHoverEvents(true);
-    // selectionArea->setAcceptedMouseButtons(Qt::NoButton);
-
-    /*
-    auto widget = new QWidget();
-    widget->setAttribute(Qt::WA_TranslucentBackground);
-    widget->setGeometry(QRect(0, 0, 500, 500));
-    // widget->setGeometry(m_w->boundingRect().toRect());
-
-    m_selectionArea = new SelectionArea(widget);
-    m_selectionArea->setGeometry(0, 0, 100, 100);
+    m_selectionArea = new SelectionAreaGraphicsObject(m_w);
+    m_selectionArea->setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
     m_selectionArea->showDebugOverlay(true);
+    m_selectionArea->setAcceptHoverEvents(true);
+    m_selectionArea->setVisible(false);
+    ui->loupe_groupBox->setEnabled(false);
 
-    auto proxy = ui->graphicsView->scene()->addWidget(widget);
-    */
-    // auto proxy = ui->graphicsView->scene()->addWidget(m_selectionArea);
+    connect(m_selectionArea, &SelectionAreaGraphicsObject::geometryChanged, this, [this]() {
+        qreal x = m_selectionArea->x();
+        qreal y = m_selectionArea->y();
+        qreal w = m_selectionArea->geometry().width();
+        qreal h = m_selectionArea->geometry().height();
+
+        x /= m_scaleFactor;
+        y /= m_scaleFactor;
+        w /= m_scaleFactor;
+        h /= m_scaleFactor;
+
+        ui->xSpinBox->setValue(x);
+        ui->ySpinBox->setValue(y);
+        ui->wSpinBox->setValue(w);
+        ui->hSpinBox->setValue(h);
+    });
+
+    connect(m_selectionArea, &SelectionAreaGraphicsObject::geometryChangeFinished, this, [this]() {
+        qreal x = m_selectionArea->x();
+        qreal y = m_selectionArea->y();
+        qreal w = m_selectionArea->geometry().width();
+        qreal h = m_selectionArea->geometry().height();
+
+        x /= m_scaleFactor;
+        y /= m_scaleFactor;
+        w /= m_scaleFactor;
+        h /= m_scaleFactor;
+        m_selectionAreaGeometry.setRect(x, y, w, h);
+    });
 }
 
 Player::~Player()
@@ -489,27 +530,6 @@ void Player::showHideFilters()
 
 void Player::showEvent(QShowEvent *event)
 {
-    /*
-    // workaround for blank screen on 2nd show
-    m_w->deleteLater();
-
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    m_w = new VideoWidget(ui->scrollArea);
-
-    m_vr->deleteLater();
-    m_vr = new VideoRenderer();
-
-    m_o->deleteLater();
-    m_o = new MediaObject(m_vr);
-
-    m_w->setMediaObject(m_o);
-#else
-    m_w = new QVideoWidget(ui->scrollArea);
-#endif //
-
-    ui->scrollArea->setWidget(m_w);
-    */
-
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 
 #else
@@ -640,20 +660,34 @@ void Player::updateVideoOutputSize()
     // 2DO:
     auto filteredFrameWidth = videoFrame.width(); // m_vo->videoFrameSize().width();
     auto filteredFrameHeight = videoFrame.height(); // m_vo->videoFrameSize().height();
+    m_scaleFactor = 1.0f;
 
     if(!ui->fitToScreen_radioButton->isChecked()) {
-        double multiplier = ((double) ui->scalePercentage_spinBox->value()) / 100;
-        newSize = QSize(filteredFrameWidth, filteredFrameHeight) * multiplier;
+        m_scaleFactor = ((double) ui->scalePercentage_spinBox->value()) / 100;
+        newSize = QSize(filteredFrameWidth, filteredFrameHeight) * m_scaleFactor;
     } else {
         auto availableSize = ui->graphicsView->viewport()->size() - QSize(1, 1);
 
-        auto scaleFactor = double(availableSize.width()) / filteredFrameWidth;
-        newSize = QSize(availableSize.width(), scaleFactor * filteredFrameHeight);
+        m_scaleFactor = double(availableSize.width()) / filteredFrameWidth;
+        newSize = QSize(availableSize.width(), m_scaleFactor * filteredFrameHeight);
         if(newSize.height() > availableSize.height()) {
-            scaleFactor = double(availableSize.height()) / filteredFrameHeight;
-            newSize = QSize(scaleFactor * filteredFrameWidth, availableSize.height());
+            m_scaleFactor = double(availableSize.height()) / filteredFrameHeight;
+            newSize = QSize(m_scaleFactor * filteredFrameWidth, availableSize.height());
         }
     }
+
+    QRectF newGeometry = m_selectionAreaGeometry;
+    if(filteredFrameWidth != newSize.width() || filteredFrameHeight != newSize.height()) {
+        qreal x, y, w, h;
+        newGeometry.getRect(&x, &y, &w, &h);
+        x *= m_scaleFactor;
+        y *= m_scaleFactor;
+        w *= m_scaleFactor;
+        h *= m_scaleFactor;
+        newGeometry.setRect(x, y, w, h);
+    }
+
+    m_selectionArea->setGeometry(newGeometry);
 
     auto geometry = m_w->boundingRect();
     geometry.setSize(newSize);
@@ -672,6 +706,41 @@ void Player::updateVideoOutputSize()
 
 void Player::applyFilter()
 {
+    bool useSelectionArea = false;
+    if(m_filterSelectors[0]->getFilterName() == "Normal")
+    {
+        for(auto i = 1; i < 6; ++i) {
+            if(m_filterSelectors[i]->getFilterName().contains("Target") || m_filterSelectors[i]->getFilterName() == "Zoom" || m_filterSelectors[i]->getFilterName() == "Pixel Scope") {
+                useSelectionArea = true;
+
+                int xIndex = 0;
+                int yIndex = 1;
+                int wIndex = 2;
+                int hIndex = 3;
+
+                if(m_filterSelectors[i]->getFilterName() == "Pixel Scope") {
+                    xIndex = 1;
+                    yIndex = 2;
+                    wIndex = 3;
+                    hIndex = 4;
+                }
+
+                auto& xSpinBox = m_filterSelectors[i]->getOptions().Sliders_SpinBox[xIndex];
+                auto& ySpinBox = m_filterSelectors[i]->getOptions().Sliders_SpinBox[yIndex];
+                auto& wSpinBox = m_filterSelectors[i]->getOptions().Sliders_SpinBox[wIndex];
+                auto& hSpinBox = m_filterSelectors[i]->getOptions().Sliders_SpinBox[hIndex];
+
+                connect(ui->xSpinBox, &QSpinBox::valueChanged, xSpinBox, &DoubleSpinBoxWithSlider::setValue, Qt::UniqueConnection);
+                connect(ui->ySpinBox, &QSpinBox::valueChanged, ySpinBox, &DoubleSpinBoxWithSlider::setValue, Qt::UniqueConnection);
+                connect(ui->wSpinBox, &QSpinBox::valueChanged, wSpinBox, &DoubleSpinBoxWithSlider::setValue, Qt::UniqueConnection);
+                connect(ui->hSpinBox, &QSpinBox::valueChanged, hSpinBox, &DoubleSpinBoxWithSlider::setValue, Qt::UniqueConnection);
+            }
+        }
+    }
+
+    ui->loupe_groupBox->setEnabled(useSelectionArea);
+    m_selectionArea->setVisible(useSelectionArea);
+
     ui->plainTextEdit->clear();
 
     QStringList definedFilters;
@@ -1189,3 +1258,39 @@ void Player::on_export_pushButton_clicked()
     }
 #endif //
 }
+
+void Player::on_xSpinBox_valueChanged(int arg1)
+{
+    auto x = qreal(arg1) * m_scaleFactor;
+    m_selectionArea->setX(x);
+}
+
+
+void Player::on_ySpinBox_valueChanged(int arg1)
+{
+    auto y = qreal(arg1) * m_scaleFactor;
+    m_selectionArea->setY(y);
+}
+
+
+void Player::on_wSpinBox_valueChanged(int arg1)
+{
+    auto w = qreal(arg1) * m_scaleFactor;
+    auto geometry = m_selectionArea->geometry();
+    geometry.moveTo(m_selectionArea->x(), m_selectionArea->y());
+    geometry.setWidth(w);
+
+    m_selectionArea->setGeometry(geometry);
+}
+
+
+void Player::on_hSpinBox_valueChanged(int arg1)
+{
+    auto h = qreal(arg1) * m_scaleFactor;
+    auto geometry = m_selectionArea->geometry();
+    geometry.moveTo(m_selectionArea->x(), m_selectionArea->y());
+    geometry.setHeight(h);
+
+    m_selectionArea->setGeometry(geometry);
+}
+

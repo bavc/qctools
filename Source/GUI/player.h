@@ -136,6 +136,8 @@ public:
         return m_file;
     }
 
+    QSize videoFrameSize() const;
+
     void specifyPosition(qint64 pos) {
         if(prevPos != pos) {
             prevPos = pos;
@@ -152,7 +154,7 @@ private:
     QTimer t;
 };
 
-class SelectionArea;
+class SelectionAreaGraphicsObject;
 class Player : public QMainWindow
 {
     Q_OBJECT
@@ -225,6 +227,14 @@ private Q_SLOTS:
 
     void on_export_pushButton_clicked();
 
+    void on_xSpinBox_valueChanged(int arg1);
+
+    void on_ySpinBox_valueChanged(int arg1);
+
+    void on_wSpinBox_valueChanged(int arg1);
+
+    void on_hSpinBox_valueChanged(int arg1);
+
 private:
     void setScaleSliderPercentage(int percents);
     void setScaleSpinboxPercentage(int percents);
@@ -240,15 +250,6 @@ private:
     Ui::Player *ui;
 
     QGraphicsVideoItem* m_w;
-/*
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    VideoWidget* m_w;
-    MediaObject* m_o;
-    VideoRenderer* m_vr;
-#else
-    QVideoWidget* m_w;
-#endif
-*/
 
     MediaPlayer* m_player;
     bool m_mute { false };
@@ -268,7 +269,10 @@ private:
     bool m_seekOnFileInformationPositionChange;
     bool m_ignorePositionChanges;
 
-    SelectionArea* m_selectionArea;
+    SelectionAreaGraphicsObject* m_selectionArea;
+    QRect m_selectionAreaGeometry;
+    qreal m_scaleFactor;
+    QSize m_videoFrameSize;
     QTimer m_filterUpdateTimer;
 };
 
