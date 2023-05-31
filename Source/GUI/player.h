@@ -10,6 +10,8 @@
 #include <QtAVPlayer/qavaudiooutput.h>
 #include <QtAVPlayer/qavplayer.h>
 
+class QGraphicsVideoItem;
+
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QMediaService>
 #include <QVideoRendererControl>
@@ -134,6 +136,8 @@ public:
         return m_file;
     }
 
+    QSize videoFrameSize() const;
+
     void specifyPosition(qint64 pos) {
         if(prevPos != pos) {
             prevPos = pos;
@@ -150,6 +154,7 @@ private:
     QTimer t;
 };
 
+class SelectionAreaGraphicsObject;
 class Player : public QMainWindow
 {
     Q_OBJECT
@@ -222,6 +227,14 @@ private Q_SLOTS:
 
     void on_export_pushButton_clicked();
 
+    void on_xDoubleSpinBox_valueChanged(double arg1);
+
+    void on_yDoubleSpinBox_valueChanged(double arg1);
+
+    void on_wDoubleSpinBox_valueChanged(double arg1);
+
+    void on_hDoubleSpinBox_valueChanged(double arg1);
+
 private:
     void setScaleSliderPercentage(int percents);
     void setScaleSpinboxPercentage(int percents);
@@ -236,13 +249,7 @@ private:
 private:
     Ui::Player *ui;
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    VideoWidget* m_w;
-    MediaObject* m_o;
-    VideoRenderer* m_vr;
-#else
-    QVideoWidget* m_w;
-#endif
+    QGraphicsVideoItem* m_w;
 
     MediaPlayer* m_player;
     bool m_mute { false };
@@ -262,6 +269,10 @@ private:
     bool m_seekOnFileInformationPositionChange;
     bool m_ignorePositionChanges;
 
+    SelectionAreaGraphicsObject* m_selectionArea;
+    QRect m_selectionAreaGeometry;
+    qreal m_scaleFactor;
+    QSize m_videoFrameSize;
     QTimer m_filterUpdateTimer;
 };
 

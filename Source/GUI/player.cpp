@@ -13,14 +13,21 @@
 #include <QGraphicsItem>
 #include <QGraphicsObject>
 #include <QFileDialog>
+#include <QGraphicsView>
+#include <QGraphicsVideoItem>
 #include "draggablechildrenbehaviour.h"
+#include "SelectionArea.h"
 #include <float.h>
 
+extern "C" {
+#include <libavfilter/buffersrc.h>
+#include <libavfilter/buffersink.h>
+#include <libavutil/avassert.h>
+#include <libavutil/bprint.h>
+#include <libavformat/avformat.h>
+}
+
 const int MaxFilters = 6;
-const int DefaultFirstFilterIndex = 0;
-const int DefaultSecondFilterIndex = 4;
-const int DefaultThirdFilterIndex = 0;
-const int DefaultForthFilterIndex = 0;
 
 Player::Player(QWidget *parent) :
     QMainWindow(parent),
@@ -34,14 +41,13 @@ Player::Player(QWidget *parent) :
 
     m_audioOutput.reset(new QAVAudioOutput);
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    m_w = new VideoWidget(ui->scrollArea);
-    m_vr = new VideoRenderer();
-    m_o = new MediaObject(m_vr);
-    m_w->setMediaObject(m_o);
-#else
-    m_w = new QVideoWidget(ui->scrollArea);
-#endif //
+    QGraphicsScene* scene = new QGraphicsScene(ui->graphicsView);
+    ui->graphicsView->setScene(scene);
+
+    m_w = new QGraphicsVideoItem();
+    m_w->setSize(QSize(300, 300));
+    scene->addItem(m_w);
+
     m_player = new MediaPlayer();
 
     QObject::connect(m_player, &QAVPlayer::audioFrame, m_player, [this](const QAVAudioFrame &frame) {
@@ -49,33 +55,28 @@ Player::Player(QWidget *parent) :
             m_audioOutput->play(frame);
     });
 
-   QObject::connect(m_player, &QAVPlayer::videoFrame, m_player, [this](const QAVVideoFrame &frame) {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-       if (m_vr->m_surface == nullptr)
-           return;
-#endif
+    QObject::connect(m_player, &QAVPlayer::videoFrame, m_player, [this](const QAVVideoFrame &frame) {
 
-       videoFrame = frame.convertTo(AV_PIX_FMT_RGB32);
+        videoFrame = frame.convertTo(AV_PIX_FMT_RGB32);
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-       if (!m_vr->m_surface->isActive() || m_vr->m_surface->surfaceFormat().frameSize() != videoFrame.size()) {
-           m_vr->m_surface->start({videoFrame.size(), videoFrame.pixelFormat(), videoFrame.handleType()});
-           updateVideoOutputSize();
-       }
-       if (m_vr->m_surface->isActive())
-           m_vr->m_surface->present(videoFrame);
+        auto surface = m_w->videoSurface();
+        if (!surface->isActive() || surface->surfaceFormat().frameSize() != videoFrame.size()) {
+            surface->start({videoFrame.size(), videoFrame.pixelFormat(), videoFrame.handleType()});
+            updateVideoOutputSize();
+        }
+        if (surface->isActive())
+            surface->present(videoFrame);
 #else
-       if(m_w->videoSink()->videoFrame().size() != videoFrame.size()) {
-           m_w->videoSink()->setVideoFrame(videoFrame);
-           updateVideoOutputSize();
-       } else {
-           m_w->videoSink()->setVideoFrame(videoFrame);
-       }
+            if(m_w->videoSink()->videoFrame().size() != videoFrame.size()) {
+                m_w->videoSink()->setVideoFrame(videoFrame);
+                updateVideoOutputSize();
+            } else {
+                m_w->videoSink()->setVideoFrame(videoFrame);
+            }
 #endif
 
-   });
-
-    ui->scrollArea->setWidget(m_w);
+    });
 
     connect(m_player, &QAVPlayer::stateChanged, [this](QAVPlayer::State state) {
         if(state == QAVPlayer::PlayingState) {
@@ -92,6 +93,33 @@ Player::Player(QWidget *parent) :
             m_framesCount = m_fileInformation->VideoFrameCount_Get();
             ui->playerSlider->setMaximum(m_player->duration());
             qDebug() << "duration: " << m_player->duration();
+
+            m_videoFrameSize = QSize(0, 0);
+            if(!m_player->currentVideoStreams().empty()) {
+                auto firstVideoStream = m_player->currentVideoStreams()[0];
+                m_videoFrameSize = QSize(firstVideoStream.stream()->codecpar->width, firstVideoStream.stream()->codecpar->height);
+
+                auto w = m_videoFrameSize.width() / 2;
+                auto h = m_videoFrameSize.height() / 2;
+                auto dx = (m_videoFrameSize.width() - w) / 2;
+                auto dy = (m_videoFrameSize.height() - h) / 2;
+
+                m_selectionAreaGeometry = QRect(dx, dy, w, h);
+                m_selectionArea->setGeometry(m_selectionAreaGeometry);
+
+                ui->xDoubleSpinBox->setValue(dx);
+                ui->xDoubleSpinBox->setMaximum(m_videoFrameSize.width());
+
+                ui->yDoubleSpinBox->setValue(dy);
+                ui->yDoubleSpinBox->setMaximum(m_videoFrameSize.height());
+
+                ui->wDoubleSpinBox->setValue(w);
+                ui->wDoubleSpinBox->setMaximum(m_videoFrameSize.width());
+
+                ui->hDoubleSpinBox->setValue(h);
+                ui->hDoubleSpinBox->setMaximum(m_videoFrameSize.height());
+            }
+            qDebug() << "videoFrameSize: " << m_videoFrameSize;
         }
     });
 
@@ -199,6 +227,43 @@ Player::Player(QWidget *parent) :
 
     m_filterUpdateTimer.setSingleShot(true);
     connect(&m_filterUpdateTimer, &QTimer::timeout, this, &Player::applyFilter);
+
+    m_selectionArea = new SelectionAreaGraphicsObject(m_w);
+    m_selectionArea->setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
+    m_selectionArea->showDebugOverlay(false);
+    m_selectionArea->setAcceptHoverEvents(true);
+    m_selectionArea->setVisible(false);
+    ui->loupe_groupBox->setEnabled(false);
+
+    connect(m_selectionArea, &SelectionAreaGraphicsObject::geometryChanged, this, [this]() {
+        qreal x = m_selectionArea->x();
+        qreal y = m_selectionArea->y();
+        qreal w = m_selectionArea->geometry().width();
+        qreal h = m_selectionArea->geometry().height();
+
+        x /= m_scaleFactor;
+        y /= m_scaleFactor;
+        w /= m_scaleFactor;
+        h /= m_scaleFactor;
+
+        ui->xDoubleSpinBox->setValue(x);
+        ui->yDoubleSpinBox->setValue(y);
+        ui->wDoubleSpinBox->setValue(w);
+        ui->hDoubleSpinBox->setValue(h);
+    });
+
+    connect(m_selectionArea, &SelectionAreaGraphicsObject::geometryChangeFinished, this, [this]() {
+        qreal x = m_selectionArea->x();
+        qreal y = m_selectionArea->y();
+        qreal w = m_selectionArea->geometry().width();
+        qreal h = m_selectionArea->geometry().height();
+
+        x /= m_scaleFactor;
+        y /= m_scaleFactor;
+        w /= m_scaleFactor;
+        h /= m_scaleFactor;
+        m_selectionAreaGeometry.setRect(x, y, w, h);
+    });
 }
 
 Player::~Player()
@@ -465,25 +530,6 @@ void Player::showHideFilters()
 
 void Player::showEvent(QShowEvent *event)
 {
-    // workaround for blank screen on 2nd show
-    m_w->deleteLater();
-
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    m_w = new VideoWidget(ui->scrollArea);
-
-    m_vr->deleteLater();
-    m_vr = new VideoRenderer();
-
-    m_o->deleteLater();
-    m_o = new MediaObject(m_vr);
-
-    m_w->setMediaObject(m_o);
-#else
-    m_w = new QVideoWidget(ui->scrollArea);
-#endif //
-
-    ui->scrollArea->setWidget(m_w);
-
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 
 #else
@@ -614,38 +660,129 @@ void Player::updateVideoOutputSize()
     // 2DO:
     auto filteredFrameWidth = videoFrame.width(); // m_vo->videoFrameSize().width();
     auto filteredFrameHeight = videoFrame.height(); // m_vo->videoFrameSize().height();
+    m_scaleFactor = 1.0f;
 
     if(!ui->fitToScreen_radioButton->isChecked()) {
-        double multiplier = ((double) ui->scalePercentage_spinBox->value()) / 100;
-        newSize = QSize(filteredFrameWidth, filteredFrameHeight) * multiplier;
+        m_scaleFactor = ((double) ui->scalePercentage_spinBox->value()) / 100;
+        newSize = QSize(filteredFrameWidth, filteredFrameHeight) * m_scaleFactor;
     } else {
-        auto availableSize = ui->scrollArea->viewport()->size() - QSize(1, 1);
+        auto availableSize = ui->graphicsView->viewport()->size() - QSize(1, 1);
 
-        auto scaleFactor = double(availableSize.width()) / filteredFrameWidth;
-        newSize = QSize(availableSize.width(), scaleFactor * filteredFrameHeight);
+        m_scaleFactor = double(availableSize.width()) / filteredFrameWidth;
+        newSize = QSize(availableSize.width(), m_scaleFactor * filteredFrameHeight);
         if(newSize.height() > availableSize.height()) {
-            scaleFactor = double(availableSize.height()) / filteredFrameHeight;
-            newSize = QSize(scaleFactor * filteredFrameWidth, availableSize.height());
+            m_scaleFactor = double(availableSize.height()) / filteredFrameHeight;
+            newSize = QSize(m_scaleFactor * filteredFrameWidth, availableSize.height());
         }
     }
 
-    auto geometry = ui->scrollArea->widget()->geometry();
+    QRectF newGeometry = m_selectionAreaGeometry;
+    if(filteredFrameWidth != newSize.width() || filteredFrameHeight != newSize.height()) {
+        qreal x, y, w, h;
+        newGeometry.getRect(&x, &y, &w, &h);
+        x *= m_scaleFactor;
+        y *= m_scaleFactor;
+        w *= m_scaleFactor;
+        h *= m_scaleFactor;
+        newGeometry.setRect(x, y, w, h);
+    }
+
+    m_selectionArea->setGeometry(newGeometry);
+
+    auto geometry = m_w->boundingRect();
     geometry.setSize(newSize);
 
-    ui->scrollArea->widget()->setGeometry(geometry);
-
+    m_w->setSize(geometry.size());
+    m_w->scene()->setSceneRect(m_w->scene()->itemsBoundingRect());
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    m_vr->m_surface->stop();
+    m_w->videoSurface()->stop();
 
     QVideoSurfaceFormat format(videoFrame.size(), videoFrame.pixelFormat(), videoFrame.handleType());
 
-    m_vr->m_surface->start(format);
-    m_vr->m_surface->present(videoFrame);
+    m_w->videoSurface()->start(format);
+    m_w->videoSurface()->present(videoFrame);
 #endif // QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+
+    if(m_selectionArea->isVisible()) {
+        auto x = ui->xDoubleSpinBox->value() * m_scaleFactor;
+        auto y = ui->yDoubleSpinBox->value() * m_scaleFactor;
+        auto w = ui->wDoubleSpinBox->value() * m_scaleFactor;
+        auto h = ui->hDoubleSpinBox->value() * m_scaleFactor;
+
+        m_selectionArea->setGeometry(QRectF(x, y, w, h));
+        m_selectionArea->setMaxSize(ui->wDoubleSpinBox->maximum() * m_scaleFactor, ui->hDoubleSpinBox->maximum() * m_scaleFactor);
+    }
 }
 
 void Player::applyFilter()
 {
+    bool useSelectionArea = false;
+    if(m_filterSelectors[0]->getFilterName() == "Normal")
+    {
+        for(auto i = 1; i < 6; ++i) {
+            if(m_filterSelectors[i]->getFilterName().contains("Target") ||
+                m_filterSelectors[i]->getFilterName() == "Zoom" ||
+                m_filterSelectors[i]->getFilterName() == "Pixel Scope" ||
+                m_filterSelectors[i]->getFilterName() == "Datascope")
+            {
+                useSelectionArea = true;
+
+                int xIndex = 0;
+                int yIndex = 1;
+                int wIndex = 2;
+                int hIndex = 3;
+
+                if(m_filterSelectors[i]->getFilterName() == "Pixel Scope") {
+                    xIndex = 1;
+                    yIndex = 2;
+                    wIndex = 3;
+                    hIndex = 4;
+                } else if(m_filterSelectors[i]->getFilterName() == "Datascope")
+                {
+                    xIndex = 1;
+                    yIndex = 2;
+                    wIndex = -1;
+                    hIndex = -1;
+                }
+
+                if(xIndex >= 0)
+                {
+                    auto& xSpinBox = m_filterSelectors[i]->getOptions().Sliders_SpinBox[xIndex];
+                    connect(ui->xDoubleSpinBox, SIGNAL(valueChanged(double)), xSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                    connect(xSpinBox, SIGNAL(valueChanged(double)), ui->xDoubleSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                    xSpinBox->setValue(ui->xDoubleSpinBox->value());
+                }
+
+                if(yIndex >= 0)
+                {
+                    auto& ySpinBox = m_filterSelectors[i]->getOptions().Sliders_SpinBox[yIndex];
+                    connect(ui->yDoubleSpinBox, SIGNAL(valueChanged(double)), ySpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                    connect(ySpinBox, SIGNAL(valueChanged(double)), ui->yDoubleSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                    ySpinBox->setValue(ui->yDoubleSpinBox->value());
+                }
+
+                if(wIndex >= 0)
+                {
+                    auto& wSpinBox = m_filterSelectors[i]->getOptions().Sliders_SpinBox[wIndex];
+                    connect(ui->wDoubleSpinBox, SIGNAL(valueChanged(double)), wSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                    connect(wSpinBox, SIGNAL(valueChanged(double)), ui->wDoubleSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                    wSpinBox->setValue(ui->wDoubleSpinBox->value());
+                }
+
+                if(hIndex >= 0)
+                {
+                    auto& hSpinBox = m_filterSelectors[i]->getOptions().Sliders_SpinBox[hIndex];
+                    connect(ui->hDoubleSpinBox, SIGNAL(valueChanged(double)), hSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                    connect(hSpinBox, SIGNAL(valueChanged(double)), ui->hDoubleSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                    hSpinBox->setValue(ui->hDoubleSpinBox->value());
+                }
+            }
+        }
+    }
+
+    ui->loupe_groupBox->setEnabled(useSelectionArea);
+    m_selectionArea->setVisible(useSelectionArea);
+
     ui->plainTextEdit->clear();
 
     QStringList definedFilters;
@@ -816,7 +953,7 @@ void Player::on_scalePercentage_spinBox_valueChanged(int value)
     double multiplier = ((double) value) / 100;
 
     QSize newSize = QSize(videoFrame.width(), videoFrame.height()) * multiplier;
-    QSize currentSize = ui->scrollArea->widget()->size();
+    QSize currentSize = m_w->size().toSize();
 
     if(newSize != currentSize)
     {
@@ -1023,7 +1160,7 @@ QString Player::replaceFilterTokens(const QString &filterString)
     str.replace(QString("${bitdepth}"), QString::number(BitsPerRawSample));
     str.replace(QString("${isRGB}"), QString::number(m_fileInformation->isRgbSet()));
 
-    QSize windowSize = ui->scrollArea->widget()->size();
+    QSize windowSize = m_w->size().toSize();
 
     str.replace(QString("${window_width}"), QString::number(windowSize.width()));
     str.replace(QString("${window_height}"), QString::number(windowSize.height()));
@@ -1163,3 +1300,39 @@ void Player::on_export_pushButton_clicked()
     }
 #endif //
 }
+
+void Player::on_xDoubleSpinBox_valueChanged(double arg1)
+{
+    auto x = qreal(arg1) * m_scaleFactor;
+    m_selectionArea->setX(x);
+}
+
+
+void Player::on_yDoubleSpinBox_valueChanged(double arg1)
+{
+    auto y = qreal(arg1) * m_scaleFactor;
+    m_selectionArea->setY(y);
+}
+
+
+void Player::on_wDoubleSpinBox_valueChanged(double arg1)
+{
+    auto w = qreal(arg1) * m_scaleFactor;
+    auto geometry = m_selectionArea->geometry();
+    geometry.moveTo(m_selectionArea->x(), m_selectionArea->y());
+    geometry.setWidth(w);
+
+    m_selectionArea->setGeometry(geometry);
+}
+
+
+void Player::on_hDoubleSpinBox_valueChanged(double arg1)
+{
+    auto h = qreal(arg1) * m_scaleFactor;
+    auto geometry = m_selectionArea->geometry();
+    geometry.moveTo(m_selectionArea->x(), m_selectionArea->y());
+    geometry.setHeight(h);
+
+    m_selectionArea->setGeometry(geometry);
+}
+

@@ -196,6 +196,17 @@ QString FilterSelector::getFilter()
     return filterString;
 }
 
+QString FilterSelector::getFilterName()
+{
+    if(m_filterOptions.EnableCheckbox->isChecked())
+    {
+        if(m_currentFilterIndex != -1)
+            return m_filterOptions.FiltersList->currentText();
+    }
+
+    return QString();
+}
+
 void FilterSelector::on_FiltersOptions_click()
 {
     on_FiltersList_currentOptionChanged(m_currentFilterIndex);

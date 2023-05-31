@@ -1,6 +1,7 @@
 #ifndef AIRUBBERBAND_H
 #define AIRUBBERBAND_H
 
+#include <QGraphicsObject>
 #include <QRubberBand>
 
 class SelectionArea : public QWidget
@@ -62,6 +63,71 @@ private:
 	QCursor* moveCursor;
 
     bool debugOverlay;
+};
+
+class SelectionAreaGraphicsObject : public QGraphicsObject
+{
+    Q_OBJECT
+public:
+    SelectionAreaGraphicsObject(QGraphicsObject * p = 0);
+    ~SelectionAreaGraphicsObject();
+
+    enum TrackerHit {
+        hitNothing = -1,
+        hitTopLeft = 0,
+        hitTopRight = 1,
+        hitBottomRight = 2,
+        hitBottomLeft = 3,
+        hitTop = 4,
+        hitRight = 5,
+        hitBottom = 6,
+        hitLeft = 7,
+        hitMiddle = 8
+    };
+    Q_ENUM(TrackerHit);
+
+    QRectF geometry() const;
+public Q_SLOTS:
+    void showDebugOverlay(bool enable);
+    void setGeometry(const QRectF& geometry);
+    void setMaxSize(int width, int height);
+
+Q_SIGNALS:
+    void geometryChanged(const QRect& rect);
+    void geometryChangeFinished();
+
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+    void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
+
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    QRectF boundingRect() const;
+
+private:
+    TrackerHit hitTest(const QPointF& point) const;
+    QCursor* cursorForHitArea(TrackerHit) const;
+
+    TrackerHit hitArea { hitNothing };
+    QPointF mouseOffset;
+    QRectF startGeometry;
+
+    QCursor defaultCursor;
+    QCursor* diagResizeCursor1;
+    QCursor* diagResizeCursor2;
+    QCursor* horResizeCursor;
+    QCursor* verResizeCursor;
+    QCursor* moveCursor;
+
+    bool debugOverlay;
+    QGraphicsItem* parentItem;
+    QRectF m_boundingRect;
+    int m_maxWidth { 0 };
+    int m_maxHeight { 0 };
 };
 
 #endif // AIRUBBERBAND_H

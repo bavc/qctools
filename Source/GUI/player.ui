@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1208</width>
-    <height>413</height>
+    <height>539</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,7 +31,7 @@
      <number>6</number>
     </property>
     <item row="0" column="0">
-     <widget class="QScrollArea" name="scrollArea">
+     <widget class="QGraphicsView" name="graphicsView">
       <property name="verticalScrollBarPolicy">
        <enum>Qt::ScrollBarAsNeeded</enum>
       </property>
@@ -41,22 +41,15 @@
       <property name="sizeAdjustPolicy">
        <enum>QAbstractScrollArea::AdjustIgnored</enum>
       </property>
-      <property name="widgetResizable">
-       <bool>false</bool>
+      <property name="interactive">
+       <bool>true</bool>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
       </property>
-      <widget class="QWidget" name="scrollAreaWidgetContents">
-       <property name="geometry">
-        <rect>
-         <x>215</x>
-         <y>29</y>
-         <width>300</width>
-         <height>246</height>
-        </rect>
-       </property>
-      </widget>
+      <property name="resizeAnchor">
+       <enum>QGraphicsView::AnchorViewCenter</enum>
+      </property>
      </widget>
     </item>
     <item row="1" column="0">
@@ -376,19 +369,6 @@ p, li { white-space: pre-wrap; }
      <property name="bottomMargin">
       <number>2</number>
      </property>
-     <item row="2" column="0">
-      <widget class="QGroupBox" name="filterGroupBox">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="title">
-        <string>Filters</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="0">
       <widget class="QGroupBox" name="arrangementGroupBox">
        <property name="sizePolicy">
@@ -530,7 +510,7 @@ p, li { white-space: pre-wrap; }
        </layout>
       </widget>
      </item>
-     <item row="1" column="0">
+     <item row="2" column="0">
       <widget class="QGroupBox" name="adjustmentsGroupBox">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -541,6 +521,116 @@ p, li { white-space: pre-wrap; }
        <property name="title">
         <string>Adjustments</string>
        </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QGroupBox" name="filterGroupBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="title">
+        <string>Filters</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QGroupBox" name="loupe_groupBox">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>Loupe</string>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <spacer name="horizontalSpacer_6">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="xLabel">
+          <property name="text">
+           <string>x</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDoubleSpinBox" name="xDoubleSpinBox">
+          <property name="decimals">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="yLabel">
+          <property name="text">
+           <string>y</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDoubleSpinBox" name="yDoubleSpinBox">
+          <property name="decimals">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="wLabel">
+          <property name="text">
+           <string>w</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDoubleSpinBox" name="wDoubleSpinBox">
+          <property name="decimals">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="hLabel">
+          <property name="text">
+           <string>h</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDoubleSpinBox" name="hDoubleSpinBox">
+          <property name="decimals">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_5">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>
