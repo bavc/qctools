@@ -90,6 +90,8 @@ public:
 public Q_SLOTS:
     void showDebugOverlay(bool enable);
     void setGeometry(const QRectF& geometry);
+    void setMaxSize(int width, int height);
+
 Q_SIGNALS:
     void geometryChanged(const QRect& rect);
     void geometryChangeFinished();
@@ -124,6 +126,8 @@ private:
     bool debugOverlay;
     QGraphicsItem* parentItem;
     QRectF m_boundingRect;
+    int m_maxWidth { 0 };
+    int m_maxHeight { 0 };
 };
 
 #endif // AIRUBBERBAND_H

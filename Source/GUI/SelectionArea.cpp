@@ -297,6 +297,12 @@ void SelectionAreaGraphicsObject::setGeometry(const QRectF &geometry)
     }
 }
 
+void SelectionAreaGraphicsObject::setMaxSize(int width, int height)
+{
+    m_maxWidth = width;
+    m_maxHeight = height;
+}
+
 void SelectionAreaGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     auto e = event;
@@ -325,6 +331,9 @@ void SelectionAreaGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event
     currentGeometry.moveTo(x(), y());
     auto scenePos = mapToScene(e->pos());
 
+    auto maxWidth = m_maxWidth == 0 ? parentItem->boundingRect().width() : m_maxWidth;
+    auto maxHeight = m_maxHeight == 0 ? parentItem->boundingRect().height() : m_maxHeight;
+
     if(hitArea == hitTopLeft) {
         if(scenePos.x() < 0)
             scenePos.setX(0);
@@ -340,30 +349,30 @@ void SelectionAreaGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event
     } else if(hitArea == hitTopRight) {
         if(scenePos.y() < 0)
             scenePos.setY(0);
-        if(scenePos.x() > parentItem->boundingRect().width())
-            scenePos.setX(parentItem->boundingRect().width());
+        if(scenePos.x() > maxWidth)
+            scenePos.setX(maxWidth);
 
         currentGeometry.setTopRight(scenePos);
     } else if(hitArea == hitRight) {
-        if(scenePos.x() > parentItem->boundingRect().width())
-            scenePos.setX(parentItem->boundingRect().width());
+        if(scenePos.x() > maxWidth)
+            scenePos.setX(maxWidth);
 
         currentGeometry.setRight(scenePos.x());
     } else if(hitArea == hitBottomRight) {
-        if(scenePos.y() > parentItem->boundingRect().height())
-            scenePos.setY(parentItem->boundingRect().height());
-        if(scenePos.x() > parentItem->boundingRect().width())
-            scenePos.setX(parentItem->boundingRect().width());
+        if(scenePos.y() > maxHeight)
+            scenePos.setY(maxHeight);
+        if(scenePos.x() > maxWidth)
+            scenePos.setX(maxWidth);
 
         currentGeometry.setBottomRight(scenePos);
     } else if(hitArea == hitBottom) {
-        if(scenePos.y() > parentItem->boundingRect().height())
-            scenePos.setY(parentItem->boundingRect().height());
+        if(scenePos.y() > maxHeight)
+            scenePos.setY(maxHeight);
 
         currentGeometry.setBottom(scenePos.y());
     } else if(hitArea == hitBottomLeft) {
-        if(scenePos.y() > parentItem->boundingRect().height())
-            scenePos.setY(parentItem->boundingRect().height());
+        if(scenePos.y() > maxHeight)
+            scenePos.setY(maxHeight);
         if(scenePos.x() < 0)
             scenePos.setX(0);
 
@@ -382,9 +391,9 @@ void SelectionAreaGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event
             currentGeometry.setWidth(w);
         }
 
-        if(currentGeometry.right() > parentItem->boundingRect().width())
+        if(currentGeometry.right() > maxWidth)
         {
-            currentGeometry.setRight(parentItem->boundingRect().width());
+            currentGeometry.setRight(maxWidth);
             currentGeometry.setLeft(currentGeometry.right() - w);
         }
 
@@ -394,9 +403,9 @@ void SelectionAreaGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event
             currentGeometry.setHeight(h);
         }
 
-        if(currentGeometry.bottom() > parentItem->boundingRect().height())
+        if(currentGeometry.bottom() > maxHeight)
         {
-            currentGeometry.setBottom(parentItem->boundingRect().height());
+            currentGeometry.setBottom(maxHeight);
             currentGeometry.setTop(currentGeometry.bottom() - h);
         }
     }

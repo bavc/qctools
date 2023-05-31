@@ -710,6 +710,7 @@ void Player::updateVideoOutputSize()
         auto h = ui->hDoubleSpinBox->value() * m_scaleFactor;
 
         m_selectionArea->setGeometry(QRectF(x, y, w, h));
+        m_selectionArea->setMaxSize(ui->wDoubleSpinBox->maximum() * m_scaleFactor, ui->hDoubleSpinBox->maximum() * m_scaleFactor);
     }
 }
 
