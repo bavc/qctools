@@ -230,7 +230,7 @@ Player::Player(QWidget *parent) :
 
     m_selectionArea = new SelectionAreaGraphicsObject(m_w);
     m_selectionArea->setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
-    m_selectionArea->showDebugOverlay(true);
+    m_selectionArea->showDebugOverlay(false);
     m_selectionArea->setAcceptHoverEvents(true);
     m_selectionArea->setVisible(false);
     ui->loupe_groupBox->setEnabled(false);
