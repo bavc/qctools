@@ -719,7 +719,11 @@ void Player::applyFilter()
     if(m_filterSelectors[0]->getFilterName() == "Normal")
     {
         for(auto i = 1; i < 6; ++i) {
-            if(m_filterSelectors[i]->getFilterName().contains("Target") || m_filterSelectors[i]->getFilterName() == "Zoom" || m_filterSelectors[i]->getFilterName() == "Pixel Scope") {
+            if(m_filterSelectors[i]->getFilterName().contains("Target") ||
+                m_filterSelectors[i]->getFilterName() == "Zoom" ||
+                m_filterSelectors[i]->getFilterName() == "Pixel Scope" ||
+                m_filterSelectors[i]->getFilterName() == "Datascope")
+            {
                 useSelectionArea = true;
 
                 int xIndex = 0;
@@ -732,27 +736,45 @@ void Player::applyFilter()
                     yIndex = 2;
                     wIndex = 3;
                     hIndex = 4;
+                } else if(m_filterSelectors[i]->getFilterName() == "Datascope")
+                {
+                    xIndex = 1;
+                    yIndex = 2;
+                    wIndex = -1;
+                    hIndex = -1;
                 }
 
-                auto& xSpinBox = m_filterSelectors[i]->getOptions().Sliders_SpinBox[xIndex];
-                auto& ySpinBox = m_filterSelectors[i]->getOptions().Sliders_SpinBox[yIndex];
-                auto& wSpinBox = m_filterSelectors[i]->getOptions().Sliders_SpinBox[wIndex];
-                auto& hSpinBox = m_filterSelectors[i]->getOptions().Sliders_SpinBox[hIndex];
+                if(xIndex >= 0)
+                {
+                    auto& xSpinBox = m_filterSelectors[i]->getOptions().Sliders_SpinBox[xIndex];
+                    connect(ui->xDoubleSpinBox, SIGNAL(valueChanged(double)), xSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                    connect(xSpinBox, SIGNAL(valueChanged(double)), ui->xDoubleSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                    xSpinBox->setValue(ui->xDoubleSpinBox->value());
+                }
 
-                connect(ui->xDoubleSpinBox, SIGNAL(valueChanged(double)), xSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
-                connect(ui->yDoubleSpinBox, SIGNAL(valueChanged(double)), ySpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
-                connect(ui->wDoubleSpinBox, SIGNAL(valueChanged(double)), wSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
-                connect(ui->hDoubleSpinBox, SIGNAL(valueChanged(double)), hSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                if(yIndex >= 0)
+                {
+                    auto& ySpinBox = m_filterSelectors[i]->getOptions().Sliders_SpinBox[yIndex];
+                    connect(ui->yDoubleSpinBox, SIGNAL(valueChanged(double)), ySpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                    connect(ySpinBox, SIGNAL(valueChanged(double)), ui->yDoubleSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                    ySpinBox->setValue(ui->yDoubleSpinBox->value());
+                }
 
-                connect(xSpinBox, SIGNAL(valueChanged(double)), ui->xDoubleSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
-                connect(ySpinBox, SIGNAL(valueChanged(double)), ui->yDoubleSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
-                connect(wSpinBox, SIGNAL(valueChanged(double)), ui->wDoubleSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
-                connect(hSpinBox, SIGNAL(valueChanged(double)), ui->hDoubleSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                if(wIndex >= 0)
+                {
+                    auto& wSpinBox = m_filterSelectors[i]->getOptions().Sliders_SpinBox[wIndex];
+                    connect(ui->wDoubleSpinBox, SIGNAL(valueChanged(double)), wSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                    connect(wSpinBox, SIGNAL(valueChanged(double)), ui->wDoubleSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                    wSpinBox->setValue(ui->wDoubleSpinBox->value());
+                }
 
-                xSpinBox->setValue(ui->xDoubleSpinBox->value());
-                ySpinBox->setValue(ui->yDoubleSpinBox->value());
-                wSpinBox->setValue(ui->wDoubleSpinBox->value());
-                hSpinBox->setValue(ui->hDoubleSpinBox->value());
+                if(hIndex >= 0)
+                {
+                    auto& hSpinBox = m_filterSelectors[i]->getOptions().Sliders_SpinBox[hIndex];
+                    connect(ui->hDoubleSpinBox, SIGNAL(valueChanged(double)), hSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                    connect(hSpinBox, SIGNAL(valueChanged(double)), ui->hDoubleSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                    hSpinBox->setValue(ui->hDoubleSpinBox->value());
+                }
             }
         }
     }
