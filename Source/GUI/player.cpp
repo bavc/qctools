@@ -702,6 +702,15 @@ void Player::updateVideoOutputSize()
     m_w->videoSurface()->start(format);
     m_w->videoSurface()->present(videoFrame);
 #endif // QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+
+    if(m_selectionArea->isVisible()) {
+        auto x = ui->xDoubleSpinBox->value() * m_scaleFactor;
+        auto y = ui->yDoubleSpinBox->value() * m_scaleFactor;
+        auto w = ui->wDoubleSpinBox->value() * m_scaleFactor;
+        auto h = ui->hDoubleSpinBox->value() * m_scaleFactor;
+
+        m_selectionArea->setGeometry(QRectF(x, y, w, h));
+    }
 }
 
 void Player::applyFilter()
@@ -734,6 +743,16 @@ void Player::applyFilter()
                 connect(ui->yDoubleSpinBox, SIGNAL(valueChanged(double)), ySpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
                 connect(ui->wDoubleSpinBox, SIGNAL(valueChanged(double)), wSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
                 connect(ui->hDoubleSpinBox, SIGNAL(valueChanged(double)), hSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+
+                connect(xSpinBox, SIGNAL(valueChanged(double)), ui->xDoubleSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                connect(ySpinBox, SIGNAL(valueChanged(double)), ui->yDoubleSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                connect(wSpinBox, SIGNAL(valueChanged(double)), ui->wDoubleSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+                connect(hSpinBox, SIGNAL(valueChanged(double)), ui->hDoubleSpinBox, SLOT(setValue(double)), Qt::UniqueConnection);
+
+                xSpinBox->setValue(ui->xDoubleSpinBox->value());
+                ySpinBox->setValue(ui->yDoubleSpinBox->value());
+                wSpinBox->setValue(ui->wDoubleSpinBox->value());
+                hSpinBox->setValue(ui->hDoubleSpinBox->value());
             }
         }
     }
@@ -1259,21 +1278,21 @@ void Player::on_export_pushButton_clicked()
 #endif //
 }
 
-void Player::on_xSpinBox_valueChanged(int arg1)
+void Player::on_xDoubleSpinBox_valueChanged(double arg1)
 {
     auto x = qreal(arg1) * m_scaleFactor;
     m_selectionArea->setX(x);
 }
 
 
-void Player::on_ySpinBox_valueChanged(int arg1)
+void Player::on_yDoubleSpinBox_valueChanged(double arg1)
 {
     auto y = qreal(arg1) * m_scaleFactor;
     m_selectionArea->setY(y);
 }
 
 
-void Player::on_wSpinBox_valueChanged(int arg1)
+void Player::on_wDoubleSpinBox_valueChanged(double arg1)
 {
     auto w = qreal(arg1) * m_scaleFactor;
     auto geometry = m_selectionArea->geometry();
@@ -1284,7 +1303,7 @@ void Player::on_wSpinBox_valueChanged(int arg1)
 }
 
 
-void Player::on_hSpinBox_valueChanged(int arg1)
+void Player::on_hDoubleSpinBox_valueChanged(double arg1)
 {
     auto h = qreal(arg1) * m_scaleFactor;
     auto geometry = m_selectionArea->geometry();

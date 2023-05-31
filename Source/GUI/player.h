@@ -227,13 +227,13 @@ private Q_SLOTS:
 
     void on_export_pushButton_clicked();
 
-    void on_xSpinBox_valueChanged(int arg1);
+    void on_xDoubleSpinBox_valueChanged(double arg1);
 
-    void on_ySpinBox_valueChanged(int arg1);
+    void on_yDoubleSpinBox_valueChanged(double arg1);
 
-    void on_wSpinBox_valueChanged(int arg1);
+    void on_wDoubleSpinBox_valueChanged(double arg1);
 
-    void on_hSpinBox_valueChanged(int arg1);
+    void on_hDoubleSpinBox_valueChanged(double arg1);
 
 private:
     void setScaleSliderPercentage(int percents);
