@@ -815,6 +815,7 @@ void Player::applyFilter()
         return;
     }
 
+    QString combinedVideoFilter;
     if(!definedVideoFilters.empty())
     {
         ui->plainTextEdit->appendPlainText(QString("*** VIDEO ***: \n\n"));
@@ -883,7 +884,7 @@ void Player::applyFilter()
             videoXstackOption = QString("%1xstack=fill=slategray:inputs=%2:layout=%3").arg(videoXstackInput).arg(definedVideoFilters.length()).arg(layout);
         }
 
-        QString combinedVideoFilter = videoSplit + videoFilterString + videoXstackOption;
+        combinedVideoFilter = videoSplit + videoFilterString + videoXstackOption;
 
         if(ui->graphmonitor_checkBox->isChecked())
         {
@@ -891,10 +892,9 @@ void Player::applyFilter()
         }
 
         ui->plainTextEdit->appendPlainText(QString("*** result ***: \n\n%1").arg(combinedVideoFilter));
-
-        setFilter(combinedVideoFilter);
     }
 
+    QString combinedAudioFilter;
     if(!definedAudioFilters.empty())
     {
         ui->plainTextEdit->appendPlainText(QString("*** AUDIO ***: \n\n"));
@@ -940,13 +940,31 @@ void Player::applyFilter()
         QString audioXstackOption;
 
         if(definedAudioFilters.length() != 1) {
-            audioXstackOption = QString("%1xstack=fill=slategray:inputs=%2:layout=%3").arg(audioXstackInput).arg(definedAudioFilters.length()).arg("");
+            audioXstackOption = QString("%1xstack=fill=slategray:inputs=%2:layout=%3").arg(audioXstackInput).arg(definedAudioFilters.length()).arg("0_0|0_h0|0_h0+h1|0_h0+h1+h2|0_h0+h1+h2+h3|0_h0+h1+h2+h3+h4");
         }
 
-        QString combinedAudioFilter = audioSplit + audioFilterString + audioXstackOption;
+        combinedAudioFilter = audioSplit + audioFilterString + audioXstackOption;
 
         ui->plainTextEdit->appendPlainText(QString("*** result ***: \n\n%1").arg(combinedAudioFilter));
     }
+
+    QString combinedFilter;
+    if(!combinedVideoFilter.isEmpty() && !combinedAudioFilter.isEmpty())
+    {
+        combinedFilter = QString("videoFilterString[VFS];audioFilterString[AFS];[VFS][AFS]xstack=fill=slategray:inputs=2:layout=0_0|0_h0")
+                             .replace("videoFilterString", combinedVideoFilter)
+                             .replace("audioFilterString", combinedAudioFilter);
+    } else if(!combinedVideoFilter.isEmpty())
+    {
+        combinedFilter = combinedVideoFilter;
+    } else if(!combinedAudioFilter.isEmpty())
+    {
+        combinedFilter = combinedAudioFilter;
+    }
+
+    ui->plainTextEdit->appendPlainText(QString("*** filterString ***: \n\n%1").arg(combinedFilter));
+
+    setFilter(combinedFilter);
 }
 
 void Player::handleFileInformationPositionChanges()
