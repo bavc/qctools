@@ -987,7 +987,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "showcqt=fullhd=0",
+            "showcqt=s=${width}x${height}",
         },
     },
     {
