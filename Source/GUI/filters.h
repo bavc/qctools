@@ -1051,7 +1051,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "showvolume",
+            "showvolume=w=${width}:h=40:f=0.95:dm=1",
         },
     },
     {
