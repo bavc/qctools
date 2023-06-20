@@ -1019,7 +1019,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "aphasemeter=mpc=red:video=1[out0][out1];[out0]anullsink;[out1]copy",
+            "aphasemeter=s=160x${width}:mpc=red:video=1[out0][out1];[out0]anullsink;[out1]transpose=0",
         },
     },
     {
