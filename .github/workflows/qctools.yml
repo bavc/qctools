@@ -87,7 +87,13 @@ jobs:
 
     - name: Install dependencies
       run: |
-        brew install ${{ matrix.packages }} pkg-config qt ffmpeg
+        brew install ${{ matrix.packages }} pkg-config ffmpeg
+
+    - name: Install Qt6
+      run: |
+        wget https://raw.githubusercontent.com/Homebrew/homebrew-core/d998401ce2c718d413db36c65da9be9135c69d34/Formula/qt.rb
+        brew install ./qt.rb
+        brew pin qt
 
     - name: Install qwt
       run: |
@@ -208,7 +214,13 @@ jobs:
 
     - name: Install dependencies
       run: |
-        brew install ${{ matrix.packages }} nasm qt
+        brew install ${{ matrix.packages }} nasm
+
+    - name: Install Qt6
+      run: |
+        wget https://raw.githubusercontent.com/Homebrew/homebrew-core/d998401ce2c718d413db36c65da9be9135c69d34/Formula/qt.rb
+        brew install ./qt.rb
+        brew pin qt
 
     - name: Set Qt6 environment path
       run: |
