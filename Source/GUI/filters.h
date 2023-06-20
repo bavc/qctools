@@ -1035,7 +1035,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "showfreqs=mode=line:win_size=w1024",
+            "showfreqs=s=${width}x160:cmode=separate",
         },
     },
     {
@@ -1067,7 +1067,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "abitscope,drawgrid=w=iw:h=ih/8:t=1:c=gray@0.9",
+            "abitscope=s=160x${width},transpose=2",
         },
     },
     {
