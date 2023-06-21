@@ -64,7 +64,7 @@ jobs:
         include:
           - compiler: clang-9
             packages: llvm@9
-            env: { 'CC': 'clang-9', 'CXX': 'clang++-9', 'HOMEBREW_NO_INSTALL_CLEANUP': '1' }
+            env: { 'CC': 'clang-9', 'CXX': 'clang++-9', 'HOMEBREW_NO_INSTALL_CLEANUP': '1', 'HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK': '1' }
 
     runs-on: macos-latest
 
@@ -191,7 +191,7 @@ jobs:
         include:
           - compiler: clang-9
             packages: llvm@9
-            env: { 'CC': 'clang-9', 'CXX': 'clang++-9', 'HOMEBREW_NO_INSTALL_CLEANUP': '1' }
+            env: { 'CC': 'clang-9', 'CXX': 'clang++-9', 'HOMEBREW_NO_INSTALL_CLEANUP': '1', 'HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK': '1' }
 
     runs-on: macos-latest
 
