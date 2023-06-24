@@ -65,6 +65,8 @@ jobs:
           - compiler: clang-9
             packages: llvm@9
             env: { 'CC': 'clang-9', 'CXX': 'clang++-9', 'HOMEBREW_NO_INSTALL_CLEANUP': '1', 'HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK': '1' }
+          - qt_version: "6.3.0"
+            qt_modules: "qtmultimedia"
 
     runs-on: macos-latest
 
@@ -90,10 +92,10 @@ jobs:
         brew install ${{ matrix.packages }} pkg-config ffmpeg
 
     - name: Install Qt6
-      run: |
-        wget https://raw.githubusercontent.com/Homebrew/homebrew-core/d998401ce2c718d413db36c65da9be9135c69d34/Formula/qt.rb
-        brew install ./qt.rb
-        brew pin qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: ${{ matrix.qt_version }}
+        modules: ${{ matrix.qt_modules }}
 
     - name: Install qwt
       run: |
@@ -192,6 +194,8 @@ jobs:
           - compiler: clang-9
             packages: llvm@9
             env: { 'CC': 'clang-9', 'CXX': 'clang++-9', 'HOMEBREW_NO_INSTALL_CLEANUP': '1', 'HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK': '1' }
+          - qt_version: "6.3.0"
+            qt_modules: "qtmultimedia"
 
     runs-on: macos-latest
 
@@ -217,10 +221,10 @@ jobs:
         brew install ${{ matrix.packages }} nasm
 
     - name: Install Qt6
-      run: |
-        wget https://raw.githubusercontent.com/Homebrew/homebrew-core/d998401ce2c718d413db36c65da9be9135c69d34/Formula/qt.rb
-        brew install ./qt.rb
-        brew pin qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: ${{ matrix.qt_version }}
+        modules: ${{ matrix.qt_modules }}
 
     - name: Set Qt6 environment path
       run: |
