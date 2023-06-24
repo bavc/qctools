@@ -99,7 +99,7 @@ jobs:
 
     - name: Install qwt
       run: |
-        brew install -s qwt
+        brew install --ignore-dependencies qwt
 
     - name: Set Qt6 environment path
       run: |
