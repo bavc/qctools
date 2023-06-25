@@ -785,7 +785,9 @@ void Player::applyFilter()
 
     ui->plainTextEdit->clear();
 
-    QStringList definedFilters;
+    QStringList definedVideoFilters;
+    QStringList definedAudioFilters;
+
     for(auto i = 0; i < MaxFilters; ++i) {
         auto layoutItem = (ui->filterGroupBox->layout()->itemAt(i));
         auto filter = qobject_cast<FilterSelector*>(layoutItem->widget());
@@ -793,91 +795,174 @@ void Player::applyFilter()
             continue;
 
         auto rawFilter = filter->getFilter();
+        auto type = filter->getFilterType();
+
         auto filterString = replaceFilterTokens(rawFilter);
         auto empty = filterString.isEmpty();
-        if(!empty)
-            definedFilters.append(filterString);
+        if(!empty) {
+            if(type == 0)
+                definedVideoFilters.append(filterString);
+            else if(type == 1)
+                definedAudioFilters.append(filterString);
+        }
     }
 
-    ui->plainTextEdit->appendPlainText(QString("*** defined filters ***: \n\n%1").arg(definedFilters.join("\n")));
+    ui->plainTextEdit->appendPlainText(QString("*** defined video filters ***: \n\n%1").arg(definedVideoFilters.join("\n")));
+    ui->plainTextEdit->appendPlainText(QString("*** defined audio filters ***: \n\n%1").arg(definedAudioFilters.join("\n")));
 
-    if(definedFilters.empty()) {
+    if(definedAudioFilters.empty() && definedVideoFilters.empty()) {
         setFilter(QString());
         return;
     }
 
-    auto layout = QString();
-    if(ui->vertical_checkBox->isChecked()) {
-        layout = "0_0|0_h0|0_h0+h1|0_h0+h1+h2|0_h0+h1+h2+h3|0_h0+h1+h2+h3+h4";
-    } else if(ui->horizontal_checkBox->isChecked()) {
-        layout = "0_0|w0_0|w0+w1_0|w0+w1+w2_0|w0+w1+w2+w3_0|w0+w1+w2+w3+w4_0";
-    } else if(ui->grid_checkBox->isChecked()) {
-        layout = "0_0|w0_0|0_h0|w0_h0|0_h0+h1|w0_h0+h1";
-    }
+    QString combinedVideoFilter;
+    if(!definedVideoFilters.empty())
+    {
+        ui->plainTextEdit->appendPlainText(QString("*** VIDEO ***: \n\n"));
 
-    ui->plainTextEdit->appendPlainText(QString("*** layout ***: \n\n%1").arg(layout));
+        auto layout = QString();
+        if(ui->vertical_checkBox->isChecked()) {
+            layout = "0_0|0_h0|0_h0+h1|0_h0+h1+h2|0_h0+h1+h2+h3|0_h0+h1+h2+h3+h4";
+        } else if(ui->horizontal_checkBox->isChecked()) {
+            layout = "0_0|w0_0|w0+w1_0|w0+w1+w2_0|w0+w1+w2+w3_0|w0+w1+w2+w3+w4_0";
+        } else if(ui->grid_checkBox->isChecked()) {
+            layout = "0_0|w0_0|0_h0|w0_h0|0_h0+h1|w0_h0+h1";
+        }
 
-    QString splits[] = {
-        "sws_flags=neighbor;%1",
-        "sws_flags=neighbor;%1split=2[x1][x2];",
-        "sws_flags=neighbor;%1split=3[x1][x2][x3];",
-        "sws_flags=neighbor;%1split=4[x1][x2][x3][x4];",
-        "sws_flags=neighbor;%1split=5[x1][x2][x3][x4][x5];",
-        "sws_flags=neighbor;%1split=6[x1][x2][x3][x4][x5][x6];"
-    };
+        ui->plainTextEdit->appendPlainText(QString("*** layout ***: \n\n%1").arg(layout));
 
-    auto adjustmentFilterString = replaceFilterTokens(m_adjustmentSelector->getFilter());
-    auto split = splits[definedFilters.length() - 1].arg(!adjustmentFilterString.isEmpty() ? (adjustmentFilterString + ",") : adjustmentFilterString);
+        QString videoSplits[] = {
+            "sws_flags=neighbor;%1",
+            "sws_flags=neighbor;%1split=2[x1][x2];",
+            "sws_flags=neighbor;%1split=3[x1][x2][x3];",
+            "sws_flags=neighbor;%1split=4[x1][x2][x3][x4];",
+            "sws_flags=neighbor;%1split=5[x1][x2][x3][x4][x5];",
+            "sws_flags=neighbor;%1split=6[x1][x2][x3][x4][x5][x6];"
+        };
 
-    ui->plainTextEdit->appendPlainText(QString("*** split ***: \n\n%1").arg(split));
+        auto adjustmentFilterString = replaceFilterTokens(m_adjustmentSelector->getFilter());
+        auto videoSplit = videoSplits[definedVideoFilters.length() - 1].arg(!adjustmentFilterString.isEmpty() ? (adjustmentFilterString + ",") : adjustmentFilterString);
 
-    QString filterString;
+        ui->plainTextEdit->appendPlainText(QString("*** video split ***: \n\n%1").arg(videoSplit));
 
-    if(definedFilters.length() == 1) {
-        filterString = definedFilters[0];
-    } else {
-        for(int i = 0; i < definedFilters.length(); ++i) {
-            if(ui->fitToGrid_checkBox->isChecked()) {
-                if(i == 0) {
-                    filterString += replaceFilterTokens(QString("[x%1]%2[y%1];")).arg(i + 1).arg(definedFilters[i]);
+        QString videoFilterString;
+
+        if(definedVideoFilters.length() == 1) {
+            videoFilterString = definedVideoFilters[0];
+        } else {
+            for(int i = 0; i < definedVideoFilters.length(); ++i) {
+                if(ui->fitToGrid_checkBox->isChecked()) {
+                    if(i == 0) {
+                        videoFilterString += replaceFilterTokens(QString("[x%1]%2[y%1];")).arg(i + 1).arg(definedVideoFilters[i]);
+                    } else {
+                        videoFilterString += replaceFilterTokens(QString("[x%1]%2[z%1];[z%1][y1]scale2ref[y%1][y1];")).arg(i + 1).arg(definedVideoFilters[i]);
+                    }
                 } else {
-                    filterString += replaceFilterTokens(QString("[x%1]%2[z%1];[z%1][y1]scale2ref[y%1][y1];")).arg(i + 1).arg(definedFilters[i]);
+                    videoFilterString += QString("[x%1]%2[y%1];").arg(i + 1).arg(definedVideoFilters[i]);
                 }
-            } else {
-                filterString += QString("[x%1]%2[y%1];").arg(i + 1).arg(definedFilters[i]);
             }
         }
+
+        ui->plainTextEdit->appendPlainText(QString("*** videoFilterString ***: \n\n%1").arg(videoFilterString));
+
+        QString videoXstackInputs[] = {
+            "",
+            "[y1][y2]",
+            "[y1][y2][y3]",
+            "[y1][y2][y3][y4]",
+            "[y1][y2][y3][y4][y5]",
+            "[y1][y2][y3][y4][y5][y6]"
+        };
+
+        auto videoXstackInput = videoXstackInputs[definedVideoFilters.length() - 1];
+
+        ui->plainTextEdit->appendPlainText(QString("*** videoXstackInput ***: \n\n%1").arg(videoXstackInput));
+
+        QString videoXstackOption;
+
+        if(definedVideoFilters.length() != 1) {
+            videoXstackOption = QString("%1xstack=fill=slategray:inputs=%2:layout=%3").arg(videoXstackInput).arg(definedVideoFilters.length()).arg(layout);
+        }
+
+        combinedVideoFilter = videoSplit + videoFilterString + videoXstackOption;
+
+        if(ui->graphmonitor_checkBox->isChecked())
+        {
+            combinedVideoFilter.append(QString(",graphmonitor=flags=queue+pts+time+timebase+format+size+rate:m=full"));
+        }
+
+        ui->plainTextEdit->appendPlainText(QString("*** result ***: \n\n%1").arg(combinedVideoFilter));
     }
 
-    ui->plainTextEdit->appendPlainText(QString("*** filterString ***: \n\n%1").arg(filterString));
-
-    QString xstack_inputs[] = {
-        "",
-        "[y1][y2]",
-        "[y1][y2][y3]",
-        "[y1][y2][y3][y4]",
-        "[y1][y2][y3][y4][y5]",
-        "[y1][y2][y3][y4][y5][y6]"
-    };
-
-    auto xstack_input = xstack_inputs[definedFilters.length() - 1];
-
-    ui->plainTextEdit->appendPlainText(QString("*** xstack_input ***: \n\n%1").arg(xstack_input));
-
-    QString xstack_option;
-
-    if(definedFilters.length() != 1) {
-        xstack_option = QString("%1xstack=fill=slategray:inputs=%2:layout=%3").arg(xstack_input).arg(definedFilters.length()).arg(layout);
-    }
-
-    QString combinedFilter = split + filterString + xstack_option;
-
-    if(ui->graphmonitor_checkBox->isChecked())
+    QString combinedAudioFilter;
+    if(!definedAudioFilters.empty())
     {
-        combinedFilter.append(QString(",graphmonitor=flags=queue+pts+time+timebase+format+size+rate:m=full"));
+        ui->plainTextEdit->appendPlainText(QString("*** AUDIO ***: \n\n"));
+
+        QString audioSplits[] = {
+            "%1",
+            "%1asplit=2[a1][a2];",
+            "%1asplit=3[a1][a2][a3];",
+            "%1asplit=4[a1][a2][a3][a4];",
+            "%1asplit=5[a1][a2][a3][a4][a5];",
+            "%1asplit=6[a1][a2][a3][a4][a5][a6];"
+        };
+
+        auto audioSplit = audioSplits[definedAudioFilters.length() - 1].arg("");
+
+        ui->plainTextEdit->appendPlainText(QString("*** audio split ***: \n\n%1").arg(audioSplit));
+
+        QString audioFilterString;
+
+        if(definedAudioFilters.length() == 1) {
+            audioFilterString = definedAudioFilters[0];
+        } else {
+            for(int i = 0; i < definedAudioFilters.length(); ++i) {
+                audioFilterString += QString("[a%1]%2[b%1];").arg(i + 1).arg(definedAudioFilters[i]);
+            }
+        }
+
+        QString audioXstackInputs[] = {
+            "",
+            "[b1][b2]",
+            "[b1][b2][b3]",
+            "[b1][b2][b3][b4]",
+            "[b1][b2][b3][b4][b5]",
+            "[b1][b2][b3][b4][b5][b6]"
+        };
+
+        ui->plainTextEdit->appendPlainText(QString("*** audioFilterString ***: \n\n%1").arg(audioFilterString));
+
+        auto audioXstackInput = audioXstackInputs[definedAudioFilters.length() - 1];
+
+        ui->plainTextEdit->appendPlainText(QString("*** audioXstackInput ***: \n\n%1").arg(audioXstackInput));
+
+        QString audioXstackOption;
+
+        if(definedAudioFilters.length() != 1) {
+            audioXstackOption = QString("%1xstack=fill=slategray:inputs=%2:layout=%3").arg(audioXstackInput).arg(definedAudioFilters.length()).arg("0_0|0_h0|0_h0+h1|0_h0+h1+h2|0_h0+h1+h2+h3|0_h0+h1+h2+h3+h4");
+        }
+
+        combinedAudioFilter = audioSplit + audioFilterString + audioXstackOption;
+
+        ui->plainTextEdit->appendPlainText(QString("*** result ***: \n\n%1").arg(combinedAudioFilter));
     }
 
-    ui->plainTextEdit->appendPlainText(QString("*** result ***: \n\n%1").arg(combinedFilter));
+    QString combinedFilter;
+    if(!combinedVideoFilter.isEmpty() && !combinedAudioFilter.isEmpty())
+    {
+        combinedFilter = QString("videoFilterString[VFS];audioFilterString[AFS];[VFS][AFS]xstack=fill=slategray:inputs=2:layout=0_0|0_h0")
+                             .replace("videoFilterString", combinedVideoFilter)
+                             .replace("audioFilterString", combinedAudioFilter);
+    } else if(!combinedVideoFilter.isEmpty())
+    {
+        combinedFilter = combinedVideoFilter;
+    } else if(!combinedAudioFilter.isEmpty())
+    {
+        combinedFilter = combinedAudioFilter;
+    }
+
+    ui->plainTextEdit->appendPlainText(QString("*** filterString ***: \n\n%1").arg(combinedFilter));
 
     setFilter(combinedFilter);
 }

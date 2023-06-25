@@ -58,6 +58,7 @@ public:
 
     QString getFilter();
     QString getFilterName();
+    int getFilterType();
 
 Q_SIGNALS:
     void filterChanged(const QString& filterString);
