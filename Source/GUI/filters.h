@@ -987,7 +987,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "showcqt=fullhd=0",
+            "showcqt=s=${width}x${height}",
         },
     },
     {
@@ -1019,7 +1019,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "aphasemeter=mpc=red:video=1[out0][out1];[out0]anullsink;[out1]copy",
+            "aphasemeter=s=160x${width}:mpc=red:video=1[out0][out1];[out0]anullsink;[out1]transpose=0",
         },
     },
     {
@@ -1035,7 +1035,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "showfreqs=mode=line:win_size=w1024",
+            "showfreqs=s=${width}x160:cmode=separate",
         },
     },
     {
@@ -1051,7 +1051,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "showvolume",
+            "showvolume=w=${width}:h=40:f=0.95:dm=1",
         },
     },
     {
@@ -1067,7 +1067,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "abitscope,drawgrid=w=iw:h=ih/8:t=1:c=gray@0.9",
+            "abitscope=s=160x${width},transpose=2",
         },
     },
     {
