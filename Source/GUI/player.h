@@ -9,6 +9,7 @@
 #include <QVideoWidget>
 #include <QtAVPlayer/qavaudiooutput.h>
 #include <QtAVPlayer/qavplayer.h>
+#include "Core/FileInformation.h"
 
 class QGraphicsVideoItem;
 
@@ -129,7 +130,12 @@ public:
 
     void setFile(const QString& file) {
         m_file = file;
-        setSource(m_file);
+        auto sourceFile = m_file;
+
+        if(isDpx(sourceFile))
+            sourceFile = adjustDpxFileName(sourceFile);
+
+        setSource(sourceFile);
     }
 
     QString file() const {
