@@ -246,6 +246,7 @@ void MainWindow::clearFilesList()
 //---------------------------------------------------------------------------
 void MainWindow::createFilesList()
 {
+    qDebug() << "MainWindow::createFilesList()";
     clearFilesList();
 
     if (getFilesCurrentPos()==(size_t)-1)
@@ -286,6 +287,7 @@ void MainWindow::clearGraphsLayout()
 //---------------------------------------------------------------------------
 void MainWindow::createGraphsLayout()
 {
+    qDebug() << "MainWindow::createGraphsLayout()";
     clearGraphsLayout();
 
     if (getFilesCurrentPos()==(size_t)-1)
@@ -357,12 +359,16 @@ void MainWindow::createGraphsLayout()
     if (PlotsArea)
     {
         PlotsArea->changeOrder(filtersInfo);
-        if (!ui->actionGraphsLayout->isChecked())
+        if (!ui->actionGraphsLayout->isChecked()) {
+            qDebug() << "if (!ui->actionGraphsLayout->isChecked()) PlotsArea->hide()";
             PlotsArea->hide();
+        }
 
         ui->verticalLayout->addWidget(PlotsArea);
         if(ui->actionGraphsLayout->isChecked()) {
             // we need force show to get all the charts shown (and prevent Qt from doing it at wrong moment)...
+
+            qDebug() << "ui->actionGraphsLayout->isChecked(): PlotsArea->show()";
             PlotsArea->show();
 
             QMap<QString, std::tuple<quint64, quint64>> filters;
@@ -507,6 +513,8 @@ void MainWindow::addFile(const QString &FileName)
 //---------------------------------------------------------------------------
 void MainWindow::addFile_finish()
 {
+    qDebug() << "addFile_finish()";
+
     if (FilesListArea)
     {
         FilesListArea->UpdateAll();
@@ -601,6 +609,8 @@ static QTime zeroTime = QTime::fromString("00:00:00");
 //---------------------------------------------------------------------------
 void MainWindow::Update()
 {
+    qDebug() << "MainWindow::Update()";
+
 	if (TinyDisplayArea)
         TinyDisplayArea->Update(false);
 
