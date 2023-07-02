@@ -206,30 +206,6 @@ const filter Filters[] =
         },
     },
     {
-        "Waveform Target",
-        0,
-        {
-            { Args_Type_Slider,  20,   0,   0,   1, "x" },
-            { Args_Type_Slider,  20,   0,   0,   1, "y" },
-            { Args_Type_Slider, 121,  16,   0,   1, "w" },
-            { Args_Type_Slider, 121,  16,   0,   1, "h" },
-            //{ Args_Type_Slider,   8,   0,  10,  10, "Intensity" },
-            { Args_Type_Slider,   0,   0,   7,   1, "Filter" },
-            { Args_Type_Slider,   0,   0,   2,   1, "Scale" },
-            { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
-        },
-        {
-            "crop=${3}:${4}:${1}:${2},scale=${width}:${height},\
-            format=${pix_fmt:4},waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1",
-            "split[a][b];\
-            [a]format=yuv444p,lutyuv=y=val/4,drawbox=w=${3}:h=${4}:x=${1}:y=${2}:color=invert:thickness=1[a1];\
-            [b]crop=${3}:${4}:${1}:${2},scale=${width}:${height},\
-            format=${pix_fmt:4},waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b1];\
-            [a1][b1]scale2ref[a2][b1];\
-            [a2][b1]blend=addition",
-        },
-    },
-    {
         "Line Select",
         0,
         {
@@ -263,23 +239,6 @@ const filter Filters[] =
         {
             "oscilloscope=x=${2}/1000000:y=${3}/1000000:s=${4}/1000000:t=${5}/1000000",
             "split[a][b];[a]field=top[a1];[b]field=bottom[b1];[a1]oscilloscope=x=${2}/1000000:y=${3}/1000000:s=${4}/1000000:t=${5}/1000000[a2];[b1]oscilloscope=x=${2}/1000000:y=${3}/1000000:s=${4}/1000000:t=${5}/1000000[b2],[a2][b2]vstack",
-        },
-    },
-    {
-        "Pixel Scope",
-        0,
-        {
-            { Args_Type_Toggle,      0,   0,       0,   0, "Field" },
-            { Args_Type_Slider,     20,   0,       0,   1, "x" },
-            { Args_Type_Slider,     20,   0,       0,   1, "y" },
-            { Args_Type_Slider,      8,   1,      80,   1, "width" },
-            { Args_Type_Slider,      8,   1,      80,   1, "height" },
-            { Args_Type_None,        0,   0,       0,   0, nullptr },
-            { Args_Type_None,        0,   0,       0,   0, nullptr },
-        },
-        {
-            "scale='max(640\\,iw)':'max(480\\,ih)',pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5},format=rgb24",
-            "il=l=d:c=d,scale='max(640\\,iw)':'max(480\\,ih)',pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5},format=rgb24",
         },
     },
     {
@@ -326,29 +285,6 @@ const filter Filters[] =
         },
     },
     {
-        "Vectorscope Target",
-        0,
-        {
-            { Args_Type_Slider,  20,   0,   0,   1, "x" },
-            { Args_Type_Slider,  20,   0,   0,   1, "y" },
-            { Args_Type_Slider, 120,  16,   0,   1, "w" },
-            { Args_Type_Slider, 120,  16,   0,   1, "h" },
-            //{ Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
-            { Args_Type_Slider,   3,   0,   5,   1, "Mode" },
-            { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
-            { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
-        },
-        {
-            "crop=${3}:${4}:${1}:${2},\
-            format=${pix_fmt:6},vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
-            "split[a][b];\
-            [a]lutyuv=y=val/4,scale=${width}:${height},setsar=1/1,format=${pix_fmt:6},drawbox=w=${3}:h=${4}:x=${1}:y=${2}:color=invert:thickness=1[a1];\
-            [b]crop=${3}:${4}:${1}:${2},\
-            format=${pix_fmt:6},vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height},setsar=1/1[b1];\
-            [a1][b1]blend=addition",
-        },
-    },
-    {
         "CIE Scope",
         0,
         {
@@ -362,25 +298,6 @@ const filter Filters[] =
         },
         {
             "ciescope=system=${1}:gamuts=pow(2\\,${2}):contrast=${3}:intensity=${4}",
-        },
-    },
-    {
-        "Datascope",
-        0,
-        {
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Slider,   0,   0,   0,   1, "x" },
-            { Args_Type_Slider,   0,   0,   0,   1, "y" },
-            { Args_Type_Slider,   1,   0,   2,   1, "DataMode" },
-            { Args_Type_Slider,   1,   0,   1,   1, "Axis"},
-            { Args_Type_Slider,   0,   0,   1,   1, "Dec" },
-            { Args_Type_Toggle,   0,   0,   1,   1, "Show" },
-        },
-        {
-                       "datascope=x=${2}:y=${3}:mode=${4}:axis=${5}:format=${6}",
-                       "format=yuv444p,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=32:height=4,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=4:height=32",
-            "il=l=d:c=d,datascope=x=${2}:y=${3}:mode=${4}:axis=${5}:format=${6}",
-            "il=l=d:c=d,format=yuv444p,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=32:height=4,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=4:height=32",
         },
     },
     {
@@ -870,26 +787,6 @@ const filter Filters[] =
         },
     },
     {
-        "Zoom",
-        0,
-        {
-            { Args_Type_Slider,  20,   0,   0,   1, "x" },
-            { Args_Type_Slider,  20,   0,   0,   1, "y" },
-            { Args_Type_Slider, 120,  16,   0,   1, "w" },
-            { Args_Type_Slider, 120,  16,   0,   1, "h" },
-            { Args_Type_Slider,   0,   0,  10,  10, "Strength" },
-            //{ Args_Type_Slider,   0,   0,  10,  10, "Intensity" },
-            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
-            { Args_Type_Toggle,   1,   0,   0,   0, "Zoom"},
-        },
-        {
-            "scale=${width}:${height}:flags=neighbor,histeq=strength=${5},setsar=1/1",
-            "crop=x=${1}:y=${2}:w=${3}:h=${4},scale=${width}:${height}:flags=neighbor,histeq=strength=${5},setsar=1/1",
-            "il=l=d:c=d,scale=${width}:${height}:flags=neighbor,histeq=strength=${5},setsar=1/1",
-            "il=l=d:c=d,crop=x=${1}:y=${2}:w=${3}:h=${4},scale=${width}:${height}:flags=neighbor,histeq=strength=${5},setsar=1/1",
-        },
-    },
-    {
         "Corners",
         0,
         {
@@ -923,6 +820,125 @@ const filter Filters[] =
             "readvitc=scan_max=${1},readeia608=scan_max=${1}:spw=${2},crop=iw:${1}:0:0,scale=${width}:${height}:flags=neighbor,drawtext=fontfile=${fontfile}:fontcolor=white:fontsize=36:box=1:boxcolor=black@0.5:x=(w-tw)/2:y=h*3/4-ascent:text=Line %{metadata\\\\:lavfi.readeia608.0.line\\\\:-} %{metadata\\\\:lavfi.readeia608.0.cc\\\\:------} - Line %{metadata\\\\:lavfi.readeia608.1.line\\\\:-} %{metadata\\\\:lavfi.readeia608.1.cc\\\\:------},drawtext=fontfile=${fontfile}:fontcolor=white:fontsize=36:box=1:boxcolor=black@0.5:x=(w-tw)/2:y=h*3/4-ascent*3:text=VITC %{metadata\\\\:lavfi.readvitc.tc_str\\\\:-- -- -- --}",
             "readvitc=scan_max=${1},readeia608=scan_max=${1}:spw=${2}:chp=1,drawtext=fontfile=${fontfile}:fontcolor=white:fontsize=36:box=1:boxcolor=black@0.5:x=(w-tw)/2:y=h*3/4-ascent:text=Line %{metadata\\\\:lavfi.readeia608.0.line\\\\:-} %{metadata\\\\:lavfi.readeia608.0.cc\\\\:------} - Line %{metadata\\\\:lavfi.readeia608.1.line\\\\:-} %{metadata\\\\:lavfi.readeia608.1.cc\\\\:------},drawtext=fontfile=${fontfile}:fontcolor=white:fontsize=36:box=1:boxcolor=black@0.5:x=(w-tw)/2:y=h*3/4-ascent*3:text=VITC %{metadata\\\\:lavfi.readvitc.tc_str\\\\:-- -- -- --}",
             "readvitc=scan_max=${1},readeia608=scan_max=${1}:spw=${2}:chp=1,crop=iw:${1}:0:0,scale=${width}:${height}:flags=neighbor,drawtext=fontfile=${fontfile}:fontcolor=white:fontsize=36:box=1:boxcolor=black@0.5:x=(w-tw)/2:y=h*3/4-ascent:text=Line %{metadata\\\\:lavfi.readeia608.0.line\\\\:-} %{metadata\\\\:lavfi.readeia608.0.cc\\\\:------} - Line %{metadata\\\\:lavfi.readeia608.1.line\\\\:-} %{metadata\\\\:lavfi.readeia608.1.cc\\\\:------},drawtext=fontfile=${fontfile}:fontcolor=white:fontsize=36:box=1:boxcolor=black@0.5:x=(w-tw)/2:y=h*3/4-ascent*3:text=VITC %{metadata\\\\:lavfi.readvitc.tc_str\\\\:-- -- -- --}",
+        },
+    },
+    {
+        "(Separator)",
+        -1,
+        {
+            { Args_Type_None,   0, 0, 0, 0, nullptr },
+            { Args_Type_None,   0, 0, 0, 0, nullptr },
+            { Args_Type_None,   0, 0, 0, 0, nullptr },
+            { Args_Type_None,   0, 0, 0, 0, nullptr },
+            { Args_Type_None,   0, 0, 0, 0, nullptr },
+            { Args_Type_None,   0, 0, 0, 0, nullptr },
+            { Args_Type_None,   0, 0, 0, 0, nullptr },
+        },
+        {
+            "",
+        },
+    },
+    {
+        "Datascope",
+        0,
+        {
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Slider,   0,   0,   0,   1, "x" },
+            { Args_Type_Slider,   0,   0,   0,   1, "y" },
+            { Args_Type_Slider,   1,   0,   2,   1, "DataMode" },
+            { Args_Type_Slider,   1,   0,   1,   1, "Axis"},
+            { Args_Type_Slider,   0,   0,   1,   1, "Dec" },
+            { Args_Type_Toggle,   0,   0,   1,   1, "Show" },
+        },
+        {
+                       "datascope=x=${2}:y=${3}:mode=${4}:axis=${5}:format=${6}",
+                       "format=yuv444p,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=32:height=4,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=4:height=32",
+            "il=l=d:c=d,datascope=x=${2}:y=${3}:mode=${4}:axis=${5}:format=${6}",
+            "il=l=d:c=d,format=yuv444p,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=32:height=4,drawbox=x=${2}:y=${3}:color=yellow:thickness=4:width=4:height=32",
+        },
+    },
+    {
+        "Pixel Scope",
+        0,
+        {
+            { Args_Type_Toggle,      0,   0,       0,   0, "Field" },
+            { Args_Type_Slider,     20,   0,       0,   1, "x" },
+            { Args_Type_Slider,     20,   0,       0,   1, "y" },
+            { Args_Type_Slider,      8,   1,      80,   1, "width" },
+            { Args_Type_Slider,      8,   1,      80,   1, "height" },
+            { Args_Type_None,        0,   0,       0,   0, nullptr },
+            { Args_Type_None,        0,   0,       0,   0, nullptr },
+        },
+        {
+            "scale='max(640\\,iw)':'max(480\\,ih)',pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5},format=rgb24",
+            "il=l=d:c=d,scale='max(640\\,iw)':'max(480\\,ih)',pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5},format=rgb24",
+        },
+    },
+    {
+        "Waveform Target",
+        0,
+        {
+            { Args_Type_Slider,  20,   0,   0,   1, "x" },
+            { Args_Type_Slider,  20,   0,   0,   1, "y" },
+            { Args_Type_Slider, 121,  16,   0,   1, "w" },
+            { Args_Type_Slider, 121,  16,   0,   1, "h" },
+            //{ Args_Type_Slider,   8,   0,  10,  10, "Intensity" },
+            { Args_Type_Slider,   0,   0,   7,   1, "Filter" },
+            { Args_Type_Slider,   0,   0,   2,   1, "Scale" },
+            { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
+        },
+        {
+            "crop=${3}:${4}:${1}:${2},scale=${width}:${height},\
+            format=${pix_fmt:4},waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6},scale=${width}:${height},setsar=1/1",
+            "split[a][b];\
+            [a]format=yuv444p,lutyuv=y=val/4,drawbox=w=${3}:h=${4}:x=${1}:y=${2}:color=invert:thickness=1[a1];\
+            [b]crop=${3}:${4}:${1}:${2},scale=${width}:${height},\
+            format=${pix_fmt:4},waveform=intensity=0.8:mode=column:mirror=1:c=1:f=${5}:graticule=green:flags=numbers+dots:scale=${6}[b1];\
+            [a1][b1]scale2ref[a2][b1];\
+            [a2][b1]blend=addition",
+        },
+    },
+    {
+        "Vectorscope Target",
+        0,
+        {
+            { Args_Type_Slider,  20,   0,   0,   1, "x" },
+            { Args_Type_Slider,  20,   0,   0,   1, "y" },
+            { Args_Type_Slider, 120,  16,   0,   1, "w" },
+            { Args_Type_Slider, 120,  16,   0,   1, "h" },
+            //{ Args_Type_Slider,   1,   0,  10,  10, "Intensity" },
+            { Args_Type_Slider,   3,   0,   5,   1, "Mode" },
+            { Args_Type_Slider,   0,   0,   3,   1, "Peak" },
+            { Args_Type_Toggle,   1,   0,   0,   0, "Background"},
+        },
+        {
+            "crop=${3}:${4}:${1}:${2},\
+            format=${pix_fmt:6},vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2",
+            "split[a][b];\
+            [a]lutyuv=y=val/4,scale=${width}:${height},setsar=1/1,format=${pix_fmt:6},drawbox=w=${3}:h=${4}:x=${1}:y=${2}:color=invert:thickness=1[a1];\
+            [b]crop=${3}:${4}:${1}:${2},\
+            format=${pix_fmt:6},vectorscope=i=0.1:mode=${5}:envelope=${6}:colorspace=601:graticule=green:flags=name,pad=ih*${dar}:ih:(ow-iw)/2:(oh-ih)/2,scale=${width}:${height},setsar=1/1[b1];\
+            [a1][b1]blend=addition",
+        },
+    },
+    {
+        "Zoom",
+        0,
+        {
+            { Args_Type_Slider,  20,   0,   0,   1, "x" },
+            { Args_Type_Slider,  20,   0,   0,   1, "y" },
+            { Args_Type_Slider, 120,  16,   0,   1, "w" },
+            { Args_Type_Slider, 120,  16,   0,   1, "h" },
+            { Args_Type_Slider,   0,   0,  10,  10, "Strength" },
+            //{ Args_Type_Slider,   0,   0,  10,  10, "Intensity" },
+            { Args_Type_Toggle,   0,   0,   0,   0, "Field" },
+            { Args_Type_Toggle,   1,   0,   0,   0, "Zoom"},
+        },
+        {
+            "scale=${width}:${height}:flags=neighbor,histeq=strength=${5},setsar=1/1",
+            "crop=x=${1}:y=${2}:w=${3}:h=${4},scale=${width}:${height}:flags=neighbor,histeq=strength=${5},setsar=1/1",
+            "il=l=d:c=d,scale=${width}:${height}:flags=neighbor,histeq=strength=${5},setsar=1/1",
+            "il=l=d:c=d,crop=x=${1}:y=${2}:w=${3}:h=${4},scale=${width}:${height}:flags=neighbor,histeq=strength=${5},setsar=1/1",
         },
     },
     {

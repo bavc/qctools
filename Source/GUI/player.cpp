@@ -212,7 +212,7 @@ Player::Player(QWidget *parent) :
 
     m_adjustmentSelector->setMinimumHeight(50);
     m_adjustmentSelector->selectCurrentFilter(-1);
-    m_adjustmentSelector->setCurrentIndex(22);
+    m_adjustmentSelector->setCurrentIndex(18);
 
     handleFilterChange(m_adjustmentSelector, -1);
 
