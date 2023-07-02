@@ -20,8 +20,10 @@
 [Interlacement Detection (single frame)](#singleframe)  
 [Interlacement Detection (multiple frames)](#multiframe)  
 [Interlacement Detection (repeated fields)](#repeated)  
-[Entropy](#entropy)
-[Entropy Diff](#entropy-diff)
+[Entropy](#entropy)  
+[Entropy Diff](#entropy-diff)  
+[Blockiness](#blockiness)  
+[Blurriness](#blurriness)  
 
 ### Audio
 
@@ -249,6 +251,14 @@ Plots the graylevel entropy of the histogram of the color channels. A color chan
 ## Entropy Diff {#entropy-diff}
 
 Plots the frame-to-frame difference in the graylevel entropy in the histogram of each color channel of the video frames. Incoherancy in plotted values may help indicate a damaged digital tape source (such as scratched D5 tape) or highlight digital manipulation of the image. The values should correspond to chaos or discontinuity in the histogram plot.
+
+## Blockiness {#blockiness}
+
+Measures the blockiness of the frame using the default settings of libavfilter's [blockdetect filter](https://ffmpeg.org/ffmpeg-filters.html#blockdetect-1]).
+
+## Blurriness {#blurriness}
+
+Measures the blurriness of the frame using the default settings of libavfilter's [blurdetect filter](https://ffmpeg.org/ffmpeg-filters.html#blurdetect-1]).
 
 ## Audio
 
