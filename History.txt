@@ -10,6 +10,9 @@
 x Fix typo that broke part of the Extract Planes Equalized playback filter.
 x Improvements on reading files that contain non-audiovisual streams.
 + Readnig panels from qctools.mkv report.
++ The Datascope, Waveform Target, Vectorscope Target, Zoom, and Pixel Scope filters now use a resizable/movable selection box to determine their area of focus.
++ Adding a blockdetect and blurdetect graph.
++ Switching to QtAVPlayer for graphing and playback, which also adds ffmpeg5 support to QCTools
 
 1.2.1, 2022-02-12
 x Fix issue with piped input to qcli (PR #704)
