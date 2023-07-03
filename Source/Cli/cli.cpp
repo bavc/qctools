@@ -614,6 +614,10 @@ int Cli::exec(QCoreApplication &a)
                 filters |= 1 << ActiveFilter_Video_Entropy;
             else if(filterString == "entropy-diff")
                 filters |= 1 << ActiveFilter_Video_EntropyDiff;
+            else if(filterString == "blockdetect")
+                filters |= 1 << ActiveFilter_Video_blockdetect;
+            else if(filterString == "blurdetect")
+                filters |= 1 << ActiveFilter_Video_blurdetect;
         }
     }
 
@@ -640,6 +644,10 @@ int Cli::exec(QCoreApplication &a)
         std::cout << "entropy" << " ";
     if(filters.test(ActiveFilter_Video_EntropyDiff))
         std::cout << "entropy-diff" << " ";
+    if(filters.test(ActiveFilter_Video_blockdetect))
+        std::cout << "blockdetect" << " ";
+    if(filters.test(ActiveFilter_Video_blurdetect))
+        std::cout << "blurdetect" << " ";
 
     std::cout << std::endl;
 

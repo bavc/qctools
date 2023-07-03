@@ -244,6 +244,18 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "lossy file should show the variety of frame sizes.",
         ActiveFilter_Video_signalstats,
     },
+    //Item_blockdetect
+    {
+        Item_blockdetect,  1,    "0",  "50",  4,  "Blockiness", false,
+        "Blockiness.",
+        ActiveFilter_Video_blockdetect,
+    },
+    //Item_blurdetect
+    {
+        Item_blurdetect,   1,    "0",  "50",  4,  "Blurriness", false,
+        "Blurriness",
+        ActiveFilter_Video_blurdetect,
+    },
 
     //const   std::size_t Start; //Item
     //const   std::size_t Count;
@@ -344,6 +356,9 @@ const struct per_item VideoPerItem [Item_VideoMax]=
     // pkt_duration_time & pkt_size
     { Group_pkt_duration_time, Group_VideoMax,     "pkt_duration_time",        "pkt_duration_time", 5,  false,   DBL_MAX, DBL_MAX, (activefilter) -1 },
     { Group_pkt_size,  Group_VideoMax,     "pkt_size",      "pkt_size",                  0,  false,   DBL_MAX, DBL_MAX, (activefilter) -1 },
+    // block and blur detections
+    { Group_blockdetect, Group_VideoMax,     "blockiness",     "lavfi.block",            6,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_blockdetect },
+    { Group_blurdetect,  Group_VideoMax,     "blurriness",     "lavfi.blur",             6,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_blurdetect },
 
     //    const   std::size_t Group1; //Group
     //    const   std::size_t Group2; //Group

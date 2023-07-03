@@ -33,6 +33,8 @@ enum activefilter
     ActiveFilter_Video_Deflicker,
     ActiveFilter_Video_Entropy,
     ActiveFilter_Video_EntropyDiff,
+    ActiveFilter_Video_blockdetect,
+    ActiveFilter_Video_blurdetect,
     ActiveFilter_Max //Note: always add a new ActiveFilter element before ActiveFilter_Max, never before any other element, else preferences of people already having the tool will be shifted when preferences are read from the profile
 };
 typedef std::bitset<ActiveFilter_Max> activefilters;
