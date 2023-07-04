@@ -161,7 +161,7 @@ jobs:
 
     - name: Build FFmpeg
       run: |
-        git clone --depth 1 --branch n4.4 https://github.com/FFmpeg/FFmpeg ../ffmpeg
+        git clone --depth 1 --branch n5.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
         cd ../ffmpeg
         ./configure --enable-gpl \
                     --enable-static \
@@ -239,7 +239,7 @@ jobs:
 
     - name: Build FFmpeg
       run: |
-        git clone --depth 1 --branch n4.4 https://github.com/FFmpeg/FFmpeg ../ffmpeg
+        git clone --depth 1 --branch n5.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
         cd ../ffmpeg
         ./configure --enable-gpl \
                     --enable-static \
@@ -332,7 +332,7 @@ jobs:
 
     - name: Build FFmpeg
       run: |
-        git clone --depth 1 --branch n4.4 https://github.com/FFmpeg/FFmpeg ../ffmpeg
+        git clone --depth 1 --branch n5.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
         cd ../ffmpeg
         ./configure --enable-gpl \
                     --enable-shared \
@@ -422,7 +422,7 @@ jobs:
 
     - name: Build FFmpeg
       run: |
-        git clone --depth 1 --branch n4.4 https://github.com/FFmpeg/FFmpeg ../ffmpeg
+        git clone --depth 1 --branch n5.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
         cd ../ffmpeg
         ./configure --enable-gpl \
                     --enable-shared \
