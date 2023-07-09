@@ -318,6 +318,7 @@ bool isUnsignedAudioSampleFormat(int audioFormat)
 // Simultaneous parsing
 //***************************************************************************
 static int ActiveParsing_Count=0;
+QString panelOutputPrefix = QString("panel_");
 
 void FileInformation::run()
 {
@@ -1006,15 +1007,16 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                     stat->TimeStampFromFrame(frame.frame(), stat->x_Current);
                     stat->StatsFromFrame(frame.frame(), frame.size().width(), frame.size().height());
 
-                } else if(frame.filterName().startsWith("panel")) {
-                    auto index = frame.filterName().mid(5).toInt();
+                } else if(frame.filterName().startsWith(panelOutputPrefix)) {
+                    auto indexString = frame.filterName().mid(panelOutputPrefix.length());
+                    auto index = indexString.toInt();
                     while(m_panelFrames.size() <= index)
                         m_panelFrames.append(QVector<QAVVideoFrame>());
 
                     m_panelFrames[index].append(frame);
 
                     qDebug() << "panel frame pts: " << frame.frame()->pts;
-                    qDebug() << "m_panelFrames[index]: " << m_panelFrames[index].size() << index;
+                    qDebug() << "m_panelFrames[index]: " << m_panelFrames[index].size() << index << indexString;
                 }
                 else
                 {
@@ -1082,7 +1084,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                 } else {
                     int index = frame.stream().index();
 
-                    while(m_panelFrames.size() <= index)
+                    while(m_panelFrames.size() < index)
                         m_panelFrames.append(QVector<QAVVideoFrame>());
 
                     auto panelStreamIndex = index - 1;
@@ -1571,7 +1573,7 @@ void FileInformation::makeMkvReport(QString exportFileName, QByteArray attachmen
             streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString::fromStdString(panelTitle));
 
             QString filterChain;
-            QString filterOutputName = QString(" [panel_%1]").arg(panelOutputIndex);
+            QString filterOutputName = QString(" [%1%2]").arg(panelOutputPrefix).arg(panelOutputIndex);
             for(auto i = 0; i < m_mediaParser->filters().size(); ++i) {
                 auto filter = m_mediaParser->filters().at(i);
                 if(filter.endsWith(filterOutputName)) {
