@@ -267,7 +267,7 @@ private:
     SignalServer* signalServer;
     SignalServerConnectionChecker* connectionChecker;
     QWidget* connectionIndicator;
-    size_t files_CurrentPos;
+    size_t files_CurrentPos { (size_t) -1 };
 
     QJsonDocument m_barchartsProfile;
     QComboBox* m_profileSelectorCombobox;

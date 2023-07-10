@@ -176,8 +176,6 @@ public:
 
     void updateInfoLabels();
 
-    void stopAndWait();
-
     static qint64 timeStringToMs(const QString& timeValue);
 
 public Q_SLOTS:
