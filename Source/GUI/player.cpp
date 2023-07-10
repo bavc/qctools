@@ -448,25 +448,35 @@ void Player::setFile(FileInformation *fileInfo)
         m_filterSelectors[2]->selectCurrentFilterByName("Bit Plane (10 slices)");
         m_filterSelectors[3]->selectCurrentFilterByName("Vectorscope");
 
-        stopAndWait();
-
+        m_player->stop();
         m_player->setFile(fileInfo->fileName());
+
+        QEventLoop loop;
+        QMetaObject::Connection c;
+        c = connect(m_player, &QAVPlayer::mediaStatusChanged, this, [&, this]() {
+            loop.exit();
+            QObject::disconnect(c);
+        });
+        loop.exec();
 
         SignalWaiter waiter(m_player, "seeked(qint64)");
         m_mute = true;
 
         auto ms = frameToMs(m_fileInformation->Frames_Pos_Get());
-        qDebug() << "seek finished at " << ms;
+        if(ms != m_player->position())
+        {
+            qDebug() << "seeking to " << ms;
+            waiter.wait([this, ms]() {
+                playPaused(ms);
+            });
+            qDebug() << "seek finished at " << ms;
+        }
 
-        waiter.wait([this, ms]() {
-            playPaused(ms);
-        });
         m_mute = false;
 
         updateInfoLabels();
 
         connect(m_fileInformation, &FileInformation::positionChanged, this, &Player::handleFileInformationPositionChanges);
-
     }
 }
 
@@ -1113,11 +1123,6 @@ void Player::handleFilterChange(FilterSelector *filterSelector, int filterIndex)
         m_filterUpdateTimer.stop();
         m_filterUpdateTimer.start(100);
     });
-}
-
-void Player::stopAndWait()
-{
-    m_player->stop();
 }
 
 qint64 Player::timeStringToMs(const QString &timeValue)
