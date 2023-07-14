@@ -436,8 +436,13 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                     return panelsCount;
                 }, [&, panelOutputIndex](int index) -> QImage {
                     auto frame = m_fileInfoData->getPanelFrame(panelOutputIndex, index);
-                    auto panelImage = QImage(*frame.frame()->data, frame.frame()->width, frame.frame()->height,
-                                             *frame.frame()->linesize, QImage::Format_RGB888);
+                    QVideoFrame videoFrame = frame;
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+                    auto panelImage = videoFrame.image();
+#else
+                    auto panelImage = videoFrame.toImage();
+#endif //
 
                     auto frameRate = m_fileInfoData->getAvgVideoFrameRate();
                     if(frameRate.isValid()) {
@@ -452,9 +457,14 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                     return panelsCount;
                 }, [&, panelOutputIndex](int index) -> QImage {
                     auto frame = m_fileInfoData->getPanelFrame(panelOutputIndex, index);
-                    auto panelImage = QImage(*frame.frame()->data, frame.frame()->width, frame.frame()->height,
-                                             *frame.frame()->linesize, QImage::Format_RGB888);
 
+                    QVideoFrame videoFrame = frame;
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+                    auto panelImage = videoFrame.image();
+#else
+                    auto panelImage = videoFrame.toImage();
+#endif //
                     return panelImage;
                 });
             }
