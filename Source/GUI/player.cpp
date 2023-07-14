@@ -53,7 +53,7 @@ Player::Player(QWidget *parent) :
     QObject::connect(m_player, &QAVPlayer::audioFrame, m_player, [this](const QAVAudioFrame &frame) {
         if(!ui->playerSlider->isSliderDown() && !m_mute)
             m_audioOutput->play(frame);
-    });
+    }, Qt::DirectConnection);
 
     QObject::connect(m_player, &QAVPlayer::videoFrame, m_player, [this](const QAVVideoFrame &frame) {
 
@@ -76,7 +76,13 @@ Player::Player(QWidget *parent) :
             }
 #endif
 
-    });
+    },
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        Qt::AutoConnection
+#else
+        Qt::DirectConnection
+#endif //
+        );
 
     connect(m_player, &QAVPlayer::stateChanged, [this](QAVPlayer::State state) {
         if(state == QAVPlayer::PlayingState) {
