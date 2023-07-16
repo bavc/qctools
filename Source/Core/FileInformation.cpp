@@ -1120,8 +1120,10 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 //---------------------------------------------------------------------------
 FileInformation::~FileInformation ()
 {
-    if(m_mediaParser->state() == QAVPlayer::PlayingState)
+    if(m_mediaParser->state() == QAVPlayer::PlayingState) {
         m_mediaParser->stop();
+        delete m_mediaParser;
+    }
 
     bool result = wait();
     assert(result);
