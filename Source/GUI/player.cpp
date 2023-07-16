@@ -476,6 +476,8 @@ void Player::setFile(FileInformation *fileInfo)
                 playPaused(ms);
             });
             qDebug() << "seek finished at " << ms;
+        } else {
+            m_player->pause();
         }
 
         m_mute = false;
