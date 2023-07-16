@@ -152,7 +152,7 @@ CommonStreamStats::CommonStreamStats(QAVStream* stream) :
     stream_index(stream->index()),
     codec_name(stream ? stream->codec()->codec()->name : ""),
     codec_long_name(stream ? stream->codec()->codec()->long_name : ""),
-    codec_time_base(stream ? rational_to_string(stream->stream()->time_base, '/') : ""),
+    codec_time_base(stream ? rational_to_string(av_stream_get_codec_timebase(stream->stream()), '/') : ""),
     codec_tag(stream ? stream->stream()->codecpar->codec_tag : 0),
     r_frame_rate(stream != NULL ? rational_to_string(stream->stream()->r_frame_rate, '/') : ""),
     avg_frame_rate(stream != NULL ? rational_to_string(stream->stream()->avg_frame_rate, '/') : ""),
