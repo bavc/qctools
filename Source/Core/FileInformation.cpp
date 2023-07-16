@@ -1089,6 +1089,8 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
                     auto panelStreamIndex = index - 1;
                     m_panelFrames[panelStreamIndex].push_back(frame);
+
+                    qDebug() << "m_panelFrames[panelStreamIndex]: " << panelStreamIndex << m_panelFrames[panelStreamIndex].size();
                 }
             },
             //Qt::QueuedConnection
@@ -1560,6 +1562,8 @@ void FileInformation::makeMkvReport(QString exportFileName, QByteArray attachmen
 
     for(auto& panelTitle : panelOutputsByTitle().keys())
     {
+        qDebug() << "encoding panel... panelTitle: " << QString::fromStdString(panelTitle);
+
         auto panelOutputIndexes = panelOutputsByTitle()[panelTitle];
         for(auto panelOutputIndex : panelOutputIndexes) {
             auto panelFramesCount = getPanelFramesCount(panelOutputIndex);
@@ -1621,7 +1625,7 @@ void FileInformation::makeMkvReport(QString exportFileName, QByteArray attachmen
 
             panelSource.num = num;
             panelSource.den = den;
-            panelSource.getPacket = [output, codecNum, codecDen, panelIndex, panelsCount, panelOutputIndex, panelsCallback, this]() mutable -> std::shared_ptr<AVPacket> {
+            panelSource.getPacket = [output, codecNum, codecDen, panelIndex, panelsCount, panelOutputIndex, panelsCallback, panelSource, this]() mutable -> std::shared_ptr<AVPacket> {
                 if(panelsCallback)
                     panelsCallback(panelIndex, panelsCount);
 
@@ -1636,7 +1640,9 @@ void FileInformation::makeMkvReport(QString exportFileName, QByteArray attachmen
                 output->timeBaseDen = codecDen;
                 output->timeBaseNum = codecNum;
                 output->Width = frame.frame()->width;
-                output->Height = frame.frame()->height;
+                output->Height = panelSource.height; // frame.frame()->height;
+
+                qDebug() << "getPacket => panelIndex: " << panelIndex << ", timeBaseNum = " << codecNum << ", timeBaseDen = " << codecDen << ", width = " << output->Width << ", height = " << output->Height;
 
                 auto packet = output->encodeFrame(frame.frame());
 
@@ -1644,6 +1650,10 @@ void FileInformation::makeMkvReport(QString exportFileName, QByteArray attachmen
 
                 return packet;
             };
+
+            qDebug() << "\tpanelOutputIndex = " << panelOutputIndex;
+            qDebug() << "\tpanelSource = " << panelSource.bitrate << panelSource.num << panelSource.den << panelSource.width << panelSource.height;
+            qDebug() << "\tcodecNum = " << codecNum << ", codecDen = " << codecDen;
 
             sources.push_back(panelSource);
         }
