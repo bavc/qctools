@@ -1,5 +1,5 @@
 #include "cli.h"
-#include <qavplayer.h>
+#include <QtAVPlayer/qavplayer.h>
 #include "version.h"
 #include "Core/CommonStats.h"
 #include "Core/FileInformation.h"

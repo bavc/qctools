@@ -1,7 +1,7 @@
 message('entering qctools-cli.pro')
 
 QT += core multimedia network
-#QT -= gui
+QT -= gui
 
 CONFIG += c++11
 
@@ -84,10 +84,7 @@ HEADERS += \
 message('qctools-lib: including ffmpeg')
 include(../ffmpeg.pri)
 
-QTAVPLAYER_SRC=$$absolute_path(../qctools-QtAVPlayer)
-QTAVPLAYER_LIB=$$absolute_path($$OUT_PWD/../qctools-QtAVPlayer)
-
-message('using UseQtAVPlayerLib')
-include(../qctools-QtAVPlayer/UseQtAVPlayerLib.pri)
+INCLUDEPATH += ../qctools-QtAVPlayer/src
+include(../qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.pri)
 
 message('leaving qctools-cli.pro')

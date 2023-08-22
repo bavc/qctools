@@ -17,7 +17,7 @@
 #include <cctype>
 #include <functional>
 #include <Core/Core.h>
-#include <qavplayer.h>
+#include <QtAVPlayer/qavplayer.h>
 
 struct AVFrame;
 class QAVStream;
