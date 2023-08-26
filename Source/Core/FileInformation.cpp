@@ -1255,13 +1255,13 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName, const activef
 
     if(file->open(QIODevice::ReadWrite))
     {
-        if(name.endsWith(".qctools.xml"))
+        if (name.endsWith(".qctools.xml"))
         {
             auto bytesLeft = Data.str().size();
             auto writePtr = DataS.c_str();
             auto totalBytesWritten = 0;
 
-            while(bytesLeft) {
+            while (bytesLeft) {
                 auto bytesToWrite = std::min(size_t(Buffer_Size), bytesLeft);
                 auto bytesWritten = file->write(writePtr, bytesToWrite);
                 totalBytesWritten += bytesWritten;
@@ -1271,9 +1271,13 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName, const activef
                 writePtr += bytesToWrite;
                 bytesLeft -= bytesWritten;
 
-                if(bytesWritten != bytesToWrite)
+                if (bytesWritten != bytesToWrite)
                     break;
             }
+        }
+        else if (name.endsWith(".xml"))
+        {
+            file->write(DataS.c_str(), DataS.length());
         } else {
             char* Buffer=new char[Buffer_Size];
             z_stream strm;

@@ -572,10 +572,11 @@ int Cli::exec(QCoreApplication &a)
 
     bool mkvReport = output.endsWith(".qctools.mkv");
     bool xmlGzReport = output.endsWith(".xml.gz");
+    bool xmlReport = output.endsWith(".xml");
 
-    if(!output.isEmpty() && !xmlGzReport && !mkvReport)
+    if(!output.isEmpty() && !xmlGzReport && !mkvReport && !xmlReport)
     {
-        std::cout << "warning: non-standard extension (not *.xml.gz) has been specified for output file. " << std::endl;
+        std::cout << "warning: non-standard extension (not *qctools.mkv, *.xml.gz or *.xml) has been specified for output file. " << std::endl;
     }
 
     QFile file(output);
