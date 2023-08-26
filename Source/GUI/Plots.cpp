@@ -15,7 +15,7 @@
 #include "GUI/barchartconditioneditor.h"
 #include "GUI/barchartconditioninput.h"
 #include "Core/Core.h"
-#include <qavplayer.h>
+#include <QtAVPlayer/qavplayer.h>
 #include "playercontrol.h"
 #include <QComboBox>
 #include <QGridLayout>
@@ -31,6 +31,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QToolButton>
+#include <QVideoFrame>
 #include <qwt_plot_curve.h>
 
 //---------------------------------------------------------------------------

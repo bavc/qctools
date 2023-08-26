@@ -2,14 +2,12 @@ message('entering qctools-gui.pro')
 
 QT       += core gui network multimedia multimediawidgets
 
-#QT += avwidgets
-
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport qml
 
 TARGET = QCTools
 TEMPLATE = app
 
-CONFIG += c++11 qt no_keywords
+CONFIG += c++11 qt
 
 message("PWD = " $$PWD)
 
@@ -209,11 +207,11 @@ INCLUDEPATH += $$SOURCES_PATH/ThirdParty/cqmarkdown
 include(../qwt.pri)
 include(../ffmpeg.pri)
 
-QTAVPLAYER_SRC=$$absolute_path(../qctools-QtAVPlayer)
-QTAVPLAYER_LIB=$$absolute_path($$OUT_PWD/../qctools-QtAVPlayer)
+CONFIG -= no_keywords
 
-message('using UseQtAVPlayerLib')
-include(../qctools-QtAVPlayer/UseQtAVPlayerLib.pri)
+DEFINES += QT_AVPLAYER_MULTIMEDIA
+INCLUDEPATH += ../qctools-QtAVPlayer/src
+include(../qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.pri)
 
 greaterThan(QT_MAJOR_VERSION, 5) {
     win32-msvc* {

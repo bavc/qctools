@@ -272,6 +272,8 @@ jobs:
           - compiler: gcc-9
             packages: gcc-9 g++-9
             env: { 'CC': 'gcc-9', 'CXX': 'g++-9' }
+          - qt_version: "5.15.2"
+            qt_packages: "libxkbcommon-dev libgstreamer-plugins-base1.0-0 libgstreamer-gl1.0-0"
 
     runs-on: ubuntu-latest
 
@@ -313,10 +315,9 @@ jobs:
                                 libiec61883-dev
 
     - name: Install Qt 5.15
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
-        arch: win64_mingw81
-        version: 5.15.2
+        version: ${{ matrix.qt_version }}
 
     - name: Cleanup
       run: |
@@ -363,6 +364,9 @@ jobs:
           - compiler: gcc-9
             packages: gcc-9 g++-9
             env: { 'CC': 'gcc-9', 'CXX': 'g++-9' }
+          - qt_version: "6.5.0"
+            qt_modules: "qtmultimedia qt5compat"
+            qt_packages: "libxkbcommon-dev libgstreamer-plugins-base1.0-0 libgstreamer-gl1.0-0"
 
     runs-on: ubuntu-latest
 
@@ -402,11 +406,11 @@ jobs:
                                 libxkbcommon-dev \
                                 libxv-dev
 
-    - name: Install Qt 6.2
-      uses: jurplel/install-qt-action@v2
+    - name: Install Qt 6
+      uses: jurplel/install-qt-action@v3
       with:
-        version: 6.2.0
-        modules: 'addons.qtmultimedia qt5compat'
+        version: ${{ matrix.qt_version }}
+        modules: ${{ matrix.qt_modules }}
 
     - name: Cleanup
       run: |
@@ -446,6 +450,10 @@ jobs:
 
   build-windows-mingw:
 
+    strategy:
+      matrix:
+        qt_version: ["5.15.2"]
+
     runs-on: windows-latest
 
     steps:
@@ -478,10 +486,10 @@ jobs:
         make install
 
     - name: Install Qt 5.15
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
         arch: win64_mingw81
-        version: 5.15.2
+        version: ${{ matrix.qt_version }}
 
     - name: Install wget & unzip
       run: |
@@ -527,6 +535,12 @@ jobs:
 
   build-windows-mingw-Qt6:
 
+    strategy:
+      matrix:
+        include:
+          - qt_version: "6.3.0"
+            qt_modules: "qtmultimedia qt5compat"
+
     runs-on: windows-latest
 
     steps:
@@ -558,12 +572,12 @@ jobs:
               ..
         make install
 
-    - name: Install Qt 6.2
-      uses: jurplel/install-qt-action@v2
+    - name: Install Qt 6
+      uses: jurplel/install-qt-action@v3
       with:
-        arch: win64_mingw81
-        version: 6.2.0
-        modules: 'addons.qtmultimedia'
+        arch: win64_mingw
+        version: ${{ matrix.qt_version }}
+        modules: ${{ matrix.qt_modules }}
 
     - name: Install wget & unzip
       run: |
@@ -609,6 +623,10 @@ jobs:
 
   build-windows-vs:
 
+    strategy:
+      matrix:
+        qt_version: ["5.15.2"]
+
     runs-on: windows-latest
 
     steps:
@@ -646,9 +664,9 @@ jobs:
         nmake install
 
     - name: Install Qt 5.15
-      uses: jurplel/install-qt-action@v2
-      with: 
-        version: 5.15.2
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: ${{ matrix.qt_version }}
 
     - name: Install wget & unzip
       run: |
@@ -694,6 +712,12 @@ jobs:
 
   build-windows-vs-Qt6:
 
+    strategy:
+      matrix:
+        include:
+          - qt_version: "6.3.0"
+            qt_modules: "qtmultimedia qt5compat"
+
     runs-on: windows-latest
 
     steps:
@@ -730,11 +754,12 @@ jobs:
               ..
         nmake install
 
-    - name: Install Qt 6.2
-      uses: jurplel/install-qt-action@v2
-      with: 
-        version: 6.2.0
-        modules: 'addons.qtmultimedia'
+    - name: Install Qt 6
+      uses: jurplel/install-qt-action@v3
+      with:
+        arch: win64_msvc2019_64
+        version: ${{ matrix.qt_version }}
+        modules: ${{ matrix.qt_modules }}
 
     - name: Install wget & unzip
       run: |
