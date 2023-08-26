@@ -28,6 +28,7 @@ namespace tinyxml2 {
     class XMLElement;
 }
 
+class QAVFrame;
 class CommonStats
 {
 public:
@@ -70,8 +71,8 @@ public:
 
     // External data
             void                StatsFromExternalData_Finish() {Frequency=1; StatsFinish();}
-    virtual void                StatsFromFrame(struct AVFrame* Frame, int Width, int Height) = 0;
-    virtual void                TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos) = 0;
+    virtual void                StatsFromFrame(const QAVFrame& Frame, int Width, int Height) = 0;
+    virtual void                TimeStampFromFrame(const QAVFrame& Frame, size_t FramePos) = 0;
     virtual void                StatsFinish();
     virtual std::string              StatsToXML(const activefilters& filters) = 0;
 

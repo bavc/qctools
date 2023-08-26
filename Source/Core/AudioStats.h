@@ -32,8 +32,8 @@ public:
 
     // External data
     virtual void parseFrame(tinyxml2::XMLElement* frame);
-    void                        StatsFromFrame(struct AVFrame* Frame, int Width, int Height);
-    void                        TimeStampFromFrame(struct AVFrame* Frame, size_t FramePos);
+    void                        StatsFromFrame(const QAVFrame& Frame, int Width, int Height);
+    void                        TimeStampFromFrame(const QAVFrame& Frame, size_t FramePos);
     std::string                      StatsToXML(const activefilters& filters);
 };
 

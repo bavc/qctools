@@ -4,6 +4,7 @@
 #include "Core/CommonStats.h"
 #include "Core/FileInformation.h"
 #include <QDir>
+#include <Core/logging.h>
 
 Cli::Cli() : indexOfStreamWithKnownFrameCount(0), statsFileBytesWritten(0), statsFileBytesTotal(0), statsFileBytesUploaded(0), statsFileBytesToUpload(0)
 {
@@ -15,6 +16,7 @@ int Cli::exec(QCoreApplication &a)
     std::string appName = "qcli";
     std::string copyright = "Copyright (C): 2013-2020, BAVC.\nCopyright (C): 2018-2020, RiceCapades LLC & MediaArea.net SARL.";
     Preferences prefs;
+    Logging logging;
 
     QString input;
     QString output;
@@ -53,6 +55,9 @@ int Cli::exec(QCoreApplication &a)
         } else if(a.arguments().at(i) == "-u")
         {
             uploadToSignalServer = true;
+        } else if(a.arguments().at(i) == "--log")
+        {
+            logging.enable();
         } else if(a.arguments().at(i) == "-uf")
         {
             forceUploadToSignalServer = true;
@@ -567,10 +572,11 @@ int Cli::exec(QCoreApplication &a)
 
     bool mkvReport = output.endsWith(".qctools.mkv");
     bool xmlGzReport = output.endsWith(".xml.gz");
+    bool xmlReport = output.endsWith(".xml");
 
-    if(!output.isEmpty() && !xmlGzReport && !mkvReport)
+    if(!output.isEmpty() && !xmlGzReport && !mkvReport && !xmlReport)
     {
-        std::cout << "warning: non-standard extension (not *.xml.gz) has been specified for output file. " << std::endl;
+        std::cout << "warning: non-standard extension (not *qctools.mkv, *.xml.gz or *.xml) has been specified for output file. " << std::endl;
     }
 
     QFile file(output);

@@ -805,6 +805,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     QEventLoop loop;
     QMetaObject::Connection c;
     c = connect(m_mediaParser, &QAVPlayer::mediaStatusChanged, this, [&, this]() {
+        qDebug() << "m_mediaParser status after loading: " << m_mediaParser->mediaStatus();
         loop.exit();
         QObject::disconnect(c);
     });
@@ -983,6 +984,9 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
             }
         }
 
+        for(auto& filter : filters) {
+            qDebug() << "applying filters: " << filter;
+        }
         m_mediaParser->setFilters(filters);
 
         QObject::connect(m_mediaParser, &QAVPlayer::audioFrame, m_mediaParser, [this](const QAVAudioFrame &frame) {
@@ -990,8 +994,8 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
                 auto stat = Stats[frame.stream().index()];
 
-                stat->TimeStampFromFrame(frame.frame(), stat->x_Current);
-                stat->StatsFromFrame(frame.frame(), 0, 0);
+                stat->TimeStampFromFrame(frame, stat->x_Current);
+                stat->StatsFromFrame(frame, 0, 0);
 
             },
             // Qt::QueuedConnection
@@ -1004,8 +1008,8 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                 if(frame.filterName() == "stats") {
                     auto stat = Stats[frame.stream().index()];
 
-                    stat->TimeStampFromFrame(frame.frame(), stat->x_Current);
-                    stat->StatsFromFrame(frame.frame(), frame.size().width(), frame.size().height());
+                    stat->TimeStampFromFrame(frame, stat->x_Current);
+                    stat->StatsFromFrame(frame, frame.size().width(), frame.size().height());
 
                 } else if(frame.filterName().startsWith(panelOutputPrefix)) {
                     auto indexString = frame.filterName().mid(panelOutputPrefix.length());
@@ -1028,6 +1032,8 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
             );
 
         QObject::connect(m_mediaParser, &QAVPlayer::mediaStatusChanged, [this](QAVPlayer::MediaStatus status) {
+            qDebug() << "m_mediaParser => mediaStatusChanged: " << status;
+
             if(status == QAVPlayer::EndOfMedia) {
 
                 for (size_t Pos=0; Pos<Stats.size(); Pos++)
@@ -1036,6 +1042,10 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
                 m_parsed = true;
                 Q_EMIT parsingCompleted(true);
+            }
+            else if(status == QAVPlayer::InvalidMedia)
+            {
+                Q_EMIT parsingCompleted(false);
             }
         });
 
@@ -1245,13 +1255,13 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName, const activef
 
     if(file->open(QIODevice::ReadWrite))
     {
-        if(name.endsWith(".qctools.xml"))
+        if (name.endsWith(".qctools.xml"))
         {
             auto bytesLeft = Data.str().size();
             auto writePtr = DataS.c_str();
             auto totalBytesWritten = 0;
 
-            while(bytesLeft) {
+            while (bytesLeft) {
                 auto bytesToWrite = std::min(size_t(Buffer_Size), bytesLeft);
                 auto bytesWritten = file->write(writePtr, bytesToWrite);
                 totalBytesWritten += bytesWritten;
@@ -1261,9 +1271,13 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName, const activef
                 writePtr += bytesToWrite;
                 bytesLeft -= bytesWritten;
 
-                if(bytesWritten != bytesToWrite)
+                if (bytesWritten != bytesToWrite)
                     break;
             }
+        }
+        else if (name.endsWith(".xml"))
+        {
+            file->write(DataS.c_str(), DataS.length());
         } else {
             char* Buffer=new char[Buffer_Size];
             z_stream strm;
