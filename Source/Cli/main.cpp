@@ -11,6 +11,8 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
 
 int main(int argc, char *argv[])
 {
+    qputenv("QT_AVPLAYER_NO_HWDEVICE", "1");
+
     qInstallMessageHandler(messageHandler);
     QCoreApplication a(argc, argv);
 
