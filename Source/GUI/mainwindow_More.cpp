@@ -489,6 +489,8 @@ void MainWindow::addFile(const QString &FileName)
     if (FileName.isEmpty())
         return;
 
+    qDebug() << "addFile: " << FileName;
+
     // Launch analysis
     FileInformation* Temp=new FileInformation(signalServer, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks, preferences->getActivePanels(), preferences->createQCvaultFileNameString(FileName));
     if (!Temp->isValid() && !Temp->hasStats())

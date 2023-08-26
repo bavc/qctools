@@ -805,6 +805,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     QEventLoop loop;
     QMetaObject::Connection c;
     c = connect(m_mediaParser, &QAVPlayer::mediaStatusChanged, this, [&, this]() {
+        qDebug() << "m_mediaParser status after loading: " << m_mediaParser->mediaStatus();
         loop.exit();
         QObject::disconnect(c);
     });
@@ -983,6 +984,9 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
             }
         }
 
+        for(auto& filter : filters) {
+            qDebug() << "applying filters: " << filter;
+        }
         m_mediaParser->setFilters(filters);
 
         QObject::connect(m_mediaParser, &QAVPlayer::audioFrame, m_mediaParser, [this](const QAVAudioFrame &frame) {
@@ -1028,6 +1032,8 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
             );
 
         QObject::connect(m_mediaParser, &QAVPlayer::mediaStatusChanged, [this](QAVPlayer::MediaStatus status) {
+            qDebug() << "m_mediaParser => mediaStatusChanged: " << status;
+
             if(status == QAVPlayer::EndOfMedia) {
 
                 for (size_t Pos=0; Pos<Stats.size(); Pos++)
@@ -1036,6 +1042,10 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
                 m_parsed = true;
                 Q_EMIT parsingCompleted(true);
+            }
+            else if(status == QAVPlayer::InvalidMedia)
+            {
+                Q_EMIT parsingCompleted(false);
             }
         });
 
