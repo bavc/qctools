@@ -176,8 +176,9 @@ void AudioStats::parseFrame(tinyxml2::XMLElement *Frame)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void AudioStats::StatsFromFrame (struct AVFrame* Frame, int, int)
+void AudioStats::StatsFromFrame (const QAVFrame& frame, int, int)
 {
+    auto Frame = frame.frame();
     AVDictionary * m= Frame->metadata;
     AVDictionaryEntry* e=NULL;
     bool statsMapInitialized = !statsValueInfoByKeys.empty();
@@ -249,8 +250,10 @@ void AudioStats::StatsFromFrame (struct AVFrame* Frame, int, int)
 }
 
 //---------------------------------------------------------------------------
-void AudioStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
+void AudioStats::TimeStampFromFrame (const QAVFrame& frame, size_t FramePos)
 {
+    auto Frame = frame.frame();
+
     if (Frequency==0)
         return; // Not supported
 
@@ -259,9 +262,13 @@ void AudioStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
 
     x[0][FramePos]=FramePos;
 
+    /* can't use old way, take pts directly from frame
     int64_t ts=(Frame->pts == AV_NOPTS_VALUE)?Frame->pkt_dts : Frame->pts; // Using DTS is PTS is not available
     if (ts==AV_NOPTS_VALUE && FramePos)
         ts=(int64_t)((FirstTimeStamp+x[1][FramePos-1]+durations[FramePos-1])*Frequency); // If time stamp is not present, creating a fake one from last frame duration
+    */
+
+    int64_t ts = frame.pts() * 1000;
     if (ts!=AV_NOPTS_VALUE)
     {
         if (FirstTimeStamp==DBL_MAX)

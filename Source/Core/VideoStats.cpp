@@ -255,8 +255,9 @@ void VideoStats::parseFrame(tinyxml2::XMLElement *Frame)
 
 //---------------------------------------------------------------------------
 
-void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
+void VideoStats::StatsFromFrame (const QAVFrame& frame, int Width, int Height)
 {
+    auto Frame = frame.frame();
     AVDictionary * m= Frame->metadata;
     AVDictionaryEntry* e=NULL;
     bool statsMapInitialized = !statsValueInfoByKeys.empty();
@@ -368,8 +369,10 @@ void VideoStats::StatsFromFrame (struct AVFrame* Frame, int Width, int Height)
 }
 
 //---------------------------------------------------------------------------
-void VideoStats::TimeStampFromFrame (struct AVFrame* Frame, size_t FramePos)
+void VideoStats::TimeStampFromFrame (const QAVFrame& frame, size_t FramePos)
 {
+    auto Frame = frame.frame();
+
     if (Frequency==0)
         return; // Not supported
 

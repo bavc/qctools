@@ -994,8 +994,8 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
                 auto stat = Stats[frame.stream().index()];
 
-                stat->TimeStampFromFrame(frame.frame(), stat->x_Current);
-                stat->StatsFromFrame(frame.frame(), 0, 0);
+                stat->TimeStampFromFrame(frame, stat->x_Current);
+                stat->StatsFromFrame(frame, 0, 0);
 
             },
             // Qt::QueuedConnection
@@ -1008,8 +1008,8 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                 if(frame.filterName() == "stats") {
                     auto stat = Stats[frame.stream().index()];
 
-                    stat->TimeStampFromFrame(frame.frame(), stat->x_Current);
-                    stat->StatsFromFrame(frame.frame(), frame.size().width(), frame.size().height());
+                    stat->TimeStampFromFrame(frame, stat->x_Current);
+                    stat->StatsFromFrame(frame, frame.size().width(), frame.size().height());
 
                 } else if(frame.filterName().startsWith(panelOutputPrefix)) {
                     auto indexString = frame.filterName().mid(panelOutputPrefix.length());
