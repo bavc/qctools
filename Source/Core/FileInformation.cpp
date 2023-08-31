@@ -1790,6 +1790,9 @@ int FileInformation::isRgbSet() const
     auto stream = videoStreams[0];
 
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get((AVPixelFormat) stream.stream()->codecpar->format);
+    if(!desc)
+        return 0;
+
     return (desc->flags & AV_PIX_FMT_FLAG_RGB);
 }
 
