@@ -13,6 +13,7 @@
 extern "C"
 {
 #include <libavutil/frame.h>
+#include <libavformat/avformat.h>
 }
 #include <qavplayer.h>
 
@@ -268,7 +269,9 @@ void AudioStats::TimeStampFromFrame (const QAVFrame& frame, size_t FramePos)
         ts=(int64_t)((FirstTimeStamp+x[1][FramePos-1]+durations[FramePos-1])*Frequency); // If time stamp is not present, creating a fake one from last frame duration
     */
 
-    int64_t ts = frame.pts() * 1000;
+    auto time_base = frame.stream().stream()->time_base;
+    int64_t ts = frame.pts() * time_base.den / time_base.num;
+
     if (ts!=AV_NOPTS_VALUE)
     {
         if (FirstTimeStamp==DBL_MAX)
