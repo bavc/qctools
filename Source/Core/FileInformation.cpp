@@ -915,71 +915,75 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
         filters.append("scale=72:72,format=rgb24 [thumbnails]");
 
-        if(!m_mediaParser->currentVideoStreams().empty()) {
-            auto codecHeight = m_mediaParser->currentVideoStreams()[0].stream()->codecpar->height;
-            qDebug() << "codec height: " << codecHeight;
-            m_panelSize.setHeight(codecHeight);
-        }
-        QSet<int> visitedStreamTypes;
+        if(!StatsFromExternalData_IsOpen) {
+            // only do panels if no legacy report was opened
 
-        for(auto & streamStat : Stats)
-        {
-            if(streamStat == nullptr)
-                continue;
+            if(!m_mediaParser->currentVideoStreams().empty()) {
+                auto codecHeight = m_mediaParser->currentVideoStreams()[0].stream()->codecpar->height;
+                qDebug() << "codec height: " << codecHeight;
+                m_panelSize.setHeight(codecHeight);
+            }
+            QSet<int> visitedStreamTypes;
 
-            auto streamType = streamStat->Type_Get();
-            auto allTracks = ActiveAllTracks[streamType == AVMEDIA_TYPE_VIDEO ? Type_Video : Type_Audio];
-
-            if(!allTracks && visitedStreamTypes.contains(streamType))
-                continue;
-
-            visitedStreamTypes.insert(streamType);
-
-            for(auto panelTitle : activePanels.keys())
+            for(auto & streamStat : Stats)
             {
-                auto panelType = std::get<4>(activePanels[panelTitle]);
-                if(streamType != panelType)
+                if(streamStat == nullptr)
                     continue;
 
-                auto sampleRate = 0;
-                auto filter = std::get<0>(activePanels[panelTitle]);
-                while(filter.indexOf(QString("${PANEL_WIDTH}")) != -1)
-                    filter.replace(QString("${PANEL_WIDTH}"), QString::number(m_panelSize.width()));
-                while(filter.indexOf(QString("${AUDIO_FRAME_RATE}")) != -1)
-                    filter.replace(QString("${AUDIO_FRAME_RATE}"), QString::number(32));
-                while(filter.indexOf(QString("${AUDIO_SAMPLE_RATE}")) != -1)
-                    filter.replace(QString("${AUDIO_SAMPLE_RATE}"), QString::number(/* Glue->sampleRate(streamIndex)) */ sampleRate));
-                while(filter.indexOf(QString("${DEFAULT_HEIGHT}")) != -1)
-                    filter.replace(QString("${DEFAULT_HEIGHT}"), QString::number(360));
+                auto streamType = streamStat->Type_Get();
+                auto allTracks = ActiveAllTracks[streamType == AVMEDIA_TYPE_VIDEO ? Type_Video : Type_Audio];
 
-                auto version = std::get<1>(activePanels[panelTitle]);
-                auto yaxis = std::get<2>(activePanels[panelTitle]);
-                auto legend = std::get<3>(activePanels[panelTitle]);
+                if(!allTracks && visitedStreamTypes.contains(streamType))
+                    continue;
 
-                auto f = filter + QString(" [panel_%1]").arg(m_panelMetadata.size());
-                qDebug() << "f: " << f;
-                filters.append(f);
+                visitedStreamTypes.insert(streamType);
 
-                std::map<std::string, std::string> metadata;
-                metadata["filter"] = filter.toStdString();
-                metadata["version"] = version.toStdString();
-                metadata["yaxis"] = yaxis.toStdString();
-                metadata["legend"] = legend.toStdString();
-                metadata["panel_type"] = panelType == 0 ? "video" : "audio";
-
-                m_panelMetadata.append(metadata);
-
-                // qDebug() << "added output" << output << streamIndex << output->Title.c_str() << "streamType: " << streamType << "filter: " << filter;
-
-                auto it = m_panelOutputsByTitle.find(panelTitle.toStdString());
-                if(it != m_panelOutputsByTitle.end())
+                for(auto panelTitle : activePanels.keys())
                 {
-                    it.value().append(m_panelMetadata.size() - 1);
-                } else {
-                    QVector<int> panelOutputs;
-                    panelOutputs.append(m_panelMetadata.size() - 1);
+                    auto panelType = std::get<4>(activePanels[panelTitle]);
+                    if(streamType != panelType)
+                        continue;
 
-                    m_panelOutputsByTitle[panelTitle.toStdString()] = panelOutputs;
+                    auto sampleRate = 0;
+                    auto filter = std::get<0>(activePanels[panelTitle]);
+                    while(filter.indexOf(QString("${PANEL_WIDTH}")) != -1)
+                        filter.replace(QString("${PANEL_WIDTH}"), QString::number(m_panelSize.width()));
+                    while(filter.indexOf(QString("${AUDIO_FRAME_RATE}")) != -1)
+                        filter.replace(QString("${AUDIO_FRAME_RATE}"), QString::number(32));
+                    while(filter.indexOf(QString("${AUDIO_SAMPLE_RATE}")) != -1)
+                        filter.replace(QString("${AUDIO_SAMPLE_RATE}"), QString::number(/* Glue->sampleRate(streamIndex)) */ sampleRate));
+                    while(filter.indexOf(QString("${DEFAULT_HEIGHT}")) != -1)
+                        filter.replace(QString("${DEFAULT_HEIGHT}"), QString::number(360));
+
+                    auto version = std::get<1>(activePanels[panelTitle]);
+                    auto yaxis = std::get<2>(activePanels[panelTitle]);
+                    auto legend = std::get<3>(activePanels[panelTitle]);
+
+                    auto f = filter + QString(" [panel_%1]").arg(m_panelMetadata.size());
+                    qDebug() << "f: " << f;
+                    filters.append(f);
+
+                    std::map<std::string, std::string> metadata;
+                    metadata["filter"] = filter.toStdString();
+                    metadata["version"] = version.toStdString();
+                    metadata["yaxis"] = yaxis.toStdString();
+                    metadata["legend"] = legend.toStdString();
+                    metadata["panel_type"] = panelType == 0 ? "video" : "audio";
+
+                    m_panelMetadata.append(metadata);
+
+                    // qDebug() << "added output" << output << streamIndex << output->Title.c_str() << "streamType: " << streamType << "filter: " << filter;
+
+                    auto it = m_panelOutputsByTitle.find(panelTitle.toStdString());
+                    if(it != m_panelOutputsByTitle.end())
+                    {
+                        it.value().append(m_panelMetadata.size() - 1);
+                    } else {
+                        QVector<int> panelOutputs;
+                        panelOutputs.append(m_panelMetadata.size() - 1);
+
+                        m_panelOutputsByTitle[panelTitle.toStdString()] = panelOutputs;
+                    }
                 }
             }
         }
@@ -1123,7 +1127,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
             Stats.clear(); //Removing all, as we can not sync with video or audio
     }
 
-    if(!StatsFromExternalData_IsOpen || !attachment.isEmpty())
+    if(!StatsFromExternalData_IsOpen || attachment.isEmpty())
         startParse();
 }
 
