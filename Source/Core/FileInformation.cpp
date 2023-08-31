@@ -1049,6 +1049,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
             }
             else if(status == QAVPlayer::InvalidMedia)
             {
+                m_parsed = true;
                 Q_EMIT parsingCompleted(false);
             }
         });
@@ -1110,6 +1111,25 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
             //Qt::QueuedConnection
             Qt::DirectConnection
             );
+
+        QObject::connect(m_mediaParser, &QAVPlayer::mediaStatusChanged, [this](QAVPlayer::MediaStatus status) {
+            qDebug() << "m_mediaParser => mediaStatusChanged: " << status;
+
+            if(status == QAVPlayer::EndOfMedia) {
+
+                for (size_t Pos=0; Pos<Stats.size(); Pos++)
+                    if (Stats[Pos])
+                        Stats[Pos]->StatsFinish();
+
+                m_parsed = true;
+                Q_EMIT parsingCompleted(true);
+            }
+            else if(status == QAVPlayer::InvalidMedia)
+            {
+                m_parsed = true;
+                Q_EMIT parsingCompleted(false);
+            }
+        });
     }
 
     // Looking for the reference stream (video or audio)
@@ -1127,8 +1147,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
             Stats.clear(); //Removing all, as we can not sync with video or audio
     }
 
-    if(!StatsFromExternalData_IsOpen || attachment.isEmpty())
-        startParse();
+    startParse();
 }
 
 //---------------------------------------------------------------------------
