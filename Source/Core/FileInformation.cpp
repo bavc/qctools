@@ -2272,18 +2272,14 @@ size_t FileInformation::VideoFrameCount_Get()
 
 qreal FileInformation::averageFrameRate() const
 {
-    /* 2DO !!!
-    if(!Glue)
-        return 0;
+    auto avgFrameRate = 25;
 
-    auto splitted = QString::fromStdString(Glue->AvgVideoFrameRate_Get()).split("/");
-    if(splitted.length() == 1)
-        return splitted[0].toDouble();
+    for (auto& stream : m_mediaParser->currentVideoStreams()) {
+        avgFrameRate = qreal(stream.stream()->avg_frame_rate.num) / stream.stream()->avg_frame_rate.den;
+        break;
+    }
 
-    return splitted[0].toDouble() / splitted[1].toDouble();
-    */
-
-    return 25;
+    return avgFrameRate;
 }
 
 double FileInformation::TimeStampOfCurrentFrame() const
