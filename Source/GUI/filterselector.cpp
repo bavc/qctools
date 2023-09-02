@@ -6,6 +6,7 @@
 #include <QGridLayout>
 #include <string>
 #include <cmath>
+#include <QStandardItemModel>
 
 FilterSelector::FilterSelector(QWidget *parent, const std::function<bool(const char*)>& nameFilter) : QFrame(parent), FileInfoData(nullptr)
 {
@@ -179,6 +180,21 @@ void FilterSelector::selectCurrentFilterByName(const char *filterName)
         if(itemText == filterName) {
             selectCurrentFilter(i);
             break;
+        }
+    }
+}
+
+void FilterSelector::setFiltersEnabled(int type, bool enabled)
+{
+    auto model = qobject_cast<QStandardItemModel*>(m_filterOptions.FiltersList->model());
+
+    for(auto i = 0; i < m_filterOptions.FiltersList->count(); ++i) {
+        auto physicalFilterIndex = getPhysicalFilterIndex(i);
+        auto filterType = Filters[physicalFilterIndex].Type;
+
+        if(filterType == type) {
+            auto item = model->item(i);
+            item->setFlags(enabled ? item->flags() | Qt::ItemIsEnabled : item->flags() & ~Qt::ItemIsEnabled);
         }
     }
 }

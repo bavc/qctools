@@ -2107,6 +2107,16 @@ double FileInformation::abitDepth() const
     return stream.stream()->codecpar->bits_per_coded_sample;
 }
 
+bool FileInformation::hasVideoStreams() const
+{
+    return !m_mediaParser->currentVideoStreams().empty();
+}
+
+bool FileInformation::hasAudioStreams() const
+{
+    return !m_mediaParser->currentAudioStreams().empty();
+}
+
 //---------------------------------------------------------------------------
 int FileInformation::Frames_Count_Get (size_t Stats_Pos) const
 {

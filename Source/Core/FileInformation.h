@@ -123,6 +123,9 @@ public:
     std::string channelLayout() const;
     double abitDepth() const;
 
+    bool hasVideoStreams() const;
+    bool hasAudioStreams() const;
+
     activefilters               ActiveFilters;
     activealltracks             ActiveAllTracks;
 

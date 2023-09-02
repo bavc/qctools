@@ -55,6 +55,7 @@ public:
     void setCurrentIndex(int index);
     void selectCurrentFilter(int index);
     void selectCurrentFilterByName(const char* filterName);
+    void setFiltersEnabled(int type, bool enabled);
 
     QString getFilter();
     QString getFilterName();
