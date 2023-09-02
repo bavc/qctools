@@ -2297,8 +2297,7 @@ double FileInformation::TimeStampOfCurrentFrame() const
 
 bool FileInformation::isValid() const
 {
-    return true; // 2DO !!!
-    // return Glue != 0;
+    return m_mediaParser->mediaStatus() != QAVPlayer::InvalidMedia && m_mediaParser->mediaStatus() != QAVPlayer::NoMedia;
 }
 
 int FileInformation::BitsPerRawSample(int streamType) const
