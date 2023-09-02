@@ -907,13 +907,14 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
         QList<QString> filters;
 
-        if(!Filters[0].empty())
+        if(!Filters[0].empty() && !m_mediaParser->currentVideoStreams().empty())
             filters.append(QString("%1 [stats]").arg(QString::fromStdString(Filters[0])));
 
         if(!Filters[1].empty() && !m_mediaParser->currentAudioStreams().empty())
             filters.append(QString::fromStdString(Filters[1]));
 
-        filters.append("scale=72:72,format=rgb24 [thumbnails]");
+        if(!m_mediaParser->currentVideoStreams().empty())
+            filters.append("scale=72:72,format=rgb24 [thumbnails]");
 
         if(!StatsFromExternalData_IsOpen) {
             // only do panels if no legacy report was opened
@@ -2106,6 +2107,16 @@ double FileInformation::abitDepth() const
     return stream.stream()->codecpar->bits_per_coded_sample;
 }
 
+bool FileInformation::hasVideoStreams() const
+{
+    return !m_mediaParser->currentVideoStreams().empty();
+}
+
+bool FileInformation::hasAudioStreams() const
+{
+    return !m_mediaParser->currentAudioStreams().empty();
+}
+
 //---------------------------------------------------------------------------
 int FileInformation::Frames_Count_Get (size_t Stats_Pos) const
 {
@@ -2297,6 +2308,7 @@ double FileInformation::TimeStampOfCurrentFrame() const
 
 bool FileInformation::isValid() const
 {
+    qDebug() << "checking if media file valid: " << m_mediaParser->mediaStatus();
     return m_mediaParser->mediaStatus() != QAVPlayer::InvalidMedia && m_mediaParser->mediaStatus() != QAVPlayer::NoMedia;
 }
 

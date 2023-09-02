@@ -226,11 +226,6 @@ Player::Player(QWidget *parent) :
     ui->adjustmentsGroupBox->layout()->setContentsMargins(2, 2, 2, 2);
     ui->adjustmentsGroupBox->layout()->addWidget(m_adjustmentSelector);
 
-    m_filterSelectors[0]->selectCurrentFilter(-1);
-
-    // select 'normal' by default
-    m_filterSelectors[0]->enableCurrentFilter(true);
-
     m_filterUpdateTimer.setSingleShot(true);
     connect(&m_filterUpdateTimer, &QTimer::timeout, this, &Player::applyFilter);
 
@@ -449,10 +444,32 @@ void Player::setFile(FileInformation *fileInfo)
             m_filterSelectors[i]->setFileInformation(m_fileInformation);
         }
 
-        m_filterSelectors[0]->selectCurrentFilterByName("Normal");
-        m_filterSelectors[1]->selectCurrentFilterByName("Waveform");
-        m_filterSelectors[2]->selectCurrentFilterByName("Bit Plane (10 slices)");
-        m_filterSelectors[3]->selectCurrentFilterByName("Vectorscope");
+        bool hasVideoStreams = m_fileInformation->hasVideoStreams();
+        bool hasAudioStreams = m_fileInformation->hasAudioStreams();
+
+        if(hasVideoStreams) {
+            m_filterSelectors[0]->selectCurrentFilterByName("Normal");
+            m_filterSelectors[1]->selectCurrentFilterByName("Waveform");
+            m_filterSelectors[2]->selectCurrentFilterByName("Bit Plane (10 slices)");
+            m_filterSelectors[3]->selectCurrentFilterByName("Vectorscope");
+
+            // select 'normal' by default
+            m_filterSelectors[0]->enableCurrentFilter(true);
+
+        } else if (hasAudioStreams) {
+            m_filterSelectors[0]->selectCurrentFilterByName("Audio Bit Scope");
+            m_filterSelectors[1]->selectCurrentFilterByName("Audio Waveform");
+            m_filterSelectors[2]->selectCurrentFilterByName("Audio Spectrum");
+            m_filterSelectors[3]->selectCurrentFilterByName("Audio Vectorscope");
+
+            // deselect 'normal' by default
+            m_filterSelectors[0]->enableCurrentFilter(false);
+        }
+
+        for(auto i = 0; i < 4; ++i) {
+            m_filterSelectors[i]->setFiltersEnabled(AVMEDIA_TYPE_AUDIO, hasAudioStreams);
+            m_filterSelectors[i]->setFiltersEnabled(AVMEDIA_TYPE_VIDEO, hasVideoStreams);
+        }
 
         m_player->stop();
         m_player->setFile(fileInfo->fileName());
