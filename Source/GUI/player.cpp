@@ -980,6 +980,8 @@ void Player::applyFilter()
         combinedFilter = combinedAudioFilter;
     }
 
+    combinedFilter += ",format=rgb24";
+
     ui->plainTextEdit->appendPlainText(QString("*** filterString ***: \n\n%1").arg(combinedFilter));
 
     setFilter(combinedFilter);
