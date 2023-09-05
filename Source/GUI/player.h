@@ -108,7 +108,7 @@ public:
         connect(this, &QAVPlayer::stateChanged, this, [this](QAVPlayer::State state) {
             if(state == QAVPlayer::PlayingState) {
                 t.start();
-            } else if(state == QAVPlayer::StoppedState) {
+            } else if(state == QAVPlayer::StoppedState || state == QAVPlayer::PausedState) {
                 t.stop();
             }
         }, Qt::QueuedConnection);

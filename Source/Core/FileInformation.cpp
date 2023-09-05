@@ -2237,10 +2237,13 @@ void FileInformation::Frames_Pos_Set (int Pos, size_t Stats_Pos)
 //---------------------------------------------------------------------------
 void FileInformation::Frames_Pos_Minus ()
 {
+    qDebug() << "Frames_Pos_Minus..";
+
     if (Frames_Pos==0)
         return;
 
     Frames_Pos--;
+    qDebug() << "Frames_Pos_Minus: " << Frames_Pos;
 
     Q_EMIT positionChanged();
 }
@@ -2248,10 +2251,13 @@ void FileInformation::Frames_Pos_Minus ()
 //---------------------------------------------------------------------------
 bool FileInformation::Frames_Pos_Plus ()
 {
+    qDebug() << "Frames_Pos_Plus..";
+
     if (Frames_Pos+1>=ReferenceStat()->x_Current_Max)
         return false;;
 
     Frames_Pos++;
+    qDebug() << "Frames_Pos_Plus: " << Frames_Pos;
 
     Q_EMIT positionChanged();
     return true;
