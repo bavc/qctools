@@ -773,11 +773,11 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         }
         Filters[0].erase(0, 1); // remove first comma
         if (ActiveFilters[ActiveFilter_Audio_astats])
-            Filters[1]+=",aformat=sample_fmts=flt|fltp,astats=metadata=1:reset=1:length=0.4";
+            Filters[1]+=",aformat=sample_fmts=flt|fltp:channel_layouts=stereo,astats=metadata=1:reset=1:length=0.4";
         if (ActiveFilters[ActiveFilter_Audio_aphasemeter])
             Filters[1]+=",aphasemeter=video=0";
         if (ActiveFilters[ActiveFilter_Audio_EbuR128])
-            Filters[1]+=",ebur128=metadata=1,aformat=sample_fmts=flt|fltp";
+            Filters[1]+=",ebur128=metadata=1,aformat=sample_fmts=flt|fltp:channel_layouts=stereo";
         Filters[1].erase(0, 1); // remove first comma
 
         m_panelSize.setWidth(512);
