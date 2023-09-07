@@ -48,6 +48,8 @@ int main(int argc, char *argv[])
         {
             files.append(QString::fromLocal8Bit(argv[Pos]));
         }
+
+        qDebug() << "arg: " << argv[Pos];
     }
 
     MainWindow w(NULL);
@@ -59,12 +61,15 @@ int main(int argc, char *argv[])
 
     qDebug() << "new size: " << newSize << "availableGeometry: " << availableGeometry << "new geometry: " << newGeometry;
     w.setGeometry(newGeometry);
-    for(auto file : files)
-    {
-        w.addFile(file);
-    }
-    if(files.size() > 0)
-        w.addFile_finish();
+
+    QTimer::singleShot(0, [&]() {
+        for (auto file : files)
+        {
+            w.addFile(file);
+        }
+        if (files.size() > 0)
+            w.addFile_finish();
+    });
 
     qDebug() << "size: " << w.size() << "pos: " << w.pos();
 
