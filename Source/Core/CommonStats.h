@@ -65,7 +65,7 @@ public:
     std::string                      Count2_Get(size_t Pos);
     std::string                      Percent_Get(size_t Pos);
 
-    static void statsFromExternalData(const char* Data, size_t Size, const std::function<CommonStats*(int, size_t)>& statsGetter);
+    static void statsFromExternalData(const char* Data, size_t Size, const std::function<CommonStats*(int, int)>& statsGetter);
 
     virtual void parseFrame(tinyxml2::XMLElement* frame) = 0;
 
