@@ -1,4 +1,4 @@
-1.3, 2023-05-
+1.3, 2023-09-
 === Thanks to New York Public Library for their support and contributions on this release ===
 + Refactor of method to generate statistics, panels, and thumbnails based on QtAVPlayer.
 + Updates to several playback filters to support RGB based pixel formats.
@@ -13,6 +13,12 @@ x Improvements on reading files that contain non-audiovisual streams.
 + The Datascope, Waveform Target, Vectorscope Target, Zoom, and Pixel Scope filters now use a resizable/movable selection box to determine their area of focus.
 + Adding a blockdetect and blurdetect graph.
 + Switching to QtAVPlayer for graphing and playback, which also adds ffmpeg5 support to QCTools
+x Fix issue with saving reports with comments (#738).
++ Added tests for valid files.
++ Performance improvements in player via QtAVPlayer.
+x Fixes to audio statistics timestamps (#778).
+x Fixes for loading/saving panels.
+x Fixes to playback via the graph view.
 
 1.2.1, 2022-02-12
 x Fix issue with piped input to qcli (PR #704)
