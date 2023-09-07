@@ -986,8 +986,8 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "showwaves=mode=${3}:n=${2}:s=${width}x${height}:split_channels=0,negate",
-            "showwaves=mode=${3}:n=${2}:s=${width}x${height}:split_channels=1,negate",
+            "aformat=sample_fmts=flt|fltp:channel_layouts=stereo,showwaves=mode=${3}:n=${2}:s=${width}x${height}:split_channels=0,negate",
+            "aformat=sample_fmts=flt|fltp:channel_layouts=stereo,showwaves=mode=${3}:n=${2}:s=${width}x${height}:split_channels=1,negate",
         },
     },
     {
@@ -1099,7 +1099,7 @@ const filter Filters[] =
             { Args_Type_None,     0,   0,   0,   0, nullptr },
         },
         {
-            "ebur128=video=1:meter=${1}[out0][out1];[out1]anullsink;[out0]copy",
+            "aformat=sample_fmts=flt|fltp:channel_layouts=stereo,ebur128=video=1:meter=${1}[out0][out1];[out1]anullsink;[out0]copy",
         },
     },
     {
