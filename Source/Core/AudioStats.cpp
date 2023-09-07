@@ -127,14 +127,16 @@ void AudioStats::parseFrame(tinyxml2::XMLElement *Frame)
                     value=0;
                 y[j][x_Current]=value;
 
-                if (PerItem[j].Group1!=Group_AudioMax && y_Max[PerItem[j].Group1]<y[j][x_Current])
-                    y_Max[PerItem[j].Group1]=y[j][x_Current];
-                if (PerItem[j].Group2!=Group_AudioMax && y_Max[PerItem[j].Group2]<y[j][x_Current])
-                    y_Max[PerItem[j].Group2]=y[j][x_Current];
-                if (PerItem[j].Group1!=Group_AudioMax && y_Min[PerItem[j].Group1]>y[j][x_Current])
-                    y_Min[PerItem[j].Group1]=y[j][x_Current];
-                if (PerItem[j].Group2!=Group_AudioMax && y_Min[PerItem[j].Group2]>y[j][x_Current])
-                    y_Min[PerItem[j].Group2]=y[j][x_Current];
+                if (!std::isinf(value)) {
+                    if (PerItem[j].Group1 != Group_AudioMax && y_Max[PerItem[j].Group1] < y[j][x_Current])
+                        y_Max[PerItem[j].Group1] = y[j][x_Current];
+                    if (PerItem[j].Group2 != Group_AudioMax && y_Max[PerItem[j].Group2] < y[j][x_Current])
+                        y_Max[PerItem[j].Group2] = y[j][x_Current];
+                    if (PerItem[j].Group1 != Group_AudioMax && y_Min[PerItem[j].Group1] > y[j][x_Current])
+                        y_Min[PerItem[j].Group1] = y[j][x_Current];
+                    if (PerItem[j].Group2 != Group_AudioMax && y_Min[PerItem[j].Group2] > y[j][x_Current])
+                        y_Min[PerItem[j].Group2] = y[j][x_Current];
+                }
 
                 //AudioStats
                 Stats_Totals[j]+=y[j][x_Current];
@@ -198,16 +200,19 @@ void AudioStats::StatsFromFrame (const QAVFrame& frame, int, int)
 
         if (j<Item_AudioMax)
         {
-            y[j][x_Current]=std::atof(e->value);
-                                            
-            if (PerItem[j].Group1!=Group_AudioMax && y_Max[PerItem[j].Group1]<y[j][x_Current])
-                y_Max[PerItem[j].Group1]=y[j][x_Current];
-            if (PerItem[j].Group2!=Group_AudioMax && y_Max[PerItem[j].Group2]<y[j][x_Current])
-                y_Max[PerItem[j].Group2]=y[j][x_Current];
-            if (PerItem[j].Group1!=Group_AudioMax && y_Min[PerItem[j].Group1]>y[j][x_Current])
-                y_Min[PerItem[j].Group1]=y[j][x_Current];
-            if (PerItem[j].Group2!=Group_AudioMax && y_Min[PerItem[j].Group2]>y[j][x_Current])
-                y_Min[PerItem[j].Group2]=y[j][x_Current];
+            double value = std::atof(e->value);
+            y[j][x_Current]=value;
+
+            if (!std::isinf(value)) {
+                if (PerItem[j].Group1 != Group_AudioMax && y_Max[PerItem[j].Group1] < y[j][x_Current])
+                    y_Max[PerItem[j].Group1] = y[j][x_Current];
+                if (PerItem[j].Group2 != Group_AudioMax && y_Max[PerItem[j].Group2] < y[j][x_Current])
+                    y_Max[PerItem[j].Group2] = y[j][x_Current];
+                if (PerItem[j].Group1 != Group_AudioMax && y_Min[PerItem[j].Group1] > y[j][x_Current])
+                    y_Min[PerItem[j].Group1] = y[j][x_Current];
+                if (PerItem[j].Group2 != Group_AudioMax && y_Min[PerItem[j].Group2] > y[j][x_Current])
+                    y_Min[PerItem[j].Group2] = y[j][x_Current];
+            }
 
             //Stats
             Stats_Totals[j]+=y[j][x_Current];

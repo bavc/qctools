@@ -204,14 +204,16 @@ void VideoStats::parseFrame(tinyxml2::XMLElement *Frame)
                 else
                     y[j][x_Current]=value;
 
-                if (PerItem[j].Group1!=Group_VideoMax && y_Max[PerItem[j].Group1]<y[j][x_Current])
-                    y_Max[PerItem[j].Group1]=y[j][x_Current];
-                if (PerItem[j].Group2!=Group_VideoMax && y_Max[PerItem[j].Group2]<y[j][x_Current])
-                    y_Max[PerItem[j].Group2]=y[j][x_Current];
-                if (PerItem[j].Group1!=Group_VideoMax && y_Min[PerItem[j].Group1]>y[j][x_Current])
-                    y_Min[PerItem[j].Group1]=y[j][x_Current];
-                if (PerItem[j].Group2!=Group_VideoMax && y_Min[PerItem[j].Group2]>y[j][x_Current])
-                    y_Min[PerItem[j].Group2]=y[j][x_Current];
+                if (!std::isinf(value)) {
+                    if (PerItem[j].Group1 != Group_VideoMax && y_Max[PerItem[j].Group1] < y[j][x_Current])
+                        y_Max[PerItem[j].Group1] = y[j][x_Current];
+                    if (PerItem[j].Group2 != Group_VideoMax && y_Max[PerItem[j].Group2] < y[j][x_Current])
+                        y_Max[PerItem[j].Group2] = y[j][x_Current];
+                    if (PerItem[j].Group1 != Group_VideoMax && y_Min[PerItem[j].Group1] > y[j][x_Current])
+                        y_Min[PerItem[j].Group1] = y[j][x_Current];
+                    if (PerItem[j].Group2 != Group_VideoMax && y_Min[PerItem[j].Group2] > y[j][x_Current])
+                        y_Min[PerItem[j].Group2] = y[j][x_Current];
+                }
 
                 //VideoStats
                 Stats_Totals[j]+=y[j][x_Current];
@@ -290,14 +292,16 @@ void VideoStats::StatsFromFrame (const QAVFrame& frame, int Width, int Height)
             else
                 y[j][x_Current]=value;
 
-            if (PerItem[j].Group1!=Group_VideoMax && y_Max[PerItem[j].Group1]<y[j][x_Current])
-                y_Max[PerItem[j].Group1]=y[j][x_Current];
-            if (PerItem[j].Group2!=Group_VideoMax && y_Max[PerItem[j].Group2]<y[j][x_Current])
-                y_Max[PerItem[j].Group2]=y[j][x_Current];
-            if (PerItem[j].Group1!=Group_VideoMax && y_Min[PerItem[j].Group1]>y[j][x_Current])
-                y_Min[PerItem[j].Group1]=y[j][x_Current];
-            if (PerItem[j].Group2!=Group_VideoMax && y_Min[PerItem[j].Group2]>y[j][x_Current])
-                y_Min[PerItem[j].Group2]=y[j][x_Current];
+            if (!std::isinf(value)) {
+                if (PerItem[j].Group1 != Group_VideoMax && y_Max[PerItem[j].Group1] < y[j][x_Current])
+                    y_Max[PerItem[j].Group1] = y[j][x_Current];
+                if (PerItem[j].Group2 != Group_VideoMax && y_Max[PerItem[j].Group2] < y[j][x_Current])
+                    y_Max[PerItem[j].Group2] = y[j][x_Current];
+                if (PerItem[j].Group1 != Group_VideoMax && y_Min[PerItem[j].Group1] > y[j][x_Current])
+                    y_Min[PerItem[j].Group1] = y[j][x_Current];
+                if (PerItem[j].Group2 != Group_VideoMax && y_Min[PerItem[j].Group2] > y[j][x_Current])
+                    y_Min[PerItem[j].Group2] = y[j][x_Current];
+            }
 
             //Stats
             Stats_Totals[j]+=y[j][x_Current];
