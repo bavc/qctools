@@ -1,5 +1,5 @@
 1.3, 2023-09-
-=== Thanks to New York Public Library for their support and contributions on this release ===
+=== Thanks to New York Public Library and Smithsonian National Museum of African American History and Culture (NMAAHC) for their support and contributions on this release ===
 + Refactor of method to generate statistics, panels, and thumbnails based on QtAVPlayer.
 + Updates to several playback filters to support RGB based pixel formats.
 + Additional Value Highlight playback filter to show specific values in addition to ranges.
