@@ -186,6 +186,9 @@ CommonStats::~CommonStats()
 
 void CommonStats::processAdditionalStats(const char* key, const char* value, bool statsMapInitialized)
 {
+    if (strcmp(key, "qctools.comment") == 0)
+        return;
+
     if(!statsMapInitialized) {
         auto type = StatsValueInfo::typeFromKey(key, value);
         auto stats = StatsValueInfo {
@@ -459,7 +462,7 @@ std::string CommonStats::Percent_Get(size_t Pos)
     return str.str();
 }
 
-void CommonStats::statsFromExternalData(const char *Data, size_t Size, const std::function<CommonStats*(int, size_t)>& statsGetter)
+void CommonStats::statsFromExternalData(const char *Data, size_t Size, const std::function<CommonStats*(int, int)>& statsGetter)
 {
     // AudioStats from external data
     // XML input
