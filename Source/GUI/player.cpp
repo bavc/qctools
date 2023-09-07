@@ -1017,13 +1017,9 @@ void Player::handleFileInformationPositionChanges()
         {
             m_ignorePositionChanges = true;
 
-            auto prevMs = frameToMs(m_fileInformation->Frames_Pos_Get() - 12);
-            if(prevMs < 0)
-                prevMs = 0;
-
             // ScopedMute mute(m_player);
 
-            m_player->seek(qint64(prevMs));
+            m_player->seek(qint64(ms));
             m_ignorePositionChanges = false;
             ui->playerSlider->setValue(ms);
         }
