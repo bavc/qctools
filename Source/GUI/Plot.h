@@ -135,8 +135,17 @@ public:
 
         auto xData = m_stats->x[m_xDataIndex];
         auto yData = m_stats->y[m_yDataIndex];
+        auto xVal = xData[i];
+        auto yVal = yData[i];
 
-        return QPointF(xData[i], (m_barchart ? toBarchart(yData, i, 1.0) : yData[i]));
+        if (yVal == std::numeric_limits<double>::infinity()) {
+            yVal = m_stats->y_Max[m_plotGroup];;
+        }
+        else if (yVal == -std::numeric_limits<double>::infinity()) {
+            yVal = m_stats->y_Min[m_plotGroup];
+        }
+
+        return QPointF(xVal, (m_barchart ? toBarchart(yData, i, 1.0) : yVal));
     }
 
     QPointF originalSample(size_t i) const {
