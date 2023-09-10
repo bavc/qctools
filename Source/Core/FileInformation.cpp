@@ -1096,7 +1096,6 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                 if(frame.stream().index() == 0) {
                     m_thumbnails_frames.push_back(frame);
 
-                    ++Frames_Pos;
                 } else {
                     int index = frame.stream().index();
 
