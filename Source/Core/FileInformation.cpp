@@ -582,7 +582,28 @@ QString adjustDpxFileName(QString mediaFileName, int& dpxOffset) {
         ++numberOfDigits;
     }
 
+    QFileInfo info(mediaFileName);
+    QDir dir(info.absolutePath());
+
     dpxOffset = mediaFileName.mid(offset + 1, numberOfDigits).toInt();
+    auto dpxWildcard = mediaFileName;
+
+    dpxWildcard.replace(offset + 1, numberOfDigits, "*");
+    dpxWildcard.remove(0, info.absolutePath().size() + 1);
+
+    auto entries = dir.entryList(QStringList() << dpxWildcard, QDir::Files, QDir::Name);
+    if (!entries.empty()) {
+        auto firstEntry = entries[0];
+        mediaFileName.replace(mediaFileName.size() - info.fileName().size(), info.fileName().length(), firstEntry);
+
+        offset = mediaFileName.length() - dotDpx.length() - 1;
+        numberOfDigits = 0;
+        while (offset >= 0 && mediaFileName[offset].isNumber()) {
+            --offset;
+            ++numberOfDigits;
+        }
+    }
+
     auto fmt = QString::asprintf("%0%dd", numberOfDigits);
     mediaFileName.replace(offset + 1, numberOfDigits, fmt);
 
