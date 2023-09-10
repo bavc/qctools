@@ -132,8 +132,15 @@ public:
         m_file = file;
         auto sourceFile = m_file;
 
-        if(isDpx(sourceFile))
-            sourceFile = adjustDpxFileName(sourceFile);
+        if (isDpx(sourceFile)) {
+            int dpxOffset = 0;
+            sourceFile = adjustDpxFileName(sourceFile, dpxOffset);
+            setInputOptions({ {"start_number", QString::number(dpxOffset) } });
+        } else {
+            if(!inputOptions().empty()) {
+                setInputOptions({});
+            }
+        }
 
         setSource(sourceFile);
     }

@@ -574,13 +574,15 @@ bool isDpx(QString mediaFileName) {
     return mediaFileName.endsWith(dotDpx, Qt::CaseInsensitive);
 }
 
-QString adjustDpxFileName(QString mediaFileName) {
+QString adjustDpxFileName(QString mediaFileName, int& dpxOffset) {
     auto offset = mediaFileName.length() - dotDpx.length() - 1;
     auto numberOfDigits = 0;
     while(offset >= 0 && mediaFileName[offset].isNumber()) {
         --offset;
         ++numberOfDigits;
     }
+
+    dpxOffset = mediaFileName.mid(offset + 1, numberOfDigits).toInt();
     auto fmt = QString::asprintf("%0%dd", numberOfDigits);
     mediaFileName.replace(offset + 1, numberOfDigits, fmt);
 
@@ -796,13 +798,16 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         }
     }
 
+    m_mediaParser = new QAVPlayer();
+
     if(mediaFileName  == "-")
         mediaFileName  = "pipe:0";
     else if(isDpx(mediaFileName)) {
-        mediaFileName = adjustDpxFileName(mediaFileName);
+        int dpxOffset = 0;
+        mediaFileName = adjustDpxFileName(mediaFileName, dpxOffset);
+        m_mediaParser->setInputOptions({ {"start_number", QString::number(dpxOffset) } });
     }
 
-    m_mediaParser = new QAVPlayer();
     m_mediaParser->setSource(mediaFileName);
     m_mediaParser->setSynced(false);
 
