@@ -587,6 +587,10 @@ QString adjustDpxFileName(QString mediaFileName) {
     return mediaFileName;
 }
 
+QString astats = "astats";
+QString stats = "stats";
+QString thumbnails = "thumbnails";
+
 FileInformation::FileInformation (SignalServer* signalServer, const QString &FileName_, activefilters ActiveFilters_, activealltracks ActiveAllTracks_,
                                   QMap<QString, std::tuple<QString, QString, QString, QString, int>> activePanels,
                                   const QString &QCvaultFileNamePrefix,
@@ -908,13 +912,13 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         QList<QString> filters;
 
         if(!Filters[0].empty() && !m_mediaParser->currentVideoStreams().empty())
-            filters.append(QString("%1 [stats]").arg(QString::fromStdString(Filters[0])));
+            filters.append(QString("%1 [%2]").arg(QString::fromStdString(Filters[0])).arg(stats));
 
         if(!Filters[1].empty() && !m_mediaParser->currentAudioStreams().empty())
-            filters.append(QString::fromStdString(Filters[1]));
+            filters.append(QString("%1 [%2]").arg(QString::fromStdString(Filters[1])).arg(astats));
 
         if(!m_mediaParser->currentVideoStreams().empty())
-            filters.append("scale=72:72,format=rgb24 [thumbnails]");
+            filters.append(QString("scale=72:72,format=rgb24 [%1]").arg(thumbnails));
 
         if(!StatsFromExternalData_IsOpen) {
             // only do panels if no legacy report was opened
@@ -997,11 +1001,12 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         QObject::connect(m_mediaParser, &QAVPlayer::audioFrame, m_mediaParser, [this](const QAVAudioFrame &frame) {
                 qDebug() << "audio frame came from: " << frame.filterName() << frame.stream() << frame.stream().index();
 
-                auto stat = Stats[frame.stream().index()];
+                if (frame.filterName() == astats) {
+                    auto stat = Stats[frame.stream().index()];
 
-                stat->TimeStampFromFrame(frame, stat->x_Current);
-                stat->StatsFromFrame(frame, 0, 0);
-
+                    stat->TimeStampFromFrame(frame, stat->x_Current);
+                    stat->StatsFromFrame(frame, 0, 0);
+                }
             },
             // Qt::QueuedConnection
             Qt::DirectConnection
@@ -1010,7 +1015,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         QObject::connect(m_mediaParser, &QAVPlayer::videoFrame, m_mediaParser, [this](const QAVVideoFrame &frame) {
                 qDebug() << "video frame came from: " << frame.filterName() << frame.stream() << frame.stream().index();
 
-                if(frame.filterName() == "stats") {
+                if(frame.filterName() == stats) {
                     auto stat = Stats[frame.stream().index()];
 
                     stat->TimeStampFromFrame(frame, stat->x_Current);
@@ -1027,7 +1032,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                     qDebug() << "panel frame pts: " << frame.frame()->pts;
                     qDebug() << "m_panelFrames[index]: " << m_panelFrames[index].size() << index << indexString;
                 }
-                else
+                else if(frame.filterName() == thumbnails)
                 {
                     m_thumbnails_frames.push_back(frame);
                 }
@@ -1066,12 +1071,6 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     } else {
         auto availableVideoStreams = m_mediaParser->availableVideoStreams();
         m_mediaParser->setVideoStreams(availableVideoStreams);
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 13, 0)
-        QList<QString> filters;
-        filters.append("format=rgb24");
-        m_mediaParser->setFilters(filters);
-#endif //
 
         for(auto i = 0; i < availableVideoStreams.count(); ++i) {
             if(i == 0)
