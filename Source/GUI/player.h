@@ -135,7 +135,7 @@ public:
         if (isDpx(sourceFile)) {
             int dpxOffset = 0;
             sourceFile = adjustDpxFileName(sourceFile, dpxOffset);
-            setInputOptions({ {"start_number", QString::number(dpxOffset) } });
+            setInputOptions({ {"start_number", QString::number(dpxOffset) }, {"f", "image2"} });
         } else {
             if(!inputOptions().empty()) {
                 setInputOptions({});

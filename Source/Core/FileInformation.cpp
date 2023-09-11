@@ -821,12 +821,12 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
     m_mediaParser = new QAVPlayer();
 
+    int dpxOffset = -1;
     if(mediaFileName  == "-")
         mediaFileName  = "pipe:0";
     else if(isDpx(mediaFileName)) {
-        int dpxOffset = 0;
         mediaFileName = adjustDpxFileName(mediaFileName, dpxOffset);
-        m_mediaParser->setInputOptions({ {"start_number", QString::number(dpxOffset) } });
+        m_mediaParser->setInputOptions({ {"start_number", QString::number(dpxOffset) }, {"f", "image2"} });
     }
 
     m_mediaParser->setSource(mediaFileName);
@@ -860,7 +860,13 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
         AVFormatContext* FormatContext = nullptr;
         auto stdMediaFileName = mediaFileName.toStdString();
-        if (avformat_open_input(&FormatContext, stdMediaFileName.c_str(), NULL, NULL)>=0)
+        AVDictionary* options = nullptr;
+        if (dpxOffset != -1) {
+            auto dpxOffsetString = std::to_string(dpxOffset);
+            av_dict_set(&options, "f", "image2", 0);
+            av_dict_set(&options, "start_number", dpxOffsetString.c_str(), 0);
+        }
+        if (avformat_open_input(&FormatContext, stdMediaFileName.c_str(), nullptr, &options)>=0)
         {
             QVector<QAVStream*> orderedStreams;
             if (avformat_find_stream_info(FormatContext, NULL)>=0) {
@@ -930,6 +936,9 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
             }
 
             avformat_close_input(&FormatContext);
+        }
+        if (options) {
+            av_dict_free(&options);
         }
     }
 
