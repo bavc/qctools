@@ -70,7 +70,7 @@ Player::Player(QWidget *parent) :
 #else
             if(m_w->videoSink()->videoFrame().size() != videoFrame.size()) {
                 m_w->videoSink()->setVideoFrame(videoFrame);
-                updateVideoOutputSize();
+                QTimer::singleShot(0, [this] { updateVideoOutputSize(); });
             } else {
                 m_w->videoSink()->setVideoFrame(videoFrame);
             }
@@ -642,7 +642,7 @@ void Player::updateInfoLabels()
 
 void Player::updateSlider(qint64 value)
 {
-    if(m_ignorePositionChanges)
+    if(m_ignorePositionChanges || !m_fileInformation)
         return;
 
     auto displayPosition = m_player->position();
