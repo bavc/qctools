@@ -1,6 +1,6 @@
 message('entering qctools-cli.pro')
 
-QT += core multimedia network
+QT += core network
 QT -= gui
 
 CONFIG += c++11
@@ -84,7 +84,6 @@ HEADERS += \
 message('qctools-lib: including ffmpeg')
 include(../ffmpeg.pri)
 
-DEFINES += QT_AVPLAYER_MULTIMEDIA
 INCLUDEPATH += ../qctools-QtAVPlayer/src
 include(../qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.pri)
 
