@@ -37,7 +37,7 @@ public:
     }
 
     size_t size() const {
-        return stats->x_Current;
+        return stats ? stats->x_Current : 0;
     }
     QPointF sample(size_t i) const {
         int dataTypeIndex = pDataTypeIndex ? *pDataTypeIndex : 0;

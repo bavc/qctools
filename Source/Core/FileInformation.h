@@ -38,7 +38,7 @@ std::string FFmpeg_Configuration();
 std::string FFmpeg_LibsVersion();
 
 bool isDpx(QString mediaFileName);
-QString adjustDpxFileName(QString mediaFileName);
+QString adjustDpxFileName(QString mediaFileName, int& dpxOffset);
 
 //---------------------------------------------------------------------------
 class FileInformation : public QThread

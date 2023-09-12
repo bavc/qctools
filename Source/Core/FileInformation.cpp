@@ -574,13 +574,36 @@ bool isDpx(QString mediaFileName) {
     return mediaFileName.endsWith(dotDpx, Qt::CaseInsensitive);
 }
 
-QString adjustDpxFileName(QString mediaFileName) {
+QString adjustDpxFileName(QString mediaFileName, int& dpxOffset) {
     auto offset = mediaFileName.length() - dotDpx.length() - 1;
     auto numberOfDigits = 0;
     while(offset >= 0 && mediaFileName[offset].isNumber()) {
         --offset;
         ++numberOfDigits;
     }
+
+    QFileInfo info(mediaFileName);
+    QDir dir(info.absolutePath());
+
+    dpxOffset = mediaFileName.mid(offset + 1, numberOfDigits).toInt();
+    auto dpxWildcard = mediaFileName;
+
+    dpxWildcard.replace(offset + 1, numberOfDigits, "*");
+    dpxWildcard.remove(0, info.absolutePath().size() + 1);
+
+    auto entries = dir.entryList(QStringList() << dpxWildcard, QDir::Files, QDir::Name);
+    if (!entries.empty()) {
+        auto firstEntry = entries[0];
+        mediaFileName.replace(mediaFileName.size() - info.fileName().size(), info.fileName().length(), firstEntry);
+
+        offset = mediaFileName.length() - dotDpx.length() - 1;
+        numberOfDigits = 0;
+        while (offset >= 0 && mediaFileName[offset].isNumber()) {
+            --offset;
+            ++numberOfDigits;
+        }
+    }
+
     auto fmt = QString::asprintf("%0%dd", numberOfDigits);
     mediaFileName.replace(offset + 1, numberOfDigits, fmt);
 
@@ -796,13 +819,16 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         }
     }
 
+    m_mediaParser = new QAVPlayer();
+
+    int dpxOffset = -1;
     if(mediaFileName  == "-")
         mediaFileName  = "pipe:0";
     else if(isDpx(mediaFileName)) {
-        mediaFileName = adjustDpxFileName(mediaFileName);
+        mediaFileName = adjustDpxFileName(mediaFileName, dpxOffset);
+        m_mediaParser->setInputOptions({ {"start_number", QString::number(dpxOffset) }, {"f", "image2"} });
     }
 
-    m_mediaParser = new QAVPlayer();
     m_mediaParser->setSource(mediaFileName);
     m_mediaParser->setSynced(false);
 
@@ -834,7 +860,13 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
         AVFormatContext* FormatContext = nullptr;
         auto stdMediaFileName = mediaFileName.toStdString();
-        if (avformat_open_input(&FormatContext, stdMediaFileName.c_str(), NULL, NULL)>=0)
+        AVDictionary* options = nullptr;
+        if (dpxOffset != -1) {
+            auto dpxOffsetString = std::to_string(dpxOffset);
+            av_dict_set(&options, "f", "image2", 0);
+            av_dict_set(&options, "start_number", dpxOffsetString.c_str(), 0);
+        }
+        if (avformat_open_input(&FormatContext, stdMediaFileName.c_str(), nullptr, &options)>=0)
         {
             QVector<QAVStream*> orderedStreams;
             if (avformat_find_stream_info(FormatContext, NULL)>=0) {
@@ -904,6 +936,9 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
             }
 
             avformat_close_input(&FormatContext);
+        }
+        if (options) {
+            av_dict_free(&options);
         }
     }
 
