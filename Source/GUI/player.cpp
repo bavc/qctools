@@ -70,7 +70,7 @@ Player::Player(QWidget *parent) :
 #else
             if(m_w->videoSink()->videoFrame().size() != videoFrame.size()) {
                 m_w->videoSink()->setVideoFrame(videoFrame);
-                updateVideoOutputSize();
+                QTimer::singleShot(0, [this] { updateVideoOutputSize(); });
             } else {
                 m_w->videoSink()->setVideoFrame(videoFrame);
             }
