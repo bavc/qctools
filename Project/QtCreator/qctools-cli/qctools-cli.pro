@@ -84,6 +84,7 @@ HEADERS += \
 message('qctools-lib: including ffmpeg')
 include(../ffmpeg.pri)
 
+DEFINES += QT_AVPLAYER_MULTIMEDIA
 INCLUDEPATH += ../qctools-QtAVPlayer/src
 include(../qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.pri)
 
