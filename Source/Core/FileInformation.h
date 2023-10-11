@@ -260,7 +260,8 @@ private:
 
     std::vector<QAVVideoFrame> m_thumbnails_frames;
 
-    QAVPlayer* m_mediaParser;
+    QAVPlayer* m_mediaParser { nullptr };
+    QAVPlayer* m_mediaPlayer { nullptr };
 };
 
 #endif // GUI_FileInformation_H
