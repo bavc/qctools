@@ -1,3 +1,7 @@
+1.3.1, 2023-10-12
+===
+x Fix critical bug where QCTools would use context from the thumbnail track of the QCTools report, if present, rather than the context of the source file.
+
 1.3, 2023-09-13
 === Thanks to New York Public Library and Smithsonian National Museum of African American History and Culture (NMAAHC) for their support and contributions on this release ===
 + Refactor of method to generate statistics, panels, and thumbnails based on QtAVPlayer.
