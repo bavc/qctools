@@ -650,7 +650,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     static const QString dotQctoolsDotMkv = ".qctools.mkv";
 
     QByteArray attachment;
-    auto mediaFileName = FileName;
+    auto mediaOrMkvReportFileName = FileName;
 
     if (FileName.endsWith(dotQctoolsDotXmlDotGz))
     {
@@ -697,7 +697,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         if (QFile::exists(FileName + dotQctoolsDotMkv))
         {
             attachment = getAttachment(FileName + dotQctoolsDotMkv, StatsFromExternalData_FileName);
-            mediaFileName = mediaFileName + dotQctoolsDotMkv;
+            mediaOrMkvReportFileName = mediaOrMkvReportFileName + dotQctoolsDotMkv;
         }
         else if (QFile::exists(FileName + dotQctoolsDotXmlDotGz))
         {
@@ -725,7 +725,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                 if (list.size() == 1)
                 {
                     attachment = getAttachment(QCvaultPath.absolutePath() + "/" + list[0], StatsFromExternalData_FileName);
-                    mediaFileName = (QCvaultPath.absolutePath() + "/" + list[0]);
+                    mediaOrMkvReportFileName = (QCvaultPath.absolutePath() + "/" + list[0]);
                     break;
                 }
                 list = QCvaultPath.entryList(QStringList(QCvaultFileName + "*" + dotQctoolsDotXmlDotGz), QDir::Files, QDir::Name);
@@ -817,19 +817,42 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         {
             checkFileUploaded(shortFileName);
         }
+
+        m_mediaPlayer = new QAVPlayer();
+
+        int dpxOffset = -1;
+        auto mediaFileName = FileName;
+
+        if(mediaFileName == "-")
+            mediaFileName = "pipe:0";
+        else if(isDpx(mediaFileName)) {
+            mediaFileName = adjustDpxFileName(mediaFileName, dpxOffset);
+            m_mediaPlayer->setInputOptions({ {"start_number", QString::number(dpxOffset) }, {"f", "image2"} });
+        }
+
+        m_mediaPlayer->setSource(FileName);
+
+        QEventLoop loop;
+        QMetaObject::Connection c;
+        c = connect(m_mediaPlayer, &QAVPlayer::mediaStatusChanged, this, [&, this]() {
+            qDebug() << "m_mediaPlayer status after loading: " << m_mediaPlayer->mediaStatus();
+            loop.exit();
+            QObject::disconnect(c);
+        });
+        loop.exec();
     }
 
     m_mediaParser = new QAVPlayer();
 
     int dpxOffset = -1;
-    if(mediaFileName  == "-")
-        mediaFileName  = "pipe:0";
-    else if(isDpx(mediaFileName)) {
-        mediaFileName = adjustDpxFileName(mediaFileName, dpxOffset);
+    if(mediaOrMkvReportFileName  == "-")
+        mediaOrMkvReportFileName  = "pipe:0";
+    else if(isDpx(mediaOrMkvReportFileName)) {
+        mediaOrMkvReportFileName = adjustDpxFileName(mediaOrMkvReportFileName, dpxOffset);
         m_mediaParser->setInputOptions({ {"start_number", QString::number(dpxOffset) }, {"f", "image2"} });
     }
 
-    m_mediaParser->setSource(mediaFileName);
+    m_mediaParser->setSource(mediaOrMkvReportFileName);
     m_mediaParser->setSynced(false);
 
     QEventLoop loop;
@@ -859,7 +882,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         streams.append(m_mediaParser->availableAudioStreams());
 
         AVFormatContext* FormatContext = nullptr;
-        auto stdMediaFileName = mediaFileName.toStdString();
+        auto stdMediaFileName = mediaOrMkvReportFileName.toStdString();
         AVDictionary* options = nullptr;
         if (dpxOffset != -1) {
             auto dpxOffsetString = std::to_string(dpxOffset);
@@ -1190,6 +1213,11 @@ FileInformation::~FileInformation ()
     if(m_mediaParser->state() == QAVPlayer::PlayingState) {
         m_mediaParser->stop();
         delete m_mediaParser;
+    }
+
+    if(m_mediaPlayer) {
+        m_mediaPlayer->stop();
+        delete m_mediaPlayer;
     }
 
     bool result = wait();
@@ -1760,7 +1788,7 @@ QString FileInformation::fileName() const
 
 int FileInformation::width() const
 {
-    auto videoStreams = m_mediaParser->availableVideoStreams();
+    auto videoStreams = m_mediaPlayer ? m_mediaPlayer->availableVideoStreams() : m_mediaParser->availableVideoStreams();
     if(videoStreams.empty())
         return 0;
 
@@ -1769,7 +1797,7 @@ int FileInformation::width() const
 
 int FileInformation::height() const
 {
-    auto videoStreams = m_mediaParser->availableVideoStreams();
+    auto videoStreams = m_mediaPlayer ? m_mediaPlayer->availableVideoStreams() : m_mediaParser->availableVideoStreams();
     if(videoStreams.empty())
         return 0;
 
@@ -1778,7 +1806,7 @@ int FileInformation::height() const
 
 int FileInformation::bitsPerRawSample() const
 {
-    auto videoStreams = m_mediaParser->availableVideoStreams();
+    auto videoStreams = m_mediaPlayer ? m_mediaPlayer->availableVideoStreams() : m_mediaParser->availableVideoStreams();
     if(videoStreams.empty())
         return 0;
 
@@ -1787,7 +1815,7 @@ int FileInformation::bitsPerRawSample() const
 
 double FileInformation::dar() const
 {
-    auto videoStreams = m_mediaParser->availableVideoStreams();
+    auto videoStreams = m_mediaPlayer ? m_mediaPlayer->availableVideoStreams() : m_mediaParser->availableVideoStreams();
     if(videoStreams.empty())
         return 0;
 
@@ -1802,7 +1830,7 @@ double FileInformation::dar() const
 
 std::string FileInformation::pixFormatName() const
 {
-    auto videoStreams = m_mediaParser->availableVideoStreams();
+    auto videoStreams = m_mediaPlayer ? m_mediaPlayer->availableVideoStreams() : m_mediaParser->availableVideoStreams();
     if(videoStreams.empty())
         return std::string();
 
@@ -1817,7 +1845,7 @@ std::string FileInformation::pixFormatName() const
 
 int FileInformation::isRgbSet() const
 {
-    auto videoStreams = m_mediaParser->availableVideoStreams();
+    auto videoStreams = m_mediaPlayer ? m_mediaPlayer->availableVideoStreams() : m_mediaParser->availableVideoStreams();
     if(videoStreams.empty())
         return 0;
 
@@ -1844,7 +1872,7 @@ double FileInformation::duration() const
 
 std::string FileInformation::videoFormat() const
 {
-    auto videoStreams = m_mediaParser->availableVideoStreams();
+    auto videoStreams = m_mediaPlayer ? m_mediaPlayer->availableVideoStreams() : m_mediaParser->availableVideoStreams();
     if(videoStreams.empty())
         return std::string();
 
@@ -1861,7 +1889,7 @@ std::string FileInformation::videoFormat() const
 
 std::string FileInformation::fieldOrder() const
 {
-    auto videoStreams = m_mediaParser->availableVideoStreams();
+    auto videoStreams = m_mediaPlayer ? m_mediaPlayer->availableVideoStreams() : m_mediaParser->availableVideoStreams();
     if(videoStreams.empty())
         return std::string();
 
@@ -1884,7 +1912,7 @@ std::string FileInformation::fieldOrder() const
 
 std::string FileInformation::sar() const
 {
-    auto videoStreams = m_mediaParser->availableVideoStreams();
+    auto videoStreams = m_mediaPlayer ? m_mediaPlayer->availableVideoStreams() : m_mediaParser->availableVideoStreams();
     if(videoStreams.empty())
         return 0;
 
@@ -1913,7 +1941,7 @@ std::string FileInformation::sar() const
 
 FileInformation::FrameRate FileInformation::getAvgVideoFrameRate() const
 {
-    auto videoStreams = m_mediaParser->availableVideoStreams();
+    auto videoStreams = m_mediaPlayer ? m_mediaPlayer->availableVideoStreams() : m_mediaParser->availableVideoStreams();
     if(videoStreams.empty())
         return FrameRate(0, 0);
 
@@ -1932,7 +1960,7 @@ double FileInformation::framesDivDuration() const
 
 std::string FileInformation::rvideoFrameRate() const
 {
-    auto videoStreams = m_mediaParser->availableVideoStreams();
+    auto videoStreams = m_mediaPlayer ? m_mediaPlayer->availableVideoStreams() : m_mediaParser->availableVideoStreams();
     if(videoStreams.empty())
         return 0;
 
@@ -1956,7 +1984,7 @@ std::string FileInformation::rvideoFrameRate() const
 
 std::string FileInformation::avgVideoFrameRate() const
 {
-    auto videoStreams = m_mediaParser->availableVideoStreams();
+    auto videoStreams = m_mediaPlayer ? m_mediaPlayer->availableVideoStreams() : m_mediaParser->availableVideoStreams();
     if(videoStreams.empty())
         return 0;
 
@@ -1980,7 +2008,7 @@ std::string FileInformation::avgVideoFrameRate() const
 
 std::string FileInformation::colorSpace() const
 {
-    auto videoStreams = m_mediaParser->availableVideoStreams();
+    auto videoStreams = m_mediaPlayer ? m_mediaPlayer->availableVideoStreams() : m_mediaParser->availableVideoStreams();
     if(videoStreams.empty())
         return 0;
 
@@ -2006,7 +2034,7 @@ std::string FileInformation::colorSpace() const
 
 std::string FileInformation::colorRange() const
 {
-    auto videoStreams = m_mediaParser->availableVideoStreams();
+    auto videoStreams = m_mediaPlayer ? m_mediaPlayer->availableVideoStreams() : m_mediaParser->availableVideoStreams();
     if(videoStreams.empty())
         return 0;
 
@@ -2024,7 +2052,7 @@ std::string FileInformation::colorRange() const
 
 std::string FileInformation::audioFormat() const
 {
-    auto audioStreams = m_mediaParser->availableAudioStreams();
+    auto audioStreams = m_mediaPlayer ? m_mediaPlayer->availableAudioStreams() : m_mediaParser->availableAudioStreams();
     if(audioStreams.empty())
         return std::string();
 
@@ -2041,7 +2069,7 @@ std::string FileInformation::audioFormat() const
 
 std::string FileInformation::sampleFormat() const
 {
-    auto audioStreams = m_mediaParser->availableAudioStreams();
+    auto audioStreams = m_mediaPlayer ? m_mediaPlayer->availableAudioStreams() : m_mediaParser->availableAudioStreams();
     if(audioStreams.empty())
         return std::string();
 
@@ -2073,7 +2101,7 @@ std::string FileInformation::sampleFormat() const
 
 double FileInformation::samplingRate() const
 {
-    auto audioStreams = m_mediaParser->availableAudioStreams();
+    auto audioStreams = m_mediaPlayer ? m_mediaPlayer->availableAudioStreams() : m_mediaParser->availableAudioStreams();
     if(audioStreams.empty())
         return 0;
 
@@ -2084,7 +2112,7 @@ double FileInformation::samplingRate() const
 
 std::string FileInformation::channelLayout() const
 {
-    auto audioStreams = m_mediaParser->availableAudioStreams();
+    auto audioStreams = m_mediaPlayer ? m_mediaPlayer->availableAudioStreams() : m_mediaParser->availableAudioStreams();
     if(audioStreams.empty())
         return std::string();
 
@@ -2131,7 +2159,7 @@ std::string FileInformation::channelLayout() const
 
 double FileInformation::abitDepth() const
 {
-    auto audioStreams = m_mediaParser->availableAudioStreams();
+    auto audioStreams = m_mediaPlayer ? m_mediaPlayer->availableAudioStreams() : m_mediaParser->availableAudioStreams();
     if(audioStreams.empty())
         return 0;
 
@@ -2142,12 +2170,12 @@ double FileInformation::abitDepth() const
 
 bool FileInformation::hasVideoStreams() const
 {
-    return !m_mediaParser->currentVideoStreams().empty();
+    return !(m_mediaPlayer ? m_mediaPlayer->currentVideoStreams().empty() : m_mediaParser->currentVideoStreams().empty());
 }
 
 bool FileInformation::hasAudioStreams() const
 {
-    return !m_mediaParser->currentAudioStreams().empty();
+    return !(m_mediaPlayer ? m_mediaPlayer->currentAudioStreams().empty() : m_mediaParser->currentAudioStreams().empty());
 }
 
 //---------------------------------------------------------------------------
