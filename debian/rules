@@ -3,6 +3,7 @@
 
 # Uncomment this to turn on verbose mode.
 export DH_VERBOSE=1
+export QT_SELECT=qt5
 
 configure: configure-stamp
 configure-stamp:
@@ -36,28 +37,36 @@ install: build
 	dh_clean -k 
 	dh_installdirs
 
-	# Add here commands to install the package into debian/qctools
-	install -dm 755 $(CURDIR)/debian/qctools/usr/bin
-	install -m 755 qctools/Project/QtCreator/QCTools $(CURDIR)/debian/qctools/usr/bin
-	#cd qctools/Project/QtCreator && $(MAKE) install DESTDIR=$(CURDIR)/debian/qctools
+	# Add here commands to install the package into debian/tmp
+	install -dm 755 $(CURDIR)/debian/tmp/usr/bin
+	install -m 755 qctools/Project/QtCreator/build/qctools-gui/QCTools $(CURDIR)/debian/tmp/usr/bin
+	install -m 755 qctools/Project/QtCreator/build/qctools-cli/qcli $(CURDIR)/debian/tmp/usr/bin
 
-	install -dm 755 $(CURDIR)/debian/qctools/usr/share/doc/qctools
-	install -m 644 qctools/History.txt $(CURDIR)/debian/qctools/usr/share/doc/qctools/History.txt
-	install -m 644 qctools/License.html $(CURDIR)/debian/qctools/usr/share/doc/qctools
+	install -dm 755 $(CURDIR)/debian/tmp/usr/share/doc/qctools
+	install -m 644 qctools/History.txt $(CURDIR)/debian/tmp/usr/share/doc/qctools
+	install -m 644 qctools/License.html $(CURDIR)/debian/tmp/usr/share/doc/qctools
 
-	install -dm 755 $(CURDIR)/debian/qctools/usr/share/pixmaps
-	install -m 644 qctools/Source/Resource/Logo.png $(CURDIR)/debian/qctools/usr/share/pixmaps/qctools.xpm
-	install -dm 755 $(CURDIR)/debian/qctools/usr/share/icons/hicolor
-	install -m 644 qctools/Source/Resource/Logo.png $(CURDIR)/debian/qctools/usr/share/icons/hicolor/qctools.png
-	install -dm 755 $(CURDIR)/debian/qctools/usr/share/icons/hicolor/256x256/apps
-	install -m 644 qctools/Source/Resource/Logo.png $(CURDIR)/debian/qctools/usr/share/icons/hicolor/256x256/apps/qctools.png
+	install -dm 755 $(CURDIR)/debian/tmp/usr/share/doc/qcli
+	install -m 644 qctools/History.txt $(CURDIR)/debian/tmp/usr/share/doc/qcli
+	install -m 644 qctools/License.html $(CURDIR)/debian/tmp/usr/share/doc/qcli
 
-	install -dm 755 $(CURDIR)/debian/qctools/usr/share/applications
-	install -m 644 qctools/Project/GNU/GUI/qctools.desktop $(CURDIR)/debian/qctools/usr/share/applications
-	install -dm 755 $(CURDIR)/debian/qctools/usr/share/apps/konqueror/servicemenus/
-	install -m 644 qctools/Project/GNU/GUI/qctools.kde3.desktop $(CURDIR)/debian/qctools/usr/share/apps/konqueror/servicemenus/qctools.desktop
-	install -dm 755 $(CURDIR)/debian/qctools/usr/share/kde4/services/ServiceMenus/
-	install -m 644 qctools/Project/GNU/GUI/qctools.kde4.desktop $(CURDIR)/debian/qctools/usr/share/kde4/services/ServiceMenus/qctools.desktop
+	install -dm 755 $(CURDIR)/debian/tmp/usr/share/pixmaps
+	install -m 644 qctools/Source/Resource/Logo.png $(CURDIR)/debian/tmp/usr/share/pixmaps/qctools.xpm
+	install -dm 755 $(CURDIR)/debian/tmp/usr/share/icons/hicolor
+	install -m 644 qctools/Source/Resource/Logo.png $(CURDIR)/debian/tmp/usr/share/icons/hicolor/qctools.png
+	install -dm 755 $(CURDIR)/debian/tmp/usr/share/icons/hicolor/256x256/apps
+	install -m 644 qctools/Source/Resource/Logo.png $(CURDIR)/debian/tmp/usr/share/icons/hicolor/256x256/apps/qctools.png
+
+	install -dm 755 $(CURDIR)/debian/tmp/usr/share/applications
+	install -m 644 qctools/Project/GNU/GUI/qctools.desktop $(CURDIR)/debian/tmp/usr/share/applications
+	install -dm 755 $(CURDIR)/debian/tmp/usr/share/apps/konqueror/servicemenus/
+	install -m 644 qctools/Project/GNU/GUI/qctools.kde3.desktop $(CURDIR)/debian/tmp/usr/share/apps/konqueror/servicemenus/qctools.desktop
+	install -dm 755 $(CURDIR)/debian/tmp/usr/share/kde4/services/ServiceMenus/
+	install -m 644 qctools/Project/GNU/GUI/qctools.kde4.desktop $(CURDIR)/debian/tmp/usr/share/kde4/services/ServiceMenus/qctools.desktop
+	install -dm 755 $(CURDIR)/debian/tmp/usr/share/kservices5/ServiceMenus/
+	install -m 644 qctools/Project/GNU/GUI/qctools.kde4.desktop $(CURDIR)/debian/tmp/usr/share/kservices5/ServiceMenus/qctools.desktop
+	install -dm 755 $(CURDIR)/debian/tmp/usr/share/appdata
+	install -m 644 qctools/Project/GNU/GUI/qctools.metainfo.xml $(CURDIR)/debian/tmp/usr/share/appdata/qctools.appdata.xml
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -67,7 +76,7 @@ binary-indep: build install
 binary-arch: build install
 	dh_testdir
 	dh_testroot
-	dh_install --sourcedir=debian/qctools
+	dh_install --sourcedir=debian/tmp
 	dh_installchangelogs 
 	dh_installdocs
 	dh_installexamples
@@ -83,7 +92,8 @@ binary-arch: build install
 #	dh_installinfo
 	dh_installman
 	dh_link
-	dh_strip --dbg-package=qctools-dbg
+	dh_strip -p qctools --dbg-package=qctools-dbg
+	dh_strip -p qcli --dbg-package=qctools-dbg
 	dh_compress
 	dh_fixperms
 #	dh_perl

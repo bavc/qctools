@@ -1,12 +1,9 @@
-cd qctools/Project/QtCreator
-if sw_vers >/dev/null 2>&1 ; then
-    #Qt 5.2 can not well detect the platform version for 10.9 then FFmpeg static link fails
-    MAJOR_MAC_VERSION=$(sw_vers -productVersion | awk -F '.' '{print $1 "." $2}')
-    $BINQMAKE QMAKE_MAC_SDK=macosx$MAJOR_MAC_VERSION
-else
-    $BINQMAKE
-fi
+rm -fr qctools/Project/QtCreator/build
+mkdir qctools/Project/QtCreator/build
+pushd qctools/Project/QtCreator/build >/dev/null 2>&1
+$BINQMAKE .. DEFINES+=QT_AVPLAYER_MULTIMEDIA
+sed -i'' 's/-framework QtAVPlayer//g' qctools-gui/Makefile.*
 make
-cd ../../..
+popd >/dev/null 2>&1
 
-echo QCTools binary is in qctools/Project/QtCreator
+echo QCTools binary is in qctools/Project/QtCreator/build/qctools-gui
