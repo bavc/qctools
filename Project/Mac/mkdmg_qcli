@@ -1,0 +1,67 @@
+#!/bin/sh
+APPNAME="qcli"
+SIGNATURE="MediaArea.net"
+
+DMG="tmp-${APPNAME}.dmg"
+FILES="tmp-${APPNAME}"
+
+# Create the package
+rm -rf "${FILES}_root"
+rm -rf "${FILES}"
+rm -f "${APPNAME}.dmg"
+rm -f "${DMG}"
+
+mkdir "${FILES}"
+mkdir "${FILES}/.background"
+
+mkdir -p "${FILES}_root/usr/local/bin"
+
+cp -R "../QtCreator/build/qctools-cli/${APPNAME}" "${FILES}_root/usr/local/bin"
+
+codesign --deep --options=runtime -f -s "Developer ID Application: ${SIGNATURE}" --verbose "${FILES}_root/usr/local/bin/${APPNAME}"
+pkgbuild --root "${FILES}_root" --identifier "net.mediaarea.${APPNAME}.mac" --sign "Developer ID Installer: ${SIGNATURE}" --version "$(<../version.txt)" "${FILES}/${APPNAME}.pkg"
+codesign --deep --options=runtime -f -s "Developer ID Application: ${SIGNATURE}" --verbose "${FILES}/${APPNAME}.pkg"
+
+cp ../../License.html "${FILES}/License.html"
+cp ../../History.txt "${FILES}/History.txt"
+cp Logo_White.icns "${FILES}/.background/Logo_White.icns"
+
+# Create the disk image
+hdiutil create "$DMG" -ov -fs HFS+ -format UDRW -volname "${APPNAME}" -srcfolder "${FILES}"
+
+DEVICE=$(hdiutil attach -readwrite -noverify "${DMG}" | egrep '^/dev/' | sed 1q | awk '{print $1}')
+sleep 2
+
+pushd /Volumes/"${APPNAME}"
+rm -f .DS_Store
+popd
+
+echo '
+   tell application "Finder"
+     tell disk "'${APPNAME}'"
+           open
+           set current view of container window to icon view
+           set toolbar visible of container window to false
+           set the bounds of container window to {400, 100, 962, 600}
+           set viewOptions to the icon view options of container window
+           set arrangement of viewOptions to not arranged
+           set icon size of viewOptions to 72
+           set background picture of viewOptions to file ".background:Logo_White.icns"
+           set position of item "'${APPNAME}'.pkg" of container window to {125, 175}
+           set position of item "License.html" of container window to {450, 225}
+           set position of item "History.txt" of container window to {450, 325}
+           close
+     end tell
+   end tell
+' | osascript
+
+hdiutil detach "${DEVICE}"
+sleep 2
+
+# convert to compressed image, delete temp image
+hdiutil convert "$DMG" -format UDBZ -o "${APPNAME}.dmg"
+codesign --deep --options=runtime -f -s "Developer ID Application: ${SIGNATURE}" --verbose "${APPNAME}.dmg"
+
+rm -rf "${FILES}_root"
+rm -rf "${FILES}"
+rm -f "${DMG}"

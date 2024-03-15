@@ -14,21 +14,8 @@ elif qmake-qt5 --version >/dev/null 2>&1 ; then
     BINQMAKE=qmake-qt5
 elif qmake5 --version >/dev/null 2>&1 ; then
     BINQMAKE=qmake5
-elif qmake-qt4 --version >/dev/null 2>&1 ; then
-    BINQMAKE=qmake-qt4
-elif qmake4 --version >/dev/null 2>&1 ; then
-    BINQMAKE=qmake4
-elif $HOME/Qt/5.3/clang_64/bin/qmake --version >/dev/null 2>&1 ; then
-    BINQMAKE=$HOME/Qt/5.3/clang_64/bin/qmake
-elif $HOME/Qt/5.4/clang_64/bin/qmake --version >/dev/null 2>&1 ; then
-    BINQMAKE=$HOME/Qt/5.3/clang_64/bin/qmake
 else
     echo qmake not found
-    exit
-fi
-
-if [ ! $(which cmake) ] ; then
-    echo cmake not found
     exit
 fi
 
