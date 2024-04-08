@@ -3,7 +3,7 @@ message('entering qctools-cli.pro')
 QT += core network
 QT -= gui
 
-CONFIG += c++11
+CONFIG += c++1z
 
 TARGET = qcli
 CONFIG += console

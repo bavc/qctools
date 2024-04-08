@@ -2,7 +2,7 @@ QT = core network multimedia concurrent
 
 TARGET = qctools
 TEMPLATE = lib
-CONFIG += c++11
+CONFIG += c++1z
 CONFIG += staticlib
 
 message('qctools-lib: including ffmpeg')
