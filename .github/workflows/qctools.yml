@@ -491,22 +491,16 @@ jobs:
         arch: win64_mingw81
         version: ${{ matrix.qt_version }}
 
-    - name: Install wget & unzip
-      run: |
-        choco install wget unzip xidel
-
     - name: Install FFmpeg
-      shell: cmd
+      shell: pwsh
       run: |
-        cd ..
-        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "//a[contains(@href, '-gpl-shared.zip')]/@href[1]" --silent > ffmpeg.url
-        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "(//a[contains(@href, '-gpl-shared.zip')])[1]/substring(., 0, string-length(.) - 3)" --silent > ffmpeg.name
-        set /P FFMPEG_URL=< ffmpeg.url
-        set /P FFMPEG_NAME=< ffmpeg.name
-        wget https://github.com%FFMPEG_URL%
-        unzip %FFMPEG_NAME%.zip
-        ren %FFMPEG_NAME% ffmpeg
-        dir ffmpeg
+        Set-Location ..
+        $json = $(curl -L -H "Accept: application/vnd.github+json" https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/latest)
+        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-gpl-shared-6.1.zip")).name | sub("\\.zip$";"")')
+        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-gpl-shared-6.1.zip")).browser_download_url')
+        Invoke-WebRequest -Uri "$ffmpeg_url" -OutFile "$ffmpeg_name.zip"
+        Expand-Archive -Path "$ffmpeg_name.zip" -DestinationPath .
+        Rename-Item -Path "$ffmpeg_name" -NewName "ffmpeg"
 
     - name: Download and configure qwt
       run: |
@@ -579,22 +573,16 @@ jobs:
         version: ${{ matrix.qt_version }}
         modules: ${{ matrix.qt_modules }}
 
-    - name: Install wget & unzip
-      run: |
-        choco install wget unzip xidel
-
     - name: Install FFmpeg
-      shell: cmd
+      shell: pwsh
       run: |
-        cd ..
-        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "//a[contains(@href, '-gpl-shared.zip')]/@href[1]" --silent > ffmpeg.url
-        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "(//a[contains(@href, '-gpl-shared.zip')])[1]/substring(., 0, string-length(.) - 3)" --silent > ffmpeg.name
-        set /P FFMPEG_URL=< ffmpeg.url
-        set /P FFMPEG_NAME=< ffmpeg.name
-        wget https://github.com%FFMPEG_URL%
-        unzip %FFMPEG_NAME%.zip
-        ren %FFMPEG_NAME% ffmpeg
-        dir ffmpeg
+        Set-Location ..
+        $json = $(curl -L -H "Accept: application/vnd.github+json" https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/latest)
+        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-gpl-shared-6.1.zip")).name | sub("\\.zip$";"")')
+        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-gpl-shared-6.1.zip")).browser_download_url')
+        Invoke-WebRequest -Uri "$ffmpeg_url" -OutFile "$ffmpeg_name.zip"
+        Expand-Archive -Path "$ffmpeg_name.zip" -DestinationPath .
+        Rename-Item -Path "$ffmpeg_name" -NewName "ffmpeg"
 
     - name: Download and configure qwt
       run: |
@@ -668,22 +656,16 @@ jobs:
       with:
         version: ${{ matrix.qt_version }}
 
-    - name: Install wget & unzip
-      run: |
-        choco install wget unzip xidel
-
     - name: Install FFmpeg
-      shell: cmd
+      shell: pwsh
       run: |
-        cd ..
-        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "//a[contains(@href, '-gpl-shared.zip')]/@href[1]" --silent > ffmpeg.url
-        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "(//a[contains(@href, '-gpl-shared.zip')])[1]/substring(., 0, string-length(.) - 3)" --silent > ffmpeg.name
-        set /P FFMPEG_URL=< ffmpeg.url
-        set /P FFMPEG_NAME=< ffmpeg.name
-        wget https://github.com%FFMPEG_URL%
-        unzip %FFMPEG_NAME%.zip
-        ren %FFMPEG_NAME% ffmpeg
-        dir ffmpeg
+        Set-Location ..
+        $json = $(curl -L -H "Accept: application/vnd.github+json" https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/latest)
+        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-gpl-shared-6.1.zip")).name | sub("\\.zip$";"")')
+        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-gpl-shared-6.1.zip")).browser_download_url')
+        Invoke-WebRequest -Uri "$ffmpeg_url" -OutFile "$ffmpeg_name.zip"
+        Expand-Archive -Path "$ffmpeg_name.zip" -DestinationPath .
+        Rename-Item -Path "$ffmpeg_name" -NewName "ffmpeg"
 
     - name: Download and configure qwt
       run: |
@@ -761,22 +743,16 @@ jobs:
         version: ${{ matrix.qt_version }}
         modules: ${{ matrix.qt_modules }}
 
-    - name: Install wget & unzip
-      run: |
-        choco install wget unzip xidel
-
     - name: Install FFmpeg
-      shell: cmd
+      shell: pwsh
       run: |
-        cd ..
-        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "//a[contains(@href, '-gpl-shared.zip')]/@href[1]" --silent > ffmpeg.url
-        xidel https://github.com/BtbN/FFmpeg-Builds/releases -e "(//a[contains(@href, '-gpl-shared.zip')])[1]/substring(., 0, string-length(.) - 3)" --silent > ffmpeg.name
-        set /P FFMPEG_URL=< ffmpeg.url
-        set /P FFMPEG_NAME=< ffmpeg.name
-        wget https://github.com%FFMPEG_URL%
-        unzip %FFMPEG_NAME%.zip
-        ren %FFMPEG_NAME% ffmpeg
-        dir ffmpeg
+        Set-Location ..
+        $json = $(curl -L -H "Accept: application/vnd.github+json" https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/latest)
+        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-gpl-shared-6.1.zip")).name | sub("\\.zip$";"")')
+        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-gpl-shared-6.1.zip")).browser_download_url')
+        Invoke-WebRequest -Uri "$ffmpeg_url" -OutFile "$ffmpeg_name.zip"
+        Expand-Archive -Path "$ffmpeg_name.zip" -DestinationPath .
+        Rename-Item -Path "$ffmpeg_name" -NewName "ffmpeg"
 
     - name: Download and configure qwt
       run: |
