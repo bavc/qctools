@@ -44,7 +44,7 @@ jobs:
 
     - name: Set Qt5 environment path
       run: |
-        echo "/usr/local/opt/qt5/bin" >> $GITHUB_PATH
+        echo "/usr/local/opt/qt@5/bin" >> $GITHUB_PATH
 
     - name: Build QCTools
       env:
@@ -63,7 +63,7 @@ jobs:
         compiler: ['clang-9']
         include:
           - compiler: clang-9
-            packages: llvm@9
+            packages: llvm@13
             env: { 'CC': 'clang-9', 'CXX': 'clang++-9', 'HOMEBREW_NO_INSTALL_CLEANUP': '1', 'HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK': '1' }
           - qt_version: "6.3.0"
             qt_modules: "qtmultimedia"
@@ -150,7 +150,7 @@ jobs:
 
     - name: Set Qt5 environment path
       run: |
-        echo "/usr/local/opt/qt5/bin" >> $GITHUB_PATH
+        echo "/usr/local/opt/qt@5/bin" >> $GITHUB_PATH
 
     - name: Build qwt
       run: |
@@ -192,7 +192,7 @@ jobs:
         compiler: ['clang-9']
         include:
           - compiler: clang-9
-            packages: llvm@9
+            packages: llvm@13
             env: { 'CC': 'clang-9', 'CXX': 'clang++-9', 'HOMEBREW_NO_INSTALL_CLEANUP': '1', 'HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK': '1' }
           - qt_version: "6.3.0"
             qt_modules: "qtmultimedia"
