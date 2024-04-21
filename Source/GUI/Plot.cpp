@@ -509,17 +509,26 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
 
     for( unsigned j = 0; j < PerStreamType[m_type].PerGroup[m_group].Count; ++j )
     {
-        PlotCurve* curve = new PlotCurve( PerStreamType[m_type].PerItem[PerStreamType[m_type].PerGroup[m_group].Start + j].Name );
+        auto item = PerStreamType[m_type].PerItem[PerStreamType[m_type].PerGroup[m_group].Start + j];
+        PlotCurve* curve = new PlotCurve( item.Name );
+        QColor color = curveColor(j);
+        int thickness = 0;
+
         switch (m_group)
         {
             case Group_IDET_S :
             case Group_IDET_M :
             case Group_IDET_R :
-                curve->setPen( curveColor( j ), 2 );
+                thickness = 2;
                 break;
-            default :
-                curve->setPen( curveColor( j ) );
         }
+
+        if(item.color && *item.color)
+            color = QColor(item.color);
+        if(item.thickness > -1)
+            thickness = item.thickness;
+
+        curve->setPen(color, thickness);
         curve->setRenderHint( QwtPlotItem::RenderAntialiased );
         curve->setZ( curve->z() - j ); //Invert data order (e.g. MAX before MIN)
         curve->setIndex(j, PerStreamType[m_type].PerGroup[m_group].Count);

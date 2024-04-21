@@ -63,6 +63,8 @@ struct per_item
     const   double      DefaultLimit;
     const   double      DefaultLimit2;
     const   activefilter Filter;
+    const   char*       color;
+    const   int         thickness;
 };
 
 struct stream_info
