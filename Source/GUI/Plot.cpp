@@ -528,6 +528,7 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
         if(item.thickness > -1)
             thickness = item.thickness;
 
+        qDebug() << "setting color for " << PerStreamType[m_type].PerGroup[m_group].Name << "/" << item.Name << ": color = " << color << ", thickness = " << thickness;
         curve->setPen(color, thickness);
         curve->setRenderHint( QwtPlotItem::RenderAntialiased );
         curve->setZ( curve->z() - j ); //Invert data order (e.g. MAX before MIN)
