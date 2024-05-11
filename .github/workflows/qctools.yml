@@ -171,7 +171,7 @@ jobs:
 
     - name: Build qwt
       run: |
-        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        git clone --branch qwt-6.3 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
         cd ../qwt
         qmake -r
         make CC=$CC CXX=$CXX -j4
@@ -249,7 +249,7 @@ jobs:
 
     - name: Build qwt
       run: |
-        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        git clone --branch qwt-6.3 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
         cd ../qwt
         qmake -r
         make CC=$CC CXX=$CXX -j4
@@ -343,7 +343,7 @@ jobs:
 
     - name: Build qwt
       run: |
-        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        git clone --branch qwt-6.3 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
         cd ../qwt
         qmake -r
         make -j4
@@ -436,7 +436,7 @@ jobs:
 
     - name: Build qwt
       run: |
-        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        git clone --branch qwt-6.3 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
         cd ../qwt
         qmake -r
         make -j4
@@ -521,7 +521,7 @@ jobs:
 
     - name: Download and configure qwt
       run: |
-        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        git clone --branch qwt-6.3 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
         copy .github\workflows\qwtconfig.pri ..\qwt
         cd ../qwt
         qmake -r
@@ -603,7 +603,7 @@ jobs:
 
     - name: Download and configure qwt
       run: |
-        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        git clone --branch qwt-6.3 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
         copy .github\workflows\qwtconfig.pri ..\qwt
         cd ../qwt
         qmake -r
@@ -686,7 +686,7 @@ jobs:
 
     - name: Download and configure qwt
       run: |
-        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        git clone --branch qwt-6.3 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
         copy .github\workflows\qwtconfig.pri ..\qwt
         cd ../qwt
         qmake -r
@@ -773,7 +773,7 @@ jobs:
 
     - name: Download and configure qwt
       run: |
-        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        git clone --branch qwt-6.3 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
         copy .github\workflows\qwtconfig.pri ..\qwt
         cd ../qwt
         qmake -r
