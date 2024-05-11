@@ -437,6 +437,13 @@ class Plot : public QwtPlot
     Q_OBJECT
 
 public:
+    enum YMinMaxMode {
+        MinMaxOfThePlot,
+        Formula,
+        Custom
+    };
+    Q_ENUM(YMinMaxMode);
+
     explicit Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* fileInformation, QWidget *parent );
     virtual ~Plot();
 
@@ -472,6 +479,15 @@ public:
     void updateSymbols();
     bool isBarchart() const;
 
+    void setYAxisMinMaxMode(YMinMaxMode mode);
+    YMinMaxMode yAxisMinMaxMode() const;
+
+    void setYAxisCustomMinMax(double min, double max);
+    void getYAxisCustomMinMax(double& min, double& max);
+
+    bool hasMinMaxFormula() const;
+
+    const CommonStats* getStats() const;
 Q_SIGNALS:
     void cursorMoved(const QPointF& point, int index);
     void visibilityChanged(bool visible);
@@ -488,6 +504,9 @@ private:
     const QwtPlotCurve* curve( int index ) const;
     QColor curveColor( int index ) const;
 
+    YMinMaxMode             m_yminMaxMode { MinMaxOfThePlot };
+    double                  m_customYMin { 0.0 };
+    double                  m_customYMax { 0.0 };
     QJSValue                m_maxValue;
     QJSValue                m_minValue;
     QJSEngine               m_engine;

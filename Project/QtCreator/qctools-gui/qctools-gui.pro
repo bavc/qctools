@@ -75,7 +75,8 @@ HEADERS += \
     $$SOURCES_PATH/GUI/filterselector.h \
     $$SOURCES_PATH/GUI/playercontrol.h \
     $$SOURCES_PATH/GUI/panelsview.h \
-    $$SOURCES_PATH/GUI/plotschooser.h
+    $$SOURCES_PATH/GUI/plotschooser.h \
+    $$SOURCES_PATH/GUI/yminmaxselector.h
 
 SOURCES += \
     $$SOURCES_PATH/GUI/FilesList.cpp \
@@ -108,7 +109,8 @@ SOURCES += \
     $$SOURCES_PATH/GUI/filterselector.cpp \
     $$SOURCES_PATH/GUI/playercontrol.cpp \
     $$SOURCES_PATH/GUI/panelsview.cpp \
-    $$SOURCES_PATH/GUI/plotschooser.cpp
+    $$SOURCES_PATH/GUI/plotschooser.cpp \
+    $$SOURCES_PATH/GUI/yminmaxselector.cpp
 
 include(../zlib.pri)
 
@@ -121,7 +123,8 @@ FORMS += \
     $$SOURCES_PATH/GUI/barchartconditioninput.ui \
     $$SOURCES_PATH/GUI/managebarchartconditions.ui \
     $$SOURCES_PATH/GUI/playercontrol.ui \
-    $$SOURCES_PATH/GUI/plotschooser.ui
+    $$SOURCES_PATH/GUI/plotschooser.ui \
+    $$SOURCES_PATH/GUI/yminmaxselector.ui \
 
 RESOURCES += \
     $$SOURCES_PATH/Resource/Resources.qrc
