@@ -27,6 +27,8 @@
 #include <qwt_clipper.h>
 
 #include "Core/FileInformation.h"
+#include <QMetaEnum>
+#include <QSettings>
 #include <cassert>
 #include <optional>
 
@@ -438,30 +440,34 @@ void Plot::initYAxis()
     }
     else
     {
+        auto yMin = 0.0;
+        auto yMax = 0.0;
         const size_t plotType = type();
         const size_t plotGroup = group();
 
         CommonStats* stat = stats( streamPos() );
         const struct per_group& group = PerStreamType[plotType].PerGroup[plotGroup];
 
-        auto yMin = 0.0;
-        if(m_minValue.isNull() || m_minValue.isError() || m_minValue.isUndefined()) {
-            yMin = stat->y_Min[plotGroup]; // auto-select min
-        } else {
+        if(m_yminMaxMode == Formula)
+        {
             if(m_minValue.isNumber())
                 yMin = m_minValue.toNumber();
             else if(m_minValue.isCallable())
                 yMin = m_minValue.call().toNumber();
-        }
 
-        auto yMax = 0.0;
-        if(m_maxValue.isNull() || m_maxValue.isError() || m_maxValue.isUndefined()) {
-            yMax = stat->y_Max[plotGroup]; // auto-select min
-        } else {
             if(m_maxValue.isNumber())
                 yMax = m_maxValue.toNumber();
             else if(m_maxValue.isCallable())
                 yMax = m_maxValue.call().toNumber();
+        }
+        else if(m_yminMaxMode == MinMaxOfThePlot)
+        {
+            yMin = stat->y_Min[plotGroup]; // auto-select min
+            yMax = stat->y_Max[plotGroup]; // auto-select max
+        } else if(m_yminMaxMode == Custom)
+        {
+            yMin = m_customYMin;
+            yMax = m_customYMax;
         }
 
         setYAxis( yMin, yMax, group.StepsCount );
@@ -518,6 +524,47 @@ void Plot::updateSymbols()
 bool Plot::isBarchart() const
 {
     return m_barchart;
+}
+
+void Plot::setYAxisMinMaxMode(YMinMaxMode mode)
+{
+    m_yminMaxMode = mode;
+    initYAxis();
+}
+
+Plot::YMinMaxMode Plot::yAxisMinMaxMode() const
+{
+    return m_yminMaxMode;
+}
+
+void Plot::setYAxisCustomMinMax(double min, double max)
+{
+    m_customYMin = min;
+    m_customYMax = max;
+}
+
+void Plot::getYAxisCustomMinMax(double &min, double &max)
+{
+    min = m_customYMin;
+    max = m_customYMax;
+}
+
+bool Plot::hasMinMaxFormula() const
+{
+    if(m_minValue.isNull() || m_minValue.isError() || m_minValue.isUndefined()) {
+        return false;
+    }
+
+    if(m_maxValue.isNull() || m_maxValue.isError() || m_maxValue.isUndefined()) {
+        return false;
+    }
+
+    return true;
+}
+
+const CommonStats *Plot::getStats() const
+{
+    return stats( streamPos() );
 }
 
 void Plot::setBarchart(bool value)
@@ -751,6 +798,28 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
 #else
     panner->setMouseButton( Qt::MiddleButton );
 #endif // QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+
+    QSettings settings;
+    settings.beginGroup("yminmax");
+
+    QMetaEnum metaEnum = QMetaEnum::fromType<Plot::YMinMaxMode>();
+    QString value = settings.value(QString::number(m_group)).toString();
+    if(!value.isEmpty()) {
+        auto splitted = value.split(";");
+        auto yMinMaxMode = (Plot::YMinMaxMode) metaEnum.keyToValue(splitted[0].toLatin1().constData());
+
+        if(yMinMaxMode == Plot::Custom) {
+            auto min = splitted[1].toDouble();
+            auto max = splitted[2].toDouble();
+
+            setYAxisCustomMinMax(min, max);
+        }
+
+        setYAxisMinMaxMode(yMinMaxMode);
+    }
+
+    settings.endGroup();
+
 }
 
 //---------------------------------------------------------------------------
