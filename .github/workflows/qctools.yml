@@ -35,16 +35,20 @@ jobs:
 
     - name: Install dependencies
       run: |
-        brew install ${{ matrix.packages }} pkg-config ffmpeg
+        brew install ${{ matrix.packages }} pkg-config ffmpeg@6 qt@5
 
     - name: Install qwt-qt5
       run: |
         wget https://raw.githubusercontent.com/Homebrew/homebrew-core/56cd02e96876d1fb5b9ae951d605585fe8d614de/Formula/qwt.rb
-        brew install ./qwt.rb
+        brew install --ignore-dependencies ./qwt.rb
 
     - name: Set Qt5 environment path
       run: |
-        echo "/usr/local/opt/qt@5/bin" >> $GITHUB_PATH
+        echo `brew --prefix qt@5`/bin >> $GITHUB_PATH
+
+    - name: Check Qt install
+      run: |
+        qmake -v
 
     - name: Build QCTools
       env:
@@ -53,6 +57,7 @@ jobs:
         cd Project/QtCreator
         mkdir build
         cd build
+        export PKG_CONFIG_PATH="/opt/homebrew/opt/ffmpeg@6/lib/pkgconfig"
         qmake ..
         make CC=$CC CXX=$CXX -j4
 
@@ -64,9 +69,7 @@ jobs:
         include:
           - compiler: clang-9
             packages: llvm@13
-            env: { 'CC': 'clang-9', 'CXX': 'clang++-9', 'HOMEBREW_NO_INSTALL_CLEANUP': '1', 'HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK': '1' }
-          - qt_version: "6.3.0"
-            qt_modules: "qtmultimedia"
+            env: { 'CC': 'clang', 'CXX': 'clang++', 'HOMEBREW_NO_INSTALL_CLEANUP': '1', 'HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK': '1' }
 
     runs-on: macos-latest
 
@@ -89,13 +92,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        brew install ${{ matrix.packages }} pkg-config ffmpeg
-
-    - name: Install Qt6
-      uses: jurplel/install-qt-action@v3
-      with:
-        version: ${{ matrix.qt_version }}
-        modules: ${{ matrix.qt_modules }}
+        brew install ${{ matrix.packages }} pkg-config ffmpeg@6 qt
 
     - name: Install qwt
       run: |
@@ -103,7 +100,11 @@ jobs:
 
     - name: Set Qt6 environment path
       run: |
-        echo "/usr/local/opt/qt6/bin" >> $GITHUB_PATH
+        echo `brew --prefix qt`/bin >> $GITHUB_PATH
+
+    - name: Check Qt install
+      run: |
+        qmake -v
 
     - name: Build QCTools
       env:
@@ -112,6 +113,7 @@ jobs:
         cd Project/QtCreator
         mkdir build
         cd build
+        export PKG_CONFIG_PATH="/opt/homebrew/opt/ffmpeg@6/lib/pkgconfig"
         qmake ..
         make -j4
 
@@ -124,6 +126,7 @@ jobs:
           - compiler: clang-9
             packages: llvm@13
             env: { 'CC': 'clang', 'CXX': 'clang++' }
+          - qt_version: "5.15.*"
 
     runs-on: macos-latest
 
@@ -146,18 +149,32 @@ jobs:
 
     - name: Install dependencies
       run: |
-        brew install ${{ matrix.packages }} nasm qt@5
+        brew install ${{ matrix.packages }} nasm
+
+    - name: Install Qt5
+      run: |
+        brew install qt@5
 
     - name: Set Qt5 environment path
       run: |
-        echo "/usr/local/opt/qt@5/bin" >> $GITHUB_PATH
+        echo `brew --prefix qt@5`/bin >> $GITHUB_PATH
+
+#    - name: Install Qt5
+#      uses: jurplel/install-qt-action@v3
+#      with:
+#        version: ${{ matrix.qt_version }}
+#        modules: ${{ matrix.qt_modules }}
+
+    - name: Check Qt install
+      run: |
+        qmake -v
 
     - name: Build qwt
       run: |
-        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        git clone --branch qwt-6.3 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
         cd ../qwt
         qmake -r
-        make -j4
+        make CC=$CC CXX=$CXX -j4
 
     - name: Build FFmpeg
       run: |
@@ -173,7 +190,7 @@ jobs:
                     --disable-ffplay \
                     --disable-ffprobe \
                     --disable-debug
-        make -j12
+        make CC=$CC CXX=$CXX -j12
 
     - name: Build QCTools
       env:
@@ -193,8 +210,8 @@ jobs:
         include:
           - compiler: clang-9
             packages: llvm@13
-            env: { 'CC': 'clang-9', 'CXX': 'clang++-9', 'HOMEBREW_NO_INSTALL_CLEANUP': '1', 'HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK': '1' }
-          - qt_version: "6.3.0"
+            env: { 'CC': 'clang', 'CXX': 'clang++', 'HOMEBREW_NO_INSTALL_CLEANUP': '1', 'HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK': '1' }
+          - qt_version: "6.5.*"
             qt_modules: "qtmultimedia"
 
     runs-on: macos-latest
@@ -226,16 +243,16 @@ jobs:
         version: ${{ matrix.qt_version }}
         modules: ${{ matrix.qt_modules }}
 
-    - name: Set Qt6 environment path
+    - name: Check Qt install
       run: |
-        echo "/usr/local/opt/qt6/bin" >> $GITHUB_PATH
+        qmake -v
 
     - name: Build qwt
       run: |
-        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        git clone --branch qwt-6.3 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
         cd ../qwt
         qmake -r
-        make -j4
+        make CC=$CC CXX=$CXX -j4
 
     - name: Build FFmpeg
       run: |
@@ -251,7 +268,7 @@ jobs:
                     --disable-ffplay \
                     --disable-ffprobe \
                     --disable-debug
-        make -j12
+        make CC=$CC CXX=$CXX -j12
 
     - name: Build QCTools
       env:
@@ -261,7 +278,7 @@ jobs:
         mkdir build
         cd build
         qmake .. 
-        make -j4
+        make CC=$CC CXX=$CXX -j4
 
   build-linux:
 
@@ -272,7 +289,7 @@ jobs:
           - compiler: gcc-9
             packages: gcc-9 g++-9
             env: { 'CC': 'gcc-9', 'CXX': 'g++-9' }
-          - qt_version: "5.15.2"
+          - qt_version: "5.15.*"
             qt_packages: "libxkbcommon-dev libgstreamer-plugins-base1.0-0 libgstreamer-gl1.0-0"
 
     runs-on: ubuntu-latest
@@ -326,7 +343,7 @@ jobs:
 
     - name: Build qwt
       run: |
-        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        git clone --branch qwt-6.3 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
         cd ../qwt
         qmake -r
         make -j4
@@ -364,7 +381,7 @@ jobs:
           - compiler: gcc-9
             packages: gcc-9 g++-9
             env: { 'CC': 'gcc-9', 'CXX': 'g++-9' }
-          - qt_version: "6.5.0"
+          - qt_version: "6.5.*"
             qt_modules: "qtmultimedia qt5compat"
             qt_packages: "libxkbcommon-dev libgstreamer-plugins-base1.0-0 libgstreamer-gl1.0-0"
 
@@ -419,7 +436,7 @@ jobs:
 
     - name: Build qwt
       run: |
-        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        git clone --branch qwt-6.3 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
         cd ../qwt
         qmake -r
         make -j4
@@ -452,7 +469,7 @@ jobs:
 
     strategy:
       matrix:
-        qt_version: ["5.15.2"]
+        qt_version: ["5.15.*"]
 
     runs-on: windows-latest
 
@@ -504,7 +521,7 @@ jobs:
 
     - name: Download and configure qwt
       run: |
-        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        git clone --branch qwt-6.3 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
         copy .github\workflows\qwtconfig.pri ..\qwt
         cd ../qwt
         qmake -r
@@ -586,7 +603,7 @@ jobs:
 
     - name: Download and configure qwt
       run: |
-        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        git clone --branch qwt-6.3 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
         copy .github\workflows\qwtconfig.pri ..\qwt
         cd ../qwt
         qmake -r
@@ -613,7 +630,7 @@ jobs:
 
     strategy:
       matrix:
-        qt_version: ["5.15.2"]
+        qt_version: ["5.15.*"]
 
     runs-on: windows-latest
 
@@ -669,7 +686,7 @@ jobs:
 
     - name: Download and configure qwt
       run: |
-        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        git clone --branch qwt-6.3 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
         copy .github\workflows\qwtconfig.pri ..\qwt
         cd ../qwt
         qmake -r
@@ -756,7 +773,7 @@ jobs:
 
     - name: Download and configure qwt
       run: |
-        git clone --branch qwt-6.2 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
+        git clone --branch qwt-6.3 --depth 1 https://git.code.sf.net/p/qwt/git ../qwt
         copy .github\workflows\qwtconfig.pri ..\qwt
         cd ../qwt
         qmake -r
