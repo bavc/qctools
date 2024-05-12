@@ -271,11 +271,11 @@ struct per_group VideoPerGroup [Group_VideoMax]=
 const struct per_item VideoPerItem [Item_VideoMax]=
 {
     //Y
-    { Group_Y,       Group_VideoMax,       "Y MIN",         "lavfi.signalstats.YMIN",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "gray", 1 },
-    { Group_Y,       Group_VideoMax,       "Y LOW",         "lavfi.signalstats.YLOW",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "green", 2 },
-    { Group_Y,       Group_VideoMax,       "Y AVG",         "lavfi.signalstats.YAVG",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "yellow", 3 },
-    { Group_Y,       Group_VideoMax,       "Y HIGH",        "lavfi.signalstats.YHIGH",   0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, nullptr, -1 },
-    { Group_Y,       Group_VideoMax,       "Y MAX",         "lavfi.signalstats.YMAX",    0,   true,   DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, nullptr, -1 },
+    { Group_Y,       Group_VideoMax,       "Y MIN",         "lavfi.signalstats.YMIN",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "gray", 1, }, // "Y LOW;green;0.5" },
+    { Group_Y,       Group_VideoMax,       "Y LOW",         "lavfi.signalstats.YLOW",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "green", 2, }, // "Y LOW;transparent;0.5" },
+    { Group_Y,       Group_VideoMax,       "Y AVG",         "lavfi.signalstats.YAVG",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "yellow", 3, }, // "Y LOW;red;0.5" },
+    { Group_Y,       Group_VideoMax,       "Y HIGH",        "lavfi.signalstats.YHIGH",   0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, nullptr, -1, "Y AVG;yellow;0.8" },
+    { Group_Y,       Group_VideoMax,       "Y MAX",         "lavfi.signalstats.YMAX",    0,   true,   DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, nullptr, -1, "Y HIGH;green;0.5" },
     //U
     { Group_U,       Group_VideoMax,       "U MIN",         "lavfi.signalstats.UMIN",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, nullptr, -1 },
     { Group_U,       Group_VideoMax,       "U LOW",         "lavfi.signalstats.ULOW",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, nullptr, -1 },

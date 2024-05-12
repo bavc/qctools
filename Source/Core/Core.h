@@ -65,6 +65,7 @@ struct per_item
     const   activefilter Filter;
     const   char*       color;
     const   int         thickness;
+    const   char*       fillInfo { nullptr };
 };
 
 struct stream_info
