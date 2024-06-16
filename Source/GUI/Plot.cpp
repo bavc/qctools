@@ -251,8 +251,12 @@ public:
         m_count = count;
     }
 
-    void setClipCurve(QwtPlotCurve* curve) {
-        m_clipCurve = curve;
+    void setFillCurve(QwtPlotCurve* curve) {
+        m_fillCurve = curve;
+    }
+
+    void setFillBaseLine(float value) {
+        m_fillBaseline = value;
     }
 
     void setFillBrush(QBrush brush) {
@@ -263,7 +267,7 @@ protected:
     virtual void drawCurve( QPainter* painter , int style, const QwtScaleMap& xMap, const QwtScaleMap& yMap, const QRectF& canvasRect, int from, int to ) const {
         QwtPlotCurve::drawCurve(painter, style, xMap, yMap, canvasRect, from, to);
 
-        if(m_clipCurve && !symbol())
+        if((m_fillBaseline || m_fillCurve) && !symbol())
         {
             auto brush = m_fillBrush;
 
@@ -288,7 +292,13 @@ protected:
 
             mapper.setBoundingRect( canvasRect );
             QPolygonF polygon = mapper.toPolygonF( xMap, yMap, data(), from, to);
-            QPolygonF baselinePolygon = mapper.toPolygonF( xMap, yMap, m_clipCurve->data(), from, to);
+            QPolygonF baselinePolygon;
+            if(m_fillCurve)
+                baselinePolygon = mapper.toPolygonF( xMap, yMap, m_fillCurve->data(), from, to);
+            else if(m_fillBaseline) {
+                baselinePolygon += QPointF(xMap.transform(qreal(from)), yMap.transform(m_fillBaseline.value()));
+                baselinePolygon += QPointF(xMap.transform(qreal(to)), yMap.transform(m_fillBaseline.value()));
+            }
 
             for(auto it = baselinePolygon.rbegin(); it != baselinePolygon.rend(); ++it) {
                 polygon += *it;
@@ -362,7 +372,8 @@ private:
     int m_index;
     int m_count;
     QBrush m_fillBrush;
-    QwtPlotCurve* m_clipCurve { nullptr };
+    QwtPlotCurve* m_fillCurve { nullptr };
+    std::optional<float> m_fillBaseline;
 };
 
 //***************************************************************************
@@ -630,9 +641,13 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
             auto curve = curvesByName[item.Name];
             curve->setFillBrush(QBrush(color));
 
-            auto fillCurve = curvesByName[curveName];
-
-            curve->setClipCurve(fillCurve);
+            if(curvesByName.contains(curveName)) {
+                auto fillCurve = curvesByName[curveName];
+                curve->setFillCurve(fillCurve);
+            } else {
+                auto fillValue = curveName.toFloat();
+                curve->setFillBaseLine(fillValue);
+            }
         }
     }
 
