@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>550</width>
     <height>192</height>
    </rect>
   </property>
@@ -20,13 +20,13 @@
    <item row="0" column="0" colspan="3">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Select y-axis min/max</string>
+      <string>Set the y-axis range</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
        <widget class="QRadioButton" name="minMaxOfThePlot_radioButton">
         <property name="text">
-         <string>min/max value of the plot</string>
+         <string>Fit to the plotted data</string>
         </property>
         <property name="checked">
          <bool>true</bool>
@@ -36,7 +36,7 @@
       <item row="1" column="0">
        <widget class="QRadioButton" name="minMaxSystemProvided_radioButton">
         <property name="text">
-         <string>system provided min/max</string>
+         <string>Full Range</string>
         </property>
         <property name="checked">
          <bool>false</bool>
@@ -48,7 +48,7 @@
         <item>
          <widget class="QRadioButton" name="customMinMax_radioButton">
           <property name="text">
-           <string>custom</string>
+           <string>Custom</string>
           </property>
          </widget>
         </item>
