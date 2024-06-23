@@ -51,6 +51,7 @@ PlotLegend::~PlotLegend()
 QWidget *PlotLegend::createWidget( const QwtLegendData &data ) const
 {
     QWidget *w = QwtLegend::createWidget( data );
+    w->setMaximumHeight(10);
 
     QwtLegendLabel *label = dynamic_cast<QwtLegendLabel *>( w );
     if ( label )
