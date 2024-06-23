@@ -4,6 +4,7 @@
 
 #include <QMetaEnum>
 #include <QSettings>
+#include <QLineEdit>
 
 YMinMaxSelector::YMinMaxSelector(QWidget *parent)
     : QWidget(parent)
@@ -12,6 +13,10 @@ YMinMaxSelector::YMinMaxSelector(QWidget *parent)
     ui->setupUi(this);
 
     connect(ui->customMinMax_radioButton, &QRadioButton::toggled, this, &YMinMaxSelector::enableCustomMinMax);
+
+    m_palette = ui->min_doubleSpinBox->palette();
+    m_redPalette = ui->min_doubleSpinBox->palette();
+    m_redPalette.setColor(QPalette::Base, QColor("red"));
 }
 
 YMinMaxSelector::~YMinMaxSelector()
@@ -75,6 +80,9 @@ void YMinMaxSelector::setPlot(Plot *plot)
         ui->min_doubleSpinBox->setValue(yMin);
         ui->max_doubleSpinBox->setValue(yMax);
     }
+
+    updateApplyButton();
+    updateMinMaxStyling();
 }
 
 Plot *YMinMaxSelector::getPlot() const
@@ -114,5 +122,74 @@ void YMinMaxSelector::on_apply_pushButton_clicked()
     settings.endGroup();
 
     m_plot->replot();
+    hide();
+}
+
+
+void YMinMaxSelector::on_min_doubleSpinBox_valueChanged(double arg1)
+{
+    Q_UNUSED(arg1)
+    updateApplyButton();
+    updateMinMaxStyling();
+}
+
+
+void YMinMaxSelector::on_max_doubleSpinBox_valueChanged(double arg1)
+{
+    Q_UNUSED(arg1)
+    updateApplyButton();
+    updateMinMaxStyling();
+}
+
+void YMinMaxSelector::updateApplyButton()
+{
+    bool minBiggerThanMax = ui->min_doubleSpinBox->value() > ui->max_doubleSpinBox->value();
+    bool customSelected = ui->customMinMax_radioButton->isChecked();
+
+    if(customSelected)
+        ui->apply_pushButton->setEnabled(!minBiggerThanMax);
+    else
+        ui->apply_pushButton->setEnabled(true);
+}
+
+void YMinMaxSelector::updateMinMaxStyling()
+{
+    bool minBiggerThanMax = ui->min_doubleSpinBox->value() > ui->max_doubleSpinBox->value();
+    bool customSelected = ui->customMinMax_radioButton->isChecked();
+
+    auto minControl = ui->min_doubleSpinBox;
+    auto maxControl = ui->max_doubleSpinBox;
+
+    QPalette palette = m_palette;
+    if(customSelected)
+    {
+        if(minBiggerThanMax) {
+            palette = m_redPalette;
+        }
+    }
+
+    minControl->setPalette(palette);
+    maxControl->setPalette(palette);
+}
+
+
+void YMinMaxSelector::on_minMaxOfThePlot_radioButton_clicked()
+{
+    updateApplyButton();
+    updateMinMaxStyling();
+}
+
+
+void YMinMaxSelector::on_minMaxSystemProvided_radioButton_clicked()
+{
+    updateApplyButton();
+    updateMinMaxStyling();
+}
+
+
+void YMinMaxSelector::on_customMinMax_radioButton_clicked()
+{
+    updateApplyButton();
+    updateMinMaxStyling();
 }
 

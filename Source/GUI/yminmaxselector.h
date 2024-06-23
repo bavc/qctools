@@ -27,9 +27,19 @@ public:
 private Q_SLOTS:
     void enableCustomMinMax(bool value);
     void on_apply_pushButton_clicked();
+    void on_min_doubleSpinBox_valueChanged(double arg1);
+    void on_max_doubleSpinBox_valueChanged(double arg1);
+    void on_minMaxOfThePlot_radioButton_clicked();
+    void on_minMaxSystemProvided_radioButton_clicked();
+    void on_customMinMax_radioButton_clicked();
 
 private:
+    void updateApplyButton();
+    void updateMinMaxStyling();
+
     Plot* m_plot { nullptr };
+    QPalette m_palette;
+    QPalette m_redPalette;
     Ui::YMinMaxSelector *ui;
 };
 
