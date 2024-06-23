@@ -22,6 +22,8 @@ class QwtPlot;
 class Plot;
 class PlotScaleWidget;
 class PlayerControl;
+class YMinMaxSelector;
+class QToolButton;
 
 void showEditFrameCommentsDialog(QWidget* parentWidget, FileInformation* info, CommonStats* stats, size_t frameIndex);
 
@@ -116,6 +118,7 @@ public:
     void                        loadBarchartsProfile(const QJsonObject& profile);
 
     void showEditBarchartProfileDialog(const size_t plotGroup, Plot* plot, const stream_info& streamInfo);
+    void showYMinMaxConfigDialog(const size_t plotGroup, Plot* plot, const stream_info& streamInfo, QToolButton* button);
 
 Q_SIGNALS:
     void visibleFramesChanged(int from, int to);
@@ -146,6 +149,7 @@ private:
     void                        setFramePos( size_t framePos, size_t statsPos = (size_t)-1 ) const { m_fileInfoData->Frames_Pos_Set(framePos, statsPos); }
 
 private:
+    YMinMaxSelector*            m_yMinMaxSelector;
     PlotScaleWidget*            m_scaleWidget;
     CommentsPlot*               m_commentsPlot;
     std::vector<PanelsView*>    m_PanelsViews;
