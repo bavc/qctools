@@ -296,6 +296,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                     });
 
                     QToolButton* yMinMaxConfigButton = new QToolButton();
+                    yMinMaxConfigButton->setIcon(QIcon(":/icon/signalserver_upload.png"));
                     connect(plot, SIGNAL(visibilityChanged(bool)), yMinMaxConfigButton, SLOT(setVisible(bool)));
                     connect(yMinMaxConfigButton, &QToolButton::clicked, [=]() {
                         showYMinMaxConfigDialog(plotGroup, plot, streamInfo, yMinMaxConfigButton);
