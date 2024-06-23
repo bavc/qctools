@@ -529,6 +529,20 @@ bool Plot::isBarchart() const
 void Plot::setYAxisMinMaxMode(YMinMaxMode mode)
 {
     m_yminMaxMode = mode;
+    QColor color;
+    switch(m_yminMaxMode) {
+    case MinMaxOfThePlot:
+        color = "darkblue";
+        break;
+    case Formula:
+        color = "black";
+        break;
+    case Custom:
+        color = QColor(85, 0, 127);
+        break;
+    }
+
+    setYAxisColor(color);
     initYAxis();
 }
 
@@ -858,6 +872,15 @@ QSize Plot::minimumSizeHint() const
 {
     const QSize hint = QwtPlot::minimumSizeHint();
     return QSize( hint.width(), -1 );
+}
+
+void Plot::setYAxisColor(QColor color)
+{
+    auto yAxis = axisWidget(QwtPlot::yLeft);
+    QPalette palette = yAxis->palette();
+    palette.setColor(QPalette::WindowText, color);	// for ticks
+    palette.setColor(QPalette::Text, color); // for ticks' labels
+    yAxis->setPalette(palette);
 }
 
 const QwtPlotCurve* Plot::curve( int index ) const
