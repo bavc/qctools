@@ -453,6 +453,7 @@ public:
     virtual QSize sizeHint() const;
     virtual QSize minimumSizeHint() const;
 
+    void setYAxisColor(QColor color);
     void setYAxis( double min, double max, int numSteps );
     void setCursorPos( double x );
 
