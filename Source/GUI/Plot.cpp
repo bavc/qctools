@@ -28,6 +28,7 @@
 
 #include "Core/FileInformation.h"
 #include <cassert>
+#include <optional>
 
 static double stepSize( double distance, int numSteps )
 {
