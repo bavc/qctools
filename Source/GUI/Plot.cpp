@@ -297,8 +297,12 @@ protected:
             if(m_fillCurve)
                 baselinePolygon = mapper.toPolygonF( xMap, yMap, m_fillCurve->data(), from, to);
             else if(m_fillBaseline) {
-                baselinePolygon += QPointF(xMap.transform(qreal(from)), yMap.transform(m_fillBaseline.value()));
-                baselinePolygon += QPointF(xMap.transform(qreal(to)), yMap.transform(m_fillBaseline.value()));
+                const PlotSeriesData* plotSeriesData = static_cast<const PlotSeriesData*>(data());
+                auto fromSample = plotSeriesData->sample(from);
+                auto toSample = plotSeriesData->sample(to);
+
+                baselinePolygon += QPointF(xMap.transform(qreal(fromSample.x())), yMap.transform(m_fillBaseline.value()));
+                baselinePolygon += QPointF(xMap.transform(qreal(toSample.x())), yMap.transform(m_fillBaseline.value()));
             }
 
             for(auto it = baselinePolygon.rbegin(); it != baselinePolygon.rend(); ++it) {
