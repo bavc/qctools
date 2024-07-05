@@ -7,7 +7,9 @@
 //---------------------------------------------------------------------------
 
 #include "GUI/PlotLegend.h"
+#include <qwt_graphic.h>
 #include <qwt_legend_label.h>
+#include <qwt_dyngrid_layout.h>
 #include <QScrollArea>
 #include <QLayout>
 
@@ -23,9 +25,10 @@ PlotLegend::PlotLegend( QWidget *parent ):
     setMaxColumns( 1 );
     setContentsMargins( 0, 0, 0, 0 );
 
-    QLayout* layout = contentsWidget()->layout();
+    QwtDynGridLayout* layout = qobject_cast<QwtDynGridLayout*> (contentsWidget()->layout());
     layout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
-    layout->setSpacing( 0 );
+    layout->setSpacing(0);
+    layout->setExpandingDirections(Qt::Horizontal);
 
     QScrollArea *scrollArea = findChild<QScrollArea *>();
     if ( scrollArea )
@@ -51,11 +54,15 @@ PlotLegend::~PlotLegend()
 QWidget *PlotLegend::createWidget( const QwtLegendData &data ) const
 {
     QWidget *w = QwtLegend::createWidget( data );
+    auto icon = data.icon();
+    if(!icon.isNull())
+        w->setMaximumHeight(10);
 
     QwtLegendLabel *label = dynamic_cast<QwtLegendLabel *>( w );
     if ( label )
     {
         label->setMargin( 0 );
+        label->setContentsMargins(0, 0, 0, 0);
     }
 
     return w;

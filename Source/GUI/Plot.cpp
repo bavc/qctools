@@ -24,9 +24,11 @@
 #include <qwt_point_mapper.h>
 #include <qwt_painter.h>
 #include <qwt_symbol.h>
+#include <qwt_clipper.h>
 
 #include "Core/FileInformation.h"
 #include <cassert>
+#include <optional>
 
 static double stepSize( double distance, int numSteps )
 {
@@ -250,7 +252,94 @@ public:
         m_count = count;
     }
 
+    void setFillCurve(QwtPlotCurve* curve) {
+        m_fillCurve = curve;
+    }
+
+    void setFillBaseLine(float value) {
+        m_fillBaseline = value;
+    }
+
+    void setFillBrush(QBrush brush) {
+        m_fillBrush = brush;
+    }
+
 protected:
+    virtual void drawCurve( QPainter* painter , int style, const QwtScaleMap& xMap, const QwtScaleMap& yMap, const QRectF& canvasRect, int from, int to ) const {
+        QwtPlotCurve::drawCurve(painter, style, xMap, yMap, canvasRect, from, to);
+
+        if((m_fillBaseline || m_fillCurve) && !symbol())
+        {
+            auto brush = m_fillBrush;
+
+            if ( brush.style() == Qt::NoBrush )
+                return;
+
+            const bool doFit = ( testCurveAttribute( Fitted ) && curveFitter() );
+            const bool doAlign = !doFit && QwtPainter::roundingAlignment( painter );
+
+            QwtPointMapper mapper;
+
+            if ( doAlign )
+            {
+                mapper.setFlag( QwtPointMapper::RoundPoints, true );
+                mapper.setFlag( QwtPointMapper::WeedOutIntermediatePoints,
+                               testPaintAttribute( FilterPointsAggressive ) );
+            }
+
+            mapper.setFlag( QwtPointMapper::WeedOutPoints,
+                           testPaintAttribute( FilterPoints ) ||
+                               testPaintAttribute( FilterPointsAggressive ) );
+
+            mapper.setBoundingRect( canvasRect );
+            QPolygonF polygon = mapper.toPolygonF( xMap, yMap, data(), from, to);
+            QPolygonF baselinePolygon;
+            if(m_fillCurve)
+                baselinePolygon = mapper.toPolygonF( xMap, yMap, m_fillCurve->data(), from, to);
+            else if(m_fillBaseline) {
+                const PlotSeriesData* plotSeriesData = static_cast<const PlotSeriesData*>(data());
+                auto fromSample = plotSeriesData->sample(from);
+                auto toSample = plotSeriesData->sample(to);
+
+                baselinePolygon += QPointF(xMap.transform(qreal(fromSample.x())), yMap.transform(m_fillBaseline.value()));
+                baselinePolygon += QPointF(xMap.transform(qreal(toSample.x())), yMap.transform(m_fillBaseline.value()));
+            }
+
+            for(auto it = baselinePolygon.rbegin(); it != baselinePolygon.rend(); ++it) {
+                polygon += *it;
+            }
+
+            if ( polygon.count() <= 2 ) // a line can't be filled
+                return;
+
+            if ( !brush.color().isValid() )
+                brush.setColor( this->pen().color() );
+
+            if ( testPaintAttribute(ClipPolygons) )
+            {
+                const QRectF clipRect = qwtIntersectedClipRect( canvasRect, painter );
+                QwtClipper::clipPolygonF( clipRect, polygon, true );
+            }
+
+            painter->save();
+
+            painter->setPen( Qt::NoPen );
+            painter->setBrush( brush );
+
+            QwtPainter::drawPolygon( painter, polygon );
+
+            painter->restore();
+        }
+    }
+
+    virtual void fillCurve( QPainter *painter, const QwtScaleMap& xMap, const QwtScaleMap& yMap, const QRectF& canvasRect, QPolygonF& polygon) const {
+        QwtPlotCurve::fillCurve(painter, xMap, yMap, canvasRect, polygon);
+    }
+
+    virtual void drawLines(QPainter* p, const QwtScaleMap& xMap, const QwtScaleMap& yMap, const QRectF& canvasRect, int from, int to) const {
+        QwtPlotCurve::drawLines(p, xMap, yMap, canvasRect, from, to);
+    }
+
     void drawSymbols(QPainter *p, const QwtSymbol &s, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to) const {
 
         QwtPointMapper mapper;
@@ -287,6 +376,9 @@ protected:
 private:
     int m_index;
     int m_count;
+    QBrush m_fillBrush;
+    QwtPlotCurve* m_fillCurve { nullptr };
+    std::optional<float> m_fillBaseline;
 };
 
 //***************************************************************************
@@ -506,6 +598,7 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
 
     // curves
     m_curves.reserve(PerStreamType[m_type].PerGroup[m_group].Count);
+    QMap<QString, PlotCurve*> curvesByName;
 
     for( unsigned j = 0; j < PerStreamType[m_type].PerGroup[m_group].Count; ++j )
     {
@@ -536,6 +629,31 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
         curve->attach( this );
 
         m_curves += curve;
+
+        curvesByName[item.Name] = curve;
+    }
+
+    for( unsigned j = 0; j < PerStreamType[m_type].PerGroup[m_group].Count; ++j )
+    {
+        auto item = PerStreamType[m_type].PerItem[PerStreamType[m_type].PerGroup[m_group].Start + j];
+        if(item.fillInfo) {
+            auto splitted = QString(item.fillInfo).split(";");
+            auto curveName = splitted[0];
+            auto color = QColor(splitted[1]);
+            auto alpha = QString(splitted[2]).toFloat();
+
+            color.setAlphaF(alpha);
+            auto curve = curvesByName[item.Name];
+            curve->setFillBrush(QBrush(color));
+
+            if(curvesByName.contains(curveName)) {
+                auto fillCurve = curvesByName[curveName];
+                curve->setFillCurve(fillCurve);
+            } else {
+                auto fillValue = curveName.toFloat();
+                curve->setFillBaseLine(fillValue);
+            }
+        }
     }
 
     PlotPicker* picker = new PlotPicker( this, &PerStreamType[m_type], m_group, &m_curves, fileInformation );
