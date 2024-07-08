@@ -50,6 +50,7 @@ struct per_group
     const   bool        CheckedByDefault;
     const   char*       Description;
     activefilter        ActiveFilterGroup;
+    const   char*       YAxisMinMaxMode;
 };
 
 struct per_item

@@ -17,6 +17,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "LOW (10th percentile), and HIGH (90th percentile) values for each frame.\n"
         "The Y plane provides information about video brightness or luminance.",
         ActiveFilter_Video_signalstats,
+        "MinMaxOfThePlot",
     },
     //U
     {
@@ -25,6 +26,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "LOW (10th percentile), and HIGH (90th percentile) values for each frame.\n"
         "The U plane (along with V) provides information about video color.",
         ActiveFilter_Video_signalstats,
+        "Formula",
     },
     //V
     {
@@ -33,6 +35,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "LOW (10th percentile), and HIGH (90th percentile) values for each frame.\n"
         "The V plane (along with U) provides information about video color.",
         ActiveFilter_Video_signalstats,
+        "Custom;0;55"
     },
     //YDiff
     {

@@ -813,12 +813,8 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
     panner->setMouseButton( Qt::MiddleButton );
 #endif // QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 
-    QSettings settings;
-    settings.beginGroup("yminmax");
-
-    QMetaEnum metaEnum = QMetaEnum::fromType<Plot::YMinMaxMode>();
-    QString value = settings.value(QString::number(m_group)).toString();
-    if(!value.isEmpty()) {
+    auto applyYMinMaxMode = [&](QString value) {
+        QMetaEnum metaEnum = QMetaEnum::fromType<Plot::YMinMaxMode>();
         auto splitted = value.split(";");
         auto yMinMaxMode = (Plot::YMinMaxMode) metaEnum.keyToValue(splitted[0].toLatin1().constData());
 
@@ -830,6 +826,21 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
         }
 
         setYAxisMinMaxMode(yMinMaxMode);
+    };
+
+    if(group.YAxisMinMaxMode) {
+        QString yMinMaxModeStringValue = group.YAxisMinMaxMode;
+        qDebug() << "applying default yMinMaxMode: " << yMinMaxModeStringValue;
+        applyYMinMaxMode(yMinMaxModeStringValue);
+    }
+
+    QSettings settings;
+    settings.beginGroup("yminmax");
+
+    QString value = settings.value(QString::number(m_group)).toString();
+    if(!value.isEmpty()) {
+        qDebug() << "applying yMinMaxMode from settings: " << value;
+        applyYMinMaxMode(value);
     }
 
     settings.endGroup();
