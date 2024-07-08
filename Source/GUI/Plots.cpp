@@ -17,6 +17,7 @@
 #include "Core/Core.h"
 #include <QtAVPlayer/qavplayer.h>
 #include "playercontrol.h"
+#include "yminmaxselector.h"
 #include <QComboBox>
 #include <QGridLayout>
 #include <QEvent>
@@ -121,6 +122,18 @@ void Plots::showEditBarchartProfileDialog(const size_t plotGroup, Plot* plot, co
 
         Q_EMIT barchartProfileChanged();
     }
+}
+
+void Plots::showYMinMaxConfigDialog(const size_t plotGroup, Plot *plot, const stream_info &streamInfo, QToolButton* button)
+{
+    auto globalButtonPos = button->mapToGlobal(QPoint(0, 0));
+    auto geometry = m_yMinMaxSelector->geometry();
+
+    m_yMinMaxSelector->setPlot(plot);
+    m_yMinMaxSelector->enableFormulaMinMax(plot->hasMinMaxFormula());
+    m_yMinMaxSelector->move(QPoint(globalButtonPos.x() - geometry.width(), globalButtonPos.y()));
+    if(!m_yMinMaxSelector->isVisible())
+        m_yMinMaxSelector->show();
 }
 
 Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
@@ -282,11 +295,19 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                         barchartPlotSwitch->setIcon(switchToBarcharts ? QIcon(":/icon/chart_chart.png") : QIcon(":/icon/bar_chart.png"));
                     });
 
+                    QToolButton* yMinMaxConfigButton = new QToolButton();
+                    yMinMaxConfigButton->setIcon(QIcon(":/icon/signalserver_upload.png"));
+                    connect(plot, SIGNAL(visibilityChanged(bool)), yMinMaxConfigButton, SLOT(setVisible(bool)));
+                    connect(yMinMaxConfigButton, &QToolButton::clicked, [=]() {
+                        showYMinMaxConfigDialog(plotGroup, plot, streamInfo, yMinMaxConfigButton);
+                    });
+
                     QHBoxLayout* barchartAndConfigurationLayout = new QHBoxLayout();
                     barchartAndConfigurationLayout->setAlignment(Qt::AlignLeft);
                     barchartAndConfigurationLayout->setSpacing(5);
                     barchartAndConfigurationLayout->addWidget(barchartPlotSwitch);
                     barchartAndConfigurationLayout->addWidget(barchartConfigButton);
+                    barchartAndConfigurationLayout->addWidget(yMinMaxConfigButton);
 
                     legendLayout->addItem(barchartAndConfigurationLayout);
                     legendLayout->addWidget(plot->plotLegend());
@@ -496,6 +517,9 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
     m_scaleWidget->setScale( m_timeInterval.from, m_timeInterval.to);
 
     setCursorPos( framePos() );
+
+    m_yMinMaxSelector = new YMinMaxSelector(this);
+    m_yMinMaxSelector->setWindowFlag(Qt::Popup);
 }
 
 //---------------------------------------------------------------------------
