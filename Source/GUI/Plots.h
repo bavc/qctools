@@ -96,6 +96,7 @@ public:
     void                        setPlotVisible( size_t type, size_t group, bool on );
     void setCommentsVisible(bool visible);
     void updatePlotsVisibility(const QMap<QString, std::tuple<quint64, quint64>> & visiblePlots);
+    void updatePlotsYAxisMinMaxMode();
 
     const QwtPlot*              plot( size_t streamPos, size_t group ) const;
     CommentsPlot*               commentsPlot() const { return m_commentsPlot; }
@@ -123,6 +124,7 @@ public:
 Q_SIGNALS:
     void visibleFramesChanged(int from, int to);
     void                        barchartProfileChanged();
+    void reloadYAxisMinMaxMode();
 
 public Q_SLOTS:
     void                        onCurrentFrameChanged();

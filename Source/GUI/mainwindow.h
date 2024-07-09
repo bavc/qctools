@@ -251,6 +251,8 @@ private Q_SLOTS:
 
     void on_setupFilters_pushButton_clicked();
 
+    void on_actionReset_all_y_axis_ranges_to_default_triggered();
+
 protected:
     void closeEvent(QCloseEvent* event);
     void resizeEvent(QResizeEvent* event);

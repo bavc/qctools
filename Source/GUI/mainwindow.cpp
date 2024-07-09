@@ -1060,3 +1060,10 @@ void MainWindow::on_setupFilters_pushButton_clicked()
         m_plotsChooser->setGeometry(newGeometry);
     }
 }
+
+void MainWindow::on_actionReset_all_y_axis_ranges_to_default_triggered()
+{
+    if(PlotsArea)
+        PlotsArea->updatePlotsYAxisMinMaxMode();
+}
+

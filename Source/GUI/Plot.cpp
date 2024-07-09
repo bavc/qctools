@@ -526,6 +526,43 @@ bool Plot::isBarchart() const
     return m_barchart;
 }
 
+void Plot::loadYAxisMinMaxMode()
+{
+    const struct per_group& group = PerStreamType[m_type].PerGroup[m_group];
+
+    auto applyYMinMaxMode = [&](QString value) {
+        QMetaEnum metaEnum = QMetaEnum::fromType<Plot::YMinMaxMode>();
+        auto splitted = value.split(";");
+        auto yMinMaxMode = (Plot::YMinMaxMode) metaEnum.keyToValue(splitted[0].toLatin1().constData());
+
+        if(yMinMaxMode == Plot::Custom) {
+            auto min = splitted[1].toDouble();
+            auto max = splitted[2].toDouble();
+
+            setYAxisCustomMinMax(min, max);
+        }
+
+        setYAxisMinMaxMode(yMinMaxMode);
+    };
+
+    if(group.YAxisMinMaxMode) {
+        QString yMinMaxModeStringValue = group.YAxisMinMaxMode;
+        qDebug() << "applying default yMinMaxMode: " << yMinMaxModeStringValue;
+        applyYMinMaxMode(yMinMaxModeStringValue);
+    }
+
+    QSettings settings;
+    settings.beginGroup("yminmax");
+
+    QString value = settings.value(QString::number(m_group)).toString();
+    if(!value.isEmpty()) {
+        qDebug() << "applying yMinMaxMode from settings: " << value;
+        applyYMinMaxMode(value);
+    }
+
+    settings.endGroup();
+}
+
 void Plot::setYAxisMinMaxMode(YMinMaxMode mode)
 {
     m_yminMaxMode = mode;
@@ -813,38 +850,7 @@ Plot::Plot( size_t streamPos, size_t Type, size_t Group, const FileInformation* 
     panner->setMouseButton( Qt::MiddleButton );
 #endif // QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 
-    auto applyYMinMaxMode = [&](QString value) {
-        QMetaEnum metaEnum = QMetaEnum::fromType<Plot::YMinMaxMode>();
-        auto splitted = value.split(";");
-        auto yMinMaxMode = (Plot::YMinMaxMode) metaEnum.keyToValue(splitted[0].toLatin1().constData());
-
-        if(yMinMaxMode == Plot::Custom) {
-            auto min = splitted[1].toDouble();
-            auto max = splitted[2].toDouble();
-
-            setYAxisCustomMinMax(min, max);
-        }
-
-        setYAxisMinMaxMode(yMinMaxMode);
-    };
-
-    if(group.YAxisMinMaxMode) {
-        QString yMinMaxModeStringValue = group.YAxisMinMaxMode;
-        qDebug() << "applying default yMinMaxMode: " << yMinMaxModeStringValue;
-        applyYMinMaxMode(yMinMaxModeStringValue);
-    }
-
-    QSettings settings;
-    settings.beginGroup("yminmax");
-
-    QString value = settings.value(QString::number(m_group)).toString();
-    if(!value.isEmpty()) {
-        qDebug() << "applying yMinMaxMode from settings: " << value;
-        applyYMinMaxMode(value);
-    }
-
-    settings.endGroup();
-
+    loadYAxisMinMaxMode();
 }
 
 //---------------------------------------------------------------------------
