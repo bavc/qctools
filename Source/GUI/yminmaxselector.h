@@ -33,6 +33,8 @@ private Q_SLOTS:
     void on_minMaxSystemProvided_radioButton_clicked();
     void on_customMinMax_radioButton_clicked();
 
+    void on_reset_pushButton_clicked();
+
 private:
     void updateApplyButton();
     void updateMinMaxStyling();

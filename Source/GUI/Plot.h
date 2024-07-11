@@ -496,6 +496,7 @@ Q_SIGNALS:
 public Q_SLOTS:
     void initYAxis();
     void setBarchart(bool value);
+    void loadYAxisMinMaxMode(); // default or from settings
 
 private Q_SLOTS:
     void onPickerMoved( const QPointF& );

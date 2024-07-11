@@ -34,6 +34,8 @@
 #include <QToolButton>
 #include <QVideoFrame>
 #include <qwt_plot_curve.h>
+#include <QMessageBox>
+#include <QSettings>
 
 //---------------------------------------------------------------------------
 
@@ -176,6 +178,8 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                     connect(plot, &Plot::visibilityChanged, [plot](bool visible) {
                         qDebug() << "Plot::visibilityChanged for " << plot << "visible: " << visible;
                     });
+
+                    connect(this, &Plots::reloadYAxisMinMaxMode, plot, &Plot::loadYAxisMinMaxMode);
 
                     const size_t plotType = plot->type();
                     const size_t plotGroup = plot->group();
@@ -1345,6 +1349,19 @@ void Plots::updatePlotsVisibility(const QMap<QString, std::tuple<quint64, quint6
 
         panel->setVisible(panelVisible);
         panel->legend()->setVisible(panelVisible);
+    }
+}
+
+void Plots::updatePlotsYAxisMinMaxMode()
+{
+    auto reply = QMessageBox::question(this, "QCTools", "All Y-axis min/max to will be reset default. Are you sure?",
+                                  QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        QSettings settings;
+        settings.remove("yminmax");
+
+        Q_EMIT reloadYAxisMinMaxMode();
+        replotAll();
     }
 }
 

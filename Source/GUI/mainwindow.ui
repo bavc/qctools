@@ -167,6 +167,7 @@
     <addaction name="actionNavigateNextComment"/>
     <addaction name="separator"/>
     <addaction name="actionToolbar"/>
+    <addaction name="actionReset_all_y_axis_ranges_to_default"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -707,6 +708,11 @@
    </property>
    <property name="text">
     <string>Show / hide filters panel</string>
+   </property>
+  </action>
+  <action name="actionReset_all_y_axis_ranges_to_default">
+   <property name="text">
+    <string>Reset all y-axis ranges to default</string>
    </property>
   </action>
  </widget>
