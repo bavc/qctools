@@ -193,3 +193,17 @@ void YMinMaxSelector::on_customMinMax_radioButton_clicked()
     updateMinMaxStyling();
 }
 
+
+void YMinMaxSelector::on_reset_pushButton_clicked()
+{
+    QSettings settings;
+    settings.beginGroup("yminmax");
+    settings.remove(QString::number(m_plot->group()));
+    settings.endGroup();
+
+    m_plot->setYAxisCustomMinMax(0, 0);
+    m_plot->loadYAxisMinMaxMode();
+    m_plot->replot();
+    hide();
+}
+
