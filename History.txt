@@ -1,3 +1,9 @@
+1.4, 2024-07
+=== Thanks to George Blood LP for their support and contributions to this release ===
++ QCTools plotted data now has color fills to readability.
++ The y-axis per plot can be adjusted to show the full range, fit to plot, or to show a custom min/max range.
++ Qtplayer updates
+
 1.3.1, 2023-10-12
 ===
 x Fix critical bug where QCTools would use context from the thumbnail track of the QCTools report, if present, rather than the context of the source file.
