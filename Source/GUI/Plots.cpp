@@ -1354,7 +1354,7 @@ void Plots::updatePlotsVisibility(const QMap<QString, std::tuple<quint64, quint6
 
 void Plots::updatePlotsYAxisMinMaxMode()
 {
-    auto reply = QMessageBox::question(this, "QCTools", "Y axis min/max to will be reset default. Are you sure?",
+    auto reply = QMessageBox::question(this, "QCTools", "All Y-axis min/max to will be reset default. Are you sure?",
                                   QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::Yes) {
         QSettings settings;
