@@ -26,7 +26,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "LOW (10th percentile), and HIGH (90th percentile) values for each frame.\n"
         "The U plane (along with V) provides information about video color.",
         ActiveFilter_Video_signalstats,
-        "Formula",
+        "MinMaxOfThePlot",
     },
     //V
     {
@@ -35,7 +35,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "LOW (10th percentile), and HIGH (90th percentile) values for each frame.\n"
         "The V plane (along with U) provides information about video color.",
         ActiveFilter_Video_signalstats,
-        "Custom;0;55"
+        "MinMaxOfThePlot"
     },
     //YDiff
     {
@@ -82,6 +82,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "can not be converted back to RGB without producing negatives or overflows,\n"
         "such values a indicative errors such as time base corrector errors or Digital Betacam damage.",
         ActiveFilter_Video_signalstats,
+        "MinMaxOfThePlot"
     },
     //Hue
     {
@@ -90,6 +91,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "Degrees are measured clockwise starting from 0 at the bottom side of a\n"
         "vectorscope. Skin tone is 147 degrees. Hue is plotted via median and average.",
         ActiveFilter_Video_signalstats,
+        "MinMaxOfThePlot"
     },
     //TOUT
     {
@@ -117,6 +119,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "outside the standard video broadcast range of 16-235 pixels for Y or\n"
         "16-240 for U and V.",
         ActiveFilter_Video_signalstats,
+        "Formula"
     },
     //Bit depths
     {
@@ -126,6 +129,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "8 may reveal that some processing before encoding the v210 removed\n"
         "the least significant two bits.",
         ActiveFilter_Video_signalstats,
+        "MinMaxOfThePlot"
     },
     //CropW
     {
@@ -185,6 +189,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "adjacent frames when classifying each frame. Each frame's classification is\n"
         "plotted with a half-life of 1.",
         ActiveFilter_Video_Idet,
+        "MinMaxOfThePlot"
     },
     //idet.multiple
     {
@@ -194,6 +199,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "history of previous frames. Each frame's classification is plotted with a\n"
         "half-life of 1.",
         ActiveFilter_Video_Idet,
+        "MinMaxOfThePlot"
     },
     //idet.repeat
     {
@@ -202,6 +208,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "This plot shows fields that are repeated between adjacent frames (a sign\n"
         "of telecine). Each frame's classification is plotted with a half-life of 1.",
         ActiveFilter_Video_Idet,
+        "MinMaxOfThePlot"
     },
     //deflicker
     {
@@ -210,6 +217,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "arithmetric mean of sets of 5 frames. The plotted value shows the relative\n"
         "change in luminance that would be used by libavfilter's deflicker filter.",
         ActiveFilter_Video_Deflicker,
+        "MinMaxOfThePlot"
     },
     //entropy
     {
@@ -219,6 +227,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "A color channel with only a single shade will have entropy of 0,\n"
         "while a channel using all shades will be 1.",
         ActiveFilter_Video_Entropy,
+        "MinMaxOfThePlot"
     },
     //entropy-diff
     {
@@ -231,6 +240,7 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         "The values should correspond to chaos or discontinuity in the\n"
         "histogram plot.",
         ActiveFilter_Video_EntropyDiff,
+        "MinMaxOfThePlot"
     },
     //Item_pkt_duration_time
     {
@@ -252,12 +262,14 @@ struct per_group VideoPerGroup [Group_VideoMax]=
         Item_blockdetect,  1,    "0",  "50",  4,  "Blockiness", false,
         "Blockiness.",
         ActiveFilter_Video_blockdetect,
+        "MinMaxOfThePlot"
     },
     //Item_blurdetect
     {
         Item_blurdetect,   1,    "0",  "50",  4,  "Blurriness", false,
         "Blurriness",
         ActiveFilter_Video_blurdetect,
+        "MinMaxOfThePlot"
     },
 
     //const   std::size_t Start; //Item
