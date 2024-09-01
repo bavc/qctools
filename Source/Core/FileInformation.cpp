@@ -951,7 +951,8 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
                         ++AudioPos;
                     }
 
-                    Stats.push_back(Stat);
+                    if (Stat)
+                        Stats.push_back(Stat);
                 }
 
                 streamsStats = new StreamsStats(orderedStreams, FormatContext);
