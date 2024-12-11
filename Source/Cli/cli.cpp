@@ -5,6 +5,7 @@
 #include "Core/FileInformation.h"
 #include <QDir>
 #include <Core/logging.h>
+#include <clocale>
 
 Cli::Cli() : indexOfStreamWithKnownFrameCount(0), statsFileBytesWritten(0), statsFileBytesTotal(0), statsFileBytesUploaded(0), statsFileBytesToUpload(0)
 {
@@ -37,6 +38,7 @@ int Cli::exec(QCoreApplication &a)
     bool forceUploadToSignalServer = false;
 
     QString checkUploadFileName;
+    std::setlocale(LC_NUMERIC, "C");
 
     for(int i = 1; i < a.arguments().length(); ++i)
     {

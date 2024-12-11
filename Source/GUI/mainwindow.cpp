@@ -34,6 +34,7 @@
 #include <QScreen>
 #include <QClipboard>
 #include <QGuiApplication>
+#include <clocale>
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QDesktopWidget>
@@ -81,6 +82,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // Info
     DragDrop_Image=NULL;
     DragDrop_Text=NULL;
+
+    std::setlocale(LC_NUMERIC, "C");
 
     m_plotsChooser = new PlotsChooser();
     connect(m_plotsChooser, &PlotsChooser::orderChanged, [&]() {
