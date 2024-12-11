@@ -1060,7 +1060,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         QObject::connect(m_mediaParser, &QAVPlayer::audioFrame, m_mediaParser, [this](const QAVAudioFrame &frame) {
                 qDebug() << "audio frame came from: " << frame.filterName() << frame.stream() << frame.stream().index();
 
-                if (frame.filterName() == astats) {
+                if (frame.filterName() == astats && frame.stream().index() < Stats.size()) {
                     auto stat = Stats[frame.stream().index()];
 
                     stat->TimeStampFromFrame(frame, stat->x_Current);
@@ -1074,7 +1074,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         QObject::connect(m_mediaParser, &QAVPlayer::videoFrame, m_mediaParser, [this](const QAVVideoFrame &frame) {
                 qDebug() << "video frame came from: " << frame.filterName() << frame.stream() << frame.stream().index();
 
-                if(frame.filterName() == stats) {
+                if(frame.filterName() == stats && frame.stream().index() < Stats.size()) {
                     auto stat = Stats[frame.stream().index()];
 
                     stat->TimeStampFromFrame(frame, stat->x_Current);

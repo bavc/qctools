@@ -19,6 +19,7 @@ extern "C"
 
 #include "Core/Core.h"
 #include "tinyxml2.h"
+#include <QMutexLocker>
 #include <sstream>
 #include <iomanip>
 #include <cstdlib>
@@ -126,6 +127,9 @@ CommonStats::CommonStats (const struct per_item* PerItem_, int Type_, size_t Cou
 //---------------------------------------------------------------------------
 CommonStats::~CommonStats()
 {
+    //Lock data
+    QMutexLocker Lock(&Mutex);
+
     // Data - Counts
     delete[] Stats_Totals;
     delete[] Stats_Counts;
@@ -154,9 +158,9 @@ CommonStats::~CommonStats()
     delete[] pict_type_char;
 
     for (size_t j = 0; j < Data_Reserved; ++j)
-        delete [] comments[j];
+        free(comments[j]);
 
-    delete [] comments;
+    delete[] comments;
 
     auto numberOfIntValues = lastStatsIndexByValueType[StatsValueInfo::Int];
 
@@ -188,6 +192,9 @@ void CommonStats::processAdditionalStats(const char* key, const char* value, boo
 {
     if (strcmp(key, "qctools.comment") == 0)
         return;
+
+    // Lock data
+    QMutexLocker Lock(&Mutex);
 
     if(!statsMapInitialized) {
         auto type = StatsValueInfo::typeFromKey(key, value);
@@ -223,6 +230,9 @@ void CommonStats::processAdditionalStats(const char* key, const char* value, boo
 
 void CommonStats::writeAdditionalStats(std::stringstream &stream, size_t index)
 {
+    // Lock data
+    QMutexLocker Lock(&Mutex);
+
     if(additionalIntStats) {
         for(size_t i = 0; i < statsKeysByIndexByValueType[StatsValueInfo::Int].size(); ++i) {
             auto key = statsKeysByIndexByValueType[StatsValueInfo::Int][i];
@@ -253,6 +263,9 @@ void CommonStats::writeAdditionalStats(std::stringstream &stream, size_t index)
 
 void CommonStats::updateAdditionalStats(StatsValueInfo::Type type, size_t oldSize, size_t size)
 {
+    // Lock data
+    QMutexLocker Lock(&Mutex);
+
     if (type==StatsValueInfo::Int)
     {
         auto additionalIntStats_Old = additionalIntStats;
@@ -305,6 +318,9 @@ void CommonStats::updateAdditionalStats(StatsValueInfo::Type type, size_t oldSiz
 
 void CommonStats::initializeAdditionalStats()
 {
+    // Lock data
+    QMutexLocker Lock(&Mutex);
+
     auto numberOfIntValues = lastStatsIndexByValueType[StatsValueInfo::Int];
     if(numberOfIntValues != 0) {
         additionalIntStats = new int*[numberOfIntValues];
@@ -367,6 +383,9 @@ double CommonStats::State_Get()
 //---------------------------------------------------------------------------
 void CommonStats::StatsFinish ()
 {
+    // Lock data
+    QMutexLocker Lock(&Mutex);
+
     // Adaptation
     if (x_Current==1)
     {
@@ -517,6 +536,9 @@ void CommonStats::statsFromExternalData(const char *Data, size_t Size, const std
 //---------------------------------------------------------------------------
 void CommonStats::Data_Reserve(size_t NewValue)
 {
+    // Lock data
+    QMutexLocker Lock(&Mutex);
+
     // Saving old data
     size_t                      Data_Reserved_Old = Data_Reserved;
     double**                    x_Old = x;
