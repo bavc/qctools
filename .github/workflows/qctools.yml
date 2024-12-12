@@ -31,7 +31,7 @@ jobs:
         git submodule sync --recursive
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
-            submodule update --init --force --recursive --depth=1
+            submodule update --init --force --recursive --remote --depth=1
 
     - name: Install dependencies
       run: |
@@ -88,7 +88,7 @@ jobs:
         git submodule sync --recursive
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
-            submodule update --init --force --recursive --depth=1
+            submodule update --init --force --recursive --remote --depth=1
 
     - name: Install dependencies
       run: |
@@ -145,7 +145,7 @@ jobs:
         git submodule sync --recursive
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
-            submodule update --init --force --recursive --depth=1
+            submodule update --init --force --recursive --remote --depth=1
 
     - name: Install dependencies
       run: |
@@ -178,7 +178,7 @@ jobs:
 
     - name: Build FFmpeg
       run: |
-        git clone --depth 1 --branch n5.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
+        git clone --depth 1 --branch n6.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
         cd ../ffmpeg
         ./configure --enable-gpl \
                     --enable-static \
@@ -231,7 +231,7 @@ jobs:
         git submodule sync --recursive
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
-            submodule update --init --force --recursive --depth=1
+            submodule update --init --force --recursive --remote --depth=1
 
     - name: Install dependencies
       run: |
@@ -256,7 +256,7 @@ jobs:
 
     - name: Build FFmpeg
       run: |
-        git clone --depth 1 --branch n5.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
+        git clone --depth 1 --branch n6.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
         cd ../ffmpeg
         ./configure --enable-gpl \
                     --enable-static \
@@ -287,7 +287,7 @@ jobs:
         compiler: ['gcc-9']
         include:
           - compiler: gcc-9
-            packages: gcc-9 g++-9
+            packages: gcc-9 g++-9 libbz2-dev
             env: { 'CC': 'gcc-9', 'CXX': 'g++-9' }
           - qt_version: "5.15.*"
             qt_packages: "libxkbcommon-dev libgstreamer-plugins-base1.0-0 libgstreamer-gl1.0-0"
@@ -308,28 +308,18 @@ jobs:
         git submodule sync --recursive
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
-            submodule update --init --force --recursive --depth=1
+            submodule update --init --force --recursive --remote --depth=1
 
-    - name: Install Python 3.7 version
+    - name: Install Python 3.x version
       uses: actions/setup-python@v1
       with:
-        python-version: '3.7'
+        python-version: '3'
         architecture: 'x64'
 
     - name: Install compiler and FFmpeg dependencies
       run: |
         sudo apt-get update &&
-        sudo apt-get install -y ${{ matrix.packages }} \
-                                libunwind-dev \
-                                libavcodec-dev \
-                                libavformat-dev \
-                                libavdevice-dev \
-                                libegl1-mesa-dev \
-                                libglew-dev \
-                                libxv-dev \
-                                libraw1394-dev \
-                                libavc1394-dev \
-                                libiec61883-dev
+        sudo apt-get install -y ${{ matrix.packages }}
 
     - name: Install Qt 5.15
       uses: jurplel/install-qt-action@v3
@@ -350,7 +340,7 @@ jobs:
 
     - name: Build FFmpeg
       run: |
-        git clone --depth 1 --branch n5.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
+        git clone --depth 1 --branch n6.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
         cd ../ffmpeg
         ./configure --enable-gpl \
                     --enable-shared \
@@ -379,7 +369,7 @@ jobs:
         compiler: ['gcc-9']
         include:
           - compiler: gcc-9
-            packages: gcc-9 g++-9
+            packages: gcc-9 g++-9 libbz2-dev
             env: { 'CC': 'gcc-9', 'CXX': 'g++-9' }
           - qt_version: "6.5.*"
             qt_modules: "qtmultimedia qt5compat"
@@ -401,27 +391,18 @@ jobs:
         git submodule sync --recursive
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
-            submodule update --init --force --recursive --depth=1
+            submodule update --init --force --recursive --remote --depth=1
 
-    - name: Install Python 3.7 version
+    - name: Install Python 3.x version
       uses: actions/setup-python@v1
       with:
-        python-version: '3.7'
+        python-version: '3'
         architecture: 'x64'
 
     - name: Install compiler and FFmpeg dependencies
       run: |
         sudo apt-get update &&
-        sudo apt-get install -y ${{ matrix.packages }} \
-                                libunwind-dev \
-                                libgstreamer-plugins-base1.0-dev \
-                                libavcodec-dev \
-                                libavformat-dev \
-                                libavdevice-dev \
-                                libegl1-mesa-dev \
-                                libglew-dev \
-                                libxkbcommon-dev \
-                                libxv-dev
+        sudo apt-get install -y ${{ matrix.packages }}
 
     - name: Install Qt 6
       uses: jurplel/install-qt-action@v3
@@ -443,7 +424,7 @@ jobs:
 
     - name: Build FFmpeg
       run: |
-        git clone --depth 1 --branch n5.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
+        git clone --depth 1 --branch n6.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
         cd ../ffmpeg
         ./configure --enable-gpl \
                     --enable-shared \
@@ -486,7 +467,7 @@ jobs:
         git submodule sync --recursive
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
-            submodule update --init --force --recursive --depth=1
+            submodule update --init --force --recursive --remote --depth=1
 
     - name: Build and install zlib
       shell: cmd
@@ -567,7 +548,7 @@ jobs:
         git submodule sync --recursive
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
-            submodule update --init --force --recursive --depth=1
+            submodule update --init --force --recursive --remote --depth=1
 
     - name: Build and install zlib
       shell: cmd
@@ -647,7 +628,7 @@ jobs:
         git submodule sync --recursive
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
-            submodule update --init --force --recursive --depth=1
+            submodule update --init --force --recursive --remote --depth=1
 
     - name: Init vs environment
       uses: egor-tensin/vs-shell@v2
@@ -732,7 +713,7 @@ jobs:
         git submodule sync --recursive
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
-            submodule update --init --force --recursive --depth=1
+            submodule update --init --force --recursive --remote --depth=1
 
     - name: Init vs environment
       uses: egor-tensin/vs-shell@v2
