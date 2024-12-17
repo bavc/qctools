@@ -17,6 +17,7 @@
 #include <cctype>
 #include <functional>
 #include <Core/Core.h>
+#include <QMutex>
 #include <QtAVPlayer/qavplayer.h>
 
 struct AVFrame;
@@ -198,6 +199,9 @@ protected:
     int**                       additionalIntStats;
     double**                    additionalDoubleStats;
     char***                     additionalStringStats;
+
+   // Thread synchronisation
+   QMutex                       Mutex;
 };
 
 #endif // Stats_H
