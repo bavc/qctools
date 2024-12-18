@@ -86,7 +86,6 @@ private:
     std::unique_ptr<SignalServer> signalServer;
 
     QTimer progressTimer;
-    int indexOfStreamWithKnownFrameCount;
 
     quint64 statsFileBytesWritten;
     quint64 statsFileBytesTotal;
