@@ -7,7 +7,7 @@
 #include <Core/logging.h>
 #include <clocale>
 
-Cli::Cli() : indexOfStreamWithKnownFrameCount(0), statsFileBytesWritten(0), statsFileBytesTotal(0), statsFileBytesUploaded(0), statsFileBytesToUpload(0)
+Cli::Cli() : statsFileBytesWritten(0), statsFileBytesTotal(0), statsFileBytesUploaded(0), statsFileBytesToUpload(0)
 {
 
 }
@@ -671,12 +671,6 @@ int Cli::exec(QCoreApplication &a)
         return InvalidInput;
     }
 
-    for(int i = 0; i < info->Stats.size(); ++i)
-    {
-        if(info->Frames_Count_Get(i) > info->Frames_Count_Get(indexOfStreamWithKnownFrameCount))
-            indexOfStreamWithKnownFrameCount = i;
-    }
-
     if(!info->hasStats() || forceOutput)
     {
         // parse
@@ -812,8 +806,12 @@ int Cli::exec(QCoreApplication &a)
 
 void Cli::updateParsingProgress()
 {
-    int value = info->Frames_Pos_Get(indexOfStreamWithKnownFrameCount) * progress->getMax() /
-                info->Frames_Count_Get(indexOfStreamWithKnownFrameCount);
+    CommonStats* stat = info->ReferenceStat();
+    if(!stat)
+        return;
+
+    int value = stat->x_Current * progress->getMax() /
+                stat->x_Current_Max;
 
     progress->setValue(value);
 }
