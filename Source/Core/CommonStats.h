@@ -54,6 +54,7 @@ public:
     double*                     y_Max;                      // Maximum y by plot
     double                      FirstTimeStamp;             // Time stamp of the first frame
     char**                      comments;                   // Comments per frame (utf-8)
+    int                         streamIndex;                // Stream index in the container
 
     // Status
     int                         Type_Get();
@@ -184,7 +185,6 @@ protected:
 
     // Info
     double                      Frequency;
-    int							streamIndex;
 
     // Memory management
     size_t                      Data_Reserved; // Count of frames reserved in memory;

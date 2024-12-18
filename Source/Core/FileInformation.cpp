@@ -1060,11 +1060,16 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         QObject::connect(m_mediaParser, &QAVPlayer::audioFrame, m_mediaParser, [this](const QAVAudioFrame &frame) {
                 qDebug() << "audio frame came from: " << frame.filterName() << frame.stream() << frame.stream().index();
 
-                if (frame.filterName() == astats && frame.stream().index() < Stats.size()) {
-                    auto stat = Stats[frame.stream().index()];
+                if (frame.filterName() == astats) {
+                    auto it = std::find_if(Stats.begin(), Stats.end(), [&](CommonStats* stat) {
+                        return stat->streamIndex == frame.stream().index();
+                    });
 
-                    stat->TimeStampFromFrame(frame, stat->x_Current);
-                    stat->StatsFromFrame(frame, 0, 0);
+                    if(it != Stats.end()) {
+                        auto stat = *it;
+                        stat->TimeStampFromFrame(frame, stat->x_Current);
+                        stat->StatsFromFrame(frame, 0, 0);
+                    }
                 }
             },
             // Qt::QueuedConnection
@@ -1074,12 +1079,16 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         QObject::connect(m_mediaParser, &QAVPlayer::videoFrame, m_mediaParser, [this](const QAVVideoFrame &frame) {
                 qDebug() << "video frame came from: " << frame.filterName() << frame.stream() << frame.stream().index();
 
-                if(frame.filterName() == stats && frame.stream().index() < Stats.size()) {
-                    auto stat = Stats[frame.stream().index()];
+                if(frame.filterName() == stats) {
+                    auto it = std::find_if(Stats.begin(), Stats.end(), [&](CommonStats* stat) {
+                        return stat->streamIndex == frame.stream().index();
+                    });
 
-                    stat->TimeStampFromFrame(frame, stat->x_Current);
-                    stat->StatsFromFrame(frame, frame.size().width(), frame.size().height());
-
+                    if(it != Stats.end()) {
+                        auto stat = *it;
+                        stat->TimeStampFromFrame(frame, stat->x_Current);
+                        stat->StatsFromFrame(frame, frame.size().width(), frame.size().height());
+                    }
                 } else if(frame.filterName().startsWith(panelOutputPrefix)) {
                     auto indexString = frame.filterName().mid(panelOutputPrefix.length());
                     auto index = indexString.toInt();
