@@ -99,7 +99,7 @@ VideoStreamStats::VideoStreamStats(XMLElement *streamElement) : CommonStreamStat
         refs = refs_value;
 }
 
-VideoStreamStats::VideoStreamStats(QAVStream* stream, AVFormatContext *context) : CommonStreamStats(stream),
+VideoStreamStats::VideoStreamStats(QAVStream* stream) : CommonStreamStats(stream),
     width(stream != NULL ? std::to_string(stream->stream()->codecpar->width) : ""),
     height(stream != NULL ? std::to_string(stream->stream()->codecpar->height) : ""),
     coded_width(stream != NULL ? std::to_string(stream->codec()->avctx()->coded_width) : ""),
@@ -114,13 +114,12 @@ VideoStreamStats::VideoStreamStats(QAVStream* stream, AVFormatContext *context) 
 {
     if(stream != NULL)
     {
-        AVRational sar = av_guess_sample_aspect_ratio(context, stream->stream(), NULL);
+        AVRational sar = av_guess_sample_aspect_ratio(NULL, stream->stream(), NULL); // context is unused and can be null in current ffmpeg code
         sample_aspect_ratio = rational_to_string(sar, ':');
 
         if(stream->codec()->avctx()->sample_aspect_ratio.den)
         {
             AVRational dar;
-
             av_reduce(&dar.num, &dar.den,
                       stream->stream()->codecpar->width  * sar.num,
                       stream->stream()->codecpar->height * sar.den,

@@ -22,7 +22,7 @@ class AudioStreamStats : public CommonStreamStats
 {
 public:
     AudioStreamStats(tinyxml2::XMLElement* streamElement);
-    AudioStreamStats(QAVStream* stream, AVFormatContext *context);
+    AudioStreamStats(QAVStream* stream);
 
     virtual void writeStreamInfoToXML(QXmlStreamWriter* writer);
 
