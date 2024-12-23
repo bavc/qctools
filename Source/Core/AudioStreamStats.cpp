@@ -59,15 +59,13 @@ AudioStreamStats::AudioStreamStats(XMLElement *streamElement) : CommonStreamStat
         bits_per_sample = std::stoi(bits_per_sample_value);
 }
 
-AudioStreamStats::AudioStreamStats(QAVStream* stream, AVFormatContext *context) : CommonStreamStats(stream),
+AudioStreamStats::AudioStreamStats(QAVStream* stream) : CommonStreamStats(stream),
     sample_fmt_string(""),
     sample_rate(stream != NULL ? stream->stream()->codecpar->sample_rate : 0),
     channels(stream != NULL ? stream->stream()->codecpar->channels : 0),
     channel_layout(""),
     bits_per_sample(stream != NULL ? av_get_bits_per_sample(stream->stream()->codecpar->codec_id) : 0)
 {
-    Q_UNUSED(context);
-
     codec_type = "audio";
     stream_type = AVMEDIA_TYPE_AUDIO;
 

@@ -18,7 +18,7 @@ class VideoStreamStats : public CommonStreamStats
 {
 public:
     VideoStreamStats(tinyxml2::XMLElement* streamElement);
-    VideoStreamStats(QAVStream* stream, AVFormatContext *context);
+    VideoStreamStats(QAVStream* stream);
 
     virtual void writeStreamInfoToXML(QXmlStreamWriter* writer);
 

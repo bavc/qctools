@@ -17,7 +17,6 @@ namespace tinyxml2 {
     class XMLElement;
 }
 
-struct AVFormatContext;
 class QAVStream;
 struct AVCodec;
 

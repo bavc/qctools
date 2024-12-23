@@ -878,92 +878,70 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
         qDebug() << "m_mediaParser->currentVideoStreams(): " << m_mediaParser->currentVideoStreams().size();
         qDebug() << "m_mediaParser->currentAudioStreams(): " << m_mediaParser->currentAudioStreams().size();
 
-        auto streams = m_mediaParser->availableVideoStreams();
-        streams.append(m_mediaParser->availableAudioStreams());
+        QList<QAVStream> streams;
+        streams.append(m_mediaParser->currentVideoStreams());
+        streams.append(m_mediaParser->currentAudioStreams());
 
-        AVFormatContext* FormatContext = nullptr;
-        auto stdMediaFileName = mediaOrMkvReportFileName.toStdString();
-        AVDictionary* options = nullptr;
-        if (dpxOffset != -1) {
-            auto dpxOffsetString = std::to_string(dpxOffset);
-            av_dict_set(&options, "f", "image2", 0);
-            av_dict_set(&options, "start_number", dpxOffsetString.c_str(), 0);
-        }
-        if (avformat_open_input(&FormatContext, stdMediaFileName.c_str(), nullptr, &options)>=0)
-        {
-            QVector<QAVStream*> orderedStreams;
-            if (avformat_find_stream_info(FormatContext, NULL)>=0) {
-
-                containerFormat = FormatContext->iformat->long_name;
-                streamCount = FormatContext->nb_streams;
-                bitRate = FormatContext->bit_rate;
-
-                size_t VideoPos=0;
-                size_t AudioPos=0;
-
-                for(auto i = 0; i < FormatContext->nb_streams; ++i) {
-                    auto codec_type = FormatContext->streams[i]->codecpar->codec_type;
-                    if(codec_type != AVMEDIA_TYPE_VIDEO && codec_type != AVMEDIA_TYPE_AUDIO)
-                        continue;
-
-                    auto streamIt = std::find_if(streams.begin(), streams.end(), [i](QAVStream& stream) {
-                        return stream.stream()->index == i;
-                    });
-
-                    if(streamIt == streams.end()) {
-                        qDebug() << "error: it should never happen";
-                        assert(false);
-                        continue;
-                    }
-
-                    if(streamIt->codec()->codec() == nullptr) {
-                        qDebug() << "error: codec is null for stream" << i << "... skipping";
-                        continue;
-                    }
-                    orderedStreams.append(&*streamIt);
-
-                    auto Duration = 0;
-                    auto FrameCount = streamIt->stream()->nb_frames;
-                    if (streamIt->stream()->duration != AV_NOPTS_VALUE)
-                        Duration= ((double)streamIt->stream()->duration)*streamIt->stream()->time_base.num/streamIt->stream()->time_base.den;
-
-                    // If duration is not known, estimating it
-                    if (Duration==0 && FormatContext->duration!=AV_NOPTS_VALUE)
-                        Duration=((double)FormatContext->duration)/AV_TIME_BASE;
-
-                    // If frame count is not known, estimating it
-                    if (FrameCount==0 && streamIt->stream()->avg_frame_rate.num && streamIt->stream()->avg_frame_rate.den && Duration)
-                        FrameCount=Duration*streamIt->stream()->avg_frame_rate.num/streamIt->stream()->avg_frame_rate.den;
-                    if (FrameCount==0
-                        && ((streamIt->stream()->time_base.num==1 && streamIt->stream()->time_base.den>=24 && streamIt->stream()->time_base.den<=60)
-                            || (streamIt->stream()->time_base.num==1001 && streamIt->stream()->time_base.den>=24000 && streamIt->stream()->time_base.den<=60000)))
-                        FrameCount=streamIt->stream()->duration;
-
-                    CommonStats* Stat = nullptr;
-
-                    if(streamIt->stream()->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-                        if (!VideoPos || ActiveAllTracks[Type_Video])
-                            Stat = new VideoStats(FrameCount, Duration, &*streamIt);
-                        ++VideoPos;
-                    } else if(streamIt->stream()->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-                        if (!AudioPos || ActiveAllTracks[Type_Audio])
-                            Stat = new AudioStats(FrameCount, Duration, &*streamIt);
-                        ++AudioPos;
-                    }
-
-                    if (Stat)
-                        Stats.push_back(Stat);
-                }
-
-                streamsStats = new StreamsStats(orderedStreams, FormatContext);
-                formatStats = new FormatStats(FormatContext);
+        QVector<QAVStream*> orderedStreams;
+        for (int i = 0; i < streams.size(); ++i) {
+            if(streams[i].codec()->codec() == nullptr) {
+                qDebug() << "error: codec is null for stream" << streams[i].stream()->index << "... skipping";
+                continue;
             }
 
-            avformat_close_input(&FormatContext);
+            auto codec_type = streams[i].stream()->codecpar->codec_type;
+            if(codec_type != AVMEDIA_TYPE_VIDEO && codec_type != AVMEDIA_TYPE_AUDIO)
+                continue;
+
+            orderedStreams.append(&streams[i]);
         }
-        if (options) {
-            av_dict_free(&options);
+        std::sort(orderedStreams.begin(), orderedStreams.end(), [](QAVStream* a, QAVStream* b) {
+            return a->stream()->index < b->stream()->index;
+        });
+
+        containerFormat = m_mediaParser->avctx()->iformat->long_name;
+        streamCount = m_mediaParser->avctx()->nb_streams;
+        bitRate = m_mediaParser->avctx()->bit_rate;
+
+        size_t VideoPos=0;
+        size_t AudioPos=0;
+
+        for( auto streamIt = orderedStreams.begin(); streamIt != orderedStreams.end(); ++streamIt) {
+            auto Duration = 0;
+            auto FrameCount = (*streamIt)->stream()->nb_frames;
+            if ((*streamIt)->stream()->duration != AV_NOPTS_VALUE)
+                Duration= ((double)(*streamIt)->stream()->duration)*(*streamIt)->stream()->time_base.num/(*streamIt)->stream()->time_base.den;
+
+            // If duration is not known, estimating it
+            if (Duration==0 &&  m_mediaParser->avctx()->duration!=AV_NOPTS_VALUE)
+                Duration=((double) m_mediaParser->avctx()->duration)/AV_TIME_BASE;
+
+            // If frame count is not known, estimating it
+            if (FrameCount==0 && (*streamIt)->stream()->avg_frame_rate.num && (*streamIt)->stream()->avg_frame_rate.den && Duration)
+                FrameCount=Duration*(*streamIt)->stream()->avg_frame_rate.num/(*streamIt)->stream()->avg_frame_rate.den;
+            if (FrameCount==0
+                && (((*streamIt)->stream()->time_base.num==1 && (*streamIt)->stream()->time_base.den>=24 && (*streamIt)->stream()->time_base.den<=60)
+                    || ((*streamIt)->stream()->time_base.num==1001 && (*streamIt)->stream()->time_base.den>=24000 && (*streamIt)->stream()->time_base.den<=60000)))
+                FrameCount=(*streamIt)->stream()->duration;
+
+            CommonStats* Stat = nullptr;
+
+            if((*streamIt)->stream()->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+                if (!VideoPos || ActiveAllTracks[Type_Video])
+                    Stat = new VideoStats(FrameCount, Duration, *streamIt);
+                ++VideoPos;
+            } else if((*streamIt)->stream()->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+                if (!AudioPos || ActiveAllTracks[Type_Audio])
+                    Stat = new AudioStats(FrameCount, Duration, *streamIt);
+                ++AudioPos;
+            }
+
+            if (Stat)
+                Stats.push_back(Stat);
         }
+
+        streamsStats = new StreamsStats(orderedStreams);
+        formatStats = new FormatStats(m_mediaParser->avctx());
     }
 
     if(attachment.isEmpty()) {
