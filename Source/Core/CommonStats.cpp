@@ -263,9 +263,6 @@ void CommonStats::writeAdditionalStats(std::stringstream &stream, size_t index)
 
 void CommonStats::updateAdditionalStats(StatsValueInfo::Type type, size_t oldSize, size_t size)
 {
-    // Lock data
-    QMutexLocker Lock(&Mutex);
-
     if (type==StatsValueInfo::Int)
     {
         auto additionalIntStats_Old = additionalIntStats;
