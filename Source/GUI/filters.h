@@ -870,8 +870,8 @@ const filter Filters[] =
             { Args_Type_None,        0,   0,       0,   0, nullptr },
         },
         {
-            "scale='max(640\\,iw)':'max(480\\,ih)',pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5},format=rgb24",
-            "il=l=d:c=d,scale='max(640\\,iw)':'max(480\\,ih)',pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5},format=rgb24",
+            "scale='max(640\\,iw)':'max(480\\,ih)',pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5}",
+            "il=l=d:c=d,scale='max(640\\,iw)':'max(480\\,ih)',pixscope=x=${2}/${width}:y=${3}/${height}:w=${4}:h=${5}",
         },
     },
     {
