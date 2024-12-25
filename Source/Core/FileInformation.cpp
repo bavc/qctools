@@ -1612,6 +1612,11 @@ void FileInformation::makeMkvReport(QString exportFileName, QByteArray attachmen
     auto codecTimeBaseSplitted = codecTimeBase.split("/");
     int codecNum = codecTimeBaseSplitted[0].toInt();
     int codecDen = codecTimeBaseSplitted[1].toInt();
+    if (av_cmp_q(AVRational {codecNum, codecDen}, AVRational {0, 1}) == 0) // Codec time base is not always set
+    {
+        codecNum = num;
+        codecDen = den;
+    }
 
     source.metadata = streamMetadata;
     source.width = m_thumbnails_frames.empty() ? 0 : m_thumbnails_frames[0].size().width();
@@ -1710,6 +1715,11 @@ void FileInformation::makeMkvReport(QString exportFileName, QByteArray attachmen
             auto codecTimeBaseSplitted = codecTimeBase.split("/");
             int codecNum = codecTimeBaseSplitted[0].toInt();
             int codecDen = codecTimeBaseSplitted[1].toInt();
+            if (av_cmp_q(AVRational {codecNum, codecDen}, AVRational {0, 1}) == 0) // Codec time base is not always set
+            {
+                codecNum = num;
+                codecDen = den;
+            }
 
             std::shared_ptr<Output> output = std::make_shared<Output>();
             output->scaleBeforeEncoding = true;
