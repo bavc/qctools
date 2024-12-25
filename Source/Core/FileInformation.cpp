@@ -1406,8 +1406,9 @@ struct Output {
 
     AVFilterGraph* FilterGraph = { nullptr };
 
-    int Scale_OutputPixelFormat = { AV_PIX_FMT_YUVJ420P };
-    int Output_PixelFormat = { AV_PIX_FMT_YUVJ420P };
+    int Scale_OutputPixelFormat = { AV_PIX_FMT_YUV420P };
+    int Output_PixelFormat = { AV_PIX_FMT_YUV420P };
+    int Output_ColorRange = { AVCOL_RANGE_JPEG };
     int Output_CodecID = { AV_CODEC_ID_MJPEG };
     int Width = { 0 };
     int Height = { 0 };
@@ -1462,6 +1463,7 @@ struct Output {
         Output_CodecContext->width         = size.width();
         Output_CodecContext->height        = size.height();
         Output_CodecContext->pix_fmt       = (AVPixelFormat) Output_PixelFormat;
+        Output_CodecContext->color_range   = (AVColorRange) Output_ColorRange;
         Output_CodecContext->time_base.num = timeBaseNum;
         Output_CodecContext->time_base.den = timeBaseDen;
 
@@ -1513,6 +1515,7 @@ struct Output {
                 scaledFrame->width = Width;
                 scaledFrame->height= Height;
                 scaledFrame->format=(AVPixelFormat)Scale_OutputPixelFormat;
+                scaledFrame->color_range = (AVColorRange) Output_ColorRange;
 
                 av_image_alloc(scaledFrame->data, scaledFrame->linesize, scaledFrame->width, scaledFrame->height, (AVPixelFormat) Scale_OutputPixelFormat, 1);
                 if (sws_scale(ScaleContext, Frame->data, Frame->linesize, 0, Frame->height, scaledFrame->data, scaledFrame->linesize)<0)

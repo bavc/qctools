@@ -106,7 +106,8 @@ void FFmpegVideoEncoder::makeVideo(const QString &video, const QVector<Source>& 
         videoEncCtx->time_base.den = source.den;
 
         videoEncCtx->gop_size      = 1; /* emit one intra frame every twelve frames at most */
-        videoEncCtx->pix_fmt       = AV_PIX_FMT_YUVJ422P;
+        videoEncCtx->pix_fmt       = AV_PIX_FMT_YUV420P;
+        videoEncCtx->color_range   = AVCOL_RANGE_JPEG;
         videoEncCtx->max_b_frames  = 0;
 
         if (videoEncCtx->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
