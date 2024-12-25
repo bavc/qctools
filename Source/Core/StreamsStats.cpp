@@ -23,10 +23,11 @@ extern "C"
 
 #include "Core/VideoStreamStats.h"
 #include "Core/AudioStreamStats.h"
+#include "StreamsStats.h"
 
 using namespace tinyxml2;
 
-StreamsStats::StreamsStats(QVector<QAVStream*> qavstreams)
+StreamsStats::StreamsStats(QVector<QAVStream*> qavstreams) : nullCommonStreamStatsPtr(nullptr)
 {
     for (size_t pos = 0; pos < qavstreams.count(); ++pos)
     {
@@ -111,4 +112,19 @@ int StreamsStats::avSampleFormat() const
     }
 
     return AV_SAMPLE_FMT_NONE;
+}
+
+const StreamsStats::CommonStreamStatsPtr& StreamsStats::getReferenceStream() const
+{
+    for(auto& stream : streams) {
+        if(stream->getType() == AVMEDIA_TYPE_VIDEO)
+            return stream;
+    }
+
+    for(auto& stream : streams) {
+        if(stream->getType() == AVMEDIA_TYPE_AUDIO)
+            return stream;
+    }
+
+    return nullCommonStreamStatsPtr;
 }

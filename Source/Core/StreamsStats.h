@@ -33,9 +33,11 @@ public:
     int bitsPerRawVideoSample() const;
     int avSampleFormat() const;
 
+    const CommonStreamStatsPtr& getReferenceStream() const;
     const std::list<CommonStreamStatsPtr>& getStreams() const { return streams; }
 private:
     std::list<CommonStreamStatsPtr> streams;
+    CommonStreamStatsPtr nullCommonStreamStatsPtr;
 };
 
 #endif // StreamsStats_H

@@ -1406,8 +1406,9 @@ struct Output {
 
     AVFilterGraph* FilterGraph = { nullptr };
 
-    int Scale_OutputPixelFormat = { AV_PIX_FMT_YUVJ420P };
-    int Output_PixelFormat = { AV_PIX_FMT_YUVJ420P };
+    int Scale_OutputPixelFormat = { AV_PIX_FMT_YUV420P };
+    int Output_PixelFormat = { AV_PIX_FMT_YUV420P };
+    int Output_ColorRange = { AVCOL_RANGE_JPEG };
     int Output_CodecID = { AV_CODEC_ID_MJPEG };
     int Width = { 0 };
     int Height = { 0 };
@@ -1462,6 +1463,7 @@ struct Output {
         Output_CodecContext->width         = size.width();
         Output_CodecContext->height        = size.height();
         Output_CodecContext->pix_fmt       = (AVPixelFormat) Output_PixelFormat;
+        Output_CodecContext->color_range   = (AVColorRange) Output_ColorRange;
         Output_CodecContext->time_base.num = timeBaseNum;
         Output_CodecContext->time_base.den = timeBaseDen;
 
@@ -1513,6 +1515,7 @@ struct Output {
                 scaledFrame->width = Width;
                 scaledFrame->height= Height;
                 scaledFrame->format=(AVPixelFormat)Scale_OutputPixelFormat;
+                scaledFrame->color_range = (AVColorRange) Output_ColorRange;
 
                 av_image_alloc(scaledFrame->data, scaledFrame->linesize, scaledFrame->width, scaledFrame->height, (AVPixelFormat) Scale_OutputPixelFormat, 1);
                 if (sws_scale(ScaleContext, Frame->data, Frame->linesize, 0, Frame->height, scaledFrame->data, scaledFrame->linesize)<0)
@@ -1600,15 +1603,20 @@ void FileInformation::makeMkvReport(QString exportFileName, QByteArray attachmen
     FFmpegVideoEncoder::Metadata streamMetadata;
     streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString("Frame Thumbnails"));
 
-    auto timeBase = QString::fromStdString(streamsStats->getStreams().begin()->get()->getTime_base());
+    auto timeBase = streamsStats->getReferenceStream() ? QString::fromStdString(streamsStats->getReferenceStream()->getTime_base()) : QString("1/25");
     auto timeBaseSplitted = timeBase.split("/");
     int num = timeBaseSplitted[0].toInt();
     int den = timeBaseSplitted[1].toInt();
 
-    auto codecTimeBase = QString::fromStdString(streamsStats->getStreams().begin()->get()->getCodec_Time_Base());
+    auto codecTimeBase = streamsStats->getReferenceStream() ? QString::fromStdString(streamsStats->getReferenceStream()->getCodec_Time_Base()) : QString("0/1");
     auto codecTimeBaseSplitted = codecTimeBase.split("/");
     int codecNum = codecTimeBaseSplitted[0].toInt();
     int codecDen = codecTimeBaseSplitted[1].toInt();
+    if (av_cmp_q(AVRational {codecNum, codecDen}, AVRational {0, 1}) == 0) // Codec time base is not always set
+    {
+        codecNum = num;
+        codecDen = den;
+    }
 
     source.metadata = streamMetadata;
     source.width = m_thumbnails_frames.empty() ? 0 : m_thumbnails_frames[0].size().width();
@@ -1698,15 +1706,20 @@ void FileInformation::makeMkvReport(QString exportFileName, QByteArray attachmen
             panelSource.height = panelSize().height();
 
             // 2do: take related stream instead of first one
-            auto timeBase = QString::fromStdString(streamsStats->getStreams().begin()->get()->getTime_base());
+            auto timeBase = streamsStats->getReferenceStream() ? QString::fromStdString(streamsStats->getReferenceStream()->getTime_base()) : QString("1/25");
             auto timeBaseSplitted = timeBase.split("/");
             int num = timeBaseSplitted[0].toInt();
             int den = timeBaseSplitted[1].toInt();
 
-            auto codecTimeBase = QString::fromStdString(streamsStats->getStreams().begin()->get()->getCodec_Time_Base());
+            auto codecTimeBase = streamsStats->getReferenceStream() ? QString::fromStdString(streamsStats->getReferenceStream()->getCodec_Time_Base()) : QString("0/1");
             auto codecTimeBaseSplitted = codecTimeBase.split("/");
             int codecNum = codecTimeBaseSplitted[0].toInt();
             int codecDen = codecTimeBaseSplitted[1].toInt();
+            if (av_cmp_q(AVRational {codecNum, codecDen}, AVRational {0, 1}) == 0) // Codec time base is not always set
+            {
+                codecNum = num;
+                codecDen = den;
+            }
 
             std::shared_ptr<Output> output = std::make_shared<Output>();
             output->scaleBeforeEncoding = true;
