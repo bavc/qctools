@@ -1603,12 +1603,12 @@ void FileInformation::makeMkvReport(QString exportFileName, QByteArray attachmen
     FFmpegVideoEncoder::Metadata streamMetadata;
     streamMetadata << FFmpegVideoEncoder::MetadataEntry(QString("title"), QString("Frame Thumbnails"));
 
-    auto timeBase = QString::fromStdString(streamsStats->getStreams().begin()->get()->getTime_base());
+    auto timeBase = streamsStats->getReferenceStream() ? QString::fromStdString(streamsStats->getReferenceStream()->getTime_base()) : QString("1/25");
     auto timeBaseSplitted = timeBase.split("/");
     int num = timeBaseSplitted[0].toInt();
     int den = timeBaseSplitted[1].toInt();
 
-    auto codecTimeBase = QString::fromStdString(streamsStats->getStreams().begin()->get()->getCodec_Time_Base());
+    auto codecTimeBase = streamsStats->getReferenceStream() ? QString::fromStdString(streamsStats->getReferenceStream()->getCodec_Time_Base()) : QString("0/1");
     auto codecTimeBaseSplitted = codecTimeBase.split("/");
     int codecNum = codecTimeBaseSplitted[0].toInt();
     int codecDen = codecTimeBaseSplitted[1].toInt();
@@ -1706,12 +1706,12 @@ void FileInformation::makeMkvReport(QString exportFileName, QByteArray attachmen
             panelSource.height = panelSize().height();
 
             // 2do: take related stream instead of first one
-            auto timeBase = QString::fromStdString(streamsStats->getStreams().begin()->get()->getTime_base());
+            auto timeBase = streamsStats->getReferenceStream() ? QString::fromStdString(streamsStats->getReferenceStream()->getTime_base()) : QString("1/25");
             auto timeBaseSplitted = timeBase.split("/");
             int num = timeBaseSplitted[0].toInt();
             int den = timeBaseSplitted[1].toInt();
 
-            auto codecTimeBase = QString::fromStdString(streamsStats->getStreams().begin()->get()->getCodec_Time_Base());
+            auto codecTimeBase = streamsStats->getReferenceStream() ? QString::fromStdString(streamsStats->getReferenceStream()->getCodec_Time_Base()) : QString("0/1");
             auto codecTimeBaseSplitted = codecTimeBase.split("/");
             int codecNum = codecTimeBaseSplitted[0].toInt();
             int codecDen = codecTimeBaseSplitted[1].toInt();
