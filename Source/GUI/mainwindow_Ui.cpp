@@ -139,6 +139,19 @@ void MainWindow::Ui_Init()
     // Drag n drop
     setAcceptDrops(true);
 
+#ifdef MACSTORE
+    if (ui->actionExport_XmlGz_Sidecar)
+        ui->actionExport_XmlGz_Sidecar->setVisible(false);
+    if (ui->actionExport_Mkv_Prompt)
+        ui->actionExport_Mkv_Prompt->setVisible(false);
+    if (ui->actionExport_Mkv_Sidecar)
+        ui->actionExport_Mkv_Sidecar->setVisible(false);
+    if (ui->actionExport_XmlGz_SidecarAll)
+        ui->actionExport_XmlGz_SidecarAll->setVisible(false);
+    if (ui->actionExport_Mkv_SidecarAll)
+        ui->actionExport_Mkv_SidecarAll->setVisible(false);
+#endif // MACSTORE
+
     // Icons
     ui->actionOpen->setIcon(QIcon(":/icon/document-open.png"));
     ui->actionExport_XmlGz_Prompt->setIcon(QIcon(":/icon/export_xml.png"));
@@ -411,7 +424,9 @@ void MainWindow::configureZoom()
 
         ui->actionGoTo->setEnabled(!Files.empty());
         ui->actionExport_XmlGz_Prompt->setEnabled(!Files.empty());
+#ifndef MACSTORE
         ui->actionExport_XmlGz_Sidecar->setEnabled(!Files.empty());
+#endif // !MACSTORE
         //ui->actionPrint->setEnabled(!Files.empty());
         return;
     }
@@ -421,7 +436,9 @@ void MainWindow::configureZoom()
     ui->actionZoomIn->setEnabled( isPlotZoomable() );
     ui->actionGoTo->setEnabled(true);
     ui->actionExport_XmlGz_Prompt->setEnabled(true);
+#ifndef MACSTORE
     ui->actionExport_XmlGz_Sidecar->setEnabled(true);
+#endif // !MACSTORE
     //ui->actionPrint->setEnabled(true);
 }
 
