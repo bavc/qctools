@@ -50,7 +50,7 @@ cat > $APPNAME.xcarchive/Info.plist <<EOF
 		<key>CFBundleShortVersionString</key>
 		<string>$VERSION</string>
 		<key>CFBundleVersion</key>
-		<string>1.3.1</string>
+		<string>1.4</string>
 		<key>IconPaths</key>
 		<array>
 			<string>Applications/$APPNAME.app/Contents/Resources/Logo.icns</string>
