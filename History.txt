@@ -1,4 +1,4 @@
-1.4, 2024-12
+1.4, 2024-12-30
 === Thanks to George Blood LP for their support and contributions to this release ===
 + QCTools plotted data now has color fills to readability.
 + The y-axis per plot can be adjusted to show the full range, fit to plot, or to show a custom min/max range.
