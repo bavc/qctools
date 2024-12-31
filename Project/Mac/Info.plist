@@ -19,9 +19,9 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.3</string>
+    <string>1.4</string>
     <key>CFBundleVersion</key>
-    <string>1.3</string>
+    <string>1.4</string>
     <key>DTCompiler</key>
     <string></string>
     <key>DTPlatformBuild</key>
@@ -31,7 +31,7 @@
     <key>DTSDKBuild</key>
     <string>10K549</string>
     <key>DTSDKName</key>
-    <string>macosx10.12</string>
+    <string>macosx11</string>
     <key>DTXcode</key>
     <string>0420</string>
     <key>DTXcodeBuild</key>
@@ -39,7 +39,7 @@
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.utilities</string>
     <key>LSMinimumSystemVersion</key>
-    <string>10.12</string>
+    <string>11</string>
     <key>NSHumanReadableCopyright</key>
     <string>(c) MediaArea.net</string>
     <key>NSMainNibFile</key>

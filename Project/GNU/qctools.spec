@@ -1,4 +1,4 @@
-%define qctools_version           1.3
+%define qctools_version           1.4
 %define debug_package %{nil}
 %define _unpackaged_files_terminate_build 0
 
