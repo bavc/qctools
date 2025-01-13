@@ -386,12 +386,14 @@ void MainWindow::on_actionFilesList_triggered()
         ui->menuLegacy_outputs->setVisible(false);
     if (ui->actionExport_XmlGz_Prompt)
         ui->actionExport_XmlGz_Prompt->setVisible(false);
-    if (ui->actionExport_XmlGz_Sidecar)
-        ui->actionExport_XmlGz_Sidecar->setVisible(false);
     if (ui->actionExport_Mkv_Prompt)
         ui->actionExport_Mkv_Prompt->setVisible(false);
+#ifndef MACSTORE
+    if (ui->actionExport_XmlGz_Sidecar)
+        ui->actionExport_XmlGz_Sidecar->setVisible(false);
     if (ui->actionExport_Mkv_Sidecar)
         ui->actionExport_Mkv_Sidecar->setVisible(false);
+#endif // !MACSTORE
     if (ui->actionExport_Mkv_QCvault)
         ui->actionExport_Mkv_QCvault->setVisible(false);
     if (ui->actionPrint)
@@ -436,12 +438,14 @@ void MainWindow::on_actionGraphsLayout_triggered()
         ui->actionGoTo->setVisible(true);
     if (ui->actionExport_XmlGz_Prompt)
         ui->actionExport_XmlGz_Prompt->setVisible(true);
-    if (ui->actionExport_XmlGz_Sidecar)
-        ui->actionExport_XmlGz_Sidecar->setVisible(true);
     if (ui->actionExport_Mkv_Prompt)
         ui->actionExport_Mkv_Prompt->setVisible(true);
+#ifndef MACSTORE
+    if (ui->actionExport_XmlGz_Sidecar)
+        ui->actionExport_XmlGz_Sidecar->setVisible(true);
     if (ui->actionExport_Mkv_Sidecar)
         ui->actionExport_Mkv_Sidecar->setVisible(true);
+#endif // !MACSTORE
     //if (ui->actionPrint)
     //    ui->actionPrint->setVisible(true);
     if (ui->actionZoomIn)
@@ -823,12 +827,18 @@ void MainWindow::updateExportActions()
         exportEnabled = hasStats || parsed;
     }
     ui->actionExport_XmlGz_Prompt->setEnabled(exportEnabled);
-    ui->actionExport_XmlGz_Sidecar->setEnabled(exportEnabled);
     ui->actionExport_Mkv_Prompt->setEnabled(exportEnabled);
+#ifndef MACSTORE
+    ui->actionExport_XmlGz_Sidecar->setEnabled(exportEnabled);
     ui->actionExport_Mkv_Sidecar->setEnabled(exportEnabled);
+#endif // !MACSTORE
     ui->actionExport_Mkv_QCvault->setEnabled(exportEnabled);
 
+#ifndef MACSTORE
     ui->menuLegacy_outputs->setEnabled(ui->actionExport_XmlGz_Prompt->isEnabled() || ui->actionExport_XmlGz_Sidecar->isEnabled() || ui->actionExport_XmlGz_SidecarAll->isEnabled());
+#else
+    ui->menuLegacy_outputs->setEnabled(ui->actionExport_XmlGz_Prompt->isEnabled());
+#endif // !MACSTORE
 }
 
 void MainWindow::updateExportAllAction()
@@ -842,11 +852,17 @@ void MainWindow::updateExportAllAction()
         }
     }
 
+#ifndef MACSTORE
     ui->actionExport_XmlGz_SidecarAll->setEnabled(allParsedOrHaveStats);
     ui->actionExport_Mkv_SidecarAll->setEnabled(allParsedOrHaveStats);
+#endif // !MACSTORE
     ui->actionExport_Mkv_QCvaultAll->setEnabled(allParsedOrHaveStats);
 
+#ifndef MACSTORE
     ui->menuLegacy_outputs->setEnabled(ui->actionExport_XmlGz_Prompt->isEnabled() || ui->actionExport_XmlGz_Sidecar->isEnabled() || ui->actionExport_XmlGz_SidecarAll->isEnabled());
+#else
+    ui->menuLegacy_outputs->setEnabled(ui->actionExport_XmlGz_Prompt->isEnabled());
+#endif // !MACSTORE
 }
 
 void MainWindow::showPlayer()

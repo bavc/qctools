@@ -8,6 +8,12 @@ USE_BREW = $$(USE_BREW)
     DEFINES += USE_BREW
 }
 
+macx {
+    contains(MACSTORE, yes|1) {
+        DEFINES += MACSTORE
+    }
+}
+
 include(ffmpeg.pri)
 
 contains(DEFINES, USE_BREW) {
