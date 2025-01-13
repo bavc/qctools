@@ -11,7 +11,7 @@ jobs:
         compiler: ['clang-9']
         include:
           - compiler: clang-9
-            packages: llvm@13
+            packages: llvm@15
             env: { 'CC': 'clang', 'CXX': 'clang++' }
 
     runs-on: macos-latest
@@ -68,7 +68,7 @@ jobs:
         compiler: ['clang-9']
         include:
           - compiler: clang-9
-            packages: llvm@13
+            packages: llvm@15
             env: { 'CC': 'clang', 'CXX': 'clang++', 'HOMEBREW_NO_INSTALL_CLEANUP': '1', 'HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK': '1' }
 
     runs-on: macos-latest
@@ -124,7 +124,7 @@ jobs:
         compiler: ['clang-9']
         include:
           - compiler: clang-9
-            packages: llvm@13
+            packages: llvm@15
             env: { 'CC': 'clang', 'CXX': 'clang++' }
           - qt_version: "5.15.*"
 
@@ -209,7 +209,7 @@ jobs:
         compiler: ['clang-9']
         include:
           - compiler: clang-9
-            packages: llvm@13
+            packages: llvm@15
             env: { 'CC': 'clang', 'CXX': 'clang++', 'HOMEBREW_NO_INSTALL_CLEANUP': '1', 'HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK': '1' }
           - qt_version: "6.5.*"
             qt_modules: "qtmultimedia"
