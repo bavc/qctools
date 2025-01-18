@@ -9,6 +9,7 @@
 #include <QRadioButton>
 #include <QWidget>
 #include <QPointer>
+#include <functional>
 #include "doublespinboxwithslider.h"
 #include "filters.h"
 

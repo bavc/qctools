@@ -11,11 +11,25 @@ source=(${pkgname}_${pkgver}-1.tar.gz)
 md5sums=('00000000000000000000000000000000')
 arch=('i686' 'x86_64')
 
-depends=('qt5-base' 'qt5-multimedia' 'qt5-declarative' 'bzip2' 'zlib' 'yasm')
+depends=('qt6-base' 'qt6-multimedia' 'qt6-multimedia-ffmpeg' 'qt6-declarative' 'freetype2' 'harfbuzz' 'bzip2' 'zlib' 'yasm')
 
 build() {
+    cd "${srcdir}/qctools/ffmpeg"
+    ./configure --enable-gpl --enable-version3 --disable-autodetect --disable-programs --disable-securetransport --disable-videotoolbox --enable-static --disable-shared --disable-doc --disable-debug --disable-lzma --disable-iconv --enable-pic --prefix="$(pwd)" --enable-libfreetype --enable-libharfbuzz
+    make
+
+    cd "${srcdir}/qctools/qwt"
+    export QWT_STATIC=1 QWT_NO_SVG=1 QWT_NO_OPENGL=1 QWT_NO_DESIGNER=1
+    qmake6
+    make
+
     cd "${srcdir}/qctools/qctools"
-    ./Project/BuildAllFromSource/build
+    chmod 644 History.txt
+    chmod 644 License.html
+    mkdir Project/QtCreator/build
+    cd Project/QtCreator/build
+    qmake6 DEFINES+=QT_AVPLAYER_MULTIMEDIA ..
+    make
 }
 
 package_qctools() {

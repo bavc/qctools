@@ -73,14 +73,15 @@ Push-Location -Path QCTools_${version}_Windows_x64
         Copy-Item -Path $build_path\qctools\Project\QtCreator\build\qctools-gui\release\tls\qopensslbackend.dll
         Copy-Item -Path $build_path\qctools\Project\QtCreator\build\qctools-gui\release\tls\qschannelbackend.dll
     Pop-Location
-    Copy-Item -Path $build_path\ffmpeg\bin\avdevice-*.dll
-    Copy-Item -Path $build_path\ffmpeg\bin\avcodec-*.dll
-    Copy-Item -Path $build_path\ffmpeg\bin\avfilter-*.dll
-    Copy-Item -Path $build_path\ffmpeg\bin\avformat-*.dll
-    Copy-Item -Path $build_path\ffmpeg\bin\avutil-*.dll
-    Copy-Item -Path $build_path\ffmpeg\bin\postproc-*.dll
-    Copy-Item -Path $build_path\ffmpeg\bin\swresample-*.dll
-    Copy-Item -Path $build_path\ffmpeg\bin\swscale-*.dll
+    Copy-Item -Path $build_path\output\lib\qwt.dll
+    Copy-Item -Path $build_path\output\bin\avdevice-*.dll
+    Copy-Item -Path $build_path\output\bin\avcodec-*.dll
+    Copy-Item -Path $build_path\output\bin\avfilter-*.dll
+    Copy-Item -Path $build_path\output\bin\avformat-*.dll
+    Copy-Item -Path $build_path\output\bin\avutil-*.dll
+    Copy-Item -Path $build_path\output\bin\postproc-*.dll
+    Copy-Item -Path $build_path\output\bin\swresample-*.dll
+    Copy-Item -Path $build_path\output\bin\swscale-*.dll
     Copy-Item -Path $build_path\output\bin\freetype-*.dll
     Copy-Item -Path $build_path\output\bin\harfbuzz.dll
     Copy-Item -Path $Env:VCToolsRedistDir\x64\Microsoft.VC143.CRT\concrt140.dll

@@ -26,10 +26,11 @@ macx:!isEmpty(USE_BREW):equals(USE_BREW, true) {
     include( $${QWT_ROOT}/qwtfunctions.pri )
 
     macx {
-        macx:LIBS       += -F$${QWT_ROOT}/lib -framework qwt
+        contains(STATIC, yes|1):LIBS += -L$${QWT_ROOT}/lib -lqwt
+        else:                   LIBS += -F$${QWT_ROOT}/lib -framework qwt
     }
 
-    win32-msvc* {
+    !contains(STATIC, yes|1):win32-msvc* {
         DEFINES += QWT_DLL
     }
 
@@ -40,6 +41,7 @@ macx:!isEmpty(USE_BREW):equals(USE_BREW, true) {
     }
 
     INCLUDEPATH += $$QWT_ROOT/src
+    INCLUDEPATH += $$QWT_ROOT/include
 
     # copy qwt
     if(equals(MAKEFILE_GENERATOR, MSVC.NET)|equals(MAKEFILE_GENERATOR, MSBUILD)) {

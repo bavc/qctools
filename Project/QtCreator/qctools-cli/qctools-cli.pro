@@ -13,6 +13,8 @@ TEMPLATE = app
 
 message("PWD = " $$PWD)
 
+win32:RC_FILE = qcli.rc
+
 # link against libqctools
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../qctools-lib/release/ -lqctools
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../qctools-lib/debug/ -lqctools
@@ -53,9 +55,6 @@ DEFINES += QT_DEPRECATED_WARNING
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 include(../zlib.pri)
-win32 {
-    LIBS += -lbcrypt -lwsock32 -lws2_32
-}
 
 !win32 {
     LIBS      += -lbz2
@@ -81,10 +80,10 @@ macx:LIBS += -liconv \
 HEADERS += \
     version.h
 
-message('qctools-lib: including ffmpeg')
-include(../ffmpeg.pri)
-
 INCLUDEPATH += ../qctools-QtAVPlayer/src
 include(../qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.pri)
+
+message('qctools-lib: including ffmpeg')
+include(../ffmpeg.pri)
 
 message('leaving qctools-cli.pro')

@@ -5,6 +5,9 @@ TEMPLATE = lib
 CONFIG += c++1z
 CONFIG += staticlib
 
+
+include(../brew.pri)
+
 message('qctools-lib: including ffmpeg')
 include(../ffmpeg.pri)
 

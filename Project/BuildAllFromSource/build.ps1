@@ -9,6 +9,7 @@
 # - pkg-config binary in the PATH                                                                 #
 # - Meson binary in the PATH                                                                      #
 # - Ninja binary in the PATH                                                                      #
+# - Git binary in the PATH                                                                        #
 # - Configured WSL2 Linux environment with pkgconf, make and nasm packages installed              #
 ###################################################################################################
 
@@ -20,12 +21,17 @@ function Cmd-Result {
 }
 
 # setup environment
+$SCRIPT_DIR=$PSScriptRoot
+Push-Location "$SCRIPT_DIR\..\..\.."
+    $INSTALL_DIR=(Get-Location).Path
+Pop-Location
+Set-Location $INSTALL_DIR
+
 $ErrorActionPreference="Stop"
 $Env:SUBDIR= # Prevent ffmpeg build error
-$Env:PKG_CONFIG_PATH="$Pwd\output\lib\pkgconfig"
+$Env:PKG_CONFIG_PATH="$INSTALL_DIR\output\lib\pkgconfig"
 $FFmpeg_CmdLine=@(
     '--toolchain=msvc',
-    '--prefix=.',
     '--enable-shared',
     '--disable-static',
     '--disable-doc',
@@ -39,6 +45,21 @@ $FFmpeg_CmdLine=@(
     '--extra-libs=msvcrt.lib'
 )
 
+# get dependencies
+Write-Output "Get Dependencies"
+Get-Content "$SCRIPT_DIR\dependencies.txt" | ForEach-Object {
+    $DIR=($_ -Split ':', 2)[0]
+    $URL=($_ -Split ':', 2)[1]
+    if (-not (Test-Path "$DIR")) {
+        New-Item -ItemType Directory -Path "$DIR"
+        Push-Location "$DIR"
+           curl.exe -LO "$URL" ; Cmd-Result
+           tar --extract --strip-components=1 --file="$($URL.Split('/')[-1])" ; Cmd-Result
+           Remove-Item -Force -Path "$($URL.Split('/')[-1])"
+        Pop-Location
+    }
+}
+
 # freetype
 Write-Output "Build FreeType"
 if (Test-Path -Path freetype\build) {
@@ -46,7 +67,7 @@ if (Test-Path -Path freetype\build) {
 }
 New-Item -ItemType directory -Name freetype\build
 Push-Location -Path freetype\build
-    meson setup --prefix $Pwd\..\..\output --buildtype=release -Db_vscrt=md -Dbrotli=disabled -Dbzip2=disabled -Dharfbuzz=disabled -Dpng=disabled -Dzlib=internal .. ; Cmd-Result
+    meson setup --prefix "$INSTALL_DIR\output" --buildtype=release -Db_vscrt=md -Dbrotli=disabled -Dbzip2=disabled -Dharfbuzz=disabled -Dpng=disabled -Dzlib=internal .. ; Cmd-Result
     ninja install ; Cmd-Result
 Pop-Location
 
@@ -57,7 +78,7 @@ if (Test-Path -Path harfbuzz\build) {
 }
 New-Item -ItemType directory -Name harfbuzz\build
 Push-Location -Path harfbuzz\build
-    meson setup --prefix $Pwd\..\..\output --buildtype=release -Db_vscrt=md -Dglib=disabled -Dgobject=disabled -Dcairo=disabled -Dchafa=disabled -Dicu=disabled -Dgraphite=disabled -Dgraphite2=disabled -Dgdi=disabled -Ddirectwrite=disabled -Dcoretext=disabled -Dwasm=disabled -Dtests=disabled -Dintrospection=disabled -Ddocs=disabled -Ddoc_tests=false -Dutilities=disabled .. ; Cmd-Result
+    meson setup --prefix "$INSTALL_DIR\output" --buildtype=release -Db_vscrt=md -Dglib=disabled -Dgobject=disabled -Dcairo=disabled -Dchafa=disabled -Dicu=disabled -Dgraphite=disabled -Dgraphite2=disabled -Dgdi=disabled -Ddirectwrite=disabled -Dcoretext=disabled -Dwasm=disabled -Dtests=disabled -Dintrospection=disabled -Ddocs=disabled -Ddoc_tests=false -Dutilities=disabled .. ; Cmd-Result
     ninja install ; Cmd-Result
 Pop-Location
 
@@ -72,26 +93,27 @@ Pop-Location
 # ffmpeg
 Write-Output "Build FFmpeg"
 Push-Location ffmpeg
-    if (Test-Path -Path Makefile) {
-        wsl --shell-type standard  --  make clean
-    }
-    wsl --shell-type standard  -- PKG_CONFIG_PATH=`$PWD/../output/lib/pkgconfig ./configure @FFmpeg_CmdLine ; Cmd-Result
-    wsl --shell-type standard  --  make install ; Cmd-Result
+    wsl --shell-type standard -- PKG_CONFIG_PATH=`$PWD/../output/lib/pkgconfig ./configure --prefix=`$PWD/../output @FFmpeg_CmdLine ; Cmd-Result
+    wsl --shell-type standard -- make install ; Cmd-Result
 Pop-Location
-
 
 # qwt
 Write-Output "Build Qwt"
-Push-Location -Path qwt
-    $Env:QWT_STATIC=1
+if (Test-Path -Path qwt\build) {
+    Remove-Item -Recurse -Force -Path qwt\build
+}
+New-Item -ItemType directory -Name qwt\build
+Push-Location -Path qwt\build
+    git -C .. apply "$SCRIPT_DIR\qwt.patch" ; Cmd-Result
     $Env:QWT_NO_SVG=1
     $Env:QWT_NO_OPENGL=1
     $Env:QWT_NO_DESIGNER=1
-    if (Test-Path -Path Makefile) {
-        nmake distclean
-    }
-    qmake -recursive ; Cmd-Result
-    nmake Release ; Cmd-Result
+    $Env:QWT_NO_EXAMPLES=1
+    $Env:QWT_NO_PLAYGROUND=1
+    $Env:QWT_NO_TESTS=1
+    $Env:QWT_INSTALL_PREFIX="$INSTALL_DIR\output"
+    qmake .. ; Cmd-Result
+    nmake install ; Cmd-Result
 Pop-Location
 
 # qctools
@@ -101,8 +123,13 @@ if (Test-Path -Path qctools\Project\QtCreator\build) {
 }
 New-Item -ItemType directory -Name qctools\Project\QtCreator\build
 Push-Location -Path qctools\Project\QtCreator\build
+    $Env:QWT_ROOT="$INSTALL_DIR/output"
+    $Env:FFMPEG="$INSTALL_DIR/output"
     qmake QMAKE_CXXFLAGS+=/Zi QMAKE_LFLAGS+=/INCREMENTAL:NO QMAKE_LFLAGS+=/Debug DEFINES+=QT_AVPLAYER_MULTIMEDIA .. ; Cmd-Result
     nmake Release ; Cmd-Result
     windeployqt qctools-gui/release/QCTools.exe ; Cmd-Result
     windeployqt qctools-cli/release/qcli.exe ; Cmd-Result
 Pop-Location
+
+Write-Output "QCTools binary is in $INSTALL_DIR/qctools/Project/QtCreator/build/qctools-gui"
+Write-Output "qcli binary is in $INSTALL_DIR/qctools/Project/QtCreator/build/qctools-cli"
