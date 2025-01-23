@@ -3,7 +3,10 @@
 
 # Uncomment this to turn on verbose mode.
 export DH_VERBOSE=1
-export QT_SELECT=qt5
+export QWT_STATIC=1
+export QWT_NO_SVG=1
+export QWT_NO_OPENGL=1
+export QWT_NO_DESIGNER=1
 
 configure: configure-stamp
 configure-stamp:
@@ -18,10 +21,17 @@ build-stamp: configure-stamp
 	dh_testdir
 
 	# Add here commands to compile the package.
-	cd qctools && ./Project/BuildAllFromSource/build
+	cd ffmpeg && ./configure --enable-gpl --enable-version3 --disable-autodetect --disable-programs --disable-securetransport --disable-videotoolbox --enable-static --disable-shared --disable-doc --disable-debug --disable-lzma --disable-iconv --enable-pic --prefix="$(pwd)" --enable-libfreetype --enable-libharfbuzz
+	cd ffmpeg && $(MAKE)
+	
+	cd qwt && qmake6
+	cd qwt && $(MAKE)
+
+	mkdir qctools/Project/QtCreator/build
+	cd qctools/Project/QtCreator/build && qmake6 DEFINES+=QT_AVPLAYER_MULTIMEDIA ..
+	cd qctools/Project/QtCreator/build && $(MAKE)
 
 	touch $@
-
 clean: 
 	dh_testdir
 	dh_testroot

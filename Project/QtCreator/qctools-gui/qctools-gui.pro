@@ -7,9 +7,11 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport qml
 TARGET = QCTools
 TEMPLATE = app
 
-CONFIG += c++1z qt
+CONFIG += c++17 qt
 
 message("PWD = " $$PWD)
+
+win32:RC_FILE = QCTools.rc
 
 # link against libqctools
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../qctools-lib/release/ -lqctools
@@ -208,13 +210,14 @@ for(resource, DRESOURCES) {
 INCLUDEPATH += $$SOURCES_PATH
 INCLUDEPATH += $$SOURCES_PATH/ThirdParty/cqmarkdown
 include(../qwt.pri)
-include(../ffmpeg.pri)
 
 CONFIG -= no_keywords
 
 DEFINES += QT_AVPLAYER_MULTIMEDIA
 INCLUDEPATH += ../qctools-QtAVPlayer/src
 include(../qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.pri)
+
+include(../ffmpeg.pri)
 
 greaterThan(QT_MAJOR_VERSION, 5) {
     win32-msvc* {
@@ -223,13 +226,14 @@ greaterThan(QT_MAJOR_VERSION, 5) {
     }
 }
 
-win32-g++* {
-    LIBS += -lbcrypt -lwsock32 -lws2_32
+macx {
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 11.0
+    QMAKE_INFO_PLIST = ../../Mac/Info.plist
 }
 
 macx:ICON = $$SOURCES_PATH/Resource/Logo.icns
 macx:LIBS += -liconv \
-	     -framework CoreFoundation \
+             -framework CoreFoundation \
              -framework Foundation \
              -framework AppKit \
              -framework AudioToolBox \

@@ -10,6 +10,9 @@
 #include <QtPlugin>
 #include <iostream>
 
+#if defined(_WIN32) && !defined(_DLL)
+    Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+#endif
 
 #include <QtCore/QtPlugin>
 

@@ -1,0 +1,136 @@
+diff --git a/qwtconfig.pri b/qwtconfig.pri
+index d0b5d7c..4f05e09 100644
+--- a/qwtconfig.pri
++++ b/qwtconfig.pri
+@@ -16,16 +16,19 @@ QWT_VERSION      = $${QWT_VER_MAJ}.$${QWT_VER_MIN}.$${QWT_VER_PAT}
+ # Install paths
+ ######################################################################
+ 
+-QWT_INSTALL_PREFIX = $$[QT_INSTALL_PREFIX]
+-
+-unix {
+-    QWT_INSTALL_PREFIX    = /usr/local/qwt-$$QWT_VERSION
+-    # QWT_INSTALL_PREFIX = /usr/local/qwt-$$QWT_VERSION-qt-$$QT_VERSION
+-}
+-
+-win32 {
+-    QWT_INSTALL_PREFIX    = C:/Qwt-$$QWT_VERSION
+-    # QWT_INSTALL_PREFIX = C:/Qwt-$$QWT_VERSION-qt-$$QT_VERSION
++QWT_INSTALL_PREFIX = $$(QWT_INSTALL_PREFIX)
++
++isEmpty(QWT_INSTALL_PREFIX) {
++    QWT_INSTALL_PREFIX = $$[QT_INSTALL_PREFIX]
++    unix {
++        QWT_INSTALL_PREFIX    = /usr/local/qwt-$$QWT_VERSION-dev
++        # QWT_INSTALL_PREFIX = /usr/local/qwt-$$QWT_VERSION-dev-qt-$$QT_VERSION
++    }
++
++    win32 {
++        QWT_INSTALL_PREFIX    = C:/Qwt-$$QWT_VERSION-dev
++        # QWT_INSTALL_PREFIX = C:/Qwt-$$QWT_VERSION-dev-qt-$$QT_VERSION
++    }
+ }
+ 
+ QWT_INSTALL_DOCS      = $${QWT_INSTALL_PREFIX}/doc
+@@ -72,7 +75,13 @@ QWT_INSTALL_FEATURES  = $${QWT_INSTALL_PREFIX}/features
+ # it will be a static library.
+ ######################################################################
+ 
+-QWT_CONFIG           += QwtDll
++QWT_STATIC=$$(QWT_STATIC)
++isEmpty(QWT_STATIC) {
++    QWT_CONFIG           += QwtDll
++    message('using dynamic build')
++} else {
++    message('using static build')
++}
+ 
+ ######################################################################
+ # QwtPlot enables all classes, that are needed to use the QwtPlot
+@@ -100,13 +109,25 @@ QWT_CONFIG     += QwtWidgets
+ # export a plot to a SVG document
+ ######################################################################
+ 
+-QWT_CONFIG     += QwtSvg
++QWT_NO_SVG=$$(QWT_NO_SVG)
++isEmpty(QWT_NO_SVG) {
++    QWT_CONFIG     += QwtSvg
++    message('enable svg support')
++} else {
++    message('disable svg support')
++}
+ 
+ ######################################################################
+ # If you want to use a OpenGL plot canvas
+ ######################################################################
+ 
+-QWT_CONFIG     += QwtOpenGL
++QWT_NO_OPENGL=$$(QWT_NO_OPENGL)
++isEmpty(QWT_NO_OPENGL) {
++    QWT_CONFIG     += QwtOpenGL
++    message('enable opengl support')
++} else {
++    message('disable opengl support')
++}
+ 
+ ######################################################################
+ # If you want to build the Qwt designer plugin,
+@@ -114,7 +135,13 @@ QWT_CONFIG     += QwtOpenGL
+ # Otherwise you have to build it from the designer directory.
+ ######################################################################
+ 
+-QWT_CONFIG     += QwtDesigner
++QWT_NO_DESIGNER=$$(QWT_NO_DESIGNER)
++isEmpty(QWT_NO_DESIGNER) {
++    QWT_CONFIG     += QwtDesigner
++    message('enable designer plugin')
++} else {
++    message('disable designer plugin')
++}
+ 
+ ######################################################################
+ # Compile all Qwt classes into the designer plugin instead
+@@ -137,7 +164,13 @@ win32 {
+ # Otherwise you have to build them from the examples directory.
+ ######################################################################
+ 
+-QWT_CONFIG     += QwtExamples
++QWT_NO_EXAMPLES=$$(QWT_NO_EXAMPLES)
++isEmpty(QWT_NO_EXAMPLES) {
++    QWT_CONFIG           += QwtExamples
++    message('enable examples')
++} else {
++    message('disable examples')
++}
+ 
+ ######################################################################
+ # The playground is primarily intended for the Qwt development
+@@ -148,14 +181,26 @@ QWT_CONFIG     += QwtExamples
+ # Otherwise you have to build them from the playground directory.
+ ######################################################################
+ 
+-QWT_CONFIG     += QwtPlayground
++QWT_NO_PLAYGROUND=$$(QWT_NO_PLAYGROUND)
++isEmpty(QWT_NO_PLAYGROUND) {
++    QWT_CONFIG           += QwtPlayground
++    message('enable playground')
++} else {
++    message('disable playground')
++}
+ 
+ ######################################################################
+ # If you want to auto build the tests, enable the line below
+ # Otherwise you have to build them from the tests directory.
+ ######################################################################
+ 
+-QWT_CONFIG     += QwtTests
++QWT_TESTS=$$(QWT_NO_TESTS)
++isEmpty(QWT_NO_EXAMPLES) {
++    QWT_CONFIG           += QwtTests
++    message('enable tests')
++} else {
++    message('disable tests')
++}
+ 
+ ######################################################################
+ # When Qt has been built as framework qmake wants

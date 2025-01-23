@@ -18,6 +18,8 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires:  gcc-c++
 BuildRequires:  pkgconfig
 BuildRequires:  zlib-devel
+BuildRequires:  freetype-devel
+BuildRequires:  harfbuzz-devel
 %if 0%{?fedora_version} >= 24
 BuildRequires: bzip2-devel
 %else
@@ -26,7 +28,6 @@ BuildRequires:  libbz2-devel
 %endif
 %endif
 BuildRequires:  yasm
-BuildRequires:  cmake
 %if 0%{?suse_version}
 BuildRequires:  update-desktop-files
 %endif
@@ -36,63 +37,46 @@ BuildRequires:  alternatives
 %endif
 
 %if 0%{?suse_version} >= 1200
-BuildRequires:  pkgconfig(Qt5Qml)
-BuildRequires:  pkgconfig(Qt5Svg)
-BuildRequires:  pkgconfig(Qt5Core)
-BuildRequires:  pkgconfig(Qt5Widgets)
-BuildRequires:  pkgconfig(Qt5Network)
-BuildRequires:  pkgconfig(Qt5Concurrent)
-BuildRequires:  pkgconfig(Qt5PrintSupport)
-BuildRequires:  pkgconfig(Qt5QuickControls2)
-BuildRequires:  pkgconfig(Qt5XmlPatterns)
-BuildRequires:  pkgconfig(Qt5Multimedia)
+BuildRequires:  pkgconfig(Qt6Qml)
+BuildRequires:  pkgconfig(Qt6Svg)
+BuildRequires:  pkgconfig(Qt6Core)
+BuildRequires:  pkgconfig(Qt6Widgets)
+BuildRequires:  pkgconfig(Qt6Network)
+BuildRequires:  pkgconfig(Qt6Concurrent)
+BuildRequires:  pkgconfig(Qt6PrintSupport)
+BuildRequires:  pkgconfig(Qt6QuickControls2)
+BuildRequires:  pkgconfig(Qt6Multimedia)
 BuildRequires:  libXv-devel
 %endif
 
 %if 0%{?fedora_version} ||  0%{?rhel} > 7
-BuildRequires:  pkgconfig(Qt5)
-BuildRequires:  pkgconfig(Qt5Qml)
-BuildRequires:  pkgconfig(Qt5QuickControls2)
-BuildRequires:  pkgconfig(Qt5Svg)
-BuildRequires:  pkgconfig(Qt5XmlPatterns)
-BuildRequires:  pkgconfig(Qt5Multimedia)
+BuildRequires:  pkgconfig(Qt6)
+BuildRequires:  pkgconfig(Qt6Qml)
+BuildRequires:  pkgconfig(Qt6QuickControls2)
+BuildRequires:  pkgconfig(Qt6Svg)
+BuildRequires:  pkgconfig(Qt6Multimedia)
+BuildRequires:  qt6-qtbase-private-devel
 BuildRequires:  desktop-file-utils
+BuildRequires:  libxkbcommon-devel
 BuildRequires:  libXv-devel
+
+%if 0%{?fedora_version} > 39
+BuildRequires:  libvpl
+%endif
 %endif
 
 %if 0%{?mageia}
-%ifarch x86_64
 BuildRequires:  lib64bzip2-devel
-BuildRequires:  lib64qt5qml-devel
-BuildRequires:  lib64qt5base5-devel
-BuildRequires:  lib64qt5quicktemplates2-devel
-BuildRequires:  lib64qt5quicktemplates2_5
-BuildRequires:  lib64qt5quickcontrols2-devel
-BuildRequires:  lib64qt5quickcontrols2_5
-BuildRequires:  lib64qt5quickwidgets-devel
-BuildRequires:  lib64qt5multimedia-devel
-BuildRequires:  lib64qt5svg-devel
-BuildRequires:  lib64qt5xmlpatterns-devel
-BuildRequires:  lib64qt5xmlpatterns5
-%else
-BuildRequires:  libbzip2-devel
-BuildRequires:  libqt5qml-devel
-BuildRequires:  libqt5base5-devel
-BuildRequires:  libqt5quicktemplates2-devel
-BuildRequires:  libqt5quicktemplates2_5
-BuildRequires:  libqt5quickcontrols2-devel
-BuildRequires:  libqt5quickcontrols2_5
-BuildRequires:  libqt5quickwidgets-devel
-BuildRequires:  libqt5multimedia-devel
-BuildRequires:  libqt5svg-devel
-BuildRequires:  libqt5xmlpatterns-devel
-BuildRequires:  libqt5xmlpatterns5
-%endif
-%if 0%{?mageia} > 5
-BuildRequires:  libproxy-pacrunner
-%endif
-BuildRequires:  sane-backends-iscan
-BuildRequires:  libuuid-devel
+BuildRequires:  lib64qt6qml-devel
+BuildRequires:  lib64qt6base6-devel
+BuildRequires:  lib64qt6quicktemplates2-devel
+BuildRequires:  lib64qt6quicktemplates26
+BuildRequires:  lib64qt6quickcontrols2-devel
+BuildRequires:  lib64qt6quickcontrols26
+BuildRequires:  lib64qt6quickwidgets-devel
+BuildRequires:  lib64qt6multimedia-devel
+BuildRequires:  lib64qt6multimediawidgets-devel
+BuildRequires:  lib64qt6svg-devel
 %endif
 
 %package -n qcli
@@ -131,10 +115,25 @@ the digital object, and the associated catalog record.
 %setup -q -n qctools
 
 # build
+pushd ffmpeg
+    ./configure --enable-gpl --enable-version3 --disable-autodetect --disable-programs --disable-securetransport --disable-videotoolbox --enable-static --disable-shared --disable-doc --disable-debug --disable-lzma --disable-iconv --enable-pic --prefix="$(pwd)" --enable-libfreetype --enable-libharfbuzz
+    %__make %{?jobs:-j%{jobs}}
+popd
+
+pushd qwt
+    export QWT_STATIC=1 QWT_NO_SVG=1 QWT_NO_OPENGL=1 QWT_NO_DESIGNER=1
+    qmake
+    %__make %{?jobs:-j%{jobs}}
+popd
+
 pushd qctools
     chmod 644 History.txt
     chmod 644 License.html
-    ./Project/BuildAllFromSource/build
+    mkdir Project/QtCreator/build
+    pushd Project/QtCreator/build
+    qmake DEFINES+=QT_AVPLAYER_MULTIMEDIA ..
+    %__make %{?jobs:-j%{jobs}}
+    popd
 popd
 
 %install

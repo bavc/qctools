@@ -1,0 +1,4 @@
+freetype:https://download.savannah.gnu.org/releases/freetype/freetype-2.13.2.tar.xz
+harfbuzz:https://github.com/harfbuzz/harfbuzz/releases/download/10.2.0/harfbuzz-10.2.0.tar.xz
+ffmpeg:https://ffmpeg.org/releases/ffmpeg-6.1.2.tar.xz
+qwt:https://sourceforge.net/projects/qwt/files/qwt/6.3.0/qwt-6.3.0.tar.bz2
