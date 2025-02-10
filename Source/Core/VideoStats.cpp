@@ -439,31 +439,32 @@ void VideoStats::setHeight(int height)
 //---------------------------------------------------------------------------
 std::string VideoStats::StatsToXML (const activefilters& filters)
 {
-    std::stringstream Data;
+    std::string Data;
 
     // Per frame (note: the XML header and footer are not created here)
     std::stringstream widthStream; widthStream<<width; // Note: we use the same value for all frame, we should later use the right value per frame
     std::stringstream heightStream; heightStream<<height; // Note: we use the same value for all frame, we should later use the right value per frame
     for (size_t x_Pos=0; x_Pos<x_Current; ++x_Pos)
     {
+        std::stringstream Frame;
         std::stringstream pkt_pts_time; pkt_pts_time<<std::fixed<<std::setprecision(7)<<(x[1][x_Pos]+FirstTimeStamp);
         std::stringstream pkt_duration_time; pkt_duration_time<<std::fixed<<std::setprecision(7)<<durations[x_Pos];
         std::stringstream key_frame; key_frame<<key_frames[x_Pos]?'1':'0';
-        Data<<"        <frame media_type=\"video\"";
-        Data << " stream_index=\"" << streamIndex << "\"";
+        Frame<<"        <frame media_type=\"video\"";
+        Frame << " stream_index=\"" << streamIndex << "\"";
 
-        Data<<" key_frame=\"" << key_frame.str() << "\"";
-        Data << " pkt_pts=\"" << pkt_pts[x_Pos] << "\"";
-        Data<<" pkt_pts_time=\"" << pkt_pts_time.str() << "\"";
+        Frame<<" key_frame=\"" << key_frame.str() << "\"";
+        Frame << " pkt_pts=\"" << pkt_pts[x_Pos] << "\"";
+        Frame<<" pkt_pts_time=\"" << pkt_pts_time.str() << "\"";
         if (pkt_duration_time)
-            Data<<" pkt_duration_time=\"" << pkt_duration_time.str() << "\"";
-        Data << " pkt_pos=\"" << pkt_pos[x_Pos] << "\"";
-        Data << " pkt_size=\"" << pkt_size[x_Pos] << "\"";
-        Data<<" width=\"" << widthStream.str() << "\" height=\"" << heightStream.str() <<"\"";
-        Data << " pix_fmt=\"" << av_get_pix_fmt_name((AVPixelFormat) pix_fmt[x_Pos]) << "\"";
-        Data << " pict_type=\"" << pict_type_char[x_Pos] << "\"";
+            Frame<<" pkt_duration_time=\"" << pkt_duration_time.str() << "\"";
+        Frame << " pkt_pos=\"" << pkt_pos[x_Pos] << "\"";
+        Frame << " pkt_size=\"" << pkt_size[x_Pos] << "\"";
+        Frame<<" width=\"" << widthStream.str() << "\" height=\"" << heightStream.str() <<"\"";
+        Frame << " pix_fmt=\"" << av_get_pix_fmt_name((AVPixelFormat) pix_fmt[x_Pos]) << "\"";
+        Frame << " pict_type=\"" << pict_type_char[x_Pos] << "\"";
 
-        Data << ">\n";
+        Frame << ">\n";
 
         for (size_t Plot_Pos=0; Plot_Pos<Item_VideoMax; Plot_Pos++)
         {
@@ -493,16 +494,17 @@ std::string VideoStats::StatsToXML (const activefilters& filters)
                 value = std::to_string(y[Plot_Pos][x_Pos]);
             }
 
-            Data<<"            <tag key=\""+key+"\" value=\""+value+"\"/>\n";
+            Frame<<"            <tag key=\""+key+"\" value=\""+value+"\"/>\n";
         }
 
-        writeAdditionalStats(Data, x_Pos);
+        writeAdditionalStats(Frame, x_Pos);
 
         if(comments[x_Pos])
-            Data<<"            <tag key=\"qctools.comment\" value=\"" << comments[x_Pos] << "\"/>\n";
+            Frame<<"            <tag key=\"qctools.comment\" value=\"" << comments[x_Pos] << "\"/>\n";
 
-        Data<<"        </frame>\n";
+        Frame<<"        </frame>\n";
+        Data+=Frame.str();
     }
 
-    return Data.str();
+    return Data;
 }

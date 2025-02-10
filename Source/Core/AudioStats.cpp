@@ -304,27 +304,28 @@ void AudioStats::TimeStampFromFrame (const QAVFrame& frame, size_t FramePos)
 
 std::string AudioStats::StatsToXML (const activefilters& filters)
 {
-    std::stringstream Data;
+    std::string Data;
 
     // Per frame (note: the XML header and footer are not created here)
     for (size_t x_Pos=0; x_Pos<x_Current; ++x_Pos)
     {
+        std::stringstream Frame;
         std::stringstream pkt_pts_time; pkt_pts_time<<std::fixed<<std::setprecision(7)<<(x[1][x_Pos]+FirstTimeStamp);
         std::stringstream pkt_duration_time; pkt_duration_time<<std::fixed<<std::setprecision(7)<<durations[x_Pos];
         std::stringstream key_frame; key_frame<< (key_frames[x_Pos]? '1' : '0');
 
-        Data<<"        <frame media_type=\"audio\"";
-        Data << " stream_index=\"" << streamIndex << "\"";
+        Frame<<"        <frame media_type=\"audio\"";
+        Frame << " stream_index=\"" << streamIndex << "\"";
 
-        Data<<" key_frame=\"" << key_frame.str() << "\"";
-        Data << " pkt_pts=\"" << pkt_pts[x_Pos] << "\"";
-        Data<<" pkt_pts_time=\"" << pkt_pts_time.str() << "\"";
+        Frame<<" key_frame=\"" << key_frame.str() << "\"";
+        Frame << " pkt_pts=\"" << pkt_pts[x_Pos] << "\"";
+        Frame<<" pkt_pts_time=\"" << pkt_pts_time.str() << "\"";
         if (pkt_duration_time)
-            Data<<" pkt_duration_time=\"" << pkt_duration_time.str() << "\"";
-        Data << " pkt_pos=\"" << pkt_pos[x_Pos] << "\"";
-        Data << " pkt_size=\"" << pkt_size[x_Pos] << "\"";
+            Frame<<" pkt_duration_time=\"" << pkt_duration_time.str() << "\"";
+        Frame << " pkt_pos=\"" << pkt_pos[x_Pos] << "\"";
+        Frame << " pkt_size=\"" << pkt_size[x_Pos] << "\"";
 
-        Data << ">\n";
+        Frame << ">\n";
 
         for (size_t Plot_Pos=0; Plot_Pos<Item_AudioMax; Plot_Pos++)
         {
@@ -338,13 +339,14 @@ std::string AudioStats::StatsToXML (const activefilters& filters)
             const std::string& key = PerItem[Plot_Pos].FFmpeg_Name;
             auto value = std::to_string(y[Plot_Pos][x_Pos]);
 
-            Data<<"            <tag key=\""+key+"\" value=\""+value+"\"/>\n";
+            Frame<<"            <tag key=\""+key+"\" value=\""+value+"\"/>\n";
         }
 
-        writeAdditionalStats(Data, x_Pos);
+        writeAdditionalStats(Frame, x_Pos);
 
-        Data<<"        </frame>\n";
+        Frame<<"        </frame>\n";
+        Data+=Frame.str();
     }
 
-    return Data.str();
+    return Data;
 }
