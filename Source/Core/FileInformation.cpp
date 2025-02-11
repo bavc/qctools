@@ -1256,19 +1256,21 @@ void FileInformation::startExport(const QString &exportFileName)
 //---------------------------------------------------------------------------
 void FileInformation::Export_XmlGz (const QString &ExportFileName, const activefilters& filters)
 {
-    std::stringstream Data;
+    std::string Data;
 
     // Header
-    Data<<"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-    Data<<"<!-- Created by QCTools " << Version << " -->\n";
-    Data<<"<ffprobe:ffprobe xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:ffprobe='http://www.ffmpeg.org/schema/ffprobe' xsi:schemaLocation='http://www.ffmpeg.org/schema/ffprobe ffprobe.xsd'>\n";
-    Data<<"    <program_version version=\"" << FFmpeg_Version() << "\" copyright=\"Copyright (c) 2007-" << FFmpeg_Year() << " the FFmpeg developers\" build_date=\"" __DATE__ "\" build_time=\"" __TIME__ "\" compiler_ident=\"" << FFmpeg_Compiler() << "\" configuration=\"" << FFmpeg_Configuration() << "\"/>\n";
-    Data<<"\n";
-    Data<<"    <library_versions>\n";
-    Data<<FFmpeg_LibsVersion();
-    Data<<"    </library_versions>\n";
+    std::stringstream Header;
+    Header<<"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    Header<<"<!-- Created by QCTools " << Version << " -->\n";
+    Header<<"<ffprobe:ffprobe xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:ffprobe='http://www.ffmpeg.org/schema/ffprobe' xsi:schemaLocation='http://www.ffmpeg.org/schema/ffprobe ffprobe.xsd'>\n";
+    Header<<"    <program_version version=\"" << FFmpeg_Version() << "\" copyright=\"Copyright (c) 2007-" << FFmpeg_Year() << " the FFmpeg developers\" build_date=\"" __DATE__ "\" build_time=\"" __TIME__ "\" compiler_ident=\"" << FFmpeg_Compiler() << "\" configuration=\"" << FFmpeg_Configuration() << "\"/>\n";
+    Header<<"\n";
+    Header<<"    <library_versions>\n";
+    Header<<FFmpeg_LibsVersion();
+    Header<<"    </library_versions>\n";
 
-    Data<<"    <frames>\n";
+    Header<<"    <frames>\n";
+    Data+=Header.str();
 
     // From stats
     for (size_t Pos=0; Pos<Stats.size(); Pos++)
@@ -1281,12 +1283,13 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName, const activef
                 videoStats->setWidth(m_mediaParser->availableVideoStreams()[0].stream()->codecpar->width);
                 videoStats->setHeight(m_mediaParser->availableVideoStreams()[0].stream()->codecpar->height);
             }
-            Data<<Stats[Pos]->StatsToXML(filters);
+            Data+=Stats[Pos]->StatsToXML(filters);
         }
     }
 
     // Footer
-    Data<<"    </frames>";
+    std::stringstream Footer;
+    Footer<<"    </frames>";
 
     QString streamsAndFormats;
     QXmlStreamWriter writer(&streamsAndFormats);
@@ -1305,9 +1308,10 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName, const activef
         splitted[i] = QString(qAbs(writer.autoFormattingIndent()), writer.autoFormattingIndent() > 0 ? ' ' : '\t') + splitted[i];
     streamsAndFormats = splitted.join("\n");
 
-    Data<<streamsAndFormats.toStdString() << "\n\n";
+    Footer<<streamsAndFormats.toStdString() << "\n\n";
 
-    Data<<"</ffprobe:ffprobe>";
+    Footer<<"</ffprobe:ffprobe>";
+    Data+=Footer.str();
 
     SharedFile file;
     QString name;
@@ -1323,15 +1327,13 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName, const activef
         name = info.fileName();
     }
 
-    std::string DataS=Data.str();
     uLongf Buffer_Size=65536;
-
     if(file->open(QIODevice::ReadWrite))
     {
-        if (name.endsWith(".qctools.xml"))
+        if (name.endsWith(".xml"))
         {
-            auto bytesLeft = Data.str().size();
-            auto writePtr = DataS.c_str();
+            auto bytesLeft = Data.size();
+            auto writePtr = Data.c_str();
             auto totalBytesWritten = 0;
 
             while (bytesLeft) {
@@ -1339,7 +1341,7 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName, const activef
                 auto bytesWritten = file->write(writePtr, bytesToWrite);
                 totalBytesWritten += bytesWritten;
 
-                Q_EMIT statsFileGenerationProgress(totalBytesWritten, DataS.size());
+                Q_EMIT statsFileGenerationProgress(totalBytesWritten, Data.size());
 
                 writePtr += bytesToWrite;
                 bytesLeft -= bytesWritten;
@@ -1348,14 +1350,12 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName, const activef
                     break;
             }
         }
-        else if (name.endsWith(".xml"))
+        else
         {
-            file->write(DataS.c_str(), DataS.length());
-        } else {
             char* Buffer=new char[Buffer_Size];
             z_stream strm;
-            strm.next_in = (Bytef *) DataS.c_str();
-            strm.avail_in = DataS.size() ;
+            strm.next_in = (Bytef *) Data.c_str();
+            strm.avail_in = Data.size() ;
             strm.total_out = 0;
             strm.zalloc = Z_NULL;
             strm.zfree = Z_NULL;
@@ -1369,7 +1369,7 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName, const activef
                         break;
                     file->write(Buffer, Buffer_Size-strm.avail_out);
 
-                    Q_EMIT statsFileGenerationProgress((char*) strm.next_in - DataS.c_str(), DataS.size());
+                    Q_EMIT statsFileGenerationProgress((char*) strm.next_in - Data.c_str(), Data.size());
                 }
                 while (strm.avail_out == 0);
                 deflateEnd (&strm);
