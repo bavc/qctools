@@ -6,6 +6,7 @@
 
 #include "GUI/TinyDisplay.h"
 #include "GUI/player.h"
+#include "GUI/utils.h"
 
 #include "Core/FileInformation.h"
 #include "Core/CommonStats.h"
@@ -135,7 +136,7 @@ QPixmap toPixmap(const QByteArray& bytes)
 
 QPixmap toPixmap(QAVVideoFrame frame) {
 #if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
-    QVideoFrame vf = frame;
+    QVideoFrame vf = QAVV_QV(frame);
     QImage img = vf.toImage();
 #elif QT_VERSION > QT_VERSION_CHECK(5, 13, 0)
     QVideoFrame vf = frame;
