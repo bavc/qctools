@@ -21,14 +21,15 @@ build-stamp: configure-stamp
 	dh_testdir
 
 	# Add here commands to compile the package.
-	cd ffmpeg && ./configure --enable-gpl --enable-version3 --disable-autodetect --disable-programs --disable-securetransport --disable-videotoolbox --enable-static --disable-shared --disable-doc --disable-debug --disable-lzma --disable-iconv --enable-pic --prefix="$(pwd)" --enable-libfreetype --enable-libharfbuzz
+	cd ffmpeg && ./configure --prefix="$(pwd)" --enable-gpl --enable-version3 --disable-autodetect --disable-programs --enable-static --disable-shared --disable-doc --disable-debug --enable-libfreetype --enable-libharfbuzz
 	cd ffmpeg && $(MAKE)
-	
+
+	cd qwt && patch -p1 < ../qctools/Project/BuildAllFromSource/qwt.patch
 	cd qwt && qmake6
 	cd qwt && $(MAKE)
 
 	mkdir qctools/Project/QtCreator/build
-	cd qctools/Project/QtCreator/build && qmake6 DEFINES+=QT_AVPLAYER_MULTIMEDIA ..
+	cd qctools/Project/QtCreator/build && qmake6 .. -after CONFIG+=force_debug_info LIBS+=-lharfbuzz LIBS+=-lfreetype
 	cd qctools/Project/QtCreator/build && $(MAKE)
 
 	touch $@

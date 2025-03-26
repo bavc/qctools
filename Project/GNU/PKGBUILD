@@ -9,16 +9,17 @@ url="http://mediaarea.net"
 license=('GPL')
 source=(${pkgname}_${pkgver}-1.tar.gz)
 md5sums=('00000000000000000000000000000000')
-arch=('i686' 'x86_64')
+arch=('x86_64')
 
-depends=('qt6-base' 'qt6-multimedia' 'qt6-multimedia-ffmpeg' 'qt6-declarative' 'freetype2' 'harfbuzz' 'bzip2' 'zlib' 'yasm')
+depends=('qt6-base' 'qt6-svg' 'qt6-multimedia' 'qt6-multimedia-ffmpeg' 'qt6-declarative' 'freetype2' 'harfbuzz' 'zlib' 'nasm')
 
 build() {
     cd "${srcdir}/qctools/ffmpeg"
-    ./configure --enable-gpl --enable-version3 --disable-autodetect --disable-programs --disable-securetransport --disable-videotoolbox --enable-static --disable-shared --disable-doc --disable-debug --disable-lzma --disable-iconv --enable-pic --prefix="$(pwd)" --enable-libfreetype --enable-libharfbuzz
+    ./configure --prefix="$(pwd)" --enable-gpl --enable-version3 --disable-autodetect --disable-programs --enable-static --disable-shared --disable-doc --disable-debug --enable-libfreetype --enable-libharfbuzz
     make
 
     cd "${srcdir}/qctools/qwt"
+    patch -p1 < ../qctools/Project/BuildAllFromSource/qwt.patch
     export QWT_STATIC=1 QWT_NO_SVG=1 QWT_NO_OPENGL=1 QWT_NO_DESIGNER=1
     qmake6
     make
@@ -28,7 +29,7 @@ build() {
     chmod 644 License.html
     mkdir Project/QtCreator/build
     cd Project/QtCreator/build
-    qmake6 DEFINES+=QT_AVPLAYER_MULTIMEDIA ..
+    qmake6 -after LIBS+=-lharfbuzz LIBS+=-lfreetype ..
     make
 }
 

@@ -1,6 +1,4 @@
 %define qctools_version           1.4
-%define debug_package %{nil}
-%define _unpackaged_files_terminate_build 0
 
 Name:           qctools
 Version:        %{qctools_version}
@@ -15,28 +13,37 @@ Source0:        %{name}_%{version}-1.tar.gz
 
 Prefix:         %{_prefix}
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
+BuildRequires:  nasm
 BuildRequires:  gcc-c++
 BuildRequires:  pkgconfig
 BuildRequires:  zlib-devel
 BuildRequires:  freetype-devel
 BuildRequires:  harfbuzz-devel
-%if 0%{?fedora_version} >= 24
-BuildRequires: bzip2-devel
-%else
-%if ! 0%{?mageia}
-BuildRequires:  libbz2-devel
+
+%if 0%{?fedora_version} ||  0%{?rhel}
+BuildRequires:  pkgconfig(Qt6)
+BuildRequires:  pkgconfig(Qt6Svg)
+BuildRequires:  pkgconfig(Qt6Multimedia)
+BuildRequires:  pkgconfig(Qt6Qml)
+BuildRequires:  pkgconfig(Qt6QuickControls2)
+BuildRequires:  desktop-file-utils
 %endif
+
+%if 0%{?mageia}
+BuildRequires:  lib64bzip2-devel
+BuildRequires:  lib64qt6base6-devel
+BuildRequires:  lib64qt6svg-devel
+BuildRequires:  lib64qt6qml-devel
+BuildRequires:  lib64qt6multimedia-devel
+BuildRequires:  lib64qt6multimediawidgets-devel
+BuildRequires:  lib64qt6quicktemplates2-devel
+BuildRequires:  lib64qt6quicktemplates26
+BuildRequires:  lib64qt6quickcontrols2-devel
+BuildRequires:  lib64qt6quickcontrols26
+BuildRequires:  lib64qt6quickwidgets-devel
 %endif
-BuildRequires:  yasm
+
 %if 0%{?suse_version}
-BuildRequires:  update-desktop-files
-%endif
-
-%if 0%{?rhel} > 7
-BuildRequires:  alternatives
-%endif
-
-%if 0%{?suse_version} >= 1200
 BuildRequires:  pkgconfig(Qt6Qml)
 BuildRequires:  pkgconfig(Qt6Svg)
 BuildRequires:  pkgconfig(Qt6Core)
@@ -46,37 +53,12 @@ BuildRequires:  pkgconfig(Qt6Concurrent)
 BuildRequires:  pkgconfig(Qt6PrintSupport)
 BuildRequires:  pkgconfig(Qt6QuickControls2)
 BuildRequires:  pkgconfig(Qt6Multimedia)
-BuildRequires:  libXv-devel
+BuildRequires:  pkgconfig(Qt6MultimediaWidgets)
+BuildRequires:  update-desktop-files
 %endif
-
-%if 0%{?fedora_version} ||  0%{?rhel} > 7
-BuildRequires:  pkgconfig(Qt6)
-BuildRequires:  pkgconfig(Qt6Qml)
-BuildRequires:  pkgconfig(Qt6QuickControls2)
-BuildRequires:  pkgconfig(Qt6Svg)
-BuildRequires:  pkgconfig(Qt6Multimedia)
-BuildRequires:  qt6-qtbase-private-devel
-BuildRequires:  desktop-file-utils
-BuildRequires:  libxkbcommon-devel
-BuildRequires:  libXv-devel
 
 %if 0%{?fedora_version} > 39
 BuildRequires:  libvpl
-%endif
-%endif
-
-%if 0%{?mageia}
-BuildRequires:  lib64bzip2-devel
-BuildRequires:  lib64qt6qml-devel
-BuildRequires:  lib64qt6base6-devel
-BuildRequires:  lib64qt6quicktemplates2-devel
-BuildRequires:  lib64qt6quicktemplates26
-BuildRequires:  lib64qt6quickcontrols2-devel
-BuildRequires:  lib64qt6quickcontrols26
-BuildRequires:  lib64qt6quickwidgets-devel
-BuildRequires:  lib64qt6multimedia-devel
-BuildRequires:  lib64qt6multimediawidgets-devel
-BuildRequires:  lib64qt6svg-devel
 %endif
 
 %package -n qcli
@@ -116,13 +98,14 @@ the digital object, and the associated catalog record.
 
 # build
 pushd ffmpeg
-    ./configure --enable-gpl --enable-version3 --disable-autodetect --disable-programs --disable-securetransport --disable-videotoolbox --enable-static --disable-shared --disable-doc --disable-debug --disable-lzma --disable-iconv --enable-pic --prefix="$(pwd)" --enable-libfreetype --enable-libharfbuzz
+    ./configure --prefix="$(pwd)../output" --enable-gpl --enable-version3 --disable-autodetect --disable-programs --enable-static --disable-shared --disable-doc --disable-debug --enable-libfreetype --enable-libharfbuzz
     %__make %{?jobs:-j%{jobs}}
 popd
 
 pushd qwt
+    patch -p1 < ../qctools/Project/BuildAllFromSource/qwt.patch
     export QWT_STATIC=1 QWT_NO_SVG=1 QWT_NO_OPENGL=1 QWT_NO_DESIGNER=1
-    qmake
+    qmake6
     %__make %{?jobs:-j%{jobs}}
 popd
 
@@ -131,7 +114,7 @@ pushd qctools
     chmod 644 License.html
     mkdir Project/QtCreator/build
     pushd Project/QtCreator/build
-    qmake DEFINES+=QT_AVPLAYER_MULTIMEDIA ..
+    qmake6 .. -after CONFIG+=force_debug_info LIBS+=-lharfbuzz LIBS+=-lfreetype
     %__make %{?jobs:-j%{jobs}}
     popd
 popd
@@ -211,5 +194,5 @@ install -m 644  qctools/Project/GNU/GUI/qctools.metainfo.xml %{buildroot}%{_data
 %{_bindir}/qcli
 
 %changelog
-* Wed Jan 01 2014 MediaArea.net SARL <info@mediaarea.net> - 0.5.0
-- See History.txt for more info and real dates
+* Thu Mar 13 2025 MediaArea.net SARL <info@mediaarea.net> - 25.03
+- See History.txt for more information
