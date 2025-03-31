@@ -7,7 +7,12 @@
 #include <QWidget>
 #include <QUrl>
 #include <QVideoWidget>
+#include <QVideoFrame>
+#ifdef QT_AVPLAYER_MULTIMEDIA
 #include <QtAVPlayer/qavaudiooutput.h>
+#else
+#include <QAudioSink>
+#endif // QT_AVPLAYER_MULTIMEDIA
 #include <QtAVPlayer/qavplayer.h>
 #include "Core/FileInformation.h"
 
@@ -265,7 +270,12 @@ private:
     MediaPlayer* m_player;
     bool m_mute { false };
 
+    #ifdef QT_AVPLAYER_MULTIMEDIA
     QScopedPointer<QAVAudioOutput> m_audioOutput;
+    #else
+    QScopedPointer<QAudioSink> m_audioOutput;
+    QIODevice* m_audioDevice;
+    #endif // QT_AVPLAYER_MULTIMEDIA
     QVideoFrame videoFrame;
 
     bool m_handlePlayPauseClick;

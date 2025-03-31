@@ -78,7 +78,8 @@ HEADERS += \
     $$SOURCES_PATH/GUI/playercontrol.h \
     $$SOURCES_PATH/GUI/panelsview.h \
     $$SOURCES_PATH/GUI/plotschooser.h \
-    $$SOURCES_PATH/GUI/yminmaxselector.h
+    $$SOURCES_PATH/GUI/yminmaxselector.h \
+    $$SOURCES_PATH/GUI/utils.h
 
 SOURCES += \
     $$SOURCES_PATH/GUI/FilesList.cpp \
@@ -112,7 +113,8 @@ SOURCES += \
     $$SOURCES_PATH/GUI/playercontrol.cpp \
     $$SOURCES_PATH/GUI/panelsview.cpp \
     $$SOURCES_PATH/GUI/plotschooser.cpp \
-    $$SOURCES_PATH/GUI/yminmaxselector.cpp
+    $$SOURCES_PATH/GUI/yminmaxselector.cpp \
+    $$SOURCES_PATH/GUI/utils.cpp
 
 include(../zlib.pri)
 
@@ -213,7 +215,8 @@ include(../qwt.pri)
 
 CONFIG -= no_keywords
 
-DEFINES += QT_AVPLAYER_MULTIMEDIA
+!linux|lessThan(QT_MAJOR_VERSION, 6): DEFINES += QT_AVPLAYER_MULTIMEDIA
+
 INCLUDEPATH += ../qctools-QtAVPlayer/src
 include(../qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.pri)
 

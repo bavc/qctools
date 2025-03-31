@@ -5,6 +5,7 @@
 #include "GUI/filterselector.h"
 #include "GUI/Comments.h"
 #include "GUI/Plots.h"
+#include "GUI/utils.h"
 #include <QDir>
 #include <QAction>
 #include <QStandardPaths>
@@ -39,7 +40,9 @@ Player::Player(QWidget *parent) :
     ui->commentsPlaceHolderFrame->setLayout(new QHBoxLayout);
     ui->commentsPlaceHolderFrame->layout()->setContentsMargins(0, 0, 0, 0);
 
+    #ifdef QT_AVPLAYER_MULTIMEDIA
     m_audioOutput.reset(new QAVAudioOutput);
+    #endif // QT_AVPLAYER_MULTIMEDIA
 
     QGraphicsScene* scene = new QGraphicsScene(ui->graphicsView);
     ui->graphicsView->setScene(scene);
@@ -50,14 +53,49 @@ Player::Player(QWidget *parent) :
 
     m_player = new MediaPlayer();
 
+    #ifdef QT_AVPLAYER_MULTIMEDIA
     QObject::connect(m_player, &QAVPlayer::audioFrame, m_player, [this](const QAVAudioFrame &frame) {
         if(!ui->playerSlider->isSliderDown() && !m_mute)
             m_audioOutput->play(frame);
     }, Qt::DirectConnection);
+    #else
+    QObject::connect(m_player, &QAVPlayer::audioFrame, m_player, [this](const QAVAudioFrame &frame) {
+        if(!ui->playerSlider->isSliderDown() && !m_mute)
+        {
+            QAudioFormat format;
+            format.setSampleRate(frame.format().sampleRate());
+            format.setChannelCount(frame.format().channelCount());
+            switch (frame.format().sampleFormat())
+            {
+            case QAVAudioFormat::UInt8:
+                format.setSampleFormat(QAudioFormat::UInt8); break;
+            case QAVAudioFormat::Int16:
+                format.setSampleFormat(QAudioFormat::Int16); break;
+            case QAVAudioFormat::Int32:
+                format.setSampleFormat(QAudioFormat::Int32); break;
+            case QAVAudioFormat::Float:
+                format.setSampleFormat(QAudioFormat::Float); break;
+            default:
+                format.setSampleFormat(QAudioFormat::Unknown); break;
+            }
+
+            if (m_audioOutput.isNull() || m_audioOutput->state() == QAudio::StoppedState || m_audioOutput->format() != format)
+            {
+                m_audioOutput.reset(new QAudioSink(format));
+                m_audioDevice = m_audioOutput->start();
+            }
+
+            m_audioDevice->write(frame.data());
+        }
+    }, Qt::DirectConnection);
+    #endif // QT_AVPLAYER_MULTIMEDIA
 
     QObject::connect(m_player, &QAVPlayer::videoFrame, m_player, [this](const QAVVideoFrame &frame) {
-
+        #ifdef QT_AVPLAYER_MULTIMEDIA
         videoFrame = frame.convertTo(AV_PIX_FMT_RGB32);
+        #else
+        videoFrame = QAVV_QV(frame);
+        #endif //QT_AVPLAYER_MULTIMEDIA
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         auto surface = m_w->videoSurface();

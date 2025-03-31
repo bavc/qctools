@@ -15,6 +15,7 @@
 #include <QPushButton>
 #include <QJsonDocument>
 #include <QPointer>
+#include <QVideoFrame>
 
 #include <vector>
 

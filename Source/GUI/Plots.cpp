@@ -14,12 +14,14 @@
 #include "GUI/CommentsEditor.h"
 #include "GUI/barchartconditioneditor.h"
 #include "GUI/barchartconditioninput.h"
+#include "GUI/utils.h"
 #include "Core/Core.h"
 #include <QtAVPlayer/qavplayer.h>
 #include "playercontrol.h"
 #include "yminmaxselector.h"
 #include <QComboBox>
 #include <QGridLayout>
+#include <QVideoFrame>
 #include <QEvent>
 #include <qwt_plot_layout.h>
 #include <qwt_plot_canvas.h>
@@ -31,12 +33,9 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QToolButton>
-#include <QVideoFrame>
 #include <qwt_plot_curve.h>
 #include <QMessageBox>
 #include <QSettings>
-
-//---------------------------------------------------------------------------
 
 class XAxisFormatBox: public QComboBox
 {
@@ -460,7 +459,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                     return panelsCount;
                 }, [&, panelOutputIndex](int index) -> QImage {
                     auto frame = m_fileInfoData->getPanelFrame(panelOutputIndex, index);
-                    QVideoFrame videoFrame = frame;
+                    QVideoFrame videoFrame = QAVV_QV(frame);
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                     auto panelImage = videoFrame.image();
@@ -482,7 +481,7 @@ Plots::Plots( QWidget *parent, FileInformation* fileInformation ) :
                 }, [&, panelOutputIndex](int index) -> QImage {
                     auto frame = m_fileInfoData->getPanelFrame(panelOutputIndex, index);
 
-                    QVideoFrame videoFrame = frame;
+                    QVideoFrame videoFrame = QAVV_QV(frame);
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                     auto panelImage = videoFrame.image();

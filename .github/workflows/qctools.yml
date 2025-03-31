@@ -494,8 +494,8 @@ jobs:
       run: |
         Set-Location ..
         $json = $(curl -L -H "Accept: application/vnd.github+json" https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/latest)
-        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-gpl-shared-6.1.zip")).name | sub("\\.zip$";"")')
-        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-gpl-shared-6.1.zip")).browser_download_url')
+        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-6.1.zip")).name | sub("\\.zip$";"")')
+        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-6.1.zip")).browser_download_url')
         Invoke-WebRequest -Uri "$ffmpeg_url" -OutFile "$ffmpeg_name.zip"
         Expand-Archive -Path "$ffmpeg_name.zip" -DestinationPath .
         Rename-Item -Path "$ffmpeg_name" -NewName "ffmpeg"
@@ -576,8 +576,8 @@ jobs:
       run: |
         Set-Location ..
         $json = $(curl -L -H "Accept: application/vnd.github+json" https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/latest)
-        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-gpl-shared-6.1.zip")).name | sub("\\.zip$";"")')
-        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-gpl-shared-6.1.zip")).browser_download_url')
+        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-6.1.zip")).name | sub("\\.zip$";"")')
+        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-6.1.zip")).browser_download_url')
         Invoke-WebRequest -Uri "$ffmpeg_url" -OutFile "$ffmpeg_name.zip"
         Expand-Archive -Path "$ffmpeg_name.zip" -DestinationPath .
         Rename-Item -Path "$ffmpeg_name" -NewName "ffmpeg"
@@ -659,8 +659,8 @@ jobs:
       run: |
         Set-Location ..
         $json = $(curl -L -H "Accept: application/vnd.github+json" https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/latest)
-        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-gpl-shared-6.1.zip")).name | sub("\\.zip$";"")')
-        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-gpl-shared-6.1.zip")).browser_download_url')
+        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-6.1.zip")).name | sub("\\.zip$";"")')
+        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-6.1.zip")).browser_download_url')
         Invoke-WebRequest -Uri "$ffmpeg_url" -OutFile "$ffmpeg_name.zip"
         Expand-Archive -Path "$ffmpeg_name.zip" -DestinationPath .
         Rename-Item -Path "$ffmpeg_name" -NewName "ffmpeg"
@@ -746,8 +746,8 @@ jobs:
       run: |
         Set-Location ..
         $json = $(curl -L -H "Accept: application/vnd.github+json" https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/latest)
-        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-gpl-shared-6.1.zip")).name | sub("\\.zip$";"")')
-        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-gpl-shared-6.1.zip")).browser_download_url')
+        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-6.1.zip")).name | sub("\\.zip$";"")')
+        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-6.1.zip")).browser_download_url')
         Invoke-WebRequest -Uri "$ffmpeg_url" -OutFile "$ffmpeg_name.zip"
         Expand-Archive -Path "$ffmpeg_name.zip" -DestinationPath .
         Rename-Item -Path "$ffmpeg_name" -NewName "ffmpeg"
