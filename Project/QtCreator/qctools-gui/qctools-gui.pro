@@ -215,7 +215,7 @@ include(../qwt.pri)
 
 CONFIG -= no_keywords
 
-!linux: DEFINES += QT_AVPLAYER_MULTIMEDIA
+!linux|lessThan(QT_MAJOR_VERSION, 6): DEFINES += QT_AVPLAYER_MULTIMEDIA
 
 INCLUDEPATH += ../qctools-QtAVPlayer/src
 include(../qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.pri)
