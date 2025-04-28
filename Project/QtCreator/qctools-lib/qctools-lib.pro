@@ -2,7 +2,8 @@ QT = core network multimedia concurrent
 
 TARGET = qctools
 TEMPLATE = lib
-CONFIG += c++1z
+macx:CONFIG += c++20
+else:CONFIG += c++1z
 CONFIG += staticlib
 
 

@@ -286,19 +286,19 @@ struct per_group VideoPerGroup [Group_VideoMax]=
 const struct per_item VideoPerItem [Item_VideoMax]=
 {
     //Y
-    { Group_Y,       Group_VideoMax,       "Y MIN",         "lavfi.signalstats.YMIN",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "silver",     1 },
+    { Group_Y,       Group_VideoMax,       "Y MIN",         "lavfi.signalstats.YMIN",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "silver",     1, nullptr },
     { Group_Y,       Group_VideoMax,       "Y LOW",         "lavfi.signalstats.YLOW",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "darkgreen",  1, "Y MIN;teal;0.2" },
     { Group_Y,       Group_VideoMax,       "Y AVG",         "lavfi.signalstats.YAVG",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "black",      1, "Y LOW;teal;0.8" },
     { Group_Y,       Group_VideoMax,       "Y HIGH",        "lavfi.signalstats.YHIGH",   0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "lightgreen", 1, "Y AVG;teal;0.8" },
     { Group_Y,       Group_VideoMax,       "Y MAX",         "lavfi.signalstats.YMAX",    0,   true,   DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "gray",       1, "Y HIGH;teal;0.2" },
     //U
-    { Group_U,       Group_VideoMax,       "U MIN",         "lavfi.signalstats.UMIN",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "silver",     1 },
+    { Group_U,       Group_VideoMax,       "U MIN",         "lavfi.signalstats.UMIN",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "silver",     1, nullptr },
     { Group_U,       Group_VideoMax,       "U LOW",         "lavfi.signalstats.ULOW",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "darkblue",   1, "U MIN;darkblue;0.2" },
     { Group_U,       Group_VideoMax,       "U AVG",         "lavfi.signalstats.UAVG",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "black",      1, "U LOW;darkblue;0.8" },
     { Group_U,       Group_VideoMax,       "U HIGH",        "lavfi.signalstats.UHIGH",   0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "lightblue",  1, "U AVG;darkblue;0.8" },
     { Group_U,       Group_VideoMax,       "U MAX",         "lavfi.signalstats.UMAX",    0,   true,   DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "gray",       1, "U HIGH;darkblue;0.2" },
     //V
-    { Group_V,       Group_VideoMax,       "V MIN",         "lavfi.signalstats.VMIN",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "silver",     1 },
+    { Group_V,       Group_VideoMax,       "V MIN",         "lavfi.signalstats.VMIN",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "silver",     1, nullptr },
     { Group_V,       Group_VideoMax,       "V LOW",         "lavfi.signalstats.VLOW",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "darkred",    1, "V MIN;darkred;0.2" },
     { Group_V,       Group_VideoMax,       "V AVG",         "lavfi.signalstats.VAVG",    0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "black",      1, "V LOW;darkred;0.8" },
     { Group_V,       Group_VideoMax,       "V HIGH",        "lavfi.signalstats.VHIGH",   0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "pink",       1, "V AVG;darkred;0.8" },
@@ -314,8 +314,8 @@ const struct per_item VideoPerItem [Item_VideoMax]=
     { Group_Sat,     Group_VideoMax,       "SAT HIGH",      "lavfi.signalstats.SATHIGH", 0,   false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "darkred",    1, "SAT AVG;red;0.6" },
     { Group_Sat,     Group_VideoMax,       "SAT MAX",       "lavfi.signalstats.SATMAX",  0,   true,      88.7,   118.2, ActiveFilter_Video_signalstats, "gray",       1, "SAT HIGH;red;0.8" },
     //Hue
-    { Group_Hue,     Group_VideoMax,       "HUE MED",       "lavfi.signalstats.HUEMED",  0,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "orange",     1 },
-    { Group_Hue,     Group_VideoMax,       "HUE AVG",       "lavfi.signalstats.HUEAVG",  0,  true,   DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "purple",     1 },
+    { Group_Hue,     Group_VideoMax,       "HUE MED",       "lavfi.signalstats.HUEMED",  0,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "orange",      1, nullptr },
+    { Group_Hue,     Group_VideoMax,       "HUE AVG",       "lavfi.signalstats.HUEAVG",  0,  true,   DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "purple",      1, nullptr },
     //Others
     { Group_TOUT,    Group_VideoMax,       "TOUT",          "lavfi.signalstats.TOUT",    8,  false,    0.005, DBL_MAX, ActiveFilter_Video_signalstats, "darkgray",   1, "0;whitesmoke;0.6" },
     { Group_VREP,    Group_VideoMax,       "VREP",          "lavfi.signalstats.VREP",    8,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "purple",     1, "0;purple;0.6" },
@@ -325,25 +325,25 @@ const struct per_item VideoPerItem [Item_VideoMax]=
     { Group_YUVB,    Group_VideoMax,     "U Active Bits", "lavfi.signalstats.UBITDEPTH", 0,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "darkblue",   1, "0;darkblue;0.4" },
     { Group_YUVB,    Group_VideoMax,     "Y Active Bits", "lavfi.signalstats.YBITDEPTH", 0,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_signalstats, "darkgreen",  1, "0;teal;0.4" },
     //Crop
-    { Group_CropW,   Group_VideoMax,       "Crop Left",     "lavfi.cropdetect.x1",       0,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_cropdetect, nullptr, -1  },
-    { Group_CropW,   Group_VideoMax,       "Crop Right",    "lavfi.cropdetect.x2",       0,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_cropdetect, nullptr, -1   },
-    { Group_CropH,   Group_VideoMax,       "Crop Top",      "lavfi.cropdetect.y1",       0,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_cropdetect, nullptr, -1   },
-    { Group_CropH,   Group_VideoMax,       "Crop Bottom",   "lavfi.cropdetect.y2",       0,  true,   DBL_MAX, DBL_MAX, ActiveFilter_Video_cropdetect, nullptr, -1   },
-    { Group_CropF,   Group_VideoMax,       "Crop Width",    "lavfi.cropdetect.w",        0,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_cropdetect, nullptr, -1   },
-    { Group_CropF,   Group_VideoMax,       "Crop Height",   "lavfi.cropdetect.h",        0,  true,   DBL_MAX, DBL_MAX, ActiveFilter_Video_cropdetect, nullptr, -1   },
+    { Group_CropW,   Group_VideoMax,       "Crop Left",     "lavfi.cropdetect.x1",       0,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_cropdetect, nullptr, -1, nullptr },
+    { Group_CropW,   Group_VideoMax,       "Crop Right",    "lavfi.cropdetect.x2",       0,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_cropdetect, nullptr, -1, nullptr },
+    { Group_CropH,   Group_VideoMax,       "Crop Top",      "lavfi.cropdetect.y1",       0,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_cropdetect, nullptr, -1, nullptr },
+    { Group_CropH,   Group_VideoMax,       "Crop Bottom",   "lavfi.cropdetect.y2",       0,  true,   DBL_MAX, DBL_MAX, ActiveFilter_Video_cropdetect, nullptr, -1, nullptr },
+    { Group_CropF,   Group_VideoMax,       "Crop Width",    "lavfi.cropdetect.w",        0,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_cropdetect, nullptr, -1, nullptr },
+    { Group_CropF,   Group_VideoMax,       "Crop Height",   "lavfi.cropdetect.h",        0,  true,   DBL_MAX, DBL_MAX, ActiveFilter_Video_cropdetect, nullptr, -1, nullptr },
     //MSEf
-    { Group_MSE,     Group_VideoMax,       "MSEf V",        "lavfi.psnr.mse.v",          2,  true,   DBL_MAX, DBL_MAX, ActiveFilter_Video_Psnr, "darkred",    1 },
-    { Group_MSE,     Group_VideoMax,       "MSEf U",        "lavfi.psnr.mse.u",          2,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_Psnr, "darkblue",   1 },
-    { Group_MSE,     Group_VideoMax,       "MSEf Y",        "lavfi.psnr.mse.y",          2,  false,     1000, DBL_MAX, ActiveFilter_Video_Psnr, "darkgreen",  1 },
+    { Group_MSE,     Group_VideoMax,       "MSEf V",        "lavfi.psnr.mse.v",          2,  true,   DBL_MAX, DBL_MAX, ActiveFilter_Video_Psnr, "darkred",    1, nullptr },
+    { Group_MSE,     Group_VideoMax,       "MSEf U",        "lavfi.psnr.mse.u",          2,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_Psnr, "darkblue",   1, nullptr },
+    { Group_MSE,     Group_VideoMax,       "MSEf Y",        "lavfi.psnr.mse.y",          2,  false,     1000, DBL_MAX, ActiveFilter_Video_Psnr, "darkgreen",  1, nullptr },
     //PSNRf
-    { Group_PSNR,    Group_VideoMax,       "PSNRf V",       "lavfi.psnr.psnr.v",         2,  true,   DBL_MAX, DBL_MAX, ActiveFilter_Video_Psnr, "darkred",    1 },
-    { Group_PSNR,    Group_VideoMax,       "PSNRf U",       "lavfi.psnr.psnr.u",         2,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_Psnr, "darkblue",   1 },
-    { Group_PSNR,    Group_VideoMax,       "PSNRf Y",       "lavfi.psnr.psnr.y",         2,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_Psnr, "darkgreen",  1 },
+    { Group_PSNR,    Group_VideoMax,       "PSNRf V",       "lavfi.psnr.psnr.v",         2,  true,   DBL_MAX, DBL_MAX, ActiveFilter_Video_Psnr, "darkred",    1, nullptr },
+    { Group_PSNR,    Group_VideoMax,       "PSNRf U",       "lavfi.psnr.psnr.u",         2,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_Psnr, "darkblue",   1, nullptr },
+    { Group_PSNR,    Group_VideoMax,       "PSNRf Y",       "lavfi.psnr.psnr.y",         2,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_Psnr, "darkgreen",  1, nullptr },
     //SSIMf
-    { Group_SSIM,    Group_VideoMax,       "SSIMf All",     "lavfi.ssim.All",            2,  true,   DBL_MAX, DBL_MAX, ActiveFilter_Video_Ssim, "black",      1 },
-    { Group_SSIM,    Group_VideoMax,       "SSIMf V",       "lavfi.ssim.V",              2,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_Ssim, "darkred",    1 },
-    { Group_SSIM,    Group_VideoMax,       "SSIMf U",       "lavfi.ssim.U",              2,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_Ssim, "darkblue",   1 },
-    { Group_SSIM,    Group_VideoMax,       "SSIMf Y",       "lavfi.ssim.Y",              2,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_Ssim, "darkgreen",  1 },
+    { Group_SSIM,    Group_VideoMax,       "SSIMf All",     "lavfi.ssim.All",            2,  true,   DBL_MAX, DBL_MAX, ActiveFilter_Video_Ssim, "black",      1, nullptr },
+    { Group_SSIM,    Group_VideoMax,       "SSIMf V",       "lavfi.ssim.V",              2,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_Ssim, "darkred",    1, nullptr },
+    { Group_SSIM,    Group_VideoMax,       "SSIMf U",       "lavfi.ssim.U",              2,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_Ssim, "darkblue",   1, nullptr },
+    { Group_SSIM,    Group_VideoMax,       "SSIMf Y",       "lavfi.ssim.Y",              2,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_Ssim, "darkgreen",  1, nullptr },
     //IDET.single
     { Group_IDET_S,    Group_VideoMax,     "s.bff",         "lavfi.idet.single.bff",     2,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_Idet, "royalblue",     2, "0;royalblue;1" },
     { Group_IDET_S,    Group_VideoMax,     "s.tff",         "lavfi.idet.single.tff",     2,  false,  DBL_MAX, DBL_MAX, ActiveFilter_Video_Idet, "gold",          2, "0;gold;1" },
@@ -361,13 +361,13 @@ const struct per_item VideoPerItem [Item_VideoMax]=
     //DEFL
     { Group_DEFL,      Group_VideoMax,     "flicker", "lavfi.deflicker.relative_change", 5,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_Deflicker, "olive",     1, "0;olive;0.6" },
     //ENTR
-    { Group_ENTR,      Group_VideoMax,   "V ENT", "lavfi.entropy.normalized_entropy.normal.V",5,false,DBL_MAX, DBL_MAX, ActiveFilter_Video_Entropy,     "darkred",    1 },
-    { Group_ENTR,      Group_VideoMax,   "U ENT", "lavfi.entropy.normalized_entropy.normal.U",5,false,DBL_MAX, DBL_MAX, ActiveFilter_Video_Entropy,     "darkblue",   1 },
-    { Group_ENTR,      Group_VideoMax,   "Y ENT", "lavfi.entropy.normalized_entropy.normal.Y",5,false,DBL_MAX, DBL_MAX, ActiveFilter_Video_Entropy,     "darkgreen",  1 },
+    { Group_ENTR,      Group_VideoMax,   "V ENT", "lavfi.entropy.normalized_entropy.normal.V",5,false,DBL_MAX, DBL_MAX, ActiveFilter_Video_Entropy,     "darkred",    1, nullptr },
+    { Group_ENTR,      Group_VideoMax,   "U ENT", "lavfi.entropy.normalized_entropy.normal.U",5,false,DBL_MAX, DBL_MAX, ActiveFilter_Video_Entropy,     "darkblue",   1, nullptr },
+    { Group_ENTR,      Group_VideoMax,   "Y ENT", "lavfi.entropy.normalized_entropy.normal.Y",5,false,DBL_MAX, DBL_MAX, ActiveFilter_Video_Entropy,     "darkgreen",  1, nullptr },
     //ENTR-DIFF
-    { Group_ENTRD,     Group_VideoMax,"V ENT DIF","lavfi.entropy.normalized_entropy.diff.V",  5,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_EntropyDiff, "darkred",    1 },
-    { Group_ENTRD,     Group_VideoMax,"U ENT DIF","lavfi.entropy.normalized_entropy.diff.U",  5,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_EntropyDiff, "darkblue",   1 },
-    { Group_ENTRD,     Group_VideoMax,"Y ENT DIF","lavfi.entropy.normalized_entropy.diff.Y",  5,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_EntropyDiff, "darkgreen",  1 },
+    { Group_ENTRD,     Group_VideoMax,"V ENT DIF","lavfi.entropy.normalized_entropy.diff.V",  5,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_EntropyDiff, "darkred",    1, nullptr },
+    { Group_ENTRD,     Group_VideoMax,"U ENT DIF","lavfi.entropy.normalized_entropy.diff.U",  5,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_EntropyDiff, "darkblue",   1, nullptr },
+    { Group_ENTRD,     Group_VideoMax,"Y ENT DIF","lavfi.entropy.normalized_entropy.diff.Y",  5,  false,   DBL_MAX, DBL_MAX, ActiveFilter_Video_EntropyDiff, "darkgreen",  1, nullptr },
     // pkt_duration_time & pkt_size
     { Group_pkt_duration_time, Group_VideoMax, "pkt_duration_time", "pkt_duration_time", 5,  false,   DBL_MAX, DBL_MAX, (activefilter) -1,              "black",     1, "0;lawngreen;0.6" },
     { Group_pkt_size,  Group_VideoMax,     "pkt_size",      "pkt_size",                  0,  false,   DBL_MAX, DBL_MAX, (activefilter) -1,              "black",     1, "0;maroon;0.6" },
