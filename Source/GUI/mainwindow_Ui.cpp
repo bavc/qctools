@@ -44,6 +44,7 @@
 #include <QJsonDocument>
 #include <QStandardItemModel>
 #include <QMessageBox>
+#include <QStandardPaths>
 
 #include <qwt_plot_renderer.h>
 #include <QDebug>
@@ -198,7 +199,11 @@ void MainWindow::Ui_Init()
         }
     });
 
-    auto profilesModel = new BarchartProfilesModel(m_profileSelectorCombobox, QCoreApplication::applicationDirPath());
+    QString profilePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if (!QDir(profilePath).exists()) {
+        QDir().mkpath(profilePath);
+    }
+    auto profilesModel = new BarchartProfilesModel(m_profileSelectorCombobox, profilePath);
 
     m_profileSelectorCombobox->setModel(profilesModel);
 
