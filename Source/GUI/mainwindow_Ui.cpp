@@ -229,8 +229,18 @@ void MainWindow::Ui_Init()
         connect(&manageDialog, &ManageBarchartConditions::newProfile, this, [&](const QString& profileFilePath) {
             auto currentProfileFilePath = m_profileSelectorCombobox->currentData(BarchartProfilesModel::Data).toString();
 
-            Plots fakePlots(0, Files[getFilesCurrentPos()]);
-            QJsonDocument profilesJson = QJsonDocument(fakePlots.saveBarchartsProfile());
+
+            QJsonDocument profilesJson;
+            if (Files.size() > getFilesCurrentPos()) {
+                Plots fakePlots(0, Files[getFilesCurrentPos()]);
+                profilesJson = QJsonDocument(fakePlots.saveBarchartsProfile());
+            }
+            else {
+                QFile defaultProfileFile(":/barchart_profiles/default.json");
+                if (defaultProfileFile.open(QIODevice::ReadOnly)) {
+                    profilesJson = QJsonDocument::fromJson(defaultProfileFile.readAll());
+                }
+            }
 
             QFile file(profileFilePath);
             if(file.open(QFile::WriteOnly)) {
