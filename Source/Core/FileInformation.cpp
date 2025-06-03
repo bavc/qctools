@@ -1352,29 +1352,46 @@ void FileInformation::Export_XmlGz (const QString &ExportFileName, const activef
         }
         else
         {
-            char* Buffer=new char[Buffer_Size];
             z_stream strm;
-            strm.next_in = (Bytef *) Data.c_str();
-            strm.avail_in = Data.size() ;
-            strm.total_out = 0;
-            strm.zalloc = Z_NULL;
-            strm.zfree = Z_NULL;
-            if (deflateInit2(&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY)>=0) // 15 + 16 are magic values for gzip
+            memset(&strm, 0, sizeof(strm));
+            if (deflateInit2(&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY) >= 0) // 15 + 16 are magic values for gzip
             {
+                char* Buffer = new char[Buffer_Size];
+                size_t Data_Size = Data.size();
+                size_t Data_Offset = 0;
+                bool Error = false;
                 do
                 {
-                    strm.next_out = (unsigned char*) Buffer;
-                    strm.avail_out = Buffer_Size;
-                    if (deflate(&strm, Z_FINISH)<0)
-                        break;
-                    file->write(Buffer, Buffer_Size-strm.avail_out);
+                    uint32_t Chunk_Size = (uint32_t)std::min<size_t>(Buffer_Size * 1024, Data_Size - Data_Offset);
+                    int flush = (Data_Offset + Chunk_Size >= Data_Size) ? Z_FINISH : Z_NO_FLUSH;
+                    strm.next_in = (Bytef*)Data.data() + Data_Offset;
+                    strm.avail_in = Chunk_Size;
+                    do
+                    {
+                        strm.next_out = (Bytef*)Buffer;
+                        strm.avail_out = Buffer_Size;
+                        if (deflate(&strm, flush) < 0)
+                        {
+                            Error = true;
+                            break;
+                        }
 
-                    Q_EMIT statsFileGenerationProgress((char*) strm.next_in - Data.c_str(), Data.size());
+                        file->write(Buffer, Buffer_Size - strm.avail_out);
+
+                        Q_EMIT statsFileGenerationProgress(Data_Offset + (strm.next_in - ((Bytef*)Data.data() + Data_Offset)), Data_Size);
+                    }
+                    while (strm.avail_out == 0);
+
+                    if (Error)
+                        break;
+
+                    Data_Offset += Chunk_Size;
                 }
-                while (strm.avail_out == 0);
-                deflateEnd (&strm);
+                while (Data_Offset < Data_Size);
+
+                deflateEnd(&strm);
+                delete[] Buffer;
             }
-            delete[] Buffer;
         }
 
         file->flush();
