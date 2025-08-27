@@ -15,6 +15,7 @@ extern "C"
 #include <libavutil/frame.h>
 #include <libavutil/pixdesc.h>
 #include <libavutil/bprint.h>
+#include <libavutil/version.h>
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
 }
@@ -62,7 +63,11 @@ AudioStreamStats::AudioStreamStats(XMLElement *streamElement) : CommonStreamStat
 AudioStreamStats::AudioStreamStats(QAVStream* stream) : CommonStreamStats(stream),
     sample_fmt_string(""),
     sample_rate(stream != NULL ? stream->stream()->codecpar->sample_rate : 0),
+#if LIBAVUTIL_VERSION_INT <= AV_VERSION_INT(57, 23, 0)
     channels(stream != NULL ? stream->stream()->codecpar->channels : 0),
+#else
+    channels(stream != NULL ? stream->stream()->codecpar->ch_layout.nb_channels : 0),
+#endif
     channel_layout(""),
     bits_per_sample(stream != NULL ? av_get_bits_per_sample(stream->stream()->codecpar->codec_id) : 0)
 {
@@ -81,9 +86,15 @@ AudioStreamStats::AudioStreamStats(QAVStream* stream) : CommonStreamStats(stream
         AVBPrint pbuf;
         av_bprint_init(&pbuf, 1, AV_BPRINT_SIZE_UNLIMITED);
 
+#if LIBAVUTIL_VERSION_INT <= AV_VERSION_INT(57, 23, 0)
         if (stream->stream()->codecpar->channel_layout) {
             av_bprint_clear(&pbuf);
             av_bprint_channel_layout(&pbuf, stream->stream()->codecpar->channels, stream->stream()->codecpar->channel_layout);
+#else
+        if (av_channel_layout_check(&stream->stream()->codecpar->ch_layout)) {
+            av_bprint_clear(&pbuf);
+            av_channel_layout_describe_bprint(&stream->stream()->codecpar->ch_layout, &pbuf);
+#endif
             channel_layout = pbuf.str;
         } else {
             channel_layout = "unknown";

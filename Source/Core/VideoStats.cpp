@@ -14,6 +14,7 @@ extern "C"
 {
 #include <libavutil/frame.h>
 #include <libavutil/pixdesc.h>
+#include <libavutil/version.h>
 }
 #include <qavplayer.h>
 
@@ -411,8 +412,13 @@ void VideoStats::TimeStampFromFrame (const QAVFrame& frame, size_t FramePos)
         x[2][FramePos]=x[1][FramePos]/60;
         x[3][FramePos]=x[2][FramePos]/60;
     }
+#if LIBAVUTIL_VERSION_INT <= AV_VERSION_INT(57, 30, 0)
     if (Frame->pkt_duration!=AV_NOPTS_VALUE)
         durations[FramePos]=((double)Frame->pkt_duration)/Frequency;
+#else
+    if (Frame->duration!=AV_NOPTS_VALUE)
+        durations[FramePos]=((double)Frame->duration)/Frequency;
+#endif
 }
 
 //---------------------------------------------------------------------------
