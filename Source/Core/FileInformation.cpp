@@ -29,6 +29,7 @@ extern "C" {
 #include <libavutil/pixfmt.h>
 #include <libavutil/imgutils.h>
 #include <libavutil/ffversion.h>
+#include <libavutil/version.h>
 
 #ifndef WITH_SYSTEM_FFMPEG
 #include <config.h>
@@ -1580,7 +1581,11 @@ struct Output {
             return outPacket;
         }
 
+#if LIBAVUTIL_VERSION_INT <= AV_VERSION_INT(57, 30, 0)
         outPacket->duration = Frame->pkt_duration;
+#else
+        outPacket->duration = Frame->duration;
+#endif
         return outPacket;
     }
 };
@@ -2142,7 +2147,11 @@ std::string FileInformation::channelLayout() const
     if (stream.codec()->codec()->long_name == nullptr)
         return std::string();
 
+#if LIBAVUTIL_VERSION_INT <= AV_VERSION_INT(57, 23, 0)
     switch (stream.stream()->codecpar->channel_layout)
+#else
+    switch (stream.stream()->codecpar->ch_layout.u.mask)
+#endif
     {
     case AV_CH_LAYOUT_MONO: return "mono";
     case AV_CH_LAYOUT_STEREO: return "stereo";
