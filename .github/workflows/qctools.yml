@@ -35,7 +35,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        brew install ${{ matrix.packages }} pkg-config ffmpeg@8 qt@5
+        brew install ${{ matrix.packages }} pkg-config ffmpeg@9 qt@5
 
     - name: Install qwt-qt5
       run: |
@@ -60,7 +60,7 @@ jobs:
         sed -i '' 's/std::atomic_bool abortRequest = false;/std::atomic_bool abortRequest{false};/g' qctools-QtAVPlayer/src/QtAVPlayer/qavdemuxer.cpp || true # temporary fix
         mkdir build
         cd build
-        export PKG_CONFIG_PATH="/opt/homebrew/opt/ffmpeg@8/lib/pkgconfig"
+        export PKG_CONFIG_PATH="/opt/homebrew/opt/ffmpeg@9/lib/pkgconfig"
         qmake ..
         make CC=$CC CXX=$CXX -j4
 
@@ -95,7 +95,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        brew install ${{ matrix.packages }} pkg-config ffmpeg@6 qt
+        brew install ${{ matrix.packages }} pkg-config ffmpeg@9 qt
 
     - name: Install qwt
       run: |
@@ -117,7 +117,7 @@ jobs:
         sed -i '' 's/#if QT_VERSION < QT_VERSION_CHECK(6, 4, 0)/#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)/g' qctools-QtAVPlayer/src/QtAVPlayer/qavvideoframe.cpp || true # temporary fix
         mkdir build
         cd build
-        export PKG_CONFIG_PATH="/opt/homebrew/opt/ffmpeg@6/lib/pkgconfig"
+        export PKG_CONFIG_PATH="/opt/homebrew/opt/ffmpeg@9/lib/pkgconfig"
         qmake ..
         make -j4
 
@@ -182,7 +182,7 @@ jobs:
 
     - name: Build FFmpeg
       run: |
-        git clone --depth 1 --branch n8.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
+        git clone --depth 1 --branch n9.0.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
         cd ../ffmpeg
         ./configure --enable-gpl \
                     --enable-static \
@@ -263,7 +263,7 @@ jobs:
 
     - name: Build FFmpeg
       run: |
-        git clone --depth 1 --branch n8.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
+        git clone --depth 1 --branch n9.0.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
         cd ../ffmpeg
         ./configure --enable-gpl \
                     --enable-static \
@@ -347,7 +347,7 @@ jobs:
 
     - name: Build FFmpeg
       run: |
-        git clone --depth 1 --branch n8.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
+        git clone --depth 1 --branch n9.0.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
         cd ../ffmpeg
         ./configure --enable-gpl \
                     --enable-shared \
@@ -431,7 +431,7 @@ jobs:
 
     - name: Build FFmpeg
       run: |
-        git clone --depth 1 --branch n8.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
+        git clone --depth 1 --branch n9.0.1 https://github.com/FFmpeg/FFmpeg ../ffmpeg
         cd ../ffmpeg
         ./configure --enable-gpl \
                     --enable-shared \
@@ -500,9 +500,9 @@ jobs:
       shell: pwsh
       run: |
         Set-Location ..
-        $json = $(curl -L -H "Accept: application/vnd.github+json" https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/342531362)
-        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-8.1.zip")).name | sub("\\.zip$";"")')
-        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-8.1.zip")).browser_download_url')
+        $json = $(curl -L -H "Accept: application/vnd.github+json" https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/402639889)
+        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-9.0.zip")).name | sub("\\.zip$";"")')
+        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-9.0.zip")).browser_download_url')
         Invoke-WebRequest -Uri "$ffmpeg_url" -OutFile "$ffmpeg_name.zip"
         Expand-Archive -Path "$ffmpeg_name.zip" -DestinationPath .
         Rename-Item -Path "$ffmpeg_name" -NewName "ffmpeg"
@@ -583,9 +583,9 @@ jobs:
       shell: pwsh
       run: |
         Set-Location ..
-        $json = $(curl -L -H "Accept: application/vnd.github+json" https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/342531362)
-        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-8.1.zip")).name | sub("\\.zip$";"")')
-        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-8.1.zip")).browser_download_url')
+        $json = $(curl -L -H "Accept: application/vnd.github+json" https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/402639889)
+        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-9.0.zip")).name | sub("\\.zip$";"")')
+        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-9.0.zip")).browser_download_url')
         Invoke-WebRequest -Uri "$ffmpeg_url" -OutFile "$ffmpeg_name.zip"
         Expand-Archive -Path "$ffmpeg_name.zip" -DestinationPath .
         Rename-Item -Path "$ffmpeg_name" -NewName "ffmpeg"
@@ -667,9 +667,9 @@ jobs:
       shell: pwsh
       run: |
         Set-Location ..
-        $json = $(curl -L -H "Accept: application/vnd.github+json" https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/342531362)
-        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-8.1.zip")).name | sub("\\.zip$";"")')
-        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-8.1.zip")).browser_download_url')
+        $json = $(curl -L -H "Accept: application/vnd.github+json" https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/402639889)
+        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-9.0.zip")).name | sub("\\.zip$";"")')
+        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-9.0.zip")).browser_download_url')
         Invoke-WebRequest -Uri "$ffmpeg_url" -OutFile "$ffmpeg_name.zip"
         Expand-Archive -Path "$ffmpeg_name.zip" -DestinationPath .
         Rename-Item -Path "$ffmpeg_name" -NewName "ffmpeg"
@@ -754,9 +754,9 @@ jobs:
       shell: pwsh
       run: |
         Set-Location ..
-        $json = $(curl -L -H "Accept: application/vnd.github+json" https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/342531362)
-        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-8.1.zip")).name | sub("\\.zip$";"")')
-        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-8.1.zip")).browser_download_url')
+        $json = $(curl -L -H "Accept: application/vnd.github+json" https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/402639889)
+        $ffmpeg_name = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-9.0.zip")).name | sub("\\.zip$";"")')
+        $ffmpeg_url = $($json | jq -r '.assets[] | select(.name | endswith("-win64-gpl-shared-9.0.zip")).browser_download_url')
         Invoke-WebRequest -Uri "$ffmpeg_url" -OutFile "$ffmpeg_name.zip"
         Expand-Archive -Path "$ffmpeg_name.zip" -DestinationPath .
         Rename-Item -Path "$ffmpeg_name" -NewName "ffmpeg"

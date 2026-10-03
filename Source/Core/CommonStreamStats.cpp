@@ -15,6 +15,8 @@ extern "C"
 {
 #include <libavutil/frame.h>
 #include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+#include <libavcodec/codec_desc.h>
 }
 #include "tinyxml2.h"
 #include <sstream>
@@ -27,6 +29,37 @@ using namespace tinyxml2;
 
 static std::string rational_to_string(AVRational r, char sep) {
     return std::to_string(r.num).append(1, sep).append(std::to_string(r.den));
+}
+
+static AVRational stream_codec_timebase(QAVStream* stream)
+{
+    if (stream == NULL)
+        return AVRational { 0, 1 };
+
+#if LIBAVFORMAT_VERSION_MAJOR < 63
+    return av_stream_get_codec_timebase(stream->stream());
+#else
+    // av_stream_get_codec_timebase() was removed in FFmpeg 9 (libavformat 63).
+    // First, try to get the codec time base from the decoder context (should be sufficient for audio frames).
+    const QSharedPointer<QAVCodec> codec = stream->codec();
+    const AVCodecContext* avctx = codec ? codec->avctx() : nullptr;
+    if (avctx && avctx->time_base.num > 0 && avctx->time_base.den > 0)
+        return avctx->time_base;
+
+    // Reconstruct the codec time base from the codec framerate.
+    const AVStream* st = stream->stream();
+    if (!st)
+        return AVRational { 0, 1 };
+
+    const AVRational codec_framerate = st->codecpar->framerate;
+    if (codec_framerate.num > 0 && codec_framerate.den > 0) {
+        const AVCodecDescriptor* codec_desc = avcodec_descriptor_get(st->codecpar->codec_id);
+        const int ticks_per_frame = (codec_desc && (codec_desc->props & AV_CODEC_PROP_FIELDS)) ? 2 : 1;
+        return av_inv_q(av_mul_q(codec_framerate, AVRational { ticks_per_frame, 1 }));
+    }
+
+    return AVRational { 0, 1 };
+#endif
 }
 
 static CommonStreamStats::Metadata extractMetadata(QMap<QString, QString> tags)
@@ -152,7 +185,7 @@ CommonStreamStats::CommonStreamStats(QAVStream* stream) :
     stream_index(stream->index()),
     codec_name(stream ? stream->codec()->codec()->name : ""),
     codec_long_name(stream ? stream->codec()->codec()->long_name : ""),
-    codec_time_base(stream ? rational_to_string(av_stream_get_codec_timebase(stream->stream()), '/') : ""),
+    codec_time_base(stream ? rational_to_string(stream_codec_timebase(stream), '/') : ""),
     codec_tag(stream ? stream->stream()->codecpar->codec_tag : 0),
     r_frame_rate(stream != NULL ? rational_to_string(stream->stream()->r_frame_rate, '/') : ""),
     avg_frame_rate(stream != NULL ? rational_to_string(stream->stream()->avg_frame_rate, '/') : ""),
