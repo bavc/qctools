@@ -1,0 +1,285 @@
+From 19d9897926326d5fa6f1130833fbccc0dfd79c2d Mon Sep 17 00:00:00 2001
+From: Maxime Gervais <gervais.maxime@gmail.com>
+Date: Sun, 4 Oct 2026 21:23:05 +0200
+Subject: [PATCH] Add an option to automatically download hardware-decoded
+ frame
+
+---
+ ../src/QtAVPlayer/qavfiltergraph.cpp      |  4 +-
+ ../src/QtAVPlayer/qavfiltergraph_p.h      |  2 +-
+ ../src/QtAVPlayer/qavfilters.cpp          |  5 ++-
+ ../src/QtAVPlayer/qavfilters_p.h          |  3 +-
+ ../src/QtAVPlayer/qavplayer.cpp           | 20 ++++++++-
+ ../src/QtAVPlayer/qavplayer.h             | 13 ++++++
+ ../src/QtAVPlayer/qavvideoinputfilter.cpp | 62 +++++++++++++++++++++++++-
+ ../src/QtAVPlayer/qavvideoinputfilter_p.h |  2 +-
+ 8 files changed, 102 insertions(+), 9 deletions(-)
+
+diff --git a/qctools-QtAVPlayer/src/QtAVPlayer/qavfiltergraph.cpp b/qctools-QtAVPlayer/src/QtAVPlayer/qavfiltergraph.cpp
+index 88d05d7..cd2df49 100644
+--- a/qctools-QtAVPlayer/src/QtAVPlayer/qavfiltergraph.cpp
++++ b/qctools-QtAVPlayer/src/QtAVPlayer/qavfiltergraph.cpp
+@@ -64,7 +64,7 @@ int QAVFilterGraph::parse(const QString &desc)
+     return avfilter_graph_parse2(d->graph, desc.toUtf8().constData(), &d->inputs, &d->outputs);
+ }
+ 
+-int QAVFilterGraph::apply(const QAVFrame &frame)
++int QAVFilterGraph::apply(const QAVFrame &frame, bool autoDownloadHWFrames)
+ {
+     Q_D(QAVFilterGraph);
+     if (!frame.stream())
+@@ -91,7 +91,7 @@ int QAVFilterGraph::apply(const QAVFrame &frame)
+         switch (avfilter_pad_get_type(cur->filter_ctx->input_pads, cur->pad_idx)) {
+         case AVMEDIA_TYPE_VIDEO: {
+             if (codec_type == AVMEDIA_TYPE_VIDEO) {
+-                QAVVideoInputFilter filter(frame);
++                QAVVideoInputFilter filter(frame, autoDownloadHWFrames);
+                 ret = filter.configure(d->graph, cur);
+                 if (ret < 0)
+                     return ret;
+diff --git a/qctools-QtAVPlayer/src/QtAVPlayer/qavfiltergraph_p.h b/qctools-QtAVPlayer/src/QtAVPlayer/qavfiltergraph_p.h
+index 5e6659b..07092de 100644
+--- a/qctools-QtAVPlayer/src/QtAVPlayer/qavfiltergraph_p.h
++++ b/qctools-QtAVPlayer/src/QtAVPlayer/qavfiltergraph_p.h
+@@ -40,7 +40,7 @@ public:
+     ~QAVFilterGraph();
+ 
+     int parse(const QString &desc);
+-    int apply(const QAVFrame &frame);
++    int apply(const QAVFrame &frame, bool autoDownloadHWFrames = false);
+     int config();
+     QString desc() const;
+     QMutex &mutex();
+diff --git a/qctools-QtAVPlayer/src/QtAVPlayer/qavfilters.cpp b/qctools-QtAVPlayer/src/QtAVPlayer/qavfilters.cpp
+index aaa1079..62d5df3 100644
+--- a/qctools-QtAVPlayer/src/QtAVPlayer/qavfilters.cpp
++++ b/qctools-QtAVPlayer/src/QtAVPlayer/qavfilters.cpp
+@@ -20,7 +20,8 @@ int QAVFilters::createFilters(
+     const QList<QString> &filterDescs,
+     const QAVFrame &frame,
+     const QAVStream &videoStream,
+-    const QAVStream &audioStream)
++    const QAVStream &audioStream,
++    bool autoDownloadHWFrames)
+ {
+     QMutexLocker locker(&m_mutex);
+     m_videoFilters.clear();
+@@ -53,7 +54,7 @@ int QAVFilters::createFilters(
+                     return AVERROR(ENOTSUP);
+                 }
+             }
+-            ret = graph->apply(videoFrame);
++            ret = graph->apply(videoFrame, autoDownloadHWFrames);
+             if (ret < 0) {
+                 qWarning() << "Could not create video filters:" << ret;
+                 return ret;
+diff --git a/qctools-QtAVPlayer/src/QtAVPlayer/qavfilters_p.h b/qctools-QtAVPlayer/src/QtAVPlayer/qavfilters_p.h
+index 6f8471d..682b3f3 100644
+--- a/qctools-QtAVPlayer/src/QtAVPlayer/qavfilters_p.h
++++ b/qctools-QtAVPlayer/src/QtAVPlayer/qavfilters_p.h
+@@ -37,7 +37,8 @@ public:
+         const QList<QString> &filterDescs,
+         const QAVFrame &frame,
+         const QAVStream &videoStream,
+-        const QAVStream &audioStream);
++        const QAVStream &audioStream,
++        bool autoDownloadHWFrames = false);
+     int write(
+         AVMediaType mediaType,
+         const QAVFrame &decodedFrame);
+diff --git a/qctools-QtAVPlayer/src/QtAVPlayer/qavplayer.cpp b/qctools-QtAVPlayer/src/QtAVPlayer/qavplayer.cpp
+index 2faed36..97f3dc0 100644
+--- a/qctools-QtAVPlayer/src/QtAVPlayer/qavplayer.cpp
++++ b/qctools-QtAVPlayer/src/QtAVPlayer/qavplayer.cpp
+@@ -131,6 +131,7 @@ public:
+     double currPts = 0.0;
+     mutable QMutex positionMutex;
+     bool synced = true;
++    bool autoDownloadHWFrames = false;
+ 
+     QAVPlayer::Error error = QAVPlayer::NoError;
+ 
+@@ -525,7 +526,8 @@ bool QAVPlayerPrivate::applyFilters(const QAVFrame &frame)
+         descs,
+         frame,
+         !videoStreams.isEmpty() ? videoStreams.first() : QAVStream(),
+-        !audioStreams.isEmpty() ? audioStreams.first() : QAVStream());
++        !audioStreams.isEmpty() ? audioStreams.first() : QAVStream(),
++        autoDownloadHWFrames);
+     if (ret < 0) {
+         setError(QAVPlayer::FilterError, QLatin1String("Could not create filters: ") + err_str(ret));
+         return false;
+@@ -1385,6 +1387,22 @@ void QAVPlayer::setSynced(bool sync)
+     Q_EMIT syncedChanged(sync);
+ }
+ 
++bool QAVPlayer::isAutoDownloadHWFrames() const
++{
++    Q_D(const QAVPlayer);
++    return d->autoDownloadHWFrames;
++}
++
++void QAVPlayer::setAutoDownloadHWFrames(bool download)
++{
++    Q_D(QAVPlayer);
++    if (d->autoDownloadHWFrames == download)
++        return;
++
++    d->autoDownloadHWFrames = download;
++    Q_EMIT autoDownloadHWFramesChanged(download);
++}
++
+ QString QAVPlayer::inputFormat() const
+ {
+     Q_D(const QAVPlayer);
+diff --git a/qctools-QtAVPlayer/src/QtAVPlayer/qavplayer.h b/qctools-QtAVPlayer/src/QtAVPlayer/qavplayer.h
+index 3731915..56fb407 100644
+--- a/qctools-QtAVPlayer/src/QtAVPlayer/qavplayer.h
++++ b/qctools-QtAVPlayer/src/QtAVPlayer/qavplayer.h
+@@ -107,6 +107,18 @@ public:
+     bool isSynced() const;
+     void setSynced(bool sync);
+ 
++    /**
++     * When enabled, a hardware-decoded frame (e.g. AV_PIX_FMT_VULKAN/VAAPI/...)
++     * is automatically downloaded to a software pixel format before entering
++     * the filter graph set via setFilters()/setFilter(), so software-only
++     * filters (e.g. signalstats) work without the caller having to add an
++     * explicit "hwdownload" step. Off by default, to keep existing filter
++     * graphs that are themselves hw-aware (e.g. using scale_vulkan) working
++     * unchanged.
++     */
++    bool isAutoDownloadHWFrames() const;
++    void setAutoDownloadHWFrames(bool download);
++
+     QString inputFormat() const;
+     void setInputFormat(const QString &format);
+ 
+@@ -164,6 +176,7 @@ Q_SIGNALS:
+     void filtersChanged(const QList<QString> &filters);
+     void bitstreamFilterChanged(const QString &desc);
+     void syncedChanged(bool sync);
++    void autoDownloadHWFramesChanged(bool download);
+     void inputFormatChanged(const QString &format);
+     void inputVideoCodecChanged(const QString &codec);
+     void inputOptionsChanged(const QMap<QString, QString> &opts);
+diff --git a/qctools-QtAVPlayer/src/QtAVPlayer/qavvideoinputfilter.cpp b/qctools-QtAVPlayer/src/QtAVPlayer/qavvideoinputfilter.cpp
+index cd84f90..a82e7a7 100644
+--- a/qctools-QtAVPlayer/src/QtAVPlayer/qavvideoinputfilter.cpp
++++ b/qctools-QtAVPlayer/src/QtAVPlayer/qavvideoinputfilter.cpp
+@@ -15,6 +15,7 @@ extern "C" {
+ #include <libavformat/avformat.h>
+ #include <libavfilter/buffersrc.h>
+ #include <libavutil/bprint.h>
++#include <libavutil/pixdesc.h>
+ #include <libavcodec/avcodec.h>
+ }
+ 
+@@ -34,6 +35,7 @@ public:
+     AVRational time_base{};
+     AVRational frame_rate{};
+     AVBufferRef *hw_frames_ctx = nullptr;
++    bool autoDownloadHWFrames = false;
+ };
+ 
+ QAVVideoInputFilter::QAVVideoInputFilter()
+@@ -41,10 +43,11 @@ QAVVideoInputFilter::QAVVideoInputFilter()
+ {
+ }
+ 
+-QAVVideoInputFilter::QAVVideoInputFilter(const QAVFrame &frame)
++QAVVideoInputFilter::QAVVideoInputFilter(const QAVFrame &frame, bool autoDownloadHWFrames)
+     : QAVVideoInputFilter()
+ {
+     Q_D(QAVVideoInputFilter);
++    d->autoDownloadHWFrames = autoDownloadHWFrames;
+     const auto &frm = frame.frame();
+     const auto &stream = frame.stream().stream();
+     // Use codec's hw frame ctx
+@@ -84,6 +87,8 @@ QAVVideoInputFilter &QAVVideoInputFilter::operator=(const QAVVideoInputFilter &o
+     d->sample_aspect_ratio = other.d_func()->sample_aspect_ratio;
+     d->time_base = other.d_func()->time_base;
+     d->frame_rate = other.d_func()->frame_rate;
++    d->hw_frames_ctx = other.d_func()->hw_frames_ctx;
++    d->autoDownloadHWFrames = other.d_func()->autoDownloadHWFrames;
+     return *this;
+ }
+ 
+@@ -124,6 +129,61 @@ int QAVVideoInputFilter::configure(AVFilterGraph *graph, AVFilterInOut *in)
+         return ret;
+     }
+ 
++    // A hw-decoded frame (e.g. AV_PIX_FMT_VULKAN/VAAPI/...) cannot flow
++    // directly into a filter chain that expects software pixel formats -
++    // FFmpeg never auto-inserts hwdownload for that. When requested, splice
++    // one in here so setFilters() works out of the box with hw decoding.
++    if (d->autoDownloadHWFrames && d->hw_frames_ctx) {
++        char hwdlName[255];
++        snprintf(hwdlName, sizeof(hwdlName), "hwdownload_%d", index);
++        AVFilterContext *hwdownload = avfilter_graph_alloc_filter(graph, avfilter_get_by_name("hwdownload"), hwdlName);
++        if (!hwdownload)
++            return AVERROR(ENOMEM);
++
++        ret = avfilter_init_dict(hwdownload, NULL);
++        if (ret < 0) {
++            qWarning() << "avfilter_init_dict (hwdownload) failed:" << ret;
++            return ret;
++        }
++
++        ret = avfilter_link(d->ctx, 0, hwdownload, 0);
++        if (ret < 0)
++            return ret;
++
++        // hwdownload cannot convert pixel formats, only transfer memory: it
++        // must be linked straight into the hw frame's own underlying software
++        // format, otherwise it's left to auto-negotiation with whatever the
++        // rest of the graph declares as acceptable, which can pick a format
++        // hwdownload can't actually produce (e.g. yuv420p for a gbrp10le
++        // source). Pin it explicitly via an intermediate "format" filter.
++        auto framesCtx = reinterpret_cast<const AVHWFramesContext *>(d->hw_frames_ctx->data);
++        const char *swFormatName = av_get_pix_fmt_name(framesCtx->sw_format);
++        if (!swFormatName) {
++            qWarning() << "Unknown software pixel format for hw frames, cannot auto-download";
++            return AVERROR(EINVAL);
++        }
++
++        char fmtName[255];
++        snprintf(fmtName, sizeof(fmtName), "hwdownload_format_%d", index++);
++        char fmtArgs[64];
++        snprintf(fmtArgs, sizeof(fmtArgs), "pix_fmts=%s", swFormatName);
++        AVFilterContext *format = avfilter_graph_alloc_filter(graph, avfilter_get_by_name("format"), fmtName);
++        if (!format)
++            return AVERROR(ENOMEM);
++
++        ret = avfilter_init_str(format, fmtArgs);
++        if (ret < 0) {
++            qWarning() << "avfilter_init_str (format) failed:" << ret;
++            return ret;
++        }
++
++        ret = avfilter_link(hwdownload, 0, format, 0);
++        if (ret < 0)
++            return ret;
++
++        return avfilter_link(format, 0, in->filter_ctx, in->pad_idx);
++    }
++
+     return avfilter_link(d->ctx, 0, in->filter_ctx, in->pad_idx);
+ }
+ 
+diff --git a/qctools-QtAVPlayer/src/QtAVPlayer/qavvideoinputfilter_p.h b/qctools-QtAVPlayer/src/QtAVPlayer/qavvideoinputfilter_p.h
+index dfb3d7c..6775fbe 100644
+--- a/qctools-QtAVPlayer/src/QtAVPlayer/qavvideoinputfilter_p.h
++++ b/qctools-QtAVPlayer/src/QtAVPlayer/qavvideoinputfilter_p.h
+@@ -28,7 +28,7 @@ class QAVVideoInputFilterPrivate;
+ class Q_AVPLAYER_EXPORT QAVVideoInputFilter : public QAVInOutFilter
+ {
+ public:
+-    QAVVideoInputFilter(const QAVFrame &frame);
++    QAVVideoInputFilter(const QAVFrame &frame, bool autoDownloadHWFrames = false);
+     QAVVideoInputFilter(const QAVVideoInputFilter &other);
+     ~QAVVideoInputFilter();
+     QAVVideoInputFilter &operator=(const QAVVideoInputFilter &other);
+-- 
+2.55.0
+

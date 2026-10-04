@@ -14,11 +14,13 @@ Source0:        %{name}_%{version}-1.tar.gz
 Prefix:         %{_prefix}
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires:  nasm
+BuildRequires:  glslc
 BuildRequires:  gcc-c++
 BuildRequires:  pkgconfig
 BuildRequires:  zlib-devel
 BuildRequires:  freetype-devel
 BuildRequires:  harfbuzz-devel
+BuildRequires:  vulkan-headers
 
 %if 0%{?fedora_version} ||  0%{?rhel}
 BuildRequires:  pkgconfig(Qt6)
@@ -98,7 +100,7 @@ the digital object, and the associated catalog record.
 
 # build
 pushd ffmpeg
-    ./configure --prefix="$(pwd)../output" --enable-gpl --enable-version3 --disable-autodetect --disable-programs --enable-static --disable-shared --disable-doc --disable-debug --enable-libfreetype --enable-libharfbuzz
+    ./configure --prefix="$(pwd)../output" --enable-gpl --enable-version3 --disable-autodetect --disable-programs --enable-static --disable-shared --disable-doc --disable-debug --enable-libfreetype --enable-libharfbuzz --enable-vulkan
     %__make %{?jobs:-j%{jobs}}
 popd
 
@@ -114,6 +116,8 @@ pushd qctools
     chmod 644 License.html
     pushd Project/QtCreator
         patch -p1 < ../BuildAllFromSource/qtavplayer-pktinfo.patch
+        patch -p1 < ../BuildAllFromSource/qtavplayer-hwframe.patch
+        patch -p1 < ../BuildAllFromSource/qtavplayer-vulkan-texture-guard.patch
         mkdir build
         pushd build
             qmake6 .. -after CONFIG+=force_debug_info LIBS+=-lharfbuzz LIBS+=-lfreetype

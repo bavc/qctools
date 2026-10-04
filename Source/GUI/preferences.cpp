@@ -147,6 +147,7 @@ void PreferencesDialog::Load()
     ui->signalServerLogin_lineEdit->setText(signalServerLogin());
     ui->signalServerPassword_lineEdit->setText(signalServerPassword());
     ui->signalServerEnable_checkBox->setChecked(isSignalServerEnabled());
+    ui->hwAccelEnable_checkBox->setChecked(preferences->isHwDecodeEnabled());
 }
 
 //---------------------------------------------------------------------------
@@ -170,6 +171,7 @@ void PreferencesDialog::Save()
     preferences->setSignalServerPassword(ui->signalServerPassword_lineEdit->text());
     preferences->setSignalServerEnabled(ui->signalServerEnable_checkBox->isChecked());
     preferences->setSignalServerAutoUploadEnabled(ui->signalServerEnableAutoUpload_checkBox->isChecked());
+    preferences->setHwDecodeEnabled(ui->hwAccelEnable_checkBox->isChecked());
 
     preferences->sync();
 }

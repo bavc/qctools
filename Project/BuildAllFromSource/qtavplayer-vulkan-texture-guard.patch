@@ -1,0 +1,61 @@
+From 1476b781e83fef80e6ad05b646ef0b5405c66ce0 Mon Sep 17 00:00:00 2001
+From: Maxime Gervais <gervais.maxime@gmail.com>
+Date: Thu, 29 Oct 2026 13:25:05 +0100
+Subject: [PATCH] Only use Vulkan textures when the Qt private API is available
+
+The Vulkan backend was guarded for Qt >= 6.4, but qvideoframetexturefromsource_p.h is not available before Qt 6.8.2. This breaks QtMultimedia builds with Vulkan enabled on older Qt releases even though FFmpeg Vulkan decoding is otherwise supported.
+
+Feature-test the private header and fall back to QAVVideoBuffer_GPU when it is absent. This keeps the Vulkan hardware device registered while allowing frames to be downloaded to CPU for rendering.
+---
+ qctools-QtAVPlayer/src/QtAVPlayer/qavhwdevice_vulkan.cpp | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/qctools-QtAVPlayer/src/QtAVPlayer/qavhwdevice_vulkan.cpp b/qctools-QtAVPlayer/src/QtAVPlayer/qavhwdevice_vulkan.cpp
+index d3981d5..9e52433 100644
+--- a/qctools-QtAVPlayer/src/QtAVPlayer/qavhwdevice_vulkan.cpp
++++ b/qctools-QtAVPlayer/src/QtAVPlayer/qavhwdevice_vulkan.cpp
+@@ -9,7 +9,13 @@
+ #include "qavvideobuffer_gpu_p.h"
+ #include <QDebug>
+ 
+-#if defined(QT_AVPLAYER_MULTIMEDIA) && defined(QT_AVPLAYER_VULKAN) && QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
++#if defined(QT_AVPLAYER_MULTIMEDIA) && defined(QT_AVPLAYER_VULKAN) \
++    && QT_VERSION >= QT_VERSION_CHECK(6, 4, 0) \
++    && __has_include(<QtMultimedia/private/qvideoframetexturefromsource_p.h>)
++#define QAVPLAYER_VULKAN_TEXTURES
++#endif
++
++#ifdef QAVPLAYER_VULKAN_TEXTURES
+ #include <private/qrhi_p.h>
+ #include <QtMultimedia/private/qvideoframetexturefromsource_p.h>
+ #endif
+@@ -17,7 +23,7 @@
+ extern "C" {
+ #include <libavutil/pixdesc.h>
+ #include <libavcodec/avcodec.h>
+-#if defined(QT_AVPLAYER_MULTIMEDIA) && defined(QT_AVPLAYER_VULKAN) && QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
++#ifdef QAVPLAYER_VULKAN_TEXTURES
+ #include <libavutil/hwcontext_vulkan.h>
+ #endif
+ }
+@@ -34,7 +40,7 @@ AVHWDeviceType QAVHWDevice_Vulkan::type() const
+     return AV_HWDEVICE_TYPE_VULKAN;
+ }
+ 
+-#if defined(QT_AVPLAYER_MULTIMEDIA) && defined(QT_AVPLAYER_VULKAN) && QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
++#ifdef QAVPLAYER_VULKAN_TEXTURES
+ 
+ class QVideoFrameTexturesFromRhiTextureArray : public QVideoFrameTextures
+ {
+@@ -387,7 +393,7 @@ QAVVideoBuffer *QAVHWDevice_Vulkan::videoBuffer(const QAVVideoFrame &frame) cons
+     return new VideoBuffer_Vulkan(frame);
+ }
+ 
+-#else // #if defined(QT_AVPLAYER_MULTIMEDIA) && defined(QT_AVPLAYER_VULKAN) && QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
++#else // QAVPLAYER_VULKAN_TEXTURES
+ 
+ QAVVideoBuffer *QAVHWDevice_Vulkan::videoBuffer(const QAVVideoFrame &frame) const
+ {
+-- 
+2.56.0
+
