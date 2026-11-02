@@ -618,7 +618,8 @@ QString thumbnails = "thumbnails";
 FileInformation::FileInformation (SignalServer* signalServer, const QString &FileName_, activefilters ActiveFilters_, activealltracks ActiveAllTracks_,
                                   QMap<QString, std::tuple<QString, QString, QString, QString, int>> activePanels,
                                   const QString &QCvaultFileNamePrefix,
-                                  int FrameCount) :
+                                  int FrameCount,
+                                  bool HwAccelEnabled) :
     FileName(FileName_),
     ActiveFilters(ActiveFilters_),
     ActiveAllTracks(ActiveAllTracks_),
@@ -630,7 +631,8 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     m_autoCheckFileUploaded(true),
     m_autoUpload(true),
     m_hasStats(false),
-    m_commentsUpdated(false)
+    m_commentsUpdated(false),
+    m_hwAccelEnabled(HwAccelEnabled)
 {
     static struct RegisterMetatypes {
         RegisterMetatypes() {
@@ -821,6 +823,11 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
 
         m_mediaPlayer = new QAVPlayer();
 
+        if (!m_hwAccelEnabled)
+            m_mediaPlayer->setInputVideoCodec(QStringLiteral("software"));
+        else
+            m_mediaPlayer->setAutoDownloadHWFrames(true);
+
         int dpxOffset = -1;
         auto mediaFileName = FileName;
 
@@ -844,6 +851,11 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
     }
 
     m_mediaParser = new QAVPlayer();
+
+    if (!m_hwAccelEnabled)
+        m_mediaParser->setInputVideoCodec(QStringLiteral("software"));
+    else
+        m_mediaParser->setAutoDownloadHWFrames(true);
 
     int dpxOffset = -1;
     if(mediaOrMkvReportFileName  == "-")

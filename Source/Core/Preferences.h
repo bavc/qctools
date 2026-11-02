@@ -54,6 +54,9 @@ public:
     bool isSignalServerEnabled() const;
     void setSignalServerEnabled(bool enabled);
 
+    bool isHwDecodeEnabled() const;
+    void setHwDecodeEnabled(bool enabled);
+
     bool isSignalServerAutoUploadEnabled() const;
     void setSignalServerAutoUploadEnabled(bool enabled);
 

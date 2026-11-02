@@ -237,6 +237,22 @@
            </layout>
           </widget>
          </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_6">
+           <property name="title">
+            <string>Decoding</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_13">
+            <item>
+             <widget class="QCheckBox" name="hwAccelEnable_checkBox">
+              <property name="text">
+               <string>Enable HW acceleration</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>
@@ -501,6 +517,7 @@
   <tabstop>Tracks_Video_All</tabstop>
   <tabstop>Tracks_Audio_First</tabstop>
   <tabstop>Tracks_Audio_All</tabstop>
+  <tabstop>hwAccelEnable_checkBox</tabstop>
   <tabstop>signalServerUrl_lineEdit</tabstop>
   <tabstop>signalServerLogin_lineEdit</tabstop>
   <tabstop>signalServerPassword_lineEdit</tabstop>

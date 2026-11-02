@@ -11,6 +11,8 @@
 # - Meson binary in the PATH                                                                      #
 # - Ninja binary in the PATH                                                                      #
 # - Git binary in the PATH                                                                        #
+# - CMake binary in the PATH                                                                      #
+# - glslc binary in the PATH                                                                      #
 # Environment:                                                                                    #
 # - MULTIARCH: Compile for arm64 and x86_64 into the same binary (macOS)                          #
 ###################################################################################################
@@ -43,6 +45,7 @@ FFMPEG_CONFIGURE_OPTS=(
     --disable-shared
     --enable-libfreetype
     --enable-libharfbuzz
+    --enable-vulkan
 )
 
 QT_CONFIGURE_OPTS=()
@@ -156,6 +159,13 @@ pushd harfbuzz/build
     fi
 popd
 
+# vulkan-header
+mkdir vulkan-headers/build
+pushd vulkan-headers/build
+    cmake -GNinja -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR/output ..
+    ninja install
+popd
+
 # ffmpeg
 echo "Build FFmpeg"
 if [[ -d ffmpeg/build ]] ; then
@@ -168,7 +178,7 @@ pushd ffmpeg/build
         pushd x86_64
         (
             export PKG_CONFIG_PATH=$INSTALL_DIR/output/x86_64/lib/pkgconfig
-            ../../configure --arch=x86_64 --extra-cflags="-arch x86_64" --extra-ldflags="-arch x86_64" --prefix=$INSTALL_DIR/output/x86_64 "${FFMPEG_CONFIGURE_OPTS[@]}"
+            ../../configure --arch=x86_64 --extra-cflags="-arch x86_64" --extra-cflags="-I$INSTALL_DIR/output/include" --extra-ldflags="-arch x86_64" --prefix=$INSTALL_DIR/output/x86_64 "${FFMPEG_CONFIGURE_OPTS[@]}"
             make install
         )
         popd
@@ -176,7 +186,7 @@ pushd ffmpeg/build
         pushd arm64
         (
             export PKG_CONFIG_PATH=$INSTALL_DIR/output/arm64/lib/pkgconfig
-            ../../configure --arch=arm64 --extra-cflags="-arch arm64" --extra-ldflags="-arch arm64" --prefix=$INSTALL_DIR/output/arm64 "${FFMPEG_CONFIGURE_OPTS[@]}"
+            ../../configure --arch=arm64 --extra-cflags="-arch arm64" --extra-cflags="-I$INSTALL_DIR/output/include" --extra-ldflags="-arch arm64" --prefix=$INSTALL_DIR/output/arm64 "${FFMPEG_CONFIGURE_OPTS[@]}"
             make install
         )
         popd
@@ -221,6 +231,8 @@ mkdir qctools/Project/QtCreator/build
 pushd qctools/Project/QtCreator/build
 (
     git -C .. apply "$SCRIPT_DIR/qtavplayer-pktinfo.patch"
+    git -C .. apply "$SCRIPT_DIR/qtavplayer-hwframe.patch"
+    git -C .. apply "$SCRIPT_DIR/qtavplayer-vulkan-texture-guard.patch"
     export QWT_ROOT=$INSTALL_DIR/output FFMPEG=$INSTALL_DIR/output
     $BINQMAKE "${QT_CONFIGURE_OPTS[@]}" STATIC=1 ..
     make

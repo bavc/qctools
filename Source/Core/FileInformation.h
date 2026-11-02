@@ -62,7 +62,8 @@ public:
                                                              activefilters ActiveFilters, activealltracks ActiveAllTracks,
                                                              QMap<QString, std::tuple<QString, QString, QString, QString, int>> activePanels,
                                                              const QString &cacheFileNamePrefix,
-                                                             int FrameCount=0);
+                                                             int FrameCount=0,
+                                                             bool HwAccelEnabled=false);
                                 ~FileInformation            ();
 
     // Parsing
@@ -250,6 +251,7 @@ private:
     bool m_autoUpload;
     bool m_hasStats;
     bool m_commentsUpdated;
+    bool m_hwAccelEnabled;
     QSize m_panelSize;
 
     activefilters m_exportFilters;

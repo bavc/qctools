@@ -218,6 +218,7 @@ CONFIG -= no_keywords
 !linux|lessThan(QT_MAJOR_VERSION, 6): DEFINES += QT_AVPLAYER_MULTIMEDIA
 
 INCLUDEPATH += ../qctools-QtAVPlayer/src
+include(../qtavplayer-hwaccel.pri)
 include(../qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.pri)
 
 include(../ffmpeg.pri)

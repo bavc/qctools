@@ -81,6 +81,7 @@ HEADERS += \
     version.h
 
 INCLUDEPATH += ../qctools-QtAVPlayer/src
+include(../qtavplayer-hwaccel.pri)
 include(../qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.pri)
 
 message('qctools-lib: including ffmpeg')

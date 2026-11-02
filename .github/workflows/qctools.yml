@@ -15,12 +15,15 @@ jobs:
     - name: Checkout submodules
       shell: bash
       run: |
+        set -x
         GIT_PATH=https://github.com/.extraheader
         AUTH_HEADER="$(git config --local --get http.$GIT_PATH)"
         git submodule sync --recursive
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
             submodule update --init --force --recursive --remote --depth=1
+        git -C Project/QtCreator/qctools-QtAVPlayer apply -p2 "$PWD"/Project/BuildAllFromSource/qtavplayer-*.patch
+
 
     - name: Install dependencies
       run: |
@@ -73,10 +76,11 @@ jobs:
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
             submodule update --init --force --recursive --remote --depth=1
+        git -C Project/QtCreator/qctools-QtAVPlayer apply -p2 "$PWD"/Project/BuildAllFromSource/qtavplayer-*.patch
 
     - name: Install dependencies
       run: |
-        brew install pkg-config ffmpeg@9 qt
+        brew install pkg-config ffmpeg@9 qt vulkan-headers
 
     - name: Install qwt
       run: |
@@ -119,6 +123,7 @@ jobs:
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
             submodule update --init --force --recursive --remote --depth=1
+        git -C Project/QtCreator/qctools-QtAVPlayer apply -p2 "$PWD"/Project/BuildAllFromSource/qtavplayer-*.patch
 
     - name: Install Qt5
       run: |
@@ -191,6 +196,11 @@ jobs:
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
             submodule update --init --force --recursive --remote --depth=1
+        git -C Project/QtCreator/qctools-QtAVPlayer apply -p2 "$PWD"/Project/BuildAllFromSource/qtavplayer-*.patch
+
+    - name: Install dependencies
+      run: |
+        brew install vulkan-headers
 
     - name: Install Qt6
       uses: jurplel/install-qt-action@v3
@@ -226,7 +236,7 @@ jobs:
         cd Project/QtCreator
         mkdir build
         cd build
-        qmake .. 
+        qmake INCLUDEPATH+=/opt/homebrew/include ..
         make -j4
 
   build-linux:
@@ -253,6 +263,7 @@ jobs:
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
             submodule update --init --force --recursive --remote --depth=1
+        git -C Project/QtCreator/qctools-QtAVPlayer apply -p2 "$PWD"/Project/BuildAllFromSource/qtavplayer-*.patch
 
     - name: Install Python 3.x version
       uses: actions/setup-python@v1
@@ -331,6 +342,7 @@ jobs:
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
             submodule update --init --force --recursive --remote --depth=1
+        git -C Project/QtCreator/qctools-QtAVPlayer apply -p2 "$PWD"/Project/BuildAllFromSource/qtavplayer-*.patch
 
     - name: Install Python 3.x version
       uses: actions/setup-python@v1
@@ -407,6 +419,7 @@ jobs:
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
             submodule update --init --force --recursive --remote --depth=1
+        git -C Project/QtCreator/qctools-QtAVPlayer apply -p2 "$PWD"/Project/BuildAllFromSource/qtavplayer-*.patch
 
     - name: Build and install zlib
       shell: cmd
@@ -486,6 +499,7 @@ jobs:
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
             submodule update --init --force --recursive --remote --depth=1
+        git -C Project/QtCreator/qctools-QtAVPlayer apply -p2 "$PWD"/Project/BuildAllFromSource/qtavplayer-*.patch
 
     - name: Build and install zlib
       shell: cmd
@@ -564,6 +578,7 @@ jobs:
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
             submodule update --init --force --recursive --remote --depth=1
+        git -C Project/QtCreator/qctools-QtAVPlayer apply -p2 "$PWD"/Project/BuildAllFromSource/qtavplayer-*.patch
 
     - name: Init vs environment
       uses: egor-tensin/vs-shell@v2
@@ -646,6 +661,7 @@ jobs:
         git -c "http.extraheader=$AUTH_HEADER" \
             -c protocol.version=2 \
             submodule update --init --force --recursive --remote --depth=1
+        git -C Project/QtCreator/qctools-QtAVPlayer apply -p2 "$PWD"/Project/BuildAllFromSource/qtavplayer-*.patch
 
     - name: Init vs environment
       uses: egor-tensin/vs-shell@v2

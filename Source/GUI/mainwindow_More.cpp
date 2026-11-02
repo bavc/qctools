@@ -156,7 +156,7 @@ void MainWindow::processFile(const QString &FileName)
     statusBar()->showMessage("Scanning "+QFileInfo(FileName).fileName()+"...");
 
     // Launch analysis
-    FileInformation* file = new FileInformation(signalServer, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks, preferences->getActivePanels(), preferences->createQCvaultFileNameString(FileName));
+    FileInformation* file = new FileInformation(signalServer, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks, preferences->getActivePanels(), preferences->createQCvaultFileNameString(FileName), 0, preferences->isHwDecodeEnabled());
     connect(file, SIGNAL(positionChanged()), this, SLOT(Update()), Qt::DirectConnection); // direct connection is required here to get Update called from separate thread
     file->setIndex(Files.size());
     file->setExportFilters(Prefs->ActiveFilters);
@@ -492,7 +492,7 @@ void MainWindow::addFile(const QString &FileName)
     qDebug() << "addFile: " << FileName;
 
     // Launch analysis
-    FileInformation* Temp=new FileInformation(signalServer, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks, preferences->getActivePanels(), preferences->createQCvaultFileNameString(FileName));
+    FileInformation* Temp=new FileInformation(signalServer, FileName, Prefs->ActiveFilters, Prefs->ActiveAllTracks, preferences->getActivePanels(), preferences->createQCvaultFileNameString(FileName), 0, preferences->isHwDecodeEnabled());
     if (!Temp->isValid() && !Temp->hasStats())
     {
         delete Temp; //Temp=NULL;

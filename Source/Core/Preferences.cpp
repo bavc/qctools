@@ -37,6 +37,8 @@ QString KeyActiveAllTracks = "ActiveAllTracks";
 QString KeyActivePanels = "ActivePanels";
 QString KeyFilterSelectorsOrder = "filterSelectorsOrder";
 
+QString KeyHwDecodeEnable = "HwDecodeEnable";
+
 Preferences::Preferences(QObject *parent) : QObject(parent)
 {
     Q_INIT_RESOURCE(coreresources);
@@ -235,6 +237,18 @@ void Preferences::setSignalServerEnabled(bool enabled)
 {
     QSettings settings;
     settings.setValue(KeySignalServerEnable, enabled);
+}
+
+bool Preferences::isHwDecodeEnabled() const
+{
+    QSettings settings;
+    return settings.value(KeyHwDecodeEnable, false).toBool();
+}
+
+void Preferences::setHwDecodeEnabled(bool enabled)
+{
+    QSettings settings;
+    settings.setValue(KeyHwDecodeEnable, enabled);
 }
 
 bool Preferences::isSignalServerAutoUploadEnabled() const

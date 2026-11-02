@@ -15,6 +15,7 @@
 #endif // QT_AVPLAYER_MULTIMEDIA
 #include <QtAVPlayer/qavplayer.h>
 #include "Core/FileInformation.h"
+#include "Core/Preferences.h"
 
 class QGraphicsVideoItem;
 
@@ -146,6 +147,8 @@ public:
                 setInputOptions({});
             }
         }
+
+        setInputVideoCodec(Preferences().isHwDecodeEnabled() ? QString() : QStringLiteral("software"));
 
         setSource(sourceFile);
     }

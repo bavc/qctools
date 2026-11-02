@@ -11,6 +11,8 @@
 # - Ninja binary in the PATH                                                                      #
 # - Git binary in the PATH                                                                        #
 # - Configured WSL2 Linux environment with pkgconf, make and nasm packages installed              #
+# - Vulkan SDK installed, with its headers and glslc.exe reachable from the WSL2 environment      #
+#   (needed by ffmpeg's --enable-vulkan, for its Vulkan hwaccel decoders)                         #
 ###################################################################################################
 
 # helpers
@@ -32,6 +34,7 @@ $Env:SUBDIR= # Prevent ffmpeg build error
 $Env:PKG_CONFIG_PATH="$INSTALL_DIR\output\lib\pkgconfig"
 $FFmpeg_CmdLine=@(
     '--toolchain=msvc',
+    '--enable-cross-compile',
     '--enable-shared',
     '--disable-static',
     '--disable-doc',
@@ -42,7 +45,10 @@ $FFmpeg_CmdLine=@(
     '--enable-version3',
     '--enable-libfreetype',
     '--enable-libharfbuzz',
-    '--extra-libs=msvcrt.lib'
+    '--enable-vulkan',
+    '--extra-libs=msvcrt.lib',
+    '--extra-cflags=-I../output/include',
+    '--glslc=glslc.exe' # Use host's glslc executable
 )
 
 # get dependencies
@@ -79,6 +85,16 @@ if (Test-Path -Path harfbuzz\build) {
 New-Item -ItemType directory -Name harfbuzz\build
 Push-Location -Path harfbuzz\build
     meson setup --prefix "$INSTALL_DIR\output" --buildtype=release -Db_vscrt=md -Dglib=disabled -Dgobject=disabled -Dcairo=disabled -Dchafa=disabled -Dicu=disabled -Dgraphite=disabled -Dgraphite2=disabled -Dgdi=disabled -Ddirectwrite=disabled -Dcoretext=disabled -Dwasm=disabled -Dtests=disabled -Dintrospection=disabled -Ddocs=disabled -Ddoc_tests=false -Dutilities=disabled .. ; Cmd-Result
+    ninja install ; Cmd-Result
+Pop-Location
+
+# vulkan-headers
+if (Test-Path -Path vulkan-headers\build) {
+    Remove-Item -Recurse -Force -Path vulkan-headers\build
+}
+New-Item -ItemType directory -Name vulkan-headers\build
+Push-Location -Path vulkan-headers\build
+    cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR\output" .. ; Cmd-Result
     ninja install ; Cmd-Result
 Pop-Location
 
@@ -124,6 +140,8 @@ if (Test-Path -Path qctools\Project\QtCreator\build) {
 New-Item -ItemType directory -Name qctools\Project\QtCreator\build
 Push-Location -Path qctools\Project\QtCreator\build
     git -C .. apply "$SCRIPT_DIR\qtavplayer-pktinfo.patch" ; Cmd-Result
+    git -C .. apply "$SCRIPT_DIR\qtavplayer-hwframe.patch" ; Cmd-Result
+    git -C .. apply "$SCRIPT_DIR\qtavplayer-vulkan-texture-guard.patch" ; Cmd-Result
     $Env:QWT_ROOT="$INSTALL_DIR/output"
     $Env:FFMPEG="$INSTALL_DIR/output"
     qmake QMAKE_CXXFLAGS+=/Zi QMAKE_LFLAGS+=/INCREMENTAL:NO QMAKE_LFLAGS+=/Debug DEFINES+=QT_AVPLAYER_MULTIMEDIA .. ; Cmd-Result

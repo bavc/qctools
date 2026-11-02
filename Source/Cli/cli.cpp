@@ -31,6 +31,8 @@ int Cli::exec(QCoreApplication &a)
     bool ignoreQCvault = false;
     auto activeAllTracks = prefs.activeAllTracks();
     bool setActiveAllTracks = false;
+    auto hwAccelEnabled = prefs.isHwDecodeEnabled();
+    bool setHwAccelEnabled = false;
     bool configIsSet = false;
     bool configHasIssues = false;
 
@@ -352,6 +354,50 @@ int Cli::exec(QCoreApplication &a)
 
             std::cout << (a.arguments().at(i) == "1" ? "First audio track will be analyzed." : "All audio tracks will be analyzed.") << std::endl;
             setActiveAllTracks = true;
+        } else if (a.arguments().at(i) == "-hwaccel")
+        {
+            ++i;
+            if (i >= a.arguments().length())
+            {
+                std::cout << "Missing argument after last option." << std::endl;
+                configHasIssues = true;
+                continue;
+            }
+
+            if (a.arguments().at(i) == "on")
+                hwAccelEnabled = true;
+            else if (a.arguments().at(i) == "off")
+                hwAccelEnabled = false;
+            else
+            {
+                std::cout << "-hwaccel option argument must be either on or off" << std::endl;
+                configHasIssues = true;
+                continue;
+            }
+        } else if (a.arguments().at(i) == "-set-hwaccel")
+        {
+            ++i;
+            if (i >= a.arguments().length())
+            {
+                std::cout << "Missing argument after last option." << std::endl;
+                configHasIssues = true;
+                continue;
+            }
+            configIsSet = true;
+
+            if (a.arguments().at(i) == "on")
+                hwAccelEnabled = true;
+            else if (a.arguments().at(i) == "off")
+                hwAccelEnabled = false;
+            else
+            {
+                std::cout << "-set-hwaccel option argument must be either on or off" << std::endl;
+                configHasIssues = true;
+                continue;
+            }
+
+            std::cout << (hwAccelEnabled ? "HW acceleration enabled." : "HW acceleration disabled.") << std::endl;
+            setHwAccelEnabled = true;
         }
     }
 
@@ -371,6 +417,12 @@ int Cli::exec(QCoreApplication &a)
     if (setActiveAllTracks)
     {
         prefs.setActiveAllTracks(activeAllTracks);
+    }
+
+    // HW acceleration
+    if (setHwAccelEnabled)
+    {
+        prefs.setHwDecodeEnabled(hwAccelEnabled);
     }
 
     if (configHasIssues)
@@ -449,6 +501,10 @@ int Cli::exec(QCoreApplication &a)
                 << "    Analyze only the first video track or all audio tracks." << std::endl
                 << "-set-audio <1 or all>" << std::endl
                 << "    Register the choice of analyzing either the first audio track or all audio tracks." << std::endl
+                << "-hwaccel <on or off>" << std::endl
+                << "    Enable or disable hardware-accelerated decoding for this run." << std::endl
+                << "-set-hwaccel <on or off>" << std::endl
+                << "    Register the choice of enabling hardware-accelerated decoding." << std::endl
                 << "-f" << std::endl
                 << "    Specifies '+'-separated string of filters used. Example: -f signalstats+cropdetect" << std::endl
                 << "    The filters used in " << appName << " may also be declared via the qctools-gui (see the" << std::endl
@@ -659,7 +715,7 @@ int Cli::exec(QCoreApplication &a)
 
     std::cout << std::endl;
 
-    info = std::unique_ptr<FileInformation>(new FileInformation(signalServer.get(), input, filters, activeAllTracks, prefs.getActivePanels(), useQCvault.isEmpty() ? QString() : prefs.createQCvaultFileNameString(input)));
+    info = std::unique_ptr<FileInformation>(new FileInformation(signalServer.get(), input, filters, activeAllTracks, prefs.getActivePanels(), useQCvault.isEmpty() ? QString() : prefs.createQCvaultFileNameString(input), 0, hwAccelEnabled));
     info->setAutoCheckFileUploaded(false);
     info->setAutoUpload(false);
 
