@@ -1,6 +1,7 @@
 #!/bin/sh
 APPNAME="qcli"
 SIGNATURE="MediaArea.net"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 DMG="tmp-${APPNAME}.dmg"
 FILES="tmp-${APPNAME}"
@@ -15,9 +16,16 @@ mkdir "${FILES}"
 mkdir "${FILES}/.background"
 
 mkdir -p "${FILES}_root/usr/local/bin"
+mkdir -p "${FILES}_root/usr/local/lib/qcli/lib"
 
 cp -R "../QtCreator/build/qctools-cli/${APPNAME}" "${FILES}_root/usr/local/bin"
 
+. "${SCRIPT_DIR}/ffmpeg_dylibs.sh"
+bundle_ffmpeg_dylibs "${FILES}_root/usr/local/lib/qcli/lib" "@executable_path/../lib/qcli/lib" "${FILES}_root/usr/local/bin/${APPNAME}" || exit 1
+
+for DYLIB in "${FILES}_root/usr/local/lib/qcli/lib"/*.dylib ; do
+    codesign --options=runtime -f -s "Developer ID Application: ${SIGNATURE}" --verbose "${DYLIB}"
+done
 codesign --deep --options=runtime -f -s "Developer ID Application: ${SIGNATURE}" --verbose "${FILES}_root/usr/local/bin/${APPNAME}"
 pkgbuild --root "${FILES}_root" --identifier "net.mediaarea.${APPNAME}.mac" --sign "Developer ID Installer: ${SIGNATURE}" --version "$(<../version.txt)" "${FILES}/${APPNAME}.pkg"
 codesign --deep --options=runtime -f -s "Developer ID Application: ${SIGNATURE}" --verbose "${FILES}/${APPNAME}.pkg"
