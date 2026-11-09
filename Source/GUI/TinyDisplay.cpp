@@ -6,7 +6,6 @@
 
 #include "GUI/TinyDisplay.h"
 #include "GUI/player.h"
-#include "GUI/utils.h"
 
 #include "Core/FileInformation.h"
 #include "Core/CommonStats.h"
@@ -16,7 +15,12 @@
 #include <QToolButton>
 #include <QLabel>
 #include <QApplication>
+#include <QImage>
 #include <QVector>
+
+extern "C" {
+#include <libavutil/pixfmt.h>
+}
 
 TinyDisplay::TinyDisplay(QWidget *parent, FileInformation* FileInformationData_)
     : QWidget(parent),
@@ -135,15 +139,28 @@ QPixmap toPixmap(const QByteArray& bytes)
 }
 
 QPixmap toPixmap(QAVVideoFrame frame) {
-#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
-    QVideoFrame vf = QAVV_QV(frame);
-    QImage img = vf.toImage();
-#elif QT_VERSION > QT_VERSION_CHECK(5, 13, 0)
-    QVideoFrame vf = frame;
-    QImage img = vf.image();
-#else
-    QImage img(frame.frame()->data[0], frame.frame()->width, frame.frame()->height, frame.frame()->linesize[0], QImage::Format_RGB888);
-#endif //
+    if (!frame)
+        return QPixmap();
+
+    QAVVideoFrame rgbFrame = frame;
+    if (frame.format() != AV_PIX_FMT_RGB32)
+        rgbFrame = frame.convertTo(AV_PIX_FMT_RGB32);
+    if (!rgbFrame)
+        return QPixmap();
+
+    const auto mapData = rgbFrame.map();
+    if (!mapData.data[0])
+        return QPixmap();
+
+    QImage img(
+        mapData.data[0],
+        rgbFrame.size().width(),
+        rgbFrame.size().height(),
+        mapData.bytesPerLine[0],
+        QImage::Format_ARGB32);
+
+    // The FFmpeg frame owns the mapped pixels, so detach before returning.
+    img = img.copy();
 
     return QPixmap::fromImage(img);
 }

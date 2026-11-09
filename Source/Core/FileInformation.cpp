@@ -968,7 +968,7 @@ FileInformation::FileInformation (SignalServer* signalServer, const QString &Fil
             filters.append(QString("%1 [%2]").arg(QString::fromStdString(Filters[1])).arg(astats));
 
         if(!m_mediaParser->currentVideoStreams().empty())
-            filters.append(QString("scale=72:72,format=rgb24 [%1]").arg(thumbnails));
+            filters.append(QString("scale=72:72,format=rgb32 [%1]").arg(thumbnails));
 
         if(!StatsFromExternalData_IsOpen) {
             // only do panels if no legacy report was opened
