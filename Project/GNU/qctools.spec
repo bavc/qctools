@@ -13,14 +13,13 @@ Source0:        %{name}_%{version}-1.tar.gz
 
 Prefix:         %{_prefix}
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
-BuildRequires:  nasm
-BuildRequires:  glslc
 BuildRequires:  gcc-c++
 BuildRequires:  pkgconfig
 BuildRequires:  zlib-devel
 BuildRequires:  freetype-devel
 BuildRequires:  harfbuzz-devel
 BuildRequires:  vulkan-headers
+BuildRequires:  ffmpeg-ma-devel
 
 %if 0%{?fedora_version} ||  0%{?rhel}
 BuildRequires:  pkgconfig(Qt6)
@@ -32,7 +31,6 @@ BuildRequires:  desktop-file-utils
 %endif
 
 %if 0%{?mageia}
-BuildRequires:  lib64bzip2-devel
 BuildRequires:  lib64qt6base6-devel
 BuildRequires:  lib64qt6svg-devel
 BuildRequires:  lib64qt6qml-devel
@@ -59,13 +57,12 @@ BuildRequires:  pkgconfig(Qt6MultimediaWidgets)
 BuildRequires:  update-desktop-files
 %endif
 
-%if 0%{?fedora_version} > 39
-BuildRequires:  libvpl
-%endif
+Requires:       ffmpeg-ma
 
 %package -n qcli
 Summary:  QCTools command line interface
 Group:    Applications/Multimedia
+Requires: ffmpeg-ma
 
 %description
 QCTools (Quality Control Tools for Video Preservation)
@@ -99,11 +96,6 @@ the digital object, and the associated catalog record.
 %setup -q -n qctools
 
 # build
-pushd ffmpeg
-    ./configure --prefix="$(pwd)../output" --enable-gpl --enable-version3 --disable-autodetect --disable-programs --enable-static --disable-shared --disable-doc --disable-debug --enable-libfreetype --enable-libharfbuzz --enable-vulkan
-    %__make %{?jobs:-j%{jobs}}
-popd
-
 pushd qwt
     patch -p1 < ../qctools/Project/BuildAllFromSource/qwt.patch
     export QWT_STATIC=1 QWT_NO_SVG=1 QWT_NO_OPENGL=1 QWT_NO_DESIGNER=1
@@ -117,10 +109,10 @@ pushd qctools
     pushd Project/QtCreator
         patch -p1 < ../BuildAllFromSource/qtavplayer-pktinfo.patch
         patch -p1 < ../BuildAllFromSource/qtavplayer-hwframe.patch
-        patch -p1 < ../BuildAllFromSource/qtavplayer-vulkan-texture-guard.patch
+        patch -p1 < ../BuildAllFromSource/qtavplayer-ffmpeg-ma.patch
         mkdir build
         pushd build
-            qmake6 .. -after CONFIG+=force_debug_info LIBS+=-lharfbuzz LIBS+=-lfreetype
+            qmake6 FFMPEG_USE_SYSTEM=true FFMPEG_LIBRARY_SUFFIX=-ma .. -after CONFIG+=force_debug_info LIBS+=-lharfbuzz LIBS+=-lfreetype
             %__make %{?jobs:-j%{jobs}}
         popd
     popd

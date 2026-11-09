@@ -13,13 +13,13 @@ diff --git a/qctools-QtAVPlayer/src/QtAVPlayer/qavcodec.cpp b/qctools-QtAVPlayer
 index 707ced7..d7a8688 100644
 --- a/qctools-QtAVPlayer/src/QtAVPlayer/qavcodec.cpp
 +++ b/qctools-QtAVPlayer/src/QtAVPlayer/qavcodec.cpp
-@@ -65,6 +65,9 @@ bool QAVCodec::open(AVStream *stream, AVDictionary** opts)
-     }
+@@ -66,6 +66,9 @@ bool QAVCodec::open(AVStream *stream, AVDictionary** opts)
  
      d->avctx->codec_id = d->codec->id;
-+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(59, 0, 0)
+     d->avctx->codec_type = d->codec->type;
++    #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(59, 0, 0)
 +    d->avctx->flags |= AV_CODEC_FLAG_COPY_OPAQUE;
-+#endif
++    #endif
      ret = avcodec_open2(d->avctx, d->codec, opts);
      if (ret < 0) {
          qWarning() << "Could not open the codec:" << d->codec->name << d->codec->id << ret;
@@ -27,7 +27,7 @@ diff --git a/qctools-QtAVPlayer/src/QtAVPlayer/qavdemuxer.cpp b/qctools-QtAVPlay
 index 2861a7e..439ccca 100644
 --- a/qctools-QtAVPlayer/src/QtAVPlayer/qavdemuxer.cpp
 +++ b/qctools-QtAVPlayer/src/QtAVPlayer/qavdemuxer.cpp
-@@ -52,6 +52,7 @@ extern "C" {
+@@ -57,6 +57,7 @@ extern "C" {
  #include <libavformat/avformat.h>
  #include <libavdevice/avdevice.h>
  #include <libavcodec/avcodec.h>
@@ -35,7 +35,7 @@ index 2861a7e..439ccca 100644
  #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(59, 0, 0)
  #include <libavcodec/bsf.h>
  #endif
-@@ -61,6 +62,29 @@ QT_BEGIN_NAMESPACE
+@@ -66,6 +67,29 @@ QT_BEGIN_NAMESPACE
  
  namespace {
  
@@ -65,7 +65,7 @@ index 2861a7e..439ccca 100644
  struct QAVDictionaryHolder
  {
      AVDictionary *dict = nullptr;
-@@ -702,6 +726,8 @@ int QAVDemuxer::read(QAVPacket &pkt)
+@@ -742,6 +766,8 @@ int QAVDemuxer::read(QAVPacket &pkt)
          } else {
              qDebug() << "av_read_frame: unexpected result:" << ret;
          }
@@ -74,7 +74,7 @@ index 2861a7e..439ccca 100644
      }
      {
          QMutexLocker locker(&d->mutex);
-@@ -723,8 +749,10 @@ int QAVDemuxer::read(QAVPacket &pkt)
+@@ -763,8 +789,10 @@ int QAVDemuxer::read(QAVPacket &pkt)
          if ((ret >= 0 || eof) && d->bsf_ctx) {
              int bsf_ret = av_bsf_send_packet(d->bsf_ctx, d->eof ? NULL : pkt.packet());
              if (bsf_ret >= 0) {
