@@ -10,7 +10,7 @@ Signed-off-by: Maxime Gervais <gervais.maxime@gmail.com>
  2 files changed, 32 insertions(+), 1 deletion(-)
 
 diff --git a/qctools-QtAVPlayer/src/QtAVPlayer/qavcodec.cpp b/qctools-QtAVPlayer/src/QtAVPlayer/qavcodec.cpp
-index 707ced7..d7a8688 100644
+index d4b9afe..cefde54 100644
 --- a/qctools-QtAVPlayer/src/QtAVPlayer/qavcodec.cpp
 +++ b/qctools-QtAVPlayer/src/QtAVPlayer/qavcodec.cpp
 @@ -66,6 +66,9 @@ bool QAVCodec::open(AVStream *stream, AVDictionary** opts)
@@ -24,7 +24,7 @@ index 707ced7..d7a8688 100644
      if (ret < 0) {
          qWarning() << "Could not open the codec:" << d->codec->name << d->codec->id << ret;
 diff --git a/qctools-QtAVPlayer/src/QtAVPlayer/qavdemuxer.cpp b/qctools-QtAVPlayer/src/QtAVPlayer/qavdemuxer.cpp
-index 2861a7e..439ccca 100644
+index 5f6e2eb..8169b1d 100644
 --- a/qctools-QtAVPlayer/src/QtAVPlayer/qavdemuxer.cpp
 +++ b/qctools-QtAVPlayer/src/QtAVPlayer/qavdemuxer.cpp
 @@ -57,6 +57,7 @@ extern "C" {
