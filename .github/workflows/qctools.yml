@@ -8,54 +8,55 @@ jobs:
     runs-on: macos-15
 
     steps:
-    - uses: actions/checkout@v5
-      with:
-        fetch-depth: 1
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
 
-    - name: Checkout submodules
-      shell: bash
-      run: |
-        set -x
-        GIT_PATH=https://github.com/.extraheader
-        AUTH_HEADER="$(git config --local --get http.$GIT_PATH)"
-        git submodule sync --recursive
-        git -c "http.extraheader=$AUTH_HEADER" \
-            -c protocol.version=2 \
-            submodule update --init --force --recursive --remote --depth=1
-        git -C Project/QtCreator/qctools-QtAVPlayer apply -p2 "$PWD"/Project/BuildAllFromSource/qtavplayer-*.patch
+      - name: Checkout submodules
+        shell: bash
+        run: |
+          set -x
+          GIT_PATH=https://github.com/.extraheader
+          AUTH_HEADER="$(git config --local --get http.$GIT_PATH)"
+          git submodule sync --recursive
+          git -c "http.extraheader=$AUTH_HEADER" \
+              -c protocol.version=2 \
+              submodule update --init --force --recursive --remote --depth=1
+          git -C Project/QtCreator/qctools-QtAVPlayer apply -p2 "$PWD"/Project/BuildAllFromSource/qtavplayer-*.patch
 
 
-    - name: Install dependencies
-      run: |
-        brew install pkg-config ffmpeg@9 qt@5
+      - name: Install dependencies
+        run: |
+          brew install pkg-config ffmpeg@9 qt@5
 
-    - name: Install qwt-qt5
-      run: |
-        curl -L https://raw.githubusercontent.com/Homebrew/homebrew-core/56cd02e96876d1fb5b9ae951d605585fe8d614de/Formula/qwt.rb -o /opt/homebrew/Library/Taps/homebrew/homebrew-core/Formula/q/qwt.rb
-        git -C /opt/homebrew/Library/Taps/homebrew/homebrew-core add Formula/q/qwt.rb
-        git -C /opt/homebrew/Library/Taps/homebrew/homebrew-core commit -m "Formula/q/qwt.rb 6.2.0 for Qt5"
-        HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_FROM_API=1 brew install qwt
+      - name: Install qwt-qt5
+        run: |
+          brew tap-new --no-git local/qwt
+          curl -fL https://raw.githubusercontent.com/Homebrew/homebrew-core/56cd02e96876d1fb5b9ae951d605585fe8d614de/Formula/qwt.rb -o "$(brew --repository local/qwt)/Formula/qwt.rb"
+          sed -i '' '/^  bottle do/,/^  end/d' "$(brew --repository local/qwt)/Formula/qwt.rb"
+          sed -i '' '/spec << "-arm64"/d' "$(brew --repository local/qwt)/Formula/qwt.rb" # macx-clang-arm64 spec no longer exists
+          HOMEBREW_NO_AUTO_UPDATE=1 brew install local/qwt/qwt
 
-    - name: Set Qt5 environment path
-      run: |
-        echo `brew --prefix qt@5`/bin >> $GITHUB_PATH
+      - name: Set Qt5 environment path
+        run: |
+          echo `brew --prefix qt@5`/bin >> $GITHUB_PATH
 
-    - name: Check Qt install
-      run: |
-        qmake -v
+      - name: Check Qt install
+        run: |
+          qmake -v
 
-    - name: Build QCTools
-      env:
-        USE_BREW: true
-      run: |
-        cd Project/QtCreator
-        sed -i '' 's/std::atomic_bool abortRequest = false;/std::atomic_bool abortRequest{false};/g' qctools-QtAVPlayer/src/QtAVPlayer/qavdemuxer.cpp || true # temporary fix
-        sed -i '' 's/std::atomic_bool m_abort = false;/std::atomic_bool m_abort{false};/g' qctools-QtAVPlayer/src/QtAVPlayer/qavformatcontext_p.h || true # temporary fix
-        mkdir build
-        cd build
-        export PKG_CONFIG_PATH="/opt/homebrew/opt/ffmpeg@9/lib/pkgconfig"
-        qmake ..
-        make -j4
+      - name: Build QCTools
+        env:
+          USE_BREW: true
+        run: |
+          cd Project/QtCreator
+          sed -i '' 's/std::atomic_bool abortRequest = false;/std::atomic_bool abortRequest{false};/g' qctools-QtAVPlayer/src/QtAVPlayer/qavdemuxer.cpp || true # temporary fix
+          sed -i '' 's/std::atomic_bool m_abort = false;/std::atomic_bool m_abort{false};/g' qctools-QtAVPlayer/src/QtAVPlayer/qavformatcontext_p.h || true # temporary fix
+          mkdir build
+          cd build
+          export PKG_CONFIG_PATH="/opt/homebrew/opt/ffmpeg@9/lib/pkgconfig"
+          qmake ..
+          make -j4
 
   build-macos-brew-Qt6:
     runs-on: macos-latest
@@ -133,12 +134,6 @@ jobs:
       run: |
         echo `brew --prefix qt@5`/bin >> $GITHUB_PATH
 
-#    - name: Install Qt5
-#      uses: jurplel/install-qt-action@v3
-#      with:
-#        version: ${{ matrix.qt_version }}
-#        modules: ${{ matrix.qt_modules }}
-
     - name: Check Qt install
       run: |
         qmake -v
@@ -203,7 +198,7 @@ jobs:
         brew install vulkan-headers
 
     - name: Install Qt6
-      uses: jurplel/install-qt-action@v3
+      uses: jurplel/install-qt-action@v4
       with:
         version: ${{ matrix.qt_version }}
         modules: ${{ matrix.qt_modules }}
@@ -266,7 +261,7 @@ jobs:
         git -C Project/QtCreator/qctools-QtAVPlayer apply -p2 "$PWD"/Project/BuildAllFromSource/qtavplayer-*.patch
 
     - name: Install Python 3.x version
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v7
       with:
         python-version: '3'
         architecture: 'x64'
@@ -277,7 +272,7 @@ jobs:
         sudo apt-get install -y ${{ matrix.packages }} ${{ matrix.qt_packages }}
 
     - name: Install Qt 5.15
-      uses: jurplel/install-qt-action@v3
+      uses: jurplel/install-qt-action@v4
       with:
         version: ${{ matrix.qt_version }}
 
@@ -345,7 +340,7 @@ jobs:
         git -C Project/QtCreator/qctools-QtAVPlayer apply -p2 "$PWD"/Project/BuildAllFromSource/qtavplayer-*.patch
 
     - name: Install Python 3.x version
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v7
       with:
         python-version: '3'
         architecture: 'x64'
@@ -356,7 +351,7 @@ jobs:
         sudo apt-get install -y ${{ matrix.packages }} ${{ matrix.qt_packages }}
 
     - name: Install Qt 6
-      uses: jurplel/install-qt-action@v3
+      uses: jurplel/install-qt-action@v4
       with:
         version: ${{ matrix.qt_version }}
         modules: ${{ matrix.qt_modules }}
@@ -436,7 +431,7 @@ jobs:
         make install
 
     - name: Install Qt 5.15
-      uses: jurplel/install-qt-action@v3
+      uses: jurplel/install-qt-action@v4
       with:
         arch: win64_mingw81
         version: ${{ matrix.qt_version }}
@@ -516,7 +511,7 @@ jobs:
         make install
 
     - name: Install Qt 6
-      uses: jurplel/install-qt-action@v3
+      uses: jurplel/install-qt-action@v4
       with:
         arch: win64_mingw
         version: ${{ matrix.qt_version }}
@@ -562,7 +557,7 @@ jobs:
       matrix:
         qt_version: ["5.15.*"]
 
-    runs-on: windows-2022
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v5
@@ -600,9 +595,19 @@ jobs:
         nmake install
 
     - name: Install Qt 5.15
-      uses: jurplel/install-qt-action@v3
+      uses: jurplel/install-qt-action@v4
       with:
         version: ${{ matrix.qt_version }}
+
+    - name: Apply Qt fix for MSVC 17.8+
+      shell: pwsh
+      run: |
+        # Backport of qtbase 52b6258ec8 (QTBUG-118993): stdext was removed from the MSVC STL
+        $file = "$env:QT_ROOT_DIR\include\QtCore\qcompilerdetection.h"
+        (Get-Content -Raw $file) `
+          -replace 'stdext::make_checked_array_iterator\(x, size_t\(N\)\)', '(x)' `
+          -replace 'stdext::make_unchecked_array_iterator\(x\)', '(x)' |
+          Set-Content -NoNewline $file
 
     - name: Install FFmpeg
       shell: pwsh
@@ -683,7 +688,7 @@ jobs:
         nmake install
 
     - name: Install Qt 6
-      uses: jurplel/install-qt-action@v3
+      uses: jurplel/install-qt-action@v4
       with:
         arch: win64_msvc2019_64
         version: ${{ matrix.qt_version }}
