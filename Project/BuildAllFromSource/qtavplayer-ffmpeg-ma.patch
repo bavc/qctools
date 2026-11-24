@@ -1,0 +1,59 @@
+From 356b6912790abd619bb2da799f0e08e05a4fccb5 Mon Sep 17 00:00:00 2001
+From: Maxime Gervais <gervais.maxime@gmail.com>
+Date: Sun, 8 Nov 2026 13:06:23 +0100
+Subject: [PATCH] Allow FFmpeg libraries with a custom suffix
+
+FFmpeg built with --build-suffix=-ma installs libraries such as libavcodec-ma and libavformat-ma. Allow callers to select these library names from both the qmake and CMake builds.
+
+The suffix is empty by default, preserving the names used by regular
+FFmpeg builds.
+---
+ qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.cmake | 18 ++++++++++--------
+ qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.pri   |  3 ++-
+ 2 files changed, 12 insertions(+), 9 deletions(-)
+
+diff --git a/qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.cmake b/qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.cmake
+index 970a2dc..dc59fdd 100644
+--- a/qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.cmake
++++ b/qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.cmake
+@@ -10,14 +10,16 @@ option(QT_AVPLAYER_WIDGET_OPENGL "Enable widget opengl" OFF)
+ option(QT_AVPLAYER_LIBASS "Enable libass" OFF)
+ option(QT_AVPLAYER_CUDA "Enable CUDA" OFF)
+ option(QT_AVPLAYER_VULKAN "Enable Vulkan" OFF)
+-
++set(QT_AVPLAYER_FFMPEG_LIBRARY_SUFFIX "" CACHE STRING
++    "Suffix appended to FFmpeg library names (for example, -ma)")
++
+-find_library(AVDEVICE_LIBRARY REQUIRED NAMES avdevice)
+-find_library(AVCODEC_LIBRARY REQUIRED NAMES avcodec)
+-find_library(AVFILTER_LIBRARY REQUIRED NAMES avfilter)
+-find_library(AVFORMAT_LIBRARY REQUIRED NAMES avformat)
+-find_library(AVUTIL_LIBRARY REQUIRED NAMES avutil)
+-find_library(SWRESAMPLE_LIBRARY REQUIRED NAMES swresample)
+-find_library(SWSCALE_LIBRARY REQUIRED NAMES swscale)
++find_library(AVDEVICE_LIBRARY REQUIRED NAMES avdevice${QT_AVPLAYER_FFMPEG_LIBRARY_SUFFIX})
++find_library(AVCODEC_LIBRARY REQUIRED NAMES avcodec${QT_AVPLAYER_FFMPEG_LIBRARY_SUFFIX})
++find_library(AVFILTER_LIBRARY REQUIRED NAMES avfilter${QT_AVPLAYER_FFMPEG_LIBRARY_SUFFIX})
++find_library(AVFORMAT_LIBRARY REQUIRED NAMES avformat${QT_AVPLAYER_FFMPEG_LIBRARY_SUFFIX})
++find_library(AVUTIL_LIBRARY REQUIRED NAMES avutil${QT_AVPLAYER_FFMPEG_LIBRARY_SUFFIX})
++find_library(SWRESAMPLE_LIBRARY REQUIRED NAMES swresample${QT_AVPLAYER_FFMPEG_LIBRARY_SUFFIX})
++find_library(SWSCALE_LIBRARY REQUIRED NAMES swscale${QT_AVPLAYER_FFMPEG_LIBRARY_SUFFIX})
+ 
+ add_compile_definitions(QT_BUILD_QTAVPLAYER_LIB)
+ 
+diff --git a/qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.pri b/qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.pri
+index ed50515..f07fede 100644
+--- a/qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.pri
++++ b/qctools-QtAVPlayer/src/QtAVPlayer/QtAVPlayer.pri
+@@ -1,6 +1,7 @@
+ QT += concurrent
+ CONFIG += C++1z
+-LIBS += -lavcodec -lavformat -lswscale -lavutil -lswresample -lswscale -lavfilter -lavdevice
++isEmpty(FFMPEG_LIBRARY_SUFFIX): FFMPEG_LIBRARY_SUFFIX = $$(FFMPEG_LIBRARY_SUFFIX)
++LIBS += -lavcodec$${FFMPEG_LIBRARY_SUFFIX} -lavformat$${FFMPEG_LIBRARY_SUFFIX} -lswscale$${FFMPEG_LIBRARY_SUFFIX} -lavutil$${FFMPEG_LIBRARY_SUFFIX} -lswresample$${FFMPEG_LIBRARY_SUFFIX} -lswscale$${FFMPEG_LIBRARY_SUFFIX} -lavfilter$${FFMPEG_LIBRARY_SUFFIX} -lavdevice$${FFMPEG_LIBRARY_SUFFIX}
+ DEFINES += QT_BUILD_QTAVPLAYER_LIB
+ 
+ PRIVATE_HEADERS += \
+-- 
+2.56.0
+

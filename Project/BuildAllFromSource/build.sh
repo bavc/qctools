@@ -12,9 +12,10 @@
 # - Ninja binary in the PATH                                                                      #
 # - Git binary in the PATH                                                                        #
 # - CMake binary in the PATH                                                                      #
-# - glslc binary in the PATH                                                                      #
+# - unzip binary in the PATH (macOS)                                                              #
 # Environment:                                                                                    #
 # - MULTIARCH: Compile for arm64 and x86_64 into the same binary (macOS)                          #
+# - FFMPEG_SUFFIX: FFmpeg pkg-config library suffix on Linux (for example, -ma)                   #
 ###################################################################################################
 # setup environment
 set -e
@@ -34,19 +35,9 @@ SCRIPT_DIR=$(cd $(dirname "$0") && pwd)
 INSTALL_DIR=$(cd $(dirname "$0") && cd ../../.. && pwd)
 cd "$INSTALL_DIR"
 
-FFMPEG_CONFIGURE_OPTS=(
-    --enable-gpl
-    --enable-version3
-    --disable-doc
-    --disable-debug
-    --disable-programs
-    --disable-autodetect
-    --enable-static
-    --disable-shared
-    --enable-libfreetype
-    --enable-libharfbuzz
-    --enable-vulkan
-)
+FFMPEG_ARCHIVE_VERSION=Latest
+FFMPEG_DOWNLOAD_URL="https://mediaarea.net/download/binary/ffmpeg/latest"
+FFMPEG_DIR="$INSTALL_DIR/ffmpeg"
 
 QT_CONFIGURE_OPTS=()
 
@@ -55,7 +46,6 @@ if sw_vers >/dev/null 2>&1 ; then
     export CFLAGS="-mmacosx-version-min=11.0 $CFLAGS"
     export CXXFLAGS="-mmacosx-version-min=11.0 $CXXFLAGS"
     export LDFLAGS="-mmacosx-version-min=11.0 $LDFLAGS"
-    FFMPEG_CONFIGURE_OPTS+=(--extra-cflags="-mmacosx-version-min=11.0" --extra-ldflags="-mmacosx-version-min=11.0")
     if [[ -n "$MULTIARCH" ]] ; then
         QT_CONFIGURE_OPTS+=(QMAKE_APPLE_DEVICE_ARCHS="x86_64 arm64")
         mkdir -p $INSTALL_DIR/output/lib
@@ -78,6 +68,19 @@ while read LINE; do
         popd   
     fi
 done < $SCRIPT_DIR/dependencies.txt
+
+if [[ "$OS" == "mac" ]] ; then
+    echo "Download FFmpeg"
+    rm -rf "$FFMPEG_DIR"
+    mkdir -p "$FFMPEG_DIR"
+    for FFMPEG_PACKAGE in Dev Bin ; do
+        FFMPEG_ARCHIVE="FFmpeg_${FFMPEG_PACKAGE}_${FFMPEG_ARCHIVE_VERSION}_Mac_Shared_universal.zip"
+        curl -fL "${FFMPEG_DOWNLOAD_URL}/${FFMPEG_ARCHIVE}" -o "$INSTALL_DIR/$FFMPEG_ARCHIVE"
+        unzip -oq "$INSTALL_DIR/$FFMPEG_ARCHIVE" -d "$FFMPEG_DIR"
+        rm -f "$INSTALL_DIR/$FFMPEG_ARCHIVE"
+    done
+    export FFMPEG="$FFMPEG_DIR"
+fi
 
 # freetype
 echo "Build FreeType"
@@ -166,47 +169,6 @@ pushd vulkan-headers/build
     ninja install
 popd
 
-# ffmpeg
-echo "Build FFmpeg"
-if [[ -d ffmpeg/build ]] ; then
-    rm -fr ffmpeg/build
-fi
-mkdir ffmpeg/build
-pushd ffmpeg/build
-    if [[ "$OS" == "mac" && -n "$MULTIARCH" ]] ; then
-        mkdir x86_64
-        pushd x86_64
-        (
-            export PKG_CONFIG_PATH=$INSTALL_DIR/output/x86_64/lib/pkgconfig
-            ../../configure --arch=x86_64 --extra-cflags="-arch x86_64" --extra-cflags="-I$INSTALL_DIR/output/include" --extra-ldflags="-arch x86_64" --prefix=$INSTALL_DIR/output/x86_64 "${FFMPEG_CONFIGURE_OPTS[@]}"
-            make install
-        )
-        popd
-        mkdir arm64
-        pushd arm64
-        (
-            export PKG_CONFIG_PATH=$INSTALL_DIR/output/arm64/lib/pkgconfig
-            ../../configure --arch=arm64 --extra-cflags="-arch arm64" --extra-cflags="-I$INSTALL_DIR/output/include" --extra-ldflags="-arch arm64" --prefix=$INSTALL_DIR/output/arm64 "${FFMPEG_CONFIGURE_OPTS[@]}"
-            make install
-        )
-        popd
-        lipo -create $INSTALL_DIR/output/x86_64/lib/libavcodec.a $INSTALL_DIR/output/arm64/lib/libavcodec.a -output $INSTALL_DIR/output/lib/libavcodec.a
-        lipo -create $INSTALL_DIR/output/x86_64/lib/libavdevice.a $INSTALL_DIR/output/arm64/lib/libavdevice.a -output $INSTALL_DIR/output/lib/libavdevice.a
-        lipo -create $INSTALL_DIR/output/x86_64/lib/libavfilter.a $INSTALL_DIR/output/arm64/lib/libavfilter.a -output $INSTALL_DIR/output/lib/libavfilter.a
-        lipo -create $INSTALL_DIR/output/x86_64/lib/libavformat.a $INSTALL_DIR/output/arm64/lib/libavformat.a -output $INSTALL_DIR/output/lib/libavformat.a
-        lipo -create $INSTALL_DIR/output/x86_64/lib/libavutil.a $INSTALL_DIR/output/arm64/lib/libavutil.a -output $INSTALL_DIR/output/lib/libavutil.a
-        lipo -create $INSTALL_DIR/output/x86_64/lib/libswresample.a $INSTALL_DIR/output/arm64/lib/libswresample.a -output $INSTALL_DIR/output/lib/libswresample.a
-        lipo -create $INSTALL_DIR/output/x86_64/lib/libswscale.a $INSTALL_DIR/output/arm64/lib/libswscale.a -output $INSTALL_DIR/output/lib/libswscale.a
-        cp -r $INSTALL_DIR/output/x86_64/include $INSTALL_DIR/output
-    else
-    (
-        export PKG_CONFIG_PATH=$INSTALL_DIR/output/lib/pkgconfig
-        ../configure --prefix=$INSTALL_DIR/output "${FFMPEG_CONFIGURE_OPTS[@]}"
-        make install
-    )
-    fi
-popd
-
 # qwt
 echo "Build Qwt"
 if [[ -d qwt/build ]] ; then
@@ -232,9 +194,19 @@ pushd qctools/Project/QtCreator/build
 (
     git -C .. apply "$SCRIPT_DIR/qtavplayer-pktinfo.patch"
     git -C .. apply "$SCRIPT_DIR/qtavplayer-hwframe.patch"
-    git -C .. apply "$SCRIPT_DIR/qtavplayer-vulkan-texture-guard.patch"
-    export QWT_ROOT=$INSTALL_DIR/output FFMPEG=$INSTALL_DIR/output
-    $BINQMAKE "${QT_CONFIGURE_OPTS[@]}" STATIC=1 ..
+    git -C .. apply "$SCRIPT_DIR/qtavplayer-ffmpeg-ma.patch"
+    QMAKE_OPTS=("${QT_CONFIGURE_OPTS[@]}" STATIC=1)
+    if [[ "$OS" == "mac" ]] ; then
+        export FFMPEG="$FFMPEG_DIR"
+    else
+        QMAKE_OPTS+=(FFMPEG_USE_SYSTEM=true)
+    fi
+    FFMPEG_SUFFIX="${FFMPEG_SUFFIX:-${FFMPEG_LIBRARY_SUFFIX:-}}"
+    if [[ "$OS" != "mac" && -n "$FFMPEG_SUFFIX" ]] ; then
+        QMAKE_OPTS+=(FFMPEG_LIBRARY_SUFFIX="$FFMPEG_SUFFIX")
+    fi
+    export QWT_ROOT=$INSTALL_DIR/output
+    $BINQMAKE "${QMAKE_OPTS[@]}" ..
     make
 )
 popd

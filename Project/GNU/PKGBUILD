@@ -11,13 +11,9 @@ source=(${pkgname}_${pkgver}-1.tar.gz)
 md5sums=('00000000000000000000000000000000')
 arch=('x86_64')
 
-depends=('qt6-base' 'qt6-svg' 'qt6-multimedia' 'qt6-multimedia-ffmpeg' 'qt6-declarative' 'freetype2' 'harfbuzz' 'zlib' 'nasm' 'shaderc' 'vulkan-headers')
+depends=('qt6-base' 'qt6-svg' 'qt6-multimedia' 'qt6-multimedia-ffmpeg' 'qt6-declarative' 'freetype2' 'harfbuzz' 'zlib' 'vulkan-headers' 'ffmpeg-ma')
 
 build() {
-    cd "${srcdir}/qctools/ffmpeg"
-    ./configure --prefix="$(pwd)" --enable-gpl --enable-version3 --disable-autodetect --disable-programs --enable-static --disable-shared --disable-doc --disable-debug --enable-libfreetype --enable-libharfbuzz --enable-vulkan
-    make
-
     cd "${srcdir}/qctools/qwt"
     patch -p1 < ../qctools/Project/BuildAllFromSource/qwt.patch
     export QWT_STATIC=1 QWT_NO_SVG=1 QWT_NO_OPENGL=1 QWT_NO_DESIGNER=1
@@ -30,10 +26,10 @@ build() {
     cd Project/QtCreator
     patch -p1 < ../BuildAllFromSource/qtavplayer-pktinfo.patch
     patch -p1 < ../BuildAllFromSource/qtavplayer-hwframe.patch
-    patch -p1 < ../BuildAllFromSource/qtavplayer-vulkan-texture-guard.patch
+    patch -p1 < ../BuildAllFromSource/qtavplayer-ffmpeg-ma.patch
     mkdir build
     cd build
-    qmake6 -after LIBS+=-lharfbuzz LIBS+=-lfreetype ..
+    qmake6 FFMPEG_USE_SYSTEM=true FFMPEG_LIBRARY_SUFFIX=-ma -after LIBS+=-lharfbuzz LIBS+=-lfreetype ..
     make
 }
 

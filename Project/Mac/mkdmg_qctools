@@ -2,9 +2,13 @@
 APPNAME="QCTools"
 SIGNATURE="MediaArea.net"
 BUNDLEID="net.mediaarea.qctools.mac"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 DMG="tmp-${APPNAME}.dmg"
 FILES="tmp-${APPNAME}"
+APP="${FILES}/${APPNAME}.app"
+FRAMEWORKS="${APP}/Contents/Frameworks"
+EXECUTABLE="${APP}/Contents/MacOS/${APPNAME}"
 
 # Create the package
 rm -rf "${FILES}"
@@ -14,11 +18,17 @@ rm -f "${APPNAME}.dmg"
 mkdir "${FILES}"
 mkdir "${FILES}/.background"
 cp -R "../QtCreator/build/qctools-gui/${APPNAME}.app" "${FILES}/"
-rm -fr "${FILES}/${APPNAME}.app/Contents/Frameworks"
-rm -fr "${FILES}/${APPNAME}.app/Contents/Library"
+rm -rf "${FRAMEWORKS}"
+rm -rf "${APP}/Contents/Library"
 
-codesign -f --deep --options=runtime -s "Developer ID Application: ${SIGNATURE}" -i "${BUNDLEID}" --verbose "${FILES}/${APPNAME}.app/Contents/MacOS/${APPNAME}"
-codesign -f --deep --options=runtime -s "Developer ID Application: ${SIGNATURE}" --verbose "${FILES}/${APPNAME}.app"
+. "${SCRIPT_DIR}/ffmpeg_dylibs.sh"
+bundle_ffmpeg_dylibs "${FRAMEWORKS}" "@executable_path/../Frameworks" "${EXECUTABLE}" || exit 1
+
+for DYLIB in "${FRAMEWORKS}"/*.dylib ; do
+    codesign -f --options=runtime -s "Developer ID Application: ${SIGNATURE}" --verbose "${DYLIB}"
+done
+codesign -f --deep --options=runtime -s "Developer ID Application: ${SIGNATURE}" -i "${BUNDLEID}" --verbose "${EXECUTABLE}"
+codesign -f --deep --options=runtime -s "Developer ID Application: ${SIGNATURE}" --verbose "${APP}"
 
 cp ../../License.html "${FILES}/License.html"
 cp ../../History.txt "${FILES}/History.txt"
